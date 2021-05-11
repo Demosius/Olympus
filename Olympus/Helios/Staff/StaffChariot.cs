@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Olympus.Helios.Users
+namespace Olympus.Helios.Staff
 {
-    class UserChariot
+    class StaffChariot
     {
     }
 }

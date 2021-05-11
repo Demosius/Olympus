@@ -23,5 +23,10 @@ namespace Olympus
         {
             InitializeComponent();
         }
+
+        public void function()
+        {
+            Helios.generateDataSystem();
+        }
     }
 }

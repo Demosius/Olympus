@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Olympus.Helios.Staff;
 
-namespace Olympus.Helios.Users
+namespace Olympus.Helios
 {
-    class UserChariot
+    class Helios_Staff
     {
     }
 }

@@ -9,17 +9,16 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Olympus.Prometheus
+namespace Olympus.Charon
 {
     /// <summary>
-    /// Interaction logic for Prometheus.xaml
+    /// Interaction logic for Charon.xaml
     /// </summary>
-    public partial class Prometheus : Page
+    public partial class Charon : Window
     {
-        public Prometheus()
+        public Charon()
         {
             InitializeComponent();
         }
