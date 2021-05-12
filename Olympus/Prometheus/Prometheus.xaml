@@ -9,6 +9,16 @@
       Title="Prometheus">
 
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" MinWidth="300"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <Image Margin="5,5,5,5" Source="../Resources/Images/Olympus.jpg"/>
+        <DataGrid Grid.Row="0" Grid.Column="1" Margin="5,5,5,5" Height="Auto" Width="Auto"/>
     </Grid>
 </Page>

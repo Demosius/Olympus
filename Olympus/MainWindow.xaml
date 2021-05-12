@@ -3,21 +3,23 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Olympus"
+        xmlns:local="clr-namespace:Olympus" 
+        xmlns:Control="clr-namespace:Olympus.Components"
+        
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800">
+        Title="Olympus" WindowState="Maximized"
+        Icon="./Resources/Images/Icons/icons8-mountain-96.png">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="150"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+
+        <Control:Navbar Grid.Row="0" Grid.Column="0"/>
+        <Frame  Margin="10,10,10,10" x:Name="OView" Grid.Row="1" Grid.Column="0" Height="Auto"/>
     </Grid>
 </Window>

@@ -76,6 +76,22 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Components\DB_Selection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Components\Navbar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Components\ProjectSelection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Components\SignIn.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -87,14 +103,40 @@
     <Compile Include="Charon\Charon.xaml.cs">
       <DependentUpon>Charon.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Components\DB_Selection.xaml.cs">
+      <DependentUpon>DB_Selection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\Navbar.xaml.cs">
+      <DependentUpon>Navbar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\ProjectSelection.xaml.cs">
+      <DependentUpon>ProjectSelection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\SignIn.xaml.cs">
+      <DependentUpon>SignIn.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helios\Helios_Machines.cs" />
     <Compile Include="Helios\Helios_Staff.cs" />
     <Compile Include="Helios\Helios_Users.cs" />
     <Compile Include="Helios\Helios_Utility.cs" />
     <Compile Include="Helios\Helios_Inventory.cs" />
+    <Compile Include="Helios\Inventory\Bay.cs" />
+    <Compile Include="Helios\Inventory\Bin.cs" />
+    <Compile Include="Helios\Inventory\Item.cs" />
+    <Compile Include="Helios\Inventory\Stock.cs" />
+    <Compile Include="Helios\Inventory\Warehouse.cs" />
+    <Compile Include="Helios\Inventory\Zone.cs" />
+    <Compile Include="Helios\Machines\Forklift.cs" />
+    <Compile Include="Helios\Machines\Machine.cs" />
     <Compile Include="Helios\Machines\MachineChariot.cs" />
+    <Compile Include="Helios\Machines\Rabbit.cs" />
+    <Compile Include="Helios\Machines\Stockpicker.cs" />
     <Compile Include="Helios\MasterChariot.cs" />
+    <Compile Include="Helios\Staff\Department.cs" />
+    <Compile Include="Helios\Staff\Employee.cs" />
+    <Compile Include="Helios\Staff\Shift.cs" />
     <Compile Include="Helios\Staff\StaffChariot.cs" />
+    <Compile Include="Helios\Users\User.cs" />
     <Compile Include="Helios\Users\UserChariot.cs" />
     <Compile Include="Helios\Inventory\InventoryChariot.cs" />
     <Compile Include="MainWindow.xaml.cs">
@@ -139,7 +181,16 @@
     <None Include="Sol\Users\Users.sqlite" />
     <None Include="Sol\Warehouse\Warehouse.sqlite" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Fantasy-background-incredible-places.jpg" />
+    <Resource Include="Resources\Images\fantasy-cave.jpg" />
+    <Resource Include="Resources\Images\Olympus.jpg" />
+    <Resource Include="Resources\Images\wicked_force.jpg" />
+  </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resources\Images\Icons\icons8-mountain-96.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

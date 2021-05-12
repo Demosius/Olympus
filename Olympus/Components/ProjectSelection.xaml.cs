@@ -11,19 +11,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Olympus.Components;
 
-namespace Olympus
+namespace Olympus.Components
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for ProjectSelection.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ProjectSelection : UserControl
     {
-        public MainWindow()
+        public ProjectSelection()
         {
             InitializeComponent();
-            OView.Navigate(new Prometheus.Prometheus());
         }
     }
 }
