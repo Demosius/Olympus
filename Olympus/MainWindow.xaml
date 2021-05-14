@@ -8,7 +8,7 @@
         
         mc:Ignorable="d"
         Title="Olympus" WindowState="Maximized"
-        Icon="./Resources/Images/Icons/icons8-mountain-96.png">
+        Icon="./Resources/Images/Icons/olympus.png">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

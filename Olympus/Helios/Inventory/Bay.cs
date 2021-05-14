@@ -5,7 +5,13 @@ using System.Text;
 
 namespace Olympus.Helios.Inventory
 {
-    class Bay
-    {
+    public class Bay
+    {   
+        public string Name { get; set; }
+
+        public Bay()
+        {
+
+        }
     }
 }
