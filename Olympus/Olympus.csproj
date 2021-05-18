@@ -179,10 +179,10 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="settings.json" />
-    <None Include="Sol\Staff\Staff.sqlite" />
+    <None Include="Sol\Inventory\Inventory.sqlite" />
     <None Include="Sol\Machines\Machines.sqlite" />
+    <None Include="Sol\Staff\Staff.sqlite" />
     <None Include="Sol\Users\Users.sqlite" />
-    <None Include="Sol\Warehouse\Warehouse.sqlite" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Images\Fantasy-background-incredible-places.jpg" />
