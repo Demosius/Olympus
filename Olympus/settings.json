@@ -1,3 +1,4 @@
 {
-  "solLocation": "./Sol"
+  "SolLocation": "./Sol",
+  "ItemCSVLocation": "//ausefpdfs01ns/Shares/Public/IMR/Australia/Pricebook/IMR_PriceBookSalesRanking.csv"
 }
