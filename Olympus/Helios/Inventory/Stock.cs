@@ -85,4 +85,47 @@ namespace Olympus.Helios.Inventory
             }
         }
     }
+
+    /// <summary>
+    ///  A simplified version of stock that is not connected to any other objects, and can be converted directly to and from bin contents.
+    /// </summary>
+    public class SimpleStock
+    {
+        public string Location { get; set; }
+        public string ZoneCode { get; set; }
+        public string BinCode { get; set; }
+        public int ItemNumber { get; set; }
+        public string BarCode { get; set; }
+        public string UoMCode { get; set; }
+        public int Qty { get; set; }
+        public int PickQty { get; set; }
+        public int PutAwayQty { get; set; }
+        public int NegAdjQty { get; set; }
+        public int PosAdjQty { get; set; }
+        public DateTime DateCreated { get; set; }
+        public DateTime TimeCreated { get; set; }
+        public bool Fixed { get; set; }
+
+        public SimpleStock() { }
+
+        public SimpleStock(string location, string zoneCode, string binCode, int itemNumber, string barCode, string uomCode, 
+                            int qty, int pickQty, int putAwayQty, int negAdjQty, int posAdjQty, DateTime dateCreated, DateTime timeCreated, 
+                            bool _fixed)
+        {
+            Location = location;
+            ZoneCode = zoneCode;
+            BinCode = binCode;
+            ItemNumber = itemNumber;
+            BarCode = barCode;
+            UoMCode = uomCode;
+            Qty = qty;
+            PickQty = pickQty;
+            PutAwayQty = putAwayQty;
+            NegAdjQty = negAdjQty;
+            PosAdjQty = posAdjQty;
+            DateCreated = dateCreated;
+            TimeCreated = timeCreated;
+            Fixed = _fixed;
+        }
+    }
 }

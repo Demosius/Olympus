@@ -88,5 +88,11 @@ namespace Olympus.Helios
             return missing;
         }
 
+        public static bool MoveDataBase(string newLocation)
+        {
+
+            return false;
+        }
+
     }
 }

@@ -57,4 +57,45 @@ namespace Olympus.Helios
             return lik;
         }
     }
+
+    /// <summary>
+    ///  Represents a basic class for use of holding stock items in a list and converting to JSON.
+    /// </summary>
+    public class BinContents
+    {
+        public DateTime DateTime { get; set; }
+        public List<SimpleStock> Stock { get; set; }
+
+        public BinContents()
+        {
+            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            DateTime = chariot.LastTableUpdate("stock");
+            DataTable data = chariot.GetStockTable();
+            Stock = DataTableToStockList(data);
+        }
+
+        public BinContents(List<SimpleStock> stock)
+        {
+            DateTime = DateTime.Now;
+            Stock = stock;
+        }
+
+        public BinContents(DataTable data)
+        {
+            DateTime = DateTime.Now;
+            Stock = DataTableToStockList(data);
+        } 
+
+        private List<SimpleStock> DataTableToStockList(DataTable data)
+        {
+            List<SimpleStock> newList = new List<SimpleStock> { };
+
+            foreach (DataRow row in data.Rows)
+            {
+                newList.Add(new SimpleStock(row["location"], row["zone_code"], row["bin"], row["location"], row["location"], row["location"], row["location"], row["location"], row["location"], row["location"], row["location"], row["location"], row["location"]));
+            }
+
+            return newList;
+        }
+    }
 }
