@@ -23,6 +23,11 @@ namespace Olympus
 
     public static class Toolbox
     {
+        public static void ShowUnexpectedException(Exception ex)
+        {
+            MessageBox.Show($"Unexpected Exception:\n\n{ex}\n\nNotify Olympus development when possible.");
+        }
+
 
         public static Settings GetSettings()
         {
@@ -59,7 +64,7 @@ namespace Olympus
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Unexpected exception: \n" + ex);
+                ShowUnexpectedException(ex);
                 throw;
             }
             // Make sure the final filder is Sol, and create the directory if it doesn't exist.
@@ -102,7 +107,7 @@ namespace Olympus
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Unexpected exception: \n" + ex);
+                ShowUnexpectedException(ex);
                 throw;
             }
             Settings settings = GetSettings();

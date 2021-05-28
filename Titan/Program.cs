@@ -23,7 +23,33 @@ namespace Titan
         {
             InvPushTest();
 
+            CheckStockDate();
+
             _ = Console.ReadLine();
+        }
+
+        public static void CheckTableDatePull()
+        {
+            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            Console.WriteLine(chariot.LastTableUpdate("bin"));
+        }
+
+        public static void CheckStockDate()
+        {
+            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            Console.WriteLine(chariot.LastStockUpdate(new List<string> { "PR", "PK" }));
+        }
+
+        public static void TestDBRepair()
+        {
+            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            chariot.RepairDatabase();
+        }
+
+        public static void TestDBValidation()
+        {
+            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            chariot.ValidateDatabase();
         }
 
         public static string ToLiteral(string input)
@@ -90,24 +116,75 @@ namespace Titan
 
         public static void InvPushTest()
         {
+            char choice;
+            do
+            {
+                Console.Write($"[I] - Items\n[B] - Bins\n[S] - Stock\n[U] - UoM\n[Q] - Quit\nChoose: ... ");
 
-            Console.WriteLine("Press enter to begin: ...");
-            Console.ReadLine();
+                choice = Console.ReadLine().ToLower()[0];
 
+                switch (choice)
+                {
+                    case 'i':
+                        PushItems();
+                        break;
+                    case 'b':
+                        PushBins();
+                        break;
+                    case 's':
+                        PushStock();
+                        break;
+                    case 'u':
+                        PushUoM();
+                        break;
+                }
+                    
+            } while (choice != 'q');
+        }
+
+        public static void PushBins()
+        {
             Stopwatch stopwatch = new Stopwatch();
-
             stopwatch.Start();
 
-            //PushInventory.BinsFromClipboard();
-            //PushInventory.ItemsFromCSV();
-            //PushInventory.StockFromClipboard();
-            PushInventory.UoMFromClipboard();
+            PushInventory.BinsFromClipboard();
 
             stopwatch.Stop();
-
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to update Bin data.");
         }
 
+        public static void PushItems()
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            PushInventory.ItemsFromCSV();
+
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to update Item data.");
+        }
+
+        public static void PushStock()
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            PushInventory.StockFromClipboard();
+
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to update Stock data.");
+        }
+
+        public static void PushUoM()
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            PushInventory.UoMFromClipboard();
+
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to update UoM data.");
+        }
         public static void PathTesting(string path = @"\\ausefpdfs01ns\Shares\Public\IMR\Australia\Pricebook\IMR_PriceBookSalesRanking.csv")
         {
             Console.WriteLine(Path.GetFullPath(path));

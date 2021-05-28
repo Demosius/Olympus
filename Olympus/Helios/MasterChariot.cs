@@ -37,7 +37,7 @@ namespace Olympus.Helios
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Unexpected exception:\n\n{ex}");
+                Toolbox.ShowUnexpectedException(ex);
             }
         }
 
@@ -100,7 +100,7 @@ namespace Olympus.Helios
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failure to update {tableName} data - Unexpected Exception:\n\n{ex}");
+                Toolbox.ShowUnexpectedException(ex);
                 return false;
             }
         }
@@ -123,7 +123,25 @@ namespace Olympus.Helios
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Unexpected exception:\n\n{ex}");
+                Toolbox.ShowUnexpectedException(ex);
+            }
+            return data;
+        }
+
+        public DataTable PullTableWithQuery(string query)
+        {
+            DataTable data = new DataTable();
+            try
+            {
+                Conn.Open();
+                SQLiteCommand command = new SQLiteCommand(Conn) { CommandText = query };
+                SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
+                adapter.Fill(data);
+                Conn.Close();
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
             }
             return data;
         }
@@ -141,7 +159,9 @@ namespace Olympus.Helios
 
         public abstract bool EmptyDatabase();
 
-        public abstract void CreateTable();
+        public abstract bool CreateTable(string tableName);
+
+        public abstract bool CreateTables();
 
     }
 }
