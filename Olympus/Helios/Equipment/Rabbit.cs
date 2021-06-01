@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Olympus.Helios.Machines;
 
-namespace Olympus.Helios
+namespace Olympus.Helios.Equipment
 {
-    class Helios_Machines
+    class Rabbit
     {
     }
 }

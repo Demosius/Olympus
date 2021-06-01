@@ -8,7 +8,6 @@ using Olympus.Helios.Inventory;
 using Olympus.Helios;
 using Olympus;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Data;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
@@ -23,9 +22,37 @@ namespace Titan
         {
             InvPushTest();
 
-            CheckStockDate();
-
             _ = Console.ReadLine();
+        }
+
+        public static void TestBCDeserial()
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            BinContents bc = GetInventory.BCFromFile(@"C:\Users\aarop\BC_2ds0210601-0858.json");
+
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to pull and deserialize bin cointents from file.");
+
+            Console.WriteLine(bc.DateTime);
+            if (bc.Stock.Count >= 3)
+            {
+                Console.WriteLine(bc.Stock[0].BinCode);
+                Console.WriteLine(bc.Stock[1].BinCode);
+                Console.WriteLine(bc.Stock[2].BinCode);
+            }
+        }
+
+        public static void TestBCSerial()
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            
+            PutInventory.BCFromDB("C:/Users/aarop");
+
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to pull and serialize bin cointents.");
         }
 
         public static void CheckTableDatePull()
@@ -107,7 +134,7 @@ namespace Titan
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            DataTable data = PullInventory.Bins();
+            DataTable data = GetInventory.Bins();
 
             stopwatch.Stop();
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to pull Bin data.");
@@ -116,12 +143,14 @@ namespace Titan
 
         public static void InvPushTest()
         {
+            string entry;
             char choice;
             do
             {
                 Console.Write($"[I] - Items\n[B] - Bins\n[S] - Stock\n[U] - UoM\n[Q] - Quit\nChoose: ... ");
 
-                choice = Console.ReadLine().ToLower()[0];
+                entry = Console.ReadLine();
+                choice = (entry != "") ? entry.ToLower()[0] : 'q';
 
                 switch (choice)
                 {
@@ -147,7 +176,7 @@ namespace Titan
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            PushInventory.BinsFromClipboard();
+            PutInventory.BinsFromClipboard();
 
             stopwatch.Stop();
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to update Bin data.");
@@ -158,7 +187,7 @@ namespace Titan
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            PushInventory.ItemsFromCSV();
+            PutInventory.ItemsFromCSV();
 
             stopwatch.Stop();
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to update Item data.");
@@ -169,7 +198,7 @@ namespace Titan
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            PushInventory.StockFromClipboard();
+            PutInventory.StockFromClipboard();
 
             stopwatch.Stop();
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to update Stock data.");
@@ -180,7 +209,7 @@ namespace Titan
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            PushInventory.UoMFromClipboard();
+            PutInventory.UoMFromClipboard();
 
             stopwatch.Stop();
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to update UoM data.");

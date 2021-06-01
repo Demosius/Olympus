@@ -40,7 +40,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>castle_icon_155982.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Images\Icons\castle_icon_155982.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -80,8 +80,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Charon\Charon.cs" />
+    <Compile Include="Charon\LogIn.xaml.cs">
+      <DependentUpon>LogIn.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Charon\Register.xaml.cs">
+      <DependentUpon>Register.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Toolbox.cs" />
-    <Page Include="Charon\Charon.xaml">
+    <Page Include="Charon\LogIn.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Charon\Register.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -109,9 +120,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Charon\Charon.xaml.cs">
-      <DependentUpon>Charon.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Components\DB_Selection.xaml.cs">
       <DependentUpon>DB_Selection.xaml</DependentUpon>
     </Compile>
@@ -125,7 +133,7 @@
       <DependentUpon>SignIn.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helios\DataConversion.cs" />
-    <Compile Include="Helios\Helios_Machines.cs" />
+    <Compile Include="Helios\Helios_Equipment.cs" />
     <Compile Include="Helios\Helios_Staff.cs" />
     <Compile Include="Helios\Helios_Users.cs" />
     <Compile Include="Helios\Helios_Utility.cs" />
@@ -138,11 +146,11 @@
     <Compile Include="Helios\Inventory\UoM.cs" />
     <Compile Include="Helios\Inventory\Warehouse.cs" />
     <Compile Include="Helios\Inventory\Zone.cs" />
-    <Compile Include="Helios\Machines\Forklift.cs" />
-    <Compile Include="Helios\Machines\Machine.cs" />
-    <Compile Include="Helios\Machines\MachineChariot.cs" />
-    <Compile Include="Helios\Machines\Rabbit.cs" />
-    <Compile Include="Helios\Machines\Stockpicker.cs" />
+    <Compile Include="Helios\Equipment\Forklift.cs" />
+    <Compile Include="Helios\Equipment\Machine.cs" />
+    <Compile Include="Helios\Equipment\EquipmentChariot.cs" />
+    <Compile Include="Helios\Equipment\Rabbit.cs" />
+    <Compile Include="Helios\Equipment\Stockpicker.cs" />
     <Compile Include="Helios\MasterChariot.cs" />
     <Compile Include="Helios\Staff\Department.cs" />
     <Compile Include="Helios\Staff\Employee.cs" />
@@ -216,7 +224,7 @@
     <Resource Include="Resources\Images\Icons\olympus.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="castle_icon_155982.ico" />
+    <Resource Include="Resources\Images\Icons\castle_icon_155982.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

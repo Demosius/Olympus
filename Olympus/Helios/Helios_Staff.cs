@@ -6,7 +6,23 @@ using Olympus.Helios.Staff;
 
 namespace Olympus.Helios
 {
-    class Helios_Staff
+    public class GetStaff
     {
+
+    }
+
+    public class PutStaff
+    {
+
+    }
+
+    public class PostStaff
+    {
+
+    }
+
+    public class DeleteStaff
+    {
+
     }
 }

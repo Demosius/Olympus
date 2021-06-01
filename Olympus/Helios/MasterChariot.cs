@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,7 +30,7 @@ namespace Olympus.Helios
             {
                 Conn = new SQLiteConnection($@"URI=file:{FilePath}");
                 if (Conn == null) 
-                    throw new FailedConnectionException($"Failed to connect to {FilePath}, might be invalid path.");
+                    throw new FailedConnectionException($"Failed to connect to {FilePath}, might be an invalid path.");
             }
             catch (FailedConnectionException ex)
             {
@@ -93,6 +94,11 @@ namespace Olympus.Helios
                 Conn.Close();
                 return true;
             }
+            catch (SQLiteException ex)
+            {
+                MessageBox.Show($"Error with the data being input:\n\n{ex}\n\nCommon issues include newlines in coppied text that shouldn't be there. Check the data, and try again.");
+                return false;
+            }
             catch (InvalidDataException ex)
             {
                 MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
@@ -149,19 +155,252 @@ namespace Olympus.Helios
         // Basic database management on a higher level. 
         // Each simply retruns true if the action was successful, often based
         // on whether the database is valid.
-        public abstract bool RepairDatabase();
+        public virtual bool DeleteDatabase()
+        {
+            if (!File.Exists(FilePath)) return true;
+            try
+            {
+                File.Delete(FilePath);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
-        public abstract bool ValidateDatabase();
+        public virtual bool BuildDatabase()
+        {
+            if (File.Exists(FilePath)) return false;
+            try
+            {
+                // Create File and reconnect.
+                SQLiteConnection.CreateFile(FilePath);
+                Connect();
+                // Build Tables
+                CreateTables();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        /// <summary>
+        ///  Empties all tables of data.
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool EmptyDatabase()
+        {
+            try
+            {
+                Conn.Open();
+                using (var transaction = Conn.BeginTransaction())
+                {
+                    foreach (string table in TableDefinitions.Keys)
+                    {
+                        string sql = $"DELETE FROM {table};";
+                        SQLiteCommand command = new SQLiteCommand(sql, Conn);
+                        command.ExecuteNonQuery();
+                    }
+                    transaction.Commit();
+                }
+                Conn.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return false;
+            }
+        }
 
-        public abstract bool DeleteDatabase();
+        /// <summary>
+        ///  Goes through validation checks, but aims to repair the database if it failes.
+        ///  Most avenues lead to rebuilding from scratch.
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool RepairDatabase()
+        {
+            try
+            {
+                // If file does not exist, build from scratch.
+                if (!File.Exists(FilePath))
+                {
+                    if (!BuildDatabase())
+                        return false;
+                }
+                // If connection cannot be made, try to delete and then rebuild from scratch.
+                Conn = new SQLiteConnection($@"URI=file:{FilePath}");
+                if (Conn == null)
+                {
+                    DeleteDatabase();
+                    BuildDatabase();
+                }
+                Conn.Open();
+                // If Opening failes, rebuild from scratch.
+                if (Conn.State == ConnectionState.Closed)
+                {
+                    DeleteDatabase();
+                    BuildDatabase();
+                }
 
-        public abstract bool BuildDatabase();
+                // Check for each table, and create it if it is missing.
+                // Check tables exist.
+                DataTable tables = Conn.GetSchema("Tables");
+                string tblName;
+                // Create a dictionary for checking tables.
+                Dictionary<string, bool> tableCheck = new Dictionary<string, bool> { };
+                foreach (string name in TableDefinitions.Keys)
+                    tableCheck.Add(name, false);
 
-        public abstract bool EmptyDatabase();
+                // Check through table schema to make sure all necessary tables exist.
+                // (Extra tables are not of concern.)
+                foreach (DataRow row in tables.Rows)
+                {
+                    tblName = row["TABLE_NAME"].ToString();
+                    if (tableCheck.ContainsKey(tblName))
+                    {
+                        tableCheck[tblName] = true;
+                    }
+                }
 
-        public abstract bool CreateTable(string tableName);
+                foreach (KeyValuePair<string, bool> pair in tableCheck)
+                {
+                    if (!pair.Value)
+                    {
+                        CreateTable(pair.Key);
+                    }
+                }
 
-        public abstract bool CreateTables();
+                Conn.Close();
+                return true;
+            }
+            catch (FailedConnectionException ex)
+            {
+                MessageBox.Show(ex.Message);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return false;
+            }
+        }
 
+        /// <summary>
+        ///  Checks if the database is valid.
+        ///  Checks to the level of table existance - not columns at this point.
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool ValidateDatabase()
+        {
+            try
+            {
+                // Check file exists.
+                if (!File.Exists(FilePath)) return false;
+
+                // Check connection works.
+                Connect();
+
+                // Check Connection can be opened.
+                Conn.Open();
+
+                // Check tables exist.
+                DataTable tables = Conn.GetSchema("Tables");
+                string tblName;
+                // Create a dictionary for checking tables.
+                Dictionary<string, bool> tableCheck = new Dictionary<string, bool> { };
+                foreach (string name in TableDefinitions.Keys)
+                    tableCheck.Add(name, false);
+
+                // Check through table schema to see if all necessary tables exist.
+                // (Extra tables are not of concern.)
+                foreach (DataRow row in tables.Rows)
+                {
+                    tblName = row["TABLE_NAME"].ToString();
+                    if (tableCheck.ContainsKey(tblName))
+                    {
+                        tableCheck[tblName] = true;
+                    }
+                }
+
+                foreach (bool pass in tableCheck.Values)
+                {
+                    if (!pass)
+                    {
+                        return false;
+                    }
+                }
+
+                // Close the connection.
+                Conn.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return false;
+            }
+        }
+
+        /// <summary>
+        ///  Create table based on definition derived by string.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public virtual bool CreateTable(string tableName)
+        {
+            tableName = tableName.ToLower();
+            if (!TableDefinitions.ContainsKey(tableName))
+            {
+                MessageBox.Show($"{tableName} is not a valid table name.");
+                return false;
+            }
+            try
+            {
+                Conn.Open();
+                SQLiteCommand command = new SQLiteCommand(TableDefinitions[tableName], Conn);
+                command.ExecuteNonQuery();
+                Conn.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return false;
+            }
+        }
+
+        /// <summary>
+        ///  Create all required tables based on table definitions.
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool CreateTables()
+        {
+            try
+            {
+                Conn.Open();
+                using (var transaction = Conn.BeginTransaction())
+                {
+                    foreach (string sql in TableDefinitions.Values)
+                    {
+                        SQLiteCommand command = new SQLiteCommand(sql, Conn);
+                        command.ExecuteNonQuery();
+                    }
+                    transaction.Commit();
+                }
+                Conn.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return false;
+            }
+        }
+
+        // Placeholder to be overriden with new.
+        public abstract Dictionary<string, string> TableDefinitions { get; }
     }
 }
