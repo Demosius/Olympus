@@ -87,6 +87,7 @@
     <Compile Include="Charon\Register.xaml.cs">
       <DependentUpon>Register.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helios\Equipment\Checklist.cs" />
     <Compile Include="Toolbox.cs" />
     <Page Include="Charon\LogIn.xaml">
       <SubType>Designer</SubType>
@@ -201,7 +202,7 @@
     <Content Include="Sol\Inventory\Inventory.sqlite">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Sol\Machines\Machines.sqlite">
+    <Content Include="Sol\Equipment\Equipment.sqlite">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Sol\Staff\Staff.sqlite">

@@ -28,7 +28,7 @@ namespace Olympus.Helios
         {
             try
             {
-                Conn = new SQLiteConnection($@"URI=file:{FilePath}");
+                Conn = new SQLiteConnection($@"URI=file:{FilePath}", true);
                 if (Conn == null) 
                     throw new FailedConnectionException($"Failed to connect to {FilePath}, might be an invalid path.");
             }
@@ -45,6 +45,7 @@ namespace Olympus.Helios
         /***************************** Upload Data *****************************/
 
         // Most basic building block for updating db tables.
+        // Removes all previous data and fully replaces it.
         protected bool ReplaceFullTable(DataTable data, Dictionary<string, string> columns, string tableName)
         {
             try
@@ -54,12 +55,14 @@ namespace Olympus.Helios
                 if (missingCols.Count > 0) throw new InvalidDataException("Invalid Bin Data.", missingCols);
 
                 Conn.Open();
+                // Remove old data.
                 SQLiteCommand delCommand = new SQLiteCommand(Conn)
                 {
                     CommandText = $"DELETE FROM {tableName};"
                 };
                 delCommand.ExecuteNonQuery();
 
+                // Build Insert transaction.
                 using (var transaction = Conn.BeginTransaction())
                 {
                     SQLiteCommand command = Conn.CreateCommand();
@@ -96,7 +99,133 @@ namespace Olympus.Helios
             }
             catch (SQLiteException ex)
             {
-                MessageBox.Show($"Error with the data being input:\n\n{ex}\n\nCommon issues include newlines in coppied text that shouldn't be there. Check the data, and try again.");
+                MessageBox.Show($"Likely a fault with the data being input:\n\n{ex}\n\nCommon issues include newlines in coppied text that shouldn't be there. Check the data, and try again.","Database Error:");
+                return false;
+            }
+            catch (InvalidDataException ex)
+            {
+                MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return false;
+            }
+        }
+
+        // User Replace Into to put a table into an existing table and replacing duplicate data.
+        protected bool OverlayTable(DataTable data, Dictionary<string, string> columns, string tableName)
+        {
+            try
+            {
+                // Check for any missing columns.
+                List<string> missingCols = Utility.ValidateTableData(data, columns);
+                if (missingCols.Count > 0) throw new InvalidDataException("Invalid Bin Data.", missingCols);
+
+                Conn.Open();
+
+                // Build Insert transaction.
+                using (var transaction = Conn.BeginTransaction())
+                {
+                    SQLiteCommand command = Conn.CreateCommand();
+                    command.CommandText =
+                    $@"
+                        REPLACE INTO {tableName}
+                        ({string.Join(", ", columns.Keys)}) 
+                        VALUES (${string.Join(", $", columns.Keys)})
+                    ";
+
+                    foreach (string col in columns.Keys)
+                    {
+                        command.Parameters.Add(new SQLiteParameter('$' + col));
+                    }
+
+                    foreach (DataRow row in data.Rows)
+                    {
+                        int i = 0;
+                        string[] arrCols = columns.Keys.ToArray();
+                        foreach (SQLiteParameter param in command.Parameters)
+                        {
+                            param.Value = row[arrCols[i]];
+                            i++;
+                        }
+                        command.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+
+                }
+
+                Conn.Close();
+                return true;
+            }
+            catch (SQLiteException ex)
+            {
+                MessageBox.Show($"Likely a fault with the data being input:\n\n{ex}\n\nCommon issues include newlines in coppied text that shouldn't be there. Check the data, and try again.", "Database Error:");
+                return false;
+            }
+            catch (InvalidDataException ex)
+            {
+                MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return false;
+            }
+        }
+
+        // Insert data into a table. Assumes that there will be no issues with duplicate data.
+        protected bool InsertIntoTable(DataTable data, Dictionary<string, string> columns, string tableName)
+        {
+            try
+            {
+                // Check for any missing columns.
+                List<string> missingCols = Utility.ValidateTableData(data, columns);
+                if (missingCols.Count > 0) throw new InvalidDataException("Invalid Bin Data.", missingCols);
+
+                Conn.Open();
+
+                // Build Insert transaction.
+                using (var transaction = Conn.BeginTransaction())
+                {
+                    SQLiteCommand command = Conn.CreateCommand();
+                    command.CommandText =
+                    $@"
+                        INSERT INTO {tableName}
+                        ({string.Join(", ", columns.Keys)}) 
+                        VALUES (${string.Join(", $", columns.Keys)})
+                    ";
+
+                    foreach (string col in columns.Keys)
+                    {
+                        command.Parameters.Add(new SQLiteParameter('$' + col));
+                    }
+
+                    foreach (DataRow row in data.Rows)
+                    {
+                        int i = 0;
+                        string[] arrCols = columns.Keys.ToArray();
+                        foreach (SQLiteParameter param in command.Parameters)
+                        {
+                            param.Value = row[arrCols[i]];
+                            i++;
+                        }
+                        command.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+
+                }
+
+                Conn.Close();
+                return true;
+            }
+            catch (SQLiteException ex)
+            {
+                MessageBox.Show($"Likely a fault with the data being input:\n\n{ex}\n\nCommon issues include newlines in coppied text that shouldn't be there. Check the data, and try again.", "Database Error:");
                 return false;
             }
             catch (InvalidDataException ex)

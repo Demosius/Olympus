@@ -109,28 +109,36 @@ namespace Olympus.Helios
         /// <returns>DataTable</returns>
         public static DataTable ClipboardToTable()
         {
-            string rawData = ClipboardToString();
-            byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-            MemoryStream stream = new MemoryStream(byteArray);
-
             DataTable data = new DataTable();
-
-            using (StreamReader reader = new StreamReader(stream))
+            try
             {
-                // First set the headers.
-                string line = reader.ReadLine();
-                string[] headers = line.Split('\t');
-                foreach (string header in headers)
-                    data.Columns.Add(header);
+                string rawData = ClipboardToString();
+                if (rawData == "" || rawData == null) throw new Exception("No data on clipboard.");
 
-                line = reader.ReadLine();
+                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
+                MemoryStream stream = new MemoryStream(byteArray);
 
-                // Add row data.
-                while (line != null)
+                using (StreamReader reader = new StreamReader(stream))
                 {
-                    data.Rows.Add(line.Split('\t'));
+                    // First set the headers.
+                    string line = reader.ReadLine();
+                    string[] headers = line.Split('\t');
+                    foreach (string header in headers)
+                        data.Columns.Add(header);
+
                     line = reader.ReadLine();
+
+                    // Add row data.
+                    while (line != null)
+                    {
+                        data.Rows.Add(line.Split('\t'));
+                        line = reader.ReadLine();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
             }
 
             return data;

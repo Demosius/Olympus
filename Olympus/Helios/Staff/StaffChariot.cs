@@ -103,11 +103,17 @@ namespace Olympus.Helios.Staff
             return PullFullTable("inductionReference");
         }
 
+        /* Lockers */
+        public DataTable GetLockerTable()
+        {
+            return PullFullTable("locker");
+        }
+
         /******************************* Put Data *****************************/
         /****************************** Post Data *****************************/
         /***************************** Delete Data ****************************/
 
-        /****************************Table Definitions*************************/
+        /***************************Table Definitions**************************/
         private static readonly string BorrowsEmpDefinition =
             @"create table borrowsEmp
             (
@@ -169,7 +175,13 @@ namespace Olympus.Helios.Staff
                                          on update cascade on delete set null,
                 role_name       text not null
                     references role
-                        on update cascade on delete restrict
+                        on update cascade on delete restrict,
+                locker_id       int  default null
+                                     references locker
+                                         on update cascade on delete set null,
+                phone           text default null,
+                email           text default null,
+                address         text default null
             );
 
             create unique index employee_display_name_uindex
@@ -177,6 +189,9 @@ namespace Olympus.Helios.Staff
 
             create unique index employee_id_uindex
                 on employee (id);
+
+            create unique index employee_locker_id_uindex
+                on employee (locker_id);
 
             create unique index employee_number_uindex
                 on employee (number);
@@ -232,6 +247,24 @@ namespace Olympus.Helios.Staff
 
             create unique index licence_number_uindex
                 on licence (number);";
+
+        private static readonly string LockerDefinition =
+            @"create table locker
+            (
+                id              int not null
+                    constraint locker_pk
+                        primary key,
+                location        text,
+                employee_number int default null
+                                    references employee
+                                        on update cascade on delete set null
+            );
+
+            create unique index locker_employee_number_uindex
+                on locker (employee_number);
+
+            create unique index locker_id_uindex
+                on locker (id);";
 
         private static readonly string OwnsCarDefinition =
             @"create table ownsCar
@@ -371,6 +404,7 @@ namespace Olympus.Helios.Staff
                     { "induction", InductionDefinition },
                     { "inductionReference", InductionReferenceDefinition },
                     { "licence", LicenceDefinition },
+                    { "locker", LockerDefinition },
                     { "ownsCar", OwnsCarDefinition },
                     { "role", RoleDefinition },
                     { "shift", ShiftDefinition },

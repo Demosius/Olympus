@@ -70,6 +70,12 @@ namespace Olympus.Helios.Equipment
             return PullFullTable("type");
         }
 
+        public DataTable GetMachinesWithType()
+        {
+            string query = $"SELECT machine.*, type.* FROM machine INNER JOIN type ON machine.type_code = type.code;";
+            return PullTableWithQuery(query);
+        }
+
         /******************************* Put Data *****************************/
 
         /****************************** Post Data *****************************/

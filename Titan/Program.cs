@@ -9,6 +9,7 @@ using Olympus.Helios;
 using Olympus;
 using System.Text.Json;
 using System.Data;
+using System.Data.SQLite.Linq;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.CodeDom.Compiler;
@@ -22,7 +23,62 @@ namespace Titan
         {
             InvPushTest();
 
+            CheckColsAfterJoin();
+
             _ = Console.ReadLine();
+        }
+
+        public static void CheckColsAfterJoin()
+        {
+            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            var data = chariot.GetBinsWithContents();
+            foreach (DataColumn column in data.Columns)
+            {
+                Console.WriteLine(column.ColumnName);
+            }
+        }
+
+        public static void StringBuilding(int count)
+        {
+            Console.WriteLine("Press enter to begin: ...");
+            Console.ReadLine();
+            Stopwatch stopwatch;
+            string concat = "";
+            if (count < 100000)
+            {
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
+
+                concat = "";
+                for (int i = 0; i < count; ++i)
+                    concat += i.ToString();
+
+                stopwatch.Stop();
+                Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms for standard concatenation.");
+            }
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            List<string> vs = new List<string> { };
+            for (int i = 0; i < count; ++i)
+                vs.Add(i.ToString());
+            string join = string.Join("", vs);
+
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms using a List Join.");
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            StringBuilder build = new StringBuilder();
+            for (int i = 0; i < count; ++i)
+                build.Append(i);
+
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms using a string builder.");
+
+            Console.WriteLine(concat == build.ToString());
+            Console.WriteLine(concat == join);
+            Console.WriteLine(join == build.ToString());
         }
 
         public static void TestBCDeserial()
@@ -118,7 +174,7 @@ namespace Titan
 
             foreach (DataRow row in data.Rows)
             {
-                row["NewUsed"] = (row["NewUsed"].ToString() == "Used") ? true : false;
+                row["NewUsed"] = (row["NewUsed"].ToString() == "Used");
             }
 
             stopwatch.Stop();
@@ -497,7 +553,7 @@ namespace Titan
 
         public override string ToString()
         {
-            return $"{{\n\tName: {Name}\n\tOccupation: {Occupation}\n\tDateOfBirth: {DateOfBirth.ToString()}\n}}";
+            return $"{{\n\tName: {Name}\n\tOccupation: {Occupation}\n\tDateOfBirth: {DateOfBirth}\n}}";
         }
 
     }

@@ -5,7 +5,11 @@ using System.Text;
 
 namespace Olympus.Helios.Equipment
 {
-    class Forklift
+    public class Forklift : Machine
     {
+        public bool HighReach()
+        {
+            return TypeCode.Contains("HR");
+        }
     }
 }

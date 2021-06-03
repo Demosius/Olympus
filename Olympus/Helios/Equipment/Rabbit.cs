@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Olympus.Helios.Equipment
 {
-    class Rabbit
+    public class Rabbit : Machine
     {
     }
 }

@@ -40,6 +40,12 @@ namespace Olympus.Helios.Inventory
             return PullTableWithQuery(query);
         }
 
+        public DataTable GetBinsWithContents()
+        {
+            string query = $"SELECT bin.*, stock.* FROM bin INNER JOIN stock ON bin.code = stock.bin_code;";
+            return PullTableWithQuery(query);
+        }
+
         /* ITEMS */
         public DataTable GetItemTable()
         {
@@ -126,18 +132,40 @@ namespace Olympus.Helios.Inventory
             return dt;
         }
 
-        /*                             Update Times                           */
-        public bool SetStockUpdateTimes(DataTable stockData)
+        /* Zone-Location */
+        public DataTable GetLocZoneUniqueTable(DataTable stockData)
         {
-            DataView view = new DataView(stockData);
-            DataTable uniqueTable = view.ToTable(true, "location", "zone_code");
+            try
+            {
+                // Check for any missing columns.
+                List<string> missingCols = Utility.ValidateTableData(stockData, new Dictionary<string, string> { { "location", "Location Code" }, { "zone_code", "Zone Code" } });
+                if (missingCols.Count > 0) throw new InvalidDataException("Invalid Bin Data.", missingCols);
+
+                DataView view = new DataView(stockData);
+                return view.ToTable(true, "location", "zone_code");
+            }
+            catch (InvalidDataException)
+            {
+                // No need to show error, as the error will show on the next attempted transaction.
+                return new DataTable();
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return new DataTable();
+            }
+        }
+
+        /*                             Update Times                           */
+        public bool SetStockUpdateTimes(DataTable locZoneTable)
+        {
             DateTime dt = DateTime.Now;
             try
             {
                 Conn.Open();
                 using (var transaction = Conn.BeginTransaction())
                 {
-                    foreach (DataRow row in uniqueTable.Rows)
+                    foreach (DataRow row in locZoneTable.Rows)
                     {
                         string sql = $"REPLACE INTO [stock_update] (location, zone_code, last_update) VALUES ('{row["location"]}', '{row["zone_code"]}', '{dt}');";
                         SQLiteCommand command = new SQLiteCommand(sql, Conn);
@@ -156,12 +184,12 @@ namespace Olympus.Helios.Inventory
             }
         }
 
-        public bool SetTableUpdateTime(string tableName)
+        public bool SetTableUpdateTime(string tableName, DateTime dateTime)
         {
             try
             {
                 Conn.Open();
-                string sql = $"REPLACE INTO [update] (tbl_name, last_update) VALUES ('{tableName}', '{DateTime.Now}');";
+                string sql = $"REPLACE INTO [update] (tbl_name, last_update) VALUES ('{tableName}', '{dateTime}');";
                 SQLiteCommand command = new SQLiteCommand(sql, Conn);
                 command.ExecuteNonQuery();
                 Conn.Close();
@@ -180,17 +208,17 @@ namespace Olympus.Helios.Inventory
         {
             if (ReplaceFullTable(data, Constants.BIN_COLUMNS, "bin"))
             {
-                SetTableUpdateTime("bin");
+                SetTableUpdateTime("bin", DateTime.Now);
                 return true;
             }
             return false;
         }
 
-        public bool ItemTableUpdate(DataTable data)
+        public bool ItemTableUpdate(DataTable data, DateTime dateTime)
         {
             if (ReplaceFullTable(data, Constants.ITEM_COLUMNS, "item"))
             {
-                SetTableUpdateTime("item");
+                SetTableUpdateTime("item", dateTime);
                 return true;
             }
             return false;
@@ -198,9 +226,9 @@ namespace Olympus.Helios.Inventory
 
         public bool UoMTableUpdate(DataTable data)
         {
-            if (ReplaceFullTable(data, Constants.UOM_COLUMNS, "uom"))
+            if (OverlayTable(data, Constants.UOM_COLUMNS, "uom"))
             {
-                SetTableUpdateTime("uom");
+                SetTableUpdateTime("uom", DateTime.Now);
                 return true;
             }
             return false;
@@ -211,18 +239,63 @@ namespace Olympus.Helios.Inventory
             return ReplaceFullTable(data, Constants.ZONE_COLUMNS, "zone");
         }
 
-        public bool StockTableUpdate(DataTable data)
+        public bool StockTableUpdate(DataTable stockData)
         {
-            if (ReplaceFullTable(data, Constants.STOCK_COLUMNS, "stock"))
+            DataTable locZoneTable = GetLocZoneUniqueTable(stockData);
+            StockLocZoneDelete(locZoneTable);
+            if (OverlayTable(stockData, Constants.STOCK_COLUMNS, "stock"))
             {
-                SetTableUpdateTime("stock");
-                SetStockUpdateTimes(data);
+                SetTableUpdateTime("stock", DateTime.Now);
+                SetStockUpdateTimes(locZoneTable);
                 return true;
             }
             return false;
         }
 
-        /**************************Table Definitions************************/
+        /***************************** Delete Data ****************************/
+        /* Stock */
+        public void StockLocZoneDelete(DataTable locZoneTable)
+        {
+            try
+            {
+                Conn.Open();
+                // Check for any missing columns.
+                List<string> missingCols = Utility.ValidateTableData(locZoneTable, new List<string> {"location","zone_code"});
+                if (missingCols.Count > 0) throw new InvalidDataException("Invalid Bin Data.", missingCols);
+
+                // Build Deletion transaction.
+                using (var transaction = Conn.BeginTransaction())
+                {
+                    SQLiteCommand command = Conn.CreateCommand();
+                    
+                    foreach (DataRow row in locZoneTable.Rows)
+                    {
+                        command.CommandText =
+                        $@"
+                            DELETE FROM [stock]
+                            WHERE location = '{row["location"]}' 
+                            AND zone_code = '{row["zone_code"]}'
+                        ";
+                        command.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
+
+                }
+
+                Conn.Close();
+            }
+            catch (InvalidDataException)
+            {
+                // pass
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+            }
+        }
+
+        /***************************Table Definitions**************************/
         private static readonly string BinDefinition =
             @"create table bin
             (

@@ -66,17 +66,22 @@ namespace Olympus.Helios
             return chariot.BinTableUpdate(data);
         }
 
-        public static bool ItemsFromCSV()
+        public static bool ItemsFromCSV(bool force = false)
         {
-            DataTable data = DataConversion.CSVToTable(Toolbox.GetItemCSV(), Constants.ITEM_COLUMNS.Values.ToList(), "CompanyCode = 'AU'");
+            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            string csvFile = Toolbox.GetItemCSV();
+
+            // If the item data has been updated since the last file update don't spend time to update.
+            if (chariot.LastTableUpdate("item") == File.GetLastWriteTime(csvFile) && !force) return false;
+
+            DataTable data = DataConversion.CSVToTable(csvFile, Constants.ITEM_COLUMNS.Values.ToList(), "CompanyCode = 'AU'");
             // Set preowned column data.
             data.Columns.Add(new DataColumn("preowned"));
             foreach (DataRow row in data.Rows)
             {
                 row["preowned"] = row["NewUsed"].ToString() == "Used";
             }
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
-            return chariot.ItemTableUpdate(data);
+            return chariot.ItemTableUpdate(data, File.GetLastWriteTime(csvFile));
         }
 
         public static bool UoMFromClipboard()

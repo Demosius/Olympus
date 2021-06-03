@@ -5,7 +5,11 @@ using System.Text;
 
 namespace Olympus.Helios.Equipment
 {
-    class Stockpicker
+    public class Stockpicker : Machine
     {
+        public bool HighReach()
+        {
+            return TypeCode.Contains("HR");
+        }
     }
 }
