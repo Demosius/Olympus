@@ -70,9 +70,14 @@ namespace Olympus.Helios.Equipment
             return PullFullTable("type");
         }
 
-        public DataTable GetMachinesWithType()
+        public DataTable GetMachinesTypeChecklist()
         {
-            string query = $"SELECT machine.*, type.* FROM machine INNER JOIN type ON machine.type_code = type.code;";
+            string query = 
+                $@"
+                    SELECT machine.*, type.*, cheklist.* FROM machine 
+                    LEFT JOIN type ON machine.type_code = type.code
+                    LEFT JOIN checklist ON machine.checklist_name = checklist.name
+                ;";
             return PullTableWithQuery(query);
         }
 
