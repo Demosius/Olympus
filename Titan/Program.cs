@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Olympus.Helios.Inventory;
 using Olympus.Helios;
+using Olympus.Helios.Users;
+using Olympus.Helios.Equipment;
+using Olympus.Helios.Staff;
 using Olympus;
 using System.Text.Json;
 using System.Data;
@@ -21,11 +24,71 @@ namespace Titan
     {
         static void Main(string[] args)
         {
-            InvPushTest();
-
-            CheckColsAfterJoin();
+            TestSets();
 
             _ = Console.ReadLine();
+        }
+
+        public static void TestSets()
+        {
+            Console.WriteLine("Press enter to begin: ...");
+            Console.ReadLine();
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            Console.WriteLine($"\nSTAFF:");
+            MasterChariot chariot = new StaffChariot(Toolbox.GetSol());
+            DataSet set = chariot.PullFullDataSet();
+            foreach (DataTable table in set.Tables)
+            {
+                Console.WriteLine(table.TableName);
+            }
+            DataTable dataTable = set.Tables["clan"];
+            Console.WriteLine(dataTable.Columns.Count);
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms for Staff.");
+
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+            Console.WriteLine($"\n\nINVENTORY:");
+            chariot = new InventoryChariot(Toolbox.GetSol());
+            set = chariot.PullFullDataSet();
+            foreach (DataTable table in set.Tables)
+            {
+                Console.WriteLine(table.TableName);
+            }
+            dataTable = set.Tables["bin"];
+            Console.WriteLine(dataTable.Columns.Count);
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms for Inventory.");
+
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+            Console.WriteLine($"\n\nEQUIPMENT:");
+            chariot = new EquipmentChariot(Toolbox.GetSol());
+            set = chariot.PullFullDataSet();
+            foreach (DataTable table in set.Tables)
+            {
+                Console.WriteLine(table.TableName);
+            }
+            dataTable = set.Tables["machine"];
+            Console.WriteLine(dataTable.Columns.Count);
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms for Equipment.");
+
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+            Console.WriteLine($"\n\nUSERS:");
+            chariot = new UserChariot(Toolbox.GetSol());
+            set = chariot.PullFullDataSet();
+            foreach (DataTable table in set.Tables)
+            {
+                Console.WriteLine(table.TableName);
+            }
+            dataTable = set.Tables["role"];
+            Console.WriteLine(dataTable.Columns.Count);
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms for Users.");
         }
 
         public static void CheckColsAfterJoin()

@@ -6,6 +6,7 @@ using System.Text;
 using System.Data.SQLite;
 using System.Data;
 using System.Windows;
+using System.Collections;
 
 /// <summary>
 ///     Master chariot abstract class to be used as the base class
@@ -250,10 +251,11 @@ namespace Olympus.Helios
                 Conn.Open();
                 SQLiteCommand command = new SQLiteCommand(Conn)
                 {
-                    CommandText = $"SELECT * FROM {tableName};"
+                    CommandText = $"SELECT * FROM [{tableName}];"
                 };
                 SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
                 adapter.Fill(data);
+                data.TableName = tableName;
                 Conn.Close();
             }
             catch (Exception ex)
@@ -279,6 +281,47 @@ namespace Olympus.Helios
                 Toolbox.ShowUnexpectedException(ex);
             }
             return data;
+        }
+
+        public DataSet PullFullDataSet()
+        {
+            DataSet set = new DataSet();
+            try
+            {
+                foreach (string tableName in GetTables())
+                {
+                    set.Tables.Add(PullFullTable(tableName));
+                }
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+            }
+            return set;
+        }
+        protected List<string> GetTables()
+        {
+            List<string> list = new List<string> { };
+            // executes query that select names of all tables in master table of the database
+            String query = "SELECT name FROM sqlite_master " +
+                    "WHERE type = 'table'" +
+                    "ORDER BY 1;";
+            try
+            {
+                DataTable table = PullTableWithQuery(query);
+
+                // Return all table names in the ArrayList
+
+                foreach (DataRow row in table.Rows)
+                {
+                    list.Add(row.ItemArray[0].ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+            }
+            return list;
         }
 
         // Basic database management on a higher level. 

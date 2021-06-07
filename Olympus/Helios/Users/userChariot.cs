@@ -17,7 +17,7 @@ namespace Olympus.Helios.Users
     /// <summary>
     ///  The chariot for transferring user data back and forth from the database.
     /// </summary>
-    class UserChariot : MasterChariot
+    public class UserChariot : MasterChariot
     {
         public UserChariot()
         {
