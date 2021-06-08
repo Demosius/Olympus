@@ -9,6 +9,12 @@ namespace Olympus.Helios
 {
     public static class GetEquipment
     {
+        public static DataSet DataSet()
+        {
+            EquipmentChariot chariot = new EquipmentChariot(Toolbox.GetSol());
+            return chariot.PullFullDataSet();
+        }
+
         /* Machines */
         public static DataTable GetMachineTable()
         {

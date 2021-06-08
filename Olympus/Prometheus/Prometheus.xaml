@@ -6,7 +6,9 @@
       xmlns:local="clr-namespace:Olympus.Prometheus"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="Prometheus">
+      Title="Prometheus"
+      HorizontalAlignment="Stretch"
+      VerticalAlignment="Stretch">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -14,11 +16,188 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" MinWidth="300"/>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="*" MinWidth="200"/>
+            <ColumnDefinition Width="5*" MinWidth="200"/>
         </Grid.ColumnDefinitions>
 
-        <Image Margin="5,5,5,5" Source="../Resources/Images/Olympus.jpg"/>
-        <DataGrid Grid.Row="0" Grid.Column="1" Margin="5,5,5,5" Height="Auto" Width="Auto"/>
+        <TreeView Name="tableView" Grid.Row="0" Grid.Column="0" Margin="2,2,2,2" Height="{Binding ElementName=DisplayData, Path=ActualHeight}" 
+                  ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <TreeViewItem Header="Staff">
+                <TreeViewItem Header="Borrow Employees" Selected="SetTable" Tag="Staff,borrowsEmp"/>
+                <TreeViewItem Header="Clan" Selected="SetTable" Tag="Staff,clan"/>
+                <TreeViewItem Header="Department" Selected="SetTable" Tag="Staff,department"/>
+                <TreeViewItem Header="Employee" Selected="SetTable" Tag="Staff,employee"/>
+                <TreeViewItem Header="Induction" Selected="SetTable" Tag="Staff,induction"/>
+                <TreeViewItem Header="Induction Reference" Selected="SetTable" Tag="Staff,inductionReference"/>
+                <TreeViewItem Header="Licence" Selected="SetTable" Tag="Staff,licence"/>
+                <TreeViewItem Header="Locker" Selected="SetTable" Tag="Staff,locker"/>
+                <TreeViewItem Header="Owns Car" Selected="SetTable" Tag="Staff,ownsCar"/>
+                <TreeViewItem Header="Role" Selected="SetTable" Tag="Staff,role"/>
+                <TreeViewItem Header="Shift" Selected="SetTable" Tag="Staff,shift"/>
+                <TreeViewItem Header="Shift Rule" Selected="SetTable" Tag="Staff,shift_rule"/>
+                <TreeViewItem Header="Shift Eligibility" Selected="SetTable" Tag="Staff,shiftEligibility"/>
+                <TreeViewItem Header="Temp Tag" Selected="SetTable" Tag="Staff,temp_tag"/>
+                <TreeViewItem Header="Uses Tag" Selected="SetTable" Tag="Staff,usesTag"/>
+                <TreeViewItem Header="Vehicle" Selected="SetTable" Tag="Staff,vehicle"/>
+            </TreeViewItem>
+            <TreeViewItem Header="Inventory">
+                <TreeViewItem Header="Bin List" Selected="SetTable" Tag="Inventory,bin"/>
+                <TreeViewItem Header="Item List" Selected="SetTable" Tag="Inventory,item"/>
+                <TreeViewItem Header="Bin Contents" Selected="SetTable" Tag="Inventory,stock"/>
+                <TreeViewItem Header="Stock Update" Selected="SetTable" Tag="Inventory,stock_update"/>
+                <TreeViewItem Header="Unit of Measure" Selected="SetTable" Tag="Inventory,uom"/>
+                <TreeViewItem Header="Update Table" Selected="SetTable" Tag="Inventory,update"/>
+                <TreeViewItem Header="Zone" Selected="SetTable" Tag="Inventory,zone"/>
+            </TreeViewItem>
+            <TreeViewItem Header="Equipment">
+                <TreeViewItem Header="Battery" Selected="SetTable" Tag="Equipment,battery"/>
+                <TreeViewItem Header="Battery Location" Selected="SetTable" Tag="Equipment,battery_location"/>
+                <TreeViewItem Header="Charger" Selected="SetTable" Tag="Equipment,charger"/>
+                <TreeViewItem Header="Charger Assignment" Selected="SetTable" Tag="Equipment,charger_assignment"/>
+                <TreeViewItem Header="Checklist" Selected="SetTable" Tag="Equipment,checklist"/>
+                <TreeViewItem Header="Completed Checklists" Selected="SetTable" Tag="Equipment,completed_checklist"/>
+                <TreeViewItem Header="Fault" Selected="SetTable" Tag="Equipment,fault"/>
+                <TreeViewItem Header="Machine" Selected="SetTable" Tag="Equipment,machine"/>
+                <TreeViewItem Header="Type" Selected="SetTable" Tag="Equipment,type"/>
+            </TreeViewItem>
+            <TreeViewItem Header="Users">
+                <TreeViewItem Header="Login" Selected="SetTable" Tag="Users,login"/>
+                <TreeViewItem Header="Role" Selected="SetTable" Tag="Users,role"/>
+                <TreeViewItem Header="User" Selected="SetTable" Tag="Users,user"/>
+            </TreeViewItem>
+        </TreeView>
+
+        <DataGrid Name="DisplayData" Grid.Row="0" Grid.Column="1" Margin="1,1,1,1" Height="Auto" Width="Auto" ItemsSource="{Binding}" 
+                  AutoGenerateColumns="True" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                  VerticalScrollBarVisibility="Auto" ColumnWidth="Auto" Style="{DynamicResource DataGridStyle}">
+            
+            <DataGrid.Resources>
+                <Style TargetType="Button" x:Key="{ComponentResourceKey ResourceId=DataGridSelectAllButtonStyle, TypeInTargetAssembly={x:Type DataGrid}}">
+                    <Setter Property="Background" Value="Black" />
+                </Style>
+            </DataGrid.Resources>
+        </DataGrid>
+        
     </Grid>
+
+    <Page.Resources>
+        <!--CornerButton-->
+        <Style TargetType="Button" x:Key="{ComponentResourceKey ResourceId=DataGridSelectAllButtonStyle, TypeInTargetAssembly={x:Type DataGrid}}">
+            <Setter Property="Background" Value="Black" />
+        </Style>
+        <!-- DataGrid style -->
+        <Style x:Key="DataGridStyle" TargetType="{x:Type DataGrid}">
+            <Setter Property="ColumnHeaderStyle" Value="{DynamicResource ColumnHeaderStyle}"/>
+            <Setter Property="RowHeaderStyle" Value="{DynamicResource RowHeaderStyle}" />
+            <Setter Property="RowBackground" Value="{DynamicResource ResourceKey=RedGradient}" />
+            <Setter Property="Background" Value="#500" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="RowHeight" Value="20" />
+            <Setter Property="AllowDrop" Value="True" />
+            <Setter Property="Block.TextAlignment" Value="Right" />
+        </Style>
+        <!-- DataGridColumnHeader style -->
+        <Style x:Key="ColumnHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Background" Value="#500"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="TextElement.FontStretch" Value="Expanded"/>
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="Black" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="ToolTip" Value="Click to sort."/>
+                </Trigger>
+            </Style.Triggers>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="2"/>
+                </Style>
+                <LinearGradientBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" EndPoint="0,1" StartPoint="0,0">
+                    <GradientStop Color="PaleVioletRed" Offset="0"/>
+                    <GradientStop Color="MediumVioletRed" Offset="1"/>
+                </LinearGradientBrush>
+            </Style.Resources>
+        </Style>
+        <!-- DataGridRowHeader style -->
+        <Style x:Key="RowHeaderStyle" TargetType="DataGridRowHeader">
+            <Setter Property="Height" Value="Auto" />
+            <Setter Property="Width" Value="16" />
+            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Background" Value="{DynamicResource ResourceKey=BoneGradient}" />            
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="5"/>
+                </Style>
+                <LinearGradientBrush x:Key="BoneGradient" x:Name="BoneGradient" StartPoint="1,1" EndPoint="0,0" >
+                    <GradientStop Color="Tan" Offset="0"/>
+                    <GradientStop Color="Ivory" Offset="1"/>
+                </LinearGradientBrush>
+            </Style.Resources>
+        </Style>
+        
+        <!--DataGridCells-->
+        <Style  TargetType="{x:Type DataGridCell}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=Content.Text, RelativeSource={RelativeSource Self}}"  Value="" >
+                    <Setter Property="Background" Value="DarkRed"/>
+                </DataTrigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <!--<Setter Property="BorderBrush" Value="BlanchedAlmond"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="Foreground" Value="BlanchedAlmond"/>-->
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Trigger>
+            </Style.Triggers>
+            <Style.Resources>
+                <LinearGradientBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" EndPoint="0,1" StartPoint="0,0">
+                    <GradientStop Color="PaleVioletRed" Offset="0"/>
+                    <GradientStop Color="MediumVioletRed" Offset="1"/>
+                </LinearGradientBrush>
+            </Style.Resources>
+        </Style>
+        
+        <!-- TreeView Style -->        
+        <Style TargetType="{x:Type TreeView}">
+            <Setter Property="Background" Value="#500"/>
+        </Style>
+        <!--TreeViewItemStyle-->
+        <Style TargetType="{x:Type TreeViewItem}">
+            <Setter Property="Background" Value="#500"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="TextBlock.Margin" Value="2" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="BorderBrush" Value="Orange"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="Foreground" Value="Orange"/>
+                </Trigger>
+            </Style.Triggers>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="2"/>
+                </Style>
+                <LinearGradientBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" EndPoint="0,1" StartPoint="0,0">
+                    <GradientStop Color="PaleVioletRed" Offset="0"/>
+                    <GradientStop Color="MediumVioletRed" Offset="1"/>
+                </LinearGradientBrush>
+            </Style.Resources>
+        </Style>
+
+        <LinearGradientBrush x:Key="RedGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="DarkRed" Offset="0"/>
+            <GradientStop Color="#500" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="ReVGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="#500" Offset="0"/>
+            <GradientStop Color="DarkRed" Offset="1"/>
+        </LinearGradientBrush>
+        
+    </Page.Resources>
 </Page>

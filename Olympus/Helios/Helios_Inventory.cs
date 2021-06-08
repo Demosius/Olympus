@@ -13,6 +13,12 @@ namespace Olympus.Helios
 
     public static class GetInventory
     {
+        public static DataSet DataSet()
+        {
+            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            return chariot.PullFullDataSet();
+        }
+
         public static DataTable Bins()
         {
             InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());

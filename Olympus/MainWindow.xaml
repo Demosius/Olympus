@@ -8,11 +8,15 @@
         
         mc:Ignorable="d"
         Title="Olympus" WindowState="Maximized"
-        Icon="./Resources/Images/Icons/olympus.png">
+        Icon="./Resources/Images/Icons/olympus.png"
+        MinWidth="400"
+        MinHeight="300"
+        Background="DarkRed">
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -20,6 +24,7 @@
         </Grid.ColumnDefinitions>
 
         <Control:Navbar Grid.Row="0" Grid.Column="0"/>
-        <Frame  Margin="10,10,10,10" x:Name="OView" Grid.Row="1" Grid.Column="0" Height="Auto"/>
+        <Frame  Margin="5,5,5,5" x:Name="OView" Grid.Row="1" Grid.Column="0" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                BorderThickness="1" BorderBrush="SlateGray"/>
     </Grid>
 </Window>
