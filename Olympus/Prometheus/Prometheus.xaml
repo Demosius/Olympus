@@ -99,6 +99,7 @@
         <!-- DataGridColumnHeader style -->
         <Style x:Key="ColumnHeaderStyle" TargetType="DataGridColumnHeader">
             <Setter Property="Height" Value="30"/>
+            <Setter Property="Padding" Value="8,0,8,0"/>
             <Setter Property="Background" Value="#500"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="HorizontalAlignment" Value="Stretch" />
