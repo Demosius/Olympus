@@ -26,7 +26,7 @@ namespace Titan
         {
             Console.WriteLine(Toolbox.GetSol());
 
-            InvPushTest();
+            Console.WriteLine($"{1/2} : {1.0/2.0}");
 
             _ = Console.ReadLine();
         }

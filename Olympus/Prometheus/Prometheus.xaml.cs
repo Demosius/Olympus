@@ -34,10 +34,13 @@ namespace Olympus.Prometheus
         public int PageIndex { get; set; } = 0;
         public int PageSize { get; set; } = 25;
 
+        public string PageString { get; set; } = "Page: 0 of 0";
+
         public Prometheus()
         {
             InitializeComponent();
             SetData();
+            SetPageString();
         }
 
         public void SetData()
@@ -124,39 +127,74 @@ namespace Olympus.Prometheus
             return textInfo.ToTitleCase(header);
         }
 
-        public void ShowTable()
+        private void ShowTable()
         {
-            if (DataTable.Rows.Count == 0)
+            if (DataTable != null)
             {
-                DisplayData.DataContext = DataTable.AsDataView();
-            }
-            else 
-            {
-                while (DataTable.Rows.Count <= PageIndex * PageSize && PageIndex > 0) --PageIndex;
-                    
-                var display = DataTable.AsEnumerable().Skip(PageIndex * PageSize).Take(PageSize).CopyToDataTable();
+                if (DataTable.Rows.Count == 0)
+                {
+                    DisplayData.DataContext = DataTable.AsDataView();
+                }
+                else
+                {
+                    while (DataTable.Rows.Count <= PageIndex * PageSize && PageIndex > 0) --PageIndex;
 
-                DisplayData.DataContext = display.AsDataView();
+                    var display = DataTable.AsEnumerable().Skip(PageIndex * PageSize).Take(PageSize).CopyToDataTable();
+
+                    DisplayData.DataContext = display.AsDataView();
+                }
             }
+            SetPageString();
         }
 
-        public void PageFwd()
+        private void PageFwd(object sender, RoutedEventArgs e)
         {
-            if ((PageIndex + 1) * PageSize <= DataTable.Rows.Count) ++PageIndex;
+            if (DataTable == null)
+                PageIndex = 0;
+            else if ((PageIndex + 1) * PageSize <= DataTable.Rows.Count)
+                ++PageIndex;
             ShowTable();
         }
 
-        public void PageBack()
+        private void PageBack(object sender, RoutedEventArgs e)
         {
             if (PageIndex > 0) --PageIndex;
             ShowTable();
         }
 
-        public void ShowBins(object sender, RoutedEventArgs e)
+        private void PageLast(object sender, RoutedEventArgs e)
         {
-            List<SimpleBin> simpleBins = GetInventory.SimpleBins();
-            DisplayData.DataContext = simpleBins.Skip(PageIndex * PageSize).Take(PageSize);
+            if (DataTable == null)
+                PageIndex = 0;
+            else
+                PageIndex = DataTable.Rows.Count / PageSize + 1;
+            ShowTable();
         }
 
+        private void PageFirst(object sender, RoutedEventArgs e)
+        {
+            PageIndex = 0;
+            ShowTable();
+        }
+
+        private void SetPageString()
+        {
+            int pageTotal;
+            if (DataTable == null)
+                PageString = "No Data";
+            else
+            {
+                pageTotal = DataTable.Rows.Count / PageSize;
+                PageString = $"Page: {PageIndex + 1} of {pageTotal + 1}";
+            }
+            PageInfo.DataContext = PageString;
+        }
+
+        private void SetPageSize(object sender, RoutedEventArgs e)
+        {
+            RadioButton radioButton = (RadioButton)sender;
+            PageSize = int.Parse(radioButton.Tag.ToString());
+            ShowTable();
+        }
     }
 }
