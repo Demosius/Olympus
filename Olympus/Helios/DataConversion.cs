@@ -177,5 +177,43 @@ namespace Olympus.Helios
                 return data;
             }
         }
+
+        /// <summary>
+        ///  Given a datatable and a list of columns for each conversion type, sanitizes the data to convert all values
+        ///  in those columns to the appropriate type.
+        /// </summary>
+        /// <param name="dataTable">String loaded datatable.</param>
+        /// <param name="columns"></param>
+        public static void ConvertColumns(DataTable dataTable, List<string> dblColumns, List<string> intColumns, List<string> dtColumns, List<string> boolColumns)
+        {
+            string[] trueVals = { "yes", "used" };
+            bool b;
+            foreach (DataRow row in dataTable.Rows)
+            {
+                foreach (string col in dblColumns)
+                {
+                    Double.TryParse(row[col].ToString(), out double dbl);
+                    row[col] = dbl;
+                }
+                foreach (string col in intColumns)
+                {
+                    int.TryParse(row[col].ToString(), out int i);
+                    row[col] = i;
+                }
+                foreach (string col in dtColumns)
+                {
+                    DateTime.TryParse(row[col].ToString(), out DateTime dateTime);
+                    row[col] = dateTime;
+                }
+                foreach (string col in boolColumns)
+                {
+                    if (trueVals.Contains(row[col].ToString().ToLower()))
+                        b = true;
+                    else
+                        Boolean.TryParse(row[col].ToString(), out b);
+                    row[col] = b;
+                }
+            }
+        }
     }
 }

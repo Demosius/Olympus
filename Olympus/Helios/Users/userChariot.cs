@@ -32,20 +32,11 @@ namespace Olympus.Helios.Users
         }
 
         /******************************* Get Data *****************************/
-        public DataTable GetUserTable()
-        {
-            return PullFullTable("user");
-        }
+        /* Users */
 
-        public DataTable GetLoginTable()
-        {
-            return PullFullTable("login");
-        }
+        /* Log Ins */
 
-        public DataTable GetRoleTable()
-        {
-            return PullFullTable("role");
-        }
+        /* Roles */
 
         /******************************* Put Data *****************************/
         public bool AddUser(int userID, string password)
@@ -131,46 +122,49 @@ namespace Olympus.Helios.Users
                 on login (user_id);";
 
         private static readonly string RoleDefinition =
-            @"create table role
+            @"-- auto-generated definition
+            create table role
             (
                 name              text not null
                     constraint role_pk
                         primary key,
-                create_user       int default -2 not null,
-                delete_user       int default -2 not null,
-                view_user         int default -5 not null,
-                modify_user       int default -2 not null,
-                create_employee   int default -2 not null,
-                delete_employee   int default -2 not null,
-                view_employee     int default -5 not null,
-                modify_employee   int default -2 not null,
-                assign_role       int default false not null,
-                create_department int default false not null,
-                delete_department int default false not null,
-                modify_department int default false not null,
-                create_clan       int default false not null,
-                delete_clan       int default false not null,
-                modify_clan       int default false not null,
-                create_shift      int default -1 not null,
-                delete_shift      int default -1 not null,
-                modify_shift      int default -1 not null,
-                create_licence    int default false not null,
-                delete_licence    int default false not null,
-                view_licence      int default false not null,
-                modify_licence    int default false not null,
-                create_vehicle    int default false not null,
-                delete_vehicle    int default false not null,
-                view_vehicle      int default false not null,
-                modify_vehicle    int default false not null,
-                create_induction  int default false not null,
-                delete_induction  int default false not null,
-                modify_induction  int default false not null,
-                view_induction    int default false not null,
-                loan_employee     int default false not null
+                create_user       int     default -2 not null,
+                delete_user       int     default -2 not null,
+                view_user         int     default -5 not null,
+                modify_user       int     default -2 not null,
+                create_employee   int     default -2 not null,
+                delete_employee   int     default -2 not null,
+                view_employee     int     default -5 not null,
+                modify_employee   int     default -2 not null,
+                assign_role       boolean default FALSE not null,
+                create_department boolean default FALSE not null,
+                delete_department boolean default FALSE not null,
+                modify_department boolean default FALSE not null,
+                create_clan       boolean default FALSE not null,
+                delete_clan       boolean default FALSE not null,
+                modify_clan       boolean default FALSE not null,
+                create_shift      int     default -1 not null,
+                delete_shift      int     default -1 not null,
+                modify_shift      int     default -1 not null,
+                create_licence    boolean default FALSE not null,
+                delete_licence    boolean default FALSE not null,
+                view_licence      boolean default FALSE not null,
+                modify_licence    boolean default FALSE not null,
+                create_vehicle    boolean default FALSE not null,
+                delete_vehicle    boolean default FALSE not null,
+                view_vehicle      boolean default FALSE not null,
+                modify_vehicle    boolean default FALSE not null,
+                create_induction  boolean default FALSE not null,
+                delete_induction  boolean default FALSE not null,
+                modify_induction  boolean default FALSE not null,
+                view_induction    boolean default FALSE not null,
+                loan_employee     boolean default FALSE not null
             );
 
             create unique index role_name_uindex
-                on role (name);";
+                on role (name);
+
+";
 
         private static readonly string UserDefinition =
             @"create table user

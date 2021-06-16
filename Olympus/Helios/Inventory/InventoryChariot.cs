@@ -29,11 +29,6 @@ namespace Olympus.Helios.Inventory
 
         /***************************** Get Data ******************************/
         /* BINS */
-        public DataTable GetBinTable()
-        {
-            return PullFullTable("bin");
-        }
-
         public DataTable GetBin(string bin)
         {
             string query = $"SELECT * FROM [bin] WHERE code = '{bin}';";
@@ -46,11 +41,50 @@ namespace Olympus.Helios.Inventory
             return PullTableWithQuery(query);
         }
 
-        /* ITEMS */
-        public DataTable GetItemTable()
+        public List<SimpleBin> SimpleBins()
         {
-            return PullFullTable("item");
+            try
+            {
+                List<SimpleBin> list = new List<SimpleBin> { };
+                Conn.Open();
+                string query = "SELECT * FROM [bin];";
+                SQLiteCommand command = new SQLiteCommand(query, Conn);
+                SQLiteDataReader reader = command.ExecuteReader();
+                string mc;
+
+                while (reader.Read())
+                {
+                    mc = reader["max_cube"].ToString();
+                    list.Add
+                    (
+                        new SimpleBin
+                        (
+                            location: reader["location"].ToString(),
+                            zoneCode: reader["zone_code"].ToString(),
+                            code: reader["code"].ToString(),
+                            description: reader["description"].ToString(),
+                            empty: Convert.ToBoolean(reader["empty"]),
+                            assigned: Convert.ToBoolean(reader["assigned"]),
+                            ranking: (int)reader["ranking"],
+                            usedCube: (double)reader["used_cube"],
+                            maxCube: double.Parse(mc == "" ? "0" : mc),
+                            lastCCDate: DateTime.Parse(reader["last_cc_date"].ToString()),
+                            lastPIDate: DateTime.Parse(reader["last_pi_date"].ToString())
+                        )
+                    ); 
+                }
+
+                Conn.Close();
+                return list;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return new List<SimpleBin> { };
+            }
         }
+
+        /* ITEMS */
 
         public DataTable GetItem(int item)
         {
@@ -59,16 +93,8 @@ namespace Olympus.Helios.Inventory
         }
 
         /* ZONES */
-        public DataTable GetZoneTable()
-        {
-            return PullFullTable("zone");
-        }
 
         /* STOCK */
-        public DataTable GetStockTable()
-        {
-            return PullFullTable("stock");
-        }
 
         public DataTable GetStockForBin(string bin)
         {
@@ -83,11 +109,6 @@ namespace Olympus.Helios.Inventory
         }
 
         /* UOM */
-        public DataTable GetUoMTable()
-        {
-            return PullFullTable("uom");
-        }
-
         public DataTable GetItemUoM(int item)
         {
             string query = $"SELECT * FROM [uom] WHERE item_number = {item};";
@@ -95,11 +116,6 @@ namespace Olympus.Helios.Inventory
         }
 
         /* UPDATES */
-        public DataTable GetUpdateTable()
-        {
-            return PullFullTable("update");
-        }
-
         public DateTime LastTableUpdate(string tableName)
         {
             string query = $"SELECT [last_update] FROM [update] WHERE tbl_name = '{tableName}';";
@@ -107,18 +123,17 @@ namespace Olympus.Helios.Inventory
             Conn.Open();
             SQLiteCommand command = new SQLiteCommand(query, Conn);
             object result = command.ExecuteScalar();
-            if (result == null || result.ToString() == "") return new DateTime();
+            if (result == null || result.ToString() == "")
+            {
+                Conn.Close();
+                return new DateTime();
+            }
             dt = DateTime.Parse(result.ToString());
             Conn.Close();
             return dt;
         }
 
         /* STOCK UPDATES */
-        public DataTable GetStockUpdateTable()
-        {
-            return PullFullTable("stock_update");
-        }
-
         public DateTime LastStockUpdate(List<string> zones, string location = "9600")
         {
             string query = $"SELECT MIN([last_update]) FROM [stock_update] WHERE [location] = '{location}' AND [zone_code] IN ('{string.Join("', '", zones)}') ";
@@ -297,29 +312,31 @@ namespace Olympus.Helios.Inventory
 
         /***************************Table Definitions**************************/
         private static readonly string BinDefinition =
-            @"create table bin
+            @"-- auto-generated definition
+            create table bin
             (
                 location     text not null,
                 zone_code    text not null
                     references zone,
                 code         text not null,
                 description  text,
-                empty        int,
-                assigned     int,
+                empty        boolean,
+                assigned     boolean,
                 ranking      int,
                 used_cube    real,
                 max_cube     real,
                 last_cc_date text,
                 last_pi_date text,
                 constraint bin_pk
-                    primary key(location, code)
+                    primary key (location, code)
             );
 
             create index bin_code_index
-                on bin(code);";
+                on bin (code);";
 
         private static readonly string ItemDefinition =
-            @"create table item
+            @"-- auto-generated definition
+            create table item
             (
                 number      int not null
                     constraint item_pk
@@ -333,22 +350,24 @@ namespace Olympus.Helios.Inventory
                 width       real,
                 height      real,
                 cube        real,
-                weight      real
+                weight      real,
+                preowned    boolean default FALSE not null
             );
 
             create unique index item_number_uindex
                 on item (number);";
 
         private static readonly string UoMDefinition =
-            @"create table uom
+            @"-- auto-generated definition
+            create table uom
             (
                 code                  text not null,
                 item_number           int  not null
                     references item,
                 qty_per_uom           int  not null,
                 max_qty               int,
-                inner_pack            int,
-                exclude_cartonization int,
+                inner_pack            boolean,
+                exclude_cartonization boolean,
                 length                real,
                 width                 real,
                 height                real,
@@ -359,7 +378,8 @@ namespace Olympus.Helios.Inventory
             );";
 
         private static readonly string StockDefinition =
-            @"create table stock
+            @"-- auto-generated definition
+            create table stock
             (
                 location     text not null,
                 zone_code    text not null
@@ -380,7 +400,7 @@ namespace Olympus.Helios.Inventory
                 pos_adj_qty  int,
                 date_created text,
                 time_created text,
-                fixed        int,
+                fixed        boolean,
                 constraint stock_pk
                     primary key (location, bin_code, item_number, uom_code)
             );";

@@ -13,28 +13,82 @@ namespace Olympus.Helios
 
     public static class GetInventory
     {
+        /* Full Data */
         public static DataSet DataSet()
         {
             InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
             return chariot.PullFullDataSet();
         }
 
-        public static DataTable Bins()
+        /* Data Tables */
+        private static DataTable TableByName(string tableName)
         {
             InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
-            return chariot.GetBinTable();
+            return chariot.PullFullTable(tableName);
         }
 
-        public static DataTable Stock()
+        public static DataTable DataTable(string tableName)
         {
             InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
-            return chariot.GetStockTable();
+            if (chariot.TableDefinitions.Keys.Contains(tableName) && !tableName.StartsWith("sqlite_"))
+                return TableByName(tableName);
+            return new DataTable();
         }
 
-        public static DateTime LastStockUpdate()
+        public static DataTable BinTable()
+        {
+            return TableByName("bin");
+        }
+
+        public static DataTable ItemTable()
+        {
+            return TableByName("item");
+        }
+
+        public static DataTable UoMTable()
+        {
+            return TableByName("uom");
+        }
+
+        public static DataTable StockTable()
+        {
+            return TableByName("stock");
+        }
+
+        public static DataTable StockUpdateTable()
+        {
+            return TableByName("stock_update");
+        }
+
+        public static DataTable UpdateTable()
+        {
+            return TableByName("update");
+        }
+
+        public static DataTable ZoneTable()
+        {
+            return TableByName("zone");
+        }
+
+        /* Update times */
+        public static DateTime LastStockUpdateTime()
         {
             InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
             return chariot.LastTableUpdate("stock");
+        }
+
+
+        /* Special/Specific pull types. */
+        public static BinContents BinContents()
+        {
+            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            return new BinContents(chariot);
+        }
+
+        public static List<SimpleBin> SimpleBins()
+        {
+            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            return chariot.SimpleBins();
         }
 
         public static BinContents BCFromFile(string filePath)
@@ -61,6 +115,7 @@ namespace Olympus.Helios
                 return new BinContents(new List<SimpleStock> { });
             }
         }
+
     }
 
     public static class PutInventory
@@ -68,6 +123,13 @@ namespace Olympus.Helios
         public static bool BinsFromClipboard()
         {
             DataTable data = DataConversion.ClipboardToTable();
+            Utility.ValidateTableData(data, Constants.BIN_COLUMNS);
+            DataConversion.ConvertColumns(
+                dataTable: data,
+                dblColumns: new List<string> { "used_cube", "max_cube" },
+                intColumns: new List<string> { "ranking" },
+                dtColumns: new List<string> { "last_cc_date", "last_pi_date" },
+                boolColumns: new List<string> { "empty", "assigned" });
             InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
             return chariot.BinTableUpdate(data);
         }
@@ -81,18 +143,28 @@ namespace Olympus.Helios
             if (chariot.LastTableUpdate("item") == File.GetLastWriteTime(csvFile) && !force) return false;
 
             DataTable data = DataConversion.CSVToTable(csvFile, Constants.ITEM_COLUMNS.Values.ToList(), "CompanyCode = 'AU'");
-            // Set preowned column data.
-            data.Columns.Add(new DataColumn("preowned"));
-            foreach (DataRow row in data.Rows)
-            {
-                row["preowned"] = row["NewUsed"].ToString() == "Used";
-            }
+            // Validate data
+            Utility.ValidateTableData(data, Constants.ITEM_COLUMNS);
+            DataConversion.ConvertColumns(
+                dataTable: data,
+                dblColumns: new List<string> { "length", "width", "height", "weight", "cube" },
+                intColumns: new List<string> { "number", "category", "platform", "division", "genre" },
+                dtColumns: new List<string> {  },
+                boolColumns: new List<string> { "preowned" });
+
             return chariot.ItemTableUpdate(data, File.GetLastWriteTime(csvFile));
         }
 
         public static bool UoMFromClipboard()
         {
             DataTable data = DataConversion.ClipboardToTable();
+            Utility.ValidateTableData(data, Constants.UOM_COLUMNS);
+            DataConversion.ConvertColumns(
+                dataTable: data,
+                dblColumns: new List<string> { "length", "width", "height", "weight", "cube" },
+                intColumns: new List<string> { "item_number", "qty_per_uom", "max_qty" },
+                dtColumns: new List<string> {  },
+                boolColumns: new List<string> { "inner_pack", "exclude_cartonization" });
             InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
             return chariot.UoMTableUpdate(data);
         }
@@ -100,6 +172,13 @@ namespace Olympus.Helios
         public static bool StockFromClipboard()
         {
             DataTable data = DataConversion.ClipboardToTable();
+            Utility.ValidateTableData(data, Constants.STOCK_COLUMNS);
+            DataConversion.ConvertColumns(
+                dataTable: data,
+                dblColumns: new List<string> { },
+                intColumns: new List<string> { "item_number", "qty", "pick_qty", "put_away_qty", "neg_adj_qty", "pos_adj_qty" },
+                dtColumns: new List<string> { "date_created", "time_created" },
+                boolColumns: new List<string> { "fixed" });
             InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
             return chariot.StockTableUpdate(data);
         }
@@ -148,11 +227,11 @@ namespace Olympus.Helios
         // Default constructor.
         public BinContents() { }
 
-        // Construct from batabase.
+        // Construct from database.
         public BinContents(InventoryChariot chariot)
         {
             DateTime = chariot.LastTableUpdate("stock");
-            DataTable data = chariot.GetStockTable();
+            DataTable data = chariot.PullFullTable("stock");
             Stock = DataTableToStockList(data);
         }
 
@@ -180,7 +259,7 @@ namespace Olympus.Helios
             Stock = DataTableToStockList(data);
         }
 
-        private List<SimpleStock> DataTableToStockList(DataTable data)
+        public static List<SimpleStock> DataTableToStockList(DataTable data)
         {
             List<SimpleStock> newList = new List<SimpleStock> { };
 

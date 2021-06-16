@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 
@@ -22,52 +23,49 @@ namespace Olympus.Helios.Equipment
 
         /******************************* Get Data *****************************/
         /* Batteries */
-        public DataTable GetBatteryTable()
-        {
-            return PullFullTable("battery");
-        }
-
-        public DataTable GetBatteryLocationTable()
-        {
-            return PullFullTable("battery_location");
-        }
 
         /* Chargers */
-        public DataTable GetChargerTable()
-        {
-            return PullFullTable("charger");
-        }
-
-        public DataTable GetChargerAssignmentTable()
-        {
-            return PullFullTable("charger_assignment");
-        }
 
         /* Checklists */
-        public DataTable GetChecklistTable()
-        {
-            return PullFullTable("checklist");
-        }
-
-        public DataTable GetCompletedChecklistTable()
-        {
-            return PullFullTable("completed_checklist");
-        }
-
-        public DataTable GetFaultTable()
-        {
-            return PullFullTable("fault");
-        }
 
         /* Machine */
-        public DataTable GetMachineTable()
+        public List<SimpleMachine> SimpleMachines()
         {
-            return PullFullTable("machine");
-        }
+            try
+            {
+                List<SimpleMachine> list = new List<SimpleMachine> { };
+                Conn.Open();
+                string query = "SELECT * FROM [bin];";
+                SQLiteCommand command = new SQLiteCommand(query, Conn);
+                SQLiteDataReader reader = command.ExecuteReader();
+                string mc;
 
-        public DataTable GetTypeTable()
-        {
-            return PullFullTable("type");
+                while (reader.Read())
+                {
+                    mc = reader["max_cube"].ToString();
+                    list.Add
+                    (
+                        new SimpleMachine
+                        (
+                            serialNumber: reader["serial_no"].ToString(),
+                            typeCode: reader["type_code"].ToString(),
+                            serviceDueDate: DateTime.Parse(reader["service_due_date"].ToString()),
+                            lastServiceDate: DateTime.Parse(reader["last_service_date"].ToString()),
+                            checklistName: reader["checklist_name"].ToString(),
+                            ownership: reader["ownership"].ToString(),
+                            lastPreopCheck: DateTime.Parse(reader["last_preop_check"].ToString())
+                        )
+                    );
+                }
+
+                Conn.Close();
+                return list;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return new List<SimpleMachine> { };
+            }
         }
 
         public DataTable GetMachinesTypeChecklist()
@@ -164,7 +162,8 @@ namespace Olympus.Helios.Equipment
                 on checklist (name);";
 
         private static readonly string CompletedChecklistDefinition =
-            @"create table completed_checklist
+            @"-- auto-generated definition
+            create table completed_checklist
             (
                 id                integer not null
                     constraint completed_checklist_pk
@@ -173,8 +172,8 @@ namespace Olympus.Helios.Equipment
                     references machine
                         on update cascade,
                 timestamp         text    not null,
-                fault_found       int default 0 not null,
-                pass              int default 1 not null,
+                fault_found       boolean default FALSE not null,
+                pass              boolean default TRUE not null,
                 employee_number   int     not null,
                 checklist         text    not null
             );
@@ -183,23 +182,26 @@ namespace Olympus.Helios.Equipment
                 on completed_checklist (id);";
 
         private static readonly string FaultDefinition =
-            @"create table fault
+            @"-- auto-generated definition
+            create table fault
             (
                 id                     integer not null
                     constraint fault_pk
                         primary key autoincrement,
                 fault                  text    not null,
-                cause_failure          int default 0 not null,
+                cause_failure          boolean default FALSE not null,
                 completed_checklist_id integer not null
                     references completed_checklist
                         on update cascade on delete cascade
             );
 
             create unique index fault_id_uindex
-                on fault (id);";
+                on fault (id);
+";
 
         private static readonly string MachineDefinition =
-            @"create table machine
+            @"-- auto-generated definition
+            create table machine
             (
                 serial_no         text not null
                     constraint machine_pk
@@ -212,11 +214,13 @@ namespace Olympus.Helios.Equipment
                 checklist_name    text not null
                     references checklist
                         on update cascade on delete restrict,
-                ownership         text default 'owned' not null
+                ownership         text default 'owned' not null,
+                last_preop_check  text default null
             );
 
             create unique index machine_serial_no_uindex
-                on machine (serial_no);";
+                on machine (serial_no);
+";
 
         private static readonly string TypeDefinition =
             @"create table type

@@ -136,4 +136,37 @@ namespace Olympus.Helios.Inventory
             Stock.Remove(stock.Item.Number);
         }
     }
+
+    public class SimpleBin
+    {
+        public string Location { get; set; }
+        public string ZoneCode { get; set; }
+        public string Code { get; set; }
+        public string Description { get; set; }
+        public bool Empty { get; set; }
+        public bool Assigned { get; set; } 
+        public int Ranking { get; set; }
+        public double UsedCube { get; set; }
+        public double MaxCube { get; set; }
+        public DateTime LastCCDate { get; set; }
+        public DateTime LastPIDate { get; set; }
+
+        public SimpleBin() { }
+
+        public SimpleBin(string location, string zoneCode, string code, string description, bool empty, bool assigned,
+                            int ranking, double usedCube, double maxCube, DateTime lastCCDate, DateTime lastPIDate)
+        {
+            Location = location;
+            ZoneCode = zoneCode;
+            Code = code;
+            Description = description;
+            Empty = empty;
+            Assigned = assigned;
+            Ranking = ranking;
+            UsedCube = usedCube;
+            MaxCube = maxCube;
+            LastCCDate = lastCCDate;
+            LastPIDate = lastPIDate;
+        }
+    }
 }

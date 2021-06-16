@@ -76,4 +76,38 @@ namespace Olympus.Helios.Inventory
         }
 
     }
+
+    public class SimpleUoM
+    {
+        public string Code { get; set; }
+        public int ItemNumber { get; set; }
+        public int QtyPerUoM { get; set; }
+        public int MaxQty { get; set; }
+        public bool InnerPack { get; set; }
+        public bool ExcludeCartonization { get; set; }
+        public double Length { get; set; }
+        public double Width { get; set; }
+        public double Height { get; set; }
+        public double Cube { get; set; }
+        public double Weight { get; set; }
+
+        public SimpleUoM() { }
+
+        public SimpleUoM(string code, int itemNumber, int qtyPerUoM, int maxQty,
+                         bool innerPack, bool excludeCartonization, 
+                         double length, double width, double height, double cube, double weight)
+        {
+            Code = code;
+            ItemNumber = itemNumber;
+            QtyPerUoM = qtyPerUoM;
+            MaxQty = maxQty;
+            InnerPack = innerPack;
+            ExcludeCartonization = excludeCartonization;
+            Length = length;
+            Width = width;
+            Height = height;
+            Cube = cube;
+            Weight = weight;
+        }
+    }
 }

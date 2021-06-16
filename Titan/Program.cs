@@ -24,9 +24,203 @@ namespace Titan
     {
         static void Main()
         {
-            TestSets();
+            Console.WriteLine(Toolbox.GetSol());
+
+            InvPushTest();
 
             _ = Console.ReadLine();
+        }
+
+        public static void ContainsExistsAny()
+        {
+            Console.WriteLine("***************************************");
+            Console.WriteLine("********* ContainsExistsAny ***********");
+            Console.WriteLine("***************************************");
+
+            List<int> list = new List<int>(6000000);
+            Random random = new Random();
+            for (int i = 0; i < 6000000; i++)
+            {
+                list.Add(random.Next(6000000));
+            }
+            int[] arr = list.ToArray();
+            HashSet<int> set = new HashSet<int>(list);
+
+            Find(list, arr, set);
+
+        }
+
+        public static void ContainsExistsAnyShort()
+        {
+            Console.WriteLine("***************************************");
+            Console.WriteLine("***** ContainsExistsAnyShortRange *****");
+            Console.WriteLine("***************************************");
+
+            List<int> list = new List<int>(2000);
+            Random random = new Random();
+            for (int i = 0; i < 2000; i++)
+            {
+                list.Add(random.Next(6000000));
+            }
+            int[] arr = list.ToArray();
+            HashSet<int> set = new HashSet<int>(list);
+
+            Find(list, arr, set);
+
+        }
+
+        public static void Find(List<int> list, int[] arr, HashSet<int> set)
+        {
+            Random random = new Random();
+            int[] find = new int[10000];
+            for (int i = 0; i < 10000; i++)
+            {
+                find[i] = random.Next(6000000);
+            }
+
+            Stopwatch watch = Stopwatch.StartNew();
+            for (int rpt = 0; rpt < 10000; rpt++)
+            {
+                list.Contains(find[rpt]);
+            }
+            watch.Stop();
+            Console.WriteLine("List/Contains: {0}ms", watch.ElapsedMilliseconds);
+
+            watch = Stopwatch.StartNew();
+            for (int rpt = 0; rpt < 10000; rpt++)
+            {
+                list.Exists(a => a == find[rpt]);
+            }
+            watch.Stop();
+            Console.WriteLine("List/Exists: {0}ms", watch.ElapsedMilliseconds);
+
+            watch = Stopwatch.StartNew();
+            for (int rpt = 0; rpt < 10000; rpt++)
+            {
+                list.Any(a => a == find[rpt]);
+            }
+            watch.Stop();
+            Console.WriteLine("List/Any: {0}ms", watch.ElapsedMilliseconds);
+
+            watch = Stopwatch.StartNew();
+            for (int rpt = 0; rpt < 10000; rpt++)
+            {
+                arr.Contains(find[rpt]);
+            }
+            watch.Stop();
+            Console.WriteLine("Array/Contains: {0}ms", watch.ElapsedMilliseconds);
+
+            watch = Stopwatch.StartNew();
+            for (int rpt = 0; rpt < 10000; rpt++)
+            {
+                Array.Exists(arr, element => element == find[rpt]);
+            }
+            watch.Stop();
+            Console.WriteLine("Array/Exists: {0}ms", watch.ElapsedMilliseconds);
+
+            watch = Stopwatch.StartNew();
+            for (int rpt = 0; rpt < 10000; rpt++)
+            {
+                arr.Any(a => a == find[rpt]);
+            }
+            watch.Stop();
+            Console.WriteLine("Array/Any: {0}ms", watch.ElapsedMilliseconds);
+
+            watch = Stopwatch.StartNew();
+            for (int rpt = 0; rpt < 10000; rpt++)
+            {
+                set.Contains(find[rpt]);
+            }
+            watch.Stop();
+            Console.WriteLine("HashSet/Contains: {0}ms", watch.ElapsedMilliseconds);
+
+            watch = Stopwatch.StartNew();
+            for (int rpt = 0; rpt < 10000; rpt++)
+            {
+                set.Any(a => a == find[rpt]);
+            }
+            watch.Stop();
+            Console.WriteLine("HashSet/Any: {0}ms", watch.ElapsedMilliseconds);
+        }
+
+        public static void TestBCMethods()
+        {
+            int count = 20;
+            Console.WriteLine("Press enter to begin: ...");
+            Console.ReadLine();
+            DataTable _ = GetInventory.BinTable();
+            Stopwatch stopwatch;
+
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            List<SimpleBin> ls;
+            for (int i = 0; i < count; i++) 
+            {
+                ls = GetInventory.SimpleBins();
+            }
+
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds / count}ms for Simples from datatable.");
+
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            DataTable dt;
+            for (int i = 0; i < count; i++)
+            {
+                dt = GetInventory.BinTable();
+            }
+
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds / count}ms for just DataTable.");
+
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            //List<Object> lo;
+            //for (int i = 0; i < count; i++)
+            //{
+            //    lo = GetInventory.BinList();
+            //}
+
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds / count}ms for Object List by reader.");
+
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            //List<SimpleBin> ss;
+            //for (int i = 0; i < count; i++)
+            //{
+            //    ss = GetInventory.SimpleBinList();
+            //}
+
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds / count}ms for SimpleBin List by reader.");
+
+            /*ss = GetInventory.SimpleBinList();
+            foreach (var item in ss)
+            {
+                Console.WriteLine(item.MaxCube);
+            }
+*/
+            /*int j = 0;
+            foreach (var item in lo)
+            {
+                Console.WriteLine($"{j} : {item.ToString()});
+            }*/
+
+            /*foreach (DataRow row in dt.Rows)
+            {
+                Console.WriteLine(row["max_cube"].ToString());
+            }*/
+            /*
+                        foreach (var item in ls)
+                        {
+                            Console.WriteLine(item.MaxCube);
+                        }
+            */
         }
 
         public static void TestSets()
@@ -253,7 +447,7 @@ namespace Titan
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            DataTable data = GetInventory.Bins();
+            DataTable data = GetInventory.BinTable();
 
             stopwatch.Stop();
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to pull Bin data.");

@@ -15,14 +15,73 @@ namespace Olympus.Helios
             return chariot.PullFullDataSet();
         }
 
-        /* Machines */
-        public static DataTable GetMachineTable()
+        /* Data Tables */
+        private static DataTable TableByName(string tableName)
         {
             EquipmentChariot chariot = new EquipmentChariot(Toolbox.GetSol());
-            return chariot.GetMachineTable();
+            return chariot.PullFullTable(tableName);
         }
 
-        public static List<Machine> GetMachines()
+        public static DataTable DataTable(string tableName)
+        {
+            EquipmentChariot chariot = new EquipmentChariot(Toolbox.GetSol());
+            if (chariot.TableDefinitions.Keys.Contains(tableName) && !tableName.StartsWith("sqlite_"))
+                return TableByName(tableName);
+            return new DataTable();
+        }
+
+        public static DataTable BatteryTable()
+        {
+            return TableByName("battery");
+        }
+
+        public static DataTable BatteryLocationTable()
+        {
+            return TableByName("battery_location");
+        }
+        public static DataTable ChargerTable()
+        {
+            return TableByName("charger");
+        }
+
+        public static DataTable ChargerAssignmentTable()
+        {
+            return TableByName("charger_assignment");
+        }
+
+        internal static DataTable ChecklistTable()
+        {
+            return TableByName("checklist");
+        }
+
+        internal static DataTable CompledChecklistTable()
+        {
+            return TableByName("completed_checklist");
+        }
+
+        internal static DataTable FaultTable()
+        {
+            return TableByName("fault");
+        }
+
+        public static DataTable MachineTable()
+        {
+            return TableByName("machine");
+        }
+
+        internal static DataTable TypeTable()
+        {
+            return TableByName("type");
+        }
+
+        /* Machines */
+        public static List<SimpleMachine> SimpleMachines()
+        {
+            EquipmentChariot chariot = new EquipmentChariot(Toolbox.GetSol());
+            return chariot.SimpleMachines();
+        }
+
+        public static List<Machine> Machines()
         {
             EquipmentChariot chariot = new EquipmentChariot(Toolbox.GetSol());
             DataTable data = chariot.GetMachinesTypeChecklist();
@@ -59,30 +118,8 @@ namespace Olympus.Helios
         }
 
         /* Batteries */
-        public static DataTable GetBatteryTable()
-        {
-            EquipmentChariot chariot = new EquipmentChariot(Toolbox.GetSol());
-            return chariot.GetBatteryTable();
-        }
-
-        public static DataTable GetBatteryLocationTable()
-        {
-            EquipmentChariot chariot = new EquipmentChariot(Toolbox.GetSol());
-            return chariot.GetBatteryLocationTable();
-        }
 
         /* Charger */
-        public static DataTable GetChargerTable()
-        {
-            EquipmentChariot chariot = new EquipmentChariot(Toolbox.GetSol());
-            return chariot.GetChargerTable();
-        }
-
-        public static DataTable GetChargerAssignmentTable()
-        {
-            EquipmentChariot chariot = new EquipmentChariot();
-            return chariot.GetChargerAssignmentTable();
-        }
     }
 
     public static class PutEquipment

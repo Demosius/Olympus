@@ -31,4 +31,29 @@ namespace Olympus.Helios.Equipment
             LastPreOpCheck = lastPreop;
         }
     }
+
+    public class SimpleMachine
+    {
+        public string SerialNumber { get; set; }
+        public string TypeCode { get; set; }
+        public DateTime ServiceDueDate { get; set; }
+        public DateTime LastServiceDate { get; set; }
+        public string ChecklistName { get; set; }
+        public string Ownership { get; set; }
+        public DateTime LastPreopCheck { get; set; }
+
+        public SimpleMachine() { }
+
+        public SimpleMachine(string serialNumber, string typeCode, DateTime serviceDueDate, DateTime lastServiceDate,
+                             string checklistName, string ownership, DateTime lastPreopCheck)
+        {
+            SerialNumber = serialNumber;
+            TypeCode = typeCode;
+            ServiceDueDate = serviceDueDate;
+            LastServiceDate = lastServiceDate;
+            ChecklistName = checklistName;
+            Ownership = ownership;
+            LastPreopCheck = lastPreopCheck;
+        }
+    }
 }

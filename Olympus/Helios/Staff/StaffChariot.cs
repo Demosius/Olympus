@@ -228,25 +228,24 @@ namespace Olympus.Helios.Staff
             );";
 
         private static readonly string LicenceDefinition =
-            @"create table licence
+            @"-- auto-generated definition
+            create table uom
             (
-                number          text not null
-                    constraint licence_pk
-                        primary key,
-                issue_date      text not null,
-                expiry_date     text not null,
-                LF              int default false not null,
-                LO              int default false not null,
-                WP              int default false not null,
-                front_image     BLOB,
-                back_image      BLOB,
-                employee_number int  not null
-                    references employee
-                        on update cascade on delete set null
-            );
-
-            create unique index licence_number_uindex
-                on licence (number);";
+                code                  text not null,
+                item_number           int  not null
+                    references item,
+                qty_per_uom           int  not null,
+                max_qty               int,
+                inner_pack            boolean,
+                exclude_cartonization boolean,
+                length                real,
+                width                 real,
+                height                real,
+                cube                  real,
+                weight                real,
+                constraint uom_pk
+                    primary key (code, item_number)
+            );";
 
         private static readonly string LockerDefinition =
             @"create table locker

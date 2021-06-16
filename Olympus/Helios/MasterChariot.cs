@@ -243,7 +243,7 @@ namespace Olympus.Helios
 
         /**************************** Download Data ****************************/
 
-        protected DataTable PullFullTable(string tableName)
+        public DataTable PullFullTable(string tableName)
         {
             DataTable data = new DataTable();
             try
