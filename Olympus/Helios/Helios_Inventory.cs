@@ -77,6 +77,24 @@ namespace Olympus.Helios
             return chariot.LastTableUpdate("stock");
         }
 
+        public static DateTime LastBinUpdateTime()
+        {
+            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            return chariot.LastTableUpdate("bin");
+        }
+
+        public static DateTime LastItemUpdateTime()
+        {
+            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            return chariot.LastTableUpdate("item");
+        }
+
+        public static DateTime LastUoMUpdateTime()
+        {
+            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            return chariot.LastTableUpdate("uom");
+        }
+
 
         /* Special/Specific pull types. */
         public static BinContents BinContents()
@@ -116,22 +134,50 @@ namespace Olympus.Helios
             }
         }
 
+        /* Table Columns */
+        public static Dictionary<string, string> BinColumnDict()
+        {
+            return Constants.BIN_COLUMNS;
+        }
+
+        public static Dictionary<string, string> UoMColumnDict()
+        {
+            return Constants.UOM_COLUMNS;
+        }
+
+        public static Dictionary<string, string> StockColumnDict()
+        {
+            return Constants.STOCK_COLUMNS;
+        }
     }
 
     public static class PutInventory
     {
         public static bool BinsFromClipboard()
         {
-            DataTable data = DataConversion.ClipboardToTable();
-            Utility.ValidateTableData(data, Constants.BIN_COLUMNS);
-            DataConversion.ConvertColumns(
-                dataTable: data,
-                dblColumns: new List<string> { "used_cube", "max_cube" },
-                intColumns: new List<string> { "ranking" },
-                dtColumns: new List<string> { "last_cc_date", "last_pi_date" },
-                boolColumns: new List<string> { "empty", "assigned" });
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
-            return chariot.BinTableUpdate(data);
+            try
+            {
+                DataTable data = DataConversion.ClipboardToTable();
+                List<string> missingCols = Utility.ValidateTableData(data, Constants.BIN_COLUMNS);
+                if (missingCols.Count > 0) throw new InvalidDataException("Missing Data", missingCols);
+                DataConversion.ConvertColumns(
+                    dataTable: data,
+                    dblColumns: new List<string> { "used_cube", "max_cube" },
+                    intColumns: new List<string> { "ranking" },
+                    dtColumns: new List<string> { "last_cc_date", "last_pi_date" },
+                    boolColumns: new List<string> { "empty", "assigned" });
+                InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+                return chariot.BinTableUpdate(data);
+            }
+            catch (InvalidDataException ex)
+            {
+                MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+            }
+            return false;
         }
 
         public static bool ItemsFromCSV(bool force = false)
@@ -142,45 +188,84 @@ namespace Olympus.Helios
             // If the item data has been updated since the last file update don't spend time to update.
             if (chariot.LastTableUpdate("item") == File.GetLastWriteTime(csvFile) && !force) return false;
 
-            DataTable data = DataConversion.CSVToTable(csvFile, Constants.ITEM_COLUMNS.Values.ToList(), "CompanyCode = 'AU'");
-            // Validate data
-            Utility.ValidateTableData(data, Constants.ITEM_COLUMNS);
-            DataConversion.ConvertColumns(
-                dataTable: data,
-                dblColumns: new List<string> { "length", "width", "height", "weight", "cube" },
-                intColumns: new List<string> { "number", "category", "platform", "division", "genre" },
-                dtColumns: new List<string> {  },
-                boolColumns: new List<string> { "preowned" });
+            try
+            {
+                DataTable data = DataConversion.CSVToTable(csvFile, Constants.ITEM_COLUMNS.Values.ToList(), "CompanyCode = 'AU'");
+                // Validate data
+                List<string> missingCols = Utility.ValidateTableData(data, Constants.ITEM_COLUMNS);
+                if (missingCols.Count > 0) throw new InvalidDataException("Missing Data", missingCols);
+                DataConversion.ConvertColumns(
+                    dataTable: data,
+                    dblColumns: new List<string> { "length", "width", "height", "weight", "cube" },
+                    intColumns: new List<string> { "number", "category", "platform", "division", "genre" },
+                    dtColumns: new List<string> { },
+                    boolColumns: new List<string> { "preowned" });
 
-            return chariot.ItemTableUpdate(data, File.GetLastWriteTime(csvFile));
+                return chariot.ItemTableUpdate(data, File.GetLastWriteTime(csvFile));
+            }
+            catch (InvalidDataException ex)
+            {
+                MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+            }
+            return false;
         }
 
         public static bool UoMFromClipboard()
         {
-            DataTable data = DataConversion.ClipboardToTable();
-            Utility.ValidateTableData(data, Constants.UOM_COLUMNS);
-            DataConversion.ConvertColumns(
-                dataTable: data,
-                dblColumns: new List<string> { "length", "width", "height", "weight", "cube" },
-                intColumns: new List<string> { "item_number", "qty_per_uom", "max_qty" },
-                dtColumns: new List<string> {  },
-                boolColumns: new List<string> { "inner_pack", "exclude_cartonization" });
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
-            return chariot.UoMTableUpdate(data);
+            try
+            {
+                DataTable data = DataConversion.ClipboardToTable();
+                List<string> missingCols = Utility.ValidateTableData(data, Constants.UOM_COLUMNS);
+                if (missingCols.Count > 0) throw new InvalidDataException("Missing Data", missingCols);
+                DataConversion.ConvertColumns(
+                    dataTable: data,
+                    dblColumns: new List<string> { "length", "width", "height", "weight", "cube" },
+                    intColumns: new List<string> { "item_number", "qty_per_uom", "max_qty" },
+                    dtColumns: new List<string> { },
+                    boolColumns: new List<string> { "inner_pack", "exclude_cartonization" });
+                InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+                return chariot.UoMTableUpdate(data);
+            }
+            catch (InvalidDataException ex)
+            {
+                MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+            }
+return false;
         }
 
         public static bool StockFromClipboard()
         {
-            DataTable data = DataConversion.ClipboardToTable();
-            Utility.ValidateTableData(data, Constants.STOCK_COLUMNS);
-            DataConversion.ConvertColumns(
-                dataTable: data,
-                dblColumns: new List<string> { },
-                intColumns: new List<string> { "item_number", "qty", "pick_qty", "put_away_qty", "neg_adj_qty", "pos_adj_qty" },
-                dtColumns: new List<string> { "date_created", "time_created" },
-                boolColumns: new List<string> { "fixed" });
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
-            return chariot.StockTableUpdate(data);
+            try
+            {
+                DataTable data = DataConversion.ClipboardToTable();
+                List<string> missingCols = Utility.ValidateTableData(data, Constants.STOCK_COLUMNS);
+                if (missingCols.Count > 0) throw new InvalidDataException("Missing Data", missingCols);
+                DataConversion.ConvertColumns(
+                    dataTable: data,
+                    dblColumns: new List<string> { },
+                    intColumns: new List<string> { "item_number", "qty", "pick_qty", "put_away_qty", "neg_adj_qty", "pos_adj_qty" },
+                    dtColumns: new List<string> { "date_created", "time_created" },
+                    boolColumns: new List<string> { "fixed" });
+                InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+                return chariot.StockTableUpdate(data);
+            }
+            catch (InvalidDataException ex)
+            {
+                MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+            }
+return false;
         }
 
         public static bool BCFromDB(string dir)

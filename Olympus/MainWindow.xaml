@@ -5,13 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Olympus" 
         xmlns:Control="clr-namespace:Olympus.Components"
-        
         mc:Ignorable="d"
         Title="Olympus" WindowState="Maximized"
         Icon="./Resources/Images/Icons/olympus.png"
         MinWidth="400"
         MinHeight="300"
-        Background="DarkRed">
+        Background="#022">
     
     <Grid>
         <Grid.RowDefinitions>
@@ -23,8 +22,12 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Control:Navbar Grid.Row="0" Grid.Column="0"/>
+        <Control:Navbar x:Name="NavBar" Grid.Row="0" Grid.Column="0"/>
         <Frame  Margin="5,5,5,5" x:Name="OView" Grid.Row="1" Grid.Column="0" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                 BorderThickness="1" BorderBrush="SlateGray"/>
     </Grid>
+
+    <Window.Resources>
+        
+    </Window.Resources>
 </Window>

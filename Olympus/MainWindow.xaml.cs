@@ -12,6 +12,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Olympus.Components;
+using System.Threading;
+using System.Globalization;
 
 namespace Olympus
 {
@@ -23,6 +25,7 @@ namespace Olympus
         public MainWindow()
         {
             InitializeComponent();
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-AU");
             OView.Navigate(new Prometheus.Prometheus());
         }
     }

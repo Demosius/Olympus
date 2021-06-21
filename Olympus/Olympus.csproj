@@ -40,7 +40,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\Images\Icons\castle_icon_155982.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Images\Icons\burn.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -81,12 +81,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Charon\Charon.cs" />
+    <Compile Include="Charon\Boatman.cs" />
     <Compile Include="Charon\LogIn.xaml.cs">
       <DependentUpon>LogIn.xaml</DependentUpon>
     </Compile>
     <Compile Include="Charon\Register.xaml.cs">
       <DependentUpon>Register.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Components\InventoryUpdater.xaml.cs">
+      <DependentUpon>InventoryUpdater.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helios\Equipment\Checklist.cs" />
     <Compile Include="Helios\Staff\Clan.cs" />
@@ -103,7 +106,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Components\DB_Selection.xaml">
+    <Page Include="Components\DatabaseSelection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Components\InventoryUpdater.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -115,7 +122,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Components\SignIn.xaml">
+    <Page Include="Components\UserHandler.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -127,8 +134,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Components\DB_Selection.xaml.cs">
-      <DependentUpon>DB_Selection.xaml</DependentUpon>
+    <Compile Include="Components\DatabaseSelection.xaml.cs">
+      <DependentUpon>DatabaseSelection.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\Navbar.xaml.cs">
       <DependentUpon>Navbar.xaml</DependentUpon>
@@ -136,8 +143,8 @@
     <Compile Include="Components\ProjectSelection.xaml.cs">
       <DependentUpon>ProjectSelection.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Components\SignIn.xaml.cs">
-      <DependentUpon>SignIn.xaml</DependentUpon>
+    <Compile Include="Components\UserHandler.xaml.cs">
+      <DependentUpon>UserHandler.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helios\DataConversion.cs" />
     <Compile Include="Helios\Helios_Equipment.cs" />
@@ -205,6 +212,14 @@
     <None Include="settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Resource Include="Resources\Images\Icons\forge.ico" />
+    <Resource Include="Resources\Images\Icons\burn.ico" />
+    <Resource Include="Resources\Images\Icons\prometheus.ico" />
+    <Resource Include="Resources\Images\Icons\castle.ico" />
+    <Resource Include="Resources\Images\Icons\hellsing.ico" />
+    <Resource Include="Resources\Images\Icons\sword-smithing.ico" />
+    <Resource Include="Resources\Images\Icons\vampire.ico" />
+    <Resource Include="Resources\Images\Icons\z.ico" />
     <Content Include="Sol\Inventory\Inventory.sqlite">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -229,9 +244,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Images\Icons\olympus.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\Icons\castle_icon_155982.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

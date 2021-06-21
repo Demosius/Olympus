@@ -11,17 +11,28 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Olympus;
 
 namespace Olympus.Components
 {
     /// <summary>
-    /// Interaction logic for SignIn.xaml
+    /// Interaction logic for DB_Selection.xaml
     /// </summary>
-    public partial class SignIn : UserControl
+    public partial class DatabaseSelection : UserControl
     {
-        public SignIn()
+        public string DBString { get; set; }
+
+        public DatabaseSelection()
         {
             InitializeComponent();
+            SetDisplay();
         }
+
+        private void SetDisplay()
+        {
+            DBString = $"DB Location: {Toolbox.GetSol()}";
+            DBDisplay.DataContext = DBString;
+        }
+
     }
 }

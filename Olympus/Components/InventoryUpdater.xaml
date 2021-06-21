@@ -1,0 +1,126 @@
+﻿<UserControl x:Class="Olympus.Components.InventoryUpdater"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Olympus.Components"
+             mc:Ignorable="d">
+    <Border BorderBrush="Black" BorderThickness="1" Margin="5" Padding="0,0,5,0" Background="DarkSlateGray" CornerRadius="5">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- First Row, Date Labels -->
+            <Label x:Name="lblStockDT" Grid.Column="0" Grid.Row="0" Content="{Binding}" Foreground="Cyan"/>
+            <Label x:Name="lblBinDT" Grid.Column="1" Grid.Row="0" Content="{Binding}" Foreground="Lime"/>
+            <Label x:Name="lblUoMDT" Grid.Column="2" Grid.Row="0" Content="{Binding}" Foreground="DarkOrange"/>
+            <Label x:Name="lblItemDT" Grid.Column="3" Grid.Row="0" Content="{Binding}" Foreground="White"/>
+
+            <!-- Second Row, Buttons -->
+            <Button x:Name="btnStock" Grid.Column="0" Grid.Row="1" Content="Stock" Background="{DynamicResource CyanGradient}" Style="{DynamicResource InventoryButton}" Click="UpdateStock"/>
+            <Button x:Name="btnBins" Grid.Column="1" Grid.Row="1" Content="Bins" Background="{DynamicResource GreenGradient}" Style="{DynamicResource InventoryButton}" Click="UpdateBins"/>
+            <Button x:Name="btnUoM" Grid.Column="2" Grid.Row="1" Content="UoM" Background="{DynamicResource OrangeGradient}" Style="{DynamicResource InventoryButton}" Click="UpdateUoM"/>
+            <Button x:Name="btnItems" Grid.Column="3" Grid.Row="1" Content="Items" Background="{DynamicResource Graydient}" Style="{DynamicResource InventoryButton}" Click="UpdateItems"/>
+
+            <!-- Third Row, Column Buttons -->
+            <Button x:Name="btnStockCols" Grid.Column="0" Grid.Row="2" Content="BC Cols" Background="{DynamicResource CyanGradient}" Click="BCInfo" Style="{DynamicResource MiniButton}"/>
+            <Button x:Name="btnBinCols" Grid.Column="1" Grid.Row="2" Content="BL Cols" Background="{DynamicResource GreenGradient}" Click="BLInfo" Style="{DynamicResource MiniButton}" />
+            <Button x:Name="btnUoMCols" Grid.Column="2" Grid.Row="2" Content="UoM Cols" Background="{DynamicResource OrangeGradient}" Click="UoMInfo" Style="{DynamicResource MiniButton}" />
+            <Button x:Name="btnItemCols" Grid.Column="3" Grid.Row="2" Content="Info" Background="{DynamicResource Graydient}" Click="ShowInfo" Style="{DynamicResource MiniButton}" />
+
+        </Grid>
+    </Border>
+
+    <UserControl.Resources>
+        <!-- Label Styling -->
+        <Style TargetType="Label">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Courier New" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="TextBlock.HorizontalAlignment" Value="Center" />
+        </Style>
+
+        <!--Standard Button Styling-->
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="MinHeight" Value="20"/>
+            <Setter Property="MinWidth" Value="20"/>
+            <Setter Property="Background" Value="Firebrick" />
+            <Setter Property="Foreground" Value="WhiteSmoke" />
+            <Setter Property="BorderBrush" Value="WhiteSmoke" />
+            <Setter Property="TextBlock.TextAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Arial" />
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <!--<Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="Black"/>
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="BorderBrush" Value="DarkRed" />
+                </Trigger>
+            </Style.Triggers>-->
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="3"/>
+                </Style>
+            </Style.Resources>
+        </Style>
+
+        <!-- Inventory Buttons -->
+        <Style x:Key="InventoryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="MinWidth" Value="130"/>
+            <Setter Property="MinHeight" Value="55"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+        </Style>
+        
+        <!-- Mini Buttons -->
+        <Style x:Key="MiniButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Margin" Value="0,0,5,5"/>
+            <Setter Property="Padding" Value="2,0,2,0"/>
+            <Setter Property="FontWeight" Value="DemiBold" />
+            <Setter Property="MinWidth" Value="30" />
+            <Setter Property="MinHeight" Value="5" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="BorderBrush" Value="Black" />
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="1"/>
+                </Style>
+            </Style.Resources>
+        </Style>
+
+        <LinearGradientBrush x:Key="CyanGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="Cyan" Offset="0"/>
+            <GradientStop Color="DarkCyan" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GreenGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="Lime" Offset="0"/>
+            <GradientStop Color="Green" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="OrangeGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="DarkOrange" Offset="0"/>
+            <GradientStop Color="OrangeRed" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="Graydient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="White" Offset="0"/>
+            <GradientStop Color="Gray" Offset="1"/>
+        </LinearGradientBrush>
+    </UserControl.Resources>
+    
+</UserControl>

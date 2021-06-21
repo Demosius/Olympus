@@ -28,10 +28,9 @@ namespace Olympus
             MessageBox.Show($"Unexpected Exception:\n\n{ex}\n\nNotify Olympus development when possible.");
         }
 
-
         public static Settings GetSettings()
         {
-            string fileName = "./settings.json";
+            string fileName = $"{AppDomain.CurrentDomain.BaseDirectory}/settings.json";
             string data = File.ReadAllText(fileName);
             Settings settings = JsonSerializer.Deserialize<Settings>(data);
             return settings;
@@ -40,7 +39,7 @@ namespace Olympus
         public static void SetSettings(Settings settings)
         {
             string data = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText("./settings.json", data);
+            File.WriteAllText($"{AppDomain.CurrentDomain.BaseDirectory}/settings.json", data);
         }
 
         public static string GetSol()

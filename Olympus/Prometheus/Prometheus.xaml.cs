@@ -196,5 +196,6 @@ namespace Olympus.Prometheus
             PageSize = int.Parse(radioButton.Tag.ToString());
             ShowTable();
         }
+
     }
 }

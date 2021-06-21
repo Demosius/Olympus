@@ -26,7 +26,7 @@ namespace Titan
         {
             Console.WriteLine(Toolbox.GetSol());
 
-            Console.WriteLine($"{1/2} : {1.0/2.0}");
+            Console.WriteLine($"{AppDomain.CurrentDomain.BaseDirectory}\n{System.Reflection.Assembly.GetEntryAssembly().Location}");
 
             _ = Console.ReadLine();
         }

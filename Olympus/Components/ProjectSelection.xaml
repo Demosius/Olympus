@@ -4,26 +4,143 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Olympus.Components"
-             mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="800">
+             mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Button Grid.Row="0" Grid.Column="0" Margin="5,5,5,5"></Button>
-        <Button Grid.Row="0" Grid.Column="1" Margin="5,5,5,5"></Button>
-        <Button Grid.Row="0" Grid.Column="2" Margin="5,5,5,5"></Button>
-        <Button Grid.Row="0" Grid.Column="3" Margin="5,5,5,5"></Button>
-        <Button Grid.Row="0" Grid.Column="4" Margin="5,5,5,5"></Button>
+        <ScrollViewer Grid.Row="0" Grid.Column="0" HorizontalScrollBarVisibility="Auto" CanContentScroll="True" VerticalScrollBarVisibility="Hidden">
+            <StackPanel x:Name="DeptStack" Orientation="Horizontal">
+                <RadioButton Style="{DynamicResource DeptButton}" Content="All"/>
+                <RadioButton Style="{DynamicResource DeptButton}" Content="User"/>
+                <RadioButton Style="{DynamicResource DeptButton}" Content="Restock"/>
+                <RadioButton Style="{DynamicResource DeptButton}" Content="Replen"/>
+                <RadioButton Style="{DynamicResource DeptButton}" Content="Admin"/>
+            </StackPanel>
+        </ScrollViewer>
+        <ScrollViewer Grid.Row="1" Grid.Column="0" HorizontalScrollBarVisibility="Auto" CanContentScroll="True" VerticalScrollBarVisibility="Hidden">
+            <StackPanel x:Name="ProjectStack" Orientation="Horizontal">
+
+                <RadioButton Style="{DynamicResource ProjectButton}" ToolTip="Data Management">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/prometheus.ico" Stretch="Uniform" Width="45" Height="45"/>
+                        <Label Content="Prometheus" FontSize="8" Padding="0,5,0,5"/>
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton Style="{DynamicResource ProjectButton}" ToolTip="Replenishment Automation">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/forge.ico" Stretch="Uniform" Width="45" Height="45"/>
+                        <Label Content="RefOrge" FontSize="8" Padding="0,5,0,5"/>
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton Style="{DynamicResource ProjectButton}" ToolTip="Pre-work Stock Maintenance">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/burn.ico" Stretch="Uniform" Width="45" Height="45"/>
+                        <Label Content="AutoBurn" FontSize="8" Padding="0,5,0,5"/>
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton Style="{DynamicResource ProjectButton}" ToolTip="Count Tracking">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/vampire.ico" Stretch="Uniform" Width="45" Height="45"/>
+                        <Label Content="Dracula" FontSize="8" Padding="0,5,0,5"/>
+                    </StackPanel>
+                </RadioButton>
+                <RadioButton Style="{DynamicResource ProjectButton}" ToolTip="Zone Load Analysis Mapping">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/z.ico" Stretch="Uniform" Width="45" Height="45"/>
+                        <Label Content="ZLAM" FontSize="8" Padding="0,5,0,5"/>
+                    </StackPanel>
+                </RadioButton>
+            </StackPanel>
+        </ScrollViewer>
 
     </Grid>
+
+    <UserControl.Resources>
+        <Style x:Key="DeptButton" TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="MinWidth" Value="150"/>
+            <Setter Property="Background" Value="{DynamicResource DeptGradient}" />
+            <Setter Property="Foreground" Value="{DynamicResource ForeGradient}" />
+            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="TextBlock.TextAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Arial" />
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Foreground" Value="Black" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+            </Style.Triggers>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="3"/>
+                </Style>
+            </Style.Resources>
+        </Style>
+        <Style x:Key="ProjectButton" TargetType="RadioButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Height" Value="80"/>
+            <Setter Property="Width" Value="70"/>
+            <Setter Property="Background" Value="{DynamicResource ProjectGradient}" />
+            <Setter Property="Foreground" Value="{DynamicResource ForeGradient}" />
+            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="TextBlock.TextAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontWeight" Value="ExtraLight"/>
+            <Setter Property="FontFamily" Value="Arial" />
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+            </Style.Triggers>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="3"/>
+                </Style>
+            </Style.Resources>
+        </Style>
+        
+        <LinearGradientBrush x:Key="DeptGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="#0BA" Offset="0"/>
+            <GradientStop Color="#032" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="ProjectGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="#75A" Offset="0"/>
+            <GradientStop Color="#213" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="ForeGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="Gainsboro" Offset="0"/>
+            <GradientStop Color="BlanchedAlmond" Offset="1"/>
+        </LinearGradientBrush>
+
+        <Style TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextBlock.FontSize" Value="14"/>
+            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="Gray"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        
+    </UserControl.Resources>
+        
 </UserControl>

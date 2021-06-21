@@ -11,17 +11,21 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Olympus.Charon;
 
 namespace Olympus.Components
 {
     /// <summary>
-    /// Interaction logic for DB_Selection.xaml
+    /// Interaction logic for SignIn.xaml
     /// </summary>
-    public partial class DB_Selection : UserControl
+    public partial class UserHandler : UserControl
     {
-        public DB_Selection()
+        public Boatman Charon { get; set; }
+
+        public UserHandler()
         {
             InitializeComponent();
+            Charon = new Boatman();
         }
     }
 }

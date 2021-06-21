@@ -21,7 +21,7 @@
             <ColumnDefinition Width="*" MinWidth="200"/>
             <ColumnDefinition Width="5*" MinWidth="200"/>
         </Grid.ColumnDefinitions>
-<!--"{Binding ElementName=DisplayData, Path=ActualHeight}"--> 
+
         <TreeView Name="tableView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Margin="2,2,2,2" Height="Auto" 
                   ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
             <TreeViewItem Header="Staff">
@@ -69,7 +69,8 @@
             </TreeViewItem>
         </TreeView>
 
-        <Grid Grid.Row="0" Grid.Column="1" >
+        <Border BorderBrush="SlateGray" BorderThickness="1" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Margin="2" Background="#700"/>
+        <Grid Grid.Row="0" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -116,7 +117,6 @@
             <RadioButton Grid.Row="0" Grid.Column="4" Height="30" Width="30" Margin="20,0,20,5" HorizontalAlignment="Left" Style="{DynamicResource IPPButton}" Tag="100" Checked="SetPageSize">100</RadioButton>
             <RadioButton Grid.Row="0" Grid.Column="5" Height="30" Width="30" Margin="20,0,20,5" HorizontalAlignment="Left" Style="{DynamicResource IPPButton}" Tag="500" Checked="SetPageSize">500</RadioButton>
 
-
         </Grid>
 
             
@@ -136,11 +136,13 @@
     <Page.Resources>
         <!--Standard Button Styling-->
         <Style x:Key="StandardButton" TargetType="Button">
-            <Setter Property="Background" Value="LightGray" />
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="MinHeight" Value="20"/>
+            <Setter Property="MinWidth" Value="20"/>
+            <Setter Property="Background" Value="WhiteSmoke" />
             <Setter Property="TextBlock.TextAlignment" Value="Center" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="25" />
             <Setter Property="FontFamily" Value="Arial" />
             <Style.Resources>
                 <Style TargetType="Border">
@@ -148,10 +150,11 @@
                 </Style>
             </Style.Resources>
         </Style>
-
+        
         <!--Pagination Button Styling-->
         <Style x:Key="PageButton" TargetType="Button" BasedOn="{StaticResource StandardButton}">
             <Setter Property="Background" Value="Beige" />
+            <Setter Property="FontSize" Value="25"/>
         </Style>
 
         <!--IPP Button Styling-->
@@ -186,6 +189,7 @@
             <Setter Property="RowBackground" Value="{DynamicResource ResourceKey=RedGradient}" />
             <Setter Property="Background" Value="#500" />
             <Setter Property="Foreground" Value="White" />
+            <Setter Property="BorderBrush" Value="SlateGray" />
             <Setter Property="RowHeight" Value="20" />
             <Setter Property="AllowDrop" Value="True" />
             <Setter Property="Block.TextAlignment" Value="Right" />
@@ -242,9 +246,6 @@
                     <Setter Property="Background" Value="DarkRed"/>
                 </DataTrigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <!--<Setter Property="BorderBrush" Value="BlanchedAlmond"/>
-                    <Setter Property="BorderThickness" Value="1"/>
-                    <Setter Property="Foreground" Value="BlanchedAlmond"/>-->
                     <Setter Property="FontWeight" Value="Bold"/>
                 </Trigger>
             </Style.Triggers>
@@ -259,6 +260,7 @@
         <!-- TreeView Style -->        
         <Style TargetType="{x:Type TreeView}">
             <Setter Property="Background" Value="#500"/>
+            <Setter Property="BorderBrush" Value="SlateGray"/>
         </Style>
         <!--TreeViewItemStyle-->
         <Style TargetType="{x:Type TreeViewItem}">
