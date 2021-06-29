@@ -29,7 +29,7 @@ namespace Olympus.Prometheus
         public DataSet StaffData { get; set; }
         public DataSet EquipmentData { get; set; }
         public DataSet InventoryData { get; set; }
-        public DataTable DataTable { get; set; }
+        public DataTable DisplayTable { get; set; }
 
         public int PageIndex { get; set; } = 0;
         public int PageSize { get; set; } = 25;
@@ -39,6 +39,7 @@ namespace Olympus.Prometheus
         public Prometheus()
         {
             InitializeComponent();
+            this.DataContext = this;
             SetData();
             SetPageString();
         }
@@ -77,7 +78,7 @@ namespace Olympus.Prometheus
             }
             if (!dataSet.Tables.Contains(tblName)) GetTable(dbName, tblName);
 
-            DataTable = dataSet.Tables[tblName];
+            DisplayTable = dataSet.Tables[tblName];
             PageIndex = 0;
             ShowTable();
         }
@@ -129,17 +130,17 @@ namespace Olympus.Prometheus
 
         private void ShowTable()
         {
-            if (DataTable != null)
+            if (DisplayTable != null)
             {
-                if (DataTable.Rows.Count == 0)
+                if (DisplayTable.Rows.Count == 0)
                 {
-                    DisplayData.DataContext = DataTable.AsDataView();
+                    DisplayData.DataContext = DisplayTable.AsDataView();
                 }
                 else
                 {
-                    while (DataTable.Rows.Count <= PageIndex * PageSize && PageIndex > 0) --PageIndex;
+                    while (DisplayTable.Rows.Count <= PageIndex * PageSize && PageIndex > 0) --PageIndex;
 
-                    var display = DataTable.AsEnumerable().Skip(PageIndex * PageSize).Take(PageSize).CopyToDataTable();
+                    var display = DisplayTable.AsEnumerable().Skip(PageIndex * PageSize).Take(PageSize).CopyToDataTable();
 
                     DisplayData.DataContext = display.AsDataView();
                 }
@@ -149,9 +150,9 @@ namespace Olympus.Prometheus
 
         private void PageFwd(object sender, RoutedEventArgs e)
         {
-            if (DataTable == null)
+            if (DisplayTable == null)
                 PageIndex = 0;
-            else if ((PageIndex + 1) * PageSize <= DataTable.Rows.Count)
+            else if ((PageIndex + 1) * PageSize <= DisplayTable.Rows.Count)
                 ++PageIndex;
             ShowTable();
         }
@@ -164,10 +165,10 @@ namespace Olympus.Prometheus
 
         private void PageLast(object sender, RoutedEventArgs e)
         {
-            if (DataTable == null)
+            if (DisplayTable == null)
                 PageIndex = 0;
             else
-                PageIndex = DataTable.Rows.Count / PageSize + 1;
+                PageIndex = DisplayTable.Rows.Count / PageSize + 1;
             ShowTable();
         }
 
@@ -180,11 +181,11 @@ namespace Olympus.Prometheus
         private void SetPageString()
         {
             int pageTotal;
-            if (DataTable == null)
+            if (DisplayTable == null)
                 PageString = "No Data";
             else
             {
-                pageTotal = DataTable.Rows.Count / PageSize;
+                pageTotal = DisplayTable.Rows.Count / PageSize;
                 PageString = $"Page: {PageIndex + 1} of {pageTotal + 1}";
             }
             PageInfo.DataContext = PageString;

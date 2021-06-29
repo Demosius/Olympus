@@ -28,5 +28,10 @@ namespace Olympus
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-AU");
             OView.Navigate(new Prometheus.Prometheus());
         }
+
+        private void CommonCommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
     }
 }

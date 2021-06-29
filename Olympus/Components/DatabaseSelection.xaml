@@ -6,6 +6,14 @@
              xmlns:local="clr-namespace:Olympus.Components"
              mc:Ignorable="d" 
              d:DesignHeight="35" d:DesignWidth="800">
+
+    <!--<UserControl.DataContext>
+        <local:/>
+    </UserControl.DataContext>-->
+    
+    <UserControl.CommandBindings>
+        <CommandBinding Command="local:Commands.ChangeDatabase" CanExecute="ChangeDBCommand_CanExecute" Executed="ChangeDBCommand_Executed"/>
+    </UserControl.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -16,8 +24,8 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
             
-        <Label Name="DBDisplay" Grid.Row="0" Grid.Column="0" Margin="5,5,5,5" Content="{Binding}" TextBlock.FontSize="14" TextBlock.TextAlignment="Center"/>
-        <Button Grid.Row="0" Grid.Column="1" Margin="5" TextBlock.FontSize="14" Padding="5" TextBlock.TextAlignment="Right">Change Database</Button>
+        <Label Name="DBDisplay" Grid.Row="0" Grid.Column="0" Margin="5,5,5,5" Content="{Binding DBString, UpdateSourceTrigger=PropertyChanged}" TextBlock.FontSize="14" TextBlock.TextAlignment="Center"/>
+        <Button Grid.Row="0" Grid.Column="1" Margin="5" TextBlock.FontSize="14" Padding="5" TextBlock.TextAlignment="Right" Command="local:Commands.ChangeDatabase">Change Database</Button>
 
     </Grid>
 </UserControl>

@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:Olympus"
              DispatcherUnhandledException="Application_DispatcherUnhandledExceptionh"
              StartupUri="MainWindow.xaml">
-    
+
     <Application.Resources>
         <!-- Image Resources -->
         <Image x:Key="icoForge" Source="./Resources/Images/Icons/forge.ico" />
@@ -12,6 +12,38 @@
         <Image x:Key="icoBurn" Source="./Resources/Images/Icons/burn.ico" />
         <Image x:Key="icoDrac" Source="./Resources/Images/Icons/vampire.ico" />
 
+        <!-- Tab Control Styling -->
+        <Style TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid Name="Panel">
+                            <ContentPresenter x:Name="ContentSite"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        ContentSource="Header"
+                                        Margin="10,2"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Panel" Property="Background" Value="{DynamicResource BackGradient}" />
+                                <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="{DynamicResource ForeGradient}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="Panel" Property="Background" Value="{DynamicResource InactiveBackGradient}" />
+                                <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="{DynamicResource InactiveForeGradient}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="TabControl">
+            <Setter Property="Background" Value="{DynamicResource BackGroundBrush}"/>
+            <Setter Property="BorderBrush" Value="#055" />
+        </Style>
+        
         <!--Standard Button Styling-->
         <Style TargetType="Button">
             <Setter Property="Margin" Value="5"/>
@@ -59,9 +91,60 @@
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
 
+        <LinearGradientBrush x:Key="BackGroundBrush" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="#044" Offset="0"/>
+            <GradientStop Color="#022" Offset="1"/>
+        </LinearGradientBrush>
+        
         <LinearGradientBrush x:Key="MainGradient" EndPoint="0,1" StartPoint="0,0">
             <GradientStop Color="#0AA" Offset="0"/>
             <GradientStop Color="#022" Offset="1"/>
         </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="BackGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="#0BA" Offset="0"/>
+            <GradientStop Color="#032" Offset="1"/>
+        </LinearGradientBrush>
+        
+        <LinearGradientBrush x:Key="PurpleGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="#75A" Offset="0"/>
+            <GradientStop Color="#213" Offset="1"/>
+        </LinearGradientBrush>
+        
+        <LinearGradientBrush x:Key="ForeGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="Gainsboro" Offset="0"/>
+            <GradientStop Color="BlanchedAlmond" Offset="1"/>
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="InactiveBackGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="#BDC" Offset="0"/>
+            <GradientStop Color="#9BA" Offset="1"/>
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="InactiveForeGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="DarkSlateGray" Offset="0"/>
+            <GradientStop Color="SlateGray" Offset="1"/>
+        </LinearGradientBrush>
+
+        <!-- Data Colour Gradients -->
+        <LinearGradientBrush x:Key="CyanGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="Cyan" Offset="0"/>
+            <GradientStop Color="DarkCyan" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GreenGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="Lime" Offset="0"/>
+            <GradientStop Color="Green" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="OrangeGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="DarkOrange" Offset="0"/>
+            <GradientStop Color="OrangeRed" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="Graydient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="White" Offset="0"/>
+            <GradientStop Color="Gray" Offset="1"/>
+        </LinearGradientBrush>
+        
     </Application.Resources>
+    
+    
 </Application>

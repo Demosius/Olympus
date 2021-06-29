@@ -19,8 +19,8 @@
 
         <Label Grid.Row="0" Grid.Column="0">Who are you, and what are you doing here?</Label>
 
-        <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Height="Auto">Sign In</Button>
-        <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Height="Auto">Register</Button>
+        <Button x:Name="btnSignIn" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Height="Auto" Click="btnSignIn_Click">Sign In</Button>
+        <Button x:Name="btnRegister" Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Height="Auto" Click="btnRegister_Click">Register</Button>
         
     </Grid>
 </UserControl>

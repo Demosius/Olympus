@@ -27,5 +27,17 @@ namespace Olympus.Components
             InitializeComponent();
             Charon = new Boatman();
         }
+         
+        private void btnSignIn_Click(object sender, RoutedEventArgs e)
+        {
+            LogIn signInForm = new LogIn();
+            signInForm.ShowDialog();
+        }
+
+        private void btnRegister_Click(object sender, RoutedEventArgs e)
+        {
+            Register regForm = new Register();
+            regForm.ShowDialog();
+        }
     }
 }

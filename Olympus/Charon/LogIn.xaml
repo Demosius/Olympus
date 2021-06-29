@@ -5,8 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Olympus.Charon"
         mc:Ignorable="d"
-        Title="LogIn" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Background="{DynamicResource BackGroundBrush}"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Title="Log In" SizeToContent="WidthAndHeight">
+    <Window.CommandBindings>
+        <CommandBinding Command="local:Commands.LogIn" CanExecute="LogInCommand_CanExecute" Executed="LogInCommand_Executed" />
+    </Window.CommandBindings>
+    <StackPanel Margin="10">
+        <WrapPanel>
+            <Label Content="_User" Target="{Binding ElementName=txtUser}"/>
+            <Label>
+                <TextBlock FontSize="12" FontWeight="Light" FontStyle="Italic">(employee number)</TextBlock>
+            </Label>
+        </WrapPanel>
+        <TextBox Name="TxtUser"/>
+        <Label Target="{Binding ElementName=txtPassword}">_Password</Label>
+        <PasswordBox Name="PwdPassword"/>
+        <StackPanel Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Right">
+            <Button IsCancel="True">_Cancel</Button>
+            <Button IsDefault="True" Name="BtnLogIn" Command="local:Commands.LogIn">_Log In</Button>
+        </StackPanel>
+    </StackPanel>
 </Window>
