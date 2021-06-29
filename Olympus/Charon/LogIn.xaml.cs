@@ -23,5 +23,33 @@ namespace Olympus.Charon
         {
             InitializeComponent();
         }
+
+        private void BtnLogIn_Click(object sender, RoutedEventArgs e)
+        {
+            this.DialogResult = true;
+        }
+
+        private void LogInCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = TxtUser.Text.Length > 1 && PwdPassword.Password.Length > 1;
+        }
+
+        private void LogInCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            MessageBox.Show(PwdPassword.Password);
+        }
+    }
+
+    /// <summary>
+    ///  Static Command class for custom commands.
+    /// </summary>
+    public static partial class Commands
+    {
+        public static readonly RoutedUICommand LogIn = new RoutedUICommand
+            (
+                "Log In",
+                "Log_In",
+                typeof(Commands)
+            );
     }
 }

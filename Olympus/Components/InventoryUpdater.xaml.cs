@@ -67,7 +67,9 @@ namespace Olympus.Components
                             $"Stock (Bin Contents), Bins (Bin List), and UoM (Item Units of Measure) require data coppied from NAV.\n\n" +
                             $"Items takes data from an external workbool (Pricebook Report) and requires nothing other than pressing the button.\n\n" +
                             $"Click on the small [xx Col] buttons to be shown the required columns (and where to get the data) for the specific data type.\n\n", 
-                            $"Data Upload Help");
+                            $"Data Upload Help",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
         }
 
         private void BCInfo(object sender, RoutedEventArgs e)
@@ -78,7 +80,9 @@ namespace Olympus.Components
                             $"{String.Join("\n", GetInventory.StockColumnDict().Values)}\n\n" +
                             $"(Filter to Zone Code as required, and Location Code = '9600')\n" +
                             $"(Update to the minute, as required.)",
-                            $"Stock/Bin Contents Requirements");
+                            $"Stock/Bin Contents Requirements",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
         }
 
         private void BLInfo(object sender, RoutedEventArgs e)
@@ -89,7 +93,9 @@ namespace Olympus.Components
                             $"{String.Join("\n", GetInventory.BinColumnDict().Values)}\n\n" +
                             $"(No filtering required.)\n" +
                             $"(Update when changes are made to bin/zone layouts, or when Count Dates are required.)",
-                            $"Bin List Requirements");
+                            $"Bin List Requirements",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
         }
 
         private void UoMInfo(object sender, RoutedEventArgs e)
@@ -100,7 +106,9 @@ namespace Olympus.Components
                             $"{String.Join("\n", GetInventory.UoMColumnDict().Values)}\n\n" +
                             $"(Unfilter All, then filter Code to \"<>EACH\".)\n" +
                             $"(Update Daily. End of previous work day, or begining of current.)",
-                            $"UoM Data Requirements");
+                            $"UoM Data Requirements",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
         }
     }
 }

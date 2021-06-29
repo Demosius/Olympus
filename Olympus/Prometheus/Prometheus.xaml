@@ -85,11 +85,19 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Row="0" Grid.Column="1" Height="30" Width="30" Margin="5" HorizontalAlignment="Right" Click="PageFirst" Style="{DynamicResource PageButton}">«</Button>
-            <Button Grid.Row="0" Grid.Column="2" Height="30" Width="30" Margin="5" HorizontalAlignment="Right" Click="PageBack" Style="{DynamicResource PageButton}">‹</Button>
-            <Label Name="PageInfo" Grid.Row="0" Grid.Column="3" Margin="5" Padding="5,3,5,3" Height="Auto" FontSize="18" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1" Background="AliceBlue" Content="{Binding}"/>
-            <Button Grid.Row="0" Grid.Column="4" Height="30" Width="30" Margin="5" HorizontalAlignment="Left" Click="PageFwd" Style="{DynamicResource PageButton}">›</Button>
-            <Button Grid.Row="0" Grid.Column="5" Height="30" Width="30" Margin="5" HorizontalAlignment="Left" Click="PageLast" Style="{DynamicResource PageButton}">»</Button>
+            <Button Grid.Row="0" Grid.Column="1" Height="30" Width="30" Margin="5" HorizontalAlignment="Right" Click="PageFirst" Style="{DynamicResource PageButton}">
+                <Image Source="/Resources/Images/Pagination/first_button.png" Margin="5"/>
+            </Button>
+            <Button Grid.Row="0" Grid.Column="2" Height="30" Width="30" Margin="5" HorizontalAlignment="Right" Click="PageBack" Style="{DynamicResource PageButton}">
+                <Image Source="/Resources/Images/Pagination/previous_button.png" Margin="6"/>
+            </Button>
+            <Label Name="PageInfo" Grid.Row="0" Grid.Column="3" Margin="5" Padding="5,3,5,3" Height="Auto" FontSize="18" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1" Background="AliceBlue" Foreground="Black" Content="{Binding}"/>
+            <Button Grid.Row="0" Grid.Column="4" Height="30" Width="30" Margin="5" HorizontalAlignment="Left" Click="PageFwd" Style="{DynamicResource PageButton}">
+                <Image Source="/Resources/Images/Pagination/next_button.png" Margin="6"/>
+            </Button>
+            <Button Grid.Row="0" Grid.Column="5" Height="30" Width="30" Margin="5" HorizontalAlignment="Left" Click="PageLast" Style="{DynamicResource PageButton}">
+                <Image Source="/Resources/Images/Pagination/last_button.png" Margin="5"/>
+            </Button>
             
         </Grid>
 
@@ -153,7 +161,8 @@
         
         <!--Pagination Button Styling-->
         <Style x:Key="PageButton" TargetType="Button" BasedOn="{StaticResource StandardButton}">
-            <Setter Property="Background" Value="Beige" />
+            <Setter Property="Background" Value="{DynamicResource PinkGradient}" />
+            <Setter Property="BorderBrush" Value="Black"/>
             <Setter Property="FontSize" Value="25"/>
         </Style>
 
@@ -164,8 +173,8 @@
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="FontSize" Value="12" />
             <Setter Property="FontFamily" Value="Arial" />
-            <Setter Property="Background" Value="IndianRed" />
-            <Setter Property="BorderBrush" Value="DarkRed" />
+            <Setter Property="Background" Value="{DynamicResource OrangeGradient}" />
+            <Setter Property="BorderBrush" Value="Black" />
             <Style.Triggers>
                 <Trigger Property="IsChecked" Value="{x:Null}">
                     <Setter Property="Background" Value="Red" />
@@ -295,6 +304,17 @@
             <GradientStop Color="#500" Offset="0"/>
             <GradientStop Color="DarkRed" Offset="1"/>
         </LinearGradientBrush>
-        
+        <LinearGradientBrush x:Key="PinkGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="PaleVioletRed" Offset="0"/>
+            <GradientStop Color="MediumVioletRed" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="OrangeGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="DarkOrange" Offset="0"/>
+            <GradientStop Color="Orange" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="MedRedGradiant" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="IndianRed" Offset="0"/>
+            <GradientStop Color="IndianRed" Offset="1"/>
+        </LinearGradientBrush>
     </Page.Resources>
 </Page>
