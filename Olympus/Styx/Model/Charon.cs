@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 using Olympus.Helios.Users;
 using Olympus.Helios.Staff;
 
-namespace Olympus.Charon
+namespace Olympus.Model.Styx
 {
-    public class Boatman
+    public class Charon
     {
         public User User { get; set; }
         public Employee Employee { get; set; }
 
-        public Boatman() { }
+        public Charon() { }
 
-        public Boatman(User user, Employee employee)
+        public Charon(User user, Employee employee)
         {
             User = user;
             Employee = employee;

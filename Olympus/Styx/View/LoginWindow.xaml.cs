@@ -12,14 +12,14 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Olympus.Charon
+namespace Olympus.Styx.View
 {
     /// <summary>
     /// Interaction logic for LogIn.xaml
     /// </summary>
-    public partial class LogIn : Window
+    public partial class LoginWindow : Window
     {
-        public LogIn()
+        public LoginWindow()
         {
             InitializeComponent();
         }
