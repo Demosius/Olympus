@@ -12,9 +12,9 @@
         Background="{DynamicResource BackGroundBrush}">
 
     <Window.CommandBindings>
-        <CommandBinding Command="New" CanExecute="CommonCommandBinding_CanExecute" />
+        <!--<CommandBinding Command="New" CanExecute="CommonCommandBinding_CanExecute" />
         <CommandBinding Command="Open" CanExecute="CommonCommandBinding_CanExecute" />
-        <CommandBinding Command="Save" CanExecute="CommonCommandBinding_CanExecute" />
+        <CommandBinding Command="Save" CanExecute="CommonCommandBinding_CanExecute" />-->
     </Window.CommandBindings>
     
     <Grid>
@@ -37,7 +37,7 @@
                 <Separator/>
                 <MenuItem Header="E_xit">
                     <MenuItem.Icon>
-                        <Image Source="./Resources/Images/System/Door-Open-Out.png"/>
+                        <Image Source="../Resources/Images/System/Door-Open-Out.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>

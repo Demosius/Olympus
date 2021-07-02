@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Threading;
 using System.Globalization;
+using Olympus.Styx.Model;
 
 namespace Olympus
 {

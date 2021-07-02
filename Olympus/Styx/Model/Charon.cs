@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Olympus.Helios.Users;
 using Olympus.Helios.Staff;
 
-namespace Olympus.Model.Styx
+namespace Olympus.Styx.Model
 {
     public class Charon
     {

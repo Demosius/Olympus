@@ -14,6 +14,8 @@ using System.Windows.Shapes;
 using Olympus.Components;
 using System.Threading;
 using System.Globalization;
+using Olympus.Prometheus.View;
+using Olympus.Styx.View;
 
 namespace Olympus
 {
@@ -22,16 +24,19 @@ namespace Olympus
     /// </summary>
     public partial class MainWindow : Window
     {
+        public PrometheusPage PrometheusPage { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-AU");
-            OView.Navigate(new Prometheus.Prometheus());
+            PrometheusPage = new PrometheusPage();
+            OView.Navigate(PrometheusPage);
         }
 
-        private void CommonCommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-        }
+        //private void CommonCommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        //{
+        //    e.CanExecute = true;
+        //}
     }
 }
