@@ -17,13 +17,13 @@ namespace Olympus.Helios.Inventory
     {
         public InventoryChariot()
         {
-            FilePath = "./Sol/Inventory/Inventory.sqlite";
+            FilePath = Path.Combine(Environment.CurrentDirectory, "Sol", "Inventory", "Inventory.sqlite");
             Connect();
         }
 
         public InventoryChariot(string solLocation)
         {
-            FilePath = solLocation + "/Inventory/Inventory.sqlite";
+            FilePath = Path.Combine(solLocation, "Inventory", "Inventory.sqlite");
             Connect();
         }
 

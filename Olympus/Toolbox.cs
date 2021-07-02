@@ -30,7 +30,7 @@ namespace Olympus
 
         public static Settings GetSettings()
         {
-            string fileName = $"{AppDomain.CurrentDomain.BaseDirectory}/settings.json";
+            string fileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
             string data = File.ReadAllText(fileName);
             Settings settings = JsonSerializer.Deserialize<Settings>(data);
             return settings;
@@ -117,9 +117,51 @@ namespace Olympus
 
     public class Settings
     {
+        private string jsonFile;
+        private JSONSettings jsonSettings;
+
+        public string SolLocation 
+        { 
+            get { return jsonSettings.SolLocation; }
+            set 
+            {
+                jsonSettings.SolLocation = value;
+                WriteToFile();
+            }
+        }
+
+        public string ItemCSVLocation
+        {
+            get { return jsonSettings.ItemCSVLocation; }
+            set 
+            { 
+                jsonSettings.ItemCSVLocation = value;
+                WriteToFile();
+            }
+        }
+
+        public Settings() 
+        {
+            jsonFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.json");
+            ReadFromFile();
+        }
+
+        private void ReadFromFile()
+        {
+            string data = File.ReadAllText(jsonFile);
+            jsonSettings = JsonSerializer.Deserialize<JSONSettings>(data);
+        }
+
+        private void WriteToFile()
+        {
+            string data = JsonSerializer.Serialize(jsonSettings, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(jsonFile, data);
+        }
+    }
+
+    public class JSONSettings
+    {
         public string SolLocation { get; set; }
         public string ItemCSVLocation { get; set; }
-
-        public Settings() { }
     }
 }

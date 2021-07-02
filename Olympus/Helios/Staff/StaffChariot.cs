@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -10,13 +11,13 @@ namespace Olympus.Helios.Staff
     {
         public StaffChariot()
         {
-            FilePath = "./Sol/Staff/Staff.sqlite";
+            FilePath = Path.Combine(Environment.CurrentDirectory, "Sol", "Staff", "Staff.sqlite");
             Connect();
         }
 
         public StaffChariot(string solLocation)
         {
-            FilePath = solLocation + "/Staff/Staff.sqlite";
+            FilePath = Path.Combine(solLocation, "Staff", "Staff.sqlite");
             Connect();
         }
 

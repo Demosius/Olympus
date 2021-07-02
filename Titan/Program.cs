@@ -24,9 +24,15 @@ namespace Titan
     {
         static void Main()
         {
-            Console.WriteLine(Toolbox.GetSol());
+            //Console.WriteLine(Toolbox.GetSol());
 
-            Console.WriteLine($"{AppDomain.CurrentDomain.BaseDirectory}\n{System.Reflection.Assembly.GetEntryAssembly().Location}");
+            Console.WriteLine($"{AppDomain.CurrentDomain.BaseDirectory}\n{System.Reflection.Assembly.GetEntryAssembly().Location}\n{Environment.CurrentDirectory}");
+
+            Settings settings = new Settings();
+
+            Console.WriteLine($"{settings.ItemCSVLocation}\n{settings.SolLocation}");
+
+            InvPushTest();
 
             _ = Console.ReadLine();
         }
@@ -148,16 +154,14 @@ namespace Titan
             int count = 20;
             Console.WriteLine("Press enter to begin: ...");
             Console.ReadLine();
-            DataTable _ = GetInventory.BinTable();
+            _ = GetInventory.BinTable();
             Stopwatch stopwatch;
 
             stopwatch = new Stopwatch();
             stopwatch.Start();
-
-            List<SimpleBin> ls;
             for (int i = 0; i < count; i++) 
             {
-                ls = GetInventory.SimpleBins();
+                _ = GetInventory.SimpleBins();
             }
 
             stopwatch.Stop();
@@ -165,11 +169,9 @@ namespace Titan
 
             stopwatch = new Stopwatch();
             stopwatch.Start();
-
-            DataTable dt;
             for (int i = 0; i < count; i++)
             {
-                dt = GetInventory.BinTable();
+                _ = GetInventory.BinTable();
             }
 
             stopwatch.Stop();

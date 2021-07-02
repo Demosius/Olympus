@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Olympus.Components
+namespace Olympus.View.Components
 {
     /// <summary>
     /// Interaction logic for ProjectButton.xaml

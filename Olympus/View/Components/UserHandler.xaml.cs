@@ -11,32 +11,33 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Olympus.Charon;
+using Olympus.Styx.Model;
+using Olympus.Styx.View;
 
-namespace Olympus.Components
+namespace Olympus.View.Components
 {
     /// <summary>
     /// Interaction logic for SignIn.xaml
     /// </summary>
     public partial class UserHandler : UserControl
     {
-        public Boatman Charon { get; set; }
+        public Charon Charon { get; set; }
 
         public UserHandler()
         {
             InitializeComponent();
-            Charon = new Boatman();
+            Charon = new Charon();
         }
          
-        private void btnSignIn_Click(object sender, RoutedEventArgs e)
+        private void BtnSignIn_Click(object sender, RoutedEventArgs e)
         {
-            LogIn signInForm = new LogIn();
-            signInForm.ShowDialog();
+            LoginWindow login = new LoginWindow();
+            login.ShowDialog();
         }
 
-        private void btnRegister_Click(object sender, RoutedEventArgs e)
+        private void BtnRegister_Click(object sender, RoutedEventArgs e)
         {
-            Register regForm = new Register();
+            RegisterWindow regForm = new RegisterWindow();
             regForm.ShowDialog();
         }
     }

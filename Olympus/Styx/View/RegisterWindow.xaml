@@ -3,15 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Olympus.Charon"
+        xmlns:local="clr-namespace:Olympus.Styx.View"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="{DynamicResource BackGroundBrush}"
         Title="Register" SizeToContent="Height" Width="300">
+    
     <Window.CommandBindings>
-        <CommandBinding x:Name="ComReg" Command="local:Commands.Register" CanExecute="RegisterCommand_CanExecute" Executed="RegisterCommand_Executed"/>
+    
     </Window.CommandBindings>
+    
     <StackPanel Margin="10">
         <WrapPanel>
             <Label Content="_User" Target="{Binding ElementName=txtUser}"/>
@@ -27,7 +29,7 @@
         <TextBlock Margin="10" Foreground="WhiteSmoke" TextWrapping="Wrap">Password must be at least 6 characters long. Mixing upper and lower case letters with numbers and special characters is also recommended.</TextBlock>
         <StackPanel Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Right">
             <Button IsCancel="True">_Cancel</Button>
-            <Button IsDefault="True" Name="BtnRegister" Command="local:Commands.Register">_Register</Button>
+            <Button IsDefault="True" Name="BtnRegister" >_Register</Button>
         </StackPanel>
     </StackPanel>
 </Window>

@@ -16,7 +16,7 @@ using Olympus;
 using Olympus.Helios;
 using System.Globalization;
 
-namespace Olympus.Components
+namespace Olympus.View.Components
 {
     /// <summary>
     /// Interaction logic for InvUpdate.xaml

@@ -16,7 +16,7 @@ using Microsoft.Win32;
 using Ookii.Dialogs.Wpf;
 using System.ComponentModel;
 
-namespace Olympus.Components
+namespace Olympus.View.Components
 {
     /// <summary>
     /// Interaction logic for DB_Selection.xaml
@@ -36,51 +36,6 @@ namespace Olympus.Components
             DBString = $"DB Location: {Toolbox.GetSol()}";
         }
 
-        private void ChangeDBCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = true;
-        }
-
-        private void ChangeDBCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            var dialog = new VistaFolderBrowserDialog { SelectedPath = Toolbox.GetSol() };
-            if (dialog.ShowDialog().GetValueOrDefault())
-            {
-                DBString = dialog.SelectedPath;
-                MessageBox.Show(DBString);
-            }
-        }
     }
 
-    public class DBSViewModel : INotifyPropertyChanged
-    {
-        public string DBString { get; set; }
-
-        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
-        {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
-        }
-    }
-
-    public static partial class Commands
-    {
-        public static readonly RoutedUICommand ChangeDatabase = new RoutedUICommand
-            (
-                "Change Database",
-                "ChangeDatabase",
-                typeof(Commands),
-                new InputGestureCollection()
-                {
-                    new KeyGesture(Key.D, ModifierKeys.Control)
-                }
-            );
-    }
 }

@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Olympus" 
-        xmlns:Control="clr-namespace:Olympus.Components"
+        xmlns:Control="clr-namespace:Olympus.View.Components"
         mc:Ignorable="d"
         Title="Olympus" WindowState="Maximized"
         MinWidth="400"
@@ -42,9 +42,9 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_Edit">
-                <MenuItem Command="Cut"/>
+                <!--<MenuItem Command="Cut"/>
                 <MenuItem Command="Copy"/>
-                <MenuItem Command="Paste"/>
+                <MenuItem Command="Paste"/>-->
             </MenuItem>
         </Menu>
 
