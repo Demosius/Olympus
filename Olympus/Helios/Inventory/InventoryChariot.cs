@@ -17,13 +17,13 @@ namespace Olympus.Helios.Inventory
     {
         public InventoryChariot()
         {
-            FilePath = Path.Combine(Environment.CurrentDirectory, "Sol", "Inventory", "Inventory.sqlite");
+            DatabaseName = Path.Combine(Environment.CurrentDirectory, "Sol", "Inventory", "Inventory.sqlite");
             Connect();
         }
 
         public InventoryChariot(string solLocation)
         {
-            FilePath = Path.Combine(solLocation, "Inventory", "Inventory.sqlite");
+            DatabaseName = Path.Combine(solLocation, "Inventory", "Inventory.sqlite");
             Connect();
         }
 
@@ -46,9 +46,9 @@ namespace Olympus.Helios.Inventory
             try
             {
                 List<SimpleBin> list = new List<SimpleBin> { };
-                Conn.Open();
+                Database.Open();
                 string query = "SELECT * FROM [bin];";
-                SQLiteCommand command = new SQLiteCommand(query, Conn);
+                SQLiteCommand command = new SQLiteCommand(query, Database);
                 SQLiteDataReader reader = command.ExecuteReader();
                 string mc;
 
@@ -74,7 +74,7 @@ namespace Olympus.Helios.Inventory
                     ); 
                 }
 
-                Conn.Close();
+                Database.Close();
                 return list;
             }
             catch (Exception ex)
@@ -120,16 +120,16 @@ namespace Olympus.Helios.Inventory
         {
             string query = $"SELECT [last_update] FROM [update] WHERE tbl_name = '{tableName}';";
             DateTime dt;
-            Conn.Open();
-            SQLiteCommand command = new SQLiteCommand(query, Conn);
+            Database.Open();
+            SQLiteCommand command = new SQLiteCommand(query, Database);
             object result = command.ExecuteScalar();
             if (result == null || result.ToString() == "")
             {
-                Conn.Close();
+                Database.Close();
                 return new DateTime();
             }
             dt = DateTime.Parse(result.ToString());
-            Conn.Close();
+            Database.Close();
             return dt;
         }
 
@@ -138,12 +138,12 @@ namespace Olympus.Helios.Inventory
         {
             string query = $"SELECT MIN([last_update]) FROM [stock_update] WHERE [location] = '{location}' AND [zone_code] IN ('{string.Join("', '", zones)}') ";
             DateTime dt;
-            Conn.Open();
-            SQLiteCommand command = new SQLiteCommand(query, Conn);
+            Database.Open();
+            SQLiteCommand command = new SQLiteCommand(query, Database);
             object result = command.ExecuteScalar();
             if (result == null || result.ToString() == "") return new DateTime();
             dt = DateTime.Parse(result.ToString());
-            Conn.Close();
+            Database.Close();
             return dt;
         }
 
@@ -177,19 +177,19 @@ namespace Olympus.Helios.Inventory
             DateTime dt = DateTime.Now;
             try
             {
-                Conn.Open();
-                using (var transaction = Conn.BeginTransaction())
+                Database.Open();
+                using (var transaction = Database.BeginTransaction())
                 {
                     foreach (DataRow row in locZoneTable.Rows)
                     {
                         string sql = $"REPLACE INTO [stock_update] (location, zone_code, last_update) VALUES ('{row["location"]}', '{row["zone_code"]}', '{dt}');";
-                        SQLiteCommand command = new SQLiteCommand(sql, Conn);
+                        SQLiteCommand command = new SQLiteCommand(sql, Database);
                         command.ExecuteNonQuery();
                     }
                     transaction.Commit();
                 }
 
-                Conn.Close();
+                Database.Close();
                 return true;
             }
             catch (Exception ex)
@@ -203,11 +203,11 @@ namespace Olympus.Helios.Inventory
         {
             try
             {
-                Conn.Open();
+                Database.Open();
                 string sql = $"REPLACE INTO [update] (tbl_name, last_update) VALUES ('{tableName}', '{dateTime}');";
-                SQLiteCommand command = new SQLiteCommand(sql, Conn);
+                SQLiteCommand command = new SQLiteCommand(sql, Database);
                 command.ExecuteNonQuery();
-                Conn.Close();
+                Database.Close();
                 return true;
             }
             catch (Exception ex)
@@ -273,15 +273,15 @@ namespace Olympus.Helios.Inventory
         {
             try
             {
-                Conn.Open();
+                Database.Open();
                 // Check for any missing columns.
                 List<string> missingCols = Utility.ValidateTableData(locZoneTable, new List<string> {"location","zone_code"});
                 if (missingCols.Count > 0) throw new InvalidDataException("Invalid Bin Data.", missingCols);
 
                 // Build Deletion transaction.
-                using (var transaction = Conn.BeginTransaction())
+                using (var transaction = Database.BeginTransaction())
                 {
-                    SQLiteCommand command = Conn.CreateCommand();
+                    SQLiteCommand command = Database.CreateCommand();
                     
                     foreach (DataRow row in locZoneTable.Rows)
                     {
@@ -298,7 +298,7 @@ namespace Olympus.Helios.Inventory
 
                 }
 
-                Conn.Close();
+                Database.Close();
             }
             catch (InvalidDataException)
             {

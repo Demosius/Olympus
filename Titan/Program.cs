@@ -157,28 +157,6 @@ namespace Titan
             return items;
         }
 
-        public static List<NAVItem> CSVToMemoryTimer()
-        {
-            Console.WriteLine("*********************** CSV to MemoryStream ***********************");
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            List<NAVItem> items;
-            Dictionary<string, int> headDict = Constants.NAV_ITEM_COLUMNS;
-            // Get raw data from clipboard and check that it has data.
-            string rawData = File.ReadAllText(App.Settings.ItemCSVLocation);
-            if (rawData == "" || rawData == null) throw new Olympus.Helios.InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
-            // Start memory stream from which to read.
-            byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-            MemoryStream stream = new MemoryStream(byteArray);
-            // Start Reading from stream.
-            items = DataConversion.NAVStreamToItems(stream, headDict);
-
-            stopwatch.Stop();
-            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to convert CSV to memoryStream and convert to Object List ({items.Count}).\n");
-            return items;
-        }
-
         public static List<NAVItem> CSVOLEDBReaderToOListTimer()
         {
             Console.WriteLine("*********************** OleDB Reader - CSV to Object List ***********************");

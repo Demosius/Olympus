@@ -22,13 +22,13 @@ namespace Olympus.Helios.Users
     {
         public UserChariot()
         {
-            FilePath = Path.Combine(Environment.CurrentDirectory, "Sol", "Users", "Users.sqlite");
+            DatabaseName = Path.Combine(Environment.CurrentDirectory, "Sol", "Users", "Users.sqlite");
             Connect();
         }
 
         public UserChariot(string solLocation)
         {
-            FilePath = Path.Combine(solLocation, "Users", "Users.sqlite");
+            DatabaseName = Path.Combine(solLocation, "Users", "Users.sqlite");
             Connect();
         }
 
@@ -44,10 +44,10 @@ namespace Olympus.Helios.Users
         {
             try
             {
-                Conn.Open();
+                Database.Open();
                 // Check if user already exists.
                 string sql = $"SELECT [id] FROM [user] WHERE [id] = {userID};";
-                SQLiteCommand command = new SQLiteCommand(sql, Conn);
+                SQLiteCommand command = new SQLiteCommand(sql, Database);
                 object result = command.ExecuteScalar();
                 if (result == null) throw new UserAlreadyExistsException("");
 
@@ -62,7 +62,7 @@ namespace Olympus.Helios.Users
                 command.CommandText = $"INSERT INTO [login] (user_id, password) VALUES ({userID}, '{password}');";
                 command.ExecuteNonQuery();
 
-                Conn.Close();
+                Database.Close();
                 return true;
             }
             catch (UserAlreadyExistsException)
@@ -81,19 +81,19 @@ namespace Olympus.Helios.Users
         {
             try
             {
-                Conn.Open();
+                Database.Open();
                 string sql = $"SELECT [name] FROM [role] WHERE [name] = 'default;";
-                SQLiteCommand command = new SQLiteCommand(sql, Conn);
+                SQLiteCommand command = new SQLiteCommand(sql, Database);
                 object result = command.ExecuteScalar();
                 if (result != null)
                 {
-                    Conn.Close();
+                    Database.Close();
                     return false;
                 }
                 command.CommandText = $"INSERT INTO [role] (name) VALUES ('default');";
                 command.ExecuteNonQuery();
 
-                Conn.Close();
+                Database.Close();
                 return true;
             }
             catch (Exception ex)

@@ -11,13 +11,13 @@ namespace Olympus.Helios.Staff
     {
         public StaffChariot()
         {
-            FilePath = Path.Combine(Environment.CurrentDirectory, "Sol", "Staff", "Staff.sqlite");
+            DatabaseName = Path.Combine(Environment.CurrentDirectory, "Sol", "Staff", "Staff.sqlite");
             Connect();
         }
 
         public StaffChariot(string solLocation)
         {
-            FilePath = Path.Combine(solLocation, "Staff", "Staff.sqlite");
+            DatabaseName = Path.Combine(solLocation, "Staff", "Staff.sqlite");
             Connect();
         }
 

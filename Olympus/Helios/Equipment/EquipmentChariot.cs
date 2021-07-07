@@ -12,13 +12,13 @@ namespace Olympus.Helios.Equipment
     {
         public EquipmentChariot()
         {
-            FilePath = Path.Combine(Environment.CurrentDirectory, "Sol", "Equipment", "Equipment.sqlite");
+            DatabaseName = Path.Combine(Environment.CurrentDirectory, "Sol", "Equipment", "Equipment.sqlite");
             Connect();
         }
 
         public EquipmentChariot(string solLocation)
         {
-            FilePath = Path.Combine(solLocation, "Equipment", "Equipment.sqlite");
+            DatabaseName = Path.Combine(solLocation, "Equipment", "Equipment.sqlite");
             Connect();
         }
 
@@ -35,9 +35,9 @@ namespace Olympus.Helios.Equipment
             try
             {
                 List<SimpleMachine> list = new List<SimpleMachine> { };
-                Conn.Open();
+                Database.Open();
                 string query = "SELECT * FROM [bin];";
-                SQLiteCommand command = new SQLiteCommand(query, Conn);
+                SQLiteCommand command = new SQLiteCommand(query, Database);
                 SQLiteDataReader reader = command.ExecuteReader();
                 string mc;
 
@@ -59,7 +59,7 @@ namespace Olympus.Helios.Equipment
                     );
                 }
 
-                Conn.Close();
+                Database.Close();
                 return list;
             }
             catch (Exception ex)

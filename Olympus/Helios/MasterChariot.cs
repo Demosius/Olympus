@@ -3,7 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Data.SQLite;
+using SQLite;
 using System.Data;
 using System.Windows;
 using System.Collections;
@@ -22,16 +22,24 @@ namespace Olympus.Helios
 {
     public abstract class MasterChariot
     {
-        public string FilePath { get; set; }
-        public SQLiteConnection Conn { get; set; }
+        public string BaseDataDirectory { get; set; }
+        public string DatabaseName { get; set; }
+        public SQLiteConnection Database { get; set; }
 
-        protected void Connect()
+        protected void InitializeDatabseConnection()
         {
             try
             {
-                Conn = new SQLiteConnection($@"URI=file:{FilePath}", true);
-                if (Conn == null) 
-                    throw new FailedConnectionException($"Failed to connect to {FilePath}, might be an invalid path.");
+                if (Database == null)
+                {
+                    if (!Directory.Exists(BaseDataDirectory)) Directory.CreateDirectory(BaseDataDirectory);
+
+                    Database = new SQLiteConnection(Path.Combine(BaseDataDirectory, DatabaseName));
+                    if (Database == null) 
+                        throw new FailedConnectionException($"Failed to connect to {DatabaseName}, might be an invalid path.");
+                }
+
+                Database.CreateTables(CreateFlags.None, Tables);
             }
             catch (FailedConnectionException ex)
             {
@@ -43,59 +51,19 @@ namespace Olympus.Helios
             }
         }
 
-        /***************************** Upload Data *****************************/
+        /***************************** CREATE Data *****************************/
 
         // Most basic building block for updating db tables.
         // Removes all previous data and fully replaces it.
-        protected bool ReplaceFullTable(DataTable data, Dictionary<string, string> columns, string tableName)
+        protected bool ReplaceFullTable<T>(List<T> objList)
         {
             try
             {
-                // Check for any missing columns.
-                List<string> missingCols = Utility.ValidateTableData(data, columns);
-                if (missingCols.Count > 0) throw new InvalidDataException("Invalid Bin Data.", missingCols);
-
-                Conn.Open();
-                // Remove old data.
-                SQLiteCommand delCommand = new SQLiteCommand(Conn)
+                Database.RunInTransaction(() =>
                 {
-                    CommandText = $"DELETE FROM {tableName};"
-                };
-                delCommand.ExecuteNonQuery();
-
-                // Build Insert transaction.
-                using (var transaction = Conn.BeginTransaction())
-                {
-                    SQLiteCommand command = Conn.CreateCommand();
-                    command.CommandText =
-                    $@"
-                        INSERT INTO {tableName}
-                        ({string.Join(", ", columns.Keys)}) 
-                        VALUES (${string.Join(", $",columns.Keys)})
-                    ";
-
-                    foreach (string col in columns.Keys)
-                    {
-                        command.Parameters.Add(new SQLiteParameter('$' + col));
-                    }
-
-                    foreach (DataRow row in data.Rows)
-                    {
-                        int i = 0;
-                        string[] arrCols = columns.Keys.ToArray();
-                        foreach (SQLiteParameter param in command.Parameters)
-                        {
-                            param.Value = row[arrCols[i]];
-                            i++;
-                        }
-                        command.ExecuteNonQuery();
-                    }
-
-                    transaction.Commit();
-
-                }
-
-                Conn.Close();
+                    Database.DeleteAll<T>();
+                    Database.InsertAll(objList);
+                });
                 return true;
             }
             catch (SQLiteException ex)
@@ -115,113 +83,15 @@ namespace Olympus.Helios
             }
         }
 
-        // User Replace Into to put a table into an existing table and replacing duplicate data.
-        protected bool OverlayTable(DataTable data, Dictionary<string, string> columns, string tableName)
-        {
-            try
-            {
-                // Check for any missing columns.
-                List<string> missingCols = Utility.ValidateTableData(data, columns);
-                if (missingCols.Count > 0) throw new InvalidDataException("Invalid Bin Data.", missingCols);
-
-                Conn.Open();
-
-                // Build Insert transaction.
-                using (var transaction = Conn.BeginTransaction())
-                {
-                    SQLiteCommand command = Conn.CreateCommand();
-                    command.CommandText =
-                    $@"
-                        REPLACE INTO {tableName}
-                        ({string.Join(", ", columns.Keys)}) 
-                        VALUES (${string.Join(", $", columns.Keys)})
-                    ";
-
-                    foreach (string col in columns.Keys)
-                    {
-                        command.Parameters.Add(new SQLiteParameter('$' + col));
-                    }
-
-                    foreach (DataRow row in data.Rows)
-                    {
-                        int i = 0;
-                        string[] arrCols = columns.Keys.ToArray();
-                        foreach (SQLiteParameter param in command.Parameters)
-                        {
-                            param.Value = row[arrCols[i]];
-                            i++;
-                        }
-                        command.ExecuteNonQuery();
-                    }
-
-                    transaction.Commit();
-
-                }
-
-                Conn.Close();
-                return true;
-            }
-            catch (SQLiteException ex)
-            {
-                MessageBox.Show($"Likely a fault with the data being input:\n\n{ex}\n\nCommon issues include newlines in coppied text that shouldn't be there. Check the data, and try again.", "Database Error:");
-                return false;
-            }
-            catch (InvalidDataException ex)
-            {
-                MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Toolbox.ShowUnexpectedException(ex);
-                return false;
-            }
-        }
-
         // Insert data into a table. Assumes that there will be no issues with duplicate data.
-        protected bool InsertIntoTable(DataTable data, Dictionary<string, string> columns, string tableName)
+        protected bool InsertIntoTable<T>(List<T> objList)
         {
             try
             {
-                // Check for any missing columns.
-                List<string> missingCols = Utility.ValidateTableData(data, columns);
-                if (missingCols.Count > 0) throw new InvalidDataException("Invalid Bin Data.", missingCols);
-
-                Conn.Open();
-
-                // Build Insert transaction.
-                using (var transaction = Conn.BeginTransaction())
+                Database.RunInTransaction(() =>
                 {
-                    SQLiteCommand command = Conn.CreateCommand();
-                    command.CommandText =
-                    $@"
-                        INSERT INTO {tableName}
-                        ({string.Join(", ", columns.Keys)}) 
-                        VALUES (${string.Join(", $", columns.Keys)})
-                    ";
-
-                    foreach (string col in columns.Keys)
-                    {
-                        command.Parameters.Add(new SQLiteParameter('$' + col));
-                    }
-
-                    foreach (DataRow row in data.Rows)
-                    {
-                        int i = 0;
-                        string[] arrCols = columns.Keys.ToArray();
-                        foreach (SQLiteParameter param in command.Parameters)
-                        {
-                            param.Value = row[arrCols[i]];
-                            i++;
-                        }
-                        command.ExecuteNonQuery();
-                    }
-
-                    transaction.Commit();
-
-                }
-
-                Conn.Close();
+                    Database.InsertAll(objList);
+                });
                 return true;
             }
             catch (SQLiteException ex)
@@ -241,81 +111,32 @@ namespace Olympus.Helios
             }
         }
 
-        /**************************** Download Data ****************************/
+        /**************************** READ Data ****************************/
 
-        public DataTable PullFullTable(string tableName)
+        public List<T> PullObjectList<T>() where T : new()
         {
             DataTable data = new DataTable();
             try
             {
-                Conn.Open();
-                SQLiteCommand command = new SQLiteCommand(Conn)
-                {
-                    CommandText = $"SELECT * FROM [{tableName}];"
-                };
-                SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
-                adapter.Fill(data);
-                data.TableName = tableName;
-                Conn.Close();
+                return Database.Table<T>().ToList();
             }
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
+                return new List<T> { };
             }
-            return data;
         }
 
-        public DataTable PullTableWithQuery(string query)
-        {
-            DataTable data = new DataTable();
-            try
-            {
-                Conn.Open();
-                SQLiteCommand command = new SQLiteCommand(Conn) { CommandText = query };
-                SQLiteDataAdapter adapter = new SQLiteDataAdapter(command);
-                adapter.Fill(data);
-                Conn.Close();
-            }
-            catch (Exception ex)
-            {
-                Toolbox.ShowUnexpectedException(ex);
-            }
-            return data;
-        }
-
-        public DataSet PullFullDataSet()
-        {
-            DataSet set = new DataSet();
-            try
-            {
-                foreach (string tableName in GetTables())
-                {
-                    set.Tables.Add(PullFullTable(tableName));
-                }
-            }
-            catch (Exception ex)
-            {
-                Toolbox.ShowUnexpectedException(ex);
-            }
-            return set;
-        }
-
-        protected List<string> GetTables()
+        protected List<string> GetTableNames()
         {
             List<string> list = new List<string> { };
-            // executes query that select names of all tables in master table of the database
-            String query = "SELECT name FROM sqlite_master " +
-                    "WHERE type = 'table'" +
-                    "ORDER BY 1;";
             try
             {
-                DataTable table = PullTableWithQuery(query);
+                List<TableMapping> tableMappings = Database.TableMappings.ToList();
 
-                // Return all table names in the ArrayList
-
-                foreach (DataRow row in table.Rows)
+                foreach (TableMapping map in tableMappings)
                 {
-                    list.Add(row.ItemArray[0].ToString());
+                    list.Add(map.TableName);
                 }
             }
             catch (Exception ex)
@@ -325,19 +146,47 @@ namespace Olympus.Helios
             return list;
         }
 
-        /**************************** Delete Data ****************************/
-        public bool EmptyTable(string tableName)
+        /**************************** UPDATE Data ****************************/
+
+        // Update an existing table - replacing duplicate data (and adding new data).
+        protected bool UpdateTable<T>(List<T> objList)
         {
             try
             {
-                Conn.Open();
-                SQLiteCommand delCommand = new SQLiteCommand(Conn)
+                Database.RunInTransaction(() =>
                 {
-                    CommandText = $"DELETE FROM {tableName};"
-                };
-                delCommand.ExecuteNonQuery();
-                Conn.Close();
+                    Database.UpdateAll(objList);
+                });
                 return true;
+            }
+            catch (SQLiteException ex)
+            {
+                MessageBox.Show($"Likely a fault with the data being input:\n\n{ex}\n\nCommon issues include newlines in coppied text that shouldn't be there. Check the data, and try again.", "Database Error:");
+                return false;
+            }
+            catch (InvalidDataException ex)
+            {
+                MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return false;
+            }
+        }
+
+        /**************************** DELETE Data ****************************/
+        public bool EmptyTable<T>(string tableName)
+        {
+            try
+            {
+                int delCount = 0;
+                Database.RunInTransaction(() =>
+                {
+                    delCount = Database.DeleteAll<T>();
+                });
+                return delCount > 0;
             }
             catch (Exception ex)
             {
@@ -351,10 +200,10 @@ namespace Olympus.Helios
         // on whether the database is valid.
         public virtual bool DeleteDatabase()
         {
-            if (!File.Exists(FilePath)) return true;
+            if (!File.Exists(DatabaseName)) return true;
             try
             {
-                File.Delete(FilePath);
+                File.Delete(DatabaseName);
                 return true;
             }
             catch (Exception)
@@ -363,23 +212,6 @@ namespace Olympus.Helios
             }
         }
 
-        public virtual bool BuildDatabase()
-        {
-            if (File.Exists(FilePath)) return false;
-            try
-            {
-                // Create File and reconnect.
-                SQLiteConnection.CreateFile(FilePath);
-                Connect();
-                // Build Tables
-                CreateTables();
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
         /// <summary>
         ///  Empties all tables of data.
         /// </summary>
@@ -388,18 +220,14 @@ namespace Olympus.Helios
         {
             try
             {
-                Conn.Open();
-                using (var transaction = Conn.BeginTransaction())
+                List<TableMapping> mappings = Database.TableMappings.ToList();
+                Database.RunInTransaction(() =>
                 {
-                    foreach (string table in TableDefinitions.Keys)
+                    foreach (TableMapping map in mappings)
                     {
-                        string sql = $"DELETE FROM {table};";
-                        SQLiteCommand command = new SQLiteCommand(sql, Conn);
-                        command.ExecuteNonQuery();
+                        Database.DeleteAll(map);
                     }
-                    transaction.Commit();
-                }
-                Conn.Close();
+                });
                 return true;
             }
             catch (Exception ex)
@@ -418,56 +246,7 @@ namespace Olympus.Helios
         {
             try
             {
-                // If file does not exist, build from scratch.
-                if (!File.Exists(FilePath))
-                {
-                    if (!BuildDatabase())
-                        return false;
-                }
-                // If connection cannot be made, try to delete and then rebuild from scratch.
-                Conn = new SQLiteConnection($@"URI=file:{FilePath}");
-                if (Conn == null)
-                {
-                    DeleteDatabase();
-                    BuildDatabase();
-                }
-                Conn.Open();
-                // If Opening failes, rebuild from scratch.
-                if (Conn.State == ConnectionState.Closed)
-                {
-                    DeleteDatabase();
-                    BuildDatabase();
-                }
-
-                // Check for each table, and create it if it is missing.
-                // Check tables exist.
-                DataTable tables = Conn.GetSchema("Tables");
-                string tblName;
-                // Create a dictionary for checking tables.
-                Dictionary<string, bool> tableCheck = new Dictionary<string, bool> { };
-                foreach (string name in TableDefinitions.Keys)
-                    tableCheck.Add(name, false);
-
-                // Check through table schema to make sure all necessary tables exist.
-                // (Extra tables are not of concern.)
-                foreach (DataRow row in tables.Rows)
-                {
-                    tblName = row["TABLE_NAME"].ToString();
-                    if (tableCheck.ContainsKey(tblName))
-                    {
-                        tableCheck[tblName] = true;
-                    }
-                }
-
-                foreach (KeyValuePair<string, bool> pair in tableCheck)
-                {
-                    if (!pair.Value)
-                    {
-                        CreateTable(pair.Key);
-                    }
-                }
-
-                Conn.Close();
+                CreateTables();
                 return true;
             }
             catch (FailedConnectionException ex)
@@ -483,53 +262,15 @@ namespace Olympus.Helios
         }
 
         /// <summary>
-        ///  Checks if the database is valid.
-        ///  Checks to the level of table existance - not columns at this point.
+        ///  Create table for certain type.
         /// </summary>
-        /// <returns></returns>
-        public virtual bool ValidateDatabase()
+        /// <returns>True if successful.</returns>
+        public virtual bool CreateTable<T>()
         {
             try
             {
-                // Check file exists.
-                if (!File.Exists(FilePath)) return false;
-
-                // Check connection works.
-                Connect();
-
-                // Check Connection can be opened.
-                Conn.Open();
-
-                // Check tables exist.
-                DataTable tables = Conn.GetSchema("Tables");
-                string tblName;
-                // Create a dictionary for checking tables.
-                Dictionary<string, bool> tableCheck = new Dictionary<string, bool> { };
-                foreach (string name in TableDefinitions.Keys)
-                    tableCheck.Add(name, false);
-
-                // Check through table schema to see if all necessary tables exist.
-                // (Extra tables are not of concern.)
-                foreach (DataRow row in tables.Rows)
-                {
-                    tblName = row["TABLE_NAME"].ToString();
-                    if (tableCheck.ContainsKey(tblName))
-                    {
-                        tableCheck[tblName] = true;
-                    }
-                }
-
-                foreach (bool pass in tableCheck.Values)
-                {
-                    if (!pass)
-                    {
-                        return false;
-                    }
-                }
-
-                // Close the connection.
-                Conn.Close();
-                return true;
+                CreateTableResult res = Database.CreateTable<T>();
+                return res == CreateTableResult.Created;
             }
             catch (Exception ex)
             {
@@ -539,53 +280,24 @@ namespace Olympus.Helios
         }
 
         /// <summary>
-        ///  Create table based on definition derived by string.
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
-        public virtual bool CreateTable(string tableName)
-        {
-            tableName = tableName.ToLower();
-            if (!TableDefinitions.ContainsKey(tableName))
-            {
-                MessageBox.Show($"{tableName} is not a valid table name.");
-                return false;
-            }
-            try
-            {
-                Conn.Open();
-                SQLiteCommand command = new SQLiteCommand(TableDefinitions[tableName], Conn);
-                command.ExecuteNonQuery();
-                Conn.Close();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Toolbox.ShowUnexpectedException(ex);
-                return false;
-            }
-        }
-
-        /// <summary>
-        ///  Create all required tables based on table definitions.
+        ///  Create all required tables based.
         /// </summary>
         /// <returns></returns>
         public virtual bool CreateTables()
         {
             try
             {
-                Conn.Open();
-                using (var transaction = Conn.BeginTransaction())
+                bool returnValue = true;
+
+                CreateTablesResult results = Database.CreateTables(CreateFlags.None, Tables);
+
+                // Check all results, for each table. Will return false if ANY of them are false.
+                foreach (CreateTableResult res in results.Results.Values)
                 {
-                    foreach (string sql in TableDefinitions.Values)
-                    {
-                        SQLiteCommand command = new SQLiteCommand(sql, Conn);
-                        command.ExecuteNonQuery();
-                    }
-                    transaction.Commit();
+                    returnValue = returnValue && res == CreateTableResult.Created;
                 }
-                Conn.Close();
-                return true;
+
+                return returnValue;
             }
             catch (Exception ex)
             {
@@ -595,6 +307,6 @@ namespace Olympus.Helios
         }
 
         // Placeholder to be overriden with new.
-        public abstract Dictionary<string, string> TableDefinitions { get; }
+        public abstract Type[] Tables { get; }
     }
 }
