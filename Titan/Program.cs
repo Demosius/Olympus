@@ -35,67 +35,7 @@ namespace Titan
             Console.WriteLine("Press enter to begin: ...");
             Console.ReadLine();
 
-            int matchCount = 0;
-            int missCount = 0;
 
-            List<NAVItem> dtItems = CSVToDTTimer();
-            List<NAVItem> memItems = CSVToMemoryTimer();
-            List<NAVItem> oleItems =  CSVOLEDBReaderToOListTimer();
-            List<NAVItem> fileItems = CSVFileReadToOListTimer();
-
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            int max = new List<int>
-            {
-                dtItems.Count,
-                //memItems.Count,
-                oleItems.Count,
-                fileItems.Count
-            }.Max();
-
-            NAVItem dti, memi, olei, filei;
-
-            for (int i = 0; i < max; ++i )
-            {
-                if (i < dtItems.Count)
-                    dti = dtItems[i];
-                else
-                    dti = new NAVItem();
-
-                //if (i < memItems.Count)
-                //    memi = dtItems[i];
-                //else
-                //    memi = new NAVItem();
-
-                if (i < oleItems.Count)
-                    olei = dtItems[i];
-                else
-                    olei = new NAVItem();
-
-                if (i < fileItems.Count)
-                    filei = dtItems[i];
-                else
-                    filei = new NAVItem();
-
-                matchCount += //(dti == memi ? 1 : 0) +
-                              (dti == olei ? 1 : 0) +
-                              (dti == filei ? 1 : 0) +
-                              //(memi == olei ? 1 : 0) +
-                              //(memi == filei ? 1 : 0) +
-                              (olei == filei ? 1 : 0);
-
-                missCount += //(dti != memi ? 1 : 0) +
-                              (dti != olei ? 1 : 0) +
-                              (dti != filei ? 1 : 0) +
-                              //(memi != olei ? 1 : 0) +
-                              //(memi != filei ? 1 : 0) +
-                              (olei != filei ? 1 : 0);
-            }
-
-            stopwatch.Stop();
-            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to compare the item lists.");
-            Console.WriteLine($"Match Count: {matchCount} \tMiss Count: {missCount}");
 
             _ = Console.ReadLine();
         }
@@ -148,7 +88,71 @@ namespace Titan
             };
 
             stopwatch.Stop();
-            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to convert datatable to Object List ({items.Count}).");
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to convert datatable to Object List ({items.Count}).\n");
+
+            return items;
+        }
+
+        public static List<NAVItem> CSVToFileStreamTimer()
+        {
+            Console.WriteLine("*********************** CSV to FileStream ***********************");
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            List<NAVItem> items = new List<NAVItem> { };
+            NAVItem item;
+
+            IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+            Dictionary<string, int> headDict = Constants.NAV_ITEM_COLUMNS;
+
+            using (StreamReader reader = new StreamReader(File.OpenRead(App.Settings.ItemCSVLocation)))
+            {
+                string[] headArr = reader.ReadLine().Trim('"').Split(',', '"');
+                DataConversion.SetHeadPosFromArray(ref headDict, headArr);
+                string[] row;
+                string line = reader.ReadLine();
+
+                while (line != null)
+                {
+                    row = line.Trim('"').Split(',', '"');
+
+                    if (row[0] == "AU")
+                    {
+                        if (!int.TryParse(row[headDict["ItemCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int iNum)) iNum = 0;
+                        if (!double.TryParse(row[headDict["Length"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double length)) length = 0;
+                        if (!double.TryParse(row[headDict["Width"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double width)) width = 0;
+                        if (!double.TryParse(row[headDict["Height"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double height)) height = 0;
+                        if (!double.TryParse(row[headDict["Cubage"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double cube)) cube = 0;
+                        if (!double.TryParse(row[headDict["Weight"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double weight)) weight = 0;
+                        if (!int.TryParse(row[headDict["DivisionCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int div)) div = 0;
+                        if (!int.TryParse(row[headDict["CategoryCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int cat)) cat = 0;
+                        if (!int.TryParse(row[headDict["PlatformCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int pf)) pf = 0;
+                        if (!int.TryParse(row[headDict["GenreCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int gen)) gen = 0;
+
+                        item = new NAVItem
+                        {
+                            Number = iNum,
+                            Description = row[headDict["ItemName"]],
+                            Barcode = row[headDict["PrimaryBarcode"]],
+                            CategoryCode = cat,
+                            DivisionCode = div,
+                            PlatformCode = pf,
+                            GenreCode = gen,
+                            Length = length,
+                            Width = width,
+                            Height = height,
+                            Cube = cube,
+                            Weight = weight,
+                            PreOwned = row[headDict["NewUsed"]] == "Used"
+                        };
+                        items.Add(item);
+                    }
+                    line = reader.ReadLine();
+                }
+            }
+            
+            stopwatch.Stop();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to read CSV to FileStream then convert to Object list ({items.Count}).\n");
 
             return items;
         }
@@ -159,32 +163,19 @@ namespace Titan
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            List<NAVItem> items = new List<NAVItem> { };
-            NAVItem item;
-
-            using (MemoryStream ms = new MemoryStream())
-            using (FileStream file = new FileStream(App.Settings.ItemCSVLocation, FileMode.Open, FileAccess.Read))
-            {
-                byte[] bytes = new byte[file.Length];
-                file.Read(bytes, 0, (int)file.Length);
-                ms.Write(bytes, 0, (int)file.Length);
-                int count = 0;
-                using (StreamReader reader = new StreamReader(ms))
-                {
-                    string line = reader.ReadLine();
-                    while (line != null)
-                    {
-                        line = reader.ReadLine();
-                        ++count;
-                    }
-                }
-                Console.WriteLine(count);
-                // List<NAVItem> items = DataConversion.NAVStreamToItems(ms, Constants.NAV_ITEM_COLUMNS);
-            }
+            List<NAVItem> items;
+            Dictionary<string, int> headDict = Constants.NAV_ITEM_COLUMNS;
+            // Get raw data from clipboard and check that it has data.
+            string rawData = File.ReadAllText(App.Settings.ItemCSVLocation);
+            if (rawData == "" || rawData == null) throw new Olympus.Helios.InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+            // Start memory stream from which to read.
+            byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
+            MemoryStream stream = new MemoryStream(byteArray);
+            // Start Reading from stream.
+            items = DataConversion.NAVStreamToItems(stream, headDict);
 
             stopwatch.Stop();
-            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to read CSV to MemoryStream then convert to Object list ({items.Count}).");
-
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to convert CSV to memoryStream and convert to Object List ({items.Count}).\n");
             return items;
         }
 
@@ -223,11 +214,11 @@ namespace Titan
                     while (reader.Read())
                     {
                         if (!int.TryParse(reader["ItemCode"].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int iNum)) iNum = 0;
-                        if (!double.TryParse(reader["Length"].ToString(), NumberStyles.AllowThousands, provider, out double length)) length = 0;
-                        if (!double.TryParse(reader["Width"].ToString(), NumberStyles.AllowThousands, provider, out double width)) width = 0;
-                        if (!double.TryParse(reader["Height"].ToString(), NumberStyles.AllowThousands, provider, out double height)) height = 0;
-                        if (!double.TryParse(reader["Cubage"].ToString(), NumberStyles.AllowThousands, provider, out double cube)) cube = 0;
-                        if (!double.TryParse(reader["Weight"].ToString(), NumberStyles.AllowThousands, provider, out double weight)) weight = 0;
+                        if (!double.TryParse(reader["Length"].ToString(), NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double length)) length = 0;
+                        if (!double.TryParse(reader["Width"].ToString(), NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double width)) width = 0;
+                        if (!double.TryParse(reader["Height"].ToString(), NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double height)) height = 0;
+                        if (!double.TryParse(reader["Cubage"].ToString(), NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double cube)) cube = 0;
+                        if (!double.TryParse(reader["Weight"].ToString(), NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double weight)) weight = 0;
                         if (!int.TryParse(reader["DivisionCode"].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int div)) div = 0;
                         if (!int.TryParse(reader["CategoryCode"].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int cat)) cat = 0;
                         if (!int.TryParse(reader["PlatformCode"].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int pf)) pf = 0;
@@ -257,14 +248,14 @@ namespace Titan
             }
 
             stopwatch.Stop();
-            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to read CSV directly to object list ({items.Count}).");
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to read CSV directly to object list ({items.Count}).\n");
 
             return items;
         }
 
         public static List<NAVItem> CSVFileReadToOListTimer()
         {
-            Console.WriteLine("*********************** CSV File Read to Object List ***********************");
+            Console.WriteLine("*********************** CSV File Read into string then to Object List ***********************");
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
@@ -285,22 +276,22 @@ namespace Titan
 
                 if (row[0] == "AU")
                 {
-                    if (!int.TryParse(row[headDict["ItemCode"]].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int iNum)) iNum = 0;
-                    if (!double.TryParse(row[headDict["Length"]].ToString(), NumberStyles.AllowThousands, provider, out double length)) length = 0;
-                    if (!double.TryParse(row[headDict["Width"]].ToString(), NumberStyles.AllowThousands, provider, out double width)) width = 0;
-                    if (!double.TryParse(row[headDict["Height"]].ToString(), NumberStyles.AllowThousands, provider, out double height)) height = 0;
-                    if (!double.TryParse(row[headDict["Cubage"]].ToString(), NumberStyles.AllowThousands, provider, out double cube)) cube = 0;
-                    if (!double.TryParse(row[headDict["Weight"]].ToString(), NumberStyles.AllowThousands, provider, out double weight)) weight = 0;
-                    if (!int.TryParse(row[headDict["DivisionCode"]].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int div)) div = 0;
-                    if (!int.TryParse(row[headDict["CategoryCode"]].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int cat)) cat = 0;
-                    if (!int.TryParse(row[headDict["PlatformCode"]].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int pf)) pf = 0;
-                    if (!int.TryParse(row[headDict["GenreCode"]].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int gen)) gen = 0;
+                    if (!int.TryParse(row[headDict["ItemCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int iNum)) iNum = 0;
+                    if (!double.TryParse(row[headDict["Length"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double length)) length = 0;
+                    if (!double.TryParse(row[headDict["Width"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double width)) width = 0;
+                    if (!double.TryParse(row[headDict["Height"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double height)) height = 0;
+                    if (!double.TryParse(row[headDict["Cubage"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double cube)) cube = 0;
+                    if (!double.TryParse(row[headDict["Weight"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double weight)) weight = 0;
+                    if (!int.TryParse(row[headDict["DivisionCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int div)) div = 0;
+                    if (!int.TryParse(row[headDict["CategoryCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int cat)) cat = 0;
+                    if (!int.TryParse(row[headDict["PlatformCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int pf)) pf = 0;
+                    if (!int.TryParse(row[headDict["GenreCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int gen)) gen = 0;
 
                     item = new NAVItem
                     {
                         Number = iNum,
-                        Description = row[headDict["ItemName"]].ToString(),
-                        Barcode = row[headDict["PrimaryBarcode"]].ToString(),
+                        Description = row[headDict["ItemName"]],
+                        Barcode = row[headDict["PrimaryBarcode"]],
                         CategoryCode = cat,
                         DivisionCode = div,
                         PlatformCode = pf,
@@ -310,18 +301,18 @@ namespace Titan
                         Height = height,
                         Cube = cube,
                         Weight = weight,
-                        PreOwned = row[headDict["NewUsed"]].ToString() == "Used"
+                        PreOwned = row[headDict["NewUsed"]] == "Used"
                     };
                     items.Add(item);
                 }
             }
 
             stopwatch.Stop();
-            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms for CSV fileRead to Object List ({items.Count}).");
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms for CSV fileRead to get string and convert to Object List ({items.Count}).\n");
             return items;
         }
 
-            public static void SysDatSqlReadTest()
+        public static void SysDatSqlReadTest()
         {
             Console.WriteLine("*******************System.Data.SQLite**********************");
 
@@ -1069,6 +1060,7 @@ namespace Titan
             stopwatch.Stop();
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to update UoM data.");
         }
+
         public static void PathTesting(string path = @"\\ausefpdfs01ns\Shares\Public\IMR\Australia\Pricebook\IMR_PriceBookSalesRanking.csv")
         {
             Console.WriteLine(Path.GetFullPath(path));
@@ -1245,7 +1237,6 @@ namespace Titan
             Console.WriteLine(json3);
         }
 
-
         public static void DeserializeJSON()
         {
             // Deserialize
@@ -1310,6 +1301,7 @@ namespace Titan
 
             Console.WriteLine(data.ToString());
         }
+
     }
 
     public class MyDate

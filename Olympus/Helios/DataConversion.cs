@@ -113,7 +113,7 @@ namespace Olympus.Helios
 
                     if (highestCol < row.Length)
                     {
-                        if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer, provider, out int code)) code = 0;
+                        if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int code)) code = 0;
 
                         div = new NAVDivision
                         {
@@ -191,8 +191,8 @@ namespace Olympus.Helios
 
                     if (highestCol < row.Length)
                     {
-                        if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer, provider, out int code)) code = 0;
-                        if (!int.TryParse(row[headDict["Item Division Code"]], NumberStyles.Integer, provider, out int div)) div = 0;
+                        if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int code)) code = 0;
+                        if (!int.TryParse(row[headDict["Item Division Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int div)) div = 0;
 
                         cat = new NAVCategory
                         {
@@ -271,7 +271,7 @@ namespace Olympus.Helios
 
                     if (highestCol < row.Length)
                     {
-                        if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer, provider, out int code)) code = 0;
+                        if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int code)) code = 0;
 
                         pf = new NAVPlatform
                         {
@@ -349,7 +349,7 @@ namespace Olympus.Helios
 
                     if (highestCol < row.Length)
                     {
-                        if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer, provider, out int code)) code = 0;
+                        if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int code)) code = 0;
 
                         gen = new NAVGenre
                         {
@@ -505,7 +505,7 @@ namespace Olympus.Helios
                     {
                         string locCode = row[headDict["Location Code"]];
                         string code = row[headDict["Code"]];
-                        if (!int.TryParse(row[headDict["Zone Ranking"]], NumberStyles.Integer, provider, out int rank)) rank = 0;
+                        if (!int.TryParse(row[headDict["Zone Ranking"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int rank)) rank = 0;
 
                         zone = new NAVZone
                         {
@@ -626,97 +626,65 @@ namespace Olympus.Helios
         ///  Turns external data from predetermined CSV into a list of items.
         /// </summary>
         /// <returns>List of NAVItem objects.</returns>
+        
         public static List<NAVItem> NAVCSVToItems()
         {
             List<NAVItem> items = new List<NAVItem> { };
-
-            Dictionary<string, int> headDict = Constants.NAV_DIV_PF_GEN_COLUMNS;
-
             try
             {
-                // Get raw data from clipboard and check that it has data.
-                string rawData = ClipboardToString();
-                if (rawData == "" || rawData == null) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
-                // Start memory stream from which to read.
-                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-                MemoryStream stream = new MemoryStream(byteArray);
-                // Start Reading from stream.
-                items = NAVStreamToItems(stream, headDict);
-            }
-            catch (InvalidDataException ex)
-            {
-                ex.DisplayErrorMessage();
+                NAVItem item;
+                IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+                Dictionary<string, int> headDict = Constants.NAV_ITEM_COLUMNS;
+                using (StreamReader reader = new StreamReader(File.OpenRead(App.Settings.ItemCSVLocation)))
+                {
+                    string[] headArr = reader.ReadLine().Trim('"').Split(',', '"');
+                    DataConversion.SetHeadPosFromArray(ref headDict, headArr);
+                    string[] row;
+                    string line = reader.ReadLine();
+
+                    while (line != null)
+                    {
+                        row = line.Trim('"').Split(',', '"');
+
+                        if (row[0] == "AU")
+                        {
+                            if (!int.TryParse(row[headDict["ItemCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int iNum)) iNum = 0;
+                            if (!double.TryParse(row[headDict["Length"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double length)) length = 0;
+                            if (!double.TryParse(row[headDict["Width"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double width)) width = 0;
+                            if (!double.TryParse(row[headDict["Height"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double height)) height = 0;
+                            if (!double.TryParse(row[headDict["Cubage"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double cube)) cube = 0;
+                            if (!double.TryParse(row[headDict["Weight"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double weight)) weight = 0;
+                            if (!int.TryParse(row[headDict["DivisionCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int div)) div = 0;
+                            if (!int.TryParse(row[headDict["CategoryCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int cat)) cat = 0;
+                            if (!int.TryParse(row[headDict["PlatformCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int pf)) pf = 0;
+                            if (!int.TryParse(row[headDict["GenreCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int gen)) gen = 0;
+
+                            item = new NAVItem
+                            {
+                                Number = iNum,
+                                Description = row[headDict["ItemName"]],
+                                Barcode = row[headDict["PrimaryBarcode"]],
+                                CategoryCode = cat,
+                                DivisionCode = div,
+                                PlatformCode = pf,
+                                GenreCode = gen,
+                                Length = length,
+                                Width = width,
+                                Height = height,
+                                Cube = cube,
+                                Weight = weight,
+                                PreOwned = row[headDict["NewUsed"]] == "Used"
+                            };
+                            items.Add(item);
+                        }
+                        line = reader.ReadLine();
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
             }
-
-            return items;
-        }
-
-        // Convert a memory stream into a Item list.
-        public static List<NAVItem> NAVStreamToItems(MemoryStream stream, Dictionary<string, int> headDict)
-        {
-            List<NAVItem> items = new List<NAVItem> { };
-
-            string[] row;
-            int highestCol;
-            NAVItem item;
-
-            IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
-
-            using (StreamReader reader = new StreamReader(stream))
-            {
-                // First set the headers.
-                string line = reader.ReadLine();
-                string[] headArr = line.Split(',');
-                SetHeadPosFromArray(ref headDict, headArr);
-                // Get highest column value to make sure that any given data line isn't cut short.
-                highestCol = headDict.Values.Max();
-
-                line = reader.ReadLine();
-                // Add row data.
-                while (line != null)
-                {
-                    row = line.Split('\t');
-
-                    if (highestCol < row.Length)
-                    {
-                        if (!int.TryParse(row[headDict["ItemCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int iNum)) iNum = 0;
-                        if (!double.TryParse(row[headDict["Length"]].ToString(), NumberStyles.AllowThousands, provider, out double length)) length = 0;
-                        if (!double.TryParse(row[headDict["Width"]].ToString(), NumberStyles.AllowThousands, provider, out double width)) width = 0;
-                        if (!double.TryParse(row[headDict["Height"]].ToString(), NumberStyles.AllowThousands, provider, out double height)) height = 0;
-                        if (!double.TryParse(row[headDict["Cubage"]].ToString(), NumberStyles.AllowThousands, provider, out double cube)) cube = 0;
-                        if (!double.TryParse(row[headDict["Weight"]].ToString(), NumberStyles.AllowThousands, provider, out double weight)) weight = 0;
-                        if (!int.TryParse(row[headDict["DivisionCode"]].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int div)) div = 0;
-                        if (!int.TryParse(row[headDict["CategoryCode"]].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int cat)) cat = 0;
-                        if (!int.TryParse(row[headDict["PlatformCode"]].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int pf)) pf = 0;
-                        if (!int.TryParse(row[headDict["GenreCode"]].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int gen)) gen = 0;
-
-
-                        item = new NAVItem
-                        {
-                            Number = iNum,
-                            Description = row[headDict["ItemName"]].ToString(),
-                            Barcode = row[headDict["PrimaryBarcode"]].ToString(),
-                            CategoryCode = cat,
-                            DivisionCode = div,
-                            PlatformCode = pf,
-                            GenreCode = gen,
-                            Length = length,
-                            Width = width,
-                            Height = height,
-                            Cube = cube,
-                            Weight = weight
-                        };
-                        items.Add(item);
-                    }
-
-                    line = reader.ReadLine();
-                }
-            }
-
             return items;
         }
 
@@ -761,9 +729,7 @@ namespace Olympus.Helios
             string[] row;
             int highestCol;
             NAVUoM uom;
-
             IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
-
             using (StreamReader reader = new StreamReader(stream))
             {
                 // First set the headers.
@@ -778,23 +744,37 @@ namespace Olympus.Helios
                 while (line != null)
                 {
                     row = line.Split('\t');
-
                     if (highestCol < row.Length)
                     {
-                        if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer, provider, out int code)) code = 0;
+                        string code = row[headDict["Code"]];
+                        if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int iNum)) iNum = 0;
+                        if (!int.TryParse(row[headDict["Qty. per Unit of Measure"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int qtyPU)) qtyPU = 0;
+                        if (!int.TryParse(row[headDict["Max Qty"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int max)) max = 0;
+                        if (!double.TryParse(row[headDict["Length (CM)"]], NumberStyles.AllowDecimalPoint| NumberStyles.AllowThousands, provider, out double length)) length = 0;
+                        if (!double.TryParse(row[headDict["Width (CM)"]], NumberStyles.AllowDecimalPoint| NumberStyles.AllowThousands, provider, out double width)) width = 0;
+                        if (!double.TryParse(row[headDict["Height (CM)"]], NumberStyles.AllowDecimalPoint| NumberStyles.AllowThousands, provider, out double height)) height = 0;
+                        if (!double.TryParse(row[headDict["CM Cubage"]], NumberStyles.AllowDecimalPoint| NumberStyles.AllowThousands, provider, out double cube)) cube = 0;
+                        if (!double.TryParse(row[headDict["Weight (Kg)"]], NumberStyles.AllowDecimalPoint| NumberStyles.AllowThousands, provider, out double weight)) weight = 0;
 
                         uom = new NAVUoM
                         {
-                            Code = row[headDict["Code"]],
-                            ItemNumber = code
+                            ID = string.Join(":", iNum, code),
+                            Code = code,
+                            ItemNumber = iNum,
+                            QtyPerUoM = qtyPU,
+                            MaxQty = max,
+                            ExcludCartonization = row[headDict["Exclude Cartonization"]] == "Yes",
+                            Length = length,
+                            Width = width,
+                            Height = height,
+                            Cube = cube,
+                            Weight = weight
                         };
                         uoms.Add(uom);
                     }
-
                     line = reader.ReadLine();
                 }
             }
-
             return uoms;
         }
 
@@ -861,11 +841,11 @@ namespace Olympus.Helios
                     {
                         // 
                         if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer, provider, out int itemNo)) itemNo = 0;
-                        if (!int.TryParse(row[headDict["Quantity"]], NumberStyles.Integer, provider, out int qty)) itemNo = 0;
-                        if (!int.TryParse(row[headDict["Pick Qty."]], NumberStyles.Integer, provider, out int pickQty)) itemNo = 0;
-                        if (!int.TryParse(row[headDict["Put-away Qty."]], NumberStyles.Integer, provider, out int putQty)) itemNo = 0;
-                        if (!int.TryParse(row[headDict["Neg. Adjmt. Qty."]], NumberStyles.Integer, provider, out int negQty)) itemNo = 0;
-                        if (!int.TryParse(row[headDict["Pos. Adjmt. Qty."]], NumberStyles.Integer, provider, out int posQty)) itemNo = 0;
+                        if (!int.TryParse(row[headDict["Quantity"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int qty)) itemNo = 0;
+                        if (!int.TryParse(row[headDict["Pick Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int pickQty)) itemNo = 0;
+                        if (!int.TryParse(row[headDict["Put-away Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int putQty)) itemNo = 0;
+                        if (!int.TryParse(row[headDict["Neg. Adjmt. Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int negQty)) itemNo = 0;
+                        if (!int.TryParse(row[headDict["Pos. Adjmt. Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int posQty)) itemNo = 0;
                         if (!DateTime.TryParse(row[headDict["Date Created"]], provider, DateTimeStyles.None, out DateTime dateCreated)) dateCreated = new DateTime();
                         if (!DateTime.TryParse(row[headDict["Time Created"]], provider, DateTimeStyles.NoCurrentDateDefault, out DateTime timeCreated)) timeCreated = new DateTime();
 

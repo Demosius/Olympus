@@ -76,5 +76,10 @@ namespace Olympus.Helios.Inventory.Model
         }
 
         public static bool operator !=(NAVItem lhs, NAVItem rhs) => !(lhs == rhs);
+
+        public override string ToString()
+        {
+            return $"{Number}|{Description}|{Barcode}: (DIV:{DivisionCode}, CAT:{CategoryCode}, PF:{PlatformCode}, GEN:{GenreCode}) - L:{Length}cm x W:{Width}cm x H:{Height}cm = Cube:{Cube}cm³, Weight:{Weight} - {(PreOwned ? "Used" : "New")} ";
+        }
     }
 }
