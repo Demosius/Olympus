@@ -16,20 +16,20 @@ namespace Olympus.Helios
         /* Full Data */
         public static DataSet DataSet()
         {
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            InventoryChariot chariot = new InventoryChariot(App.Settings.SolLocation);
             return chariot.PullFullDataSet();
         }
 
         /* Data Tables */
         private static DataTable TableByName(string tableName)
         {
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            InventoryChariot chariot = new InventoryChariot(App.Settings.SolLocation);
             return chariot.PullFullTable(tableName);
         }
 
         public static DataTable DataTable(string tableName)
         {
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            InventoryChariot chariot = new InventoryChariot(App.Settings.SolLocation);
             if (chariot.TableDefinitions.Keys.Contains(tableName) && !tableName.StartsWith("sqlite_"))
                 return TableByName(tableName);
             return new DataTable();
@@ -73,25 +73,25 @@ namespace Olympus.Helios
         /* Update times */
         public static DateTime LastStockUpdateTime()
         {
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            InventoryChariot chariot = new InventoryChariot(App.Settings.SolLocation);
             return chariot.LastTableUpdate("stock");
         }
 
         public static DateTime LastBinUpdateTime()
         {
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            InventoryChariot chariot = new InventoryChariot(App.Settings.SolLocation);
             return chariot.LastTableUpdate("bin");
         }
 
         public static DateTime LastItemUpdateTime()
         {
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            InventoryChariot chariot = new InventoryChariot(App.Settings.SolLocation);
             return chariot.LastTableUpdate("item");
         }
 
         public static DateTime LastUoMUpdateTime()
         {
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            InventoryChariot chariot = new InventoryChariot(App.Settings.SolLocation);
             return chariot.LastTableUpdate("uom");
         }
 
@@ -99,13 +99,13 @@ namespace Olympus.Helios
         /* Special/Specific pull types. */
         public static BinContents BinContents()
         {
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            InventoryChariot chariot = new InventoryChariot(App.Settings.SolLocation);
             return new BinContents(chariot);
         }
 
         public static List<SimpleBin> SimpleBins()
         {
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+            InventoryChariot chariot = new InventoryChariot(App.Settings.SolLocation);
             return chariot.SimpleBins();
         }
 
@@ -159,19 +159,19 @@ namespace Olympus.Helios
             {
                 DataTable data = DataConversion.ClipboardToTable();
                 List<string> missingCols = Utility.ValidateTableData(data, Constants.BIN_COLUMNS);
-                if (missingCols.Count > 0) throw new InvalidDataException("Missing Data", missingCols);
+                if (missingCols.Count > 0) throw new InvalidDataException(missingCols);
                 DataConversion.ConvertColumns(
-                    dataTable: data,
+                    dataTable: ref data,
                     dblColumns: new List<string> { "used_cube", "max_cube" },
                     intColumns: new List<string> { "ranking" },
                     dtColumns: new List<string> { "last_cc_date", "last_pi_date" },
                     boolColumns: new List<string> { "empty", "assigned" });
-                InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+                InventoryChariot chariot = new InventoryChariot(App.Settings.SolLocation);
                 return chariot.BinTableUpdate(data);
             }
             catch (InvalidDataException ex)
             {
-                MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
+                ex.DisplayErrorMessage();
             }
             catch (Exception ex)
             {
@@ -182,8 +182,8 @@ namespace Olympus.Helios
 
         public static bool ItemsFromCSV(bool force = false)
         {
-            InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
-            string csvFile = Toolbox.GetItemCSV();
+            InventoryChariot chariot = new InventoryChariot(App.Settings.SolLocation);
+            string csvFile = App.Settings.ItemCSVLocation;
 
             // If the item data has been updated since the last file update don't spend time to update.
             if (chariot.LastTableUpdate("item") == File.GetLastWriteTime(csvFile) && !force) return false;
@@ -193,9 +193,9 @@ namespace Olympus.Helios
                 DataTable data = DataConversion.CSVToTable(csvFile, Constants.ITEM_COLUMNS.Values.ToList(), "CompanyCode = 'AU'");
                 // Validate data
                 List<string> missingCols = Utility.ValidateTableData(data, Constants.ITEM_COLUMNS);
-                if (missingCols.Count > 0) throw new InvalidDataException("Missing Data", missingCols);
+                if (missingCols.Count > 0) throw new InvalidDataException(missingCols);
                 DataConversion.ConvertColumns(
-                    dataTable: data,
+                    dataTable: ref data,
                     dblColumns: new List<string> { "length", "width", "height", "weight", "cube" },
                     intColumns: new List<string> { "number", "category", "platform", "division", "genre" },
                     dtColumns: new List<string> { },
@@ -205,7 +205,7 @@ namespace Olympus.Helios
             }
             catch (InvalidDataException ex)
             {
-                MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
+                ex.DisplayErrorMessage();
             }
             catch (Exception ex)
             {
@@ -220,19 +220,19 @@ namespace Olympus.Helios
             {
                 DataTable data = DataConversion.ClipboardToTable();
                 List<string> missingCols = Utility.ValidateTableData(data, Constants.UOM_COLUMNS);
-                if (missingCols.Count > 0) throw new InvalidDataException("Missing Data", missingCols);
+                if (missingCols.Count > 0) throw new InvalidDataException(missingCols);
                 DataConversion.ConvertColumns(
-                    dataTable: data,
+                    dataTable: ref data,
                     dblColumns: new List<string> { "length", "width", "height", "weight", "cube" },
                     intColumns: new List<string> { "item_number", "qty_per_uom", "max_qty" },
                     dtColumns: new List<string> { },
                     boolColumns: new List<string> { "inner_pack", "exclude_cartonization" });
-                InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+                InventoryChariot chariot = new InventoryChariot(App.Settings.SolLocation);
                 return chariot.UoMTableUpdate(data);
             }
             catch (InvalidDataException ex)
             {
-                MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
+                ex.DisplayErrorMessage();
             }
             catch (Exception ex)
             {
@@ -247,19 +247,19 @@ return false;
             {
                 DataTable data = DataConversion.ClipboardToTable();
                 List<string> missingCols = Utility.ValidateTableData(data, Constants.STOCK_COLUMNS);
-                if (missingCols.Count > 0) throw new InvalidDataException("Missing Data", missingCols);
+                if (missingCols.Count > 0) throw new InvalidDataException(missingCols);
                 DataConversion.ConvertColumns(
-                    dataTable: data,
+                    dataTable: ref data,
                     dblColumns: new List<string> { },
                     intColumns: new List<string> { "item_number", "qty", "pick_qty", "put_away_qty", "neg_adj_qty", "pos_adj_qty" },
                     dtColumns: new List<string> { "date_created", "time_created" },
                     boolColumns: new List<string> { "fixed" });
-                InventoryChariot chariot = new InventoryChariot(Toolbox.GetSol());
+                InventoryChariot chariot = new InventoryChariot(App.Settings.SolLocation);
                 return chariot.StockTableUpdate(data);
             }
             catch (InvalidDataException ex)
             {
-                MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
+                ex.DisplayErrorMessage();
             }
             catch (Exception ex)
             {

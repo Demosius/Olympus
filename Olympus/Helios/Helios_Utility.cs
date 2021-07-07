@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using System.Windows;
 
 namespace Olympus.Helios
 {   
@@ -19,6 +20,19 @@ namespace Olympus.Helios
         public InvalidDataException(string message, List<string> missingColumns): base(message)
         {
             MissingColumns = missingColumns;
+        }
+
+        public InvalidDataException(List<string> missingColumns)
+        {
+            MissingColumns = missingColumns;
+        }
+
+        public void DisplayErrorMessage()
+        {
+            MessageBox.Show($"Missing Columns:\n\n{string.Join("|", MissingColumns)}{(Message != "" ? $"\n\n{Message}" : Message)}",
+                                "Missing Columns",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
         }
     }
 

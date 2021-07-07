@@ -22,7 +22,6 @@ namespace Olympus.View.Components
         public Navbar()
         {
             InitializeComponent();
-            Console.WriteLine($"==============================={AppDomain.CurrentDomain.BaseDirectory}==============================================");
         }
     }
 }

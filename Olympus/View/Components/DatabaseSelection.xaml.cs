@@ -33,7 +33,7 @@ namespace Olympus.View.Components
 
         private void SetDisplay()
         {
-            DBString = $"DB Location: {Toolbox.GetSol()}";
+            DBString = $"DB Location: {App.Settings.SolLocation}";
         }
 
     }

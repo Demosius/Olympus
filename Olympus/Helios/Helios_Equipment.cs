@@ -11,20 +11,20 @@ namespace Olympus.Helios
     {
         public static DataSet DataSet()
         {
-            EquipmentChariot chariot = new EquipmentChariot(Toolbox.GetSol());
+            EquipmentChariot chariot = new EquipmentChariot(App.Settings.SolLocation);
             return chariot.PullFullDataSet();
         }
 
         /* Data Tables */
         private static DataTable TableByName(string tableName)
         {
-            EquipmentChariot chariot = new EquipmentChariot(Toolbox.GetSol());
+            EquipmentChariot chariot = new EquipmentChariot(App.Settings.SolLocation);
             return chariot.PullFullTable(tableName);
         }
 
         public static DataTable DataTable(string tableName)
         {
-            EquipmentChariot chariot = new EquipmentChariot(Toolbox.GetSol());
+            EquipmentChariot chariot = new EquipmentChariot(App.Settings.SolLocation);
             if (chariot.TableDefinitions.Keys.Contains(tableName) && !tableName.StartsWith("sqlite_"))
                 return TableByName(tableName);
             return new DataTable();
@@ -77,13 +77,13 @@ namespace Olympus.Helios
         /* Machines */
         public static List<SimpleMachine> SimpleMachines()
         {
-            EquipmentChariot chariot = new EquipmentChariot(Toolbox.GetSol());
+            EquipmentChariot chariot = new EquipmentChariot(App.Settings.SolLocation);
             return chariot.SimpleMachines();
         }
 
         public static List<Machine> Machines()
         {
-            EquipmentChariot chariot = new EquipmentChariot(Toolbox.GetSol());
+            EquipmentChariot chariot = new EquipmentChariot(App.Settings.SolLocation);
             DataTable data = chariot.GetMachinesTypeChecklist();
             List<Machine> machines = data.AsEnumerable().Select
                 (row =>

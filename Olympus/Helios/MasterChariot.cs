@@ -299,6 +299,7 @@ namespace Olympus.Helios
             }
             return set;
         }
+
         protected List<string> GetTables()
         {
             List<string> list = new List<string> { };
@@ -322,6 +323,27 @@ namespace Olympus.Helios
                 Toolbox.ShowUnexpectedException(ex);
             }
             return list;
+        }
+
+        /**************************** Delete Data ****************************/
+        public bool EmptyTable(string tableName)
+        {
+            try
+            {
+                Conn.Open();
+                SQLiteCommand delCommand = new SQLiteCommand(Conn)
+                {
+                    CommandText = $"DELETE FROM {tableName};"
+                };
+                delCommand.ExecuteNonQuery();
+                Conn.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return false;
+            }
         }
 
         // Basic database management on a higher level. 

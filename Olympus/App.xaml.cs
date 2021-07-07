@@ -7,6 +7,8 @@ using System.Windows;
 using System.Threading;
 using System.Globalization;
 using Olympus.Styx.Model;
+using System.IO;
+using Olympus.Model;
 
 namespace Olympus
 {
@@ -21,7 +23,8 @@ namespace Olympus
             e.Handled = true;
         }
 
-        public static Charon Charon { get; set; }
-        public static Se
+        public static Charon Charon { get; set; } = new Charon();
+        public static Settings Settings { get; set; } = new Settings();
+        public static string BaseDirectory = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
     }
 }

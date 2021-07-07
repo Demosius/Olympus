@@ -310,6 +310,8 @@ namespace Olympus.Helios.Inventory
             }
         }
 
+
+
         /***************************Table Definitions**************************/
         private static readonly string BinDefinition =
             @"-- auto-generated definition

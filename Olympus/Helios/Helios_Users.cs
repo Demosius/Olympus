@@ -11,20 +11,20 @@ namespace Olympus.Helios
     {
         public static DataSet DataSet()
         {
-            UserChariot chariot = new UserChariot(Toolbox.GetSol());
+            UserChariot chariot = new UserChariot(App.Settings.SolLocation);
             return chariot.PullFullDataSet();
         }
 
         /* Data Tables */
         private static DataTable TableByName(string tableName)
         {
-            UserChariot chariot = new UserChariot(Toolbox.GetSol());
+            UserChariot chariot = new UserChariot(App.Settings.SolLocation);
             return chariot.PullFullTable(tableName);
         }
 
         public static DataTable DataTable(string tableName)
         {
-            UserChariot chariot = new UserChariot(Toolbox.GetSol());
+            UserChariot chariot = new UserChariot(App.Settings.SolLocation);
             if (chariot.TableDefinitions.Keys.Contains(tableName) && !tableName.StartsWith("sqlite_"))
                 return TableByName(tableName);
             return new DataTable();

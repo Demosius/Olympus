@@ -12,6 +12,98 @@ namespace Olympus.Helios.Inventory
     /// </summary>
     public static class Constants
     {
+        public static readonly Dictionary<string, int> NAV_STOCK_COLUMNS = new Dictionary<string, int>
+        {
+            { "Location Code", -1 },
+            { "Zone Code", -1 },
+            { "Bin Code", -1 },
+            { "Item No.", -1 },
+            { "ItemBarcode", -1 },
+            { "Unit of Measure Code", -1 },
+            { "Quantity", -1 },
+            { "Pick Qty.", -1 },
+            { "Put-away Qty.", -1 },
+            { "Neg. Adjmt. Qty.", -1 },
+            { "Pos. Adjmt. Qty.", -1 },
+            { "Date Created", -1 },
+            { "Time Created", -1 },
+            { "Fixed", -1 }
+        };
+
+        public static readonly Dictionary<string, int> NAV_DIV_PF_GEN_COLUMNS = new Dictionary<string, int>
+        {
+            { "Code", -1 },
+            { "Description", -1 }
+        };
+
+        public static readonly Dictionary<string, int> NAV_CATEGORY_COLUMNS = new Dictionary<string, int>
+        {
+            { "Code", -1 },
+            { "Description", -1 },
+            { "Item Division Code", -1 }
+        };
+
+        public static readonly Dictionary<string, int> NAV_LOCATION_COLUMNS = new Dictionary<string, int>
+        {
+            { "Code", -1 },
+            { "Name", -1 }
+        };
+
+        public static readonly Dictionary<string, int> NAV_ZONE_COLUMNS = new Dictionary<string, int>
+        {
+            { "Locaiton Code", -1 },
+            { "Code", -1 },
+            { "Description", -1 },
+            { "Zone Ranking", -1 }
+        };
+
+        public static readonly Dictionary<string, int> NAV_ITEM_COLUMNS = new Dictionary<string, int>
+        {
+            { "ItemCode", -1 },
+            { "ItemName", -1 },
+            { "PrimaryBarcode", -1 },
+            { "NewUsed", -1 },
+            { "CategoryCode", -1 },
+            { "PlatformCode", -1 },
+            { "DivisionCode", -1 }, 
+            { "GenreCode", -1 },
+            { "Length", -1 },
+            { "Width", -1 },
+            { "Height", -1 },
+            { "Cubage", -1 },
+            { "Weight", -1 }
+        };
+
+        public static readonly Dictionary<string, int> NAV_UOM_COLUMNS = new Dictionary<string, int>
+        {
+            { "Code", -1 },
+            { "Item No.", -1 },
+            { "Qty. per Unit of Measure", -1 },
+            { "Max Qty", -1 },
+            { "Inner Pack", -1 },
+            { "Exclude Cartonization", -1 },
+            { "Length (CM)", -1 },
+            { "Width (CM)", -1 },
+            { "Height (CM)", -1 },
+            { "CM Cubage", -1 },
+            { "Weight (Kg)", -1 }
+        };
+
+        public static readonly Dictionary<string, int> NAV_BIN_COLUMNS = new Dictionary<string, int>
+        {
+            { "Location Code", -1 },
+            { "Zone Code", -1 },
+            { "Code", -1 },
+            { "Description", -1 },
+            { "Empty", -1 },
+            { "Bin Assigned", -1 },
+            { "Bin Ranking", -1 },
+            { "Used Cubage", -1 },
+            { "Maximum Cubage", -1 },
+            { "CC Last Count Date", -1 },
+            { "PU - Last Count Date", -1 }
+        };
+
         public static readonly Dictionary<string, string> BIN_COLUMNS = new Dictionary<string, string>
         {
             {"location", "Location Code" },
@@ -64,6 +156,7 @@ namespace Olympus.Helios.Inventory
         {
             { "number", "ItemCode" },
             { "description", "ItemName" },
+            { "barcode", "PrimaryBarcode" },
             { "preowned", "NewUsed" },
             { "category", "CategoryCode" },
             { "platform", "PlatformCode" },
