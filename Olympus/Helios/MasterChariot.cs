@@ -26,7 +26,7 @@ namespace Olympus.Helios
         public string DatabaseName { get; set; }
         public SQLiteConnection Database { get; set; }
 
-        protected void InitializeDatabseConnection()
+        protected void InitializeDatabaseConnection()
         {
             try
             {

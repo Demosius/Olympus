@@ -83,6 +83,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helios\Inventory\Model\BinContentsUpdate.cs" />
     <Compile Include="Helios\Inventory\Model\NAVBin.cs" />
     <Compile Include="Helios\Inventory\Model\NAVCategory.cs" />
     <Compile Include="Helios\Inventory\Model\NAVDivision.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="Helios\Inventory\Model\NAVStock.cs" />
     <Compile Include="Helios\Inventory\Model\NAVUoM.cs" />
     <Compile Include="Helios\Inventory\Model\NAVZone.cs" />
+    <Compile Include="Helios\Inventory\Model\TableUpdate.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="Styx\Model\Charon.cs" />
     <Compile Include="Styx\View\LoginWindow.xaml.cs">

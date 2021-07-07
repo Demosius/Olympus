@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using Olympus.Helios.Inventory.Model;
 
 namespace Olympus.Helios.Inventory
 {
@@ -18,13 +19,13 @@ namespace Olympus.Helios.Inventory
         public InventoryChariot()
         {
             DatabaseName = Path.Combine(Environment.CurrentDirectory, "Sol", "Inventory", "Inventory.sqlite");
-            Connect();
+            InitializeDatabaseConnection();
         }
 
         public InventoryChariot(string solLocation)
         {
             DatabaseName = Path.Combine(solLocation, "Inventory", "Inventory.sqlite");
-            Connect();
+            InitializeDatabaseConnection();
         }
 
         /***************************** Get Data ******************************/
@@ -310,159 +311,9 @@ namespace Olympus.Helios.Inventory
             }
         }
 
-
-
-        /***************************Table Definitions**************************/
-        private static readonly string BinDefinition =
-            @"-- auto-generated definition
-            create table bin
-            (
-                location     text not null,
-                zone_code    text not null
-                    references zone,
-                code         text not null,
-                description  text,
-                empty        boolean,
-                assigned     boolean,
-                ranking      int,
-                used_cube    real,
-                max_cube     real,
-                last_cc_date text,
-                last_pi_date text,
-                constraint bin_pk
-                    primary key (location, code)
-            );
-
-            create index bin_code_index
-                on bin (code);";
-
-        private static readonly string ItemDefinition =
-            @"-- auto-generated definition
-            create table item
-            (
-                number      int not null
-                    constraint item_pk
-                        primary key,
-                description text,
-                category    int,
-                platform    int,
-                division    int,
-                genre       int,
-                length      real,
-                width       real,
-                height      real,
-                cube        real,
-                weight      real,
-                preowned    boolean default FALSE not null
-            );
-
-            create unique index item_number_uindex
-                on item (number);";
-
-        private static readonly string UoMDefinition =
-            @"-- auto-generated definition
-            create table uom
-            (
-                code                  text not null,
-                item_number           int  not null
-                    references item,
-                qty_per_uom           int  not null,
-                max_qty               int,
-                inner_pack            boolean,
-                exclude_cartonization boolean,
-                length                real,
-                width                 real,
-                height                real,
-                cube                  real,
-                weight                real,
-                constraint uom_pk
-                    primary key (code, item_number)
-            );";
-
-        private static readonly string StockDefinition =
-            @"-- auto-generated definition
-            create table stock
-            (
-                location     text not null,
-                zone_code    text not null
-                    references zone,
-                bin_code     text not null
-                    constraint stock_bin_code_fk
-                        references bin (code),
-                item_number  int  not null
-                    references item,
-                barcode      text,
-                uom_code     text not null
-                    constraint stock_uom_code_fk
-                        references uom (code),
-                qty          int  not null,
-                pick_qty     int,
-                put_away_qty int,
-                neg_adj_qty  int,
-                pos_adj_qty  int,
-                date_created text,
-                time_created text,
-                fixed        boolean,
-                constraint stock_pk
-                    primary key (location, bin_code, item_number, uom_code)
-            );";
-
-        private static readonly string ZoneDefinition =
-            @"create table zone
-            (
-                code        text not null
-                    constraint zone_pk
-                        primary key,
-                type        text not null,
-                description text
-            );
-
-            create unique index zone_code_uindex
-                on zone (code);";
-
-        private static readonly string StockUpdateDefinition =
-            @"create table stock_update
-            (
-                location    text not null,
-                zone_code   text not null,
-                last_update text,
-                constraint stock_update_pk
-                    primary key (location, zone_code),
-                constraint stock_update_stock_location_zone_code_fk
-                    foreign key (location, zone_code) references stock (location, zone_code)
-                        on update cascade on delete cascade
-            );";
-
-        private static readonly string UpdateDefinition =
-            @"create table ""update""
-            (
-                tbl_name text not null
-                    constraint update_pk
-                        primary key
-                    constraint update_sqlite_master_tbl_name_fk
-                        references sqlite_master(tbl_name)
-                        on update cascade on delete cascade,
-                last_update text
-            );
-
-            create unique index update_tbl_name_uindex
-                on ""update"" (tbl_name);";
-
-        public override Dictionary<string, string> TableDefinitions
-        {
-            get 
-            {
-                return new Dictionary<string, string>
-                {
-                    { "bin", BinDefinition },
-                    { "item", ItemDefinition },
-                    { "stock", StockDefinition },
-                    { "stock_update", StockUpdateDefinition },
-                    { "uom", UoMDefinition },
-                    { "update", UpdateDefinition },
-                    { "zone", ZoneDefinition }
-                };
-            }
-        }
+        public override Type[] Tables { get; } = new Type[] {typeof(NAVBin), typeof(NAVCategory), typeof(NAVDivision), 
+                                                             typeof(NAVGenre), typeof(NAVItem), typeof(NAVLocation), 
+                                                             typeof(NAVPlatform), typeof(NAVStock), typeof(NAVUoM), 
+                                                             typeof(NAVZone)};
     }
 }
