@@ -7,6 +7,7 @@ using SQLite;
 using System.Data;
 using System.Windows;
 using System.Collections;
+using SQLiteNetExtensions.Extensions;
 
 /// <summary>
 ///     Master chariot abstract class to be used as the base class
@@ -20,10 +21,17 @@ using System.Collections;
 
 namespace Olympus.Helios
 {
+    public enum PullType
+    {
+        ObjectOnly,
+        IncludeChildren,
+        FullRecursive
+    }
+
     public abstract class MasterChariot
     {
         public string BaseDataDirectory { get; set; }
-        public string DatabaseName { get; set; }
+        public abstract string DatabaseName { get; }
         public SQLiteConnection Database { get; set; }
 
         protected void InitializeDatabaseConnection()
@@ -51,11 +59,13 @@ namespace Olympus.Helios
             }
         }
 
+        public abstract void ResetConnection();
+
         /***************************** CREATE Data *****************************/
 
         // Most basic building block for updating db tables.
         // Removes all previous data and fully replaces it.
-        protected bool ReplaceFullTable<T>(List<T> objList)
+        public bool ReplaceFullTable<T>(List<T> objList)
         {
             try
             {
@@ -113,17 +123,35 @@ namespace Olympus.Helios
 
         /**************************** READ Data ****************************/
 
-        public List<T> PullObjectList<T>() where T : new()
+        public List<T> PullObjectList<T>(PullType pullType = PullType.ObjectOnly) where T : new()
         {
-            DataTable data = new DataTable();
             try
             {
-                return Database.Table<T>().ToList();
+                if (pullType == PullType.ObjectOnly)
+                    return Database.Table<T>().ToList();
+                bool recursive = pullType == PullType.FullRecursive;
+                return Database.GetAllWithChildren<T>(null, recursive);
             }
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
                 return new List<T> { };
+            }
+        }
+
+        public T PullObject<T>(object primaryKey, PullType pullType = PullType.ObjectOnly) where T : new()
+        {
+            try
+            {
+                if (pullType == PullType.ObjectOnly)
+                    return Database.Find<T>(primaryKey);
+                bool recursive = pullType == PullType.FullRecursive;
+                return Database.GetWithChildren<T>(primaryKey, recursive);
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return new T();
             }
         }
 
@@ -146,10 +174,15 @@ namespace Olympus.Helios
             return list;
         }
 
+        public string GetTableName(Type type)
+        {
+            return Database.GetMapping(type).TableName;
+        }
+
         /**************************** UPDATE Data ****************************/
 
         // Update an existing table - replacing duplicate data (and adding new data).
-        protected bool UpdateTable<T>(List<T> objList)
+        public bool UpdateTable<T>(List<T> objList)
         {
             try
             {
@@ -177,7 +210,7 @@ namespace Olympus.Helios
         }
 
         /**************************** DELETE Data ****************************/
-        public bool EmptyTable<T>(string tableName)
+        public bool EmptyTable<T>()
         {
             try
             {

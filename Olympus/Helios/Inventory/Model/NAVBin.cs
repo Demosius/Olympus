@@ -31,5 +31,7 @@ namespace Olympus.Helios.Inventory.Model
         public NAVZone Zone { get; set; }
         [OneToMany]
         public NAVStock Stock { get; set; }
+        [ManyToMany(typeof(BinBay))]
+        public BinBay BinBay { get; set; }
     }
 }

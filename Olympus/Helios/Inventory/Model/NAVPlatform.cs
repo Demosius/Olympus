@@ -16,6 +16,6 @@ namespace Olympus.Helios.Inventory.Model
         public string Description { get; set; }
 
         [OneToMany]
-        public List<Item> Items { get; set; }
+        public List<NAVItem> Items { get; set; }
     }
 }

@@ -83,6 +83,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helios\Charioteer.cs" />
+    <Compile Include="Helios\Equipment\EquipmentCreator.cs" />
+    <Compile Include="Helios\Equipment\EquipmentDeleter.cs" />
+    <Compile Include="Helios\Equipment\EquipmentReader.cs" />
+    <Compile Include="Helios\Equipment\EquipmentUpdater.cs" />
+    <Compile Include="Helios\Inventory\InventoryCreator.cs" />
+    <Compile Include="Helios\Inventory\InventoryDeleter.cs" />
+    <Compile Include="Helios\Inventory\InventoryReader.cs" />
+    <Compile Include="Helios\Inventory\InventoryUpdater.cs" />
+    <Compile Include="Helios\Inventory\Model\BinBay.cs" />
     <Compile Include="Helios\Inventory\Model\BinContentsUpdate.cs" />
     <Compile Include="Helios\Inventory\Model\NAVBin.cs" />
     <Compile Include="Helios\Inventory\Model\NAVCategory.cs" />
@@ -95,6 +105,15 @@
     <Compile Include="Helios\Inventory\Model\NAVUoM.cs" />
     <Compile Include="Helios\Inventory\Model\NAVZone.cs" />
     <Compile Include="Helios\Inventory\Model\TableUpdate.cs" />
+    <Compile Include="Helios\Staff\StaffCreator.cs" />
+    <Compile Include="Helios\Staff\StaffDeleter.cs" />
+    <Compile Include="Helios\Staff\StaffReader.cs" />
+    <Compile Include="Helios\Staff\StaffUpdater.cs" />
+    <Compile Include="Helios\Users\UserCreator.cs" />
+    <Compile Include="Helios\Users\UserDeleter.cs" />
+    <Compile Include="Helios\Users\UserReader.cs" />
+    <Compile Include="Helios\Users\UserUpdater.cs" />
+    <Compile Include="Helios\Users\Model\Role.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="Styx\Model\Charon.cs" />
     <Compile Include="Styx\View\LoginWindow.xaml.cs">
@@ -171,19 +190,10 @@
       <DependentUpon>UserHandler.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helios\DataConversion.cs" />
-    <Compile Include="Helios\Helios_Equipment.cs" />
-    <Compile Include="Helios\Helios_Staff.cs" />
-    <Compile Include="Helios\Helios_Users.cs" />
-    <Compile Include="Helios\Helios_Utility.cs" />
-    <Compile Include="Helios\Helios_Inventory.cs" />
+    <Compile Include="Helios\Utility.cs" />
     <Compile Include="Helios\Inventory\Model\Bay.cs" />
-    <Compile Include="Helios\Inventory\Model\Bin.cs" />
     <Compile Include="Helios\Inventory\Constants.cs" />
-    <Compile Include="Helios\Inventory\Model\Item.cs" />
     <Compile Include="Helios\Inventory\Model\Stock.cs" />
-    <Compile Include="Helios\Inventory\Model\UoM.cs" />
-    <Compile Include="Helios\Inventory\Model\Warehouse.cs" />
-    <Compile Include="Helios\Inventory\Model\Zone.cs" />
     <Compile Include="Helios\Equipment\Model\Forklift.cs" />
     <Compile Include="Helios\Equipment\Model\Machine.cs" />
     <Compile Include="Helios\Equipment\EquipmentChariot.cs" />

@@ -16,10 +16,7 @@ namespace Olympus.Helios
 {
     public static class DataConversion
     {
-        /// <summary>
-        ///  Gets raw string data from the clipboard.
-        /// </summary>
-        /// <returns>Simple String</returns>
+        // Gets raw string data from the clipboard.
         public static string ClipboardToString()
         {
             string rawData="";
@@ -35,11 +32,7 @@ namespace Olympus.Helios
             return rawData;
         }
 
-        /// <summary>
-        ///  Set dictionary head positions, based on a string array from the head of the assumed data.
-        /// </summary>
-        /// <param name="headDict"></param>
-        /// <param name="headArr"></param>
+        // Set dictionary head positions, based on a string array from the head of the assumed data.
         public static void SetHeadPosFromArray(ref Dictionary<string, int> headDict, string[] headArr)
         {
             List<string> missingHeads = new List<string> { };
@@ -52,10 +45,7 @@ namespace Olympus.Helios
             if (missingHeads.Count > 0) throw new InvalidDataException(missingHeads);
         }
 
-        /// <summary>
-        ///  Turns clipboard data into a list of divisions.
-        /// </summary>
-        /// <returns>List of NAVDivision objects.</returns>
+        // Turns clipboard data into a list of divisions.
         public static List<NAVDivision> NAVClipToDivisions()
         {
             List<NAVDivision> divisions = new List<NAVDivision> { };
@@ -130,10 +120,7 @@ namespace Olympus.Helios
             return divs;
         }
 
-        /// <summary>
-        ///  Turns clipboard data into a list of categories.
-        /// </summary>
-        /// <returns>List of NAVCategory objects.</returns>
+        // Turns clipboard data into a list of categories.
         public static List<NAVCategory> NAVClipToCategories()
         {
             List<NAVCategory> categories = new List<NAVCategory> { };
@@ -210,10 +197,7 @@ namespace Olympus.Helios
             return cats;
         }
 
-        /// <summary>
-        ///  Turns clipboard data into a list of platforms.
-        /// </summary>
-        /// <returns>List of NAVPlatform objects.</returns>
+        // Turns clipboard data into a list of platforms.
         public static List<NAVPlatform> NAVClipToPlatform()
         {
             List<NAVPlatform> platforms = new List<NAVPlatform> { };
@@ -288,10 +272,7 @@ namespace Olympus.Helios
             return pfList;
         }
 
-        /// <summary>
-        ///  Turns clipboard data into a list of genres.
-        /// </summary>
-        /// <returns>List of NAVGenre objects.</returns>
+        // Turns clipboard data into a list of genres.
         public static List<NAVGenre> NAVClipToGenres()
         {
             List<NAVGenre> genres = new List<NAVGenre> { };
@@ -366,10 +347,7 @@ namespace Olympus.Helios
             return gens;
         }
 
-        /// <summary>
-        ///  Turns clipboard data into a list of locations.
-        /// </summary>
-        /// <returns>List of NAVLocation objects.</returns>
+        // Turns clipboard data into a list of locations.
         public static List<NAVLocation> NAVClipToLocations()
         {
             List<NAVLocation> locations = new List<NAVLocation> { };
@@ -408,8 +386,6 @@ namespace Olympus.Helios
             int highestCol;
             NAVLocation loc;
 
-            IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
-
             using (StreamReader reader = new StreamReader(stream))
             {
                 // First set the headers.
@@ -442,10 +418,7 @@ namespace Olympus.Helios
             return locs;
         }
 
-        /// <summary>
-        ///  Turns clipboard data into a list of zones.
-        /// </summary>
-        /// <returns>List of NAVZone objects.</returns>
+        // Turns clipboard data into a list of zones.
         public static List<NAVZone> NAVClipToZones()
         {
             List<NAVZone> zones = new List<NAVZone> { };
@@ -525,10 +498,7 @@ namespace Olympus.Helios
             return zones;
         }
 
-        /// <summary>
-        ///  Turns clipboard data into a list of bins.
-        /// </summary>
-        /// <returns>List of NAVBin objects.</returns>
+        // Turns clipboard data into a list of bins.
         public static List<NAVBin> NAVClipToBins()
         {
             List<NAVBin> bins = new List<NAVBin> { };
@@ -622,11 +592,7 @@ namespace Olympus.Helios
             return bins;
         }
 
-        /// <summary>
-        ///  Turns external data from predetermined CSV into a list of items.
-        /// </summary>
-        /// <returns>List of NAVItem objects.</returns>
-        
+        // Turns external data from predetermined CSV into a list of items.
         public static List<NAVItem> NAVCSVToItems()
         {
             List<NAVItem> items = new List<NAVItem> { };
@@ -688,10 +654,7 @@ namespace Olympus.Helios
             return items;
         }
 
-        /// <summary>
-        ///  Turns clipboard data into a list of uoms.
-        /// </summary>
-        /// <returns>List of NAVUoM objects.</returns>
+        // Turns clipboard data into a list of uoms.
         public static List<NAVUoM> NAVClipToUoMs()
         {
             List<NAVUoM> uoms = new List<NAVUoM> { };
@@ -778,10 +741,7 @@ namespace Olympus.Helios
             return uoms;
         }
 
-        /// <summary>
-        ///  Turns clipboard data into a list of stock.
-        /// </summary>
-        /// <returns>List of NAVDivision objects.</returns>
+        // Turns clipboard data into a list of stock.
         public static List<NAVStock> NAVClipToStock()
         {
             List<NAVStock> stockList = new List<NAVStock> { };
@@ -839,8 +799,14 @@ namespace Olympus.Helios
 
                     if (highestCol < row.Length)
                     {
-                        // 
+                        string location = row[headDict["Location Code"]];
+                        string zone = row[headDict["Zone Code"]];
+                        string bin = row[headDict["Bin Code"]];
+                        string uom = row[headDict["Unit of Measure Code"]];
+                        string zoneID = string.Join(":", location, zone);
+                        string binID = string.Join(":", zoneID, bin);
                         if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer, provider, out int itemNo)) itemNo = 0;
+                        string uomID = string.Join(":", itemNo, uom);
                         if (!int.TryParse(row[headDict["Quantity"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int qty)) itemNo = 0;
                         if (!int.TryParse(row[headDict["Pick Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int pickQty)) itemNo = 0;
                         if (!int.TryParse(row[headDict["Put-away Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int putQty)) itemNo = 0;
@@ -851,11 +817,15 @@ namespace Olympus.Helios
 
                         stock = new NAVStock
                         {
-                            LocationCode = row[headDict["Location Code"]],
-                            ZoneCode = row[headDict["Zone Code"]],
-                            BinCode = row[headDict["Bin Code"]],
+                            ID = string.Join(":",binID, uomID),
+                            BinID = binID,
+                            ZoneID = zoneID,
+                            UoMID = uomID,
+                            LocationCode = location,
+                            ZoneCode = zone,
+                            BinCode = bin,
                             ItemNumber = itemNo,
-                            UoMCode = row[headDict["Unit of Measure Code"]],
+                            UoMCode = uom,
                             Qty = qty,
                             PickQty = pickQty,
                             PutAwayQty = putQty,
@@ -875,11 +845,8 @@ namespace Olympus.Helios
             return stockList;
         }
 
-        /// <summary>
-        /// Reads data from the clipboard, assumes it is rectangular 2-dimensional data separated
-        /// by tabs and newlines. Converts it into an array.
-        /// </summary>
-        /// <returns> 2 dimensional array. </returns>
+        // Reads data from the clipboard, assumes it is rectangular 2-dimensional data separated
+        // by tabs and newlines. Converts it into an array.
         public static string[,] ClipboardToArray()
         {
             string rawData = ClipboardToString();
@@ -902,11 +869,7 @@ namespace Olympus.Helios
             return fullArray;
         }
 
-        /// <summary>
-        /// Takes a table-like array of data and converts it to a JSON string.
-        /// </summary>
-        /// <param name="array">2 dimensional string array with headers in top row.</param>
-        /// <returns>JSON string.</returns>
+        // Takes a table-like array of data and converts it to a JSON string.
         public static string ArrayToJSON(string[,] array)
         {
             string returnString = "{\n\t";
@@ -945,11 +908,8 @@ namespace Olympus.Helios
             return returnString;
         }
 
-        /// <summary>
-        ///  Takes data from the clipboard and converts it into a data table.
-        ///  Assumes that data is separated by tabs and new lines.
-        /// </summary>
-        /// <returns>DataTable</returns>
+        // Takes data from the clipboard and converts it into a data table.
+        // Assumes that data is separated by tabs and new lines.
         public static DataTable ClipboardToTable()
         {
             DataTable data = new DataTable();
@@ -987,13 +947,7 @@ namespace Olympus.Helios
             return data;
         }
 
-        /// <summary>
-        ///  Pulls data from a .csv file into a DataTable
-        /// </summary>
-        /// <param name="csvPath">Valid path to .csv file.</param>
-        /// <param name="columns">Leave empty to get all columns.</param>
-        /// <param name="conditions">SQL style conditions.</param>
-        /// <returns></returns>
+        // Pulls data from a .csv file into a DataTable
         public static DataTable CSVToTable(string csvPath, List<string> columns, string conditions = "", bool includesHeaders = true)
         {
             string header = includesHeaders ? "Yes" : "No";
@@ -1021,12 +975,8 @@ namespace Olympus.Helios
             }
         }
 
-        /// <summary>
-        ///  Given a datatable and a list of columns for each conversion type, sanitizes the data to convert all values
-        ///  in those columns to the appropriate type.
-        /// </summary>
-        /// <param name="dataTable">String loaded datatable.</param>
-        /// <param name="columns"></param>
+        // Given a datatable and a list of columns for each conversion type, sanitizes the data to convert all values
+        // in those columns to the appropriate type.
         public static void ConvertColumns(ref DataTable dataTable, List<string> dblColumns, List<string> intColumns, List<string> dtColumns, List<string> boolColumns)
         {
             string[] trueVals = { "yes", "used" };

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Olympus.Helios.Staff
+namespace Olympus.Helios.Staff.Model
 {
     public class Employee
     {

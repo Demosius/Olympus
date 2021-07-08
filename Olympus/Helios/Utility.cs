@@ -104,8 +104,17 @@ namespace Olympus.Helios
 
         public static bool MoveDataBase(string newLocation)
         {
-
-            return false;
+            try
+            {
+                App.Settings.SolLocation = newLocation;
+                App.Charioteer.ResetChariots();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return false;
+            }
         }
 
     }

@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using Olympus;
 using Olympus.Helios;
 using System.Globalization;
+using Olympus.Helios.Inventory.Model;
 
 namespace Olympus.View.Components
 {
@@ -31,33 +32,33 @@ namespace Olympus.View.Components
 
         private void SetDates()
         {
-            lblStockDT.DataContext = GetInventory.LastStockUpdateTime().ToString("dd/MM/yyyy HH:mm");
-            lblBinDT.DataContext = GetInventory.LastBinUpdateTime().ToString("dd/MM/yyyy HH:mm");
-            lblUoMDT.DataContext = GetInventory.LastUoMUpdateTime().ToString("dd/MM/yyyy HH:mm");
-            lblItemDT.DataContext = GetInventory.LastItemUpdateTime().ToString("dd/MM/yyyy HH:mm");
+            lblStockDT.DataContext = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVStock)).ToString("dd/MM/yyyy HH:mm");
+            lblBinDT.DataContext = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVBin)).ToString("dd/MM/yyyy HH:mm");
+            lblUoMDT.DataContext = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVUoM)).ToString("dd/MM/yyyy HH:mm");
+            lblItemDT.DataContext = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVItem)).ToString("dd/MM/yyyy HH:mm");
         }
 
         private void UpdateItems(object sender, RoutedEventArgs e)
         {
-            PutInventory.ItemsFromCSV();
+            App.Charioteer.InventoryUpdater.NAVItems(DataConversion.NAVCSVToItems(), DateTime.Now);
             SetDates();
         }
 
         private void UpdateBins(object sender, RoutedEventArgs e)
         {
-            PutInventory.BinsFromClipboard();
+            App.Charioteer.InventoryUpdater.NAVBins(DataConversion.NAVClipToBins());
             SetDates();
         }
 
         private void UpdateStock(object sender, RoutedEventArgs e)
         {
-            PutInventory.StockFromClipboard();
+            App.Charioteer.InventoryUpdater.NAVStock(DataConversion.NAVClipToStock());
             SetDates();
         }
 
         private void UpdateUoM(object sender, RoutedEventArgs e)
         {
-            PutInventory.UoMFromClipboard();
+            App.Charioteer.InventoryUpdater.NAVUoMs(DataConversion.NAVClipToUoMs());
             SetDates();
         }
 
@@ -77,7 +78,7 @@ namespace Olympus.View.Components
             MessageBox.Show($"Find the Data:\n" +
                             $"[NAV > Warehouse > Planning & Execution > Bin Contents]\n\n" +
                             $"Required Columns:\n\n" +
-                            $"{String.Join("\n", GetInventory.StockColumnDict().Values)}\n\n" +
+                            $"{String.Join("\n", Helios.Inventory.Constants.NAV_STOCK_COLUMNS.Keys)}\n\n" +
                             $"(Filter to Zone Code as required, and Location Code = '9600')\n" +
                             $"(Update to the minute, as required.)",
                             $"Stock/Bin Contents Requirements",
@@ -90,7 +91,7 @@ namespace Olympus.View.Components
             MessageBox.Show($"Find the Data:\n" +
                             $"[NAV > Warehouse > Planning & Execution > Bin Contents >> Bin Code]\n\n" +
                             $"Required Columns:\n\n" +
-                            $"{String.Join("\n", GetInventory.BinColumnDict().Values)}\n\n" +
+                            $"{String.Join("\n", Helios.Inventory.Constants.NAV_BIN_COLUMNS.Keys)}\n\n" +
                             $"(No filtering required.)\n" +
                             $"(Update when changes are made to bin/zone layouts, or when Count Dates are required.)",
                             $"Bin List Requirements",
@@ -103,7 +104,7 @@ namespace Olympus.View.Components
             MessageBox.Show($"Find the Data:\n" +
                             $"[NAV > Warehouse > Planning & Execution > Bin Contents >> Unit of Measure Code]\n\n" +
                             $"Required Columns:\n\n" +
-                            $"{String.Join("\n", GetInventory.UoMColumnDict().Values)}\n\n" +
+                            $"{String.Join("\n", Helios.Inventory.Constants.NAV_UOM_COLUMNS.Keys)}\n\n" +
                             $"(Unfilter All, then filter Code to \"<>EACH\".)\n" +
                             $"(Update Daily. End of previous work day, or begining of current.)",
                             $"UoM Data Requirements",

@@ -1,25 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using SQLite;
+using SQLiteNetExtensions.Attributes;
+using System.Collections.Generic;
 
-namespace Olympus.Helios.Inventory
+namespace Olympus.Helios.Inventory.Model
 {
     public class Bay
     {
-        public Zone Zone { get; }
-        public string Name { get; set; }
+        [PrimaryKey]
+        public string ID { get; set; } // Bay name. Called ID for consitency.
+        [ForeignKey(typeof(NAVZone))]
+        public string ZoneID { get; }
 
-        public Dictionary<string, Bin> Bins { get; }
+        [ManyToOne]
+        public NAVZone Zone { get; set; }
+        [OneToMany]
+        public List<NAVBin> Bins { get; set; }
 
-        public Bay(Zone zone, string name)
-        {
-            Zone = zone;
-            Name = name;
-
-            Bins = new Dictionary<string, Bin> { };
-        }
-
-        public void AddBin(Bin bin)
-        {
-            if (!Bins.ContainsKey(bin.Code)) Bins.Add(bin.Code, bin);
-        }
     }
 }

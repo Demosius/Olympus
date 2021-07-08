@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 
-namespace Olympus.Helios.Staff
+namespace Olympus.Helios.Staff.Model
 {
     public class Licence
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Olympus.Helios.Staff
+namespace Olympus.Helios.Staff.Model
 {
     public class Locker
     {

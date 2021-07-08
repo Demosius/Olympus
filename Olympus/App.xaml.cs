@@ -9,6 +9,7 @@ using System.Globalization;
 using Olympus.Styx.Model;
 using System.IO;
 using Olympus.Model;
+using Olympus.Helios;
 
 namespace Olympus
 {
@@ -23,8 +24,9 @@ namespace Olympus
             e.Handled = true;
         }
 
-        public static Charon Charon { get; set; } = new Charon();
         public static Settings Settings { get; set; } = new Settings();
-        public static string BaseDirectory = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
+        public static Charon Charon { get; set; } = new Charon();
+        public static Charioteer Charioteer { get; set; } = new Charioteer();
+        public readonly static string BaseDirectory = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
     }
 }
