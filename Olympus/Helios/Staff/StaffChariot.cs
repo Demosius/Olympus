@@ -14,8 +14,11 @@ namespace Olympus.Helios.Staff
         public override string DatabaseName { get; } = "Staff.sqlite";
 
         public override Type[] Tables { get; } = new Type[] {typeof(Clan), typeof(Department), typeof(Employee),
+                                                             typeof(EmployeeInductionReference), typeof(EmployeeVehicle), typeof(EmployeeShift),
+                                                             typeof(Induction), typeof(Licence), typeof(Locker),
                                                              typeof(Licence), typeof(Locker), typeof(Role),
-                                                             typeof(Shift), typeof(Vehicle)};
+                                                             typeof(Role), typeof(Shift), typeof(ShiftRule),
+                                                             typeof(TagUse), typeof(TempTag), typeof(Vehicle)};
 
         /*************************** Constructors ****************************/
 
@@ -24,7 +27,7 @@ namespace Olympus.Helios.Staff
             // Try first to use the directory based on App.Settings, if not then use local file.
             try
             {
-                BaseDataDirectory = Path.Combine(App.Settings.SolLocation, DatabaseName);
+                BaseDataDirectory = Path.Combine(App.Settings.SolLocation, "Staff");
                 InitializeDatabaseConnection();
             }
             catch

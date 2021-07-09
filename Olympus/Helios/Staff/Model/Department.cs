@@ -11,7 +11,8 @@ namespace Olympus.Helios.Staff.Model
     {
         [PrimaryKey]
         public string Name { get; set; }
-        [ForeignKey(typeof)]
+        [ForeignKey(typeof(Employee))]
+        public int HeadID { get; set; }
 
         [OneToOne]
         public Employee Head { get; set; }
@@ -21,6 +22,7 @@ namespace Olympus.Helios.Staff.Model
         public List<Employee> Employees { get; set; } = new List<Employee> { };
         [OneToMany]
         public List<Clan> Clans { get; set; } = new List<Clan> { };
-
+        [ManyToMany(typeof(Employee))]
+        public List<Employee> EmployeesCanBorrow { get; set; }
     }
 }

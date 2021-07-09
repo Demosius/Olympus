@@ -9,16 +9,6 @@ using System.Windows;
 using System.Collections;
 using SQLiteNetExtensions.Extensions;
 
-/// <summary>
-///     Master chariot abstract class to be used as the base class
-///     for all database chariots.
-///     
-///     Each chariot is to be designed as the interface, to carry 
-///     data to and from, for a specific database.
-///     
-///     Master chariot class to define expected functionality.
-/// </summary>
-
 namespace Olympus.Helios
 {
     public enum PullType
@@ -28,6 +18,15 @@ namespace Olympus.Helios
         FullRecursive
     }
 
+    /// <summary>
+    ///     Master chariot abstract class to be used as the base class
+    ///     for all database chariots.
+    ///     
+    ///     Each chariot is to be designed as the interface, to carry 
+    ///     data to and from, for a specific database.
+    ///     
+    ///     Master chariot class to define expected functionality.
+    /// </summary>
     public abstract class MasterChariot
     {
         public string BaseDataDirectory { get; set; }
@@ -43,15 +42,17 @@ namespace Olympus.Helios
                     if (!Directory.Exists(BaseDataDirectory)) Directory.CreateDirectory(BaseDataDirectory);
 
                     Database = new SQLiteConnection(Path.Combine(BaseDataDirectory, DatabaseName));
-                    if (Database == null) 
+                    if (Database == null)
                         throw new FailedConnectionException($"Failed to connect to {DatabaseName}, might be an invalid path.");
                 }
 
                 Database.CreateTables(CreateFlags.None, Tables);
+
             }
             catch (FailedConnectionException ex)
             {
                 MessageBox.Show(ex.Message);
+                throw ex;
             }
             catch (Exception ex)
             {

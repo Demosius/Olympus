@@ -28,10 +28,10 @@
             <Label x:Name="lblItemDT" Grid.Column="3" Grid.Row="0" Content="{Binding}" Foreground="White"/>
 
             <!-- Second Row, Buttons -->
-            <Button x:Name="btnStock" Grid.Column="0" Grid.Row="1" Content="Stock" Background="{DynamicResource CyanGradient}" Style="{DynamicResource InventoryButton}" Click="UpdateStock"/>
-            <Button x:Name="btnBins" Grid.Column="1" Grid.Row="1" Content="Bins" Background="{DynamicResource GreenGradient}" Style="{DynamicResource InventoryButton}" Click="UpdateBins"/>
-            <Button x:Name="btnUoM" Grid.Column="2" Grid.Row="1" Content="UoM" Background="{DynamicResource OrangeGradient}" Style="{DynamicResource InventoryButton}" Click="UpdateUoM"/>
-            <Button x:Name="btnItems" Grid.Column="3" Grid.Row="1" Content="Items" Background="{DynamicResource Graydient}" Style="{DynamicResource InventoryButton}" Click="UpdateItems"/>
+            <Button x:Name="btnStock" Grid.Column="0" Grid.Row="1" Content="Stock" Background="{DynamicResource CyanGradient}" Style="{DynamicResource InventoryButton}" />
+            <Button x:Name="btnBins" Grid.Column="1" Grid.Row="1" Content="Bins" Background="{DynamicResource GreenGradient}" Style="{DynamicResource InventoryButton}" />
+            <Button x:Name="btnUoM" Grid.Column="2" Grid.Row="1" Content="UoM" Background="{DynamicResource OrangeGradient}" Style="{DynamicResource InventoryButton}" />
+            <Button x:Name="btnItems" Grid.Column="3" Grid.Row="1" Content="Items" Background="{DynamicResource Graydient}" Style="{DynamicResource InventoryButton}" />
 
             <!-- Third Row, Column Buttons -->
             <Button x:Name="btnStockCols" Grid.Column="0" Grid.Row="2" Content="BC Cols" Background="{DynamicResource CyanGradient}" Click="BCInfo" Style="{DynamicResource MiniButton}"/>

@@ -8,17 +8,14 @@ using System.Threading.Tasks;
 
 namespace Olympus.Helios.Staff.Model
 {
-    public class Vehicle
+    public class Induction
     {
         [PrimaryKey]
-        public string Rego { get; set; }
-        public string Colour { get; set; }
-        public string Make { get; set; }
-        public string Model { get; set; }
+        public string Type { get; set; }
         public string Description { get; set; }
+        public string Period { get; set; }
 
-        [ManyToMany(typeof(EmployeeVehicle))]
-        public List<Employee> Owners { get; set; } 
-
+        [OneToMany]
+        public List<EmployeeInductionReference> EmployeeReferences { get; set; }
     }
 }

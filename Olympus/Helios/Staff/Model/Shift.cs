@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SQLite;
+using SQLiteNetExtensions.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,31 +10,20 @@ namespace Olympus.Helios.Staff.Model
 {
     public class Shift
     {
+        [PrimaryKey]
         public string Name { get; set; }
-        public Department Department { get; set; }
+        [ForeignKey(typeof(Department))]
+        public string DepartmentName { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+        public string BreakString { get; set; }
+
+        [ManyToOne]
+        public Department Department { get; set; }
+        [Ignore]
         public List<Break> Breaks { get; set; }
-
-        public Shift() { }
-
-        public Shift(string name, Department department, DateTime startTime, DateTime endTime, string breaks)
-        {
-            Name = name;
-            Department = department;
-            StartTime = startTime;
-            EndTime = endTime;
-            Breaks = JsonSerializer.Deserialize<List<Break>>(breaks);
-        }
-
-        public Shift(string name, Department department, DateTime startTime, DateTime endTime, List<Break> breaks)
-        {
-            Name = name;
-            Department = department;
-            StartTime = startTime;
-            EndTime = endTime;
-            Breaks = breaks;
-        }
+        [ManyToMany(typeof(EmployeeShift))]
+        public List<Employee> Employees { get; set; }
 
     }
 

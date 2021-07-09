@@ -105,6 +105,14 @@
     <Compile Include="Helios\Inventory\Model\NAVUoM.cs" />
     <Compile Include="Helios\Inventory\Model\NAVZone.cs" />
     <Compile Include="Helios\Inventory\Model\TableUpdate.cs" />
+    <Compile Include="Helios\Staff\Model\EmployeeDepartmentLoaning.cs" />
+    <Compile Include="Helios\Staff\Model\EmployeeInduction.cs" />
+    <Compile Include="Helios\Staff\Model\EmployeeVehicle.cs" />
+    <Compile Include="Helios\Staff\Model\EmployeeShift.cs" />
+    <Compile Include="Helios\Staff\Model\Induction.cs" />
+    <Compile Include="Helios\Staff\Model\ShiftRule.cs" />
+    <Compile Include="Helios\Staff\Model\TagUse.cs" />
+    <Compile Include="Helios\Staff\Model\TempTag.cs" />
     <Compile Include="Helios\Staff\StaffCreator.cs" />
     <Compile Include="Helios\Staff\StaffDeleter.cs" />
     <Compile Include="Helios\Staff\StaffReader.cs" />

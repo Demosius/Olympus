@@ -1,5 +1,4 @@
-﻿using SQLite;
-using SQLiteNetExtensions.Attributes;
+﻿using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,16 +7,11 @@ using System.Threading.Tasks;
 
 namespace Olympus.Helios.Staff.Model
 {
-    public class Locker
+    public class EmployeeVehicle
     {
-        [PrimaryKey]
-        public string ID { get; set; }
-        public string Location { get; set; }
         [ForeignKey(typeof(Employee))]
         public int EmployeeID { get; set; }
-
-        [OneToOne]
-        public Employee Employee { get; set; }
-
+        [ForeignKey(typeof(Vehicle))]
+        public string VehicleRego { get; set; }
     }
 }

@@ -27,40 +27,40 @@ namespace Olympus.View.Components
         public InventoryUpdater()
         {
             InitializeComponent();
-            SetDates();
+            //SetDates();
         }
 
-        private void SetDates()
-        {
-            lblStockDT.DataContext = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVStock)).ToString("dd/MM/yyyy HH:mm");
-            lblBinDT.DataContext = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVBin)).ToString("dd/MM/yyyy HH:mm");
-            lblUoMDT.DataContext = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVUoM)).ToString("dd/MM/yyyy HH:mm");
-            lblItemDT.DataContext = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVItem)).ToString("dd/MM/yyyy HH:mm");
-        }
+        //private void SetDates()
+        //{
+        //    lblStockDT.DataContext = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVStock)).ToString("dd/MM/yyyy HH:mm");
+        //    lblBinDT.DataContext = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVBin)).ToString("dd/MM/yyyy HH:mm");
+        //    lblUoMDT.DataContext = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVUoM)).ToString("dd/MM/yyyy HH:mm");
+        //    lblItemDT.DataContext = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVItem)).ToString("dd/MM/yyyy HH:mm");
+        //}
 
-        private void UpdateItems(object sender, RoutedEventArgs e)
-        {
-            App.Charioteer.InventoryUpdater.NAVItems(DataConversion.NAVCSVToItems(), DateTime.Now);
-            SetDates();
-        }
+        //private void UpdateItems(object sender, RoutedEventArgs e)
+        //{
+        //    App.Charioteer.InventoryUpdater.NAVItems(DataConversion.NAVCSVToItems(), DateTime.Now);
+        //    SetDates();
+        //}
 
-        private void UpdateBins(object sender, RoutedEventArgs e)
-        {
-            App.Charioteer.InventoryUpdater.NAVBins(DataConversion.NAVClipToBins());
-            SetDates();
-        }
+        //private void UpdateBins(object sender, RoutedEventArgs e)
+        //{
+        //    App.Charioteer.InventoryUpdater.NAVBins(DataConversion.NAVClipToBins());
+        //    SetDates();
+        //}
 
-        private void UpdateStock(object sender, RoutedEventArgs e)
-        {
-            App.Charioteer.InventoryUpdater.NAVStock(DataConversion.NAVClipToStock());
-            SetDates();
-        }
+        //private void UpdateStock(object sender, RoutedEventArgs e)
+        //{
+        //    App.Charioteer.InventoryUpdater.NAVStock(DataConversion.NAVClipToStock());
+        //    SetDates();
+        //}
 
-        private void UpdateUoM(object sender, RoutedEventArgs e)
-        {
-            App.Charioteer.InventoryUpdater.NAVUoMs(DataConversion.NAVClipToUoMs());
-            SetDates();
-        }
+        //private void UpdateUoM(object sender, RoutedEventArgs e)
+        //{
+        //    App.Charioteer.InventoryUpdater.NAVUoMs(DataConversion.NAVClipToUoMs());
+        //    SetDates();
+        //}
 
         private void ShowInfo(object sender, RoutedEventArgs e)
         {

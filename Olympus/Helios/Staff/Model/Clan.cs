@@ -15,14 +15,12 @@ namespace Olympus.Helios.Staff.Model
         [ForeignKey(typeof(Employee))]
         public int LeaderID { get; set; }
         [ForeignKey(typeof(Department))]
-
+        public string DepartmentName { get; set; }
 
         [ManyToOne]
         public Department Department { get; set; }
-
         [OneToOne]
         public Employee Leader { get; set; }
-        
         [OneToMany]
         public List<Employee> Employees { get; set; } = new List<Employee> { };
 

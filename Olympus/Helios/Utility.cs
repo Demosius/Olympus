@@ -107,7 +107,7 @@ namespace Olympus.Helios
             try
             {
                 App.Settings.SolLocation = newLocation;
-                App.Charioteer.ResetChariots();
+                //App.Charioteer.ResetChariots();
                 return true;
             }
             catch (Exception ex)

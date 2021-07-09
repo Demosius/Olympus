@@ -47,7 +47,7 @@ namespace Olympus.Helios.Inventory
                 MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
                 BaseDataDirectory = Path.Combine(App.BaseDirectory, "Sol", "Inventory");
                 InitializeDatabaseConnection();
-            }            
+            }
         }
 
         public InventoryChariot(string solLocation)

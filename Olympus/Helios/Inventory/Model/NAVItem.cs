@@ -36,8 +36,11 @@ namespace Olympus.Helios.Inventory.Model
         public List<NAVStock> Stock { get; set; }
         [ManyToOne]
         public NAVCategory Category { get; set; }
+        [ManyToOne]
         public NAVDivision Division { get; set; }
+        [ManyToOne]
         public NAVPlatform Platform { get; set; }
+        [ManyToOne]
         public NAVGenre Genre { get; set; }
 
         public override bool Equals(object obj) => this.Equals(obj as NAVItem);

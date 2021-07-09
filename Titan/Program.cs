@@ -35,7 +35,7 @@ namespace Titan
             Console.WriteLine("Press enter to begin: ...");
             Console.ReadLine();
 
-
+            Charioteer charioteer = new Charioteer();
 
             _ = Console.ReadLine();
         }
@@ -296,7 +296,7 @@ namespace Titan
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
-            _ = App.Charioteer.InventoryReader.NAVAllStock();
+            //_ = App.Charioteer.InventoryReader.NAVAllStock();
             stopwatch.Stop();
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}ms to read stock to DataTable.");
         }
