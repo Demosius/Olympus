@@ -21,6 +21,12 @@ namespace Olympus.Helios.Users.Model
         [Ignore]
         public Employee Employee { get; set; }
 
+        public void SetRole(Role role)
+        {
+            Role = role;
+            RoleName = role.Name;
+        }
+
     }
 
     

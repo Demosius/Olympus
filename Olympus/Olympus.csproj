@@ -117,6 +117,7 @@
     <Compile Include="Helios\Staff\StaffDeleter.cs" />
     <Compile Include="Helios\Staff\StaffReader.cs" />
     <Compile Include="Helios\Staff\StaffUpdater.cs" />
+    <Compile Include="Helios\Users\Model\Login.cs" />
     <Compile Include="Helios\Users\UserCreator.cs" />
     <Compile Include="Helios\Users\UserDeleter.cs" />
     <Compile Include="Helios\Users\UserReader.cs" />
@@ -124,6 +125,12 @@
     <Compile Include="Helios\Users\Model\Role.cs" />
     <Compile Include="Model\Settings.cs" />
     <Compile Include="Styx\Model\Charon.cs" />
+    <Compile Include="Styx\Model\CharonEmployeeValidation.cs" />
+    <Compile Include="Styx\Model\CharonUserValidation.cs" />
+    <Compile Include="Styx\Model\CharonValidation.cs" />
+    <Compile Include="Styx\View\AlphaRegistrationWindow.xaml.cs">
+      <DependentUpon>AlphaRegistrationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Styx\View\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
@@ -145,6 +152,10 @@
     <Compile Include="Helios\Staff\Model\Role.cs" />
     <Compile Include="Helios\Staff\Model\Vehicle.cs" />
     <Compile Include="Toolbox.cs" />
+    <Page Include="Styx\View\AlphaRegistrationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Styx\View\LoginWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

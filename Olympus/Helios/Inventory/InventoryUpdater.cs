@@ -59,7 +59,7 @@ namespace Olympus.Helios.Inventory
             return false;
         }
 
-        public bool NAVZonee(List<NAVZone> zones) => Chariot.UpdateTable(zones);
+        public bool NAVZones(List<NAVZone> zones) => Chariot.UpdateTable(zones);
 
         public bool NAVLocation(List<NAVLocation> locations) => Chariot.UpdateTable(locations);
 

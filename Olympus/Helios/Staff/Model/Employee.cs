@@ -42,7 +42,51 @@ namespace Olympus.Helios.Staff.Model
         [OneToMany]
         public List<EmployeeInductionReference> InductionReferences { get; set; }
 
+        public void SetDepartment(Department department)
+        {
+            Department = department;
+            DepartmentName = department.Name;
+            department.Employees.Add(this);
+        }
 
+        public void SetRole(Role role)
+        {
+            Role = role;
+            RoleName = role.Name;
+            role.Employees.Add(this);
+        }
+
+        public override bool Equals(object obj) => this.Equals(obj as Employee);
+
+        public bool Equals(Employee employee)
+        {
+            if (employee is null) return false;
+
+            if (Object.ReferenceEquals(this, employee)) return true;
+
+            if (this.GetType() != employee.GetType()) return false;
+
+            return ID == employee.ID;
+        }
+
+        public override int GetHashCode() => (ID, FirstName, LastName, DisplayName, PayRate,
+                                              RF_ID, PC_ID, DepartmentName, RoleName, LockerID, 
+                                              PhoneNumber, Email, Address).GetHashCode();
+
+        public static bool operator ==(Employee lhs, Employee rhs)
+        {
+            if (lhs is null)
+            {
+                if (rhs is null)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(Employee lhs, Employee rhs) => !(lhs == rhs);
 
     }
 }

@@ -18,6 +18,13 @@ namespace Olympus.Helios
         FullRecursive
     }
 
+    public enum PushType
+    {
+        ObjectOnly,
+        IncludeChildren,
+        FullRecursive
+    }
+
     /// <summary>
     ///     Master chariot abstract class to be used as the base class
     ///     for all database chariots.
@@ -122,6 +129,24 @@ namespace Olympus.Helios
             }
         }
 
+        public bool Create<T>(T item, PushType pushType = PushType.ObjectOnly)
+        {
+            try
+            {
+                if (pushType == PushType.ObjectOnly)
+                    Database.Insert(item);
+                bool recursive = pushType == PushType.FullRecursive;
+                Database.InsertWithChildren(item, recursive);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return false;
+            }
+        }
+
         /**************************** READ Data ****************************/
 
         public List<T> PullObjectList<T>(PullType pullType = PullType.ObjectOnly) where T : new()
@@ -202,6 +227,20 @@ namespace Olympus.Helios
             {
                 MessageBox.Show($"Missing Columns:\n\n{string.Join("|", ex.MissingColumns)}");
                 return false;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                return false;
+            }
+        }
+
+        public bool Update<T>(T item)
+        {
+            try
+            {
+                Database.Update(item);
+                return true;
             }
             catch (Exception ex)
             {

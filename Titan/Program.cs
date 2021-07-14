@@ -23,6 +23,7 @@ using SQLite;
 using System.Globalization;
 using System.Data.OleDb;
 using Olympus.Helios.Inventory.Model;
+using System.Security.Cryptography;
 
 namespace Titan
 {
@@ -35,9 +36,72 @@ namespace Titan
             Console.WriteLine("Press enter to begin: ...");
             Console.ReadLine();
 
-            Charioteer charioteer = new Charioteer();
+            TestPasswordRegex();
 
             _ = Console.ReadLine();
+        }
+
+        public static void TestPasswordRegex()
+        {
+            Regex regex = new Regex(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z\d])(?!.*\s).{8,255}$");
+            string check;
+            do
+            {
+                Console.Write("Enter Password: ");
+                check = Console.ReadLine();
+
+                Console.WriteLine($"\n{(regex.IsMatch(check) ? "Valid" : "INVALID")}\n");
+
+            } while (check.ToLower() != "exit");
+
+            MessageBox.Show($"Warning: Password is not very strong.\n" +
+                            $"\nRecommended:\n" +
+                            $"     •  Minimum 8 characters.\n" +
+                            $"     •  At least one lowercase letter.\n" +
+                            $"     •  At least one uppercase letter.\n" +
+                            $"     •  At least one digit.\n" +
+                            $"     •  At least one special character.\n" +
+                            $"\nRequired:\n" +
+                            $"     •  Minumum 6 characters.\n" +
+                            $"     •  No spaces.", "Weak Password", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        public static void TestCrypt()
+        {
+            var s = GenerateSalt(70);
+            Console.WriteLine( HashPassword("Password",s,10101, 70));
+            Console.WriteLine(HashPassword("Password", GenerateSalt(70), 10101, 70));
+            s = GenerateSalt(80);
+            Console.WriteLine( HashPassword("Password", s, 10101, 70));
+            Console.WriteLine( HashPassword("Password", GenerateSalt(70), 10101, 70));
+            s = GenerateSalt(70);
+            Console.WriteLine( HashPassword("Password", s, 10101, 80));
+            Console.WriteLine( HashPassword("Password", GenerateSalt(70), 10101, 80));
+            s = GenerateSalt(80);
+            Console.WriteLine( HashPassword("Password", s, 10101, 80));
+            Console.WriteLine( HashPassword("Password", GenerateSalt(70), 10101, 80));
+        }
+
+        public static string GenerateSalt(int nSalt)
+        {
+            var saltBytes = new byte[nSalt];
+
+            using (var provider = new RNGCryptoServiceProvider())
+            {
+                provider.GetNonZeroBytes(saltBytes);
+            }
+
+            return Convert.ToBase64String(saltBytes);
+        }
+
+        public static string HashPassword(string password, string salt, int nIterations, int nHash)
+        {
+            var saltBytes = Convert.FromBase64String(salt);
+
+            using (var rfc2898DeriveBytes = new Rfc2898DeriveBytes(password, saltBytes, nIterations))
+            {
+                return Convert.ToBase64String(rfc2898DeriveBytes.GetBytes(nHash));
+            }
         }
 
         public static List<NAVItem> CSVToDTTimer()

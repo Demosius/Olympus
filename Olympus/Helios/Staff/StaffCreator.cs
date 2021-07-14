@@ -16,5 +16,10 @@ namespace Olympus.Helios.Staff
             Chariot = chariot;
         }
 
+        public bool Employee(Employee employee, PushType pushType = PushType.ObjectOnly) => Chariot.Create(employee, pushType);
+
+        public bool Department(Department department, PushType pushType = PushType.ObjectOnly) => Chariot.Create(department, pushType);
+
+        public bool Role(Role role, PushType pushType = PushType.ObjectOnly) => Chariot.Create(role, pushType);
     }
 }
