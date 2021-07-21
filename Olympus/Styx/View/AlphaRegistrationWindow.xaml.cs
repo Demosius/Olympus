@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Olympus.Styx.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,18 @@ namespace Olympus.Styx.View
         public AlphaRegistrationWindow()
         {
             InitializeComponent();
+        }
+
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext != null)
+            { ((AlphaRegistrationVM)DataContext).Password = ((PasswordBox)sender).Password; }
+        }
+
+        private void PasswordBox_CnfrmPasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (DataContext != null)
+            { ((AlphaRegistrationVM)DataContext).ConfirmPassword = ((PasswordBox)sender).Password; }
         }
     }
 }

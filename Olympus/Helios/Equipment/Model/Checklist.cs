@@ -1,4 +1,5 @@
 ﻿using SQLite;
+using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,29 +14,49 @@ namespace Olympus.Helios.Equipment.Model
         [PrimaryKey]
         public string Name { get; set; }
         public string TypeCode { get; set; }
+        public string CheckCode { get; set; }
 
-        //[Ignore]
-        //public List<Check> Checks { get; set; }
+        [Ignore]
+        public List<Check> Checks { get; set; }
 
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<Forklift> Forklifts { get; set; }
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<Stockpicker> Stockpickers { get; set; }
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<Rabbit> Rabbits { get; set; }
+
+        [Ignore]
+        public List<Machine> Machines
+        {
+            get
+            {
+                List<Machine> machines = new List<Machine> { };
+                machines.AddRange(Forklifts);
+                machines.AddRange(Stockpickers);
+                machines.AddRange(Rabbits);
+                return machines;
+            }
+        }
     }
 
-    //public class Check
-    //{
-    //    public string Description { get; set; }
-    //    public bool DesiredResponse { get; set; }
-    //    public bool? Response { get; set; }
-    //    public bool FaultFails { get; set; }
+    public class Check
+    {
+        public string Description { get; set; }
+        public bool DesiredResponse { get; set; }
+        public bool? Response { get; set; }
+        public bool FaultFails { get; set; }
 
-    //    public bool? IsFault()
-    //    {
-    //        return Response == null ? Response : Response != DesiredResponse;
-    //    }
+        public bool? IsFault()
+        {
+            return Response is null ? Response : Response != DesiredResponse;
+        }
 
-    //    public string FaultString()
-    //    {
-    //        return $"{Description}: {Response}";
-    //    }
-    //}
+        public string FaultString()
+        {
+            return $"{Description}: {Response}";
+        }
+    }
 
     //public class CompletedChecklist : Checklist
     //{
@@ -69,5 +90,5 @@ namespace Olympus.Helios.Equipment.Model
     //        }
     //        return count;
     //    }
-    
+
 }

@@ -37,8 +37,17 @@ namespace Olympus.View.Components
 
         private void BtnRegister_Click(object sender, RoutedEventArgs e)
         {
-            RegisterWindow regForm = new RegisterWindow();
-            regForm.ShowDialog();
+            int userCount = App.Charioteer.UserReader.UserCount();
+            if (userCount == 0)
+            {
+                AlphaRegistrationWindow regForm = new AlphaRegistrationWindow();
+                regForm.ShowDialog();
+            }
+            else
+            {
+                RegisterWindow regForm = new RegisterWindow();
+                regForm.ShowDialog();
+            }
         }
     }
 }

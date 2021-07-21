@@ -17,7 +17,7 @@ namespace Olympus.Helios.Staff.Model
         public string Model { get; set; }
         public string Description { get; set; }
 
-        [ManyToMany(typeof(EmployeeVehicle))]
+        [ManyToMany(typeof(EmployeeVehicle), "EmployeeID", "Vehicles", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<Employee> Owners { get; set; } 
 
     }

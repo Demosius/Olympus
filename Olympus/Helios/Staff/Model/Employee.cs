@@ -13,13 +13,14 @@ namespace Olympus.Helios.Staff.Model
         public int ID { get; set; } // Employee number (e.g. 60853)
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        [NotNull]
         public string DisplayName { get; set; }
-        public decimal PayRate { get; set; }
+        public decimal? PayRate { get; set; } = null;
         public string RF_ID { get; set; }
         public string PC_ID { get; set; }
-        [ForeignKey(typeof(Department))]
+        [ForeignKey(typeof(Department)), NotNull]
         public string DepartmentName { get; set; }
-        [ForeignKey(typeof(Role))]
+        [ForeignKey(typeof(Role)), NotNull]
         public string RoleName { get; set; }
         [ForeignKey(typeof(Locker))]
         public string LockerID { get; set; }
@@ -27,34 +28,46 @@ namespace Olympus.Helios.Staff.Model
         public string Email { get; set; }
         public string Address { get; set; }
 
-        [ManyToOne]
-        public Department Department { get; set; }
-        [ManyToOne]
-        public Role Role { get; set; }
-        [OneToOne]
+        private Department department;
+        private Role role;
+
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public Department Department
+        {
+            get => department;
+            set
+            {
+                department = value;
+                DepartmentName = value.Name;
+                value.Employees.Add(this);
+            }
+        }
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public Role Role
+        {
+            get => role; 
+            set
+            {
+                role = value;
+                RoleName = value.Name;
+                value.Employees.Add(this);
+            }
+        }
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Locker Locker { get; set; }
-        [ManyToMany(typeof(EmployeeVehicle))]
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public Licence Licence { get; set; }
+        [ManyToMany(typeof(EmployeeVehicle), "VehicleRego" , "Owners" , CascadeOperations = CascadeOperation.All)]
         public List<Vehicle> Vehicles { get; set; }
-        [ManyToMany(typeof(EmployeeShift))]
+        [ManyToMany(typeof(EmployeeShift), "ShiftName", "Employees", CascadeOperations = CascadeOperation.All)]
         public List<Shift> Shifts { get; set; }
-        [ManyToMany(typeof(EmployeeDepartmentLoaning))]
-        public List<Department> DepartmentsCanWorkIn { get; set; }
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<EmployeeInductionReference> InductionReferences { get; set; }
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<ShiftRule> Rules { get; set; }
+        [ManyToMany(typeof(EmployeeDepartmentLoaning), "DepartmentName", "EmployeesCanLoan", CascadeOperations = CascadeOperation.All)]
+        public List<Department> DepartmentsCanWorkIn { get; set; }
 
-        public void SetDepartment(Department department)
-        {
-            Department = department;
-            DepartmentName = department.Name;
-            department.Employees.Add(this);
-        }
-
-        public void SetRole(Role role)
-        {
-            Role = role;
-            RoleName = role.Name;
-            role.Employees.Add(this);
-        }
 
         public override bool Equals(object obj) => this.Equals(obj as Employee);
 

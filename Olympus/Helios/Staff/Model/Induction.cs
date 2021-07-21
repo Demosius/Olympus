@@ -15,7 +15,7 @@ namespace Olympus.Helios.Staff.Model
         public string Description { get; set; }
         public string Period { get; set; }
 
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<EmployeeInductionReference> EmployeeReferences { get; set; }
     }
 }

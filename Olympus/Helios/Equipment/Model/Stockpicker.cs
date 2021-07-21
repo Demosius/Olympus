@@ -20,7 +20,7 @@ namespace Olympus.Helios.Equipment.Model
         [ForeignKey(typeof(Checklist))]
         public override string ChecklistName { get; set; }
 
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public override Checklist Checklist { get; set; }
 
         public bool HighReach()

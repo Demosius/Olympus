@@ -42,29 +42,29 @@ namespace Olympus.Helios
 
         protected void InitializeDatabaseConnection()
         {
-            try
-            {
+            //try
+            //{
                 if (Database == null)
                 {
                     if (!Directory.Exists(BaseDataDirectory)) Directory.CreateDirectory(BaseDataDirectory);
-
-                    Database = new SQLiteConnection(Path.Combine(BaseDataDirectory, DatabaseName));
+                    string s = Path.Combine(BaseDataDirectory, DatabaseName);
+                    Database = new SQLiteConnection(s);
                     if (Database == null)
                         throw new FailedConnectionException($"Failed to connect to {DatabaseName}, might be an invalid path.");
                 }
 
                 Database.CreateTables(CreateFlags.None, Tables);
 
-            }
-            catch (FailedConnectionException ex)
-            {
-                MessageBox.Show(ex.Message);
-                throw ex;
-            }
-            catch (Exception ex)
-            {
-                Toolbox.ShowUnexpectedException(ex);
-            }
+            //}
+            //catch (FailedConnectionException ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //    throw ex;
+            //}
+            //catch (Exception ex)
+            //{
+            //    Toolbox.ShowUnexpectedException(ex);
+            //}
         }
 
         public abstract void ResetConnection();
@@ -135,8 +135,11 @@ namespace Olympus.Helios
             {
                 if (pushType == PushType.ObjectOnly)
                     Database.Insert(item);
-                bool recursive = pushType == PushType.FullRecursive;
-                Database.InsertWithChildren(item, recursive);
+                else
+                {
+                    bool recursive = pushType == PushType.FullRecursive;
+                    Database.InsertWithChildren(item, recursive);
+                }
 
                 return true;
             }

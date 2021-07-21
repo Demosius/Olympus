@@ -26,8 +26,11 @@ namespace Olympus
 
         public static Settings Settings { get; set; } = Settings = new Settings();
         public static Charon Charon { get; set; } = Charon = new Charon();
-        //public static Charioteer Charioteer { get; set; } = Charioteer = new Charioteer();
-        public static string BaseDirectory { get; set; } = BaseDirectory = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
+        public static Charioteer Charioteer { get; set; } = Charioteer = new Charioteer();
 
+        public static string BaseDirectory() 
+        {
+            return Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
+        } 
     }
 }

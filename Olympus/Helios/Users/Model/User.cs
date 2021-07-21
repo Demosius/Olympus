@@ -15,17 +15,12 @@ namespace Olympus.Helios.Users.Model
         [ForeignKey(typeof(Role))]
         public string RoleName { get; set; }
 
-        [ManyToOne]
-        public Role Role { get; set; }
+        private Role role;
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public Role Role { get => role; set { role = value; RoleName = value.Name; } }
 
         [Ignore]
         public Employee Employee { get; set; }
-
-        public void SetRole(Role role)
-        {
-            Role = role;
-            RoleName = role.Name;
-        }
 
     }
 

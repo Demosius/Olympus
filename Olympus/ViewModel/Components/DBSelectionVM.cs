@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Olympus.ViewModel.Components
 {
-    class DBSelectionVM : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-    }
+    //class DBSelectionVM : INotifyPropertyChanged
+    //{
+    //    public event PropertyChangedEventHandler PropertyChanged;
+    //}
 }

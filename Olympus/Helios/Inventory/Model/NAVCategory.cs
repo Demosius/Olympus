@@ -17,7 +17,7 @@ namespace Olympus.Helios.Inventory.Model
         [ForeignKey(typeof(NAVDivision))]
         public int DivisionCode { get; set; }
 
-        [OneToMany]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVDivision Division { get; set; }
 
     }

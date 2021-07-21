@@ -11,7 +11,7 @@ namespace Olympus.Helios.Inventory.Model
     [Table("BinList")]
     public class NAVBin
     {
-        [PrimaryKey] // Combination of ZoneID and Code (e.g. 9600:PR:PR18 058)
+        [PrimaryKey, ForeignKey(typeof(BinDimensions))] // Combination of ZoneID and Code (e.g. 9600:PR:PR18 058)
         public string ID { get; set; }
         [ForeignKey(typeof(NAVZone))] // Combination of LocationCode and ZoneCode (e.g. 9600:PR)
         public string ZoneID { get; set; }
@@ -27,11 +27,60 @@ namespace Olympus.Helios.Inventory.Model
         public DateTime LastCCDate { get; set; }
         public DateTime LastPIDate { get; set; }
 
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVZone Zone { get; set; }
-        [OneToMany]
-        public NAVStock Stock { get; set; }
-        [ManyToMany(typeof(BinBay))]
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<NAVStock> NAVStock { get; set; }
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<Stock> Stock { get; set; }
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public BinBay BinBay { get; set; }
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public BinDimensions Dimensions { get; set; }
+
+        [Ignore]
+        public Bay Bay
+        {
+            get => BinBay.Bay; 
+            set
+            {
+                BinBay.Bay = value;
+            }
+        }
+
+        public NAVBin() { }
+
+        // Merges matching items in Stock (NOT NAVStock)
+        public void MergeStock()
+        {
+            // Try to merge every stock item with every other.
+            // If merge is succesful, remove the merged stock from the list.
+            // Use backwards list, and merge from the i, so we remove from the end of the list safely.
+            for (int i = Stock.Count -1; i > 0; --i)
+            {
+                for (int j = i-1; j>=0; --j)
+                {
+                    if (Stock[j].Merge(Stock[i]))
+                    {
+                        Stock.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Takes examples of NAVStock and creates Stock versions.
+        public void ConvertStock()
+        {
+            // Make sure both lists are not null.
+            if (NAVStock is null) NAVStock = new List<NAVStock> { };
+            if (Stock is null) Stock = new List<Stock> { };
+
+            foreach (NAVStock ns in NAVStock)
+            {
+                Stock stock = new Stock(ns);
+                Stock.Add(stock);
+            }
+        }
     }
 }

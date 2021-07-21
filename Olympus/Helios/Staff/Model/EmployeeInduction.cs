@@ -19,9 +19,9 @@ namespace Olympus.Helios.Staff.Model
         public DateTime IssueDate { get; set; }
         public DateTime ExpiryDate { get; set; }
 
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Employee Employee { get; set; }
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Induction Induction { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace Olympus.Helios.Staff.Model
         [ForeignKey(typeof(Employee))]
         public int EmployeeID { get; set; }
 
-        [OneToOne]
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Employee Employee { get; set; }
 
     }

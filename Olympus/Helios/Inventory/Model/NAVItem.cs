@@ -30,17 +30,19 @@ namespace Olympus.Helios.Inventory.Model
         public double Weight { get; set; }
         public bool PreOwned { get; set; }
 
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<NAVUoM> UoMs { get; set; }
-        [OneToMany]
-        public List<NAVStock> Stock { get; set; }
-        [ManyToOne]
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<NAVStock> NAVStock { get; set; }
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<Stock> Stock { get; set; }
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVCategory Category { get; set; }
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVDivision Division { get; set; }
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVPlatform Platform { get; set; }
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVGenre Genre { get; set; }
 
         public override bool Equals(object obj) => this.Equals(obj as NAVItem);

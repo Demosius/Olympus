@@ -15,7 +15,7 @@ namespace Olympus.Helios.Inventory.Model
         public string Code { get; set; }
         public string Name { get; set; }
 
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<NAVZone> Zones { get; set; }
     }
 }

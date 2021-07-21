@@ -19,9 +19,11 @@ namespace Olympus.Helios.Inventory.Model
         public string Description { get; set; }
         public int Ranking { get; set; }
 
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVLocation Location { get; set; }
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<Bay> Bays { get; set; }
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<NAVBin> Bins { get; set; }
     }
 }

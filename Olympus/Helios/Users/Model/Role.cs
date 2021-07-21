@@ -53,7 +53,7 @@ namespace Olympus.Helios.Users.Model
         public bool UpdateVehicle { get; set; }
         public bool DeleteVehicle { get; set; }
 
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<User> Users { get; set; }
 
         public void SetDefault()

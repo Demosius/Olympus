@@ -25,9 +25,9 @@ namespace Olympus.Helios.Inventory.Model
         public double Cube { get; set; }
         public double Weight { get; set; }
 
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<NAVStock> Stock { get; set; }
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVItem Item { get; set; }
     }
 }

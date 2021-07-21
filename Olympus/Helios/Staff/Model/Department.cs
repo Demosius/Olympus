@@ -14,24 +14,30 @@ namespace Olympus.Helios.Staff.Model
         [ForeignKey(typeof(Employee))]
         public int HeadID { get; set; }
 
-        [OneToOne]
-        public Employee Head { get; set; }
-        [OneToMany]
-        public List<Shift> Shifts { get; set; } = new List<Shift> { };
-        [OneToMany]
-        public List<Employee> Employees { get; set; } = new List<Employee> { };
-        [OneToMany]
-        public List<Clan> Clans { get; set; } = new List<Clan> { };
-        [OneToMany]
-        public List<Role> Roles { get; set; } = new List<Role> { };
-        [ManyToMany(typeof(Employee))]
-        public List<Employee> EmployeesCanBorrow { get; set; }
+        private Employee head;
 
-        public void SetHead(Employee employee)
+        [OneToOne]
+        public Employee Head
         {
-            Head = employee;
-            HeadID = employee.ID;
+            get => head; 
+            set
+            {
+                head = value;
+                HeadID = value.ID;
+            }
         }
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<Shift> Shifts { get; set; } = new List<Shift> { };
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<Employee> Employees { get; set; } = new List<Employee> { };
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<Clan> Clans { get; set; } = new List<Clan> { };
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<Role> Roles { get; set; } = new List<Role> { };
+        [ManyToMany(typeof(EmployeeDepartmentLoaning), "EmployeeID", "DepartmentsCanWorkIn", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<Employee> EmployeesCanLoan { get; set; }
+
+        public Department() { }
 
         public override bool Equals(object obj) => this.Equals(obj as Department);
 

@@ -16,5 +16,9 @@ namespace Olympus.Helios.Inventory.Model
         [ForeignKey(typeof(Bay))]
         public string BayID { get; set; }
 
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public NAVBin Bin { get; set; }
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public Bay Bay { get; set; }
     }
 }

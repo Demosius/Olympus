@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -45,7 +44,7 @@ namespace Olympus.Helios.Inventory
             catch
             {
                 MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
-                BaseDataDirectory = Path.Combine(App.BaseDirectory, "Sol", "Inventory");
+                BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Inventory");
                 InitializeDatabaseConnection();
             }
         }
@@ -61,7 +60,7 @@ namespace Olympus.Helios.Inventory
             catch
             {
                 MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
-                BaseDataDirectory = Path.Combine(App.BaseDirectory, "Sol", "Inventory");
+                BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Inventory");
                 InitializeDatabaseConnection();
             }
         }
@@ -77,7 +76,7 @@ namespace Olympus.Helios.Inventory
             catch
             {
                 MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
-                BaseDataDirectory = Path.Combine(App.BaseDirectory, "Sol", "Inventory");
+                BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Inventory");
                 InitializeDatabaseConnection();
             }
         }

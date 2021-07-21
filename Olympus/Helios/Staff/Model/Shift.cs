@@ -22,7 +22,7 @@ namespace Olympus.Helios.Staff.Model
         public Department Department { get; set; }
         [Ignore]
         public List<Break> Breaks { get; set; }
-        [ManyToMany(typeof(EmployeeShift))]
+        [ManyToMany(typeof(EmployeeShift), "EmployeeID", "Shifts", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<Employee> Employees { get; set; }
 
     }

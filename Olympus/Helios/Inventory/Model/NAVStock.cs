@@ -35,11 +35,11 @@ namespace Olympus.Helios.Inventory.Model
         public DateTime TimeCreated { get; set; }
         public bool Fixed { get; set; }
 
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVBin Bin { get; set; }
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVUoM UoM { get; set; }
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVItem Item { get; set; }
 
     }

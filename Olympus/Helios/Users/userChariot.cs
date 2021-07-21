@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,7 +22,7 @@ namespace Olympus.Helios.Users
     {
         public override string DatabaseName { get; } = "Users.sqlite";
 
-        public override Type[] Tables { get; } = new Type[] {typeof(User), typeof(Role)};
+        public override Type[] Tables { get; } = new Type[] {typeof(User), typeof(Role), typeof(Login)};
 
         /*************************** Constructors ****************************/
 
@@ -35,10 +34,11 @@ namespace Olympus.Helios.Users
                 BaseDataDirectory = Path.Combine(App.Settings.SolLocation, "Users");
                 InitializeDatabaseConnection();
             }
-            catch
+            catch (Exception ex)
             {
+                Toolbox.ShowUnexpectedException(ex);
                 MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
-                BaseDataDirectory = Path.Combine(App.BaseDirectory, "Sol", "Users");
+                BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Users");
                 InitializeDatabaseConnection();
             }
         }
@@ -54,7 +54,7 @@ namespace Olympus.Helios.Users
             catch
             {
                 MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
-                BaseDataDirectory = Path.Combine(App.BaseDirectory, "Sol", "Users");
+                BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Users");
                 InitializeDatabaseConnection();
             }
         }
@@ -70,7 +70,7 @@ namespace Olympus.Helios.Users
             catch
             {
                 MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
-                BaseDataDirectory = Path.Combine(App.BaseDirectory, "Sol", "Users");
+                BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Users");
                 InitializeDatabaseConnection();
             }
         }

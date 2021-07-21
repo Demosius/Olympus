@@ -1,6 +1,7 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Olympus.Helios.Inventory.Model
 {
@@ -11,10 +12,26 @@ namespace Olympus.Helios.Inventory.Model
         [ForeignKey(typeof(NAVZone))]
         public string ZoneID { get; }
 
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVZone Zone { get; set; }
-        [OneToMany]
-        public List<NAVBin> Bins { get; set; }
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<BinBay> BinBays { get; set; }
 
+        private List<NAVBin> bins;
+        [Ignore]
+        public List<NAVBin> Bins
+        {
+            get
+            {
+                if (bins is null)
+                {
+                    if (BinBays is null)
+                        BinBays = new List<BinBay> { };
+                    bins = BinBays.Select(bb => bb.Bin).ToList();
+                }
+                return bins;
+            } 
+            set { bins = value; }
+        }
     }
 }

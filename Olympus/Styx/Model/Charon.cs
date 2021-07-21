@@ -30,7 +30,7 @@ namespace Olympus.Styx.Model
         private readonly UserCreator userCreator;
         private readonly UserReader userReader;
         private readonly UserUpdater userUpdater;
-        private readonly UserDeleter userDeleter;
+        //private readonly UserDeleter userDeleter;
 
         // Reading employees.
         private readonly StaffChariot staffChariot;
@@ -43,7 +43,7 @@ namespace Olympus.Styx.Model
             userCreator = new UserCreator(ref userChariot);
             userReader = new UserReader(ref userChariot);
             userUpdater = new UserUpdater(ref userChariot);
-            userDeleter = new UserDeleter(ref userChariot);
+            //userDeleter = new UserDeleter(ref userChariot);
 
             staffChariot = new StaffChariot();
             staffReader = new StaffReader(ref staffChariot);
@@ -140,10 +140,10 @@ namespace Olympus.Styx.Model
             // Check that there are no users. (In theory there should also be no employees, but that should prevent an alpha user creation.)
             if (userReader.UserCount() > 0) return false;
 
-            staffRole.SetDepartment(department);
-            department.SetHead(employee);
-            employee.SetRole(staffRole);
-            employee.SetDepartment(department);
+            staffRole.Department = department;
+            department.Head = employee;
+            employee.Role = staffRole;
+            employee.Department = department;
 
             staffCreator.Employee(employee, Helios.PushType.FullRecursive);
 

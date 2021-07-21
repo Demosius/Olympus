@@ -17,11 +17,11 @@ namespace Olympus.Helios.Staff.Model
         [ForeignKey(typeof(Department))]
         public string DepartmentName { get; set; }
 
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Department Department { get; set; }
-        [OneToOne]
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Employee Leader { get; set; }
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<Employee> Employees { get; set; } = new List<Employee> { };
 
 

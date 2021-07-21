@@ -12,7 +12,6 @@ using Olympus.Helios.Staff;
 using Olympus;
 using System.Text.Json;
 using System.Data;
-using System.Data.SQLite.Linq;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.CodeDom.Compiler;
@@ -31,14 +30,26 @@ namespace Titan
     {
         static void Main()
         {
-            Console.WriteLine(App.Settings.SolLocation);
+            
+            //Console.WriteLine(App.Settings.SolLocation);
 
             Console.WriteLine("Press enter to begin: ...");
             Console.ReadLine();
 
-            TestPasswordRegex();
+            SQLiteTesting();
 
             _ = Console.ReadLine();
+        }
+
+        public static void SQLiteTesting()
+        {
+            string baseDataDirectory = Path.Combine("ausefpdfs01ns", "Shares", "Public", "Aaron Penny", "Data", "PCLTest");
+
+            string databaseName = "SolInv.db";
+
+            var database = new SQLiteConnection(Path.Combine(baseDataDirectory, databaseName));
+
+            database.Close();
         }
 
         public static void TestPasswordRegex()

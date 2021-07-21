@@ -95,7 +95,11 @@
             <GradientStop Color="#044" Offset="0"/>
             <GradientStop Color="#022" Offset="1"/>
         </LinearGradientBrush>
-        
+
+        <SolidColorBrush x:Key="SolidBackDark" Color="#022"/>
+        <SolidColorBrush x:Key="SolidBackMedium" Color="#044"/>
+        <SolidColorBrush x:Key="SolidBackLight" Color="#066"/>
+
         <LinearGradientBrush x:Key="MainGradient" EndPoint="0,1" StartPoint="0,0">
             <GradientStop Color="#0AA" Offset="0"/>
             <GradientStop Color="#022" Offset="1"/>

@@ -19,9 +19,9 @@ namespace Olympus.Helios.Staff.Model
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public TempTag TempTag { get; set; }
-        [ManyToOne]
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Employee Employee { get; set; }
     }
 }

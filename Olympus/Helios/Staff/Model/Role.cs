@@ -12,27 +12,36 @@ namespace Olympus.Helios.Staff.Model
     {
         [PrimaryKey]
         public string Name { get; set; }
-        [ForeignKey(typeof(Department))]
+        [ForeignKey(typeof(Department)), NotNull]
         public string DepartmentName { get; set; }
+        [NotNull]
         public int Level { get; set; }
         [ForeignKey(typeof(Role))]
         public string ReportsToRoleName { get; set; }
 
-        [ManyToOne]
-        public Department Department { get; set; }
-        [OneToOne]
+        private Department department;
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public Department Department
+        {
+            get => department; 
+            set
+            {
+                department = value;
+                DepartmentName = value.Name;
+                value.Roles.Add(this);
+            }
+        }
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Role ReprortsToRole { get; set; }
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<Employee> Employees { get; set; }
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<Role> Reports { get; set; }
 
-
-        public void SetDepartment(Department department)
+        public Role()
         {
-            Department = department;
-            DepartmentName = department.Name;
-            department.Roles.Add(this);
+            Employees = new List<Employee> { };
+            Reports = new List<Role> { };
         }
 
         public bool LookDown(ref int down, ref Role targetRole)
@@ -73,15 +82,15 @@ namespace Olympus.Helios.Staff.Model
         }
 
 
-        public override bool Equals(object obj) => this.Equals(obj as Role);
+        public override bool Equals(object obj) => Equals(obj as Role);
 
         public bool Equals(Role role)
         {
             if (role is null) return false;
 
-            if (Object.ReferenceEquals(this, role)) return true;
+            if (ReferenceEquals(this, role)) return true;
 
-            if (this.GetType() != role.GetType()) return false;
+            if (GetType() != role.GetType()) return false;
 
             return Name == role.Name;
         }

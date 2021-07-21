@@ -12,8 +12,12 @@ namespace Olympus.Helios.Staff.Model
     {
         [PrimaryKey]
         public string RF_ID { get; set; }
+        [ForeignKey(typeof(Employee))]
+        public int EmployeeID { get; set; }
 
-        [OneToMany]
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public TagUse TagUse { get; set; }
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public Employee Employee { get; set; }
     }
 }

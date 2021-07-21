@@ -29,12 +29,11 @@ namespace Olympus.Helios.Users
 
         public void AssureDBManagerRole()
         {
-            if (Chariot.Database.Execute("SELECT count(*) FROM Role WHERE Name='DatabaseManager';") > 0) return;
+            if (Chariot.PullObjectList<Role>().Where(Role => Role.Name == "DatabaseManager").Count() > 0) return;
+            //if (Chariot.Database.Execute("SELECT count(*) FROM Role WHERE Name='DatabaseManager';") > 0) return;
 
             Role role = new Role();
-
             role.SetMaster();
-
             Chariot.Create(role);
         }
 
