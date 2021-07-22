@@ -25,9 +25,40 @@ namespace Olympus.Helios.Inventory.Model
         public double Cube { get; set; }
         public double Weight { get; set; }
 
+        private EUoM? uom = null;
+        [Ignore]
+        public EUoM UoM 
+        {
+            get
+            {
+                if (uom == null)
+                {
+                    uom = EnumConverter.StringToUoM(Code);
+                }
+                return (EUoM)uom;
+            }
+        }
+
         [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<NAVStock> Stock { get; set; }
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVItem Item { get; set; }
+
+        public NAVUoM()
+        {
+            QtyPerUoM = 0;
+        }
+
+        public NAVUoM(EUoM uom) : this()
+        {
+            this.uom = uom;
+            Code = EnumConverter.UoMToString(uom);
+        }
+
+        public NAVUoM(NAVItem item, EUoM uom) : this(uom)
+        {
+            Item = item;
+            ItemNumber = item.Number;
+        }
     }
 }

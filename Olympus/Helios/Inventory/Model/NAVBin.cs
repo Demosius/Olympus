@@ -42,12 +42,11 @@ namespace Olympus.Helios.Inventory.Model
         public Bay Bay
         {
             get => BinBay.Bay; 
-            set
-            {
-                BinBay.Bay = value;
-            }
+            set { BinBay.Bay = value; }
         }
-
+        [Ignore]
+        public AccessLevel AccessLevel { get => Zone.AccessLevel; }
+        
         public NAVBin() { }
 
         // Merges matching items in Stock (NOT NAVStock)
@@ -81,6 +80,25 @@ namespace Olympus.Helios.Inventory.Model
                 Stock stock = new Stock(ns);
                 Stock.Add(stock);
             }
+        }
+
+        // Returns true if the given move represents the full quantity of the bin's contents.
+        // Returns null if the move reuires more than is available.
+        public bool? IsFullQty(Move move)
+        {
+            List<Stock> itemStock = Stock.Where(stock => stock.Item == move.Item).ToList();
+            if (itemStock.Count != 1) 
+                return null; // Item is not at this bin location OR there is multiple instances of item stock - which should not occur.
+            Stock theStock = itemStock[0];
+            if (theStock.Cases.Qty < move.TakeCases || 
+                theStock.Packs.Qty < move.TakePacks || 
+                theStock.Eaches.Qty < move.TakeEaches)
+                return null; // Too much stock trying to move.
+            if (itemStock.Count != Stock.Count) 
+                return false; // There is other stock at this location.
+            return (theStock.Cases.Qty == move.TakeCases &&
+                    theStock.Packs.Qty == move.TakePacks &&
+                    theStock.Eaches.Qty == move.TakeEaches);
         }
     }
 }

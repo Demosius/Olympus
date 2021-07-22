@@ -88,10 +88,12 @@
     <Compile Include="Helios\Equipment\EquipmentDeleter.cs" />
     <Compile Include="Helios\Equipment\EquipmentReader.cs" />
     <Compile Include="Helios\Equipment\EquipmentUpdater.cs" />
+    <Compile Include="Helios\Inventory\EnumConverter.cs" />
     <Compile Include="Helios\Inventory\InventoryCreator.cs" />
     <Compile Include="Helios\Inventory\InventoryDeleter.cs" />
     <Compile Include="Helios\Inventory\InventoryReader.cs" />
     <Compile Include="Helios\Inventory\InventoryUpdater.cs" />
+    <Compile Include="Helios\Inventory\Model\Batch.cs" />
     <Compile Include="Helios\Inventory\Model\BinBay.cs" />
     <Compile Include="Helios\Inventory\Model\BinContentsUpdate.cs" />
     <Compile Include="Helios\Inventory\Model\BinDimensions.cs" />
@@ -102,12 +104,14 @@
     <Compile Include="Helios\Inventory\Model\NAVGenre.cs" />
     <Compile Include="Helios\Inventory\Model\NAVItem.cs" />
     <Compile Include="Helios\Inventory\Model\NAVLocation.cs" />
+    <Compile Include="Helios\Inventory\Model\NAVMoveLine.cs" />
     <Compile Include="Helios\Inventory\Model\NAVPlatform.cs" />
     <Compile Include="Helios\Inventory\Model\NAVStock.cs" />
     <Compile Include="Helios\Inventory\Model\NAVUoM.cs" />
     <Compile Include="Helios\Inventory\Model\NAVZone.cs" />
     <Compile Include="Helios\Inventory\Model\SubStock.cs" />
     <Compile Include="Helios\Inventory\Model\TableUpdate.cs" />
+    <Compile Include="Helios\Inventory\Model\ZoneAccessLevel.cs" />
     <Compile Include="Helios\Staff\Model\EmployeeDepartmentLoaning.cs" />
     <Compile Include="Helios\Staff\Model\EmployeeInduction.cs" />
     <Compile Include="Helios\Staff\Model\EmployeeVehicle.cs" />
@@ -157,6 +161,8 @@
     <Compile Include="Helios\Staff\Model\Role.cs" />
     <Compile Include="Helios\Staff\Model\Vehicle.cs" />
     <Compile Include="Toolbox.cs" />
+    <Compile Include="Vulcan\Model\Operator.cs" />
+    <Compile Include="Vulcan\VulcanChariot.cs" />
     <Page Include="Styx\View\AlphaRegistrationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -324,6 +330,8 @@
     <Folder Include="Helios\Users\ViewModel\" />
     <Folder Include="Prometheus\Model\" />
     <Folder Include="Prometheus\ViewModel\" />
+    <Folder Include="Vulcan\ViewModel\" />
+    <Folder Include="Vulcan\View\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

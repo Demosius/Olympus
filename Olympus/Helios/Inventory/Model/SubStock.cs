@@ -8,13 +8,6 @@ using System.Threading.Tasks;
 
 namespace Olympus.Helios.Inventory.Model
 {
-    public enum EUoM
-    {
-        CASE,
-        PACK,
-        EACH
-    }
-
     public class SubStock
     {
         [PrimaryKey] // Combination of StockID and UoMCode (e.g. 9600:PR:PR18 058:271284:CASE)
@@ -31,7 +24,7 @@ namespace Olympus.Helios.Inventory.Model
             set
             {
                 uomCode = value;
-                eUoM = UoMToEnum(UoMCode);
+                eUoM = EnumConverter.StringToUoM(UoMCode);
             }
         }
         [Ignore]
@@ -41,7 +34,7 @@ namespace Olympus.Helios.Inventory.Model
             set
             {
                 eUoM = value;
-                uomCode = UoMToString(eUoM);
+                uomCode = EnumConverter.UoMToString(eUoM);
             }
         }
 
@@ -77,25 +70,6 @@ namespace Olympus.Helios.Inventory.Model
             PutAwayQty = navStock.PutAwayQty;
             NegAdjQty = navStock.NegAdjQty;
             PosAdjQty = navStock.PosAdjQty;
-        }
-
-        private string UoMToString(EUoM uom)
-        {
-            if (uom == EUoM.CASE)
-                return "CASE";
-            if (uom == EUoM.PACK)
-                return "PACK";
-            return "EACH";
-        }
-
-        private EUoM UoMToEnum(string uom)
-        {
-            uom = uom.ToUpper();
-            if (uom == "CASE")
-                return EUoM.CASE;
-            if (uom == "PACK")
-                return EUoM.PACK;
-            return EUoM.EACH;
         }
 
         public void SetStockID()

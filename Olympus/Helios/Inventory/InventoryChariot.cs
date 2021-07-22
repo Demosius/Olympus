@@ -4,19 +4,13 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using Olympus.Helios.Inventory.Model;
 using SQLiteNetExtensions.Extensions;
 
 namespace Olympus.Helios.Inventory
 {
-    public enum EUoM
-    {
-        EACH,
-        PACK,
-        CASE
-    }
-
     /// <summary>
     ///  The chariot class for transferring inventory data back and forth between the database.
     ///  Primarily handles data in DataTable formats, both for input and output.
@@ -160,15 +154,5 @@ namespace Olympus.Helios.Inventory
             }
         }
 
-        /**************************** CONVERT Data ***************************/
-        public string GetUoMString(EUoM eUoM)
-        {
-            if (eUoM == EUoM.CASE)
-                return "CASE";
-            else if (eUoM == EUoM.PACK)
-                return "PACK";
-            else
-                return "EACH";
-        }
     }
 }

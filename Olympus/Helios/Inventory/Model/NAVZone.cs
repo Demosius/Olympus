@@ -25,5 +25,17 @@ namespace Olympus.Helios.Inventory.Model
         public List<Bay> Bays { get; set; }
         [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<NAVBin> Bins { get; set; }
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public ZoneAccessLevel ZoneAccessLevel { get; set; }
+
+        [Ignore]
+        public AccessLevel AccessLevel
+        {
+            get => ZoneAccessLevel.AccessLevel;
+            set
+            {
+                ZoneAccessLevel.AccessLevel = value;
+            }
+        }
     }
 }

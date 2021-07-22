@@ -45,6 +45,42 @@ namespace Olympus.Helios.Inventory.Model
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVGenre Genre { get; set; }
 
+        // Specific UoMs
+        [Ignore]
+        public NAVUoM Case { get; set; }
+        [Ignore]
+        public NAVUoM Pack { get; set; }
+        [Ignore]
+        public NAVUoM Each { get; set; }
+
+        public NAVItem() { }
+
+        // Sets the specific uoms, so we don't need to pull from an "unorderred" list all the time.
+        public void SetUoMs()
+        {
+            EUoM e;
+            foreach (NAVUoM uom in UoMs)
+            {
+                e = uom.UoM;
+                if (e == EUoM.CASE)
+                    Case = uom;
+                else if (e == EUoM.PACK)
+                    Pack = uom;
+                else
+                    Each = uom;
+            }
+            if (Case is null) Case = new NAVUoM(this, EUoM.CASE);
+            if (Pack is null) Pack = new NAVUoM(this, EUoM.PACK);
+            if (Each is null) Each = new NAVUoM(this, EUoM.EACH);
+        }
+
+        public int GetBaseQty(int eaches = 0, int packs = 0, int cases = 0)
+        {
+            if (Each is null || Pack is null || Case is null) SetUoMs();
+            return eaches * Each.QtyPerUoM + packs * Pack.QtyPerUoM + cases * Case.QtyPerUoM; 
+        }
+
+        /* Equality and Operator Overloading */
         public override bool Equals(object obj) => this.Equals(obj as NAVItem);
         
         public bool Equals(NAVItem item)
