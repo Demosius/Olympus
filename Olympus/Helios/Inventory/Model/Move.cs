@@ -42,11 +42,11 @@ namespace Olympus.Helios.Inventory.Model
         { 
             get
             {
-                return TakeBin.IsFullQty(this) ?? false && AccessLevel != AccessLevel.Ground;
+                return TakeBin.IsFullQty(this) ?? false && AccessLevel != EAccessLevel.Ground;
             }
         }
         [Ignore]
-        public AccessLevel AccessLevel { get => TakeBin.Zone.AccessLevel; }
+        public EAccessLevel AccessLevel { get => TakeBin.Zone.AccessLevel; }
         [Ignore]
         public int AssignedOperator { get; set; }
         public float TimeEstimate { get; set; }
@@ -56,7 +56,7 @@ namespace Olympus.Helios.Inventory.Model
         public Move(NAVMoveLine moveLine)
         {
             ItemNumber = moveLine.ItemNumber;
-            if (moveLine.ActionType == ActionType.Place)
+            if (moveLine.ActionType == EAction.Place)
             {
                 PlaceBin = moveLine.Bin;
                 PlaceBinID = moveLine.BinID;

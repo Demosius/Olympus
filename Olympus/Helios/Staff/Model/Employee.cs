@@ -27,6 +27,8 @@ namespace Olympus.Helios.Staff.Model
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
         public string Address { get; set; }
+        [ForeignKey(typeof(EmployeeIcon))]
+        public string IconName { get; set; }
 
         private Department department;
         private Role role;
@@ -53,20 +55,25 @@ namespace Olympus.Helios.Staff.Model
                 value.Employees.Add(this);
             }
         }
+
         [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Locker Locker { get; set; }
         [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Licence Licence { get; set; }
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public EmployeeIcon Icon { get; set; }
+
         [ManyToMany(typeof(EmployeeVehicle), "VehicleRego" , "Owners" , CascadeOperations = CascadeOperation.All)]
         public List<Vehicle> Vehicles { get; set; }
         [ManyToMany(typeof(EmployeeShift), "ShiftName", "Employees", CascadeOperations = CascadeOperation.All)]
         public List<Shift> Shifts { get; set; }
+        [ManyToMany(typeof(EmployeeDepartmentLoaning), "DepartmentName", "EmployeesCanLoan", CascadeOperations = CascadeOperation.All)]
+        public List<Department> DepartmentsCanWorkIn { get; set; }
+
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<EmployeeInductionReference> InductionReferences { get; set; }
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<ShiftRule> Rules { get; set; }
-        [ManyToMany(typeof(EmployeeDepartmentLoaning), "DepartmentName", "EmployeesCanLoan", CascadeOperations = CascadeOperation.All)]
-        public List<Department> DepartmentsCanWorkIn { get; set; }
 
 
         public override bool Equals(object obj) => this.Equals(obj as Employee);

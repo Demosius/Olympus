@@ -17,6 +17,13 @@ namespace Olympus.Helios.Staff
             Chariot = chariot;
         }
 
+        /* DIRECTORIES */
+        public string BaseDirectory { get => Chariot.BaseDataDirectory; }
+        public string EmployeeIconDirectory { get => Chariot.EmployeeIconDirectory; }
+        public string EmployeeAvatarDirectory { get => Chariot.EmployeeAvatarDirectory; }
+        public string ProjectIconDirectory { get => Chariot.ProjectIconDirectory; }
+        public string LicenceImageDirectory { get => Chariot.LicenceImageDirectory; }
+         
         /* EMPLOYEES */
         public Employee Employee(int ID, PullType pullType = PullType.ObjectOnly) => Chariot.PullObject<Employee>(ID, pullType);
 

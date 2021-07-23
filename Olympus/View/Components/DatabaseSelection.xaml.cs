@@ -23,19 +23,10 @@ namespace Olympus.View.Components
     /// </summary>
     public partial class DatabaseSelection : UserControl
     {
-        public string DBString { get; set; }
-
         public DatabaseSelection()
         {
             InitializeComponent();
-            SetDisplay();
         }
-
-        private void SetDisplay()
-        {
-            DBString = $"DB Location: {App.Settings.SolLocation}";
-        }
-
     }
 
 }

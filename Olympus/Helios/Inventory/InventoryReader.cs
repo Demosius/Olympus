@@ -109,7 +109,7 @@ namespace Olympus.Helios.Inventory
 
         public List<NAVUoM> NAVUoMsByCode(EUoM eUoM, PullType pullType = PullType.ObjectOnly)
         {
-            string uomCode = Chariot.GetUoMString(eUoM);
+            string uomCode = EnumConverter.UoMToString(eUoM);
             return NAVUoMsByCode(uomCode, pullType);
         }
 

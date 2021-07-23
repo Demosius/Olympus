@@ -24,19 +24,11 @@ namespace Olympus
     /// </summary>
     public partial class MainWindow : Window
     {
-        public PrometheusPage PrometheusPage { get; set; }
-
         public MainWindow()
         {
             InitializeComponent();
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-AU");
-            PrometheusPage = new PrometheusPage();
-            OView.Navigate(PrometheusPage);
         }
 
-        //private void CommonCommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        //{
-        //    e.CanExecute = true;
-        //}
     }
 }

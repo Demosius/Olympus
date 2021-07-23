@@ -22,7 +22,10 @@ namespace Olympus.Helios.Users
     {
         public override string DatabaseName { get; } = "Users.sqlite";
 
-        public override Type[] Tables { get; } = new Type[] {typeof(User), typeof(Role), typeof(Login)};
+        public override Type[] Tables { get; } = new Type[] 
+        {
+            typeof(User), typeof(Role), typeof(Login)
+        };
 
         /*************************** Constructors ****************************/
 

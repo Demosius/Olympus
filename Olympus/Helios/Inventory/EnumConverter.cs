@@ -14,19 +14,27 @@ namespace Olympus.Helios.Inventory
         CASE
     }
 
-    public enum ActionType
+    public enum EAction
     {
         Take,
         Place
     }
 
-    public enum MoveStatus
+    public enum EStatus
     {
         Open,       // Still open for grabbing.
         Waiting,    // Operator on the way to get it.
         OnBoard,    // On forklift, in cage, on pallet, etc.
         Complete    // Completed. Should be where it needs to be (behind primaries - not necessarily IN primary).
     }
+
+    public enum EAccessLevel
+    {
+        Ground,
+        PalletRack,
+        HighReach
+    }
+
 
     public static class EnumConverter
     {
@@ -51,29 +59,29 @@ namespace Olympus.Helios.Inventory
             return EUoM.EACH;
         }
 
-        public static string ActionTypeToString(ActionType actionType)
+        public static string ActionTypeToString(EAction actionType)
         {
-            if (actionType == ActionType.Take)
+            if (actionType == EAction.Take)
                 return "Take";
-            if (actionType == ActionType.Place)
+            if (actionType == EAction.Place)
                 return "Place";
             return null;
         }
 
-        public static ActionType StringToActionType(string actionType)
+        public static EAction StringToActionType(string actionType)
         {
             if (actionType.ToLower() == "take")
-                return ActionType.Take;
-            return ActionType.Place;
+                return EAction.Take;
+            return EAction.Place;
         }
 
-        public static string MoveStatusToString(MoveStatus moveStatus)
+        public static string MoveStatusToString(EStatus moveStatus)
         {
-            if (moveStatus == MoveStatus.Open)
+            if (moveStatus == EStatus.Open)
                 return "Open";
-            if (moveStatus == MoveStatus.Waiting)
+            if (moveStatus == EStatus.Waiting)
                 return "Waiting";
-            if (moveStatus == MoveStatus.OnBoard)
+            if (moveStatus == EStatus.OnBoard)
                 return "On Board";
             return "Complete";
         }
@@ -84,16 +92,16 @@ namespace Olympus.Helios.Inventory
             return sWhitespace.Replace(input, replacement);
         }
 
-        public static MoveStatus StringToMoveStatus(string moveStatus)
+        public static EStatus StringToMoveStatus(string moveStatus)
         {
             moveStatus = ReplaceWhitespace(moveStatus.ToLower(), "");
             if (moveStatus == "open")
-                return MoveStatus.Open;
+                return EStatus.Open;
             if (moveStatus == "waiting")
-                return MoveStatus.Waiting;
+                return EStatus.Waiting;
             if (moveStatus == "onboard")
-                return MoveStatus.OnBoard;
-            return MoveStatus.Complete;
+                return EStatus.OnBoard;
+            return EStatus.Complete;
         }
     }
 }

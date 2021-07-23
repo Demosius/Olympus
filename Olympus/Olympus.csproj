@@ -83,20 +83,27 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EverBurn\View\EverBurnPage.xaml.cs">
+      <DependentUpon>EverBurnPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helios\Charioteer.cs" />
+    <Compile Include="Helios\Equipment\EnumConverter.cs" />
     <Compile Include="Helios\Equipment\EquipmentCreator.cs" />
     <Compile Include="Helios\Equipment\EquipmentDeleter.cs" />
     <Compile Include="Helios\Equipment\EquipmentReader.cs" />
     <Compile Include="Helios\Equipment\EquipmentUpdater.cs" />
+    <Compile Include="Helios\Equipment\Model\CompletedChecklist.cs" />
+    <Compile Include="Helios\Equipment\Model\MachineType.cs" />
+    <Compile Include="Helios\Equipment\Model\WorkingPlatform.cs" />
     <Compile Include="Helios\Inventory\EnumConverter.cs" />
     <Compile Include="Helios\Inventory\InventoryCreator.cs" />
     <Compile Include="Helios\Inventory\InventoryDeleter.cs" />
     <Compile Include="Helios\Inventory\InventoryReader.cs" />
     <Compile Include="Helios\Inventory\InventoryUpdater.cs" />
     <Compile Include="Helios\Inventory\Model\Batch.cs" />
-    <Compile Include="Helios\Inventory\Model\BinBay.cs" />
+    <Compile Include="Helios\Inventory\Model\BayZone.cs" />
+    <Compile Include="Helios\Inventory\Model\BinExtension.cs" />
     <Compile Include="Helios\Inventory\Model\BinContentsUpdate.cs" />
-    <Compile Include="Helios\Inventory\Model\BinDimensions.cs" />
     <Compile Include="Helios\Inventory\Model\Move.cs" />
     <Compile Include="Helios\Inventory\Model\NAVBin.cs" />
     <Compile Include="Helios\Inventory\Model\NAVCategory.cs" />
@@ -112,11 +119,18 @@
     <Compile Include="Helios\Inventory\Model\SubStock.cs" />
     <Compile Include="Helios\Inventory\Model\TableUpdate.cs" />
     <Compile Include="Helios\Inventory\Model\ZoneAccessLevel.cs" />
+    <Compile Include="Helios\Staff\EnumConverter.cs" />
+    <Compile Include="Helios\Staff\Model\EmployeeAvatar.cs" />
     <Compile Include="Helios\Staff\Model\EmployeeDepartmentLoaning.cs" />
+    <Compile Include="Helios\Staff\Model\EmployeeIcon.cs" />
     <Compile Include="Helios\Staff\Model\EmployeeInduction.cs" />
     <Compile Include="Helios\Staff\Model\EmployeeVehicle.cs" />
     <Compile Include="Helios\Staff\Model\EmployeeShift.cs" />
+    <Compile Include="Helios\Staff\Model\Image.cs" />
     <Compile Include="Helios\Staff\Model\Induction.cs" />
+    <Compile Include="Helios\Staff\Model\LicenceImage.cs" />
+    <Compile Include="Helios\Staff\Model\Project.cs" />
+    <Compile Include="Helios\Staff\Model\ProjectIcon.cs" />
     <Compile Include="Helios\Staff\Model\ShiftRule.cs" />
     <Compile Include="Helios\Staff\Model\TagUse.cs" />
     <Compile Include="Helios\Staff\Model\TempTag.cs" />
@@ -131,6 +145,9 @@
     <Compile Include="Helios\Users\UserUpdater.cs" />
     <Compile Include="Helios\Users\Model\Role.cs" />
     <Compile Include="Model\Settings.cs" />
+    <Compile Include="Pantheon\View\PantheonPage.xaml.cs">
+      <DependentUpon>PantheonPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Styx\Model\Charon.cs" />
     <Compile Include="Styx\Model\CharonEmployeeValidation.cs" />
     <Compile Include="Styx\Model\CharonUserValidation.cs" />
@@ -147,7 +164,13 @@
       <DependentUpon>RegisterWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModel\Commands\ChangeDatabaseCommand.cs" />
+    <Compile Include="ViewModel\Commands\CopyDatabaseCommand.cs" />
+    <Compile Include="ViewModel\Commands\MoveDatabaseCommand.cs" />
     <Compile Include="ViewModel\Components\DBSelectionVM.cs" />
+    <Compile Include="ViewModel\Components\InventoryUpdaterVM.cs" />
+    <Compile Include="ViewModel\Components\ProjectLauncherVM.cs" />
+    <Compile Include="ViewModel\Components\UserHandlerVM.cs" />
+    <Compile Include="ViewModel\OlympusVM.cs" />
     <Compile Include="View\Components\InventoryUpdater.xaml.cs">
       <DependentUpon>InventoryUpdater.xaml</DependentUpon>
     </Compile>
@@ -162,7 +185,18 @@
     <Compile Include="Helios\Staff\Model\Vehicle.cs" />
     <Compile Include="Toolbox.cs" />
     <Compile Include="Vulcan\Model\Operator.cs" />
+    <Compile Include="Vulcan\View\VulcanPage.xaml.cs">
+      <DependentUpon>VulcanPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Vulcan\VulcanChariot.cs" />
+    <Page Include="EverBurn\View\EverBurnPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pantheon\View\PantheonPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Styx\View\AlphaRegistrationWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -191,7 +225,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\Components\ProjectSelection.xaml">
+    <Page Include="View\Components\ProjectLauncher.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -213,8 +247,8 @@
     <Compile Include="View\Components\Navbar.xaml.cs">
       <DependentUpon>Navbar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Components\ProjectSelection.xaml.cs">
-      <DependentUpon>ProjectSelection.xaml</DependentUpon>
+    <Compile Include="View\Components\ProjectLauncher.xaml.cs">
+      <DependentUpon>ProjectLauncher.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Components\UserHandler.xaml.cs">
       <DependentUpon>UserHandler.xaml</DependentUpon>
@@ -242,6 +276,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Prometheus\View\PrometheusPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Vulcan\View\VulcanPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -324,14 +362,17 @@
     <Resource Include="Resources\Images\olympus.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="EverBurn\Model\" />
+    <Folder Include="EverBurn\ViewModel\" />
     <Folder Include="Helios\Equipment\ViewModel\" />
     <Folder Include="Helios\Inventory\ViewModel\" />
     <Folder Include="Helios\Staff\ViewModel\" />
     <Folder Include="Helios\Users\ViewModel\" />
+    <Folder Include="Pantheon\Model\" />
+    <Folder Include="Pantheon\ViewModel\" />
     <Folder Include="Prometheus\Model\" />
     <Folder Include="Prometheus\ViewModel\" />
     <Folder Include="Vulcan\ViewModel\" />
-    <Folder Include="Vulcan\View\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

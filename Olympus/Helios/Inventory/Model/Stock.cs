@@ -18,10 +18,17 @@ namespace Olympus.Helios.Inventory.Model
         public int ItemNumber { get; set; }
 
         [ForeignKey(typeof(SubStock))]
+        public string CaseID { get; set; }
+        [ForeignKey(typeof(SubStock))]
+        public string PackID { get; set; }
+        [ForeignKey(typeof(SubStock))]
+        public string EachID { get; set; }
+
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public SubStock Cases { get; set; }
-        [ForeignKey(typeof(SubStock))]
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public SubStock Packs { get; set; }
-        [ForeignKey(typeof(SubStock))]
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public SubStock Eaches { get; set; }
 
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
@@ -63,6 +70,9 @@ namespace Olympus.Helios.Inventory.Model
             Cases.SetStockID();
             Packs.SetStockID();
             Eaches.SetStockID();
+            CaseID = Cases.ID;
+            PackID = Packs.ID;
+            EachID = Eaches.ID;
         }
 
         // Move full stock to specified bin.

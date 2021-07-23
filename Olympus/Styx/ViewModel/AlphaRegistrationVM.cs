@@ -18,8 +18,7 @@ namespace Olympus.Styx.ViewModel
         private const string WARN_COLOUR = "Orange";
         private const string BAD_COLOUR = "Red";
 
-        //private Employee employee;
-        public Employee Employee { get; set; } //{ get => employee; set{ employee = value; MessageBox.Show("Set employee trigerred"); } }
+        public Employee Employee { get; set; } 
         public Department Department { get; set; }
         public StaffRole Role { get; set; }
 

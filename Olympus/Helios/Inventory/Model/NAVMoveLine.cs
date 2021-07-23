@@ -12,7 +12,7 @@ namespace Olympus.Helios.Inventory.Model
     {
         [PrimaryKey]
         public Guid ID { get; set; }
-        public ActionType ActionType { get; set; }
+        public EAction ActionType { get; set; }
         [ForeignKey(typeof(NAVLocation))]
         public string ZoneID { get; set; } // Combination of LocationCode and ZoneCode (e.g. 9600:PK)
         [ForeignKey(typeof(NAVBin))]

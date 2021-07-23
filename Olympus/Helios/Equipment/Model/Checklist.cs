@@ -13,6 +13,7 @@ namespace Olympus.Helios.Equipment.Model
     {
         [PrimaryKey]
         public string Name { get; set; }
+        [ForeignKey(typeof(MachineType))]
         public string TypeCode { get; set; }
         public string CheckCode { get; set; }
 
@@ -20,23 +21,18 @@ namespace Olympus.Helios.Equipment.Model
         public List<Check> Checks { get; set; }
 
         [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public List<Forklift> Forklifts { get; set; }
-        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public List<Stockpicker> Stockpickers { get; set; }
-        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public List<Rabbit> Rabbits { get; set; }
+        public List<Machine> Machines { get; set; }
 
-        [Ignore]
-        public List<Machine> Machines
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public MachineType MachineType { get; set; }
+
+        public Checklist() { }
+
+        public Checklist(string name, string typeCode, List<Check> checks)
         {
-            get
-            {
-                List<Machine> machines = new List<Machine> { };
-                machines.AddRange(Forklifts);
-                machines.AddRange(Stockpickers);
-                machines.AddRange(Rabbits);
-                return machines;
-            }
+            Name = name;
+            TypeCode = typeCode;
+            Checks = checks;
         }
     }
 
@@ -57,38 +53,5 @@ namespace Olympus.Helios.Equipment.Model
             return $"{Description}: {Response}";
         }
     }
-
-    //public class CompletedChecklist : Checklist
-    //{
-    //    public int MachinSerialNumber { get; set; }
-    //    public int EmployeeNumber { get; set; }
-
-    //    public string Comment { get; set; }
-
-    //    public bool Pass { get; set; }
-
-    //    public CompletedChecklist () { }
-
-    //    public CompletedChecklist(Checklist checklist, int machineSerialNumber, int employeeNumber) 
-    //        : base(checklist.Name, checklist.TypeCode, checklist.Checks)
-    //    {
-    //        MachinSerialNumber = machineSerialNumber;
-    //        EmployeeNumber = employeeNumber;
-    //    }
-
-    //    public int Faults()
-    //    {
-    //        Pass = true;
-    //        int count = 0;
-    //        foreach (Check check in Checks)
-    //        {
-    //            if (check.IsFault() ?? false)
-    //            {
-    //                count++;
-    //                if (Pass) Pass = !check.FaultFails;
-    //            }
-    //        }
-    //        return count;
-    //    }
 
 }

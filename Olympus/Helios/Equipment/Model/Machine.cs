@@ -7,18 +7,24 @@ using System.Text;
 
 namespace Olympus.Helios.Equipment.Model
 {
-    public abstract class Machine
+    public class Machine
     {   
-        public abstract int SerialNumber { get; set; }
-        public abstract string TypeCode { get; set; }
-        public abstract DateTime ServiceDueDate { get; set; }
-        public abstract DateTime LastServiceDate { get; set; }
-        public abstract DateTime LastPreOpCheck { get; set; }
-        public abstract string Ownership { get; set; }
-        public abstract string LicenceCode { get; set; }
-        public abstract string ChecklistName { get; set; }
+        [PrimaryKey]
+        public int SerialNumber { get; set; }
+        [ForeignKey(typeof(MachineType))]
+        public string TypeCode { get; set; }
+        public DateTime ServiceDueDate { get; set; }
+        public DateTime LastServiceDate { get; set; }
+        public DateTime LastPreOpCheck { get; set; }
+        public string Ownership { get; set; }
+        public string LicenceCode { get; set; }
+        [ForeignKey(typeof(Checklist))]
+        public string ChecklistName { get; set; }
 
-        public abstract Checklist Checklist { get; set; }
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public  Checklist Checklist { get; set; }
+        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public MachineType Type { get; set; }
 
     }
 }

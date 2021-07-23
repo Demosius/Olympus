@@ -19,11 +19,15 @@ namespace Olympus.Helios.Inventory
     {
         public override string DatabaseName { get; } = "Inventory.sqlite";
 
-        public override Type[] Tables { get; } = new Type[] {typeof(NAVBin), typeof(NAVCategory), typeof(NAVDivision),
-                                                             typeof(NAVGenre), typeof(NAVItem), typeof(NAVLocation),
-                                                             typeof(NAVPlatform), typeof(NAVStock), typeof(NAVUoM),
-                                                             typeof(NAVZone), typeof(TableUpdate), typeof(BinContentsUpdate),
-                                                             typeof(Bay), typeof(Stock)};
+        public override Type[] Tables { get; } = new Type[] 
+        {
+            typeof(Batch), typeof(Bay), typeof(BayZone), typeof(BinContentsUpdate),
+            typeof(BinExtension), typeof(Move), typeof(NAVBin), typeof(NAVCategory),
+            typeof(NAVDivision), typeof(NAVGenre), typeof(NAVItem), typeof(NAVLocation),
+            typeof(NAVMoveLine), typeof(NAVPlatform), typeof(NAVStock), typeof(NAVUoM),
+            typeof(NAVZone), typeof(Stock), typeof(SubStock), typeof(TableUpdate),
+            typeof(ZoneAccessLevel)
+        };
 
         /*************************** Constructors ****************************/
 

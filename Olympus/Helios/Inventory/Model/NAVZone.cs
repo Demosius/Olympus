@@ -21,15 +21,18 @@ namespace Olympus.Helios.Inventory.Model
 
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVLocation Location { get; set; }
-        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public List<Bay> Bays { get; set; }
+
         [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<NAVBin> Bins { get; set; }
+
         [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public ZoneAccessLevel ZoneAccessLevel { get; set; }
 
+        [ManyToMany(typeof(Bay), CascadeOperations = CascadeOperation.All)]
+        public List<Bay> Bays { get; set; }
+
         [Ignore]
-        public AccessLevel AccessLevel
+        public EAccessLevel AccessLevel
         {
             get => ZoneAccessLevel.AccessLevel;
             set

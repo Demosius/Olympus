@@ -5,33 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Olympus" 
         xmlns:Control="clr-namespace:Olympus.View.Components"
+        xmlns:vm="clr-namespace:Olympus.ViewModel"
         mc:Ignorable="d"
         Title="Olympus" WindowState="Maximized"
         MinWidth="400"
         MinHeight="300"
         Background="{DynamicResource BackGroundBrush}">
 
-    <Window.CommandBindings>
-        <!--<CommandBinding Command="New" CanExecute="CommonCommandBinding_CanExecute" />
-        <CommandBinding Command="Open" CanExecute="CommonCommandBinding_CanExecute" />
-        <CommandBinding Command="Save" CanExecute="CommonCommandBinding_CanExecute" />-->
-    </Window.CommandBindings>
+    <Window.DataContext>
+        <vm:OlympusVM/>
+    </Window.DataContext>
     
-    <Grid>
+    <DockPanel>
         
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <Menu Grid.Row="0" Grid.Column="0">
+        <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Command="New"/>
                 <Separator/>
@@ -42,30 +29,34 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_Edit">
-                <!--<MenuItem Command="Cut"/>
-                <MenuItem Command="Copy"/>
-                <MenuItem Command="Paste"/>-->
             </MenuItem>
         </Menu>
 
-        <ToolBarTray Grid.Row="1" Grid.Column="0">
-            <!--<ToolBar>
-                <Button Command="New" Content="New" />
-                <Button Command="Open" Content="Open" />
-                <Button Command="Save" Content="Save" />
-            </ToolBar>
-            <ToolBar>
-                <Button Command="Cut" Content="Cut" />
-                <Button Command="Copy" Content="Copy" />
-                <Button Command="Paste" Content="Paste" />
-            </ToolBar>-->
+        <ToolBarTray DockPanel.Dock="Top">
         </ToolBarTray>
-        
-        <Control:Navbar x:Name="NavBar" Grid.Row="2" Grid.Column="0"/>
-        <Frame  Margin="5,5,5,5" x:Name="OView" Grid.Row="3" Grid.Column="0" Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                BorderThickness="1" BorderBrush="SlateGray"/>
+        <StackPanel>
+            <Control:Navbar x:Name="NavBar" Grid.Row="2" Grid.Column="0"/>
+            <StackPanel Orientation="Horizontal">
+                <Control:DatabaseSelection/>
+                <Control:UserHandler HorizontalAlignment="Right"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Control:ProjectLauncher/>
+                <Control:InventoryUpdater/>
+            </StackPanel>
 
-        <StatusBar Grid.Row="4" Grid.Column="0">
+            <Frame  Content="{Binding CurrentPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Margin="5,5,5,5" 
+                x:Name="OView" 
+                Grid.Row="3" 
+                Grid.Column="0" 
+                Height="Auto" 
+                HorizontalAlignment="Stretch" 
+                VerticalAlignment="Stretch"
+                BorderThickness="1" 
+                BorderBrush="SlateGray"/>
+        </StackPanel>
+        <StatusBar DockPanel.Dock="Bottom">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid>
@@ -91,7 +82,7 @@
                 <ProgressBar Value="05" Width="180" Height="16" />
             </StatusBarItem>
         </StatusBar>
-    </Grid>
+    </DockPanel>
 
     <Window.Resources>
         

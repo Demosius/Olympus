@@ -13,8 +13,10 @@ namespace Olympus.Helios.Equipment
     {
         public override string DatabaseName { get; } = "Equipment.sqlite";
 
-        public override Type[] Tables { get; } = new Type[] {typeof(Checklist), typeof(Forklift),
-                                                             typeof(Rabbit), typeof(Stockpicker)};
+        public override Type[] Tables { get; } = new Type[] 
+        {
+            typeof(Checklist), typeof(CompletedChecklist), typeof(MachineType), typeof(Machine)
+        };
 
         /*************************** Constructors ****************************/
 

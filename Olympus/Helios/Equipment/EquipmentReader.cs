@@ -17,5 +17,32 @@ namespace Olympus.Helios.Equipment
             Chariot = chariot;
         }
 
+        /* Machines */
+        public List<Machine> Machines()
+        {
+            List<Machine> machines = new List<Machine> { };
+            foreach (var machine in Chariot.PullObjectList<Machine>(PullType.FullRecursive))
+            {
+                switch (machine.Type.LicenceRequired)
+                {
+                    case Staff.ELicence.LF:
+                        machines.Add((Forklift)machine);
+                        break;
+                    case Staff.ELicence.LO:
+                        machines.Add((Stockpicker)machine);
+                        break;
+                    case Staff.ELicence.WP:
+                        machines.Add((WorkingPlatform)machine);
+                        break;
+                    case null:
+                        machines.Add((Rabbit)machine);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return machines;
+        }
+
     }
 }

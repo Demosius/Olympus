@@ -9,13 +9,15 @@ namespace Olympus.Helios.Inventory.Model
     {
         [PrimaryKey]
         public string ID { get; set; } // Bay name. Called ID for consitency.
-        [ForeignKey(typeof(NAVZone))]
-        public string ZoneID { get; }
 
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVZone Zone { get; set; }
+
         [OneToMany(CascadeOperations = CascadeOperation.All)]
-        public List<BinBay> BinBays { get; set; }
+        public List<BinExtension> BinBays { get; set; }
+
+        [ManyToMany(typeof(BayZone), CascadeOperations = CascadeOperation.All)]
+        public List<NAVZone> Zones { get; set; }
 
         private List<NAVBin> bins;
         [Ignore]
@@ -26,7 +28,7 @@ namespace Olympus.Helios.Inventory.Model
                 if (bins is null)
                 {
                     if (BinBays is null)
-                        BinBays = new List<BinBay> { };
+                        BinBays = new List<BinExtension> { };
                     bins = BinBays.Select(bb => bb.Bin).ToList();
                 }
                 return bins;

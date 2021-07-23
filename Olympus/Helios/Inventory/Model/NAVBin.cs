@@ -11,7 +11,7 @@ namespace Olympus.Helios.Inventory.Model
     [Table("BinList")]
     public class NAVBin
     {
-        [PrimaryKey, ForeignKey(typeof(BinDimensions))] // Combination of ZoneID and Code (e.g. 9600:PR:PR18 058)
+        [PrimaryKey, ForeignKey(typeof(BinExtension))] // Combination of ZoneID and Code (e.g. 9600:PR:PR18 058)
         public string ID { get; set; }
         [ForeignKey(typeof(NAVZone))] // Combination of LocationCode and ZoneCode (e.g. 9600:PR)
         public string ZoneID { get; set; }
@@ -34,18 +34,18 @@ namespace Olympus.Helios.Inventory.Model
         [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<Stock> Stock { get; set; }
         [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public BinBay BinBay { get; set; }
-        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public BinDimensions Dimensions { get; set; }
+        public BinExtension Extension { get; set; }
 
+        [Ignore]
+        public BinExtension Dimensions { get => Extension; }
         [Ignore]
         public Bay Bay
         {
-            get => BinBay.Bay; 
-            set { BinBay.Bay = value; }
+            get => Extension.Bay; 
+            set { Extension.Bay = value; }
         }
         [Ignore]
-        public AccessLevel AccessLevel { get => Zone.AccessLevel; }
+        public EAccessLevel AccessLevel { get => Zone.AccessLevel; }
         
         public NAVBin() { }
 
