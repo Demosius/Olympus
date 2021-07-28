@@ -16,6 +16,18 @@ namespace Olympus.Helios.Staff.Model
         [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Project Project { get; set; }
 
+        public ProjectIcon() { }
+
+        // Creation of a new project icon with an already specified project.
+        public ProjectIcon(Project project, string iconFileName)
+        {
+            Project = project;
+            FileName = iconFileName;
+            ProjectName = project.Name;
+            Name = ProjectName;
+        }
+
         public override void GetImageFilePath() => Path.Combine(App.Charioteer.StaffReader.ProjectIconDirectory, FileName);
+
     }
 }

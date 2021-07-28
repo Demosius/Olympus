@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Olympus.Helios.Inventory.Model
 {
+    [Table("MoveLine")]
     public class NAVMoveLine
     {
         [PrimaryKey]

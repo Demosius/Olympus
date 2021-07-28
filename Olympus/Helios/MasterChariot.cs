@@ -42,8 +42,8 @@ namespace Olympus.Helios
 
         protected void InitializeDatabaseConnection()
         {
-            //try
-            //{
+            try
+            {
                 if (Database == null)
                 {
                     if (!Directory.Exists(BaseDataDirectory)) Directory.CreateDirectory(BaseDataDirectory);
@@ -55,16 +55,16 @@ namespace Olympus.Helios
 
                 Database.CreateTables(CreateFlags.None, Tables);
 
-            //}
-            //catch (FailedConnectionException ex)
-            //{
-            //    MessageBox.Show(ex.Message);
-            //    throw ex;
-            //}
-            //catch (Exception ex)
-            //{
-            //    Toolbox.ShowUnexpectedException(ex);
-            //}
+            }
+            catch (FailedConnectionException ex)
+            {
+                MessageBox.Show(ex.Message);
+                throw ex;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+            }
         }
 
         public abstract void ResetConnection();
@@ -102,7 +102,7 @@ namespace Olympus.Helios
         }
 
         // Insert data into a table. Assumes that there will be no issues with duplicate data.
-        protected bool InsertIntoTable<T>(List<T> objList)
+        public bool InsertIntoTable<T>(List<T> objList)
         {
             try
             {
@@ -213,11 +213,15 @@ namespace Olympus.Helios
         // Update an existing table - replacing duplicate data (and adding new data).
         public bool UpdateTable<T>(List<T> objList)
         {
+            if (objList.Count == 0) return false;
             try
             {
                 Database.RunInTransaction(() =>
                 {
-                    Database.UpdateAll(objList);
+                    foreach (var obj in objList)
+                    {
+                        Database.InsertOrReplace(obj);
+                    }
                 });
                 return true;
             }

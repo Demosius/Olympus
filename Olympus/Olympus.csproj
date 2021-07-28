@@ -83,8 +83,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="EverBurn\View\EverBurnPage.xaml.cs">
-      <DependentUpon>EverBurnPage.xaml</DependentUpon>
+    <Compile Include="Helios\Inventory\Model\Store.cs" />
+    <Compile Include="Helios\Inventory\Model\NAVTransferOrder.cs" />
+    <Compile Include="Helios\Staff\Model\DepartmentProject.cs" />
+    <Compile Include="Helios\Staff\Model\EmployeeProject.cs" />
+    <Compile Include="Khaos\View\KhaosPage.xaml.cs">
+      <DependentUpon>KhaosPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Torch\View\TorchPage.xaml.cs">
+      <DependentUpon>TorchPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Helios\Charioteer.cs" />
     <Compile Include="Helios\Equipment\EnumConverter.cs" />
@@ -165,9 +172,21 @@
     </Compile>
     <Compile Include="ViewModel\Commands\ChangeDatabaseCommand.cs" />
     <Compile Include="ViewModel\Commands\CopyDatabaseCommand.cs" />
+    <Compile Include="ViewModel\Commands\LaunchProjectCommand.cs" />
     <Compile Include="ViewModel\Commands\MoveDatabaseCommand.cs" />
+    <Compile Include="ViewModel\Commands\ShowBCColCommand.cs" />
+    <Compile Include="ViewModel\Commands\ShowBLColCommand.cs" />
+    <Compile Include="ViewModel\Commands\ShowInfoCommand.cs" />
+    <Compile Include="ViewModel\Commands\ShowULColCommand.cs" />
+    <Compile Include="ViewModel\Commands\UpdateBinsCommand.cs" />
+    <Compile Include="ViewModel\Commands\UpdateItemsCommand.cs" />
+    <Compile Include="ViewModel\Commands\UpdateStockCommand.cs" />
+    <Compile Include="ViewModel\Commands\UpdateUoMCommand.cs" />
+    <Compile Include="ViewModel\Commands\UserCommand.cs" />
     <Compile Include="ViewModel\Components\DBSelectionVM.cs" />
     <Compile Include="ViewModel\Components\InventoryUpdaterVM.cs" />
+    <Compile Include="ViewModel\Components\ProjectButtonVM.cs" />
+    <Compile Include="ViewModel\Components\ProjectGroupVM.cs" />
     <Compile Include="ViewModel\Components\ProjectLauncherVM.cs" />
     <Compile Include="ViewModel\Components\UserHandlerVM.cs" />
     <Compile Include="ViewModel\OlympusVM.cs" />
@@ -184,12 +203,19 @@
     <Compile Include="Helios\Staff\Model\Role.cs" />
     <Compile Include="Helios\Staff\Model\Vehicle.cs" />
     <Compile Include="Toolbox.cs" />
+    <Compile Include="View\Components\ProjectGroup.xaml.cs">
+      <DependentUpon>ProjectGroup.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Vulcan\Model\Operator.cs" />
     <Compile Include="Vulcan\View\VulcanPage.xaml.cs">
       <DependentUpon>VulcanPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Vulcan\VulcanChariot.cs" />
-    <Page Include="EverBurn\View\EverBurnPage.xaml">
+    <Page Include="Khaos\View\KhaosPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Torch\View\TorchPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -217,11 +243,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\Components\Navbar.xaml">
+    <Page Include="View\Components\ProjectButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\Components\ProjectButton.xaml">
+    <Page Include="View\Components\ProjectGroup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -243,9 +269,6 @@
     </Compile>
     <Compile Include="View\Components\DatabaseSelection.xaml.cs">
       <DependentUpon>DatabaseSelection.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\Components\Navbar.xaml.cs">
-      <DependentUpon>Navbar.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Components\ProjectLauncher.xaml.cs">
       <DependentUpon>ProjectLauncher.xaml</DependentUpon>
@@ -313,19 +336,40 @@
     <None Include="settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Resource Include="Resources\Images\Icons\forge.ico" />
-    <Resource Include="Resources\Images\Icons\burn.ico" />
-    <Resource Include="Resources\Images\Icons\prometheus.ico" />
+    <Content Include="Resources\Images\Icons\forge.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\burn.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\pantheon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\prometheus.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Resources\Images\Icons\castle.ico" />
-    <Resource Include="Resources\Images\Icons\hellsing.ico" />
+    <Resource Include="Resources\Images\Icons\hellsing.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\Images\Icons\sword-smithing.ico" />
-    <Resource Include="Resources\Images\Icons\vampire.ico" />
+    <Content Include="Resources\Images\Icons\torch.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\vampire.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Resources\Images\Icons\z.ico" />
     <Resource Include="Resources\Images\Pagination\first_button.png" />
     <Resource Include="Resources\Images\Pagination\last_button.png" />
     <Resource Include="Resources\Images\Pagination\next_button.png" />
     <Resource Include="Resources\Images\Pagination\previous_button.png" />
-    <Resource Include="Resources\Images\Icons\zed.ico" />
+    <Content Include="Resources\Images\Icons\vulcan.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\zed.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Resources\Images\Icons\dredd.ico" />
     <Resource Include="Resources\Images\Icons\ol.ico" />
     <Resource Include="Resources\Images\Icons\olympus.ico" />
@@ -336,6 +380,10 @@
     <Resource Include="Resources\Images\Icons\newlym.ico" />
     <Resource Include="Resources\Images\Icons\omega.ico" />
     <Resource Include="Resources\Images\System\door-open-out.png" />
+    <Resource Include="Resources\Images\Icons\chaos-white.ico" />
+    <Content Include="Resources\Images\Icons\chaos.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Sol\Inventory\Inventory.sqlite">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -362,16 +410,18 @@
     <Resource Include="Resources\Images\olympus.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="EverBurn\Model\" />
-    <Folder Include="EverBurn\ViewModel\" />
     <Folder Include="Helios\Equipment\ViewModel\" />
     <Folder Include="Helios\Inventory\ViewModel\" />
     <Folder Include="Helios\Staff\ViewModel\" />
     <Folder Include="Helios\Users\ViewModel\" />
+    <Folder Include="Khaos\Model\" />
+    <Folder Include="Khaos\ViewModel\" />
     <Folder Include="Pantheon\Model\" />
     <Folder Include="Pantheon\ViewModel\" />
     <Folder Include="Prometheus\Model\" />
     <Folder Include="Prometheus\ViewModel\" />
+    <Folder Include="Torch\Model\" />
+    <Folder Include="Torch\ViewModel\" />
     <Folder Include="Vulcan\ViewModel\" />
   </ItemGroup>
   <ItemGroup>

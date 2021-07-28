@@ -30,5 +30,11 @@ namespace Olympus.Helios.Staff
         public bool EmployeeExists(int ID) => Chariot.Database.Execute("SELECT count(*) FROM Employee WHERE ID=?;", ID) > 0;
 
         public int EmployeeCount() => Chariot.Database.Execute("SELECT count(*) FROM Employee;");
+
+        /* DEPARTMENTS */
+        public List<Department> Departments(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<Department>(pullType);
+
+        /* PROJECTS */
+        public List<Project> Projects(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<Project>(pullType);
     }
 }

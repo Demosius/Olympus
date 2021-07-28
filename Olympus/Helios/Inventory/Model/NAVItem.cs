@@ -36,6 +36,9 @@ namespace Olympus.Helios.Inventory.Model
         public List<NAVStock> NAVStock { get; set; }
         [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<Stock> Stock { get; set; }
+        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<NAVTransferOrder> TransferOrders { get; set; }
+
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVCategory Category { get; set; }
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]

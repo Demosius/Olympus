@@ -1,4 +1,6 @@
 ﻿using Olympus.Helios.Staff.Model;
+using SQLiteNetExtensions.Extensions;
+using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,15 +18,15 @@ namespace Olympus.Helios.Staff
         public string EmployeeAvatarDirectory { get; set; }
         public string ProjectIconDirectory { get; set; }
         public string LicenceImageDirectory { get; set; }
-
+        
         public override Type[] Tables { get; } = new Type[]
         {
-            typeof(Clan),                       typeof(Department),     typeof(Employee),                   typeof(EmployeeAvatar),
-            typeof(EmployeeDepartmentLoaning),  typeof(EmployeeIcon),   typeof(EmployeeInductionReference), typeof(EmployeeShift),
-            typeof(EmployeeVehicle),            typeof(Induction),      typeof(Licence),                    typeof(LicenceImage),
-            typeof(Locker),                     typeof(Project),        typeof(ProjectIcon),                typeof(Role),
-            typeof(Shift),                      typeof(ShiftRule),      typeof(TagUse),                     typeof(TempTag),
-            typeof(Vehicle)
+            typeof(Clan),               typeof(Department),                 typeof(DepartmentProject),  typeof(Employee),                   
+            typeof(EmployeeAvatar),     typeof(EmployeeDepartmentLoaning),  typeof(EmployeeIcon),       typeof(EmployeeInductionReference),    
+            typeof(EmployeeProject),    typeof(EmployeeShift),              typeof(EmployeeVehicle),    typeof(Induction),                  
+            typeof(Licence),            typeof(LicenceImage),               typeof(Locker),             typeof(Project),            
+            typeof(ProjectIcon),        typeof(Role),                       typeof(Shift),              typeof(ShiftRule),          
+            typeof(TagUse),             typeof(TempTag),                    typeof(Vehicle)
         };
 
         /*************************** Constructors ****************************/
@@ -93,6 +95,43 @@ namespace Olympus.Helios.Staff
             if (!Directory.Exists(EmployeeIconDirectory)) Directory.CreateDirectory(EmployeeIconDirectory);
             if (!Directory.Exists(EmployeeAvatarDirectory)) Directory.CreateDirectory(EmployeeAvatarDirectory);
             if (!Directory.Exists(ProjectIconDirectory)) Directory.CreateDirectory(ProjectIconDirectory);
+            EstablishInitialProjectIcons();
+        }
+
+        private void EstablishInitialProjectIcons()
+        {
+            List<Project> projects = new List<Project> 
+            {
+                new Project(EProject.Khaos, "chaos.ico"),
+                new Project(EProject.Pantheon, "pantheon.ico"),
+                new Project(EProject.Prometheus, "prometheus.ico"),
+                new Project(EProject.Torch, "torch.ico"),
+                new Project(EProject.Vulcan, "vulcan.ico")
+            };
+            List<string> existingProjects = PullObjectList<Project>().Select(p => p.Name).ToList();
+            Database.RunInTransaction(() =>
+            {
+                foreach (Project project in projects)
+                {
+                    if (!existingProjects.Contains(project.Name)) 
+                        Database.InsertWithChildren(project);
+                }
+            });
+            FillProjectIconFolder();
+        }
+
+        private void FillProjectIconFolder()
+        {
+            string resourcePath = Path.Combine(App.BaseDirectory(), "Resources", "Images", "Icons");
+            string fileName;
+            foreach (string filePath in Directory.GetFiles(resourcePath))
+            {
+                fileName = Path.GetFileName(filePath);
+                if (Path.GetExtension(filePath) == ".ico")
+                {
+                    File.Copy(filePath, Path.Combine(ProjectIconDirectory, fileName), true);
+                }
+            }
         }
 
         /***************************** CREATE Data ****************************/

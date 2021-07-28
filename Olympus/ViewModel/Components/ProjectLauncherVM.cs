@@ -1,14 +1,48 @@
-﻿using System;
+﻿using Olympus.Helios.Staff.Model;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Olympus.Helios;
+using System.Collections.ObjectModel;
 
 namespace Olympus.ViewModel.Components
 {
-    class ProjectLauncherVM : INotifyPropertyChanged
+    public class ProjectLauncherVM : INotifyPropertyChanged
     {
+        public OlympusVM OlympusVM { get; set; }
+
+        public List<Department> Departments { get; set; }
+        public List<Project> AllProjects { get; set; }
+        public List<Project> UserProjects { get; set; }
+        public ObservableCollection<ProjectGroupVM> ProjectGroups { get; set; }
+
+        public ProjectLauncherVM()
+        {
+            Departments = App.Charioteer.StaffReader.Departments(PullType.IncludeChildren);
+            AllProjects = App.Charioteer.StaffReader.Projects();
+            if (App.Charon.UserEmployee is null)
+                UserProjects = new List<Project> { };
+            else
+                UserProjects = App.Charon.UserEmployee.Projects;
+            ProjectGroups = new ObservableCollection<ProjectGroupVM>
+            {
+                new ProjectGroupVM(this, AllProjects, "All"),
+                new ProjectGroupVM(this, UserProjects, "User")
+            };
+            foreach (var dep in Departments)
+            {
+                ProjectGroups.Add(new ProjectGroupVM(this, dep));
+            }
+        }
+
+        public ProjectLauncherVM(OlympusVM olympusVM)
+        {
+            OlympusVM = olympusVM;
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnPropertyChanged(string propertyName)

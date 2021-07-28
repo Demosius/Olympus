@@ -69,6 +69,8 @@ namespace Olympus.Helios.Staff.Model
         public List<Shift> Shifts { get; set; }
         [ManyToMany(typeof(EmployeeDepartmentLoaning), "DepartmentName", "EmployeesCanLoan", CascadeOperations = CascadeOperation.All)]
         public List<Department> DepartmentsCanWorkIn { get; set; }
+        [ManyToMany(typeof(EmployeeProject), "ProjectName", "Employees", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<Project> Projects { get; set; }
 
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<EmployeeInductionReference> InductionReferences { get; set; }

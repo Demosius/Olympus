@@ -4,143 +4,156 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Olympus.View.Components"
+             xmlns:vm="clr-namespace:Olympus.ViewModel.Components"
              mc:Ignorable="d">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+    <UserControl.DataContext>
+        <vm:ProjectLauncherVM/>
+    </UserControl.DataContext>
 
-        <TabControl>
-            <TabItem Header="All">
-                <WrapPanel Orientation="Horizontal">
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Data Management">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/prometheus.ico" />
-                            <Label Content="Prometheus" />
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Replenishment Automation">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/forge.ico" />
-                            <Label Content="RefOrge" />
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Pre-work Stock Maintenance">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/burn.ico" />
-                            <Label Content="AutoBurn" />
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Count Tracking">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/vampire.ico" />
-                            <Label Content="Dracula" />
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Zone Load Analysis Mapping">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/zed.ico" />
-                            <Label Content="ZLAM"/>
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Automatic Error Association">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/dredd.ico"/>
-                            <Label Content="Dredd"/>
-                        </StackPanel>
-                    </Button>
+    <TabControl DataContext="{Binding ProjectGroupDict}">
+        <TabControl.ItemTemplate>
+            <DataTemplate>
+                <TextBlock
+                Text="{Binding }" />
+            </DataTemplate>
+        </TabControl.ItemTemplate>
+        <TabControl.ContentTemplate>
+            <DataTemplate>
+                <WrapPanel>
+
                 </WrapPanel>
-            </TabItem>
-            <TabItem Header="User">
-                <WrapPanel Orientation="Horizontal">
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Data Management">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/prometheus.ico" />
-                            <Label Content="Prometheus" />
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Replenishment Automation">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/forge.ico" />
-                            <Label Content="RefOrge" />
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Count Tracking">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/vampire.ico" />
-                            <Label Content="Dracula" />
-                        </StackPanel>
-                    </Button>
-                </WrapPanel>
-            </TabItem>
-            <TabItem Header="Restock">
-                <WrapPanel Orientation="Horizontal">
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Data Management">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/prometheus.ico" />
-                            <Label Content="Prometheus" />
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Pre-work Stock Maintenance">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/burn.ico" />
-                            <Label Content="AutoBurn" />
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Zone Load Analysis Mapping">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/zed.ico" />
-                            <Label Content="ZLAM" />
-                        </StackPanel>
-                    </Button>
-                </WrapPanel>
-            </TabItem>
-            <TabItem Header="Replen">
-                <WrapPanel Orientation="Horizontal">
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Data Management">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/prometheus.ico" />
-                            <Label Content="Prometheus" />
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Replenishment Automation">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/forge.ico" />
-                            <Label Content="RefOrge" />
-                        </StackPanel>
-                    </Button>
-                </WrapPanel>
-            </TabItem>
-            <TabItem Header="Admin">
-                <WrapPanel Orientation="Horizontal">
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Data Management">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/prometheus.ico" />
-                            <Label Content="Prometheus" />
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Count Tracking">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/vampire.ico" />
-                            <Label Content="Dracula" />
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Count Tracking">
-                        <StackPanel>
-                            <Image Source="/Resources/Images/Icons/dredd.ico" />
-                            <Label Content="Dredd" />
-                        </StackPanel>
-                    </Button>
-                </WrapPanel>
-            </TabItem>
-        </TabControl>
-    </Grid>
+            </DataTemplate>
+        </TabControl.ContentTemplate>
+        <TabItem Header="All">
+            <WrapPanel Orientation="Horizontal">
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Data Management">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/prometheus.ico" />
+                        <Label Content="Prometheus" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Makebulk management.">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/chaos.ico" />
+                        <Label Content="Khaos" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Replenishment Automation">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/forge.ico" />
+                        <Label Content="RefOrge" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Pre-work Stock Maintenance">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/burn.ico" />
+                        <Label Content="AutoBurn" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Count Tracking">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/vampire.ico" />
+                        <Label Content="Dracula" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Zone Load Analysis Mapping">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/zed.ico" />
+                        <Label Content="ZLAM"/>
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Automatic Error Association">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/dredd.ico"/>
+                        <Label Content="Dredd"/>
+                    </StackPanel>
+                </Button>
+            </WrapPanel>
+        </TabItem>
+        <TabItem Header="User">
+            <WrapPanel Orientation="Horizontal">
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Data Management">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/prometheus.ico" />
+                        <Label Content="Prometheus" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Replenishment Automation">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/forge.ico" />
+                        <Label Content="RefOrge" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Count Tracking">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/vampire.ico" />
+                        <Label Content="Dracula" />
+                    </StackPanel>
+                </Button>
+            </WrapPanel>
+        </TabItem>
+        <TabItem Header="Restock">
+            <WrapPanel Orientation="Horizontal">
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Data Management">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/prometheus.ico" />
+                        <Label Content="Prometheus" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Pre-work Stock Maintenance">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/burn.ico" />
+                        <Label Content="AutoBurn" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Zone Load Analysis Mapping">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/zed.ico" />
+                        <Label Content="ZLAM" />
+                    </StackPanel>
+                </Button>
+            </WrapPanel>
+        </TabItem>
+        <TabItem Header="Replen">
+            <WrapPanel Orientation="Horizontal">
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Data Management">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/prometheus.ico" />
+                        <Label Content="Prometheus" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Replenishment Automation">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/forge.ico" />
+                        <Label Content="RefOrge" />
+                    </StackPanel>
+                </Button>
+            </WrapPanel>
+        </TabItem>
+        <TabItem Header="Admin">
+            <WrapPanel Orientation="Horizontal">
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Data Management">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/prometheus.ico" />
+                        <Label Content="Prometheus" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Count Tracking">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/vampire.ico" />
+                        <Label Content="Dracula" />
+                    </StackPanel>
+                </Button>
+                <Button Style="{DynamicResource ProjectBtnStyle}" ToolTip="Count Tracking">
+                    <StackPanel>
+                        <Image Source="/Resources/Images/Icons/dredd.ico" />
+                        <Label Content="Dredd" />
+                    </StackPanel>
+                </Button>
+            </WrapPanel>
+        </TabItem>
+    </TabControl>
 
     <UserControl.Resources>
 

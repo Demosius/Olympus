@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>titan.ico</ApplicationIcon>
+    <ApplicationIcon>titanic.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="titan.ico" />
+    <Content Include="titanic.ico" />
     <Content Include="Vampire_icon-icons.com_75033.ico" />
   </ItemGroup>
   <ItemGroup>

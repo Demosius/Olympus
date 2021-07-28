@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -15,11 +16,11 @@ using System.Windows.Shapes;
 namespace Olympus.View.Components
 {
     /// <summary>
-    /// Interaction logic for Navbar.xaml
+    /// Interaction logic for ProjectGroup.xaml
     /// </summary>
-    public partial class Navbar : UserControl
+    public partial class ProjectGroup : UserControl
     {
-        public Navbar()
+        public ProjectGroup()
         {
             InitializeComponent();
         }

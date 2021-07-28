@@ -4,23 +4,20 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Olympus.View.Components"
+             xmlns:vm="clr-namespace:Olympus.ViewModel.Components"
              mc:Ignorable="d">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*" MaxWidth="100"/>
-            <ColumnDefinition Width="*" MaxWidth="100"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
+    <UserControl.DataContext>
+        <vm:UserHandlerVM/>
+    </UserControl.DataContext>
+    
+    <StackPanel Orientation="Horizontal">
 
-        <Label Grid.Row="0" Grid.Column="0">Who are you, and what are you doing here?</Label>
+        <Label Content="{Binding UserGreeting, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <Button x:Name="btnSignIn" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Height="Auto" Click="BtnSignIn_Click">Sign In</Button>
-        <Button x:Name="btnRegister" Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Height="Auto" Click="BtnRegister_Click">Register</Button>
-        
-    </Grid>
+        <Button Content="{Binding ButtonString, UpdateSourceTrigger=PropertyChanged}" 
+                Command="{Binding UserCommand}"
+                CommandParameter="{Binding ButtonString}"/>
+
+    </StackPanel>
 </UserControl>

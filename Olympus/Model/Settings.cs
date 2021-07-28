@@ -39,6 +39,11 @@ namespace Olympus.Model
             ReadFromFile();
         }
 
+        public DateTime LastItemWriteTime()
+        {
+            return File.GetLastWriteTime(jsonSettings.ItemCSVLocation);
+        }
+
         private void ReadFromFile()
         {
             string data = File.ReadAllText(jsonFile);

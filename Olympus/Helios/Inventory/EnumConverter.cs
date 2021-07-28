@@ -35,6 +35,13 @@ namespace Olympus.Helios.Inventory
         HighReach
     }
 
+    public enum EVolume
+    {
+        Low,
+        Medium,
+        High
+    }
+
 
     public static class EnumConverter
     {
@@ -102,6 +109,38 @@ namespace Olympus.Helios.Inventory
             if (moveStatus == "onboard")
                 return EStatus.OnBoard;
             return EStatus.Complete;
+        }
+
+        public static string VolumeToString(EVolume volume)
+        {
+            if (volume == EVolume.Low)
+                return "LV";
+            if (volume == EVolume.Medium)
+                return "MV";
+            if (volume == EVolume.High)
+                return "HV";
+            return null;
+        }
+
+        public static EVolume StringToVolume(string volume)
+        {
+            switch (ReplaceWhitespace(volume.ToUpper(), ""))
+            {
+                case "LV":
+                case "LOWVOLUME":
+                case "LOW":
+                    return EVolume.Low;
+                case "MV":
+                case "MEDIUMVOLUME":
+                case "MEDIUM":
+                    return EVolume.Medium;
+                case "HV":
+                case "HIGHVOLUME":
+                case "HIGH":
+                    return EVolume.High;
+                default:
+                    return EVolume.Low;
+            }
         }
     }
 }

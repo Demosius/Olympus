@@ -12,21 +12,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Olympus;
-using Olympus.Helios;
-using System.Globalization;
-using Olympus.Helios.Inventory.Model;
 
-namespace Olympus.View.Components
+namespace Olympus.Torch.View
 {
     /// <summary>
-    /// Interaction logic for InvUpdate.xaml
+    /// Interaction logic for TorchPage.xaml
     /// </summary>
-    public partial class InventoryUpdater : UserControl
+    public partial class TorchPage : Page
     {
-        public InventoryUpdater()
+        public TorchPage()
         {
             InitializeComponent();
-        } 
+        }
     }
 }

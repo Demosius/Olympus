@@ -34,28 +34,6 @@
 
         <ToolBarTray DockPanel.Dock="Top">
         </ToolBarTray>
-        <StackPanel>
-            <Control:Navbar x:Name="NavBar" Grid.Row="2" Grid.Column="0"/>
-            <StackPanel Orientation="Horizontal">
-                <Control:DatabaseSelection/>
-                <Control:UserHandler HorizontalAlignment="Right"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Control:ProjectLauncher/>
-                <Control:InventoryUpdater/>
-            </StackPanel>
-
-            <Frame  Content="{Binding CurrentPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                Margin="5,5,5,5" 
-                x:Name="OView" 
-                Grid.Row="3" 
-                Grid.Column="0" 
-                Height="Auto" 
-                HorizontalAlignment="Stretch" 
-                VerticalAlignment="Stretch"
-                BorderThickness="1" 
-                BorderBrush="SlateGray"/>
-        </StackPanel>
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -82,6 +60,42 @@
                 <ProgressBar Value="05" Width="180" Height="16" />
             </StatusBarItem>
         </StatusBar>
+        
+        <StackPanel>            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Control:DatabaseSelection Grid.Column="0"
+                                           DataContext="{Binding DBSelectionVM}"/>
+                <Control:UserHandler Grid.Column="2"
+                                     DataContext="{Binding UserHandlerVM}"/>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Control:ProjectLauncher Grid.Column="0"
+                                         DataContext="{Binding ProjectLauncherVM}"/>
+                <Control:InventoryUpdater Grid.Column="2"
+                                          DataContext="{Binding InventoryUpdaterVM}"/>
+            </Grid>
+
+            <Frame  Content="{Binding CurrentPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Margin="5,5,5,5" 
+                x:Name="OView" 
+                Grid.Row="3" 
+                Grid.Column="0" 
+                Height="Auto" 
+                HorizontalAlignment="Stretch" 
+                VerticalAlignment="Stretch"
+                BorderThickness="1" 
+                BorderBrush="SlateGray"/>
+        </StackPanel>
     </DockPanel>
 
     <Window.Resources>

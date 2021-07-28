@@ -1,4 +1,4 @@
-﻿using Olympus.EverBurn.View;
+﻿using Olympus.Torch.View;
 using Olympus.Helios.Staff;
 using Olympus.Pantheon.View;
 using Olympus.Prometheus.View;
@@ -10,6 +10,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using Olympus.Khaos.View;
+using Olympus.ViewModel.Components;
 
 namespace Olympus.ViewModel
 {
@@ -18,7 +20,10 @@ namespace Olympus.ViewModel
         public PrometheusPage Prometheus { get; set; }
         public PantheonPage Pantheon { get; set; }
         public VulcanPage Vulcan { get; set; }
-        public EverBurnPage EverBurn { get; set; }
+        public TorchPage Torch { get; set; }
+        public KhaosPage Khaos { get; set; }
+
+        public EProject CurrentProject { get; set; }
 
         private Page currentPage;
         public Page CurrentPage 
@@ -32,14 +37,20 @@ namespace Olympus.ViewModel
         }
         
         /* Sub ViewModels - Components */
-
+        public DBSelectionVM DBSelectionVM { get; set; }
+        public InventoryUpdaterVM InventoryUpdaterVM { get; set; }
+        public ProjectLauncherVM ProjectLauncherVM { get; set; }
+        public UserHandlerVM UserHandlerVM { get; set; }
 
         /* Commands */
 
         /* Constructor(s) */
         public OlympusVM()
         {
-            Prometheus = new PrometheusPage();
+            DBSelectionVM = new DBSelectionVM(this);
+            UserHandlerVM = new UserHandlerVM(this);
+            ProjectLauncherVM = new ProjectLauncherVM(this);
+            InventoryUpdaterVM = new InventoryUpdaterVM(this);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -65,36 +76,46 @@ namespace Olympus.ViewModel
                 case EProject.Pantheon:
                     LoadPantheon();
                     break;
-                case EProject.EverBurn:
-                    LoadEverBurn();
+                case EProject.Torch:
+                    LoadTorch();
+                    break;
+                case EProject.Khaos:
+                    LoadKhaos();
                     break;
                 default:
                     break;
             }
+            CurrentProject = project;
         }
 
-        public void LoadPrometheus()
+        private void LoadPrometheus()
         {
             if (Prometheus is null) Prometheus = new PrometheusPage();
             CurrentPage = Prometheus;
         }
 
-        public void LoadPantheon()
+        private void LoadPantheon()
         {
             if (Pantheon is null) Pantheon = new PantheonPage();
-            CurrentPage = Prometheus;
+            CurrentPage = Pantheon;
         }
 
-        public void LoadVulcan()
+        private void LoadVulcan()
         {
             if (Vulcan is null) Vulcan = new VulcanPage();
             CurrentPage = Vulcan;
         }
 
-        public void LoadEverBurn()
+        private void LoadTorch()
         {
-            if (EverBurn is null) EverBurn = new EverBurnPage();
-            CurrentPage = Vulcan;
+            if (Torch is null) Torch = new TorchPage();
+            CurrentPage = Torch;
+        }
+
+        private void LoadKhaos()
+        {
+            if (Khaos is null) Khaos = new KhaosPage();
+            CurrentPage = Khaos;
         }
     }
 }

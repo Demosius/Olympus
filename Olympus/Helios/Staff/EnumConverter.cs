@@ -11,8 +11,9 @@ namespace Olympus.Helios.Staff
     {
         Vulcan,
         Prometheus,
-        EverBurn,
-        Pantheon
+        Torch,
+        Pantheon,
+        Khaos
     }
 
     public enum ELicence
@@ -32,10 +33,12 @@ namespace Olympus.Helios.Staff
                 return "Prometheus";
             if (project == EProject.Vulcan)
                 return "Vulcan";
-            if (project == EProject.EverBurn)
-                return "EverBurn";
+            if (project == EProject.Torch)
+                return "Torch";
             if (project == EProject.Pantheon)
                 return "Pantheon";
+            if (project == EProject.Khaos)
+                return "Khaos";;
             return "None";
         }
 
@@ -44,10 +47,12 @@ namespace Olympus.Helios.Staff
             project = project.ToUpper();
             if (project == "VULCAN")
                 return EProject.Vulcan;
-            if (project == "EVERBURN")
-                return EProject.EverBurn;
+            if (project == "TORCH")
+                return EProject.Torch;
             if (project == "PANTHEON")
                 return EProject.Pantheon;
+            if (project == "KHAOS")
+                return EProject.Khaos;
             return EProject.Prometheus;
         }
 

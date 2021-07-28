@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Olympus.EverBurn.View
+namespace Olympus.Khaos.View
 {
     /// <summary>
-    /// Interaction logic for EverBurnPage.xaml
+    /// Interaction logic for KhaosPage.xaml
     /// </summary>
-    public partial class EverBurnPage : Page
+    public partial class KhaosPage : Page
     {
-        public EverBurnPage()
+        public KhaosPage()
         {
             InitializeComponent();
         }

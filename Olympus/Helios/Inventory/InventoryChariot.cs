@@ -24,9 +24,9 @@ namespace Olympus.Helios.Inventory
             typeof(Batch), typeof(Bay), typeof(BayZone), typeof(BinContentsUpdate),
             typeof(BinExtension), typeof(Move), typeof(NAVBin), typeof(NAVCategory),
             typeof(NAVDivision), typeof(NAVGenre), typeof(NAVItem), typeof(NAVLocation),
-            typeof(NAVMoveLine), typeof(NAVPlatform), typeof(NAVStock), typeof(NAVUoM),
-            typeof(NAVZone), typeof(Stock), typeof(SubStock), typeof(TableUpdate),
-            typeof(ZoneAccessLevel)
+            typeof(NAVMoveLine), typeof(NAVPlatform), typeof(NAVStock), typeof(NAVTransferOrder),
+            typeof(NAVUoM), typeof(NAVZone), typeof(Stock), typeof(Store),
+            typeof(SubStock), typeof(TableUpdate), typeof(ZoneAccessLevel)
         };
 
         /*************************** Constructors ****************************/
@@ -123,7 +123,7 @@ namespace Olympus.Helios.Inventory
                     TableName = Database.GetMapping(type).TableName,
                     LastUpdate = dateTime
                 };
-                Database.Update(update);
+                Database.InsertOrReplace(update);
                 return true;
             }
             catch (Exception ex)
@@ -148,7 +148,8 @@ namespace Olympus.Helios.Inventory
                 {
                     foreach (string zoneID in zoneIDs)
                     {
-                        Database.Execute("DELETE FROM ? WHERE [ZoneID] = ?;", GetTableName(typeof(NAVStock)), zoneID);
+                        string tableName = GetTableName(typeof(NAVStock));
+                        Database.Execute($"DELETE FROM [{tableName}] WHERE [ZoneID]=?;", zoneID);
                     }
                 });
             }
@@ -158,5 +159,24 @@ namespace Olympus.Helios.Inventory
             }
         }
 
+        /* UOM */
+        public void UoMCodeDelete(List<string> uomCodes)
+        {
+            try
+            {
+                Database.RunInTransaction(() =>
+                {
+                    foreach (string uom in uomCodes)
+                    {
+                        string tableName = GetTableName(typeof(NAVUoM));
+                        Database.Execute($"DELETE FROM [{tableName}] WHERE [Code]=?;", uom);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+            }
+        }
     }
 }

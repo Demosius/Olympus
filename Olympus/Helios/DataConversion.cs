@@ -46,6 +46,90 @@ namespace Olympus.Helios
         }
 
         // Turns clipboard data into a list of divisions.
+        public static List<NAVTransferOrder> NAVClipToTransferOrders()
+        {
+            List<NAVTransferOrder> transferOrders = new List<NAVTransferOrder> { };
+
+            Dictionary<string, int> headDict = Constants.NAV_TO_LINE_BATCH_COLUMNS;
+
+            try
+            {
+                // Get raw data from clipboard and check that it has data.
+                string rawData = ClipboardToString();
+                if (rawData == "" || rawData == null) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+                // Start memory stream from which to read.
+                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
+                MemoryStream stream = new MemoryStream(byteArray);
+                // Start Reading from stream.
+                transferOrders = NAVStreamToTransferOrders(stream, headDict);
+            }
+            catch (InvalidDataException ex)
+            {
+                ex.DisplayErrorMessage();
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+            }
+
+            return transferOrders;
+        }
+
+        // Convert a memory stream into a Division list.
+        private static List<NAVTransferOrder> NAVStreamToTransferOrders(MemoryStream stream, Dictionary<string, int> headDict)
+        {
+            List<NAVTransferOrder> tos = new List<NAVTransferOrder> { };
+
+            string[] row;
+            int highestCol;
+            NAVTransferOrder to;
+
+            IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                // First set the headers.
+                string line = reader.ReadLine();
+                string[] headArr = line.Split('\t');
+                SetHeadPosFromArray(ref headDict, headArr);
+                // Get highest column value to make sure that any given data line isn't cut short.
+                highestCol = headDict.Values.Max();
+
+                line = reader.ReadLine();
+                // Add row data.
+                while (line != null)
+                {
+                    row = line.Split('\t');
+
+                    if (highestCol < row.Length)
+                    {
+                        if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int item)) item = 0;
+                        if (!int.TryParse(row[headDict["Quantity"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int qty)) qty = 0;
+                        if (!int.TryParse(row[headDict["Avail. UOM Fulfilment Qty"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int availQty)) availQty = 0;
+                        if (!DateTime.TryParse(row[headDict["Created On Date"]], provider, DateTimeStyles.None, out DateTime date)) date = new DateTime();
+                        if (!DateTime.TryParse(row[headDict["Created On Time"]], provider, DateTimeStyles.NoCurrentDateDefault, out DateTime time)) time = new DateTime();
+
+                        to = new NAVTransferOrder
+                        {
+                            ID = row[headDict["Document No."]],
+                            StoreNumber = row[headDict["Transfer-to Code"]],
+                            ItemNumber = item,
+                            Qty = qty,
+                            UoM = EnumConverter.StringToUoM(row[headDict["Unit of Measure"]]),
+                            AvailableQty = availQty,
+                            CreationTime = date.Date.Add(time.TimeOfDay)
+                        };
+                        tos.Add(to);
+                    }
+
+                    line = reader.ReadLine();
+                }
+            }
+
+            return tos;
+        }
+
+        // Turns clipboard data into a list of divisions.
         public static List<NAVDivision> NAVClipToDivisions()
         {
             List<NAVDivision> divisions = new List<NAVDivision> { };
@@ -406,7 +490,11 @@ namespace Olympus.Helios
                         loc = new NAVLocation
                         {
                             Code = row[headDict["Code"]],
-                            Name = row[headDict["Name"]]
+                            Name = row[headDict["Name"]],
+                            CompanyCode = row[headDict["Company Code"]],
+                            IsWarehouse = row[headDict["Location Is Warehouse"]] == "Yes",
+                            IsStore = row[headDict["Location Is A Store"]] == "Yes",
+                            ActiveForRepenishment = row[headDict["Active for Replenishment"]] == "Yes"
                         };
                         locs.Add(loc);
                     }
@@ -659,7 +747,7 @@ namespace Olympus.Helios
         {
             List<NAVUoM> uoms = new List<NAVUoM> { };
 
-            Dictionary<string, int> headDict = Constants.NAV_DIV_PF_GEN_COLUMNS;
+            Dictionary<string, int> headDict = Constants.NAV_UOM_COLUMNS;
 
             try
             {

@@ -38,7 +38,10 @@ namespace Olympus.Helios.Inventory
 
         public bool NAVUoMs(List<NAVUoM> uoms)
         {
-            if (Chariot.UpdateTable(uoms))
+            // Remove previous data with relevant UoMCode 
+            // (Expect for ease/speed updates will happen one UoMCode at a time)
+            Chariot.UoMCodeDelete(uoms.Select(s => s.Code).Distinct().ToList());
+            if (Chariot.InsertIntoTable(uoms))
             {
                 Chariot.SetTableUpdateTime(typeof(NAVUoM));
                 return true;
@@ -50,7 +53,7 @@ namespace Olympus.Helios.Inventory
         {
             // Remove from stock table anything with zones equal to what is being put in.
             Chariot.StockZoneDeletes(stock.Select(s => s.ZoneID).Distinct().ToList());
-            if (Chariot.UpdateTable(stock))
+            if (Chariot.InsertIntoTable(stock))  
             {
                 Chariot.SetTableUpdateTime(typeof(NAVStock));
                 Chariot.SetStockUpdateTimes(stock);

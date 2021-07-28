@@ -5,8 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Olympus.ViewModel.Components"
              xmlns:local="clr-namespace:Olympus.View.Components"
-             mc:Ignorable="d" 
-             d:DesignHeight="35" d:DesignWidth="800">
+             mc:Ignorable="d" >
 
     <UserControl.DataContext>
         <vm:DBSelectionVM/>
@@ -28,9 +27,8 @@
         <Button Margin="5" 
                 TextBlock.FontSize="14" 
                 Padding="5" 
-                TextBlock.TextAlignment="Right" >
-            Change Database
-        </Button>
+                TextBlock.TextAlignment="Right" 
+                Content="Change Database"/>
 
     </StackPanel>
 </UserControl>

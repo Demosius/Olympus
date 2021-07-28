@@ -4,8 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Olympus.View.Components"
+             xmlns:vm="clr-namespace:Olympus.ViewModel.Components"
              mc:Ignorable="d"
              MaxHeight="155">
+
+    <UserControl.DataContext>
+        <vm:InventoryUpdaterVM/>
+    </UserControl.DataContext>
     
     <Border BorderBrush="Black" BorderThickness="1" Margin="5" Padding="0,0,5,0" Background="DarkSlateGray" CornerRadius="5" >
         <Grid>
@@ -22,22 +27,62 @@
             </Grid.RowDefinitions>
 
             <!-- First Row, Date Labels -->
-            <Label x:Name="lblStockDT" Grid.Column="0" Grid.Row="0" Content="{Binding}" Foreground="Cyan"/>
-            <Label x:Name="lblBinDT" Grid.Column="1" Grid.Row="0" Content="{Binding}" Foreground="Lime"/>
-            <Label x:Name="lblUoMDT" Grid.Column="2" Grid.Row="0" Content="{Binding}" Foreground="DarkOrange"/>
-            <Label x:Name="lblItemDT" Grid.Column="3" Grid.Row="0" Content="{Binding}" Foreground="White"/>
+            <Label Grid.Column="0" Grid.Row="0" 
+                   Content="{Binding StockUpdateString}" 
+                   Foreground="Cyan"/>
+            <Label Grid.Column="1" Grid.Row="0" 
+                   Content="{Binding BinsUpdateString}" 
+                   Foreground="Lime"/>
+            <Label Grid.Column="2" Grid.Row="0" 
+                   Content="{Binding UoMUpdateString}" 
+                   Foreground="DarkOrange"/>
+            <Label Grid.Column="3" Grid.Row="0"
+                   Content="{Binding ItemUpdateString}" 
+                   Foreground="White"/>
 
             <!-- Second Row, Buttons -->
-            <Button x:Name="btnStock" Grid.Column="0" Grid.Row="1" Content="Stock" Background="{DynamicResource CyanGradient}" Style="{DynamicResource InventoryButton}" />
-            <Button x:Name="btnBins" Grid.Column="1" Grid.Row="1" Content="Bins" Background="{DynamicResource GreenGradient}" Style="{DynamicResource InventoryButton}" />
-            <Button x:Name="btnUoM" Grid.Column="2" Grid.Row="1" Content="UoM" Background="{DynamicResource OrangeGradient}" Style="{DynamicResource InventoryButton}" />
-            <Button x:Name="btnItems" Grid.Column="3" Grid.Row="1" Content="Items" Background="{DynamicResource Graydient}" Style="{DynamicResource InventoryButton}" />
+            <Button Grid.Column="0" Grid.Row="1" 
+                    Content="Bin Contents" 
+                    Command="{Binding UpdateStockCommand}"
+                    Background="{DynamicResource CyanGradient}" 
+                    Style="{DynamicResource InventoryButton}" />
+            <Button Grid.Column="1" Grid.Row="1" 
+                    Content="Bin List" 
+                    Command="{Binding UpdateBinsCommand}"
+                    Background="{DynamicResource GreenGradient}" 
+                    Style="{DynamicResource InventoryButton}" />
+            <Button Grid.Column="2" Grid.Row="1" 
+                    Content="UoM List"
+                    Command="{Binding UpdateUoMCommand}"
+                    Background="{DynamicResource OrangeGradient}" 
+                    Style="{DynamicResource InventoryButton}" />
+            <Button Grid.Column="3" Grid.Row="1" 
+                    Content="Item List" 
+                    Command="{Binding UpdateItemsCommand}"
+                    Background="{DynamicResource Graydient}"
+                    Style="{DynamicResource InventoryButton}" />
 
             <!-- Third Row, Column Buttons -->
-            <Button x:Name="btnStockCols" Grid.Column="0" Grid.Row="2" Content="BC Cols" Background="{DynamicResource CyanGradient}" Click="BCInfo" Style="{DynamicResource MiniButton}"/>
-            <Button x:Name="btnBinCols" Grid.Column="1" Grid.Row="2" Content="BL Cols" Background="{DynamicResource GreenGradient}" Click="BLInfo" Style="{DynamicResource MiniButton}" />
-            <Button x:Name="btnUoMCols" Grid.Column="2" Grid.Row="2" Content="UoM Cols" Background="{DynamicResource OrangeGradient}" Click="UoMInfo" Style="{DynamicResource MiniButton}" />
-            <Button x:Name="btnItemCols" Grid.Column="3" Grid.Row="2" Content="Info" Background="{DynamicResource Graydient}" Click="ShowInfo" Style="{DynamicResource MiniButton}" />
+            <Button Grid.Column="0" Grid.Row="2" 
+                    Content="BC Cols" 
+                    Command="{Binding ShowBCColCommand}"
+                    Background="{DynamicResource CyanGradient}" 
+                    Style="{DynamicResource MiniButton}"/>
+            <Button Grid.Column="1" Grid.Row="2" 
+                    Content="BL Cols" 
+                    Command="{Binding ShowBLColCommand}"
+                    Background="{DynamicResource GreenGradient}" 
+                    Style="{DynamicResource MiniButton}" />
+            <Button Grid.Column="2" Grid.Row="2" 
+                    Content="UoM Cols" 
+                    Command="{Binding ShowULColCommand}"
+                    Background="{DynamicResource OrangeGradient}" 
+                    Style="{DynamicResource MiniButton}" />
+            <Button Grid.Column="3" Grid.Row="2" 
+                    Content="Info" 
+                    Command="{Binding ShowInfoCommand}"
+                    Background="{DynamicResource Graydient}" 
+                    Style="{DynamicResource MiniButton}" />
 
         </Grid>
     </Border>

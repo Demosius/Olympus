@@ -28,11 +28,18 @@ namespace Olympus.ViewModel.Components
         public MoveDatabaseCommand MoveDatabaseCommand { get; set; }
         public CopyDatabaseCommand CopyDatabaseCommand { get; set; }
 
+        public OlympusVM ParentVM { get; set; }
+
         public DBSelectionVM()
         {
             ChangeDatabaseCommand = new ChangeDatabaseCommand(this);
             MoveDatabaseCommand = new MoveDatabaseCommand(this);
             CopyDatabaseCommand = new CopyDatabaseCommand(this);
+        }
+
+        public DBSelectionVM(OlympusVM olympusVM)
+        {
+            ParentVM = olympusVM;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

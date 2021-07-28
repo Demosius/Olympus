@@ -26,6 +26,7 @@ namespace Olympus.Helios.Staff.Model
                 HeadID = value.ID;
             }
         }
+        
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<Shift> Shifts { get; set; } = new List<Shift> { };
         [OneToMany(CascadeOperations = CascadeOperation.All)]
@@ -34,8 +35,11 @@ namespace Olympus.Helios.Staff.Model
         public List<Clan> Clans { get; set; } = new List<Clan> { };
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<Role> Roles { get; set; } = new List<Role> { };
+        
         [ManyToMany(typeof(EmployeeDepartmentLoaning), "EmployeeID", "DepartmentsCanWorkIn", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<Employee> EmployeesCanLoan { get; set; }
+        [ManyToMany(typeof(DepartmentProject), "ProjectName", "Departments", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<Project> Projects { get; set; }
 
         public Department() { }
 

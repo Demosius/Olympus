@@ -101,7 +101,19 @@ namespace Olympus.Helios.Inventory
             { "Used Cubage", -1 },
             { "Maximum Cubage", -1 },
             { "CC Last Count Date", -1 },
-            { "PU - Last Count Date", -1 }
+            { "PI - Last Count Date", -1 }
+        };
+
+        public static readonly Dictionary<string, int> NAV_TO_LINE_BATCH_COLUMNS = new Dictionary<string, int>
+        {
+            {"Document No.", -1 },
+            {"Transfer-to Code", -1 },
+            {"Item No.", -1 },
+            {"Quantity", -1 },
+            {"Unit of Measure", -1 },
+            {"Avail. UOM Fulfilment Qty", -1 },
+            {"Created On Date", -1 },
+            {"Created On Time", -1 }
         };
 
         public static readonly Dictionary<string, string> BIN_COLUMNS = new Dictionary<string, string>

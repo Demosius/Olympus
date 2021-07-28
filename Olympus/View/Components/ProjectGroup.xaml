@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Olympus.View.Components.ProjectButton"
+﻿<UserControl x:Class="Olympus.View.Components.ProjectGroup"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -6,21 +6,33 @@
              xmlns:local="clr-namespace:Olympus.View.Components"
              xmlns:vm="clr-namespace:Olympus.ViewModel.Components"
              mc:Ignorable="d" >
-
+    
     <UserControl.DataContext>
-        <vm:ProjectButtonVM/>
+        <vm:ProjectGroupVM/>
     </UserControl.DataContext>
     
-    <Button Style="{DynamicResource ProjectBtnStyle}" 
-            ToolTip="{Binding Project.ToolTip}"
-            Command="{Binding }"
-            CommandParameter="{Binding Project.EProject}">
-        <StackPanel>
-            <Image Source="{Binding Project.Icon.FullPath}" />
-            <Label Content="{Binding Project.Name}" />
-        </StackPanel>
-    </Button>
-
+    <ItemsControl ItemsSource="{Binding Projects}" Margin="5">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Button Style="{DynamicResource ProjectBtnStyle}" 
+                        ToolTip="{Binding ToolTip}"
+                        Command="{Binding LaunchProjectCommand, 
+                                          RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=vm:ProjectGroupVM}}"
+                        CommandParameter="{Binding Name}">
+                    <StackPanel>
+                        <Image Source="{Binding Icon.FullPath}" />
+                        <Label Content="{Binding Name}" />
+                    </StackPanel>
+                </Button>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <WrapPanel Orientation="Horizontal"/>
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+    </ItemsControl>
+    
     <UserControl.Resources>
 
         <Style x:Key="ProjectBtnStyle" TargetType="Button">

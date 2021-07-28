@@ -145,6 +145,8 @@ namespace Olympus.Helios.Inventory
             {
                 string tableName = Chariot.GetTableName(type);
                 TableUpdate tableUpdate = Chariot.Database.Find<TableUpdate>(tableName);
+                if (tableUpdate is null)
+                    return new DateTime();
                 return tableUpdate.LastUpdate;
             }
             catch (Exception ex)
