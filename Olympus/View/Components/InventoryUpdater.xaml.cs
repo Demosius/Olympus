@@ -13,9 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Olympus;
-using Olympus.Helios;
+using Olympus.Uranus;
 using System.Globalization;
-using Olympus.Helios.Inventory.Model;
+using Olympus.Uranus.Inventory.Model;
 
 namespace Olympus.View.Components
 {

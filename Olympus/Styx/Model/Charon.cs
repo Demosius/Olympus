@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Olympus.Helios.Users.Model;
-using Olympus.Helios.Staff.Model;
+using Olympus.Uranus.Users.Model;
+using Olympus.Uranus.Staff.Model;
 using System.Security.Cryptography;
 using System.Windows;
-using Olympus.Helios.Users;
-using Olympus.Helios.Staff;
-using StaffRole = Olympus.Helios.Staff.Model.Role;
+using Olympus.Uranus.Users;
+using Olympus.Uranus.Staff;
+using StaffRole = Olympus.Uranus.Staff.Model.Role;
 using System.Text.RegularExpressions;
-using Role = Olympus.Helios.Users.Model.Role;
+using Role = Olympus.Uranus.Users.Model.Role;
 
 namespace Olympus.Styx.Model
 {

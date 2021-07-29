@@ -1,5 +1,5 @@
-﻿using Olympus.Helios;
-using Olympus.Helios.Inventory.Model;
+﻿using Olympus.Uranus;
+using Olympus.Uranus.Inventory.Model;
 using Olympus.ViewModel.Commands;
 using System;
 using System.Collections.Generic;
@@ -93,33 +93,33 @@ namespace Olympus.ViewModel.Components
         // Methods
         private void GetUpdateTimes()
         {
-            StockUpdateTime = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVStock));
-            BinsUpdateTime = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVBin));
-            UoMUpdateTime = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVUoM));
-            ItemUpdateTime = App.Charioteer.InventoryReader.LastTableUpdate(typeof(NAVItem));
+            StockUpdateTime = App.Helios.InventoryReader.LastTableUpdate(typeof(NAVStock));
+            BinsUpdateTime = App.Helios.InventoryReader.LastTableUpdate(typeof(NAVBin));
+            UoMUpdateTime = App.Helios.InventoryReader.LastTableUpdate(typeof(NAVUoM));
+            ItemUpdateTime = App.Helios.InventoryReader.LastTableUpdate(typeof(NAVItem));
         }
 
         public void UpdateStock()
         {
-            App.Charioteer.InventoryUpdater.NAVStock(DataConversion.NAVClipToStock());
+            App.Helios.InventoryUpdater.NAVStock(DataConversion.NAVClipToStock());
             GetUpdateTimes();
         }
 
         public void UpdateBins()
         {
-            App.Charioteer.InventoryUpdater.NAVBins(DataConversion.NAVClipToBins());
+            App.Helios.InventoryUpdater.NAVBins(DataConversion.NAVClipToBins());
             GetUpdateTimes();
         }
 
         public void UpdateUoM()
         {
-            App.Charioteer.InventoryUpdater.NAVUoMs(DataConversion.NAVClipToUoMs());
+            App.Helios.InventoryUpdater.NAVUoMs(DataConversion.NAVClipToUoMs());
             GetUpdateTimes();
         }
 
         public void UpdateItems()
         {
-            App.Charioteer.InventoryCreator.NAVItems(DataConversion.NAVCSVToItems(), App.Settings.LastItemWriteTime());
+            App.Helios.InventoryCreator.NAVItems(DataConversion.NAVCSVToItems(), App.Settings.LastItemWriteTime());
             GetUpdateTimes();
         }
 

@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Olympus.Helios.Inventory;
-using Olympus.Helios;
-using Olympus.Helios.Users;
-using Olympus.Helios.Equipment;
-using Olympus.Helios.Staff;
+using Olympus.Uranus.Inventory;
+using Olympus.Uranus;
+using Olympus.Uranus.Users;
+using Olympus.Uranus.Equipment;
+using Olympus.Uranus.Staff;
 using Olympus;
 using System.Text.Json;
 using System.Data;
@@ -21,7 +21,7 @@ using System.Windows;
 using SQLite;
 using System.Globalization;
 using System.Data.OleDb;
-using Olympus.Helios.Inventory.Model;
+using Olympus.Uranus.Inventory.Model;
 using System.Security.Cryptography;
 
 namespace Titan

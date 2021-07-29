@@ -1,11 +1,11 @@
-﻿using Olympus.Helios.Staff.Model;
+﻿using Olympus.Uranus.Staff.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Olympus.Helios;
+using Olympus.Uranus;
 using System.Collections.ObjectModel;
 
 namespace Olympus.ViewModel.Components
@@ -21,8 +21,8 @@ namespace Olympus.ViewModel.Components
 
         public ProjectLauncherVM()
         {
-            Departments = App.Charioteer.StaffReader.Departments(PullType.IncludeChildren);
-            AllProjects = App.Charioteer.StaffReader.Projects();
+            Departments = App.Helios.StaffReader.Departments(PullType.IncludeChildren);
+            AllProjects = App.Helios.StaffReader.Projects();
             if (App.Charon.UserEmployee is null)
                 UserProjects = new List<Project> { };
             else

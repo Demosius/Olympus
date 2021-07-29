@@ -1,5 +1,5 @@
-﻿using Olympus.Helios.Staff.Model;
-using Olympus.Helios.Users.Model;
+﻿using Olympus.Uranus.Staff.Model;
+using Olympus.Uranus.Users.Model;
 using Olympus.Styx.ViewModel.Commands;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using StaffRole = Olympus.Helios.Staff.Model.Role;
+using StaffRole = Olympus.Uranus.Staff.Model.Role;
 
 namespace Olympus.Styx.ViewModel
 {

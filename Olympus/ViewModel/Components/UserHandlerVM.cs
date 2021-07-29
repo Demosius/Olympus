@@ -51,7 +51,7 @@ namespace Olympus.ViewModel.Components
             if (App.Charon.CurrentUser is null)
             {
                 UserGreeting = "Who are you, and what are you doing here?";
-                if (App.Charioteer.UserReader.UserCount() == 0)
+                if (App.Helios.UserReader.UserCount() == 0)
                     ButtonString = "Register";
                 else
                     ButtonString = "Log In";
