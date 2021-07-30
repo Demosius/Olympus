@@ -40,7 +40,7 @@ namespace Olympus.Uranus
         public abstract string DatabaseName { get; }
         public SQLiteConnection Database { get; set; }
 
-        protected void InitializeDatabaseConnection()
+        protected virtual void InitializeDatabaseConnection()
         {
             try
             {
@@ -64,10 +64,15 @@ namespace Olympus.Uranus
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
+                throw;
             }
         }
 
-        public abstract void ResetConnection();
+        public virtual void ResetConnection()
+        {
+            Database = null;
+            InitializeDatabaseConnection();
+        }
 
         /***************************** CREATE Data *****************************/
 
@@ -97,13 +102,14 @@ namespace Olympus.Uranus
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
-                return false;
+                throw;
             }
         }
 
         // Insert data into a table. Assumes that there will be no issues with duplicate data.
         public bool InsertIntoTable<T>(List<T> objList)
         {
+            if (objList.Count == 0) return false;
             try
             {
                 Database.RunInTransaction(() =>
@@ -125,7 +131,7 @@ namespace Olympus.Uranus
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
-                return false;
+                throw;
             }
         }
 
@@ -146,7 +152,7 @@ namespace Olympus.Uranus
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
-                return false;
+                throw;
             }
         }
 
@@ -199,6 +205,7 @@ namespace Olympus.Uranus
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
+                throw;
             }
             return list;
         }
@@ -238,7 +245,7 @@ namespace Olympus.Uranus
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
-                return false;
+                throw;
             }
         }
 
@@ -252,7 +259,7 @@ namespace Olympus.Uranus
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
-                return false;
+                throw;
             }
         }
 
@@ -271,7 +278,35 @@ namespace Olympus.Uranus
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
-                return false;
+                throw;
+            }
+        }
+
+        public bool Delete(object obj)
+        {
+            try
+            {
+                int rowsDeleted = Database.Delete(obj);
+                return rowsDeleted > 0;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                throw;
+            }
+        }
+
+        public bool DeleteByKey<T>(object key)
+        {
+            try
+            {
+                int rowsDeleted = Database.Delete<T>(key);
+                return rowsDeleted > 0;
+            }
+            catch (Exception ex)
+            {
+                Toolbox.ShowUnexpectedException(ex);
+                throw;
             }
         }
 
@@ -286,9 +321,10 @@ namespace Olympus.Uranus
                 File.Delete(DatabaseName);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                Toolbox.ShowUnexpectedException(ex);
+                throw;
             }
         }
 
@@ -313,7 +349,7 @@ namespace Olympus.Uranus
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
-                return false;
+                throw;
             }
         }
 
@@ -337,7 +373,7 @@ namespace Olympus.Uranus
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
-                return false;
+                throw;
             }
         }
 
@@ -355,7 +391,7 @@ namespace Olympus.Uranus
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
-                return false;
+                throw;
             }
         }
 
@@ -382,7 +418,7 @@ namespace Olympus.Uranus
             catch (Exception ex)
             {
                 Toolbox.ShowUnexpectedException(ex);
-                return false;
+                throw;
             }
         }
 

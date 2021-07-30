@@ -1,4 +1,5 @@
 ﻿using Olympus.Uranus;
+using Olympus.Uranus.Inventory;
 using Olympus.Uranus.Inventory.Model;
 using Olympus.ViewModel.Commands;
 using System;
@@ -91,7 +92,7 @@ namespace Olympus.ViewModel.Components
         }
 
         // Methods
-        private void GetUpdateTimes()
+        public void GetUpdateTimes()
         {
             StockUpdateTime = App.Helios.InventoryReader.LastTableUpdate(typeof(NAVStock));
             BinsUpdateTime = App.Helios.InventoryReader.LastTableUpdate(typeof(NAVBin));
@@ -101,26 +102,26 @@ namespace Olympus.ViewModel.Components
 
         public void UpdateStock()
         {
-            App.Helios.InventoryUpdater.NAVStock(DataConversion.NAVClipToStock());
-            GetUpdateTimes();
+            if (App.Helios.InventoryUpdater.NAVStock(DataConversion.NAVClipToStock()))
+                GetUpdateTimes();
         }
 
         public void UpdateBins()
         {
-            App.Helios.InventoryUpdater.NAVBins(DataConversion.NAVClipToBins());
-            GetUpdateTimes();
+            if (App.Helios.InventoryUpdater.NAVBins(DataConversion.NAVClipToBins()))
+                GetUpdateTimes();
         }
 
         public void UpdateUoM()
         {
-            App.Helios.InventoryUpdater.NAVUoMs(DataConversion.NAVClipToUoMs());
-            GetUpdateTimes();
+            if (App.Helios.InventoryUpdater.NAVUoMs(DataConversion.NAVClipToUoMs()))
+                GetUpdateTimes();
         }
 
         public void UpdateItems()
         {
-            App.Helios.InventoryCreator.NAVItems(DataConversion.NAVCSVToItems(), App.Settings.LastItemWriteTime());
-            GetUpdateTimes();
+            if (App.Helios.InventoryCreator.NAVItems(DataConversion.NAVCSVToItems(), App.Settings.LastItemWriteTime()))
+                GetUpdateTimes();
         }
 
         public void ShowInfo()
@@ -139,7 +140,7 @@ namespace Olympus.ViewModel.Components
             MessageBox.Show($"Find the Data:\n" +
                             $"[NAV > Warehouse > Planning & Execution > Bin Contents]\n\n" +
                             $"Required Columns:\n\n" +
-                            $"{String.Join("\n", Helios.Inventory.Constants.NAV_STOCK_COLUMNS.Keys)}\n\n" +
+                            $"{String.Join("\n", Constants.NAV_STOCK_COLUMNS.Keys)}\n\n" +
                             $"(Filter to Zone Code as required, and Location Code = '9600')\n" +
                             $"(Update to the minute, as required.)",
                             $"Stock/Bin Contents Requirements",
@@ -152,7 +153,7 @@ namespace Olympus.ViewModel.Components
             MessageBox.Show($"Find the Data:\n" +
                             $"[NAV > Warehouse > Planning & Execution > Bin Contents >> Bin Code]\n\n" +
                             $"Required Columns:\n\n" +
-                            $"{String.Join("\n", Helios.Inventory.Constants.NAV_BIN_COLUMNS.Keys)}\n\n" +
+                            $"{String.Join("\n", Constants.NAV_BIN_COLUMNS.Keys)}\n\n" +
                             $"(No filtering required.)\n" +
                             $"(Update when changes are made to bin/zone layouts, or when Count Dates are required.)",
                             $"Bin List Requirements",
@@ -165,7 +166,7 @@ namespace Olympus.ViewModel.Components
             MessageBox.Show($"Find the Data:\n" +
                             $"[NAV > Warehouse > Planning & Execution > Bin Contents >> Unit of Measure Code]\n\n" +
                             $"Required Columns:\n\n" +
-                            $"{String.Join("\n", Helios.Inventory.Constants.NAV_UOM_COLUMNS.Keys)}\n\n" +
+                            $"{String.Join("\n", Constants.NAV_UOM_COLUMNS.Keys)}\n\n" +
                             $"(Unfilter All, then filter Code to \"<>EACH\".)\n" +
                             $"(Update Daily. End of previous work day, or begining of current.)",
                             $"UoM Data Requirements",

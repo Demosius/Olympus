@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Olympus.Styx.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,9 +25,10 @@ namespace Olympus.Styx.View
             InitializeComponent();
         }
 
-        private void BtnLogIn_Click(object sender, RoutedEventArgs e)
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
+            if (this.DataContext != null)
+            { ((LogInVM)DataContext).Password = ((PasswordBox)sender).Password; }
         }
 
     }

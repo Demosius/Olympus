@@ -77,12 +77,12 @@ namespace Olympus.Styx.ViewModel
             PasswordGood = isSix && isMatch && isNoSpace;
         }
 
-        public void Register()
+        public bool Register()
         {
             Employee.DepartmentName = Department.Name;
             Role.DepartmentName = Department.Name;
             Department.HeadID = Employee.ID;
-            App.Charon.RegisterAlphaUser(Employee, Department, Role, Password, ConfirmPassword);
+            return App.Charon.RegisterAlphaUser(Employee, Department, Role, Password, ConfirmPassword);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

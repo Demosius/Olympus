@@ -6,6 +6,8 @@
              StartupUri="View/OlympusWindow.xaml">
 
     <Application.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
         <!-- Image Resources -->
         <Image x:Key="icoForge" Source="./Resources/Images/Icons/forge.ico" />
         <Image x:Key="icoPrometheus" Source="./Resources/Images/Icons/prometheus.ico" />

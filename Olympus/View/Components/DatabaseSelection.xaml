@@ -27,8 +27,22 @@
         <Button Margin="5" 
                 TextBlock.FontSize="14" 
                 Padding="5" 
-                TextBlock.TextAlignment="Right" 
-                Content="Change Database"/>
+                Content="Change Database"
+                Command="{Binding ChangeDatabaseCommand}"/>
+        <Button Margin="5"
+                TextBlock.FontSize="14"
+                Padding="5"
+                Content="Copy Database"
+                Command="{Binding CopyDatabaseCommand}"
+                CommandParameter="{Binding DBString}"
+                Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <Button Margin="5"
+                TextBlock.FontSize="14"
+                Padding="5"
+                Content="Move Database"
+                Command="{Binding MoveDatabaseCommand}"
+                CommandParameter="{Binding DBString}"
+                Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
     </StackPanel>
 </UserControl>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Olympus.Styx.ViewModel.Commands
@@ -31,7 +32,11 @@ namespace Olympus.Styx.ViewModel.Commands
 
         public void Execute(object parameter)
         {
-            VM.Register();
+            if (VM.Register())
+            {
+                Window window = parameter as Window;
+                window.Close();
+            }
         }
     }
 }

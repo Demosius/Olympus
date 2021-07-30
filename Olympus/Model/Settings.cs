@@ -39,6 +39,13 @@ namespace Olympus.Model
             ReadFromFile();
         }
 
+        public void SetNewSolLocation(string newSolLocation)
+        {
+            SolLocation = newSolLocation;
+            App.Charon.DatabaseReset();
+            App.Helios.ResetChariots();
+        }
+
         public DateTime LastItemWriteTime()
         {
             return File.GetLastWriteTime(jsonSettings.ItemCSVLocation);

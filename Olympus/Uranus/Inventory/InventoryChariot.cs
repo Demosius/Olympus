@@ -65,6 +65,8 @@ namespace Olympus.Uranus.Inventory
 
         public override void ResetConnection()
         {
+            // First thing is to nullify the current databse (connection).
+            Database = null;
             // Try first to use the directory based on App.Settings, if not then use local file.
             try
             {

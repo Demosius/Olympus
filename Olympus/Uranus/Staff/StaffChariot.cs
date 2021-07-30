@@ -38,14 +38,12 @@ namespace Olympus.Uranus.Staff
             {
                 BaseDataDirectory = Path.Combine(App.Settings.SolLocation, "Staff");
                 InitializeDatabaseConnection();
-                CreateIconDirectories();
             }
             catch
             {
                 MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
                 BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Staff");
                 InitializeDatabaseConnection();
-                CreateIconDirectories();
             }
 
         }
@@ -57,32 +55,30 @@ namespace Olympus.Uranus.Staff
             {
                 BaseDataDirectory = Path.Combine(solLocation, "Staff");
                 InitializeDatabaseConnection();
-                CreateIconDirectories();
             }
             catch
             {
                 MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
                 BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Staff");
                 InitializeDatabaseConnection();
-                CreateIconDirectories();
             }
         }
 
         public override void ResetConnection()
         {
+            // First thing is to nullify the current databse (connection).
+            Database = null;
             // Try first to use the directory based on App.Settings, if not then use local file.
             try
             {
                 BaseDataDirectory = Path.Combine(App.Settings.SolLocation, DatabaseName);
                 InitializeDatabaseConnection();
-                CreateIconDirectories();
             }
             catch
             {
                 MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
                 BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Staff");
                 InitializeDatabaseConnection();
-                CreateIconDirectories();
             }
         }
 
@@ -91,10 +87,12 @@ namespace Olympus.Uranus.Staff
             EmployeeIconDirectory = Path.Combine(BaseDataDirectory, "EmployeeIcons");
             EmployeeAvatarDirectory = Path.Combine(BaseDataDirectory, "EmployeeAvatars");
             ProjectIconDirectory = Path.Combine(BaseDataDirectory, "ProjectIcons");
+            LicenceImageDirectory = Path.Combine(BaseDataDirectory, "LicenceImages");
             if (!Directory.Exists(BaseDataDirectory)) Directory.CreateDirectory(BaseDataDirectory);
             if (!Directory.Exists(EmployeeIconDirectory)) Directory.CreateDirectory(EmployeeIconDirectory);
             if (!Directory.Exists(EmployeeAvatarDirectory)) Directory.CreateDirectory(EmployeeAvatarDirectory);
             if (!Directory.Exists(ProjectIconDirectory)) Directory.CreateDirectory(ProjectIconDirectory);
+            if (!Directory.Exists(LicenceImageDirectory)) Directory.CreateDirectory(LicenceImageDirectory);
             EstablishInitialProjectIcons();
         }
 
@@ -102,11 +100,11 @@ namespace Olympus.Uranus.Staff
         {
             List<Project> projects = new List<Project> 
             {
-                new Project(EProject.Khaos, "chaos.ico"),
-                new Project(EProject.Pantheon, "pantheon.ico"),
-                new Project(EProject.Prometheus, "prometheus.ico"),
-                new Project(EProject.Torch, "torch.ico"),
-                new Project(EProject.Vulcan, "vulcan.ico")
+                new Project(EProject.Khaos, "chaos.ico", "Handles makebulk designation and separation. (Genesis)"),
+                new Project(EProject.Pantheon, "pantheon.ico", "Roster management."),
+                new Project(EProject.Prometheus, "prometheus.ico", "Data management."),
+                new Project(EProject.Torch, "torch.ico", "Pre-work automated stock maintenance. (AutoBurn)"),
+                new Project(EProject.Vulcan, "vulcan.ico", "Replenishment DDR management and work assignment. (RefOrge)")
             };
             List<string> existingProjects = PullObjectList<Project>().Select(p => p.Name).ToList();
             Database.RunInTransaction(() =>
@@ -132,6 +130,11 @@ namespace Olympus.Uranus.Staff
                     File.Copy(filePath, Path.Combine(ProjectIconDirectory, fileName), true);
                 }
             }
+        }
+        protected override void InitializeDatabaseConnection()
+        {
+            base.InitializeDatabaseConnection();
+            CreateIconDirectories();
         }
 
         /***************************** CREATE Data ****************************/

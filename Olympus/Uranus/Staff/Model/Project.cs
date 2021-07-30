@@ -46,10 +46,11 @@ namespace Olympus.Uranus.Staff.Model
         public Project() { }
              
         // Create project and projectIcon together.
-        public Project(EProject eProject, string iconFileName)
+        public Project(EProject eProject, string iconFileName, string toolTip = "")
         {
             EProject = eProject;
             Icon = new ProjectIcon(this, iconFileName);
+            ToolTip = toolTip;
         }
     }
 }

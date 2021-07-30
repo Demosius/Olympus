@@ -83,6 +83,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Styx\ViewModel\Commands\LogInCommand.cs" />
+    <Compile Include="Styx\ViewModel\LogInVM.cs" />
     <Compile Include="Uranus\Inventory\Model\Store.cs" />
     <Compile Include="Uranus\Inventory\Model\NAVTransferOrder.cs" />
     <Compile Include="Uranus\Staff\Model\DepartmentProject.cs" />
@@ -334,7 +336,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="settings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Content Include="Resources\Images\Icons\forge.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -46,7 +46,7 @@ namespace Olympus.ViewModel.Components
             ParentVM = olympusVM;
         }
 
-        private void CheckUser()
+        public void CheckUser()
         {
             if (App.Charon.CurrentUser is null)
             {
@@ -67,16 +67,20 @@ namespace Olympus.ViewModel.Components
         {
             AlphaRegistrationWindow alpha = new AlphaRegistrationWindow();
             alpha.ShowDialog();
+            CheckUser();
         }
 
         public void LogIn()
         {
-
+            LoginWindow login = new LoginWindow();
+            login.ShowDialog();
+            CheckUser();
         }
 
         public void LogOut()
         {
-
+            App.Charon.LogOut();
+            CheckUser();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

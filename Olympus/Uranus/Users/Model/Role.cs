@@ -32,7 +32,7 @@ namespace Olympus.Uranus.Users.Model
         public bool DeleteDepartment { get; set; } // Can only be deleted if there are no employees associated.
 
         public bool AssignRole { get; set; }
-        public bool EditRoles { get; set; }
+        public bool EditRoles { get; set; } // Includes creation and deletion.
 
         public bool CreateClan { get; set; }
         public bool UpdateClan { get; set; }
@@ -52,6 +52,10 @@ namespace Olympus.Uranus.Users.Model
         public bool ReadVehicle { get; set; }
         public bool UpdateVehicle { get; set; }
         public bool DeleteVehicle { get; set; }
+
+        // Whole database operations.
+        public bool CopyDatabase { get; set; }  // Most
+        public bool MoveDatabase { get; set; }  // Only db admin/manager.
 
         [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<User> Users { get; set; }
@@ -91,6 +95,9 @@ namespace Olympus.Uranus.Users.Model
             ReadLicence = false;
             UpdateLicence = false;
             DeleteLicence = false;
+
+            CopyDatabase = false;
+            MoveDatabase = false;
         }
 
         public void SetMaster()
@@ -128,6 +135,9 @@ namespace Olympus.Uranus.Users.Model
             ReadLicence = true;
             UpdateLicence = true;
             DeleteLicence = true;
+
+            CopyDatabase = true;
+            MoveDatabase = true;
         }
     }
 }

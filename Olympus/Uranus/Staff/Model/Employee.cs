@@ -15,12 +15,12 @@ namespace Olympus.Uranus.Staff.Model
         public string LastName { get; set; }
         [NotNull]
         public string DisplayName { get; set; }
-        public decimal? PayRate { get; set; } = null;
+        public decimal? PayRate { get; set; }// = null;
         public string RF_ID { get; set; }
         public string PC_ID { get; set; }
-        [ForeignKey(typeof(Department)), NotNull]
+        [ForeignKey(typeof(Department))]//, NotNull]
         public string DepartmentName { get; set; }
-        [ForeignKey(typeof(Role)), NotNull]
+        [ForeignKey(typeof(Role))]//, NotNull]
         public string RoleName { get; set; }
         [ForeignKey(typeof(Locker))]
         public string LockerID { get; set; }
@@ -30,31 +30,31 @@ namespace Olympus.Uranus.Staff.Model
         [ForeignKey(typeof(EmployeeIcon))]
         public string IconName { get; set; }
 
-        private Department department;
-        private Role role;
+        //private Department department;
+        //private Role role;
 
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public Department Department
-        {
-            get => department;
-            set
-            {
-                department = value;
-                DepartmentName = value.Name;
-                value.Employees.Add(this);
-            }
-        }
+        public Department Department { get; set; }
+        //{
+        //    get => department;
+        //    set
+        //    {
+        //        department = value;
+        //        DepartmentName = value.Name;
+        //        value.Employees.Add(this);
+        //    }
+        //}
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public Role Role
-        {
-            get => role; 
-            set
-            {
-                role = value;
-                RoleName = value.Name;
-                value.Employees.Add(this);
-            }
-        }
+        public Role Role { get; set; }
+        //{
+        //    get => role; 
+        //    set
+        //    {
+        //        role = value;
+        //        RoleName = value.Name;
+        //        value.Employees.Add(this);
+        //    }
+        //}
 
         [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Locker Locker { get; set; }
@@ -77,6 +77,7 @@ namespace Olympus.Uranus.Staff.Model
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<ShiftRule> Rules { get; set; }
 
+        public Employee() { }
 
         public override bool Equals(object obj) => this.Equals(obj as Employee);
 

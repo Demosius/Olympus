@@ -1,9 +1,11 @@
 ﻿<Window x:Class="Olympus.Styx.View.LoginWindow"
+        x:Name="LogInWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Olympus.Styx.View"
+        xmlns:vm="clr-namespace:Olympus.Styx.ViewModel"
         mc:Ignorable="d"
         Background="{DynamicResource BackGroundBrush}"
         WindowStartupLocation="CenterScreen"
@@ -13,6 +15,10 @@
     <Window.CommandBindings>
         
     </Window.CommandBindings>
+
+    <Window.DataContext>
+        <vm:LogInVM/>
+    </Window.DataContext>
     
     <StackPanel Margin="10">
         <WrapPanel>
@@ -21,12 +27,17 @@
                 <TextBlock FontSize="12" FontWeight="Light" FontStyle="Italic">(employee number)</TextBlock>
             </Label>
         </WrapPanel>
-        <TextBox Name="TxtUser"/>
+        <TextBox Name="TxtUser"
+                 Text="{Binding UserID}"/>
         <Label Target="{Binding ElementName=txtPassword}">_Password</Label>
-        <PasswordBox Name="PwdPassword"/>
+        <PasswordBox PasswordChanged="PasswordBox_PasswordChanged"/>
         <StackPanel Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Right">
-            <Button IsCancel="True">_Cancel</Button>
-            <Button IsDefault="True" Name="btnLogIn">_Log In</Button>
+            <Button IsCancel="True"
+                    Content="_Cancel"/>
+            <Button IsDefault="True"
+                    Content="_Log In"
+                    Command="{Binding LogInCommand}"
+                    CommandParameter="{Binding ElementName=LogInWindow}"/>
         </StackPanel>
     </StackPanel>
 </Window>

@@ -21,7 +21,8 @@ namespace Olympus.ViewModel.Components
 
         public ProjectLauncherVM()
         {
-            Departments = App.Helios.StaffReader.Departments(PullType.IncludeChildren);
+            List<Department> deps = App.Helios.StaffReader.Departments(PullType.IncludeChildren);
+            Departments = deps;
             AllProjects = App.Helios.StaffReader.Projects();
             if (App.Charon.UserEmployee is null)
                 UserProjects = new List<Project> { };

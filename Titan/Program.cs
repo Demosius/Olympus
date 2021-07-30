@@ -36,9 +36,51 @@ namespace Titan
             Console.WriteLine("Press enter to begin: ...");
             Console.ReadLine();
 
-            SQLiteTesting();
+            SubDirTesting();
 
             _ = Console.ReadLine();
+        }
+
+        public static void SubDirTesting()
+        {
+            bool isSub = IsSubDirectory(@"\\ausefpdfs01ns\Shares\Public\Aaron Penny", @"\\ausefpdfs01ns\Shares\Public\Aaron Penny\BATS\AutoCount");
+            Console.WriteLine(isSub);
+        }
+
+        private static bool IsSubDirectory(string potentialParentDir, string potentialChildDir)
+        {
+            DirectoryInfo parent = new DirectoryInfo(Path.GetDirectoryName(potentialParentDir));
+            DirectoryInfo child = new DirectoryInfo(Path.GetDirectoryName(potentialChildDir));
+            return IsSubDirectory(parent, child);
+        }
+
+        private static bool IsSubDirectory(DirectoryInfo potentialParentDir, DirectoryInfo potentialChildDir)
+        {
+            if (potentialParentDir == potentialChildDir)
+                return true;    // If they are the same, return true - as it means the same for our purposes.
+            DirectoryInfo parent = potentialChildDir.Parent;
+            if (parent is null)
+                return false;   // Once there is no parent, that means that it must be false.
+            if (parent.FullName == potentialParentDir.FullName)
+                return true;
+            return IsSubDirectory(potentialParentDir, parent);
+        }
+
+        public static void GetDirectoryTesting()
+        {
+            string file = "C:/folder1/folder2/file.txt";
+            string path = "C:/folder1/folder2";
+            string lastFolderName1 = Path.GetFileName(Path.GetDirectoryName(file));
+            string lastFolderName2 = Path.GetFileName(Path.GetDirectoryName(path));
+            Console.WriteLine($"{lastFolderName1} - {lastFolderName2}\n");
+
+            string folderName1 = new DirectoryInfo(Path.GetDirectoryName(file)).Name;
+            string folderName2 = new DirectoryInfo(Path.GetDirectoryName(path)).Name;
+            Console.WriteLine($"{folderName1} - {folderName2}\n");
+
+            string folder1 = new DirectoryInfo(file).Name;
+            string folder2 = new DirectoryInfo(path).Name; 
+            Console.WriteLine($"{folder1} - {folder2}\n");
         }
 
         public static void SQLiteTesting()

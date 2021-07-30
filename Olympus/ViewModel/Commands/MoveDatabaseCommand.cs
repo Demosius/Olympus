@@ -25,12 +25,13 @@ namespace Olympus.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            return true;
+            string dbLocation = (parameter ?? "null") as string;
+            return App.Charon.CanMoveDatabase() && dbLocation.ToLower() != "local";
         }
 
         public void Execute(object parameter)
         {
-            throw new NotImplementedException();
+            VM.MoveDatabase();
         }
     }
 }

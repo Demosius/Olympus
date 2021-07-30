@@ -12,6 +12,7 @@ using Olympus.Uranus.Staff;
 using StaffRole = Olympus.Uranus.Staff.Model.Role;
 using System.Text.RegularExpressions;
 using Role = Olympus.Uranus.Users.Model.Role;
+using Olympus.Uranus;
 
 namespace Olympus.Styx.Model
 {
@@ -23,19 +24,27 @@ namespace Olympus.Styx.Model
     public partial class Charon
     {
         public User CurrentUser { get; set; }
-        public Employee UserEmployee { get; set; }
+        public Employee UserEmployee
+        {
+            get
+            {
+                if (CurrentUser is null) return null;
+                return CurrentUser.Employee;
+            }
+        }
 
         // User manipulations.
         private readonly UserChariot userChariot;
         private readonly UserCreator userCreator;
         private readonly UserReader userReader;
         private readonly UserUpdater userUpdater;
-        //private readonly UserDeleter userDeleter;
+        private readonly UserDeleter userDeleter;
 
         // Reading employees.
         private readonly StaffChariot staffChariot;
         private readonly StaffReader staffReader;
         private readonly StaffCreator staffCreator; // For alpha user registration.
+        private readonly StaffDeleter staffDeleter;
 
         public Charon()
         { 
@@ -43,21 +52,26 @@ namespace Olympus.Styx.Model
             userCreator = new UserCreator(ref userChariot);
             userReader = new UserReader(ref userChariot);
             userUpdater = new UserUpdater(ref userChariot);
-            //userDeleter = new UserDeleter(ref userChariot);
+            userDeleter = new UserDeleter(ref userChariot);
 
             staffChariot = new StaffChariot();
             staffReader = new StaffReader(ref staffChariot);
             staffCreator = new StaffCreator(ref staffChariot);
+            staffDeleter = new StaffDeleter(ref staffChariot);
         }
 
         public Charon(User user, Employee employee) : base()
         {
             CurrentUser = user;
-            UserEmployee = employee;
+            if (user.Employee is null)
+                user.Employee = employee;
+            else if (user.ID != user.Employee.ID && user.ID == employee.ID)
+                user.Employee = employee;
         }
 
         public void DatabaseReset() 
         {
+            LogOut();
             userChariot.ResetConnection();
             staffChariot.ResetConnection();
         }
@@ -80,7 +94,7 @@ namespace Olympus.Styx.Model
 
         public int GetLevelDifference(int employeeID)
         {
-            Employee employee = staffReader.Employee(employeeID, Helios.PullType.FullRecursive);
+            Employee employee = staffReader.Employee(employeeID, PullType.FullRecursive);
             return GetLevelDifference(employee);
         }
 
@@ -113,19 +127,21 @@ namespace Olympus.Styx.Model
         public void LogOut()
         {
             CurrentUser = null;
-            UserEmployee = null;
         }
 
         public bool LogIn(int userID, string password)
         {
             Login login = userReader.Login(userID);
-            if (login is null) return false;
-            if (VerifyPassword(login, password))
+            if (!(login is null))
             {
-                CurrentUser = userReader.User(userID);
-                UserEmployee = staffReader.Employee(userID, Helios.PullType.FullRecursive);
-                return true;
+                if (VerifyPassword(login, password))
+                {
+                    CurrentUser = userReader.User(userID);
+                    CurrentUser.Employee = staffReader.Employee(userID, PullType.FullRecursive);
+                    return true;
+                }
             }
+            MessageBox.Show("That User ID and Password combination do not match in the Database.", "Failed to Log In", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             return false;
         }
 
@@ -137,33 +153,45 @@ namespace Olympus.Styx.Model
             // Make sure that the passwords are valid before continuing too far.
             if (!ValidatePassword(password, confirmPassword)) return false;
             
-            // Check that there are no users. (In theory there should also be no employees, but that should prevent an alpha user creation.)
+            // Check that there are no users. (In theory there should also be no employees, but that should not prevent an alpha user creation.)
             if (userReader.UserCount() > 0) return false;
 
-            staffRole.Department = department;
-            department.Head = employee;
-            employee.Role = staffRole;
-            employee.Department = department;
-
-            staffCreator.Employee(employee, Helios.PushType.FullRecursive);
-
-            User newUser = new User()
+            try
             {
-                ID = employee.ID
-            };
-            Login newLogin = GetNewLogin(employee.ID, password);
+                department.Head = employee;
+                staffRole.Department = department;
+                employee.Role = staffRole;
+                employee.Department = department;
 
-            Role userRole = userReader.Role("DatabaseManager");
-            newUser.Role = userRole;
-            newUser.Employee = employee;
+                staffCreator.Employee(employee, PushType.FullRecursive);
 
-            userCreator.User(newUser);
-            userCreator.Login(newLogin);
+                User newUser = new User()
+                {
+                    ID = employee.ID
+                };
+                Login newLogin = GetNewLogin(employee.ID, password);
 
-            // Set user.
-            CurrentUser = newUser;
-            UserEmployee = newUser.Employee;
+                Role userRole = userReader.Role("DatabaseManager");
+                newUser.Role = userRole;
+                newUser.Employee = employee;
 
+                userCreator.User(newUser);
+                userCreator.Login(newLogin);
+
+                // Set user.
+                CurrentUser = newUser;
+            }
+            catch (Exception ex)
+            {
+                // Skip validation checks (as there is no user to validate)
+                // and delete what might have been created in previous process.
+                userChariot.DeleteByKey<Employee>(employee.ID);
+                userChariot.DeleteByKey<Department>(department.Name);
+                userChariot.DeleteByKey<StaffRole>(staffRole.Name);
+                userChariot.DeleteByKey<User>(employee.ID);
+                Toolbox.ShowUnexpectedException(ex);
+                return false;
+            }
             return true;
         }
 
@@ -185,14 +213,13 @@ namespace Olympus.Styx.Model
             Login newLogin = GetNewLogin(userID, password);
 
             newUser.Role = role;
-            newUser.Employee = staffReader.Employee(userID, Helios.PullType.FullRecursive);
+            newUser.Employee = staffReader.Employee(userID, PullType.FullRecursive);
 
             userCreator.User(newUser);
             userCreator.Login(newLogin);
 
             // Set user.
             CurrentUser = newUser;
-            UserEmployee = newUser.Employee;
 
             return true;
         }

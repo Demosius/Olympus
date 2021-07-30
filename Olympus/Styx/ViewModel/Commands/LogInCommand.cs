@@ -1,16 +1,16 @@
-﻿using Olympus.ViewModel.Components;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
-namespace Olympus.ViewModel.Commands
+namespace Olympus.Styx.ViewModel.Commands
 {
-    public class ChangeDatabaseCommand : ICommand
+    public class LogInCommand : ICommand
     {
-        public DBSelectionVM VM { get; set; }
+        private LogInVM VM;
 
         public event EventHandler CanExecuteChanged
         {
@@ -18,19 +18,23 @@ namespace Olympus.ViewModel.Commands
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-        public ChangeDatabaseCommand(DBSelectionVM vm)
+        public LogInCommand(LogInVM vm)
         {
             VM = vm;
         }
 
         public bool CanExecute(object parameter)
         {
-            return true;
+            return VM.UserID > 0 && VM.Password.Length >= 6;
         }
 
         public void Execute(object parameter)
         {
-            VM.ChangeDatabase();
+            if (VM.LogIn())
+            {
+                Window window = parameter as Window;
+                window.Close();
+            }
         }
     }
 }
