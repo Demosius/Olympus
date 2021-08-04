@@ -60,42 +60,47 @@
                 <ProgressBar Value="05" Width="180" Height="16" />
             </StatusBarItem>
         </StatusBar>
-        
-        <StackPanel>            
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Control:DatabaseSelection Grid.Column="0"
-                                           DataContext="{Binding DBSelectionVM}"/>
-                <Control:UserHandler Grid.Column="2"
-                                     DataContext="{Binding UserHandlerVM}"/>
-            </Grid>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Control:ProjectLauncher Grid.Column="0"
-                                         DataContext="{Binding ProjectLauncherVM}"/>
-                <Control:InventoryUpdater Grid.Column="2"
-                                          DataContext="{Binding InventoryUpdaterVM}"/>
-            </Grid>
-
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel>            
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Control:DatabaseSelection Grid.Column="0"
+                                               DataContext="{Binding DBSelectionVM}"/>
+                    <Control:UserHandler Grid.Column="2"
+                                         DataContext="{Binding UserHandlerVM}"/>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Control:ProjectLauncher Grid.Column="0"
+                                             DataContext="{Binding ProjectLauncherVM}"/>
+                    <Control:InventoryUpdater Grid.Column="2"
+                                              DataContext="{Binding InventoryUpdaterVM}"/>
+                </Grid>
+            </StackPanel>
             <Frame  Content="{Binding CurrentPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                Margin="5,5,5,5" 
-                x:Name="OView" 
-                Grid.Row="3" 
-                Grid.Column="0" 
-                Height="Auto" 
-                HorizontalAlignment="Stretch" 
-                VerticalAlignment="Stretch"
-                BorderThickness="1" 
-                BorderBrush="SlateGray"/>
-        </StackPanel>
+                    Grid.Row="1"
+                    Margin="5,5,5,5" 
+                    x:Name="OView"
+                    Grid.Column="0" 
+                    Height="Auto" 
+                    HorizontalAlignment="Stretch" 
+                    VerticalAlignment="Stretch"
+                    BorderThickness="1" 
+                    BorderBrush="SlateGray"
+                    NavigationUIVisibility="Hidden"/>
+        </Grid>
     </DockPanel>
 
     <Window.Resources>

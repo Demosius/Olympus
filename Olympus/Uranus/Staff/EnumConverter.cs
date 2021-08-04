@@ -44,7 +44,7 @@ namespace Olympus.Uranus.Staff
 
         public static EProject StringToProject(string project)
         {
-            project = project.ToUpper();
+            project = (project ?? "prometheus").ToUpper();
             if (project == "VULCAN")
                 return EProject.Vulcan;
             if (project == "TORCH")

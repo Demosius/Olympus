@@ -16,13 +16,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Globalization;
+using Olympus.Model;
+using Olympus.Uranus.Staff;
 
 namespace Olympus.Prometheus.View
 {
     /// <summary>
     /// Interaction logic for Prometheus.xaml
     /// </summary>
-    public partial class PrometheusPage : Page
+    public partial class PrometheusPage : Page, IProject
     {
         //public DataSet UserData { get; set; }
         //public DataSet StaffData { get; set; }
@@ -33,15 +35,17 @@ namespace Olympus.Prometheus.View
         //public int PageIndex { get; set; } = 0;
         //public int PageSize { get; set; } = 25;
 
-        //public string PageString { get; set; } = "Page: 0 of 0";
+        //public string PageString { get; set; } = "Pag6e: 0 of 0";
 
-        //public PrometheusPage()
-        //{
-        //    InitializeComponent();
-        //    this.DataContext = this;
-        //    SetData();
-        //    SetPageString();
-        //}
+        public PrometheusPage()
+        {
+            InitializeComponent();
+            //this.DataContext = this;
+            //SetData();
+            //SetPageString();
+        }
+
+        public EProject EProject => EProject.Prometheus;
 
         //public void SetData()
         //{

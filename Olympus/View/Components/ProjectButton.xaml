@@ -13,8 +13,8 @@
     
     <Button Style="{DynamicResource ProjectBtnStyle}" 
             ToolTip="{Binding Project.ToolTip}"
-            Command="{Binding }"
-            CommandParameter="{Binding Project.EProject}">
+            Command="{Binding LaunchProjectCommand}"
+            CommandParameter="{Binding Project.Name}">
         <StackPanel>
             <Image Source="{Binding Project.Icon.FullPath}" />
             <Label Content="{Binding Project.Name}" />

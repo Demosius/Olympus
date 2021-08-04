@@ -27,7 +27,7 @@ namespace Olympus.Uranus.Staff.Model
             Name = ProjectName;
         }
 
-        public override void GetImageFilePath() => Path.Combine(App.Helios.StaffReader.ProjectIconDirectory, FileName);
+        public override void GetImageFilePath() => fullPath = Path.Combine(App.Helios.StaffReader.ProjectIconDirectory, FileName);
 
     }
 }

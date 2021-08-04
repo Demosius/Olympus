@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Olympus.Model;
+using Olympus.Uranus.Staff;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,11 +20,13 @@ namespace Olympus.Vulcan.View
     /// <summary>
     /// Interaction logic for VulcanPage.xaml
     /// </summary>
-    public partial class VulcanPage : Page
+    public partial class VulcanPage : Page, IProject
     {
         public VulcanPage()
         {
             InitializeComponent();
         }
+
+        public EProject EProject => EProject.Vulcan;
     }
 }

@@ -12,24 +12,16 @@ namespace Olympus.Uranus.Staff.Model
     {
         [PrimaryKey]
         public string Name { get; set; }
-        private string fileName;
-        public string FileName 
-        { 
-            get => fileName; 
-            set
-            {
-                fileName = value;
-                fullPath = null;
-            }
-        }
+        public string FileName { get; set; }
 
-        private string fullPath = null;
+        protected string fullPath = null;
         [Ignore]
         public string FullPath
         {
             get
             {
                 if (fullPath is null) GetImageFilePath();
+                if (Path.GetFileName(fullPath) != FileName) GetImageFilePath();
                 return fullPath;
             }
         }
@@ -39,11 +31,11 @@ namespace Olympus.Uranus.Staff.Model
             string checkDir;
             // Check multiple locations for the image.
             // Current Directory
-            checkDir = Path.Combine(Directory.GetCurrentDirectory(), fileName);
+            checkDir = Path.Combine(Directory.GetCurrentDirectory(), FileName);
             if (CheckPath(checkDir)) return;
 
             // App Directory
-            checkDir = Path.Combine(App.BaseDirectory(), fileName);
+            checkDir = Path.Combine(App.BaseDirectory(), FileName);
             if (CheckPath(checkDir)) return;
 
             // Database directory.

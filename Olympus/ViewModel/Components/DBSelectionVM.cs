@@ -56,7 +56,6 @@ namespace Olympus.ViewModel.Components
         private string SelectFolder()
         {
             VistaFolderBrowserDialog folderBrowserDialog = new VistaFolderBrowserDialog();
-            folderBrowserDialog.Description = "Select the Folder that holds (or you would like to hold) the database.";
             folderBrowserDialog.ShowDialog();
             return SetSol(folderBrowserDialog.SelectedPath);
         }
@@ -86,9 +85,18 @@ namespace Olympus.ViewModel.Components
 
         public void ChangeDatabase()
         {
-            string path = SelectFolder();
-            // Empty string means cancelation.
-            if (path == "") return;
+            string path;
+            MessageBoxResult result = MessageBox.Show("Use Local database?", "DB Choice", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+                path = App.BaseDirectory();
+            else if (result == MessageBoxResult.Cancel)
+                return;
+            else
+            {
+                path = SelectFolder();
+                // Empty string means cancelation.
+                if (path == "") return;
+            }
             // Make sure directory exists.
             if (!(Directory.Exists(path)))
                 Directory.CreateDirectory(path);

@@ -12,18 +12,14 @@
     </UserControl.DataContext>
     
     <ItemsControl ItemsSource="{Binding Projects}" Margin="5">
+        <ItemsControl.Resources>
+            <DataTemplate DataType="{x:Type vm:ProjectButtonVM}">
+                <local:ProjectButton/>
+            </DataTemplate>
+        </ItemsControl.Resources>
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <Button Style="{DynamicResource ProjectBtnStyle}" 
-                        ToolTip="{Binding ToolTip}"
-                        Command="{Binding LaunchProjectCommand, 
-                                          RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=vm:ProjectGroupVM}}"
-                        CommandParameter="{Binding Name}">
-                    <StackPanel>
-                        <Image Source="{Binding Icon.FullPath}" />
-                        <Label Content="{Binding Name}" />
-                    </StackPanel>
-                </Button>
+                <local:ProjectButton DataContext="{Binding}"/>
             </DataTemplate>
         </ItemsControl.ItemTemplate>
         <ItemsControl.ItemsPanel>
@@ -33,39 +29,4 @@
         </ItemsControl.ItemsPanel>
     </ItemsControl>
     
-    <UserControl.Resources>
-
-        <Style x:Key="ProjectBtnStyle" TargetType="Button">
-            <Setter Property="Margin" Value="2"/>
-            <Setter Property="Height" Value="Auto"/>
-            <Setter Property="Width" Value="60"/>
-            <Setter Property="Background" Value="{DynamicResource PurpleGradient}" />
-            <Setter Property="Foreground" Value="{DynamicResource ForeGradient}" />
-            <Setter Property="BorderBrush" Value="Black" />
-            <Setter Property="TextBlock.TextAlignment" Value="Center" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="FontWeight" Value="ExtraLight"/>
-            <Setter Property="FontFamily" Value="Arial" />
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Style.Resources>
-                <Style TargetType="Image">
-                    <Setter Property="Stretch" Value="Uniform" />
-                    <Setter Property="Width" Value="35" />
-                    <Setter Property="Height" Value="35" />
-                </Style>
-                <Style TargetType="Label">
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="TextBlock.FontSize" Value="14"/>
-                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
-                    <Setter Property="Foreground" Value="Gray"/>
-                    <Setter Property="Margin" Value="0"/>
-                    <Setter Property="FontWeight" Value="Bold"/>
-                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                    <Setter Property="Padding" Value="0,5,0,5" />
-                    <Setter Property="FontSize" Value="8" />
-                </Style>
-            </Style.Resources>
-        </Style>
-    </UserControl.Resources>
 </UserControl>

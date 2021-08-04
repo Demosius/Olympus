@@ -11,25 +11,30 @@ namespace Olympus.ViewModel.Commands
 {
     public class LaunchProjectCommand : ICommand
     {
-        public ProjectGroupVM VM { get; set; }
+        public ProjectButtonVM VM { get; set; }
 
-        public LaunchProjectCommand(ProjectGroupVM vm)
+        public LaunchProjectCommand(ProjectButtonVM vm)
         {
             VM = vm;
         }
 
-        public event EventHandler CanExecuteChanged;
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
 
         public bool CanExecute(object parameter)
         {
             EProject eProject = EnumConverter.StringToProject(parameter as string);
-            return VM.ProjectLauncher.OlympusVM.CurrentProject != eProject;
+            if (VM.ProjectGroup is null) return false;
+            return VM.ProjectGroup.ProjectLauncher.OlympusVM.CurrentProject != eProject;
         }
 
         public void Execute(object parameter)
         {
             EProject eProject = EnumConverter.StringToProject(parameter as string);
-            VM.ProjectLauncher.OlympusVM.LoadProject(eProject);
+            VM.ProjectGroup.ProjectLauncher.OlympusVM.LoadProject(eProject);
         }
     }
 }

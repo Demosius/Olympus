@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using Olympus.Khaos.View;
 using Olympus.ViewModel.Components;
+using Olympus.Model;
 
 namespace Olympus.ViewModel
 {
@@ -32,6 +33,7 @@ namespace Olympus.ViewModel
             set
             {
                 currentPage = value;
+                if (!(value is null)) CurrentProject = (value as IProject).EProject;
                 OnPropertyChanged(nameof(CurrentPage));
             }
         }
@@ -60,8 +62,6 @@ namespace Olympus.ViewModel
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-
-
         /* Projects */
         public void LoadProject(EProject project)
         {
@@ -85,37 +85,45 @@ namespace Olympus.ViewModel
                 default:
                     break;
             }
-            CurrentProject = project;
         }
 
         private void LoadPrometheus()
         {
             if (Prometheus is null) Prometheus = new PrometheusPage();
-            CurrentPage = Prometheus;
+            SetPage(Prometheus);
         }
 
         private void LoadPantheon()
         {
             if (Pantheon is null) Pantheon = new PantheonPage();
-            CurrentPage = Pantheon;
+            SetPage(Pantheon);
         }
 
         private void LoadVulcan()
         {
             if (Vulcan is null) Vulcan = new VulcanPage();
-            CurrentPage = Vulcan;
+            SetPage(Vulcan);
         }
 
         private void LoadTorch()
         {
             if (Torch is null) Torch = new TorchPage();
-            CurrentPage = Torch;
+            SetPage(Torch);
         }
 
         private void LoadKhaos()
         {
             if (Khaos is null) Khaos = new KhaosPage();
-            CurrentPage = Khaos;
+            SetPage(Khaos);
+        }
+
+        private void SetPage(IProject project)
+        {
+            Page page = project as Page;
+            if (CurrentPage is null)
+                CurrentPage = page;
+            else
+                CurrentPage.NavigationService.Navigate(page);
         }
     }
 }

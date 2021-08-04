@@ -23,9 +23,9 @@ namespace Olympus.ViewModel.Components
         {
             List<Department> deps = App.Helios.StaffReader.Departments(PullType.IncludeChildren);
             Departments = deps;
-            AllProjects = App.Helios.StaffReader.Projects();
+            AllProjects = App.Helios.StaffReader.Projects(PullType.FullRecursive);
             if (App.Charon.UserEmployee is null)
-                UserProjects = new List<Project> { };
+                UserProjects = new List<Project>();
             else
                 UserProjects = App.Charon.UserEmployee.Projects;
             ProjectGroups = new ObservableCollection<ProjectGroupVM>
@@ -39,7 +39,7 @@ namespace Olympus.ViewModel.Components
             }
         }
 
-        public ProjectLauncherVM(OlympusVM olympusVM)
+        public ProjectLauncherVM(OlympusVM olympusVM) : this()
         {
             OlympusVM = olympusVM;
         }

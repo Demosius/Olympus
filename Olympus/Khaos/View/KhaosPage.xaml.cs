@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Olympus.Model;
+using Olympus.Uranus.Staff;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,11 +20,13 @@ namespace Olympus.Khaos.View
     /// <summary>
     /// Interaction logic for KhaosPage.xaml
     /// </summary>
-    public partial class KhaosPage : Page
+    public partial class KhaosPage : Page, IProject
     {
         public KhaosPage()
         {
             InitializeComponent();
         }
+
+        public EProject EProject => EProject.Khaos;
     }
 }

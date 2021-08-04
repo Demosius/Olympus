@@ -1,4 +1,5 @@
 ﻿using Olympus.Uranus.Staff.Model;
+using Olympus.ViewModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,6 +11,8 @@ namespace Olympus.ViewModel.Components
 {
     public class ProjectButtonVM : INotifyPropertyChanged
     {
+        public ProjectGroupVM ProjectGroup { get; set; }
+
         private Project project;
         public Project Project 
         {
@@ -20,7 +23,23 @@ namespace Olympus.ViewModel.Components
                 OnPropertyChanged(nameof(Project));
             } 
         }
-        public ProjectButtonVM() { }
+
+        public LaunchProjectCommand LaunchProjectCommand { get; set; }
+
+        public ProjectButtonVM() 
+        {
+            LaunchProjectCommand = new LaunchProjectCommand(this);
+        }
+
+        public ProjectButtonVM(ProjectGroupVM projectGroup) : this()
+        {
+            ProjectGroup = projectGroup;
+        }
+
+        public ProjectButtonVM(ProjectGroupVM projectGroup, Project project) : this(projectGroup)
+        {
+            Project = project;
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

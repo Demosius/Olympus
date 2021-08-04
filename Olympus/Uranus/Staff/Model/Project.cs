@@ -10,27 +10,9 @@ namespace Olympus.Uranus.Staff.Model
 {
     public class Project
     {
-        private string name;
-        private EProject eProject;
         [PrimaryKey]
-        public string Name
-        {
-            get => name;
-            set
-            {
-                name = value;
-                eProject = EnumConverter.StringToProject(name);
-            }
-        }
-        public EProject EProject
-        {
-            get => eProject;
-            set
-            {
-                eProject = value;
-                name = EnumConverter.ProjectToString(eProject);
-            }
-        }
+        public string Name { get; set; }
+        public EProject EProject { get; set; }
         public string ToolTip { get; set; }
         [ForeignKey(typeof(ProjectIcon))]
         public string IconName { get; set; }
@@ -49,6 +31,7 @@ namespace Olympus.Uranus.Staff.Model
         public Project(EProject eProject, string iconFileName, string toolTip = "")
         {
             EProject = eProject;
+            Name = EnumConverter.ProjectToString(eProject);
             Icon = new ProjectIcon(this, iconFileName);
             ToolTip = toolTip;
         }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Olympus.Model;
+using Olympus.Uranus.Staff;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,11 +20,13 @@ namespace Olympus.Torch.View
     /// <summary>
     /// Interaction logic for TorchPage.xaml
     /// </summary>
-    public partial class TorchPage : Page
+    public partial class TorchPage : Page, IProject
     {
         public TorchPage()
         {
             InitializeComponent();
         }
+
+        public EProject EProject => EProject.Torch;
     }
 }

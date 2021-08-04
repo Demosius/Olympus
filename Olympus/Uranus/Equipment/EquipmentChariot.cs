@@ -59,7 +59,7 @@ namespace Olympus.Uranus.Equipment
             // Try first to use the directory based on App.Settings, if not then use local file.
             try
             {
-                BaseDataDirectory = Path.Combine(App.Settings.SolLocation, DatabaseName);
+                BaseDataDirectory = Path.Combine(App.Settings.SolLocation, "Equipment");
                 InitializeDatabaseConnection();
             }
             catch

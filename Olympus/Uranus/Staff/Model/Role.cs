@@ -14,23 +14,12 @@ namespace Olympus.Uranus.Staff.Model
         public string Name { get; set; }
         [ForeignKey(typeof(Department)), NotNull]
         public string DepartmentName { get; set; }
-        [NotNull]
         public int Level { get; set; }
         [ForeignKey(typeof(Role))]
         public string ReportsToRoleName { get; set; }
 
-        //private Department department;
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Department Department { get; set; }
-        //{
-        //    get => department; 
-        //    set
-        //    {
-        //        department = value;
-        //        DepartmentName = value.Name;
-        //        value.Roles.Add(this);
-        //    }
-        //}
         [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Role ReprortsToRole { get; set; }
         [OneToMany(CascadeOperations = CascadeOperation.All)]
@@ -38,11 +27,7 @@ namespace Olympus.Uranus.Staff.Model
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<Role> Reports { get; set; }
 
-        public Role()
-        {
-            //Employees = new List<Employee> { };
-            //Reports = new List<Role> { };
-        }
+        public Role() { }
 
         public bool LookDown(ref int down, ref Role targetRole)
         {

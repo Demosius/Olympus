@@ -14,16 +14,7 @@ namespace Olympus.ViewModel.Components
     {
         public ProjectLauncherVM ProjectLauncher { get; set; }
 
-        private ObservableCollection<Project> projects;
-        public ObservableCollection<Project> Projects
-        {
-            get => projects;
-            set
-            {
-                projects = value;
-                OnPropertyChanged(nameof(Projects));
-            }
-        }
+        public ObservableCollection<ProjectButtonVM> Projects { get; set; }
         private string groupName;
         public string GroupName
         {
@@ -35,11 +26,9 @@ namespace Olympus.ViewModel.Components
             }
         }
 
-        public LaunchProjectCommand LaunchProjectCommand { get; set; }
-
         public ProjectGroupVM()
         {
-            LaunchProjectCommand = new LaunchProjectCommand(this);
+            Projects = new ObservableCollection<ProjectButtonVM>();
         }
 
         public ProjectGroupVM(ProjectLauncherVM projectLauncher) : this()
@@ -49,13 +38,19 @@ namespace Olympus.ViewModel.Components
 
         public ProjectGroupVM(ProjectLauncherVM projectLauncher, List<Project> projects, string groupName) : this(projectLauncher)
         {
-            Projects = new ObservableCollection<Project>(projects);
+            foreach (var project in projects)
+            {
+                Projects.Add(new ProjectButtonVM(this, project));
+            }
             GroupName = groupName;
         }
 
         public ProjectGroupVM(ProjectLauncherVM projectLauncher, Department department) : this(projectLauncher)
         {
-            Projects = new ObservableCollection<Project>(department.Projects);
+            foreach (var project in department.Projects)
+            {
+                Projects.Add(new ProjectButtonVM(this, project));
+            }
             GroupName = department.Name;
         }
 

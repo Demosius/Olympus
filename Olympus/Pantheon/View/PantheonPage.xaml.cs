@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Olympus.Model;
+using Olympus.Uranus.Staff;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,11 +20,13 @@ namespace Olympus.Pantheon.View
     /// <summary>
     /// Interaction logic for PantheonPage.xaml
     /// </summary>
-    public partial class PantheonPage : Page
+    public partial class PantheonPage : Page, IProject
     {
         public PantheonPage()
         {
             InitializeComponent();
         }
+
+        public EProject EProject { get => EProject.Pantheon; }
     }
 }

@@ -83,6 +83,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\IProject.cs" />
     <Compile Include="Styx\ViewModel\Commands\LogInCommand.cs" />
     <Compile Include="Styx\ViewModel\LogInVM.cs" />
     <Compile Include="Uranus\Inventory\Model\Store.cs" />

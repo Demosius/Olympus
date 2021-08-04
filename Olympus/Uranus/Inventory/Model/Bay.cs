@@ -19,6 +19,8 @@ namespace Olympus.Uranus.Inventory.Model
         [ManyToMany(typeof(BayZone), CascadeOperations = CascadeOperation.All)]
         public List<NAVZone> Zones { get; set; }
 
+        // Does not hold bins directly.
+        // Instead uses the bin extension references to get bins.
         private List<NAVBin> bins;
         [Ignore]
         public List<NAVBin> Bins
