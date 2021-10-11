@@ -9,6 +9,7 @@ namespace Olympus.Uranus.Staff
 {
     public enum EProject
     {
+        None,
         Vulcan,
         Prometheus,
         Torch,
@@ -44,7 +45,7 @@ namespace Olympus.Uranus.Staff
 
         public static EProject StringToProject(string project)
         {
-            project = (project ?? "prometheus").ToUpper();
+            project = (project ?? "none").ToUpper();
             if (project == "VULCAN")
                 return EProject.Vulcan;
             if (project == "TORCH")
@@ -53,7 +54,9 @@ namespace Olympus.Uranus.Staff
                 return EProject.Pantheon;
             if (project == "KHAOS")
                 return EProject.Khaos;
-            return EProject.Prometheus;
+            if (project == "PROMETHEUS")
+                return EProject.Prometheus;
+            return EProject.None;
         }
 
     }

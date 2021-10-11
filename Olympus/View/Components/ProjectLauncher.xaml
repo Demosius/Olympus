@@ -8,28 +8,77 @@
              mc:Ignorable="d">
 
     <UserControl.DataContext>
-        <ProjectLauncherVM xmlns="clr-namespace:Olympus.ViewModel.Components"/>
+        <vm:ProjectLauncherVM/>
     </UserControl.DataContext>
 
     <TabControl ItemsSource="{Binding ProjectGroups}" 
                 Padding="0"
-                DisplayMemberPath="GroupName"
                 Margin="5">
-        <TabControl.Resources>
-            <DataTemplate DataType="{x:Type vm:ProjectGroupVM}">
-                <local:ProjectGroup/>
-            </DataTemplate>
-        </TabControl.Resources>
-        <!--<TabControl.ItemTemplate>
+        <TabControl.ItemTemplate>
             <DataTemplate>
-                <TextBlock Text="Frank" />
+                <TextBlock Text="{Binding GroupName}" />
             </DataTemplate>
-        </TabControl.ItemTemplate>-->
+        </TabControl.ItemTemplate>
         <TabControl.ContentTemplate>
             <DataTemplate>
-                <local:ProjectGroup DataContext="{Binding}"/>
+                <ItemsControl ItemsSource="{Binding Projects}" Margin="5">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Style="{DynamicResource ProjectBtnStyle}" 
+                                    ToolTip="{Binding Project.ToolTip}"
+                                    Command="{Binding LaunchProjectCommand}"
+                                    CommandParameter="{Binding Project.Name}">
+                                <StackPanel>
+                                    <Image Source="{Binding Project.Icon.FullPath}" />
+                                    <Label Content="{Binding Project.Name}" />
+                                </StackPanel>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
             </DataTemplate>
         </TabControl.ContentTemplate>
     </TabControl>
 
+    <UserControl.Resources>
+
+        <Style x:Key="ProjectBtnStyle" TargetType="Button">
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Height" Value="Auto"/>
+            <Setter Property="Width" Value="60"/>
+            <Setter Property="Background" Value="{DynamicResource PurpleGradient}" />
+            <Setter Property="Foreground" Value="{DynamicResource ForeGradient}" />
+            <Setter Property="BorderBrush" Value="Black" />
+            <Setter Property="TextBlock.TextAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontWeight" Value="ExtraLight"/>
+            <Setter Property="FontFamily" Value="Arial" />
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Style.Resources>
+                <Style TargetType="Image">
+                    <Setter Property="Stretch" Value="Uniform" />
+                    <Setter Property="Width" Value="35" />
+                    <Setter Property="Height" Value="35" />
+                </Style>
+                <Style TargetType="Label">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="TextBlock.FontSize" Value="14"/>
+                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                    <Setter Property="Foreground" Value="Gray"/>
+                    <Setter Property="Margin" Value="0"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="Padding" Value="0,5,0,5" />
+                    <Setter Property="FontSize" Value="8" />
+                </Style>
+            </Style.Resources>
+        </Style>
+    </UserControl.Resources>
+    
 </UserControl>

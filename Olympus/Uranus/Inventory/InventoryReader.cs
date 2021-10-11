@@ -3,6 +3,7 @@ using SQLiteNetExtensions.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,7 +22,7 @@ namespace Olympus.Uranus.Inventory
         // binID is <locationCode>:<zoneCode>:<binCode>
         public NAVBin NAVBin(string binID, PullType pullType = PullType.ObjectOnly) => Chariot.PullObject<NAVBin>(binID, pullType);
 
-        public List<NAVBin> NAVBins(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVBin>(pullType);
+        public List<NAVBin> NAVBins(Expression<Func<NAVBin, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVBin>(filter, pullType);
 
         public List<NAVBin> NAVBins(string binCode, PullType pullType = PullType.ObjectOnly)
         {
@@ -34,13 +35,13 @@ namespace Olympus.Uranus.Inventory
         /* ITEMS */
         public NAVItem NAVItem(int itemNumber, PullType pullType = PullType.ObjectOnly) => Chariot.PullObject<NAVItem>(itemNumber, pullType);
 
-        public List<NAVItem> NAVItems(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVItem>(pullType);
+        public List<NAVItem> NAVItems(Expression<Func<NAVItem, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVItem>(filter, pullType);
 
         /* ZONES */
         // zoneId = locationCode + zoneCode
         public NAVZone NAVZone(string zoneID, PullType pullType = PullType.ObjectOnly) => Chariot.PullObject<NAVZone>(zoneID, pullType);
 
-        public List<NAVZone> NAVZones(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVZone>(pullType);
+        public List<NAVZone> NAVZones(Expression<Func<NAVZone, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVZone>(filter, pullType);
 
         public List<NAVZone> NAVZones(string zoneCode, PullType pullType = PullType.ObjectOnly)
         {
@@ -68,7 +69,7 @@ namespace Olympus.Uranus.Inventory
 
         public NAVStock NAVStock(string locationCode, string zoneCode, string binCode, int itemNumber, string uomCode, PullType pullType = PullType.ObjectOnly) => NAVStock(string.Join(":", locationCode, zoneCode, binCode, itemNumber, uomCode), pullType);
 
-        public List<NAVStock> NAVAllStock(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVStock>(pullType);
+        public List<NAVStock> NAVAllStock(Expression<Func<NAVStock, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVStock>(filter, pullType);
        
         public List<NAVStock> NAVItemStock(int itemNumber, PullType pullType = PullType.ObjectOnly)
         {
@@ -89,7 +90,7 @@ namespace Olympus.Uranus.Inventory
         /* UOM */
         public NAVUoM NAVUoM(string uomID, PullType pullType = PullType.ObjectOnly) => Chariot.PullObject<NAVUoM>(uomID, pullType);
        
-        public List<NAVUoM> NAVUoMs(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVUoM>(pullType);
+        public List<NAVUoM> NAVUoMs(Expression<Func<NAVUoM, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVUoM>(filter, pullType);
 
         public List<NAVUoM> NAVItemUoMs(int itemNumber, PullType pullType = PullType.ObjectOnly)
         {
@@ -116,27 +117,27 @@ namespace Olympus.Uranus.Inventory
         /* LOCATION */
         public NAVLocation NAVLocation(string locationCode, PullType pullType = PullType.ObjectOnly)  => Chariot.PullObject<NAVLocation>(locationCode, pullType);
 
-        public List<NAVLocation> NAVLocations(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVLocation>(pullType);
+        public List<NAVLocation> NAVLocations(Expression<Func<NAVLocation, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVLocation>(filter, pullType);
 
         /* DIVISION */
         public NAVDivision NAVDivision(int divCode, PullType pullType = PullType.ObjectOnly) => Chariot.PullObject<NAVDivision>(divCode, pullType);
         
-        public List<NAVDivision> NAVDivisions(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVDivision>(pullType);
+        public List<NAVDivision> NAVDivisions(Expression<Func<NAVDivision, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVDivision>(filter, pullType);
 
         /* CATEGORY */
         public NAVCategory NAVCategory(int catCode, PullType pullType = PullType.ObjectOnly) => Chariot.PullObject<NAVCategory>(catCode, pullType);
         
-        public List<NAVCategory> NAVCategorys(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVCategory>(pullType);
+        public List<NAVCategory> NAVCategorys(Expression<Func<NAVCategory, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVCategory>(filter, pullType);
 
         /* Platform */
         public NAVPlatform NAVPlatform(int pfCode, PullType pullType = PullType.ObjectOnly) => Chariot.PullObject<NAVPlatform>(pfCode, pullType);
 
-        public List<NAVPlatform> NAVPlatforms(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVPlatform>(pullType);
+        public List<NAVPlatform> NAVPlatforms(Expression<Func<NAVPlatform, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVPlatform>(filter, pullType);
 
         /* GENRE */
         public NAVGenre NAVGenre(int genCode, PullType pullType = PullType.ObjectOnly) => Chariot.PullObject<NAVGenre>(genCode, pullType);
 
-        public List<NAVGenre> NAVGenres(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVGenre>(pullType);
+        public List<NAVGenre> NAVGenres(Expression<Func<NAVGenre, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<NAVGenre>(filter, pullType);
 
         /* TABLE UPDATES */
         public DateTime LastTableUpdate(Type type)

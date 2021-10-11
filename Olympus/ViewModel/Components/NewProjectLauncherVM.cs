@@ -10,7 +10,7 @@ using System.Collections.ObjectModel;
 
 namespace Olympus.ViewModel.Components
 {
-    public class ProjectLauncherVM : INotifyPropertyChanged
+    public class NewProjectLauncherVM : INotifyPropertyChanged
     {
         public OlympusVM OlympusVM { get; set; }
 
@@ -18,18 +18,9 @@ namespace Olympus.ViewModel.Components
         public List<Project> AllProjects { get; set; }
         public List<Project> UserProjects { get; set; }
 
-        private ObservableCollection<ProjectGroupVM> projectGroups;
-        public ObservableCollection<ProjectGroupVM> ProjectGroups
-        {
-            get => projectGroups;
-            set
-            {
-                projectGroups = value;
-                OnPropertyChanged(nameof(ProjectGroups));
-            }
-        }
+        public ObservableCollection<TabItem> Tabs { get; set; }
 
-        public ProjectLauncherVM()
+        public NewProjectLauncherVM()
         {
             List<Department> deps = App.Helios.StaffReader.Departments(pullType: PullType.IncludeChildren);
             Departments = deps;
@@ -39,23 +30,23 @@ namespace Olympus.ViewModel.Components
             else
                 UserProjects = App.Charon.UserEmployee.Projects;
 
-            ProjectGroupVM projectGroup;
+            Tabs = new ObservableCollection<TabItem>();
 
-            ProjectGroups = new ObservableCollection<ProjectGroupVM>();
-            
-            projectGroup = new ProjectGroupVM(this, AllProjects, "All");
-            ProjectGroups.Add(projectGroup);
-            projectGroup = new ProjectGroupVM(this, UserProjects, "User");
-            ProjectGroups.Add(projectGroup);
+            TabItem tab;
+
+            tab = new TabItem { Header = "All", Projects = AllProjects };
+            Tabs.Add(tab);
+            tab = new TabItem { Header = "User", Projects = UserProjects };
+            Tabs.Add(tab);
 
             foreach (var dep in Departments)
             {
-                projectGroup = new ProjectGroupVM(this, dep);
-                ProjectGroups.Add(projectGroup);
+                tab = new TabItem { Header = dep.Name, Projects = dep.Projects };
+                Tabs.Add(tab);
             }
         }
 
-        public ProjectLauncherVM(OlympusVM olympusVM) : this()
+        public NewProjectLauncherVM(OlympusVM olympusVM) : this()
         {
             OlympusVM = olympusVM;
         }
@@ -66,5 +57,12 @@ namespace Olympus.ViewModel.Components
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+    }
+
+    public class TabItem
+    {
+        public string Header { get; set; }
+        public List<Project> Projects { get; set; }
+
     }
 }

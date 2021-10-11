@@ -3,13 +3,47 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:vm="clr-namespace:Olympus.Prometheus.ViewModel"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="PrometheusPage"
-      HorizontalAlignment="Stretch"
-      VerticalAlignment="Stretch">
+      Title="PrometheusPage">
 
-    <Grid Background="#533">
+    <Page.DataContext>
+        <vm:PrometheusVM/>
+    </Page.DataContext>
+
+    <DockPanel>
+        <ListView Width="150"
+                  DockPanel.Dock="Left"
+                  SelectedValue="{Binding SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  ItemsSource="{Binding Categories}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" FontSize="18"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <ListView DockPanel.Dock="Left"
+                  Width="250"
+                  SelectedValue="{Binding SelectedType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  ItemsSource="{Binding Types}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Frame Background="#977"
+               Content="{Binding CurrentPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"              
+               Height="Auto" 
+               HorizontalAlignment="Stretch" 
+               VerticalAlignment="Stretch"
+               BorderThickness="1" 
+               BorderBrush="SlateGray"
+               NavigationUIVisibility="Hidden"/>
+    </DockPanel>
+
+    <!--<Grid Background="#533">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -138,9 +172,39 @@
             </DataGrid.Resources>
         </DataGrid>
         
-    </Grid>
+    </Grid>-->
 
     <Page.Resources>
+        <!--Listview Styling-->
+        <Style TargetType="ListView">
+            <Setter Property="Background" Value="#500"/>
+            <Setter Property="BorderBrush" Value="SlateGray"/>
+        </Style>
+        <!--Listview Item Styling-->
+        <Style TargetType="ListViewItem">
+            <Setter Property="Background" Value="#500"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="TextBlock.Margin" Value="2" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="BorderBrush" Value="Orange"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="Foreground" Value="Orange"/>
+                </Trigger>
+            </Style.Triggers>
+            <Style.Resources>
+                <Style TargetType="Border">
+                    <Setter Property="CornerRadius" Value="2"/>
+                </Style>
+                <LinearGradientBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" EndPoint="0,1" StartPoint="0,0">
+                    <GradientStop Color="PaleVioletRed" Offset="0"/>
+                    <GradientStop Color="MediumVioletRed" Offset="1"/>
+                </LinearGradientBrush>
+            </Style.Resources>
+        </Style>
+
         <!--Standard Button Styling-->
         <Style x:Key="StandardButton" TargetType="Button">
             <Setter Property="Margin" Value="5"/>
@@ -157,7 +221,7 @@
                 </Style>
             </Style.Resources>
         </Style>
-        
+
         <!--Pagination Button Styling-->
         <Style x:Key="PageButton" TargetType="Button" BasedOn="{StaticResource StandardButton}">
             <Setter Property="Background" Value="{DynamicResource PinkGradient}" />
@@ -235,7 +299,7 @@
             <Setter Property="Width" Value="16" />
             <Setter Property="BorderBrush" Value="Black" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Background" Value="{DynamicResource ResourceKey=BoneGradient}" />            
+            <Setter Property="Background" Value="{DynamicResource ResourceKey=BoneGradient}" />
             <Style.Resources>
                 <Style TargetType="Border">
                     <Setter Property="CornerRadius" Value="5"/>
@@ -246,7 +310,7 @@
                 </LinearGradientBrush>
             </Style.Resources>
         </Style>
-        
+
         <!--DataGridCells-->
         <Style  TargetType="{x:Type DataGridCell}">
             <Style.Triggers>
@@ -264,8 +328,8 @@
                 </LinearGradientBrush>
             </Style.Resources>
         </Style>
-        
-        <!-- TreeView Style -->        
+
+        <!-- TreeView Style -->
         <Style TargetType="{x:Type TreeView}">
             <Setter Property="Background" Value="#500"/>
             <Setter Property="BorderBrush" Value="SlateGray"/>

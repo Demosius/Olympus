@@ -1,13 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SQLite;
-using System.Data;
-using System.Windows;
-using System.Collections;
+﻿using SQLite;
 using SQLiteNetExtensions.Extensions;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Windows;
+
 
 namespace Olympus.Uranus
 {
@@ -91,7 +90,7 @@ namespace Olympus.Uranus
             }
             catch (SQLiteException ex)
             {
-                MessageBox.Show($"Likely a fault with the data being input:\n\n{ex}\n\nCommon issues include newlines in coppied text that shouldn't be there. Check the data, and try again.","Database Error:");
+                MessageBox.Show($"Likely a fault with the data being input:\n\n{ex}\n\nCommon issues include newlines in coppied text that shouldn't be there. Check the data, and try again.", "Database Error:");
                 return false;
             }
             catch (InvalidDataException ex)
@@ -158,14 +157,14 @@ namespace Olympus.Uranus
 
         /**************************** READ Data ****************************/
 
-        public List<T> PullObjectList<T>(PullType pullType = PullType.ObjectOnly) where T : new()
+        public List<T> PullObjectList<T>(Expression<Func<T, bool>> filter = null, PullType pullType = PullType.ObjectOnly) where T : new()
         {
             try
             {
                 if (pullType == PullType.ObjectOnly)
-                    return Database.Table<T>().ToList();
+                    return filter is null ? Database.Table<T>().ToList() : Database.Table<T>().Where(filter).ToList();
                 bool recursive = pullType == PullType.FullRecursive;
-                return Database.GetAllWithChildren<T>(null, recursive);
+                return Database.GetAllWithChildren<T>(filter, recursive);
             }
             catch (Exception ex)
             {

@@ -25,7 +25,7 @@ namespace Olympus.Uranus.Users
 
         public Role Role(string roleName) => Chariot.PullObject<Role>(roleName, PullType.FullRecursive);
 
-        public int UserCount() => Chariot.PullObjectList<User>(PullType.ObjectOnly).Count; //Chariot.Database.Execute("SELECT count(*) FROM User;");
+        public int UserCount() => Chariot.PullObjectList<User>(pullType: PullType.ObjectOnly).Count; //Chariot.Database.Execute("SELECT count(*) FROM User;");
 
     }
 }

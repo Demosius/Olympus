@@ -42,5 +42,19 @@ namespace Olympus.Uranus.Inventory.Model
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVItem Item { get; set; }
 
+        public int GetBaseQty()
+        {
+            return Qty * (UoM ?? new NAVUoM(EUoM.EACH)).QtyPerUoM;
+        }
+
+        public EUoM GetEUoM()
+        {
+            return (EUoM)Enum.Parse(typeof(EUoM), !Enum.GetNames(typeof(EUoM)).Contains(UoMCode) ? "EACH" : UoMCode); // EnumConverter.StringToUoM(UoMCode);
+        }
+
+        public double GetWeight()
+        {
+            return Qty * (UoM?.Weight ?? 0);
+        }
     }
 }

@@ -11,7 +11,16 @@ namespace Olympus.ViewModel.Components
 {
     public class ProjectButtonVM : INotifyPropertyChanged
     {
-        public ProjectGroupVM ProjectGroup { get; set; }
+        private ProjectGroupVM projectGroup;
+        public ProjectGroupVM ProjectGroup 
+        {
+            get => projectGroup;
+            set
+            {
+                projectGroup = value;
+                OnPropertyChanged(nameof(ProjectGroup));
+            }
+        }
 
         private Project project;
         public Project Project 

@@ -45,7 +45,7 @@ namespace Olympus.Uranus.Users
         {
             if (!App.Charon.CanDeleteUserRole()) return false;
             // Can't delete roles that have users attached.
-            List<User> users = Chariot.PullObjectList<User>(PullType.ObjectOnly).Where(u => u.RoleName == role.Name).ToList();
+            List<User> users = Chariot.PullObjectList<User>(pullType: PullType.ObjectOnly).Where(u => u.RoleName == role.Name).ToList();
             if (users.Count > 0)
                 return false;
             return Chariot.Delete(role);
@@ -55,7 +55,7 @@ namespace Olympus.Uranus.Users
         {
             if (!App.Charon.CanDeleteUserRole()) return false;
             // Can't delete roles that have users attached.
-            List<User> users = Chariot.PullObjectList<User>(PullType.ObjectOnly).Where(u => u.RoleName == roleName).ToList();
+            List<User> users = Chariot.PullObjectList<User>(pullType: PullType.ObjectOnly).Where(u => u.RoleName == roleName).ToList();
             if (users.Count > 0)
                 return false;
             return Chariot.DeleteByKey<Role>(roleName);

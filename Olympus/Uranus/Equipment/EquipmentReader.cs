@@ -21,7 +21,7 @@ namespace Olympus.Uranus.Equipment
         public List<Machine> Machines()
         {
             List<Machine> machines = new List<Machine> { };
-            foreach (var machine in Chariot.PullObjectList<Machine>(PullType.FullRecursive))
+            foreach (var machine in Chariot.PullObjectList<Machine>(pullType: PullType.FullRecursive))
             {
                 switch (machine.Type.LicenceRequired)
                 {

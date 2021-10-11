@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,9 +34,9 @@ namespace Olympus.Uranus.Staff
         public int EmployeeCount() => Chariot.Database.Execute("SELECT count(*) FROM Employee;");
 
         /* DEPARTMENTS */
-        public List<Department> Departments(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<Department>(pullType);
+        public List<Department> Departments(Expression<Func<Department, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<Department>(filter, pullType);
 
         /* PROJECTS */
-        public List<Project> Projects(PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<Project>(pullType);
+        public List<Project> Projects(Expression<Func<Project, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<Project>(filter, pullType);
     }
 }

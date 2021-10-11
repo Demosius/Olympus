@@ -56,8 +56,6 @@ namespace Olympus.Uranus.Inventory.Model
         [Ignore]
         public NAVUoM Each { get; set; }
 
-        public NAVItem() { }
-
         // Sets the specific uoms, so we don't need to pull from an "unorderred" list all the time.
         public void SetUoMs()
         {

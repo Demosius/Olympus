@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace Olympus.View.Components
 {
     /// <summary>
-    /// Interaction logic for ProjectLauncher.xaml
+    /// Interaction logic for OldProjectSelection.xaml
     /// </summary>
-    public partial class ProjectLauncher : UserControl
+    public partial class OldProjectLauncher : UserControl
     {
-        public ProjectLauncher()
+        public OldProjectLauncher()
         {
             InitializeComponent();
         }
