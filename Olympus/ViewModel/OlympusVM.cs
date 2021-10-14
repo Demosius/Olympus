@@ -22,6 +22,7 @@ using SQLite;
 using Olympus.Uranus.Inventory;
 using System.Diagnostics;
 using System.Windows;
+using System.Data;
 
 namespace Olympus.ViewModel
 {
@@ -139,88 +140,58 @@ namespace Olympus.ViewModel
                 CurrentPage.NavigationService.Navigate(page);
         }
 
-        public void GenerateMasterSkuList(bool useRecursion)
+        public List<SKUMaster> GetMasters()
         {
-            Stopwatch tim = new Stopwatch();
-
-            tim.Start();
-            List<NAVItem> navItems = App.Helios.InventoryReader.NAVItems();
-            Console.WriteLine($"Get Base Items: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            Dictionary<int, List<NAVStock>> stock = App.Helios.InventoryReader.NAVAllStock()
+            // Set tasks to pull data from db.
+            Task<List<NAVItem>> getItemsTask = Task.Run(() => App.Helios.InventoryReader.NAVItems());
+            Task<Dictionary<int, List<NAVStock>>> getStockTask = Task.Run(() => App.Helios.InventoryReader.NAVAllStock()
                                                         .GroupBy(s => s.ItemNumber)
-                                                        .ToDictionary(g => g.Key, g => g.ToList());
-            Console.WriteLine($"Get Base Stock: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            Dictionary<int, Dictionary<string, NAVUoM>> uoms = App.Helios.InventoryReader.NAVUoMs()
+                                                        .ToDictionary(g => g.Key, g => g.ToList()));
+            Task<Dictionary<int, Dictionary<string, NAVUoM>>> getUoMTask = Task.Run(() => App.Helios.InventoryReader.NAVUoMs()
                                                                 .GroupBy(u => u.ItemNumber)
-                                                                .ToDictionary(g => g.Key, g => g.ToDictionary(u => u.Code, u => u));
-            Console.WriteLine($"Get Base UoMs: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            Dictionary<string, NAVBin> bins = App.Helios.InventoryReader.NAVBins().ToDictionary(b => b.ID, b => b);
-            Console.WriteLine($"Get Base Bins: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            Dictionary<int, string> divisions = App.Helios.InventoryReader.NAVDivisions().ToDictionary(d => d.Code, d => d.Description);
-            Dictionary<int, string> categories = App.Helios.InventoryReader.NAVCategorys().ToDictionary(c => c.Code, c => c.Description);
-            Dictionary<int, string> platforms = App.Helios.InventoryReader.NAVPlatforms().ToDictionary(p => p.Code, p => p.Description);
-            Dictionary<int, string> genres = App.Helios.InventoryReader.NAVGenres().ToDictionary(g => g.Code, g => g.Description);
-            Console.WriteLine($"Get Div/Cat/PF/Gens: {tim.ElapsedMilliseconds} ms"); tim.Restart();
+                                                                .ToDictionary(g => g.Key, g => g.ToDictionary(u => u.Code, u => u)));
+            Task<Dictionary<string, NAVBin>> getBinsTask = Task.Run(() => App.Helios.InventoryReader.NAVBins().ToDictionary(b => b.ID, b => b));
+            Task<Dictionary<int, string>> getDivsTask = Task.Run(() => App.Helios.InventoryReader.NAVDivisions().ToDictionary(d => d.Code, d => d.Description));
+            Task<Dictionary<int, string>> getCatsTask = Task.Run(() => App.Helios.InventoryReader.NAVCategorys().ToDictionary(c => c.Code, c => c.Description));
+            Task<Dictionary<int, string>> getPFsTask = Task.Run(() => App.Helios.InventoryReader.NAVPlatforms().ToDictionary(p => p.Code, p => p.Description));
+            Task<Dictionary<int, string>> getGensTask = Task.Run(() => App.Helios.InventoryReader.NAVGenres().ToDictionary(g => g.Code, g => g.Description));
+            // Wait for tasks to complete.
+            Task.WaitAll(getBinsTask, getCatsTask, getDivsTask, getGensTask, getItemsTask, getPFsTask, getStockTask, getUoMTask);
+            // Assign results to data lists/dicts.
+            List<NAVItem> navItems = getItemsTask.Result;
+            Dictionary<int, List<NAVStock>> stock = getStockTask.Result;
+            Dictionary<int, Dictionary<string, NAVUoM>> uoms = getUoMTask.Result;
+            Dictionary<string, NAVBin> bins = getBinsTask.Result;
+            Dictionary<int, string> divisions = getDivsTask.Result;
+            Dictionary<int, string> categories = getCatsTask.Result;
+            Dictionary<int, string> platforms = getPFsTask.Result;
+            Dictionary<int, string> genres = getGensTask.Result;
+            // Generate Sku Master List
             List<SKUMaster> masters = new List<SKUMaster>();
             foreach (var item in navItems)
             {
                 masters.Add(new SKUMaster(item, stock, uoms, bins, divisions, categories, platforms, genres));
             }
-            Console.WriteLine($"Set Master Skus: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            // Make sure the target destination is valid.
-            string dirPath = Path.Combine(App.BaseDirectory(), "SKUMasterExports");
-            Directory.CreateDirectory(dirPath);
-            Console.WriteLine($"Establish Dir: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            ExportMasterSkusAsCSV(masters, dirPath);
-            Console.WriteLine($"Generate CSV: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            ExportMasterSkusAsJSON(masters, dirPath);
-            Console.WriteLine($"Generate JSON: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            //ExportMasterSkusAsXML(masters, dirPath);
-            Console.WriteLine($"Generate XML: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            ExportMasterSkusIntoSQLite(masters, dirPath);
-            Console.WriteLine($"Generate SQLite: {tim.ElapsedMilliseconds} ms"); tim.Stop();
-
-            MessageBox.Show("Files exported.");
+            return masters;
         }
 
         public void GenerateMasterSkuList()
         {
-            Stopwatch tim = new Stopwatch();
+            List<SKUMaster> masters = GetMasters();
 
-            tim.Start();
-            Console.WriteLine("GETTING ITEMS (Object Only)");
-            List<NAVItem> navItems = App.Helios.InventoryReader.NAVItems(null, Uranus.PullType.ObjectOnly).ToList();
-            Console.WriteLine($"Get Items: {tim.ElapsedMilliseconds} ms - {navItems.Count} items"); tim.Restart();
-            Console.WriteLine("GETTING ITEMS (Include Children)");
-            navItems = App.Helios.InventoryReader.NAVItems(null, Uranus.PullType.IncludeChildren).ToList();
-            Console.WriteLine($"Get Items: {tim.ElapsedMilliseconds} ms - {navItems.Count} items"); tim.Restart();
-            return;
-            Console.WriteLine("GETTING ITEMS (Full Recursive) WHERE CATAGORYCODE == 999");
-            navItems = App.Helios.InventoryReader.NAVItems(i => i.CategoryCode == 999, Uranus.PullType.FullRecursive).ToList();
-            Console.WriteLine($"Get Items: {tim.ElapsedMilliseconds} ms - {navItems.Count} items"); tim.Restart();
-            List<SKUMaster> masters = new List<SKUMaster>();
-            foreach (var item in navItems)
-            {
-                masters.Add(new SKUMaster(item));
-                if (masters.Count % 1000 == 0)
-                    Console.WriteLine(masters.Count);
-            }
-            Console.WriteLine($"Get Master SKU: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            // Make sure the target destination is valid.
+            // Make sure the target destination exists.
             string dirPath = Path.Combine(App.BaseDirectory(), "SKUMasterExports");
-            Directory.CreateDirectory(dirPath);
-            Console.WriteLine($"Generate Dir: {tim.ElapsedMilliseconds} ms"); tim.Restart();
 
-            ExportMasterSkusAsCSV(masters, dirPath);
-            Console.WriteLine($"Generate CSV: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            ExportMasterSkusAsJSON(masters, dirPath);
-            Console.WriteLine($"Generate JSON: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            //ExportMasterSkusAsXML(masters, dirPath);
-            Console.WriteLine($"Generate XML: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            ExportMasterSkusIntoSQLite(masters, dirPath);
-            Console.WriteLine($"Generate SQLite: {tim.ElapsedMilliseconds} ms"); tim.Restart();
-            Console.WriteLine(masters.Count());
-            Console.WriteLine($"END: {tim.ElapsedMilliseconds} ms"); tim.Stop();
+            Task csvTask = Task.Run(() => ExportMasterSkusAsCSV(masters, dirPath));
+            Task jsonTask = Task.Run(() => ExportMasterSkusAsJSON(masters, dirPath));
+            Task xmlTask = Task.Run(() => ExportMasterSkusAsXML(masters, dirPath));
+            Task sqlTask = Task.Run(() => ExportMasterSkusIntoSQLite(masters, dirPath));
+
+            csvTask.Wait();
+            jsonTask.Wait();
+            xmlTask.Wait();
+            sqlTask.Wait();
+            MessageBox.Show("Files exported.");
         }
 
         public void ExportMasterSkusAsCSV(List<SKUMaster> masters, string dirPath)

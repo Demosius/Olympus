@@ -19,18 +19,18 @@ namespace Olympus.ViewModel.Components
         // Last update times.
         private DateTime stockUpdateTime;
         public string StockUpdateString { get => stockUpdateTime.ToString("dd/MM/yyyy HH:mm"); }
-        public DateTime StockUpdateTime 
+        public DateTime StockUpdateTime
         {
-            get => stockUpdateTime; 
+            get => stockUpdateTime;
             set
             {
                 stockUpdateTime = value;
                 OnPropertyChanged(nameof(StockUpdateString));
-            } 
+            }
         }
         private DateTime binsUpdateTime;
         public string BinsUpdateString { get => binsUpdateTime.ToString("dd/MM/yyyy HH:mm"); }
-        public DateTime BinsUpdateTime 
+        public DateTime BinsUpdateTime
         {
             get => binsUpdateTime;
             set
@@ -41,8 +41,8 @@ namespace Olympus.ViewModel.Components
         }
         private DateTime uomUpdateTime;
         public string UoMUpdateString { get => uomUpdateTime.ToString("dd/MM/yyyy HH:mm"); }
-        public DateTime UoMUpdateTime 
-        { 
+        public DateTime UoMUpdateTime
+        {
             get => uomUpdateTime;
             set
             {
@@ -102,33 +102,45 @@ namespace Olympus.ViewModel.Components
 
         public void UpdateStock()
         {
-            if (App.Helios.InventoryUpdater.NAVStock(DataConversion.NAVClipToStock()))
-                GetUpdateTimes();
+            Task.Run(() =>
+            {
+                if (App.Helios.InventoryUpdater.NAVStock(DataConversion.NAVClipToStock()))
+                    GetUpdateTimes();
+            });
         }
 
         public void UpdateBins()
         {
-            if (App.Helios.InventoryUpdater.NAVBins(DataConversion.NAVClipToBins()))
-                GetUpdateTimes();
+            Task.Run(() =>
+            {
+                if (App.Helios.InventoryUpdater.NAVBins(DataConversion.NAVClipToBins()))
+                    GetUpdateTimes();
+            });
         }
 
         public void UpdateUoM()
         {
-            if (App.Helios.InventoryUpdater.NAVUoMs(DataConversion.NAVClipToUoMs()))
-                GetUpdateTimes();
+            Task.Run(() =>
+            {
+                if (App.Helios.InventoryUpdater.NAVUoMs(DataConversion.NAVClipToUoMs()))
+                    GetUpdateTimes();
+            });
         }
 
         public void UpdateItems()
         {
-            if (App.Helios.InventoryCreator.NAVItems(DataConversion.NAVCSVToItems(), App.Settings.LastItemWriteTime()))
-                GetUpdateTimes();
+            Task.Run(() =>
+            {
+                if (App.Helios.InventoryCreator.NAVItems(DataConversion.NAVCSVToItems(), App.Settings.LastItemWriteTime()))
+                    GetUpdateTimes();
+            });
         }
 
         public void ShowInfo()
         {
             MessageBox.Show($"Click on the large buttons to update the designated data.\n\n" +
                             $"Stock (Bin Contents), Bins (Bin List), and UoM (Item Units of Measure) require data coppied from NAV.\n\n" +
-                            $"Item List takes data from an external workbool (Pricebook Report) and requires nothing other than pressing the button.\n\n" +
+                            $"Item List takes data from an external workbook (Pricebook Report) and requires nothing other than pressing the button.\n\n" +
                             $"Click on the small [xx Col] buttons to be shown the required columns (and where to get the data) for the specific data type.\n\n",
                             $"Data Upload Help",
                             MessageBoxButton.OK,

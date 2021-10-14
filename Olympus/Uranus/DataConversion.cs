@@ -11,6 +11,7 @@ using System.Data.OleDb;
 using System.Globalization;
 using Olympus.Uranus.Inventory;
 using Olympus.Uranus.Inventory.Model;
+using System.Diagnostics;
 
 namespace Olympus.Uranus
 {
@@ -19,7 +20,7 @@ namespace Olympus.Uranus
         // Gets raw string data from the clipboard.
         public static string ClipboardToString()
         {
-            string rawData="";
+            string rawData = "";
             Thread thread = new Thread(delegate ()
             {
                 rawData = Clipboard.GetText(TextDataFormat.Text);
@@ -801,11 +802,11 @@ namespace Olympus.Uranus
                         if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int iNum)) iNum = 0;
                         if (!int.TryParse(row[headDict["Qty. per Unit of Measure"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int qtyPU)) qtyPU = 0;
                         if (!int.TryParse(row[headDict["Max Qty"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int max)) max = 0;
-                        if (!double.TryParse(row[headDict["Length (CM)"]], NumberStyles.AllowDecimalPoint| NumberStyles.AllowThousands, provider, out double length)) length = 0;
-                        if (!double.TryParse(row[headDict["Width (CM)"]], NumberStyles.AllowDecimalPoint| NumberStyles.AllowThousands, provider, out double width)) width = 0;
-                        if (!double.TryParse(row[headDict["Height (CM)"]], NumberStyles.AllowDecimalPoint| NumberStyles.AllowThousands, provider, out double height)) height = 0;
-                        if (!double.TryParse(row[headDict["CM Cubage"]], NumberStyles.AllowDecimalPoint| NumberStyles.AllowThousands, provider, out double cube)) cube = 0;
-                        if (!double.TryParse(row[headDict["Weight (Kg)"]], NumberStyles.AllowDecimalPoint| NumberStyles.AllowThousands, provider, out double weight)) weight = 0;
+                        if (!double.TryParse(row[headDict["Length (CM)"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double length)) length = 0;
+                        if (!double.TryParse(row[headDict["Width (CM)"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double width)) width = 0;
+                        if (!double.TryParse(row[headDict["Height (CM)"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double height)) height = 0;
+                        if (!double.TryParse(row[headDict["CM Cubage"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double cube)) cube = 0;
+                        if (!double.TryParse(row[headDict["Weight (Kg)"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double weight)) weight = 0;
 
                         uom = new NAVUoM
                         {
@@ -835,11 +836,12 @@ namespace Olympus.Uranus
             List<NAVStock> stockList = new List<NAVStock> { };
 
             Dictionary<string, int> headDict = Constants.NAV_STOCK_COLUMNS;
-            
+
             try
             {
                 // Get raw data from clipboard and check that it has data.
                 string rawData = ClipboardToString();
+
                 if (rawData == "" || rawData == null) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
                 // Start memory stream from which to read.
                 byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
@@ -905,7 +907,7 @@ namespace Olympus.Uranus
 
                         stock = new NAVStock
                         {
-                            ID = string.Join(":",binID, uomID),
+                            ID = string.Join(":", binID, uomID),
                             BinID = binID,
                             ZoneID = zoneID,
                             UoMID = uomID,
@@ -939,18 +941,18 @@ namespace Olympus.Uranus
         {
             string rawData = ClipboardToString();
 
-            string[] outerArray = rawData.Split(new [] { "\r\n" }, StringSplitOptions.None);
+            string[] outerArray = rawData.Split(new[] { "\r\n" }, StringSplitOptions.None);
             int maxCol = outerArray[0].Split('\t').Length;
             int maxRow = outerArray.Length;
             string[,] fullArray = new string[maxRow, maxCol];
             string[] innerArray;
 
-            for (int row=0; row < outerArray.Length; ++row)
+            for (int row = 0; row < outerArray.Length; ++row)
             {
                 innerArray = outerArray[row].Split('\t');
-                for (int col=0; col < innerArray.Length && col < maxCol; ++col)
+                for (int col = 0; col < innerArray.Length && col < maxCol; ++col)
                 {
-                    fullArray[row,col] = innerArray[col];
+                    fullArray[row, col] = innerArray[col];
                 }
             }
 
@@ -967,7 +969,7 @@ namespace Olympus.Uranus
             colMax = array.GetLength(1);
             // Set headers.
             string[] headers = new string[colMax];
-            for (col = 0; col<colMax; ++col)
+            for (col = 0; col < colMax; ++col)
             {
                 headers[col] = array[0, col];
             }
@@ -975,11 +977,11 @@ namespace Olympus.Uranus
             string head, val;
 
             // Set contents
-            for (row=1; row<rowMax; ++row)
+            for (row = 1; row < rowMax; ++row)
             {
                 line = "{\n\t\t";
 
-                for (col=0; col<colMax; ++col)
+                for (col = 0; col < colMax; ++col)
                 {
                     head = headers[col] + ": ";
                     val = array[row, col];
@@ -987,7 +989,7 @@ namespace Olympus.Uranus
                 }
 
                 line += (row == rowMax - 1) ? "}\n" : "},\n\t";
-                
+
                 returnString += line;
             }
 
