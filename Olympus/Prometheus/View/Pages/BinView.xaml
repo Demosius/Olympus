@@ -4,15 +4,21 @@
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                   xmlns:base="clr-namespace:Olympus.Prometheus.View"
+                  xmlns:vm="clr-namespace:Olympus.Prometheus.ViewModel.Pages"
                   xmlns:local="clr-namespace:Olympus.Prometheus.View.Pages"
                   mc:Ignorable="d" 
                   d:DesignHeight="450" d:DesignWidth="800"
                   Title="BinView">
 
+    <Page.DataContext>
+        <vm:BinVM x:Name="VM"/>
+    </Page.DataContext>
+    
     <DockPanel>
         <ToolBar DockPanel.Dock="Top">
             <TextBox Width="250" 
-                     HorizontalAlignment="Right"/>
+                     HorizontalAlignment="Right"
+                     Text="{Binding BinFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </ToolBar>
         <Grid DockPanel.Dock="Bottom" 
               Background="#222"
@@ -32,9 +38,19 @@
             <Button Grid.Column="3"
                     Content="DELETE"/>
         </Grid>
-        <ListView>
-            
-        </ListView>
+        <DataGrid ItemsSource="{Binding DisplayBins}"
+                  SelectedItem="{Binding SelectedBin}"
+                  IsReadOnly="True" Margin="0,-1,0,1"
+                  AutoGenerateColumns="True"
+                  AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"/>
+        <!--<ListView ItemsSource="{Binding Bins}"
+                  SelectedValue="{Binding SelectedBin}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>-->
     </DockPanel>
 
     <Page.Resources>

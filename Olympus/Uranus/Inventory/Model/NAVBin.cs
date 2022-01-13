@@ -41,13 +41,21 @@ namespace Olympus.Uranus.Inventory.Model
         [Ignore]
         public Bay Bay
         {
-            get => Extension.Bay; 
+            get => Extension?.Bay; 
             set { Extension.Bay = value; }
         }
         [Ignore]
-        public EAccessLevel AccessLevel { get => Zone.AccessLevel; }
+        public EAccessLevel? AccessLevel { get => Zone?.AccessLevel; }
         
         public NAVBin() { }
+
+        /// <summary>
+        /// Given the current Code, Zone, and Location, adjusts the current ID accordingly.
+        /// </summary>
+        public void SetID()
+        {
+            ID = $"{LocationCode}:{ZoneCode}:{Code}";
+        }
 
         // Merges matching items in Stock (NOT NAVStock)
         public void MergeStock()
@@ -99,6 +107,11 @@ namespace Olympus.Uranus.Inventory.Model
             return (theStock.Cases.Qty == move.TakeCases &&
                     theStock.Packs.Qty == move.TakePacks &&
                     theStock.Eaches.Qty == move.TakeEaches);
+        }
+
+        public override string ToString()
+        {
+            return $"{Code} - {ZoneCode} - {UsedCube}m³/{MaxCube}m³"; 
         }
     }
 }

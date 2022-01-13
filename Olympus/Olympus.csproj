@@ -16,6 +16,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,10 +27,10 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationRevision>1</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -55,6 +56,18 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Resources\Images\Icons\burn.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>F0275408DC623CAD9095BD0B174D733B6141E8F1</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>Olympus_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -90,11 +103,15 @@
     <Compile Include="Prometheus\Model\DataType.cs" />
     <Compile Include="Prometheus\ViewModel\Helpers\EnumConverter.cs" />
     <Compile Include="Prometheus\ViewModel\Pages\BatchVM.cs" />
+    <Compile Include="Prometheus\ViewModel\Pages\BinEditVM.cs" />
     <Compile Include="Prometheus\ViewModel\Pages\BinVM.cs" />
     <Compile Include="Prometheus\ViewModel\PrometheusVM.cs" />
     <Compile Include="Prometheus\View\BREADBase.cs" />
     <Compile Include="Prometheus\View\Pages\BatchView.xaml.cs">
       <DependentUpon>BatchView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Prometheus\View\Pages\BinEditView.xaml.cs">
+      <DependentUpon>BinEditView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Prometheus\View\Pages\BinView.xaml.cs">
       <DependentUpon>BinView.xaml</DependentUpon>
@@ -242,6 +259,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Prometheus\View\Pages\BinEditView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Prometheus\View\Pages\BinView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -364,6 +385,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="App.config" />
+    <None Include="Olympus_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

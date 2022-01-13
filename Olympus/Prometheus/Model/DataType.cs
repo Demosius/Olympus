@@ -23,7 +23,7 @@ namespace Olympus.Prometheus.Model
         public DataType(DataCategory category, EDataType type) : this(category)
         {
             Type = type;
-            Name = EnumConverter.DataTypeToString(type);
+            Name = type.ToString();
         }
     }
 }

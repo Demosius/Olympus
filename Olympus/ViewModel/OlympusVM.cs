@@ -186,11 +186,8 @@ namespace Olympus.ViewModel
             Task jsonTask = Task.Run(() => ExportMasterSkusAsJSON(masters, dirPath));
             Task xmlTask = Task.Run(() => ExportMasterSkusAsXML(masters, dirPath));
             Task sqlTask = Task.Run(() => ExportMasterSkusIntoSQLite(masters, dirPath));
+            Task.WaitAll(csvTask, jsonTask, xmlTask, sqlTask);
 
-            csvTask.Wait();
-            jsonTask.Wait();
-            xmlTask.Wait();
-            sqlTask.Wait();
             MessageBox.Show("Files exported.");
         }
 

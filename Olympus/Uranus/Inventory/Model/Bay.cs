@@ -10,9 +10,6 @@ namespace Olympus.Uranus.Inventory.Model
         [PrimaryKey]
         public string ID { get; set; } // Bay name. Called ID for consitency.
 
-        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public NAVZone Zone { get; set; }
-
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<BinExtension> BinBays { get; set; }
 
