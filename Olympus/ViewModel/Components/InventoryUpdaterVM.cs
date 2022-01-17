@@ -1,6 +1,7 @@
-﻿using Olympus.Uranus;
-using Olympus.Uranus.Inventory;
-using Olympus.Uranus.Inventory.Model;
+﻿using Olympus.Properties;
+using Uranus;
+using Uranus.Inventory;
+using Uranus.Inventory.Model;
 using Olympus.ViewModel.Commands;
 using System;
 using System.Collections.Generic;
@@ -102,43 +103,44 @@ namespace Olympus.ViewModel.Components
 
         public void UpdateStock()
         {
-            Task.Run(() =>
-            {
-                if (App.Helios.InventoryUpdater.NAVStock(DataConversion.NAVClipToStock()))
-                    GetUpdateTimes();
-            });
+            _ = Task.Run(() =>
+              {
+                  if (App.Helios.InventoryUpdater.NAVStock(DataConversion.NAVRawStringToStock(General.ClipboardToString())))
+                      GetUpdateTimes();
+              });
         }
 
         public void UpdateBins()
         {
-            Task.Run(() =>
-            {
-                if (App.Helios.InventoryUpdater.NAVBins(DataConversion.NAVClipToBins()))
-                    GetUpdateTimes();
-            });
+            _ = Task.Run(() =>
+              {
+                  if (App.Helios.InventoryUpdater.NAVBins(DataConversion.NAVRawStringToBins(General.ClipboardToString())))
+                      GetUpdateTimes();
+              });
         }
 
         public void UpdateUoM()
         {
-            Task.Run(() =>
-            {
-                if (App.Helios.InventoryUpdater.NAVUoMs(DataConversion.NAVClipToUoMs()))
-                    GetUpdateTimes();
-            });
+            _ = Task.Run(() =>
+              {
+                  if (App.Helios.InventoryUpdater.NAVUoMs(DataConversion.NAVRawStringToUoMs(General.ClipboardToString())))
+                      GetUpdateTimes();
+              });
         }
 
         public void UpdateItems()
         {
-            Task.Run(() =>
-            {
-                if (App.Helios.InventoryCreator.NAVItems(DataConversion.NAVCSVToItems(), App.Settings.LastItemWriteTime()))
-                    GetUpdateTimes();
-            });
+            _ = Task.Run(() =>
+              {
+                  if (App.Helios.InventoryCreator.NAVItems(DataConversion.NAVCSVToItems(Settings.Default.ItemCSVLocation), 
+                      InventoryReader.LastItemWriteTime(Settings.Default.ItemCSVLocation)))
+                      GetUpdateTimes();
+              });
         }
 
-        public void ShowInfo()
+        public static void ShowInfo()
         {
-            MessageBox.Show($"Click on the large buttons to update the designated data.\n\n" +
+            _ = MessageBox.Show($"Click on the large buttons to update the designated data.\n\n" +
                             $"Stock (Bin Contents), Bins (Bin List), and UoM (Item Units of Measure) require data coppied from NAV.\n\n" +
                             $"Item List takes data from an external workbook (Pricebook Report) and requires nothing other than pressing the button.\n\n" +
                             $"Click on the small [xx Col] buttons to be shown the required columns (and where to get the data) for the specific data type.\n\n",
@@ -147,9 +149,9 @@ namespace Olympus.ViewModel.Components
                             MessageBoxImage.Information);
         }
 
-        public void BCInfo()
+        public static void BCInfo()
         {
-            MessageBox.Show($"Find the Data:\n" +
+            _ = MessageBox.Show($"Find the Data:\n" +
                             $"[NAV > Warehouse > Planning & Execution > Bin Contents]\n\n" +
                             $"Required Columns:\n\n" +
                             $"{String.Join("\n", Constants.NAV_STOCK_COLUMNS.Keys)}\n\n" +
@@ -160,9 +162,9 @@ namespace Olympus.ViewModel.Components
                             MessageBoxImage.Information);
         }
 
-        public void BLInfo()
+        public static void BLInfo()
         {
-            MessageBox.Show($"Find the Data:\n" +
+            _ = MessageBox.Show($"Find the Data:\n" +
                             $"[NAV > Warehouse > Planning & Execution > Bin Contents >> Bin Code]\n\n" +
                             $"Required Columns:\n\n" +
                             $"{String.Join("\n", Constants.NAV_BIN_COLUMNS.Keys)}\n\n" +
@@ -173,9 +175,9 @@ namespace Olympus.ViewModel.Components
                             MessageBoxImage.Information);
         }
 
-        public void UoMInfo()
+        public static void UoMInfo()
         {
-            MessageBox.Show($"Find the Data:\n" +
+            _ = MessageBox.Show($"Find the Data:\n" +
                             $"[NAV > Warehouse > Planning & Execution > Bin Contents >> Unit of Measure Code]\n\n" +
                             $"Required Columns:\n\n" +
                             $"{String.Join("\n", Constants.NAV_UOM_COLUMNS.Keys)}\n\n" +

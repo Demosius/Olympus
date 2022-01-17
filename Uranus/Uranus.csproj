@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Equipment\viewmodel\**" />
+    <Compile Remove="Inventory\viewmodel\**" />
+    <Compile Remove="Staff\viewmodel\**" />
+    <Compile Remove="Users\viewmodel\**" />
+    <EmbeddedResource Remove="Equipment\viewmodel\**" />
+    <EmbeddedResource Remove="Inventory\viewmodel\**" />
+    <EmbeddedResource Remove="Staff\viewmodel\**" />
+    <EmbeddedResource Remove="Users\viewmodel\**" />
+    <None Remove="Equipment\viewmodel\**" />
+    <None Remove="Inventory\viewmodel\**" />
+    <None Remove="Staff\viewmodel\**" />
+    <None Remove="Users\viewmodel\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+    <PackageReference Include="SQLiteNetExtensions" Version="2.1.0" />
+  </ItemGroup>
+
+</Project>

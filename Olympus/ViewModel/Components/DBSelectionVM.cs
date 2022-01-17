@@ -1,4 +1,5 @@
-﻿using Olympus.ViewModel.Commands;
+﻿using Olympus.Properties;
+using Olympus.ViewModel.Commands;
 using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,7 @@ namespace Olympus.ViewModel.Components
             ChangeDatabaseCommand = new ChangeDatabaseCommand(this);
             MoveDatabaseCommand = new MoveDatabaseCommand(this);
             CopyDatabaseCommand = new CopyDatabaseCommand(this);
-            DBString = App.Settings.SolLocation;
+            DBString = Settings.Default.SolLocation;
         }
 
         public DBSelectionVM(OlympusVM olympusVM) : this()
@@ -53,16 +54,16 @@ namespace Olympus.ViewModel.Components
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private string SelectFolder()
+        private static string SelectFolder()
         {
-            VistaFolderBrowserDialog folderBrowserDialog = new VistaFolderBrowserDialog();
-            folderBrowserDialog.ShowDialog();
+            VistaFolderBrowserDialog folderBrowserDialog = new();
+            _ = folderBrowserDialog.ShowDialog();
             return SetSol(folderBrowserDialog.SelectedPath);
         }
 
         // Given a chosen path, makes sure that either it ends in Sol,
         // or adds a Sol folder in the location and returns that.
-        private string SetSol(string path)
+        private static string SetSol(string path)
         {
             // Empty string means cancelation.
             if (path == "") return "";
@@ -76,7 +77,7 @@ namespace Olympus.ViewModel.Components
         {
             // Set App settings. 
             // This in turn resets the chariots for both helios and charon.
-            App.Settings.SetNewSolLocation(path);
+            Settings.Default.SolLocation = path;
             // Set DBString.
             DBString = path;
             OlympusVM.UserHandlerVM.CheckUser();
@@ -99,7 +100,7 @@ namespace Olympus.ViewModel.Components
             }
             // Make sure directory exists.
             if (!(Directory.Exists(path)))
-                Directory.CreateDirectory(path);
+                _ = Directory.CreateDirectory(path);
             SetDatabase(path);
         }
 
@@ -108,16 +109,16 @@ namespace Olympus.ViewModel.Components
             string path = SelectFolder();
             // Empty string means cancelation.
             if (path == "") return;
-            if (IsSubDirectory(App.Settings.SolLocation, path))
+            if (IsSubDirectory(Settings.Default.SolLocation, path))
             {
-                MessageBox.Show("Cannot copy to a subfolder of the current database.", 
+                _ = MessageBox.Show("Cannot copy to a subfolder of the current database.",
                     "Failed Database Copy",
-                    MessageBoxButton.OK, 
+                    MessageBoxButton.OK,
                     MessageBoxImage.Warning);
                 return;
             }
             // Get a copy of existing database into chosen path.
-            DirectoryCopy(App.Settings.SolLocation, path);
+            DirectoryCopy(Settings.Default.SolLocation, path);
 
             SetDatabase(path);
         }
@@ -127,17 +128,17 @@ namespace Olympus.ViewModel.Components
             string path = SelectFolder();
             // Empty string means cancelation.
             if (path == "") return;
-            if (IsSubDirectory(App.Settings.SolLocation, path))
+            if (IsSubDirectory(Settings.Default.SolLocation, path))
             {
-                MessageBox.Show("Cannot move to a subfolder of the current database.", 
-                    "Failed Database Move", 
-                    MessageBoxButton.OK, 
+                _ = MessageBox.Show("Cannot move to a subfolder of the current database.",
+                    "Failed Database Move",
+                    MessageBoxButton.OK,
                     MessageBoxImage.Warning);
                 return;
             }
             // Copy existing DB across to new location, and remove from old.
-            DirectoryCopy(App.Settings.SolLocation, path);
-            string oldPath = App.Settings.SolLocation;
+            DirectoryCopy(Settings.Default.SolLocation, path);
+            string oldPath = Settings.Default.SolLocation;
             SetDatabase(path);
             Directory.Delete(oldPath, true);
         }
@@ -145,7 +146,7 @@ namespace Olympus.ViewModel.Components
         private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs = true)
         {
             // Get the subdirectories for the specified directory.
-            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+            DirectoryInfo dir = new(sourceDirName);
 
             if (!dir.Exists)
             {
@@ -157,14 +158,14 @@ namespace Olympus.ViewModel.Components
             DirectoryInfo[] dirs = dir.GetDirectories();
 
             // If the destination directory doesn't exist, create it.       
-            Directory.CreateDirectory(destDirName);
+            _ = Directory.CreateDirectory(destDirName);
 
             // Get the files in the directory and copy them to the new location.
             FileInfo[] files = dir.GetFiles();
             foreach (FileInfo file in files)
             {
                 string tempPath = Path.Combine(destDirName, file.Name);
-                file.CopyTo(tempPath, false);
+                _ = file.CopyTo(tempPath, false);
             }
 
             // If copying subdirectories, copy them and their contents to new location.
@@ -180,8 +181,8 @@ namespace Olympus.ViewModel.Components
 
         private bool IsSubDirectory(string potentialParentDir, string potentialChildDir)
         {
-            DirectoryInfo parent = new DirectoryInfo(potentialParentDir);
-            DirectoryInfo child = new DirectoryInfo(potentialChildDir);
+            DirectoryInfo parent = new(potentialParentDir);
+            DirectoryInfo child = new(potentialChildDir);
             return IsSubDirectory(parent, child);
         }
 

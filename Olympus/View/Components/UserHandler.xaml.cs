@@ -11,8 +11,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Olympus.Styx.Model;
-using Olympus.Styx.View;
+using Olympus.Properties;
+using Styx;
+
 
 namespace Olympus.View.Components
 {
@@ -26,13 +27,13 @@ namespace Olympus.View.Components
         public UserHandler()
         {
             InitializeComponent();
-            Charon = new Charon();
+            Charon = new Charon(Settings.Default.SolLocation);
         }
          
         private void BtnSignIn_Click(object sender, RoutedEventArgs e)
         {
-            LoginWindow login = new LoginWindow();
-            login.ShowDialog();
+            LoginWindow login = new();
+            _ = login.ShowDialog();
         }
 
         private void BtnRegister_Click(object sender, RoutedEventArgs e)
@@ -40,13 +41,13 @@ namespace Olympus.View.Components
             int userCount = App.Helios.UserReader.UserCount();
             if (userCount == 0)
             {
-                AlphaRegistrationWindow regForm = new AlphaRegistrationWindow();
-                regForm.ShowDialog();
+                AlphaRegistrationWindow regForm = new();
+                _ = regForm.ShowDialog();
             }
             else
             {
-                RegisterWindow regForm = new RegisterWindow();
-                regForm.ShowDialog();
+                RegisterWindow regForm = new();
+                _ = regForm.ShowDialog();
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿using Olympus.Uranus.Staff;
+﻿using Uranus.Staff;
 using Olympus.ViewModel.Components;
 using System;
 using System.Collections.Generic;

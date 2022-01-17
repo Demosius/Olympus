@@ -3,24 +3,30 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olympus", "Olympus\Olympus.csproj", "{A1243697-A169-4ACA-88DC-29C67D485324}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Olympus", "Olympus\Olympus.csproj", "{7415656B-5EF6-4FF7-927F-F90DFDD5E694}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uranus", "Uranus\Uranus.csproj", "{FE027230-9584-45B1-A91A-F7BA4E32E85D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Styx", "Styx\Styx.csproj", "{3399630F-31DF-4E9D-B2DF-2D37D6382571}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Debug|x64 = Debug|x64
 		Release|Any CPU = Release|Any CPU
-		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A1243697-A169-4ACA-88DC-29C67D485324}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1243697-A169-4ACA-88DC-29C67D485324}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1243697-A169-4ACA-88DC-29C67D485324}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A1243697-A169-4ACA-88DC-29C67D485324}.Debug|x64.Build.0 = Debug|Any CPU
-		{A1243697-A169-4ACA-88DC-29C67D485324}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1243697-A169-4ACA-88DC-29C67D485324}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A1243697-A169-4ACA-88DC-29C67D485324}.Release|x64.ActiveCfg = Release|Any CPU
-		{A1243697-A169-4ACA-88DC-29C67D485324}.Release|x64.Build.0 = Release|Any CPU
+		{7415656B-5EF6-4FF7-927F-F90DFDD5E694}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7415656B-5EF6-4FF7-927F-F90DFDD5E694}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7415656B-5EF6-4FF7-927F-F90DFDD5E694}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7415656B-5EF6-4FF7-927F-F90DFDD5E694}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE027230-9584-45B1-A91A-F7BA4E32E85D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE027230-9584-45B1-A91A-F7BA4E32E85D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE027230-9584-45B1-A91A-F7BA4E32E85D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE027230-9584-45B1-A91A-F7BA4E32E85D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3399630F-31DF-4E9D-B2DF-2D37D6382571}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3399630F-31DF-4E9D-B2DF-2D37D6382571}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3399630F-31DF-4E9D-B2DF-2D37D6382571}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3399630F-31DF-4E9D-B2DF-2D37D6382571}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

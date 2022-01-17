@@ -30,7 +30,7 @@ namespace Olympus.ViewModel.Commands
 
         public void Execute(object parameter)
         {
-            VM.BCInfo();
+            InventoryUpdaterVM.BCInfo();
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Olympus.Uranus;
-using Olympus.Uranus.Inventory.Model;
+﻿using Uranus;
+using Uranus.Inventory.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -43,7 +43,7 @@ namespace Olympus.Prometheus.ViewModel.Pages
             {
                 binFilter = value;
                 OnPropertyChanged(nameof(BinFilter));
-                Task.Run(() => ApplyFilter());
+                _ = Task.Run(() => ApplyFilter());
             }
         }
 
@@ -56,13 +56,13 @@ namespace Olympus.Prometheus.ViewModel.Pages
             }
             else
             {
-                Task.Run(() => SetBins());
+                _ = Task.Run(() => SetBins());
             }
         }
 
         private void ApplyFilter()
         {
-            if (BinFilter is null || BinFilter == "")
+            if ((BinFilter ?? "") == "")
                 DisplayBins = new ObservableCollection<NAVBin>(Bins);
             else
                 DisplayBins = new ObservableCollection<NAVBin>(Bins.Where(b => b.Code.ToLower().Contains(BinFilter.ToLower())).ToList());

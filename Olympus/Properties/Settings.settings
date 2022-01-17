@@ -1,7 +1,12 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Olympus.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="SolLocation" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\ausefpdfs01ns\Shares\Public\DC_Data\QA\Sol</Value>
+    </Setting>
+    <Setting Name="ItemCSVLocation" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\ausefpdfs01ns\Shares\Public\DC_Data\CDB\PriceBook Sales Ranking.csv</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

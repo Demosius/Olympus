@@ -4,15 +4,23 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Olympus.ViewModel.Components"
-             xmlns:local="clr-namespace:Olympus.View.Components"
+             xmlns:local="clr-namespace:Olympus.View.Components" 
+             d:DataContext="{d:DesignInstance Type=vm:DBSelectionVM}"
              mc:Ignorable="d" >
 
     <UserControl.DataContext>
-        <vm:DBSelectionVM/>
+        <vm:DBSelectionVM x:Name="VM"/>
     </UserControl.DataContext>
 
     <UserControl.Resources>
-        <Style TargetType="Label">
+        <Style TargetType="Label" x:Key="TextStyle">
+            <Setter Property="Foreground" Value="WhiteSmoke"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="TextBlock" >
             <Setter Property="Foreground" Value="WhiteSmoke"/>
             <Setter Property="Margin" Value="5"/>
             <Setter Property="FontSize" Value="14"/>
@@ -23,7 +31,7 @@
 
     <StackPanel Orientation="Horizontal">
         <Label Content="Database Location: "/>
-        <Label Content="{Binding DBString, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock Text="{Binding DBString, UpdateSourceTrigger=PropertyChanged}"/>
         <Button Margin="5" 
                 TextBlock.FontSize="14" 
                 Padding="5" 

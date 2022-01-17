@@ -1,4 +1,4 @@
-﻿using Olympus.Styx.View;
+﻿using Olympus.View;
 using Olympus.ViewModel.Commands;
 using System;
 using System.Collections.Generic;
@@ -13,14 +13,14 @@ namespace Olympus.ViewModel.Components
     {
         public OlympusVM ParentVM { get; set; }
         private string userGreeting;
-        public string UserGreeting 
-        { 
-            get => userGreeting; 
+        public string UserGreeting
+        {
+            get => userGreeting;
             set
             {
                 userGreeting = value;
                 OnPropertyChanged(nameof(UserGreeting));
-            } 
+            }
         }
         private string buttonString;
         public string ButtonString
@@ -65,15 +65,15 @@ namespace Olympus.ViewModel.Components
 
         public void Register()
         {
-            AlphaRegistrationWindow alpha = new AlphaRegistrationWindow();
-            alpha.ShowDialog();
+            AlphaRegistrationWindow alpha = new();
+            _ = alpha.ShowDialog();
             CheckUser();
         }
 
         public void LogIn()
         {
-            LoginWindow login = new LoginWindow();
-            login.ShowDialog();
+            LoginWindow login = new();
+            _ = login.ShowDialog();
             CheckUser();
         }
 

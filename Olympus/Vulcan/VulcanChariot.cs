@@ -1,4 +1,5 @@
-﻿using Olympus.Uranus;
+﻿using Olympus.Properties;
+using Uranus;
 using Olympus.Vulcan.Model;
 using System;
 using System.Collections.Generic;
@@ -23,15 +24,15 @@ namespace Olympus.Vulcan
 
         public VulcanChariot()
         {
-            // Try first to use the directory based on App.Settings, if not then use local file.
+            // Try first to use the directory based on Settings.Default, if not then use local file.
             try
             {
-                BaseDataDirectory = Path.Combine(App.Settings.SolLocation, "Vulcan");
+                BaseDataDirectory = Path.Combine(Settings.Default.SolLocation, "Vulcan");
                 InitializeDatabaseConnection();
             }
             catch
             {
-                MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
+                _ = MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
                 BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Vulcan");
                 InitializeDatabaseConnection();
             }
@@ -47,7 +48,7 @@ namespace Olympus.Vulcan
             }
             catch
             {
-                MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
+                _ = MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
                 BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Vulcan");
                 InitializeDatabaseConnection();
             }
@@ -55,15 +56,15 @@ namespace Olympus.Vulcan
 
         public override void ResetConnection()
         {
-            // Try first to use the directory based on App.Settings, if not then use local file.
+            // Try first to use the directory based on Settings.Default, if not then use local file.
             try
             {
-                BaseDataDirectory = Path.Combine(App.Settings.SolLocation, "Vulcan");
+                BaseDataDirectory = Path.Combine(Settings.Default.SolLocation, "Vulcan");
                 InitializeDatabaseConnection();
             }
             catch
             {
-                MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
+                _ = MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
                 BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Vulcan");
                 InitializeDatabaseConnection();
             }

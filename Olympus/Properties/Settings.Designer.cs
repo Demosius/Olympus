@@ -22,5 +22,29 @@ namespace Olympus.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\ausefpdfs01ns\\Shares\\Public\\DC_Data\\QA\\Sol")]
+        public string SolLocation {
+            get {
+                return ((string)(this["SolLocation"]));
+            }
+            set {
+                this["SolLocation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\ausefpdfs01ns\\Shares\\Public\\DC_Data\\CDB\\PriceBook Sales Ranking.csv")]
+        public string ItemCSVLocation {
+            get {
+                return ((string)(this["ItemCSVLocation"]));
+            }
+            set {
+                this["ItemCSVLocation"] = value;
+            }
+        }
     }
 }

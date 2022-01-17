@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Olympus.Uranus.Inventory.Model;
-using Olympus.Uranus.Staff.Model;
+using Uranus.Inventory.Model;
+using Uranus.Staff.Model;
 using SQLite;
 
 namespace Olympus.Vulcan.Model

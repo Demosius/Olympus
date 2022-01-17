@@ -1,0 +1,39 @@
+﻿<Window x:Class="Olympus.View.LoginWindow"
+        x:Name="LogInWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Olympus.View"
+        xmlns:vm="clr-namespace:Olympus.ViewModel"
+        mc:Ignorable="d"
+        Background="{DynamicResource BackGroundBrush}"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Title="Log In" SizeToContent="WidthAndHeight">
+    
+    <Window.DataContext>
+        <vm:LogInVM x:Name="VM"/>
+    </Window.DataContext>
+    
+    <StackPanel Margin="10">
+        <WrapPanel>
+            <Label Content="_User" Target="{Binding ElementName=txtUser}"/>
+            <Label>
+                <TextBlock FontSize="12" FontWeight="Light" FontStyle="Italic">(employee number)</TextBlock>
+            </Label>
+        </WrapPanel>
+        <TextBox Name="TxtUser"
+                 Text="{Binding UserID}"/>
+        <Label Target="{Binding ElementName=txtPassword}">_Password</Label>
+        <PasswordBox PasswordChanged="PasswordBox_PasswordChanged"/>
+        <StackPanel Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Right">
+            <Button IsCancel="True"
+                    Content="_Cancel"/>
+            <Button IsDefault="True"
+                    Content="_Log In"
+                    Command="{Binding LogInCommand}"
+                    CommandParameter="{Binding ElementName=LogInWindow}"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

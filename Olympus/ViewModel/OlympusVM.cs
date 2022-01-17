@@ -1,5 +1,5 @@
 ﻿using Olympus.Torch.View;
-using Olympus.Uranus.Staff;
+using Uranus.Staff;
 using Olympus.Pantheon.View;
 using Olympus.Prometheus.View;
 using Olympus.Vulcan.View;
@@ -14,12 +14,12 @@ using Olympus.Khaos.View;
 using Olympus.ViewModel.Components;
 using Olympus.Model;
 using Olympus.ViewModel.Commands;
-using Olympus.Uranus.Inventory.Model;
+using Uranus.Inventory.Model;
 using System.IO;
 using ServiceStack.Text;
 using ServiceStack.Extensions;
 using SQLite;
-using Olympus.Uranus.Inventory;
+using Uranus.Inventory;
 using System.Diagnostics;
 using System.Windows;
 using System.Data;
@@ -137,10 +137,10 @@ namespace Olympus.ViewModel
             if (CurrentPage is null)
                 CurrentPage = page;
             else
-                CurrentPage.NavigationService.Navigate(page);
+                _ = CurrentPage.NavigationService.Navigate(page);
         }
 
-        public List<SKUMaster> GetMasters()
+        public static List<SKUMaster> GetMasters()
         {
             // Set tasks to pull data from db.
             Task<List<NAVItem>> getItemsTask = Task.Run(() => App.Helios.InventoryReader.NAVItems());
@@ -167,7 +167,7 @@ namespace Olympus.ViewModel
             Dictionary<int, string> platforms = getPFsTask.Result;
             Dictionary<int, string> genres = getGensTask.Result;
             // Generate Sku Master List
-            List<SKUMaster> masters = new List<SKUMaster>();
+            List<SKUMaster> masters = new();
             foreach (var item in navItems)
             {
                 masters.Add(new SKUMaster(item, stock, uoms, bins, divisions, categories, platforms, genres));
@@ -175,12 +175,14 @@ namespace Olympus.ViewModel
             return masters;
         }
 
-        public void GenerateMasterSkuList()
+        public static void GenerateMasterSkuList()
         {
             List<SKUMaster> masters = GetMasters();
 
             // Make sure the target destination exists.
             string dirPath = Path.Combine(App.BaseDirectory(), "SKUMasterExports");
+
+            Directory.CreateDirectory(dirPath);
 
             Task csvTask = Task.Run(() => ExportMasterSkusAsCSV(masters, dirPath));
             Task jsonTask = Task.Run(() => ExportMasterSkusAsJSON(masters, dirPath));
@@ -188,35 +190,33 @@ namespace Olympus.ViewModel
             Task sqlTask = Task.Run(() => ExportMasterSkusIntoSQLite(masters, dirPath));
             Task.WaitAll(csvTask, jsonTask, xmlTask, sqlTask);
 
-            MessageBox.Show("Files exported.");
+            _ = MessageBox.Show("Files exported.");
         }
 
-        public void ExportMasterSkusAsCSV(List<SKUMaster> masters, string dirPath)
+        public static void ExportMasterSkusAsCSV(List<SKUMaster> masters, string dirPath)
         {
             string csv = CsvSerializer.SerializeToCsv(masters);
             string filePath = Path.Combine(dirPath, "SKUMasterExport.csv");
             File.WriteAllText(filePath, csv);
         }
 
-        public void ExportMasterSkusAsJSON(List<SKUMaster> masters, string dirPath)
+        public static void ExportMasterSkusAsJSON(List<SKUMaster> masters, string dirPath)
         {
             string json = System.Text.Json.JsonSerializer.Serialize(masters);
             string filePath = Path.Combine(dirPath, "SKUMasterExport.json");
             File.WriteAllText(filePath, json);
         }
 
-        public void ExportMasterSkusIntoSQLite(List<SKUMaster> masters, string dirPath)
+        public static void ExportMasterSkusIntoSQLite(List<SKUMaster> masters, string dirPath)
         {
             string dbPath = Path.Combine(dirPath, "SKUMasterExport.sqlite");
-            using (SQLiteConnection database = new SQLiteConnection(dbPath))
-            {
-                database.CreateTable(typeof(SKUMaster));
-                database.DeleteAll<SKUMaster>();
-                database.InsertAll(masters);
-            }
+            using SQLiteConnection database = new(dbPath);
+            _ = database.CreateTable(typeof(SKUMaster));
+            _ = database.DeleteAll<SKUMaster>();
+            _ = database.InsertAll(masters);
         }
 
-        public void ExportMasterSkusAsXML(List<SKUMaster> masters, string dirPath)
+        public static void ExportMasterSkusAsXML(List<SKUMaster> masters, string dirPath)
         {
             string xml = XmlSerializer.SerializeToString(masters);
             string filePath = Path.Combine(dirPath, "SKUMasterExport.xml");

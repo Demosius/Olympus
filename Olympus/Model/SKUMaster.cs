@@ -1,5 +1,5 @@
-﻿using Olympus.Uranus.Inventory;
-using Olympus.Uranus.Inventory.Model;
+﻿using Uranus.Inventory;
+using Uranus.Inventory.Model;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -174,9 +174,9 @@ namespace Olympus.Model
 
             // Total Cartons/Units on hand, check for current pick bin,
             // gather list of pallet sizes, and verify if item picks in cases and/or split cases.
-            List<string> osZones = new List<string> { "OS", "PR", "HR" };
-            List<string> cpZones = new List<string> { "CP", "TM" };
-            List<string> primaryZones = new List<string>
+            List<string> osZones = new() { "OS", "PR", "HR" };
+            List<string> cpZones = new() { "CP", "TM" };
+            List<string> primaryZones = new()
             {
                 "BLK PK",
                 "BLK PO",
@@ -185,9 +185,9 @@ namespace Olympus.Model
                 "SP PK",
                 "SUP PK"
             };
-            List<string> zones = new List<string>();
-            List<string> bins = new List<string>();
-            List<int> palletSizes = new List<int>();
+            List<string> zones = new();
+            List<string> bins = new();
+            List<int> palletSizes = new();
             if (UnitsPerCarton is null)
                 TotalCartonsOnHand = null;
             else
@@ -244,16 +244,16 @@ namespace Olympus.Model
         {
             SKU = item.Number;
             DivisionCode = item.DivisionCode;
-            divisions.TryGetValue(DivisionCode, out string divName);
+            _ = divisions.TryGetValue(DivisionCode, out string divName);
             DivisionName = divName;
             CategoryCode = item.CategoryCode;
-            categories.TryGetValue(CategoryCode, out string catName);
+            _ = categories.TryGetValue(CategoryCode, out string catName);
             CategoryName = catName;
             PlatformCode = item.PlatformCode;
-            platforms.TryGetValue(PlatformCode, out string pfName);
+            _ = platforms.TryGetValue(PlatformCode, out string pfName);
             PlatformName = pfName;
             GenreCode = item.GenreCode;
-            genres.TryGetValue(GenreCode, out string genName);
+            _ = genres.TryGetValue(GenreCode, out string genName);
             GenreName = genName;
             if (PlatformCode == 516)
                 ProductTypeCode = EProductType.POP;
@@ -272,11 +272,11 @@ namespace Olympus.Model
             DeptType = DeptTypeCode.ToString();
 
             // Units and Dims per Case/Pack/Each/Carton(largest thereof)
-            uoms.TryGetValue(SKU, out Dictionary<string, NAVUoM> itemUoMs);
+            _ = uoms.TryGetValue(SKU, out Dictionary<string, NAVUoM> itemUoMs);
             NAVUoM caseUoM = null, packUoM = null, eachUoM = null;
-            itemUoMs?.TryGetValue("CASE", out caseUoM);
-            itemUoMs?.TryGetValue("PACK", out packUoM);
-            itemUoMs?.TryGetValue("EACH", out eachUoM);
+            _ = (itemUoMs?.TryGetValue("CASE", out caseUoM));
+            _ = (itemUoMs?.TryGetValue("PACK", out packUoM));
+            _ = (itemUoMs?.TryGetValue("EACH", out eachUoM));
             NAVUoM ctnUoM = caseUoM ?? packUoM ?? eachUoM;
 
             if (caseUoM is null)
@@ -335,11 +335,11 @@ namespace Olympus.Model
 
             // Total Cartons/Units on hand, check for current pick bin,
             // gather list of pallet sizes, and verify if item picks in cases and/or split cases.
-            List<string> overstockZones = new List<string> { "OS", "PR", "HR", "OZ" };
-            List<string> virtualZones = new List<string> { "CP", "DCP", "SUP CP", "TM", "HZ", "PARK", "WEB TP" };
-            List<string> vPickZones = new List<string> { "CP", "DCP", "SUP CP", "TM", "WEB TP" };
-            List<string> casePickZones = new List<string> { "CP", "DCP"};
-            List<string> primaryZones = new List<string>
+            List<string> overstockZones = new() { "OS", "PR", "HR", "OZ" };
+            List<string> virtualZones = new() { "CP", "DCP", "SUP CP", "TM", "HZ", "PARK", "WEB TP" };
+            List<string> vPickZones = new() { "CP", "DCP", "SUP CP", "TM", "WEB TP" };
+            List<string> casePickZones = new() { "CP", "DCP"};
+            List<string> primaryZones = new()
             {
                 "BLK PK",
                 "BLK SS",
@@ -348,11 +348,11 @@ namespace Olympus.Model
                 "SP PK",
                 "SUP PK"
             };
-            List<string> zones = new List<string>();
-            List<string> pickBins = new List<string>();
-            List<string> osBins = new List<string>();
-            List<string> vBins = new List<string>();
-            List<int> palletSizes = new List<int>();
+            List<string> zones = new();
+            List<string> pickBins = new();
+            List<string> osBins = new();
+            List<string> vBins = new();
+            List<int> palletSizes = new();
             
             EUoM uomCheck;
             if (UnitsPerCase != null)
@@ -362,7 +362,7 @@ namespace Olympus.Model
             else
                 uomCheck = EUoM.EACH;
 
-            stock.TryGetValue(SKU, out List<NAVStock> skuStock);
+            _ = stock.TryGetValue(SKU, out List<NAVStock> skuStock);
             if (skuStock is null) skuStock = new List<NAVStock>();
             foreach (NAVStock s in skuStock)
             {
@@ -400,7 +400,7 @@ namespace Olympus.Model
                     if (zone != "OS")
                     {
                         int qty = s.Qty;
-                        bins.TryGetValue(s.BinID, out NAVBin bin);
+                        _ = bins.TryGetValue(s.BinID, out NAVBin bin);
                         if (bin != null && bin.Description.Contains("Double"))
                             palletSizes.Add(qty / 2);
                         palletSizes.Add(qty);

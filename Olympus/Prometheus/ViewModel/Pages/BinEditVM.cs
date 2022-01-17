@@ -1,4 +1,4 @@
-﻿using Olympus.Uranus.Inventory.Model;
+﻿using Uranus.Inventory.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +11,7 @@ namespace Olympus.Prometheus.ViewModel.Pages
     class BinEditVM : INotifyPropertyChanged
     {
 
-        private List<string> ExistingBinIDs { get; set; }
+        public List<string> ExistingBinIDs { get; set; }
 
         private BinVM parentVM;
         public BinVM ParentVM
@@ -42,7 +42,7 @@ namespace Olympus.Prometheus.ViewModel.Pages
         /// <summary>
         /// Saves the bin changes into the parent bin list, and loads it into the database.
         /// </summary>
-        public void SaveChanges()
+        public static void SaveChanges()
         {
 
         }

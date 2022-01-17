@@ -29,7 +29,7 @@ namespace Olympus.ViewModel.Commands
 
         public void Execute(object parameter)
         {
-            Task.Run(() => VM.GenerateMasterSkuList());
+            _ = Task.Run(() => OlympusVM.GenerateMasterSkuList());
         }
     }
 }

@@ -13,7 +13,7 @@
         Background="{DynamicResource BackGroundBrush}">
 
     <Window.DataContext>
-        <vm:OlympusVM/>
+        <vm:OlympusVM x:Name="VM"/>
     </Window.DataContext>
     
     <DockPanel>

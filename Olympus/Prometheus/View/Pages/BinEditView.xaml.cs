@@ -1,5 +1,5 @@
 ﻿using Olympus.Prometheus.ViewModel.Pages;
-using Olympus.Uranus.Inventory.Model;
+using Uranus.Inventory.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;

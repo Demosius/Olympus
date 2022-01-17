@@ -45,7 +45,7 @@
             <Setter Property="Background" Value="{DynamicResource BackGroundBrush}"/>
             <Setter Property="BorderBrush" Value="#055" />
         </Style>
-        
+
         <!--Standard Button Styling-->
         <Style TargetType="Button">
             <Setter Property="Margin" Value="5"/>
@@ -111,12 +111,12 @@
             <GradientStop Color="#0BA" Offset="0"/>
             <GradientStop Color="#032" Offset="1"/>
         </LinearGradientBrush>
-        
+
         <LinearGradientBrush x:Key="PurpleGradient" EndPoint="0,1" StartPoint="0,0">
             <GradientStop Color="#75A" Offset="0"/>
             <GradientStop Color="#213" Offset="1"/>
         </LinearGradientBrush>
-        
+
         <LinearGradientBrush x:Key="ForeGradient" EndPoint="0,1" StartPoint="0,0">
             <GradientStop Color="Gainsboro" Offset="0"/>
             <GradientStop Color="BlanchedAlmond" Offset="1"/>
@@ -149,8 +149,8 @@
             <GradientStop Color="White" Offset="0"/>
             <GradientStop Color="Gray" Offset="1"/>
         </LinearGradientBrush>
-        
+
     </Application.Resources>
-    
-    
+
+
 </Application>

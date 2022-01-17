@@ -1,12 +1,13 @@
-﻿using Olympus.Uranus.Staff.Model;
+﻿using Uranus.Staff.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Olympus.Uranus;
+using Uranus;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace Olympus.ViewModel.Components
 {
@@ -31,18 +32,28 @@ namespace Olympus.ViewModel.Components
 
         public ProjectLauncherVM()
         {
-            List<Department> deps = App.Helios.StaffReader.Departments(pullType: PullType.IncludeChildren);
-            Departments = deps;
+            /*if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+            {
+                //Departments = new();
+                //AllProjects = new();
+                //UserProjects = new();
+            }
+            else
+            {
+
+            }*/
+
             AllProjects = App.Helios.StaffReader.Projects(pullType: PullType.FullRecursive);
+            Departments = App.Helios.StaffReader.Departments(pullType: PullType.IncludeChildren);
             if (App.Charon.UserEmployee is null)
-                UserProjects = new List<Project>();
+                UserProjects = new();
             else
                 UserProjects = App.Charon.UserEmployee.Projects;
 
             ProjectGroupVM projectGroup;
 
-            ProjectGroups = new ObservableCollection<ProjectGroupVM>();
-            
+            ProjectGroups = new();
+
             projectGroup = new ProjectGroupVM(this, AllProjects, "All");
             ProjectGroups.Add(projectGroup);
             projectGroup = new ProjectGroupVM(this, UserProjects, "User");

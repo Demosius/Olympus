@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Data;
-using Olympus.Uranus;
-using Olympus.Uranus.Inventory;
+using Uranus;
+using Uranus.Inventory;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -17,7 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Globalization;
 using Olympus.Model;
-using Olympus.Uranus.Staff;
+using Uranus.Staff;
 
 namespace Olympus.Prometheus.View
 {
