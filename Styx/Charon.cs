@@ -18,7 +18,18 @@ namespace Styx
 
     public partial class Charon
     {
-        public User CurrentUser { get; set; }
+        private User currentUser;
+        public User CurrentUser 
+        { 
+            get => currentUser;
+            set
+            {
+                // Make sure user project icon paths are set.
+                foreach (var p in value.Employee.Projects)
+                    p.Icon.SetImageFilePath(staffReader);
+                currentUser = value;
+            }
+        }
         public Employee UserEmployee
         {
             get

@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="SolLocation" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\\ausefpdfs01ns\Shares\Public\DC_Data\QA\Sol</Value>
+      <Value Profile="(Default)">\\ausefpdfs01ns\Shares\Public\DC_Data\Olympus\QA\Sol</Value>
     </Setting>
     <Setting Name="ItemCSVLocation" Type="System.String" Scope="User">
       <Value Profile="(Default)">\\ausefpdfs01ns\Shares\Public\DC_Data\CDB\PriceBook Sales Ranking.csv</Value>

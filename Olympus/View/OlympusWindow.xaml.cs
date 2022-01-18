@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Threading;
 using System.Globalization;
+using Olympus.Properties;
 
 namespace Olympus
 {
@@ -16,11 +17,10 @@ namespace Olympus
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-AU");
         }
 
-        void MainWindow_Closing(object sender, ConsoleCancelEventArgs e)
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            // TODO: Figure out settings saving on app close.
-            MessageBox.Show("Closing called");
+            // Saves the settings when closing the App.
+            Settings.Default.Save();
         }
-
     }
 }

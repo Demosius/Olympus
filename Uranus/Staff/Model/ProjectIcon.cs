@@ -11,9 +11,9 @@ namespace Uranus.Staff.Model
     public class ProjectIcon : Image
     {
         [ForeignKey(typeof(Project))]
-        public string ProjectName { get; set; }
+        public EProject ProjectRef { get; set; }
 
-        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        [OneToOne(inverseProperty: "Icon", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Project Project { get; set; }
 
         public ProjectIcon() { }
@@ -23,8 +23,13 @@ namespace Uranus.Staff.Model
         {
             Project = project;
             FileName = iconFileName;
-            ProjectName = project.Name;
-            Name = ProjectName;
+            ProjectRef = project.EProject;
+            Name = ProjectRef.ToString();
+        }
+
+        public void SetImageFilePath(StaffReader reader)
+        {
+            FullPath = GetImageFilePath(reader);
         }
 
         public override string GetImageFilePath(StaffReader reader) => Path.Combine(reader.ProjectIconDirectory, FileName);

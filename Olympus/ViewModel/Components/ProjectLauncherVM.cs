@@ -32,23 +32,16 @@ namespace Olympus.ViewModel.Components
 
         public ProjectLauncherVM()
         {
-            /*if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
-            {
-                //Departments = new();
-                //AllProjects = new();
-                //UserProjects = new();
-            }
-            else
-            {
-
-            }*/
-
             AllProjects = App.Helios.StaffReader.Projects(pullType: PullType.FullRecursive);
             Departments = App.Helios.StaffReader.Departments(pullType: PullType.IncludeChildren);
             if (App.Charon.UserEmployee is null)
                 UserProjects = new();
             else
                 UserProjects = App.Charon.UserEmployee.Projects;
+
+            // Set Icons for projects.
+            foreach (var p in AllProjects)
+                p.Icon.SetImageFilePath(App.Helios.StaffReader);
 
             ProjectGroupVM projectGroup;
 

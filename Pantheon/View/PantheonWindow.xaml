@@ -1,0 +1,19 @@
+﻿<Window x:Class="Pantheon.View.PantheonWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Pantheon.View"
+        mc:Ignorable="d"
+        Title="PantheonWindow" Height="450" Width="800">
+    <Frame Source="./PantheonPage.xaml"
+           Grid.Row="1"
+           Margin="2" 
+           Grid.Column="0" 
+           Height="Auto" 
+           HorizontalAlignment="Stretch" 
+           VerticalAlignment="Stretch"
+           BorderThickness="1" 
+           BorderBrush="SlateGray"
+           NavigationUIVisibility="Hidden"/>
+</Window>

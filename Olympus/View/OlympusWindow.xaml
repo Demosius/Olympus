@@ -10,14 +10,15 @@
         Title="Olympus" WindowState="Maximized"
         MinWidth="400"
         MinHeight="300"
-        Background="{DynamicResource BackGroundBrush}">
+        Background="{DynamicResource BackGroundBrush}"
+        Closing="MainWindow_Closing">
 
     <Window.DataContext>
         <vm:OlympusVM x:Name="VM"/>
     </Window.DataContext>
-    
+
     <DockPanel>
-        
+
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="Generate Master Sku List"
@@ -67,7 +68,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <StackPanel>            
+            <StackPanel>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -104,8 +105,4 @@
                     NavigationUIVisibility="Hidden"/>
         </Grid>
     </DockPanel>
-
-    <Window.Resources>
-        
-    </Window.Resources>
 </Window>

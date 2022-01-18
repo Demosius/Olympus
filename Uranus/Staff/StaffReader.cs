@@ -38,5 +38,6 @@ namespace Uranus.Staff
 
         /* PROJECTS */
         public List<Project> Projects(Expression<Func<Project, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<Project>(filter, pullType);
+
     }
 }

@@ -70,44 +70,8 @@ namespace Uranus.Staff
             if (!Directory.Exists(EmployeeAvatarDirectory)) _ = Directory.CreateDirectory(EmployeeAvatarDirectory);
             if (!Directory.Exists(ProjectIconDirectory)) _ = Directory.CreateDirectory(ProjectIconDirectory);
             if (!Directory.Exists(LicenceImageDirectory)) _ = Directory.CreateDirectory(LicenceImageDirectory);
-            EstablishInitialProjectIcons();
         }
 
-        private void EstablishInitialProjectIcons()
-        {
-            List<Project> projects = new()
-            {
-                new Project(EProject.Khaos, "chaos.ico", "Handles makebulk designation and separation. (Genesis)"),
-                new Project(EProject.Pantheon, "pantheon.ico", "Roster management."),
-                new Project(EProject.Prometheus, "prometheus.ico", "Data management."),
-                new Project(EProject.Torch, "torch.ico", "Pre-work automated stock maintenance. (AutoBurn)"),
-                new Project(EProject.Vulcan, "vulcan.ico", "Replenishment DDR management and work assignment. (RefOrge)")
-            };
-            List<string> existingProjects = PullObjectList<Project>().Select(p => p.Name).ToList();
-            Database.RunInTransaction(() =>
-            {
-                foreach (Project project in projects)
-                {
-                    if (!existingProjects.Contains(project.Name)) 
-                        Database.InsertWithChildren(project);
-                }
-            });
-            FillProjectIconFolder();
-        }
-
-        private void FillProjectIconFolder()
-        {
-            string resourcePath = Path.Combine(BaseDataDirectory, "Resources", "Images", "Icons");
-            string fileName;
-            foreach (string filePath in Directory.GetFiles(resourcePath))
-            {
-                fileName = Path.GetFileName(filePath);
-                if (Path.GetExtension(filePath) == ".ico")
-                {
-                    File.Copy(filePath, Path.Combine(ProjectIconDirectory, fileName), true);
-                }
-            }
-        }
         protected override void InitializeDatabaseConnection()
         {
             base.InitializeDatabaseConnection();

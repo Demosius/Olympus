@@ -1,28 +1,25 @@
-﻿using Olympus.Torch.View;
+﻿using Phoenix.View;
 using Uranus.Staff;
-using Olympus.Pantheon.View;
-using Olympus.Prometheus.View;
-using Olympus.Vulcan.View;
-using System;
+using Pantheon.View;
+using Prometheus.View;
+using Vulcan.View;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Olympus.Khaos.View;
+using Khaos.View;
 using Olympus.ViewModel.Components;
 using Olympus.Model;
 using Olympus.ViewModel.Commands;
 using Uranus.Inventory.Model;
 using System.IO;
 using ServiceStack.Text;
-using ServiceStack.Extensions;
 using SQLite;
-using Uranus.Inventory;
-using System.Diagnostics;
 using System.Windows;
-using System.Data;
+using Uranus.Staff.Model;
+using Uranus;
+using System;
 
 namespace Olympus.ViewModel
 {
@@ -34,6 +31,7 @@ namespace Olympus.ViewModel
         public VulcanPage Vulcan { get; set; }
         public TorchPage Torch { get; set; }
         public KhaosPage Khaos { get; set; }
+        public AionPage Aion { get; set; }
 
         public EProject CurrentProject { get; set; }
 
@@ -61,12 +59,15 @@ namespace Olympus.ViewModel
         /* Constructor(s) */
         public OlympusVM()
         {
+            EstablishInitialProjectIcons();
+
             DBSelectionVM = new DBSelectionVM(this);
             UserHandlerVM = new UserHandlerVM(this);
             ProjectLauncherVM = new ProjectLauncherVM(this);
             InventoryUpdaterVM = new InventoryUpdaterVM(this);
 
             GenerateMasterSkuListCommand = new GenerateMasterSkuListCommand(this);
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -90,15 +91,24 @@ namespace Olympus.ViewModel
                 case EProject.Pantheon:
                     LoadPantheon();
                     break;
-                case EProject.Torch:
+                case EProject.Phoenix:
                     LoadTorch();
                     break;
                 case EProject.Khaos:
                     LoadKhaos();
                     break;
+                case EProject.Aion:
+                    LoadAion();
+                    break;
                 default:
                     break;
             }
+        }
+
+        private void LoadAion()
+        {
+            if (Aion is null) Aion = new AionPage();
+            SetPage(Aion);
         }
 
         private void LoadPrometheus()
@@ -142,14 +152,15 @@ namespace Olympus.ViewModel
 
         public static List<SKUMaster> GetMasters()
         {
+            // TODO: Change to run all DB actions in a single transaction.
             // Set tasks to pull data from db.
             Task<List<NAVItem>> getItemsTask = Task.Run(() => App.Helios.InventoryReader.NAVItems());
             Task<Dictionary<int, List<NAVStock>>> getStockTask = Task.Run(() => App.Helios.InventoryReader.NAVAllStock()
-                                                        .GroupBy(s => s.ItemNumber)
-                                                        .ToDictionary(g => g.Key, g => g.ToList()));
+                .GroupBy(s => s.ItemNumber)
+                .ToDictionary(g => g.Key, g => g.ToList()));
             Task<Dictionary<int, Dictionary<string, NAVUoM>>> getUoMTask = Task.Run(() => App.Helios.InventoryReader.NAVUoMs()
-                                                                .GroupBy(u => u.ItemNumber)
-                                                                .ToDictionary(g => g.Key, g => g.ToDictionary(u => u.Code, u => u)));
+                .GroupBy(u => u.ItemNumber)
+                .ToDictionary(g => g.Key, g => g.ToDictionary(u => u.Code, u => u)));
             Task<Dictionary<string, NAVBin>> getBinsTask = Task.Run(() => App.Helios.InventoryReader.NAVBins().ToDictionary(b => b.ID, b => b));
             Task<Dictionary<int, string>> getDivsTask = Task.Run(() => App.Helios.InventoryReader.NAVDivisions().ToDictionary(d => d.Code, d => d.Description));
             Task<Dictionary<int, string>> getCatsTask = Task.Run(() => App.Helios.InventoryReader.NAVCategorys().ToDictionary(c => c.Code, c => c.Description));
@@ -173,6 +184,23 @@ namespace Olympus.ViewModel
                 masters.Add(new SKUMaster(item, stock, uoms, bins, divisions, categories, platforms, genres));
             }
             return masters;
+        }
+
+        private static void EstablishInitialProjectIcons()
+        {
+            App.Helios.StaffCreator.CopyProjectIconsFromSource(Path.Combine(App.BaseDirectory(), "Resources", "Images", "Icons"));
+            List<Project> projects = new()
+            {
+                new Project(EProject.Khaos, "chaos.ico", App.Helios.StaffReader,"Handles makebulk designation and separation. (Genesis)"),
+                new Project(EProject.Pantheon, "pantheon.ico", App.Helios.StaffReader, "Roster management."),
+                new Project(EProject.Prometheus, "prometheus.ico", App.Helios.StaffReader, "Data management."),
+                new Project(EProject.Phoenix, "phoenix.ico", App.Helios.StaffReader, "Pre-work automated stock maintenance. (AutoBurn)"),
+                new Project(EProject.Vulcan, "vulcan.ico", App.Helios.StaffReader, "Replenishment DDR management and work assignment. (RefOrge)"),
+                new Project(EProject.Aion, "Aion.ico", App.Helios.StaffReader, "Employee clock in and shift time managemnet.")
+            };
+
+            App.Helios.StaffCreator.EstablishInitialProjects(projects);
+            
         }
 
         public static void GenerateMasterSkuList()

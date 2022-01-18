@@ -13,6 +13,8 @@
   <ItemGroup>
     <None Remove="Resources\Images\Fantasy-background-incredible-places.jpg" />
     <None Remove="Resources\Images\fantasy-cave.jpg" />
+    <None Remove="Resources\Images\Icons\Aion.ico" />
+    <None Remove="Resources\Images\Icons\AionClock.ico" />
     <None Remove="Resources\Images\Icons\burn.ico" />
     <None Remove="Resources\Images\Icons\castle.ico" />
     <None Remove="Resources\Images\Icons\chaos-white.ico" />
@@ -29,6 +31,7 @@
     <None Remove="Resources\Images\Icons\olympus.ico" />
     <None Remove="Resources\Images\Icons\omega.ico" />
     <None Remove="Resources\Images\Icons\pantheon.ico" />
+    <None Remove="Resources\Images\Icons\phoenix.ico" />
     <None Remove="Resources\Images\Icons\prometheus.ico" />
     <None Remove="Resources\Images\Icons\sword-smithing.ico" />
     <None Remove="Resources\Images\Icons\torch.ico" />
@@ -52,6 +55,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Resources\Images\Icons\Aion.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\AionClock.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Images\Icons\burn.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -62,6 +71,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\pantheon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\phoenix.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\prometheus.ico">
@@ -94,17 +106,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Khaos\model\" />
-    <Folder Include="Khaos\viewmodel\" />
-    <Folder Include="Pantheon\model\" />
-    <Folder Include="Pantheon\viewmodel\" />
-    <Folder Include="Prometheus\ViewModel\Commands\" />
-    <Folder Include="Torch\model\" />
-    <Folder Include="Torch\viewmodel\" />
-    <Folder Include="Vulcan\viewmodel\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
     <PackageReference Include="ServiceStack.Text" Version="5.13.2" />
     <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
@@ -112,8 +113,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Aion\Aion\Aion.csproj" />
+    <ProjectReference Include="..\Khaos\Khaos.csproj" />
+    <ProjectReference Include="..\Pantheon\Pantheon.csproj" />
+    <ProjectReference Include="..\Phoenix\Phoenix.csproj" />
+    <ProjectReference Include="..\Prometheus\Prometheus.csproj" />
     <ProjectReference Include="..\Styx\Styx.csproj" />
     <ProjectReference Include="..\Uranus\Uranus.csproj" />
+    <ProjectReference Include="..\Vulcan\Vulcan.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -147,31 +154,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Khaos\View\KhaosPage.xaml.cs">
-      <DependentUpon>KhaosPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Pantheon\View\PantheonPage.xaml.cs">
-      <DependentUpon>PantheonPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Prometheus\View\Pages\BatchView.xaml.cs">
-      <DependentUpon>BatchView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Prometheus\View\Pages\BinEditView.xaml.cs">
-      <DependentUpon>BinEditView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Prometheus\View\Pages\BinView.xaml.cs">
-      <DependentUpon>BinView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Prometheus\View\PrometheusPage.xaml.cs">
-      <DependentUpon>PrometheusPage.xaml</DependentUpon>
-    </Compile>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Update="Torch\View\TorchPage.xaml.cs">
-      <DependentUpon>TorchPage.xaml</DependentUpon>
     </Compile>
     <Compile Update="View\AlphaRegistrationWindow.xaml.cs">
       <DependentUpon>AlphaRegistrationWindow.xaml</DependentUpon>
@@ -204,9 +190,6 @@
     <Compile Update="View\RegisterWindow.xaml.cs">
       <DependentUpon>RegisterWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Vulcan\View\VulcanPage.xaml.cs">
-      <DependentUpon>VulcanPage.xaml</DependentUpon>
-    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -217,27 +200,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Khaos\View\KhaosPage.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Pantheon\View\PantheonPage.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Prometheus\View\Pages\BatchView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Prometheus\View\Pages\BinEditView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Prometheus\View\Pages\BinView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Prometheus\View\PrometheusPage.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Torch\View\TorchPage.xaml">
-      <SubType>Designer</SubType>
-    </Page>
     <Page Update="View\AlphaRegistrationWindow.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
@@ -269,9 +231,6 @@
     </Page>
     <Page Update="View\RegisterWindow.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Vulcan\View\VulcanPage.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

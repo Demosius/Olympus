@@ -426,35 +426,5 @@ namespace Olympus.Model
                                 .Select(x => (int?)x.Key)
                                 .FirstOrDefault();
         }
-
-        //private string ProductTypeToString(EProductType productType)
-        //{
-        //    switch (productType)
-        //    {
-        //        case EProductType.CORE:
-        //            return "CORE";
-        //        case EProductType.LOOT:
-        //            return "LOOT";
-        //        case EProductType.POP:
-        //            return "POP";
-        //        default:
-        //            return "CORE";
-        //    }
-        //}
-
-        //private string DeptTypeToString(EDeptType deptType)
-        //{
-        //    switch (deptType)
-        //    {
-        //        case EDeptType.Frontline:
-        //            return "Frontline";
-        //        case EDeptType.PreOwned:
-        //            return "PreOwned";
-        //        case EDeptType.Supplies:
-        //            return "Supplies";
-        //        default:
-        //            return "CORE";
-        //    }
-        //}
     }
 }

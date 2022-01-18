@@ -70,13 +70,13 @@ namespace Uranus.Inventory.Model
 
         public bool LineMatch(NAVMoveLine moveLine)
         {
-            //TODO: This.
+            //TODO: Move line matching.
             throw new NotImplementedException();
         }
 
         public bool MergeLine(NAVMoveLine moveLine)
         {
-            //TODO: This.
+            //TODO: Move line merging.
             throw new NotImplementedException();
         }
     }

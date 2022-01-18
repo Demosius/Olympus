@@ -14,17 +14,45 @@ namespace Uranus.Staff.Model
         public string Name { get; set; }
         public string FileName { get; set; }
 
+        private string fullPath;
         [Ignore]
-        public string FullPath { get; set; }
+        public string FullPath 
+        {
+            get
+            {
+                if ((fullPath ?? "") == "")
+                    fullPath = GetImageFilePath();
+                return fullPath;
+            }
+            set => fullPath = value;
+        }
 
+        public virtual string GetImageFilePath()
+        {
+            string checkDir;
+
+            // Current Directory
+            checkDir = Path.Combine(Directory.GetCurrentDirectory(), FileName);
+            if (CheckPath(checkDir)) return checkDir;
+
+            // User Image Directory.
+            checkDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), FileName);
+            if (CheckPath(checkDir)) return checkDir;
+
+            // User Directory.
+            checkDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), FileName);
+            if (CheckPath(checkDir)) return checkDir;
+
+            return "";
+
+        }
 
         public virtual string GetImageFilePath(StaffReader reader)
         {
             string checkDir;
             // Check multiple locations for the image.
-            
-            // Current Directory
-            checkDir = Path.Combine(Directory.GetCurrentDirectory(), FileName);
+
+            checkDir = GetImageFilePath();
             if (CheckPath(checkDir)) return checkDir;
 
             // Database directory.
@@ -37,14 +65,6 @@ namespace Uranus.Staff.Model
 
             // Staff ProjectIcon Directory.
             checkDir = Path.Combine(reader.ProjectIconDirectory, FileName);
-            if (CheckPath(checkDir)) return checkDir;
-
-            // User Image Directory.
-            checkDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), FileName);
-            if (CheckPath(checkDir)) return checkDir;
-
-            // User Directory.
-            checkDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), FileName);
             if (CheckPath(checkDir)) return checkDir;
 
             return FileName;
