@@ -7,6 +7,14 @@ using System.Text;
 
 namespace Uranus.Staff.Model
 {
+    public enum EEmploymentType
+    {
+        SA, // Salaried
+        CA, // Casual
+        FP, // Full-time Permanent
+        PP, // Part-time Permanent
+    }
+
     public class Employee
     {
         [PrimaryKey]
@@ -22,7 +30,10 @@ namespace Uranus.Staff.Model
         [ForeignKey(typeof(Department))]
         public string DepartmentName { get; set; }
         [ForeignKey(typeof(Role))]
-        public string RoleName { get; set; }
+        public string RoleName { get; set; }    // Also known as Job Classification.
+        public int ReportsToID { get; set; }    // Specific Employee this employee reports to, bypassing Role and RoleReports.
+        public string PayPoint { get; set; }
+        public EEmploymentType EmploymentType { get; set; }
         [ForeignKey(typeof(Locker))]
         public string LockerID { get; set; }
         public string PhoneNumber { get; set; }

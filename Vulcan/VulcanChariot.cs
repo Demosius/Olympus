@@ -50,19 +50,27 @@ namespace Vulcan
             }
         }
 
-        public override void ResetConnection()
+        public override void ResetConnection(string solLocation)
         {
-            // Try first to use the directory based on Settings.Default, if not then use local file.
+            // Try first to use given directory, then the directory based on Settings.Default, if not then use local file.
             try
             {
-                BaseDataDirectory = Path.Combine(Settings.Default.SolLocation, "Vulcan");
+                BaseDataDirectory = Path.Combine(solLocation, "Vulcan");
                 InitializeDatabaseConnection();
             }
             catch
             {
-                _ = MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
-                BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Vulcan");
-                InitializeDatabaseConnection();
+                try
+                {
+                    BaseDataDirectory = Path.Combine(Settings.Default.SolLocation, "Vulcan");
+                    InitializeDatabaseConnection();
+                }
+                catch
+                {
+                    _ = MessageBox.Show("Reverting to local use database.", "Error loading database.", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    BaseDataDirectory = Path.Combine(App.BaseDirectory(), "Sol", "Vulcan");
+                    InitializeDatabaseConnection();
+                }
             }
         }
 

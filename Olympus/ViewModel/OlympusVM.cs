@@ -20,6 +20,9 @@ using System.Windows;
 using Uranus.Staff.Model;
 using Uranus;
 using System;
+using Aion.View;
+using Olympus.ViewModel.Utility;
+using Olympus.Properties;
 
 namespace Olympus.ViewModel
 {
@@ -29,7 +32,7 @@ namespace Olympus.ViewModel
         public PrometheusPage Prometheus { get; set; }
         public PantheonPage Pantheon { get; set; }
         public VulcanPage Vulcan { get; set; }
-        public TorchPage Torch { get; set; }
+        public PhoenixPage Phoenix { get; set; }
         public KhaosPage Khaos { get; set; }
         public AionPage Aion { get; set; }
 
@@ -48,7 +51,7 @@ namespace Olympus.ViewModel
         }
 
         /* Sub ViewModels - Components */
-        public DBSelectionVM DBSelectionVM { get; set; }
+        public DBManager DBManager { get; set; }
         public InventoryUpdaterVM InventoryUpdaterVM { get; set; }
         public ProjectLauncherVM ProjectLauncherVM { get; set; }
         public UserHandlerVM UserHandlerVM { get; set; }
@@ -61,13 +64,12 @@ namespace Olympus.ViewModel
         {
             EstablishInitialProjectIcons();
 
-            DBSelectionVM = new DBSelectionVM(this);
-            UserHandlerVM = new UserHandlerVM(this);
-            ProjectLauncherVM = new ProjectLauncherVM(this);
-            InventoryUpdaterVM = new InventoryUpdaterVM(this);
+            DBManager = new(this);
+            UserHandlerVM = new(this);
+            ProjectLauncherVM = new(this);
+            InventoryUpdaterVM = new(this);
 
-            GenerateMasterSkuListCommand = new GenerateMasterSkuListCommand(this);
-
+            GenerateMasterSkuListCommand = new(this);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -75,6 +77,51 @@ namespace Olympus.ViewModel
         private void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /* Temporary Functions */
+
+        /// <summary>
+        /// Takes all the employees that have any direct reports, and creates a User for each of those employees with the manager role.
+        /// </summary>
+        public static void AutoGenerateManagers()
+        {
+            // Get employees.
+            List<Employee> managers = App.Helios.StaffReader.Managers();
+            foreach (var m in managers)
+                App.Charon.CreateNewUser(m, "Manager");
+        }
+
+        internal void RefreshData()
+        {
+            Prometheus?.RefreshData();
+            Pantheon?.RefreshData();
+            Vulcan?.RefreshData();
+            Aion?.RefreshData();
+            Phoenix?.RefreshData();
+            Khaos?.RefreshData();
+        }
+
+        internal void ResetDB()
+        {
+            App.Helios.ResetChariots(Settings.Default.SolLocation);
+            App.Charon.DatabaseReset(Settings.Default.SolLocation);
+
+            EstablishInitialProjectIcons();
+
+            UserHandlerVM.CheckUser();
+            ProjectLauncherVM = new(this);
+            InventoryUpdaterVM = new(this);
+
+            OnPropertyChanged(nameof(ProjectLauncherVM));
+            OnPropertyChanged(nameof(InventoryUpdaterVM));
+
+            Prometheus = null;
+            Pantheon = null;
+            Vulcan = null;
+            Aion = null;
+            Phoenix = null;
+            Khaos = null;
         }
 
         /* Projects */
@@ -131,8 +178,8 @@ namespace Olympus.ViewModel
 
         private void LoadTorch()
         {
-            if (Torch is null) Torch = new TorchPage();
-            SetPage(Torch);
+            if (Phoenix is null) Phoenix = new PhoenixPage();
+            SetPage(Phoenix);
         }
 
         private void LoadKhaos()

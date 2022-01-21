@@ -96,6 +96,11 @@ namespace Uranus.Users.Model
             UpdateLicence = false;
             DeleteLicence = false;
 
+            CreateVehicle = false;
+            ReadVehicle = false;
+            UpdateVehicle = false;
+            DeleteVehicle = false;
+
             CopyDatabase = false;
             MoveDatabase = false;
         }
@@ -135,6 +140,11 @@ namespace Uranus.Users.Model
             ReadLicence = true;
             UpdateLicence = true;
             DeleteLicence = true;
+
+            CreateVehicle = true;
+            ReadVehicle = true;
+            UpdateVehicle = true;
+            DeleteVehicle = true;
 
             CopyDatabase = true;
             MoveDatabase = true;

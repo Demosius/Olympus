@@ -59,8 +59,9 @@ namespace Uranus
             catch (Exception) { throw; }
         }
 
-        public virtual void ResetConnection()
+        public virtual void ResetConnection(string solLocation)
         {
+            BaseDataDirectory = solLocation;
             Database = null;
             InitializeDatabaseConnection();
         }

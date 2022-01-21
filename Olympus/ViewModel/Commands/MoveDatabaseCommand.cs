@@ -1,16 +1,12 @@
-﻿using Olympus.ViewModel.Components;
+﻿using Olympus.ViewModel.Utility;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Olympus.ViewModel.Commands
 {
     public class MoveDatabaseCommand : ICommand
     {
-        public DBSelectionVM VM { get; set; }
+        public DBManager VM { get; set; }
 
         public event EventHandler CanExecuteChanged
         {
@@ -18,7 +14,7 @@ namespace Olympus.ViewModel.Commands
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-        public MoveDatabaseCommand(DBSelectionVM vm)
+        public MoveDatabaseCommand(DBManager vm)
         {
             VM = vm;
         }

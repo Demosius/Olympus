@@ -10,10 +10,26 @@ namespace Olympus.ViewModel
 {
     public class LogInVM : INotifyPropertyChanged
     {
-        private int userID;
-        public int UserID { get => userID; set { userID = value; OnPropertyChanged(nameof(UserID)); } }
+        private string userID;
+        public string UserID
+        {
+            get => userID;
+            set
+            {
+                userID = value;
+                OnPropertyChanged(nameof(UserID));
+            }
+        }
         private string password = "";
-        public string Password { get => password; set { password = value; OnPropertyChanged(nameof(Password)); } }
+        public string Password
+        {
+            get => password;
+            set
+            {
+                password = value;
+                OnPropertyChanged(nameof(Password));
+            }
+        }
 
         public LogInCommand LogInCommand { get; set; }
 
@@ -24,7 +40,10 @@ namespace Olympus.ViewModel
 
         public bool LogIn()
         {
-            return App.Charon.LogIn(UserID, Password);
+            if (int.TryParse(UserID, out int id))
+                return App.Charon.LogIn(id, Password);
+            else 
+                return false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

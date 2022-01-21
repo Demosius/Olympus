@@ -1,12 +1,18 @@
 ﻿using Olympus.ViewModel.Utility;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Olympus.ViewModel.Commands
 {
-    public class CopyDatabaseCommand : ICommand
+    public class UseLocalDBCommand : ICommand
     {
-        public DBManager VM { get; set; }
+        public DBManager DBM { get; set; }
+
+        public UseLocalDBCommand(DBManager dbm) { DBM = dbm; }
 
         public event EventHandler CanExecuteChanged
         {
@@ -14,20 +20,14 @@ namespace Olympus.ViewModel.Commands
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-        public CopyDatabaseCommand(DBManager vm)
-        {
-            VM = vm;
-        }
-
         public bool CanExecute(object parameter)
         {
-            string dbLocation = (parameter ?? "null") as string;
-            return App.Charon.CanCopyDatabase() || dbLocation.ToLower() == "local";
+            return true;
         }
 
         public void Execute(object parameter)
         {
-            VM.CopyDatabase();
+            DBM.UseLocalDB();
         }
     }
 }

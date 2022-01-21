@@ -17,10 +17,10 @@ namespace Uranus.Users
             Chariot = chariot;
         }
 
-        public bool UserExists(int userID) => Chariot.Database.Execute("SELECT count(*) FROM User WHERE ID=?;", userID) > 0;
-        
+        public bool UserExists(int userID) => Chariot.Database.ExecuteScalar<int>("SELECT count(*) FROM User WHERE ID=?;", userID) > 0; 
+
         public Login Login(int userID) => Chariot.PullObject<Login>(userID);
-        
+
         public User User(int userID) => Chariot.PullObject<User>(userID, PullType.FullRecursive);
 
         public Role Role(string roleName) => Chariot.PullObject<Role>(roleName, PullType.FullRecursive);

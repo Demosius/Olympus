@@ -22,7 +22,10 @@ namespace Olympus.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            return VM.UserID > 0 && VM.Password.Length >= 6;
+            if (int.TryParse(VM.UserID, out int id))
+                return id > 0 && VM.Password.Length > 0;
+            else
+                return false;
         }
 
         public void Execute(object parameter)
@@ -32,6 +35,8 @@ namespace Olympus.ViewModel.Commands
                 Window window = parameter as Window;
                 window.Close();
             }
+            else
+                MessageBox.Show("Incorrect user and password combination.", "Invalid Log In", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

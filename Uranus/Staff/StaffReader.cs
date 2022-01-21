@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using SQLite;
 
 namespace Uranus.Staff
 {
@@ -32,6 +33,19 @@ namespace Uranus.Staff
         public bool EmployeeExists(int ID) => Chariot.Database.Execute("SELECT count(*) FROM Employee WHERE ID=?;", ID) > 0;
 
         public int EmployeeCount() => Chariot.Database.Execute("SELECT count(*) FROM Employee;");
+
+        /// <summary>
+        /// Returns a list of all employees that have direct reports.
+        /// </summary>
+        /// <returns>List of Employees</returns>
+        public List<Employee> Managers()
+        {
+            SQLiteConnection conn = Chariot.Database;
+            //List<int> employeeIDs = conn.Query<int>("SELECT DISTINCT ReportsToID FROM Employee;");
+            List<int> employeeIDs = conn.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID).ToList(); 
+
+            return conn.Query<Employee>($"SELECT * FROM Employee WHERE ID IN ({string.Join(", ", employeeIDs)});");
+        }
 
         /* DEPARTMENTS */
         public List<Department> Departments(Expression<Func<Department, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<Department>(filter, pullType);

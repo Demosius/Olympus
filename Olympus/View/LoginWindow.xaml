@@ -7,10 +7,11 @@
         xmlns:local="clr-namespace:Olympus.View"
         xmlns:vm="clr-namespace:Olympus.ViewModel"
         mc:Ignorable="d"
-        Background="{DynamicResource BackGroundBrush}"
+        Background="{DynamicResource RedGradient}"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Title="Log In" SizeToContent="WidthAndHeight">
+        Title="Log In" SizeToContent="WidthAndHeight"
+        FocusManager.FocusedElement="{Binding ElementName=TxtUser}">
     
     <Window.DataContext>
         <vm:LogInVM x:Name="VM"/>

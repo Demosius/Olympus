@@ -13,7 +13,7 @@
 
     <TabControl ItemsSource="{Binding ProjectGroups}" 
                 Padding="0"
-                Margin="5">
+                Margin="2">
         <TabControl.ItemTemplate>
             <DataTemplate>
                 <TextBlock Text="{Binding GroupName}" />
@@ -21,7 +21,7 @@
         </TabControl.ItemTemplate>
         <TabControl.ContentTemplate>
             <DataTemplate>
-                <ItemsControl ItemsSource="{Binding Projects}" Margin="5">
+                <ItemsControl ItemsSource="{Binding Projects}" Margin="2">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Button Style="{DynamicResource ProjectBtnStyle}" 
@@ -58,7 +58,7 @@
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="FontWeight" Value="ExtraLight"/>
             <Setter Property="FontFamily" Value="Arial" />
-            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Padding" Value="3"/>
             <Setter Property="FontSize" Value="14"/>
             <Style.Resources>
                 <Style TargetType="Image">

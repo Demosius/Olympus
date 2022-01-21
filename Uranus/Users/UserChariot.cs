@@ -44,14 +44,14 @@ namespace Uranus.Users
         /// Resets the connection using the given location string.
         /// </summary>
         /// <param name="solLocation">A directory location, in which the User database does/should reside.</param>
-        public void ResetConnection(string solLocation)
+        public override void ResetConnection(string solLocation)
         {
             // First thing is to nullify the current databse (connection).
             Database = null;
 
             try
             {
-                BaseDataDirectory = Path.Combine(solLocation, "User");
+                BaseDataDirectory = Path.Combine(solLocation, "Users");
                 InitializeDatabaseConnection();
             }
             catch (Exception) { throw; }

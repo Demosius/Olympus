@@ -38,37 +38,37 @@ namespace Uranus
 
         public Helios(string solLocation)
         {
-            InventoryChariot = new InventoryChariot(solLocation);
-            InventoryCreator = new InventoryCreator(ref InventoryChariot);
-            InventoryReader = new InventoryReader(ref InventoryChariot);
-            InventoryUpdater = new InventoryUpdater(ref InventoryChariot);
-            InventoryDeleter = new InventoryDeleter(ref InventoryChariot);
+            InventoryChariot = new(solLocation);
+            InventoryCreator = new(ref InventoryChariot);
+            InventoryReader = new(ref InventoryChariot);
+            InventoryUpdater = new(ref InventoryChariot);
+            InventoryDeleter = new(ref InventoryChariot);
 
-            StaffChariot = new StaffChariot(solLocation);
-            StaffCreator = new StaffCreator(ref StaffChariot);
-            StaffReader = new StaffReader(ref StaffChariot);
-            StaffUpdater = new StaffUpdater(ref StaffChariot);
-            StaffDeleter = new StaffDeleter(ref StaffChariot);
+            StaffChariot = new(solLocation);
+            StaffCreator = new(ref StaffChariot);
+            StaffReader = new(ref StaffChariot);
+            StaffUpdater = new(ref StaffChariot);
+            StaffDeleter = new(ref StaffChariot);
 
-            EquipmentChariot = new EquipmentChariot(solLocation);
-            EquipmentCreator = new EquipmentCreator(ref EquipmentChariot);
-            EquipmentReader = new EquipmentReader(ref EquipmentChariot);
-            EquipmentUpdater = new EquipmentUpdater(ref EquipmentChariot);
-            EquipmentDeleter = new EquipmentDeleter(ref EquipmentChariot);
+            EquipmentChariot = new(solLocation);
+            EquipmentCreator = new(ref EquipmentChariot);
+            EquipmentReader = new(ref EquipmentChariot);
+            EquipmentUpdater = new(ref EquipmentChariot);
+            EquipmentDeleter = new(ref EquipmentChariot);
 
-            UserChariot = new UserChariot(solLocation);
-            UserCreator = new UserCreator(ref UserChariot);
-            UserReader = new UserReader(ref UserChariot);
-            UserUpdater = new UserUpdater(ref UserChariot);
-            UserDeleter = new UserDeleter(ref UserChariot);
+            UserChariot = new(solLocation);
+            UserCreator = new(ref UserChariot);
+            UserReader = new(ref UserChariot);
+            UserUpdater = new(ref UserChariot);
+            UserDeleter = new(ref UserChariot);
         }
 
-        public void ResetChariots()
+        public void ResetChariots(string newSol)
         {
-            InventoryChariot.ResetConnection();
-            StaffChariot.ResetConnection();
-            EquipmentChariot.ResetConnection();
-            UserChariot.ResetConnection();
+            InventoryChariot.ResetConnection(newSol);
+            StaffChariot.ResetConnection(newSol);
+            EquipmentChariot.ResetConnection(newSol);
+            UserChariot.ResetConnection(newSol);
         }
     }
 }

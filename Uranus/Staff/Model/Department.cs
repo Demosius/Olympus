@@ -13,6 +13,8 @@ namespace Uranus.Staff.Model
         public string Name { get; set; }
         [ForeignKey(typeof(Employee))]
         public int HeadID { get; set; }
+        [ForeignKey(typeof(Department))]
+        public string OverDepartmentName { get; set; }
 
         [OneToOne]
         public Employee Head { get; set; }
@@ -25,7 +27,12 @@ namespace Uranus.Staff.Model
         public List<Clan> Clans { get; set; }
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<Role> Roles { get; set; }
-        
+
+        [OneToMany(inverseProperty: "OverDepartment")]
+        public List<Department> SubDepartments { get; set; }
+        [ManyToOne(inverseProperty: "SubDepartments")]
+        public Department OverDepartment { get; set; }
+
         [ManyToMany(typeof(EmployeeDepartmentLoaning), "EmployeeID", "DepartmentsCanWorkIn", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<Employee> EmployeesCanLoan { get; set; }
         [ManyToMany(typeof(DepartmentProject), "ProjectName", "Departments", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]

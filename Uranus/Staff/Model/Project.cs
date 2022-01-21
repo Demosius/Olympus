@@ -11,13 +11,13 @@ namespace Uranus.Staff.Model
     public class Project
     {
         [PrimaryKey]
-        public EProject EProject { get; set; }
         public string Name { get; set; }
+        public EProject Reference { get; set; }
         public string ToolTip { get; set; }
         [ForeignKey(typeof(ProjectIcon))]
         public string IconName { get; set; }
 
-        [OneToOne(inverseProperty: "Project", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public ProjectIcon Icon { get; set; }
 
         [ManyToMany(typeof(DepartmentProject), "DepartmentName", "Projects", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
@@ -30,7 +30,7 @@ namespace Uranus.Staff.Model
         // Create project and projectIcon together.
         public Project(EProject eProject, string iconFileName, StaffReader reader, string toolTip = "")
         {
-            EProject = eProject;
+            Reference = eProject;
             Name = eProject.ToString();
             Icon = new ProjectIcon(this, iconFileName);
             ToolTip = toolTip;

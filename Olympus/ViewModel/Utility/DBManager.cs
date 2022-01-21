@@ -10,14 +10,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace Olympus.ViewModel.Components
+namespace Olympus.ViewModel.Utility
 {
-    public class DBSelectionVM : INotifyPropertyChanged
+    public class DBManager : INotifyPropertyChanged
     {
         private string dbString;
         public string DBString
         {
-            get => dbString; 
+            get => dbString;
             set
             {
                 if (value == App.BaseDirectory())
@@ -31,18 +31,25 @@ namespace Olympus.ViewModel.Components
         public ChangeDatabaseCommand ChangeDatabaseCommand { get; set; }
         public MoveDatabaseCommand MoveDatabaseCommand { get; set; }
         public CopyDatabaseCommand CopyDatabaseCommand { get; set; }
+        public UseLocalDBCommand UseLocalDBCommand { get; set; }
+        public NewDatabaseCommand NewDatabaseCommand { get; set; }
+        public MergeDatabaseCommand MergeDatabaseCommand { get; set; }
 
         public OlympusVM OlympusVM { get; set; }
 
-        public DBSelectionVM()
+        public DBManager()
         {
-            ChangeDatabaseCommand = new ChangeDatabaseCommand(this);
-            MoveDatabaseCommand = new MoveDatabaseCommand(this);
-            CopyDatabaseCommand = new CopyDatabaseCommand(this);
+            ChangeDatabaseCommand = new(this);
+            MoveDatabaseCommand = new(this);
+            CopyDatabaseCommand = new(this);
+            UseLocalDBCommand = new(this);
+            NewDatabaseCommand = new(this);
+            MergeDatabaseCommand = new(this);
+
             DBString = Settings.Default.SolLocation;
         }
 
-        public DBSelectionVM(OlympusVM olympusVM) : this()
+        public DBManager(OlympusVM olympusVM) : this()
         {
             OlympusVM = olympusVM;
         }
@@ -76,28 +83,41 @@ namespace Olympus.ViewModel.Components
         private void SetDatabase(string path)
         {
             // Set App settings. 
-            // This in turn resets the chariots for both helios and charon.
             Settings.Default.SolLocation = path;
             // Set DBString.
             DBString = path;
             OlympusVM.UserHandlerVM.CheckUser();
             OlympusVM.InventoryUpdaterVM.GetUpdateTimes();
+            // This in turn resets the chariots for both helios and charon.
+            OlympusVM.ResetDB();
+        }
+
+        internal void UseLocalDB()
+        {
+            SetDatabase(App.BaseDirectory());
         }
 
         public void ChangeDatabase()
         {
+            // TODO: Validate selected folder as exisitng Sol Location.
             string path;
-            MessageBoxResult result = MessageBox.Show("Use Local database?", "DB Choice", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
-            if (result == MessageBoxResult.Yes)
-                path = App.BaseDirectory();
-            else if (result == MessageBoxResult.Cancel)
-                return;
-            else
-            {
-                path = SelectFolder();
-                // Empty string means cancelation.
-                if (path == "") return;
-            }
+
+            path = GetExistingSol();
+
+            // Empty string means cancelation or failure to find existing Sol DB.
+            if (path == "") return;
+
+            SetDatabase(path);
+        }
+        
+        public void NewDatabase()
+        {
+            string path;
+
+            path = SelectFolder();
+            // Empty string means cancelation.
+            if (path == "") return;
+
             // Make sure directory exists.
             if (!(Directory.Exists(path)))
                 _ = Directory.CreateDirectory(path);
@@ -143,6 +163,51 @@ namespace Olympus.ViewModel.Components
             Directory.Delete(oldPath, true);
         }
 
+        /// <summary>
+        /// User selects an exisinting DB-Sol location to merge with the current location.
+        /// </summary>
+        public void MergeDatabase()
+        {
+            string path = GetExistingSol();
+
+            if (path == "") return;
+            // TODO: Finish merging logic.
+        }
+
+        /// <summary>
+        /// Allows the user to browse for an existing DB-Sol location.
+        /// </summary>
+        /// <returns>String representing Directory Path to Sol if found, otherwise empty string.</returns>
+        private string GetExistingSol()
+        {
+            string path;
+
+            path = SelectFolder();
+            SetSol(path);
+
+            if (CheckSolExistance(path)) return "";
+
+            return path;
+        }
+
+        /// <summary>
+        /// Checks to see if a proper DB-Sol structure exists at the given directory location.
+        /// </summary>
+        /// <param name="dirPath">Directory location for potential Sol.</param>
+        /// <returns>True if Sol exists, else false.</returns>
+        private static bool CheckSolExistance(string dirPath)
+        {
+            if (!Directory.Exists(dirPath)) return false;
+            string equipmentPath = Path.Join(dirPath, "Equipment", "Equipment.sqlite");
+            string staffPath = Path.Join(dirPath, "Staff", "Staff.sqlite");
+            string usersPath = Path.Join(dirPath, "Users", "Users.sqlite");
+            string inventoryPath = Path.Join(dirPath, "Inventory", "Inventory.sqlite");
+            return Directory.Exists(equipmentPath) &&
+                Directory.Exists(staffPath) &&
+                Directory.Exists(inventoryPath) &&
+                Directory.Exists(usersPath); 
+        }
+
         private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs = true)
         {
             // Get the subdirectories for the specified directory.
@@ -165,7 +230,7 @@ namespace Olympus.ViewModel.Components
             foreach (FileInfo file in files)
             {
                 string tempPath = Path.Combine(destDirName, file.Name);
-                _ = file.CopyTo(tempPath, false);
+                _ = file.CopyTo(tempPath, true);
             }
 
             // If copying subdirectories, copy them and their contents to new location.
@@ -194,7 +259,7 @@ namespace Olympus.ViewModel.Components
             if (parent is null)
                 return false;   // Once there is no parent, that means that it must be false.
             if (parent.FullName == potentialParentDir.FullName)
-                return true; 
+                return true;
             return IsSubDirectory(potentialParentDir, parent);
         }
     }

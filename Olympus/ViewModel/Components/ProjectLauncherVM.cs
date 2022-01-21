@@ -54,8 +54,11 @@ namespace Olympus.ViewModel.Components
 
             foreach (var dep in Departments)
             {
-                projectGroup = new ProjectGroupVM(this, dep);
-                ProjectGroups.Add(projectGroup);
+                if (dep.Projects.Any())
+                {
+                    projectGroup = new ProjectGroupVM(this, dep);
+                    ProjectGroups.Add(projectGroup);
+                }
             }
         }
 

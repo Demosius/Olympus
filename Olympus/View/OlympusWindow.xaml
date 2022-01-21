@@ -18,68 +18,65 @@
     </Window.DataContext>
 
     <DockPanel>
-
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="Generate Master Sku List"
-                          Command="{Binding GenerateMasterSkuListCommand}"/>
-                <MenuItem Command="New"/>
-                <Separator/>
-                <MenuItem Header="E_xit">
-                    <MenuItem.Icon>
-                        <Image Source="../Resources/Images/System/Door-Open-Out.png"/>
-                    </MenuItem.Icon>
+                <MenuItem Header="_Database">
+                    <MenuItem Header="_New Database"
+                              Command="{Binding DBManager.NewDatabaseCommand}"/>
+                    <MenuItem Header="_Change Database">
+                        <MenuItem Header="Use _Local/Default"
+                                  Command="{Binding DBManager.UseLocalDBCommand}"/>
+                        <MenuItem Header="_Browse"
+                                  Command="{Binding DBManager.ChangeDatabaseCommand}"/>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="Mer_ge"
+                              Command="{Binding DBManager.MergeDatabaseCommand}"/>
+                    <MenuItem Header="_Move"
+                              Command="{Binding DBManager.MoveDatabaseCommand}"/>
+                    <MenuItem Header="_Copy" 
+                              Command="{Binding DBManager.CopyDatabaseCommand}"/>
                 </MenuItem>
-            </MenuItem>
-            <MenuItem Header="_Edit">
+                <MenuItem Header="_Generate Master Sku List"
+                          Command="{Binding GenerateMasterSkuListCommand}"/>
+                
             </MenuItem>
         </Menu>
 
         <ToolBarTray DockPanel.Dock="Top">
         </ToolBarTray>
-        <StatusBar DockPanel.Dock="Bottom">
+        
+        <StatusBar DockPanel.Dock="Bottom"
+                   Background="{DynamicResource PurpleGradient}"
+                   Padding="0">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </ItemsPanelTemplate>
             </StatusBar.ItemsPanel>
-            <StatusBarItem>
-                <TextBlock Name="lblCursorPosition" />
-            </StatusBarItem>
-            <Separator Grid.Column="1" />
+            <StackPanel Orientation="Horizontal"
+                        Margin="5,0"
+                        Grid.Column="0">
+                <TextBlock Text="Database: " Foreground="{DynamicResource ForeGradient}"/>
+                <TextBlock Text="{Binding DBManager.DBString}" Foreground="{DynamicResource ForeGradient}"/>
+            </StackPanel>
             <StatusBarItem Grid.Column="2">
-                <TextBlock Text="c:\path\of\current\file.txt" />
-            </StatusBarItem>
-            <Separator Grid.Column="3" />
-            <StatusBarItem Grid.Column="4">
-                <ProgressBar Value="05" Width="180" Height="16" />
+                <Control:UserHandler DataContext="{Binding UserHandlerVM}"/>
             </StatusBarItem>
         </StatusBar>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <StackPanel>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Control:DatabaseSelection Grid.Column="0"
-                                               DataContext="{Binding DBSelectionVM}"/>
-                    <Control:UserHandler Grid.Column="2"
-                                         DataContext="{Binding UserHandlerVM}"/>
-                </Grid>
+        
+        <Expander DockPanel.Dock="Top"
+                  ExpandDirection="Right"
+                  IsExpanded="True"
+                  Margin="0">
+            <StackPanel DockPanel.Dock="Top"
+                        Margin="0">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -87,14 +84,17 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Control:ProjectLauncher Grid.Column="0"
-                                             DataContext="{Binding ProjectLauncherVM}"/>
+                                             DataContext="{Binding ProjectLauncherVM, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                             Margin="0"/>
                     <Control:InventoryUpdater Grid.Column="2"
-                                              DataContext="{Binding InventoryUpdaterVM}"/>
+                                              DataContext="{Binding InventoryUpdaterVM, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                              Margin="0"/>
                 </Grid>
             </StackPanel>
-            <Frame  Content="{Binding CurrentPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+        </Expander>
+        <Frame  Content="{Binding CurrentPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Grid.Row="1"
-                    Margin="5,5,5,5" 
+                    Margin="2,0,2,2" 
                     x:Name="OView"
                     Grid.Column="0" 
                     Height="Auto" 
@@ -103,6 +103,5 @@
                     BorderThickness="1" 
                     BorderBrush="SlateGray"
                     NavigationUIVisibility="Hidden"/>
-        </Grid>
     </DockPanel>
 </Window>

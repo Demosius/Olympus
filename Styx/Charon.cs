@@ -25,7 +25,7 @@ namespace Styx
             set
             {
                 // Make sure user project icon paths are set.
-                foreach (var p in value.Employee.Projects)
+                foreach (var p in value?.Employee?.Projects ?? new())
                     p.Icon.SetImageFilePath(staffReader);
                 currentUser = value;
             }
@@ -75,11 +75,11 @@ namespace Styx
                 user.Employee = employee;
         }
 
-        public void DatabaseReset()
+        public void DatabaseReset(string newSol)
         {
             LogOut();
-            userChariot.ResetConnection();
-            staffChariot.ResetConnection();
+            userChariot.ResetConnection(newSol);
+            staffChariot.ResetConnection(newSol);
         }
 
         public int GetLevelDifference(Employee employee)
@@ -146,8 +146,9 @@ namespace Styx
             {
                 if (VerifyPassword(login, password))
                 {
-                    CurrentUser = userReader.User(userID);
-                    CurrentUser.Employee = staffReader.Employee(userID, PullType.FullRecursive);
+                    User user = userReader.User(userID);
+                    user.Employee = staffReader.Employee(userID, PullType.IncludeChildren);
+                    CurrentUser = user;
                     return true;
                 }
             }
@@ -237,6 +238,32 @@ namespace Styx
             return true;
         }
 
+        /// <summary>
+        /// Assumes that the id and role name are valid and creates data entries for login and user for a new user.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="roleName"></param>
+        /// <returns></returns>
+        public bool CreateNewUser(int id, string roleName)
+        {
+            User newUser = new()
+            {
+                ID = id,
+                RoleName = roleName
+            };
+            Login newLogin = GetNewLogin(id, $"{id}");
+
+            userCreator.User(newUser);
+            userCreator.Login(newLogin);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Creates a new user based on the given employee with the default user role.
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
         public bool CreateNewUser(Employee employee)
         {
             // Check that the employee doesn't already have an associated user.
@@ -244,17 +271,27 @@ namespace Styx
 
             // Create new user and login.
             userCreator.AssureDefaultRole();
-            User newUser = new()
-            {
-                ID = employee.ID,
-                RoleName = "Default"
-            };
-            Login newLogin = GetNewLogin(employee.ID, $"Password{employee.ID}");
 
-            userCreator.User(newUser);
-            userCreator.Login(newLogin);
+            return CreateNewUser(employee.ID, "Default");
+        }
 
-            return true;
+        /// <summary>
+        /// Creates a new user based on the given employee, and assigns it the given user role, assuming that it exists.
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <param name="roleName"></param>
+        /// <returns></returns>
+        public bool CreateNewUser(Employee employee, string roleName)
+        {
+            // Check if role exists.
+            Role role = userReader.Role(roleName);
+            if (role is null) return CreateNewUser(employee);
+
+            // Check that the employee doesn't already have an associated user.
+            if (userReader.UserExists(employee.ID)) return false;
+
+            // Create user.
+            return CreateNewUser(employee.ID, roleName);
         }
 
         /// <summary>

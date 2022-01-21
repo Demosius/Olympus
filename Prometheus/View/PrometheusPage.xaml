@@ -13,18 +13,20 @@
     </Page.DataContext>
 
     <DockPanel>
-        <ListView Width="150"
+        <ListView Width="Auto"
+                  MinWidth="100"
                   DockPanel.Dock="Left"
                   SelectedValue="{Binding SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   ItemsSource="{Binding Categories}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}" FontSize="18"/>
+                    <TextBlock Text="{Binding Name}" FontSize="14"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
         <ListView DockPanel.Dock="Left"
-                  Width="250"
+                  Width="Auto"
+                  MinWidth="100"
                   SelectedValue="{Binding SelectedType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   ItemsSource="{Binding Types}">
             <ListView.ItemTemplate>
@@ -33,7 +35,7 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Frame Background="#977"
+        <Frame Background="#ECC"
                Content="{Binding CurrentPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"              
                Height="Auto" 
                HorizontalAlignment="Stretch" 
@@ -42,137 +44,6 @@
                BorderBrush="SlateGray"
                NavigationUIVisibility="Hidden"/>
     </DockPanel>
-
-    <!--<Grid Background="#533">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" MinWidth="200"/>
-            <ColumnDefinition Width="5*" MinWidth="200"/>
-        </Grid.ColumnDefinitions>
-
-        <TreeView Name="tableView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Margin="2,2,2,2" Height="Auto" 
-                  ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <TreeViewItem Header="Staff">
-                <TreeViewItem Header="Borrow Employees"  Tag="Staff,borrowsEmp"/>
-                <TreeViewItem Header="Clan"  Tag="Staff,clan"/>
-                <TreeViewItem Header="Department"  Tag="Staff,department"/>
-                <TreeViewItem Header="Employee"  Tag="Staff,employee"/>
-                <TreeViewItem Header="Induction"  Tag="Staff,induction"/>
-                <TreeViewItem Header="Induction Reference"  Tag="Staff,inductionReference"/>
-                <TreeViewItem Header="Licence"  Tag="Staff,licence"/>
-                <TreeViewItem Header="Locker"  Tag="Staff,locker"/>
-                <TreeViewItem Header="Owns Car"  Tag="Staff,ownsCar"/>
-                <TreeViewItem Header="Role"  Tag="Staff,role"/>
-                <TreeViewItem Header="Shift"  Tag="Staff,shift"/>
-                <TreeViewItem Header="Shift Rule"  Tag="Staff,shift_rule"/>
-                <TreeViewItem Header="Shift Eligibility"  Tag="Staff,shiftEligibility"/>
-                <TreeViewItem Header="Temp Tag"  Tag="Staff,temp_tag"/>
-                <TreeViewItem Header="Uses Tag"  Tag="Staff,usesTag"/>
-                <TreeViewItem Header="Vehicle"  Tag="Staff,vehicle"/>
-            </TreeViewItem>
-            <TreeViewItem Header="Inventory">
-                <TreeViewItem Header="Bin List"  Tag="Inventory,bin"/>
-                <TreeViewItem Header="Item List"  Tag="Inventory,item"/>
-                <TreeViewItem Header="Bin Contents"  Tag="Inventory,stock"/>
-                <TreeViewItem Header="Stock Update"  Tag="Inventory,stock_update"/>
-                <TreeViewItem Header="Unit of Measure"  Tag="Inventory,uom"/>
-                <TreeViewItem Header="Update Table"  Tag="Inventory,update"/>
-                <TreeViewItem Header="Zone"  Tag="Inventory,zone"/>
-            </TreeViewItem>
-            <TreeViewItem Header="Equipment">
-                <TreeViewItem Header="Battery"  Tag="Equipment,battery"/>
-                <TreeViewItem Header="Battery Location"  Tag="Equipment,battery_location"/>
-                <TreeViewItem Header="Charger"  Tag="Equipment,charger"/>
-                <TreeViewItem Header="Charger Assignment"  Tag="Equipment,charger_assignment"/>
-                <TreeViewItem Header="Checklist"  Tag="Equipment,checklist"/>
-                <TreeViewItem Header="Completed Checklists"  Tag="Equipment,completed_checklist"/>
-                <TreeViewItem Header="Fault"  Tag="Equipment,fault"/>
-                <TreeViewItem Header="Machine"  Tag="Equipment,machine"/>
-                <TreeViewItem Header="Type"  Tag="Equipment,type"/>
-            </TreeViewItem>
-            <TreeViewItem Header="Users">
-                <TreeViewItem Header="Login"  Tag="Users,login"/>
-                <TreeViewItem Header="Role"  Tag="Users,role"/>
-                <TreeViewItem Header="User"  Tag="Users,user"/>
-            </TreeViewItem>
-        </TreeView>
-
-        <Border BorderBrush="SlateGray" BorderThickness="1" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Margin="2" Background="#700"/>
-        <Grid Grid.Row="0" Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <Button Grid.Row="0" Grid.Column="1" Height="30" Width="30" Margin="5" HorizontalAlignment="Right" Style="{DynamicResource PageButton}">
-                <Image Source="/Resources/Images/Pagination/first_button.png" Margin="5"/>
-            </Button>
-            <Button Grid.Row="0" Grid.Column="2" Height="30" Width="30" Margin="5" HorizontalAlignment="Right" Style="{DynamicResource PageButton}">
-                <Image Source="/Resources/Images/Pagination/previous_button.png" Margin="6"/>
-            </Button>
-            <Label Name="PageInfo" Grid.Row="0" Grid.Column="3" Margin="5" Padding="5,3,5,3" Height="Auto" FontSize="18" HorizontalAlignment="Center" BorderBrush="Black" BorderThickness="1" Background="AliceBlue" Foreground="Black" Content="{Binding}"/>
-            <Button Grid.Row="0" Grid.Column="4" Height="30" Width="30" Margin="5" HorizontalAlignment="Left" Style="{DynamicResource PageButton}">
-                <Image Source="/Resources/Images/Pagination/next_button.png" Margin="6"/>
-            </Button>
-            <Button Grid.Row="0" Grid.Column="5" Height="30" Width="30" Margin="5" HorizontalAlignment="Left" Style="{DynamicResource PageButton}">
-                <Image Source="/Resources/Images/Pagination/last_button.png" Margin="5"/>
-            </Button>
-            
-        </Grid>
-
-
-        <Grid Grid.Row="1" Grid.Column="1" >
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <Label Content="Rows Per Page:" FontFamily="Courier New" FontSize="14" HorizontalAlignment="Right" Foreground="NavajoWhite"/>
-
-            <RadioButton Grid.Row="0" Grid.Column="1" Height="30" Width="30" Margin="20,0,20,5" HorizontalAlignment="Left" Style="{DynamicResource IPPButton}" Tag="25" IsChecked="True">25</RadioButton>
-            <RadioButton Grid.Row="0" Grid.Column="2" Height="30" Width="30" Margin="20,0,20,5" HorizontalAlignment="Left" Style="{DynamicResource IPPButton}" Tag="50" >50</RadioButton>
-            <RadioButton Grid.Row="0" Grid.Column="3" Height="30" Width="30" Margin="20,0,20,5" HorizontalAlignment="Left" Style="{DynamicResource IPPButton}" Tag="75" >75</RadioButton>
-            <RadioButton Grid.Row="0" Grid.Column="4" Height="30" Width="30" Margin="20,0,20,5" HorizontalAlignment="Left" Style="{DynamicResource IPPButton}" Tag="100" >100</RadioButton>
-            <RadioButton Grid.Row="0" Grid.Column="5" Height="30" Width="30" Margin="20,0,20,5" HorizontalAlignment="Left" Style="{DynamicResource IPPButton}" Tag="500" >500</RadioButton>
-
-        </Grid>
-
-            
-        <DataGrid Name="DisplayData" Grid.Row="2" Grid.Column="1" Margin="1,1,1,1" Height="Auto" Width="Auto" ItemsSource="{Binding}" 
-                  AutoGenerateColumns="True" ScrollViewer.CanContentScroll="True" ScrollViewer.VerticalScrollBarVisibility="Visible"
-                  VerticalScrollBarVisibility="Auto" ColumnWidth="Auto" Style="{DynamicResource DataGridStyle}">
-            
-            <DataGrid.Resources>
-                <Style TargetType="Button" x:Key="{ComponentResourceKey ResourceId=DataGridSelectAllButtonStyle, TypeInTargetAssembly={x:Type DataGrid}}">
-                    <Setter Property="Background" Value="Black" />
-                </Style>
-            </DataGrid.Resources>
-        </DataGrid>
-        
-    </Grid>-->
 
     <Page.Resources>
         <!--Listview Styling-->
@@ -184,7 +55,7 @@
         <Style TargetType="ListViewItem">
             <Setter Property="Background" Value="#500"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontSize" Value="10"/>
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="TextBlock.Margin" Value="2" />
             <Style.Triggers>

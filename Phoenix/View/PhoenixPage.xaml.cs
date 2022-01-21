@@ -8,9 +8,9 @@ namespace Phoenix.View
     /// <summary>
     /// Interaction logic for TorchPage.xaml
     /// </summary>
-    public partial class TorchPage : Page, IProject
+    public partial class PhoenixPage : Page, IProject
     {
-        public TorchPage()
+        public PhoenixPage()
         {
             InitializeComponent();
         }

@@ -47,7 +47,7 @@
         </Style>
 
         <!--Standard Button Styling-->
-        <Style TargetType="Button">
+        <Style x:Key="OButton" TargetType="Button">
             <Setter Property="Margin" Value="5"/>
             <Setter Property="MinHeight" Value="20"/>
             <Setter Property="MinWidth" Value="20"/>
@@ -60,15 +60,6 @@
             <Setter Property="FontFamily" Value="Arial" />
             <Setter Property="Padding" Value="5"/>
             <Setter Property="FontSize" Value="14"/>
-            <!--<Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border Background="{TemplateBinding Background}" BorderBrush="WhiteSmoke" CornerRadius="3" BorderThickness="1">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>-->
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="Red"/>
@@ -84,7 +75,7 @@
         </Style>
 
         <!--Standard Label Styling-->
-        <Style TargetType="Label">
+        <Style TargetType="Label" x:Key="OLabel">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="TextBlock.FontSize" Value="14"/>
             <Setter Property="TextBlock.TextAlignment" Value="Center"/>
@@ -149,6 +140,16 @@
             <GradientStop Color="White" Offset="0"/>
             <GradientStop Color="Gray" Offset="1"/>
         </LinearGradientBrush>
+        
+        <!-- Other Colour Gradients -->
+        <LinearGradientBrush x:Key="RedGradient" EndPoint="0,1" StartPoint="0,0">
+            <GradientStop Color="DarkRed" Offset="0"/>
+            <GradientStop Color="#200" Offset="1"/>
+        </LinearGradientBrush>
+
+        <!-- Implicit styling -->
+        <Style BasedOn="{StaticResource OButton}" TargetType="Button"/>
+        <Style BasedOn="{StaticResource OLabel}" TargetType="Label"/>
 
     </Application.Resources>
 

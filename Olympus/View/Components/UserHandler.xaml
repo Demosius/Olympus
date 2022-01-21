@@ -11,13 +11,27 @@
         <vm:UserHandlerVM/>
     </UserControl.DataContext>
     
-    <StackPanel Orientation="Horizontal">
+    <StackPanel Orientation="Horizontal"
+                Margin="0">
 
-        <Label Content="{Binding UserGreeting, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Content="{Binding UserGreeting, UpdateSourceTrigger=PropertyChanged}"
+               FontSize="10"/>
 
         <Button Content="{Binding ButtonString, UpdateSourceTrigger=PropertyChanged}" 
                 Command="{Binding UserCommand}"
-                CommandParameter="{Binding ButtonString}"/>
+                CommandParameter="{Binding ButtonString}"
+                FontSize="10"/>
 
     </StackPanel>
+
+    <UserControl.Resources>
+        <Style BasedOn="{StaticResource OButton}" TargetType="Button">
+            <Setter Property="Margin" Value="2,0"/>
+            <Setter Property="Background" Value="{StaticResource RedGradient}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource GreenGradient}"/>
+        </Style>
+        <Style TargetType="Label" BasedOn="{StaticResource OLabel}">
+            <Setter Property="Margin" Value="2,0"/>
+        </Style>
+    </UserControl.Resources>
 </UserControl>
