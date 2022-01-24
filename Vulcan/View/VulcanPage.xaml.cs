@@ -17,6 +17,8 @@ namespace Vulcan.View
 
         public EProject EProject => EProject.Vulcan;
 
+        public bool RequiresUser => false;
+
         public void RefreshData()
         {
             throw new NotImplementedException();

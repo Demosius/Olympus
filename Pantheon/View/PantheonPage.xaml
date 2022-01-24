@@ -6,9 +6,30 @@
       xmlns:local="clr-namespace:Pantheon.View"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="PantheonPage">
+      Title="PantheonPage"
+      Background="#111">
 
-    <Grid Background="DarkSlateGray">
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Dark Theme -->
+                <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <DockPanel>
+        <TreeView DockPanel.Dock="Left"
+                  MinWidth="100">
+            <TreeViewItem Header="Employees">
+                <TreeViewItem Header="Manage"/>
+                <TreeViewItem Header="Create"/>
+            </TreeViewItem>
+            <TreeViewItem Header="Shifts"/>
+            <TreeViewItem Header="Roster Management"/>
+        </TreeView>
         <Button Content="This is a button."/>
-    </Grid>
+    </DockPanel>
+    
 </Page>

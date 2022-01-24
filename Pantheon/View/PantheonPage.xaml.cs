@@ -18,6 +18,8 @@ namespace Pantheon.View
 
         public EProject EProject { get => EProject.Pantheon; }
 
+        public bool RequiresUser => true;
+
         public void RefreshData()
         {
             throw new NotImplementedException();

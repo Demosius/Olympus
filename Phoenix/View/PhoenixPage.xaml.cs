@@ -17,6 +17,8 @@ namespace Phoenix.View
 
         public EProject EProject => EProject.Phoenix;
 
+        public bool RequiresUser => false;
+
         public void RefreshData()
         {
             throw new NotImplementedException();

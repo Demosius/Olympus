@@ -31,6 +31,8 @@ namespace Prometheus.View
 
         public EProject EProject => EProject.Prometheus;
 
+        public bool RequiresUser => false;
+
         public void RefreshData()
         {
             throw new NotImplementedException();

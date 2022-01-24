@@ -4,6 +4,12 @@
              xmlns:local="clr-namespace:Pantheon"
              StartupUri="View/PantheonWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Dark Theme -->
+                <ResourceDictionary Source="Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary Source="Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -166,11 +166,11 @@ namespace Olympus.ViewModel.Utility
         /// <summary>
         /// User selects an exisinting DB-Sol location to merge with the current location.
         /// </summary>
-        public void MergeDatabase()
+        public static void MergeDatabase()
         {
             string path = GetExistingSol();
 
-            if (path == "") return;
+            if (path == "" || path == Settings.Default.SolLocation) return;
             // TODO: Finish merging logic.
         }
 
@@ -178,7 +178,7 @@ namespace Olympus.ViewModel.Utility
         /// Allows the user to browse for an existing DB-Sol location.
         /// </summary>
         /// <returns>String representing Directory Path to Sol if found, otherwise empty string.</returns>
-        private string GetExistingSol()
+        private static string GetExistingSol()
         {
             string path;
 

@@ -1,18 +1,19 @@
-﻿using Olympus.ViewModel.Utility;
+﻿using Pantheon.View;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
-namespace Olympus.ViewModel.Commands
+namespace Pantheon.ViewModel.Commands
 {
-    public class MergeDatabaseCommand : ICommand
+    public class LogInCommand : ICommand
     {
-        public DBManager DBM { get; set; }
+        public LoginVM VM { get; set; }
 
-        public MergeDatabaseCommand(DBManager dbm) { DBM = dbm; }
+        public LogInCommand(LoginVM vm) { VM = vm; }
 
         public event EventHandler CanExecuteChanged
         {
@@ -22,12 +23,18 @@ namespace Olympus.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            return true;
+            return VM.UserCode.Length > 0 && VM.Password.Length > 0;
         }
 
         public void Execute(object parameter)
         {
-            DBManager.MergeDatabase();
+            if (VM.LogIn())
+            {
+                Window w = parameter as Window;
+                w.Close();
+                PantheonWindow pw = new();
+                pw.Show();
+            }
         }
     }
 }

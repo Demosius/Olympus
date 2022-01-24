@@ -35,7 +35,7 @@ namespace Olympus.ViewModel
 
         public LogInVM()
         {
-            LogInCommand = new LogInCommand(this);
+            LogInCommand = new(this);
         }
 
         public bool LogIn()

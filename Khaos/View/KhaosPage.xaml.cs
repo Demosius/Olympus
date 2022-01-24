@@ -17,6 +17,8 @@ namespace Khaos.View
 
         public EProject EProject => EProject.Khaos;
 
+        public bool RequiresUser => false;
+
         public void RefreshData()
         {
             throw new NotImplementedException();
