@@ -4,10 +4,7 @@ using Uranus.Inventory;
 using Uranus.Inventory.Model;
 using Olympus.ViewModel.Commands;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -19,7 +16,8 @@ namespace Olympus.ViewModel.Components
 
         // Last update times.
         private DateTime stockUpdateTime;
-        public string StockUpdateString { get => stockUpdateTime.ToString("dd/MM/yyyy HH:mm"); }
+        public string StockUpdateString => stockUpdateTime.ToString("dd/MM/yyyy HH:mm");
+
         public DateTime StockUpdateTime
         {
             get => stockUpdateTime;
@@ -30,7 +28,8 @@ namespace Olympus.ViewModel.Components
             }
         }
         private DateTime binsUpdateTime;
-        public string BinsUpdateString { get => binsUpdateTime.ToString("dd/MM/yyyy HH:mm"); }
+        public string BinsUpdateString => binsUpdateTime.ToString("dd/MM/yyyy HH:mm");
+
         public DateTime BinsUpdateTime
         {
             get => binsUpdateTime;
@@ -41,7 +40,8 @@ namespace Olympus.ViewModel.Components
             }
         }
         private DateTime uomUpdateTime;
-        public string UoMUpdateString { get => uomUpdateTime.ToString("dd/MM/yyyy HH:mm"); }
+        public string UoMUpdateString => uomUpdateTime.ToString("dd/MM/yyyy HH:mm");
+
         public DateTime UoMUpdateTime
         {
             get => uomUpdateTime;
@@ -52,7 +52,8 @@ namespace Olympus.ViewModel.Components
             }
         }
         private DateTime itemUpdateTime;
-        public string ItemUpdateString { get => itemUpdateTime.ToString("dd/MM/yyyy HH:mm"); }
+        public string ItemUpdateString => itemUpdateTime.ToString("dd/MM/yyyy HH:mm");
+
         public DateTime ItemUpdateTime
         {
             get => itemUpdateTime;
@@ -68,23 +69,23 @@ namespace Olympus.ViewModel.Components
         public UpdateBinsCommand UpdateBinsCommand { get; set; }
         public UpdateUoMCommand UpdateUoMCommand { get; set; }
         public UpdateItemsCommand UpdateItemsCommand { get; set; }
-        public ShowBCColCommand ShowBCColCommand { get; set; }
-        public ShowBLColCommand ShowBLColCommand { get; set; }
-        public ShowULColCommand ShowULColCommand { get; set; }
+        public ShowBcColCommand ShowBcColCommand { get; set; }
+        public ShowBinListColumnCommand ShowBinListColumnCommand { get; set; }
+        public ShowUlColCommand ShowUlColCommand { get; set; }
         public ShowInfoCommand ShowInfoCommand { get; set; }
 
         // Constructors
         public InventoryUpdaterVM()
         {
             GetUpdateTimes();
-            UpdateStockCommand = new UpdateStockCommand(this);
-            UpdateBinsCommand = new UpdateBinsCommand(this);
-            UpdateUoMCommand = new UpdateUoMCommand(this);
-            UpdateItemsCommand = new UpdateItemsCommand(this);
-            ShowBCColCommand = new ShowBCColCommand(this);
-            ShowBLColCommand = new ShowBLColCommand(this);
-            ShowULColCommand = new ShowULColCommand(this);
-            ShowInfoCommand = new ShowInfoCommand(this);
+            UpdateStockCommand = new(this);
+            UpdateBinsCommand = new(this);
+            UpdateUoMCommand = new(this);
+            UpdateItemsCommand = new(this);
+            ShowBcColCommand = new(this);
+            ShowBinListColumnCommand = new(this);
+            ShowUlColCommand = new(this);
+            ShowInfoCommand = new(this);
         }
 
         public InventoryUpdaterVM(OlympusVM olympusVM) : this()
@@ -132,7 +133,7 @@ namespace Olympus.ViewModel.Components
         {
             _ = Task.Run(() =>
               {
-                  if (App.Helios.InventoryCreator.NAVItems(DataConversion.NAVCSVToItems(Settings.Default.ItemCSVLocation), 
+                  if (App.Helios.InventoryCreator.NAVItems(DataConversion.NAV_CSVToItems(Settings.Default.ItemCSVLocation), 
                       InventoryReader.LastItemWriteTime(Settings.Default.ItemCSVLocation)))
                       GetUpdateTimes();
               });
@@ -149,12 +150,12 @@ namespace Olympus.ViewModel.Components
                             MessageBoxImage.Information);
         }
 
-        public static void BCInfo()
+        public static void BcInfo()
         {
             _ = MessageBox.Show($"Find the Data:\n" +
                             $"[NAV > Warehouse > Planning & Execution > Bin Contents]\n\n" +
                             $"Required Columns:\n\n" +
-                            $"{String.Join("\n", Constants.NAV_STOCK_COLUMNS.Keys)}\n\n" +
+                            $"{String.Join("\n", Constants.NAVStockColumns.Keys)}\n\n" +
                             $"(Filter to Zone Code as required, and Location Code = '9600')\n" +
                             $"(Update to the minute, as required.)",
                             $"Stock/Bin Contents Requirements",
@@ -162,12 +163,12 @@ namespace Olympus.ViewModel.Components
                             MessageBoxImage.Information);
         }
 
-        public static void BLInfo()
+        public static void BlInfo()
         {
             _ = MessageBox.Show($"Find the Data:\n" +
                             $"[NAV > Warehouse > Planning & Execution > Bin Contents >> Bin Code]\n\n" +
                             $"Required Columns:\n\n" +
-                            $"{String.Join("\n", Constants.NAV_BIN_COLUMNS.Keys)}\n\n" +
+                            $"{String.Join("\n", Constants.NAVBinColumns.Keys)}\n\n" +
                             $"(No filtering required.)\n" +
                             $"(Update when changes are made to bin/zone layouts, or when Count Dates are required.)",
                             $"Bin List Requirements",
@@ -180,7 +181,7 @@ namespace Olympus.ViewModel.Components
             _ = MessageBox.Show($"Find the Data:\n" +
                             $"[NAV > Warehouse > Planning & Execution > Bin Contents >> Unit of Measure Code]\n\n" +
                             $"Required Columns:\n\n" +
-                            $"{String.Join("\n", Constants.NAV_UOM_COLUMNS.Keys)}\n\n" +
+                            $"{String.Join("\n", Constants.NAVUOMColumns.Keys)}\n\n" +
                             $"(Unfilter All, then filter Code to \"<>EACH\".)\n" +
                             $"(Update Daily. End of previous work day, or begining of current.)",
                             $"UoM Data Requirements",
@@ -192,7 +193,7 @@ namespace Olympus.ViewModel.Components
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
     }
 }

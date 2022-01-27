@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Windows;
 using Uranus.Users.Model;
 
 namespace Uranus.Users
@@ -18,11 +13,11 @@ namespace Uranus.Users
     /// <summary>
     ///  The chariot for transferring user data back and forth from the database.
     /// </summary>
-    public class UserChariot : MasterChariot
+    public sealed class UserChariot : MasterChariot
     {
-        public override string DatabaseName { get; } = "Users.sqlite";
+        public override string DatabaseName => "Users.sqlite";
 
-        public override Type[] Tables { get; } = new Type[]
+        public override Type[] Tables { get; } = 
         {
             typeof(User), typeof(Role), typeof(Login)
         };
@@ -32,12 +27,8 @@ namespace Uranus.Users
         public UserChariot(string solLocation)
         {
             // Try first to use the given directory, if not then use local file.
-            try
-            {
-                BaseDataDirectory = Path.Combine(solLocation, "Users");
-                InitializeDatabaseConnection();
-            }
-            catch (Exception) { throw; }
+            BaseDataDirectory = Path.Combine(solLocation, "Users");
+            InitializeDatabaseConnection();
         }
 
         /// <summary>
@@ -46,15 +37,11 @@ namespace Uranus.Users
         /// <param name="solLocation">A directory location, in which the User database does/should reside.</param>
         public override void ResetConnection(string solLocation)
         {
-            // First thing is to nullify the current databse (connection).
+            // First thing is to nullify the current database (connection).
             Database = null;
 
-            try
-            {
-                BaseDataDirectory = Path.Combine(solLocation, "Users");
-                InitializeDatabaseConnection();
-            }
-            catch (Exception) { throw; }
+            BaseDataDirectory = Path.Combine(solLocation, "Users");
+            InitializeDatabaseConnection();
         }
 
         /***************************** CREATE Data ****************************/

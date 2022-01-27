@@ -1,5 +1,4 @@
 ﻿using StaffRole = Uranus.Staff.Model.Role;
-using Role = Uranus.Users.Model.Role;
 using System;
 using Uranus.Users.Model;
 using Uranus.Staff.Model;
@@ -54,25 +53,16 @@ namespace Styx
 
         public Charon(string solLocation)
         {
-            userChariot = new UserChariot(solLocation);
-            userCreator = new UserCreator(ref userChariot);
-            userReader = new UserReader(ref userChariot);
-            userUpdater = new UserUpdater(ref userChariot);
+            userChariot = new(solLocation);
+            userCreator = new(ref userChariot);
+            userReader = new(ref userChariot);
+            userUpdater = new(ref userChariot);
             // userDeleter = new UserDeleter(ref userChariot);
 
-            staffChariot = new StaffChariot(solLocation);
-            staffReader = new StaffReader(ref staffChariot);
-            staffCreator = new StaffCreator(ref staffChariot);
+            staffChariot = new(solLocation);
+            staffReader = new(ref staffChariot);
+            staffCreator = new(ref staffChariot);
             // staffDeleter = new StaffDeleter(ref staffChariot);
-        }
-
-        public Charon(string solLocation, User user, Employee employee) : this(solLocation)
-        {
-            CurrentUser = user;
-            if (user.Employee is null)
-                user.Employee = employee;
-            else if (user.ID != user.Employee.ID && user.ID == employee.ID)
-                user.Employee = employee;
         }
 
         public void DatabaseReset(string newSol)
@@ -85,22 +75,18 @@ namespace Styx
         public int GetLevelDifference(Employee employee)
         {
             if (CurrentUser is null || UserEmployee is null) return 999;
-            StaffRole targetRole = employee.Role;
+            var targetRole = employee.Role;
             int up = 0, down = 0;
             if (UserEmployee.Role.LookDown(ref down, ref targetRole))
             {
                 return -down;
             }
-            if (UserEmployee.Role.LookUp(ref up, ref down, UserEmployee.Role, ref targetRole))
-            {
-                return up;
-            }
-            return 999;
+            return UserEmployee.Role.LookUp(ref up, ref down, UserEmployee.Role, ref targetRole) ? up : 999;
         }
 
         public int GetLevelDifference(int employeeID)
         {
-            Employee employee = staffReader.Employee(employeeID, PullType.FullRecursive);
+            var employee = staffReader.Employee(employeeID, EPullType.FullRecursive);
             return GetLevelDifference(employee);
         }
 
@@ -114,7 +100,7 @@ namespace Styx
             if (!ValidatePassword(newPassword, confirmPassword, out message)) return false;
 
             // Set up new password for current user.
-            Login newLogin = GetNewLogin(CurrentUser.ID, newPassword);
+            var newLogin = GetNewLogin(CurrentUser.ID, newPassword);
 
             userUpdater.Login(newLogin);
             return true;
@@ -126,7 +112,7 @@ namespace Styx
             // has permission to reset the password.
             if (CanUpdateUser(employee) && userReader.UserExists(employee.ID))
             {
-                Login newLogin = GetNewLogin(employee.ID, $"password{employee.ID}");
+                var newLogin = GetNewLogin(employee.ID, $"password{employee.ID}");
 
                 userUpdater.Login(newLogin);
                 return true;
@@ -141,19 +127,17 @@ namespace Styx
 
         public bool LogIn(int userID, string password)
         {
-            Login login = userReader.Login(userID);
-            if (!(login is null))
-            {
-                if (VerifyPassword(login, password))
-                {
-                    User user = userReader.User(userID);
-                    user.Employee = staffReader.Employee(userID, PullType.IncludeChildren);
-                    CurrentUser = user;
-                    return true;
-                }
-            }
+            var login = userReader.Login(userID);
+            
+            if (login is null) return false;
+            if (!VerifyPassword(login, password)) return false;
+            
+            var user = userReader.User(userID);
+            user.Employee = staffReader.Employee(userID, EPullType.IncludeChildren);
+            CurrentUser = user;
+            
+            return true;
 
-            return false;
         }
 
         // Creating the original user. Only valid when there are no current employees/users/departments/etc.
@@ -174,15 +158,15 @@ namespace Styx
                 employee.Role = staffRole;
                 employee.Department = department;
 
-                _ = staffCreator.Employee(employee, PushType.FullRecursive);
+                _ = staffCreator.Employee(employee, EPushType.FullRecursive);
 
                 User newUser = new()
                 {
                     ID = employee.ID
                 };
-                Login newLogin = GetNewLogin(employee.ID, password);
+                var newLogin = GetNewLogin(employee.ID, password);
 
-                Role userRole = userReader.Role("DatabaseManager");
+                var userRole = userReader.Role("DatabaseManager");
                 newUser.Role = userRole;
                 newUser.Employee = employee;
 
@@ -219,15 +203,15 @@ namespace Styx
 
             // Create new user and associated login.
             userCreator.AssureDefaultRole();
-            Role role = userReader.Role("Default");
+            var role = userReader.Role("Default");
             User newUser = new()
             {
                 ID = userID,
             };
-            Login newLogin = GetNewLogin(userID, password);
+            var newLogin = GetNewLogin(userID, password);
 
             newUser.Role = role;
-            newUser.Employee = staffReader.Employee(userID, PullType.FullRecursive);
+            newUser.Employee = staffReader.Employee(userID, EPullType.FullRecursive);
 
             userCreator.User(newUser);
             userCreator.Login(newLogin);
@@ -251,7 +235,7 @@ namespace Styx
                 ID = id,
                 RoleName = roleName
             };
-            Login newLogin = GetNewLogin(id, $"{id}");
+            var newLogin = GetNewLogin(id, $"{id}");
 
             userCreator.User(newUser);
             userCreator.Login(newLogin);
@@ -284,69 +268,62 @@ namespace Styx
         public bool CreateNewUser(Employee employee, string roleName)
         {
             // Check if role exists.
-            Role role = userReader.Role(roleName);
+            var role = userReader.Role(roleName);
             if (role is null) return CreateNewUser(employee);
 
-            // Check that the employee doesn't already have an associated user.
-            if (userReader.UserExists(employee.ID)) return false;
-
-            // Create user.
-            return CreateNewUser(employee.ID, roleName);
+            // Check that the employee doesn't already have an associated user. Create user if it doesn't.
+            return !userReader.UserExists(employee.ID) && CreateNewUser(employee.ID, roleName);
         }
 
         /// <summary>
         /// Check that password is correct for the user-login.
         /// </summary>
-        private static bool VerifyPassword(Login login, string Password)
+        private static bool VerifyPassword(Login login, string password)
         {
-            string checkHash = HashPassword(Password, login.Salt, 19291, 80);
+            var checkHash = HashPassword(password, login.Salt, 19291, 80);
             return checkHash == login.PasswordHash;
         }
 
         /// <summary>
-        /// Validate password by comparing the two enterred passwords are equal, and checking other relevant rules.
+        /// Validate password by comparing the two entered passwords are equal, and checking other relevant rules.
         /// </summary>
+        /// <exception cref="PasswordException"></exception>
         private static bool ValidatePassword(string password, string confirmPassword, out string message)
         {
-            try
+            // Check that password rules are adhered to.
+            if (password.Length < 6) throw new("Password is too short.");
+
+            // Check that the two different passwords are a match.
+            if (password != confirmPassword) throw new("Passwords don't match.");
+
+            // Check if the password contains spaces.
+            if (password.Contains(' ')) throw new("Password cannot contain spaces.");
+
+            // Caution user against unsafe passwords.
+            Regex regex = new(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z\d])(?!.*\s).{8,255}$");
+            if (!regex.IsMatch(password))
             {
-                // Check that password rules are adhered to.
-                if (password.Length < 6) throw new PasswordException("Password is too short.");
-
-                // Check that the two different paswswords are a match.
-                if (password != confirmPassword) throw new PasswordException("Passwords don't match.");
-
-                // Check if the password contains spaces.
-                if (password.Contains(' ')) throw new PasswordException("Password cannot contain spaces.");
-
-                // Caution user against unsafe passwords.
-                Regex regex = new(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z\d])(?!.*\s).{8,255}$");
-                if (!regex.IsMatch(password))
-                {
-                    message = $"Warning: Password is not very strong.\n" +
-                                    $"\nRecommended:\n" +
-                                    $"     •  Minimum 8 characters.\n" +
-                                    $"     •  At least one lowercase letter.\n" +
-                                    $"     •  At least one uppercase letter.\n" +
-                                    $"     •  At least one digit.\n" +
-                                    $"     •  At least one special character.\n" +
-                                    $"\nRequired:\n" +
-                                    $"     •  Minumum 6 characters.\n" +
-                                    $"     •  No spaces.";
-                }
-                else
-                    message = null;
-
-                return true;
+                message = "Warning: Password is not very strong.\n" +
+                          "\nRecommended:\n" +
+                          "     •  Minimum 8 characters.\n" +
+                          "     •  At least one lowercase letter.\n" +
+                          "     •  At least one uppercase letter.\n" +
+                          "     •  At least one digit.\n" +
+                          "     •  At least one special character.\n" +
+                          "\nRequired:\n" +
+                          "     •  Minimum 6 characters.\n" +
+                          "     •  No spaces.";
             }
-            catch (PasswordException) { throw; }
-            catch (Exception) { throw; }
+            else
+                message = null;
+
+            return true;
         }
 
         private static Login GetNewLogin(int userID, string password)
         {
-            string salt = GenerateSalt(16);
-            string newPwdHash = HashPassword(password, salt, 19291, 80);
+            var salt = GenerateSalt(16);
+            var newPwdHash = HashPassword(password, salt, 19291, 80);
             Login newLogin = new()
             {
                 UserID = userID,

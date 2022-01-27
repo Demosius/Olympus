@@ -1,13 +1,10 @@
 ﻿using Uranus;
 using Uranus.Inventory.Model;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace Prometheus.ViewModel.Pages
 {
@@ -43,42 +40,42 @@ namespace Prometheus.ViewModel.Pages
             {
                 binFilter = value;
                 OnPropertyChanged(nameof(BinFilter));
-                _ = Task.Run(() => ApplyFilter());
+                _ = Task.Run(ApplyFilter);
             }
         }
 
         public BinVM()
         {
-            if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+            if (DesignerProperties.GetIsInDesignMode(new()))
             {
-                Bins = new List<NAVBin>();
-                DisplayBins = new ObservableCollection<NAVBin>(Bins);
+                Bins = new();
+                DisplayBins = new(Bins);
             }
             else
             {
-                _ = Task.Run(() => SetBins());
+                _ = Task.Run(SetBins);
             }
         }
 
         private void ApplyFilter()
         {
             if ((BinFilter ?? "") == "")
-                DisplayBins = new ObservableCollection<NAVBin>(Bins);
+                DisplayBins = new(Bins);
             else
-                DisplayBins = new ObservableCollection<NAVBin>(Bins.Where(b => b.Code.ToLower().Contains(BinFilter.ToLower())).ToList());
+                DisplayBins = new(Bins.Where(b => b.Code.ToLower().Contains(BinFilter.ToLower())).ToList());
         }
 
         private void SetBins()
         {
-            Bins = App.Helios.InventoryReader.NAVBins(pullType: PullType.ObjectOnly);
-            DisplayBins = new ObservableCollection<NAVBin>(Bins);
+            Bins = App.Helios.InventoryReader.NAVBins(pullType: EPullType.ObjectOnly);
+            DisplayBins = new(Bins);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
     }
 }

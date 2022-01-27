@@ -1,20 +1,17 @@
 ﻿using Uranus.Inventory;
 using Uranus.Inventory.Model;
 using SQLite;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Olympus.Model
 {
     public enum EProductType
     {
-        CORE,
-        LOOT,
-        POP
+        Core,
+        Loot,
+        Pop
     }
 
     public enum EDeptType
@@ -25,10 +22,10 @@ namespace Olympus.Model
     }
 
     [DataContract]
-    public class SKUMaster
+    public class SkuMaster
     {
         [PrimaryKey, DataMember]
-        public int SKU { get; set; }
+        public int Sku { get; set; }
         [DataMember]
         public int DivisionCode { get; set; }
         [DataMember]
@@ -123,11 +120,11 @@ namespace Olympus.Model
         /// <summary>
         /// Constructor assuming fully filled item.
         /// </summary>
-        public SKUMaster(NAVItem item)
+        public SkuMaster(NAVItem item)
         {
             item.SetUoMs();
 
-            SKU = item.Number;
+            Sku = item.Number;
             DivisionCode = item.DivisionCode;
             DivisionName = item.Division.Description;
             CategoryCode = item.CategoryCode;
@@ -137,11 +134,11 @@ namespace Olympus.Model
             GenreCode = item.GenreCode;
             GenreName = item.Genre.Description;
             if (PlatformCode == 516)
-                ProductTypeCode = EProductType.POP;
+                ProductTypeCode = EProductType.Pop;
             else if (DivisionCode == 550)
-                ProductTypeCode = EProductType.LOOT;
+                ProductTypeCode = EProductType.Loot;
             else
-                ProductTypeCode = EProductType.CORE;
+                ProductTypeCode = EProductType.Core;
             ProductType = ProductTypeCode.ToString();
             ItemDescription = item.Description;
             if (PlatformCode == 125)
@@ -194,12 +191,12 @@ namespace Olympus.Model
                 TotalCartonsOnHand = 0;
             EUoM uomCheck;
             if (UnitsPerCase != null)
-                uomCheck = EUoM.CASE;
+                uomCheck = EUoM.Case;
             else if (UnitsPerPack != null)
-                uomCheck = EUoM.PACK;
+                uomCheck = EUoM.Pack;
             else
-                uomCheck = EUoM.EACH;
-            foreach (NAVStock stock in item.NAVStock)
+                uomCheck = EUoM.Each;
+            foreach (var stock in item.NAVStock)
             {
                 BaseUnitsOnHand += stock.GetBaseQty();
                 if (stock.UoM.UoM == uomCheck)
@@ -235,32 +232,32 @@ namespace Olympus.Model
         /// <summary>
         /// Constructor taking basic objects with multiple lists/dicts to cross-reference.
         /// </summary>
-        public SKUMaster(NAVItem item,
+        public SkuMaster(NAVItem item,
                         Dictionary<int, List<NAVStock>> stock,
                         Dictionary<int, Dictionary<string, NAVUoM>> uoms,
                         Dictionary<string, NAVBin> bins,
                         Dictionary<int, string> divisions, Dictionary<int, string> categories,
                         Dictionary<int, string> platforms, Dictionary<int, string> genres)
         {
-            SKU = item.Number;
+            Sku = item.Number;
             DivisionCode = item.DivisionCode;
-            _ = divisions.TryGetValue(DivisionCode, out string divName);
+            _ = divisions.TryGetValue(DivisionCode, out var divName);
             DivisionName = divName;
             CategoryCode = item.CategoryCode;
-            _ = categories.TryGetValue(CategoryCode, out string catName);
+            _ = categories.TryGetValue(CategoryCode, out var catName);
             CategoryName = catName;
             PlatformCode = item.PlatformCode;
-            _ = platforms.TryGetValue(PlatformCode, out string pfName);
+            _ = platforms.TryGetValue(PlatformCode, out var pfName);
             PlatformName = pfName;
             GenreCode = item.GenreCode;
-            _ = genres.TryGetValue(GenreCode, out string genName);
+            _ = genres.TryGetValue(GenreCode, out var genName);
             GenreName = genName;
             if (PlatformCode == 516)
-                ProductTypeCode = EProductType.POP;
+                ProductTypeCode = EProductType.Pop;
             else if (DivisionCode == 550)
-                ProductTypeCode = EProductType.LOOT;
+                ProductTypeCode = EProductType.Loot;
             else
-                ProductTypeCode = EProductType.CORE;
+                ProductTypeCode = EProductType.Core;
             ProductType = ProductTypeCode.ToString();
             ItemDescription = item.Description;
             if (PlatformCode == 125)
@@ -272,12 +269,12 @@ namespace Olympus.Model
             DeptType = DeptTypeCode.ToString();
 
             // Units and Dims per Case/Pack/Each/Carton(largest thereof)
-            _ = uoms.TryGetValue(SKU, out Dictionary<string, NAVUoM> itemUoMs);
+            _ = uoms.TryGetValue(Sku, out var itemUoMs);
             NAVUoM caseUoM = null, packUoM = null, eachUoM = null;
             _ = (itemUoMs?.TryGetValue("CASE", out caseUoM));
             _ = (itemUoMs?.TryGetValue("PACK", out packUoM));
             _ = (itemUoMs?.TryGetValue("EACH", out eachUoM));
-            NAVUoM ctnUoM = caseUoM ?? packUoM ?? eachUoM;
+            var ctnUoM = caseUoM ?? packUoM ?? eachUoM;
 
             if (caseUoM is null)
             {
@@ -356,29 +353,29 @@ namespace Olympus.Model
             
             EUoM uomCheck;
             if (UnitsPerCase != null)
-                uomCheck = EUoM.CASE;
+                uomCheck = EUoM.Case;
             else if (UnitsPerPack != null)
-                uomCheck = EUoM.PACK;
+                uomCheck = EUoM.Pack;
             else
-                uomCheck = EUoM.EACH;
+                uomCheck = EUoM.Each;
 
-            _ = stock.TryGetValue(SKU, out List<NAVStock> skuStock);
-            if (skuStock is null) skuStock = new List<NAVStock>();
-            foreach (NAVStock s in skuStock)
+            _ = stock.TryGetValue(Sku, out var skuStock);
+            if (skuStock is null) skuStock = new();
+            foreach (var s in skuStock)
             {
-                string zone = s.ZoneCode;
-                EUoM uom = s.GetEUoM();
+                var zone = s.ZoneCode;
+                var uom = s.GetEUoM();
                 switch (uom)
                 {
-                    case EUoM.CASE:
+                    case EUoM.Case:
                         s.UoM = caseUoM;
                         TotalCasesOnHand += s.Qty;
                         break;
-                    case EUoM.PACK:
+                    case EUoM.Pack:
                         s.UoM = packUoM;
                         TotalPacksOnHand += s.Qty;
                         break;
-                    case EUoM.EACH:
+                    case EUoM.Each:
                         s.UoM = eachUoM;
                         TotalEachesOnHand += s.Qty;
                         break;
@@ -399,8 +396,8 @@ namespace Olympus.Model
                     osBins.Add(s.BinCode);
                     if (zone != "OS")
                     {
-                        int qty = s.Qty;
-                        _ = bins.TryGetValue(s.BinID, out NAVBin bin);
+                        var qty = s.Qty;
+                        _ = bins.TryGetValue(s.BinID, out var bin);
                         if (bin != null && bin.Description.Contains("Double"))
                             palletSizes.Add(qty / 2);
                         palletSizes.Add(qty);

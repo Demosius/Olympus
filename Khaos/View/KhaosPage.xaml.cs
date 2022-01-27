@@ -15,7 +15,7 @@ namespace Khaos.View
             InitializeComponent();
         }
 
-        public EProject EProject => EProject.Khaos;
+        public EProject Project => EProject.Khaos;
 
         public bool RequiresUser => false;
 

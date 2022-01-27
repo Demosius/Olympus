@@ -1,9 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Uranus.Staff.Model
 {
@@ -68,39 +65,26 @@ namespace Uranus.Staff.Model
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<ShiftRule> Rules { get; set; }
 
-        public Employee() { }
-
-        public override bool Equals(object obj) => this.Equals(obj as Employee);
+        /*public override bool Equals(object obj) => Equals(obj as Employee);
 
         public bool Equals(Employee employee)
         {
             if (employee is null) return false;
 
-            if (Object.ReferenceEquals(this, employee)) return true;
+            if (ReferenceEquals(this, employee)) return true;
 
-            if (this.GetType() != employee.GetType()) return false;
+            if (GetType() != employee.GetType()) return false;
 
             return ID == employee.ID;
         }
 
-        public override int GetHashCode() => (ID, FirstName, LastName, DisplayName, PayRate,
-                                              RF_ID, PC_ID, DepartmentName, RoleName, LockerID, 
-                                              PhoneNumber, Email, Address).GetHashCode();
-
         public static bool operator ==(Employee lhs, Employee rhs)
         {
-            if (lhs is null)
-            {
-                if (rhs is null)
-                {
-                    return true;
-                }
-                return false;
-            }
-            return lhs.Equals(rhs);
+            if (lhs is not null) return lhs.Equals(rhs);
+            return rhs is null;
         }
 
-        public static bool operator !=(Employee lhs, Employee rhs) => !(lhs == rhs);
+        public static bool operator !=(Employee lhs, Employee rhs) => !(lhs == rhs);*/
 
     }
 }

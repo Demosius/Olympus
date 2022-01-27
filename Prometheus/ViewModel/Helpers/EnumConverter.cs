@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Prometheus.ViewModel.Helpers
 {
@@ -109,7 +105,7 @@ namespace Prometheus.ViewModel.Helpers
 
         public static List<EDataCategory> GetDataCategories()
         {
-            return new List<EDataCategory>
+            return new()
             {
                 EDataCategory.Inventory,
                 EDataCategory.Equipment,
@@ -121,7 +117,7 @@ namespace Prometheus.ViewModel.Helpers
         public static List<EDataType> GetTypeList(EDataCategory category)
         {
             if (category == EDataCategory.Inventory)
-                return new List<EDataType>
+                return new()
                 {
                     EDataType.Batch,
                     EDataType.Bay,
@@ -147,7 +143,7 @@ namespace Prometheus.ViewModel.Helpers
                     EDataType.ZoneAccessLevel
                 };
             if (category == EDataCategory.Equipment)
-                return new List<EDataType>
+                return new()
                 {
                     EDataType.Checklist,
                     EDataType.CompletedChecklist,
@@ -155,7 +151,7 @@ namespace Prometheus.ViewModel.Helpers
                     EDataType.MachineType
                 };
             if (category == EDataCategory.Staff)
-                return new List<EDataType>
+                return new()
                 {
                     EDataType.Clan,
                     EDataType.Department,
@@ -183,24 +179,24 @@ namespace Prometheus.ViewModel.Helpers
                     EDataType.Vehicle
                 };
             if (category == EDataCategory.Users)
-                return new List<EDataType>
+                return new()
                 {
                     EDataType.User,
                     EDataType.UserRole,
                     EDataType.Login
                 };
-            return new List<EDataType> { };
+            return new();
         }
 
-        public static EDataCategory DataTypeToCatagory(EDataType type)
+        public static EDataCategory DataTypeToCategory(EDataType type)
         {
-            if (type <= EDataType.ZoneAccessLevel)
-                return EDataCategory.Inventory;
-            if (type <= EDataType.Vehicle)
-                return EDataCategory.Staff;
-            if (type <= EDataType.MachineType)
-                return EDataCategory.Equipment;
-            return EDataCategory.Users;
+            return type switch
+            {
+                <= EDataType.ZoneAccessLevel => EDataCategory.Inventory,
+                <= EDataType.Vehicle => EDataCategory.Staff,
+                <= EDataType.MachineType => EDataCategory.Equipment,
+                _ => EDataCategory.Users
+            };
         }
 
     }

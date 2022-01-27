@@ -5,19 +5,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Windows;
 
 
 namespace Uranus
 {
-    public enum PullType
+    public enum EPullType
     {
         ObjectOnly,
         IncludeChildren,
         FullRecursive
     }
 
-    public enum PushType
+    public enum EPushType
     {
         ObjectOnly,
         IncludeChildren,
@@ -46,8 +45,8 @@ namespace Uranus
                 if (Database == null)
                 {
                     if (!Directory.Exists(BaseDataDirectory)) _ = Directory.CreateDirectory(BaseDataDirectory);
-                    string s = Path.Combine(BaseDataDirectory, DatabaseName);
-                    Database = new SQLiteConnection(s);
+                    var s = Path.Combine(BaseDataDirectory, DatabaseName);
+                    Database = new(s);
                     if (Database == null)
                         throw new FailedConnectionException($"Failed to connect to {DatabaseName}, might be an invalid path.");
                 }
@@ -112,15 +111,15 @@ namespace Uranus
             catch (Exception) { throw; }
         }
 
-        public bool Create<T>(T item, PushType pushType = PushType.ObjectOnly)
+        public bool Create<T>(T item, EPushType pushType = EPushType.ObjectOnly)
         {
             try
             {
-                if (pushType == PushType.ObjectOnly)
+                if (pushType == EPushType.ObjectOnly)
                     _ = Database.Insert(item);
                 else
                 {
-                    bool recursive = pushType == PushType.FullRecursive;
+                    var recursive = pushType == EPushType.FullRecursive;
                     Database.InsertWithChildren(item, recursive);
                 }
 
@@ -131,25 +130,25 @@ namespace Uranus
 
         /**************************** READ Data ****************************/
 
-        public List<T> PullObjectList<T>(Expression<Func<T, bool>> filter = null, PullType pullType = PullType.ObjectOnly) where T : new()
+        public List<T> PullObjectList<T>(Expression<Func<T, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) where T : new()
         {
             try
             {
-                if (pullType == PullType.ObjectOnly)
+                if (pullType == EPullType.ObjectOnly)
                     return filter is null ? Database.Table<T>().ToList() : Database.Table<T>().Where(filter).ToList();
-                bool recursive = pullType == PullType.FullRecursive;
+                var recursive = pullType == EPullType.FullRecursive;
                 return Database.GetAllWithChildren<T>(filter, recursive);
             }
             catch (Exception) { throw; }
         }
 
-        public T PullObject<T>(object primaryKey, PullType pullType = PullType.ObjectOnly) where T : new()
+        public T PullObject<T>(object primaryKey, EPullType pullType = EPullType.ObjectOnly) where T : new()
         {
             try
             {
-                if (pullType == PullType.ObjectOnly)
+                if (pullType == EPullType.ObjectOnly)
                     return Database.Find<T>(primaryKey);
-                bool recursive = pullType == PullType.FullRecursive;
+                var recursive = pullType == EPullType.FullRecursive;
                 return Database.GetWithChildren<T>(primaryKey, recursive);
             }
             catch (Exception) { throw; }
@@ -157,12 +156,12 @@ namespace Uranus
 
         protected List<string> GetTableNames()
         {
-            List<string> list = new() { };
+            List<string> list = new();
             try
             {
-                List<TableMapping> tableMappings = Database.TableMappings.ToList();
+                var tableMappings = Database.TableMappings.ToList();
 
-                foreach (TableMapping map in tableMappings)
+                foreach (var map in tableMappings)
                 {
                     list.Add(map.TableName);
                 }
@@ -213,7 +212,7 @@ namespace Uranus
         {
             try
             {
-                int delCount = 0;
+                var delCount = 0;
                 Database.RunInTransaction(() =>
                 {
                     delCount = Database.DeleteAll<T>();
@@ -227,7 +226,7 @@ namespace Uranus
         {
             try
             {
-                int rowsDeleted = Database.Delete(obj);
+                var rowsDeleted = Database.Delete(obj);
                 return rowsDeleted > 0;
             }
             catch (Exception)
@@ -240,7 +239,7 @@ namespace Uranus
         {
             try
             {
-                int rowsDeleted = Database.Delete<T>(key);
+                var rowsDeleted = Database.Delete<T>(key);
                 return rowsDeleted > 0;
             }
             catch (Exception)
@@ -274,10 +273,10 @@ namespace Uranus
         {
             try
             {
-                List<TableMapping> mappings = Database.TableMappings.ToList();
+                var mappings = Database.TableMappings.ToList();
                 Database.RunInTransaction(() =>
                 {
-                    foreach (TableMapping map in mappings)
+                    foreach (var map in mappings)
                     {
                         _ = Database.DeleteAll(map);
                     }
@@ -320,7 +319,7 @@ namespace Uranus
         {
             try
             {
-                CreateTableResult res = Database.CreateTable<T>();
+                var res = Database.CreateTable<T>();
                 return res == CreateTableResult.Created;
             }
             catch (Exception)
@@ -337,12 +336,12 @@ namespace Uranus
         {
             try
             {
-                bool returnValue = true;
+                var returnValue = true;
 
-                CreateTablesResult results = Database.CreateTables(CreateFlags.None, Tables);
+                var results = Database.CreateTables(CreateFlags.None, Tables);
 
                 // Check all results, for each table. Will return false if ANY of them are false.
-                foreach (CreateTableResult res in results.Results.Values)
+                foreach (var res in results.Results.Values)
                 {
                     returnValue = returnValue && res == CreateTableResult.Created;
                 }

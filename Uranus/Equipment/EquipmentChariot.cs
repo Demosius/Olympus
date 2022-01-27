@@ -1,11 +1,6 @@
 ﻿using Uranus.Equipment.Model;
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Windows;
 
 namespace Uranus.Equipment
 {

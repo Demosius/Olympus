@@ -29,7 +29,7 @@ namespace Prometheus.View
             //SetPageString();
         }
 
-        public EProject EProject => EProject.Prometheus;
+        public EProject Project => EProject.Prometheus;
 
         public bool RequiresUser => false;
 

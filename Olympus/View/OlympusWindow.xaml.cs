@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Threading;
 using System.Globalization;
 using Olympus.Properties;
@@ -14,7 +13,7 @@ namespace Olympus
         public MainWindow()
         {
             InitializeComponent();
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("en-AU");
+            Thread.CurrentThread.CurrentCulture = new("en-AU");
         }
 
         private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

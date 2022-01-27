@@ -2,18 +2,14 @@
 using Prometheus.View;
 using Prometheus.View.Pages;
 using Prometheus.ViewModel.Helpers;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ProEnums = Prometheus.ViewModel.Helpers.EnumConverter;
 
 namespace Prometheus.ViewModel
 {
-    class PrometheusVM : INotifyPropertyChanged
+    public class PrometheusVM : INotifyPropertyChanged
     {
         public ObservableCollection<DataCategory> Categories { get; set; }
         public ObservableCollection<DataType> Types { get; set; }
@@ -57,12 +53,12 @@ namespace Prometheus.ViewModel
 
         public PrometheusVM()
         {
-            Categories = new ObservableCollection<DataCategory>();
-            Types = new ObservableCollection<DataType>();
-            DataPages = new Dictionary<EDataType, BREADBase>();
+            Categories = new();
+            Types = new();
+            DataPages = new();
             foreach (var category in ProEnums.GetDataCategories())
             {
-                Categories.Add(new DataCategory(category));
+                Categories.Add(new(category));
             }
         }
 
@@ -105,7 +101,7 @@ namespace Prometheus.ViewModel
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
 
     }

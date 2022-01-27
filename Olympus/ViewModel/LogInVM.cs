@@ -1,10 +1,5 @@
 ﻿using Olympus.ViewModel.Commands;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Olympus.ViewModel
 {
@@ -40,7 +35,7 @@ namespace Olympus.ViewModel
 
         public bool LogIn()
         {
-            if (int.TryParse(UserID, out int id))
+            if (int.TryParse(UserID, out var id))
                 return App.Charon.LogIn(id, Password);
             else 
                 return false;
@@ -50,7 +45,7 @@ namespace Olympus.ViewModel
 
         public void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
     }
 }

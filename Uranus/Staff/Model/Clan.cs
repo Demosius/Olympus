@@ -1,10 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Staff.Model
 {
@@ -22,7 +18,7 @@ namespace Uranus.Staff.Model
         [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Employee Leader { get; set; }
         [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public List<Employee> Employees { get; set; } = new List<Employee> { };
+        public List<Employee> Employees { get; set; } = new();
 
 
     }

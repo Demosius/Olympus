@@ -1,10 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Staff.Model
 {
@@ -36,7 +32,7 @@ namespace Uranus.Staff.Model
                 ++down;
                 return true;
             }
-            foreach (Role role in Reports)
+            foreach (var role in Reports)
             {
                 if (role.LookDown(ref down, ref targetRole))
                 {
@@ -51,7 +47,7 @@ namespace Uranus.Staff.Model
         {
             ++up;
             if (this == targetRole) return true;
-            foreach(Role role in Reports)
+            foreach(var role in Reports)
             {
                 if (role != refRole)
                 {

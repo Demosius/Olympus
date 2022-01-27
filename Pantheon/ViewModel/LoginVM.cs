@@ -1,10 +1,5 @@
 ﻿using Pantheon.ViewModel.Commands;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Pantheon.ViewModel
@@ -33,7 +28,7 @@ namespace Pantheon.ViewModel
 
         internal bool LogIn()
         {
-            if (int.TryParse(UserCode, out int userID))
+            if (int.TryParse(UserCode, out var userID))
             {
                 if (App.Charon.LogIn(userID, Password))
                     return true;
@@ -53,7 +48,7 @@ namespace Pantheon.ViewModel
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
     }
 }

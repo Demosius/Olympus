@@ -1,13 +1,9 @@
 ﻿using Uranus.Staff.Model;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Uranus;
 using System.Collections.ObjectModel;
-using System.Windows;
 
 namespace Olympus.ViewModel.Components
 {
@@ -32,8 +28,8 @@ namespace Olympus.ViewModel.Components
 
         public ProjectLauncherVM()
         {
-            AllProjects = App.Helios.StaffReader.Projects(pullType: PullType.FullRecursive);
-            Departments = App.Helios.StaffReader.Departments(pullType: PullType.IncludeChildren);
+            AllProjects = App.Helios.StaffReader.Projects(pullType: EPullType.FullRecursive);
+            Departments = App.Helios.StaffReader.Departments(pullType: EPullType.IncludeChildren);
             if (App.Charon.UserEmployee is null)
                 UserProjects = new();
             else
@@ -47,16 +43,16 @@ namespace Olympus.ViewModel.Components
 
             ProjectGroups = new();
 
-            projectGroup = new ProjectGroupVM(this, AllProjects, "All");
+            projectGroup = new(this, AllProjects, "All");
             ProjectGroups.Add(projectGroup);
-            projectGroup = new ProjectGroupVM(this, UserProjects, "User");
+            projectGroup = new(this, UserProjects, "User");
             ProjectGroups.Add(projectGroup);
 
             foreach (var dep in Departments)
             {
                 if (dep.Projects.Any())
                 {
-                    projectGroup = new ProjectGroupVM(this, dep);
+                    projectGroup = new(this, dep);
                     ProjectGroups.Add(projectGroup);
                 }
             }
@@ -71,7 +67,7 @@ namespace Olympus.ViewModel.Components
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
     }
 }

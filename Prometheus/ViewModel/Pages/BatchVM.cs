@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Prometheus.ViewModel.Pages
+﻿namespace Prometheus.ViewModel.Pages
 {
-    class BatchVM
+    public class BatchVM
     {
 
     }

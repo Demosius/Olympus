@@ -1,11 +1,6 @@
 ﻿using Olympus.View;
 using Olympus.ViewModel.Commands;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Olympus.ViewModel.Components
 {
@@ -38,7 +33,7 @@ namespace Olympus.ViewModel.Components
         public UserHandlerVM()
         {
             CheckUser();
-            UserCommand = new UserCommand(this);
+            UserCommand = new(this);
         }
 
         public UserHandlerVM(OlympusVM olympusVM) : this()
@@ -87,7 +82,7 @@ namespace Olympus.ViewModel.Components
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
     }
 }

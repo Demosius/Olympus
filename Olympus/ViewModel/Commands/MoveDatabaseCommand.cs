@@ -10,8 +10,8 @@ namespace Olympus.ViewModel.Commands
 
         public event EventHandler CanExecuteChanged
         {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
         }
 
         public MoveDatabaseCommand(DBManager vm)
@@ -21,8 +21,7 @@ namespace Olympus.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            string dbLocation = (parameter ?? "null") as string;
-            return App.Charon.CanMoveDatabase() && dbLocation.ToLower() != "local";
+            return (parameter ?? "null") is string dbLocation && App.Charon.CanMoveDatabase() && dbLocation.ToLower() != "local";
         }
 
         public void Execute(object parameter)

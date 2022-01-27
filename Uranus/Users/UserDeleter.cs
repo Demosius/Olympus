@@ -1,9 +1,5 @@
 ﻿using Uranus.Users.Model;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Users
 {
@@ -40,7 +36,7 @@ namespace Uranus.Users
         public bool Role(Role role)
         {
             // Can't delete roles that have users attached.
-            List<User> users = Chariot.PullObjectList<User>(pullType: PullType.ObjectOnly).Where(u => u.RoleName == role.Name).ToList();
+            var users = Chariot.PullObjectList<User>(pullType: EPullType.ObjectOnly).Where(u => u.RoleName == role.Name).ToList();
             if (users.Count > 0)
                 return false;
             return Chariot.Delete(role);
@@ -49,7 +45,7 @@ namespace Uranus.Users
         public bool Role(string roleName)
         {
             // Can't delete roles that have users attached.
-            List<User> users = Chariot.PullObjectList<User>(pullType: PullType.ObjectOnly).Where(u => u.RoleName == roleName).ToList();
+            var users = Chariot.PullObjectList<User>(pullType: EPullType.ObjectOnly).Where(u => u.RoleName == roleName).ToList();
             if (users.Count > 0)
                 return false;
             return Chariot.DeleteByKey<Role>(roleName);

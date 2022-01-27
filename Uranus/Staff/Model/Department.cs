@@ -1,9 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Uranus.Staff.Model
 {
@@ -37,19 +34,16 @@ namespace Uranus.Staff.Model
         public List<Employee> EmployeesCanLoan { get; set; }
         [ManyToMany(typeof(DepartmentProject), "ProjectName", "Departments", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<Project> Projects { get; set; }
-
-        /* Constructor */
-        public Department() { }
-
-        public override bool Equals(object obj) => this.Equals(obj as Department);
+        
+        /*public override bool Equals(object obj) => Equals(obj as Department);
 
         public bool Equals(Department department)
         {
             if (department is null) return false;
 
-            if (Object.ReferenceEquals(this, department)) return true;
+            if (ReferenceEquals(this, department)) return true;
 
-            if (this.GetType() != department.GetType()) return false;
+            if (GetType() !=  department.GetType()) return false;
 
             return Name == department.Name;
         }
@@ -58,18 +52,11 @@ namespace Uranus.Staff.Model
 
         public static bool operator ==(Department lhs, Department rhs)
         {
-            if (lhs is null)
-            {
-                if (rhs is null)
-                {
-                    return true;
-                }
-                return false;
-            }
-            return lhs.Equals(rhs);
+            if (lhs is not null) return lhs.Equals(rhs);
+            return rhs is null;
         }
 
-        public static bool operator !=(Department lhs, Department rhs) => !(lhs == rhs);
+        public static bool operator !=(Department lhs, Department rhs) => !(lhs == rhs);*/
 
     }
 }

@@ -1,9 +1,5 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Uranus.Inventory.Model
 {
@@ -38,21 +34,21 @@ namespace Uranus.Inventory.Model
         
         public Stock()
         {
-            Cases = new SubStock(this, EUoM.CASE);
-            Packs = new SubStock(this, EUoM.PACK);
-            Eaches = new SubStock(this, EUoM.EACH);
+            Cases = new(this, EUoM.Case);
+            Packs = new(this, EUoM.Pack);
+            Eaches = new(this, EUoM.Each);
         }
 
         public Stock(NAVStock navStock) : this()
         {
             // Handle the UoMs
-            string uom = navStock.UoMCode.ToUpper();
+            var uom = navStock.UoMCode.ToUpper();
             if (uom == "CASE")
-                Cases = new SubStock(this, navStock);
+                Cases = new(this, navStock);
             else if (uom == "PACK")
-                Packs = new SubStock(this, navStock);
+                Packs = new(this, navStock);
             else
-                Eaches = new SubStock(this, navStock);
+                Eaches = new(this, navStock);
 
             // Objects
             Bin = navStock.Bin;
@@ -91,7 +87,7 @@ namespace Uranus.Inventory.Model
         // Partial move.
         public void Move(NAVBin toBin, int eaches = 0, int packs = 0, int cases = 0)
         {
-            Stock splitStock = Split(eaches, packs, cases);
+            var splitStock = Split(eaches, packs, cases);
             splitStock.Move(toBin);
         }
 

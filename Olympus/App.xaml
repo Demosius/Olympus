@@ -1,7 +1,6 @@
 ﻿<Application x:Class="Olympus.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:Olympus"
              DispatcherUnhandledException="Application_DispatcherUnhandledException"
              StartupUri="View/OlympusWindow.xaml">
 
@@ -9,10 +8,10 @@
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 
         <!-- Image Resources -->
-        <Image x:Key="icoForge" Source="./Resources/Images/Icons/forge.ico" />
-        <Image x:Key="icoPrometheus" Source="./Resources/Images/Icons/prometheus.ico" />
-        <Image x:Key="icoBurn" Source="./Resources/Images/Icons/burn.ico" />
-        <Image x:Key="icoDrac" Source="./Resources/Images/Icons/vampire.ico" />
+        <Image x:Key="IcoForge" Source="./Resources/Images/Icons/forge.ico" />
+        <Image x:Key="IcoPrometheus" Source="./Resources/Images/Icons/prometheus.ico" />
+        <Image x:Key="IcoBurn" Source="./Resources/Images/Icons/burn.ico" />
+        <Image x:Key="IcoDrac" Source="./Resources/Images/Icons/vampire.ico" />
 
         <!-- Tab Control Styling -->
         <Style TargetType="TabItem">

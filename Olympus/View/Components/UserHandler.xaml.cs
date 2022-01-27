@@ -1,16 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Olympus.Properties;
 using Styx;
 
@@ -27,7 +16,7 @@ namespace Olympus.View.Components
         public UserHandler()
         {
             InitializeComponent();
-            Charon = new Charon(Settings.Default.SolLocation);
+            Charon = new(Settings.Default.SolLocation);
         }
          
         private void BtnSignIn_Click(object sender, RoutedEventArgs e)
@@ -38,7 +27,7 @@ namespace Olympus.View.Components
 
         private void BtnRegister_Click(object sender, RoutedEventArgs e)
         {
-            int userCount = App.Helios.UserReader.UserCount();
+            var userCount = App.Helios.UserReader.UserCount();
             if (userCount == 0)
             {
                 AlphaRegistrationWindow regForm = new();

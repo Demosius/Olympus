@@ -1,10 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Staff.Model
 {
@@ -32,7 +28,7 @@ namespace Uranus.Staff.Model
         {
             Reference = eProject;
             Name = eProject.ToString();
-            Icon = new ProjectIcon(this, iconFileName);
+            Icon = new(this, iconFileName);
             ToolTip = toolTip;
             Icon.FullPath = Icon.GetImageFilePath(reader);
             IconName = Icon.Name;

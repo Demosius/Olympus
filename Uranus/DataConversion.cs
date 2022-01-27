@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.IO;
 using System.Data;
 using System.Globalization;
@@ -16,9 +15,9 @@ namespace Uranus
         // Set dictionary head positions, based on a string array from the head of the assumed data.
         public static void SetHeadPosFromArray(ref Dictionary<string, int> headDict, string[] headArr)
         {
-            List<string> missingHeads = new() { };
+            List<string> missingHeads = new();
 
-            foreach (string key in headDict.Keys.ToList())
+            foreach (var key in headDict.Keys.ToList())
             {
                 headDict[key] = Array.IndexOf(headArr, key);
                 if (headDict[key] == -1) missingHeads.Add(key);
@@ -32,28 +31,15 @@ namespace Uranus
         /// <returns></returns>
         public static List<NAVTransferOrder> NAVRawStringToTransferOrders(string rawData)
         {
-            List<NAVTransferOrder> transferOrders;
+            var headDict = Constants.NAVToLineBatchColumns;
 
-            Dictionary<string, int> headDict = Constants.NAV_TO_LINE_BATCH_COLUMNS;
-
-            try
-            {
-                // Get raw data from clipboard and check that it has data.
-                if (rawData == "" || rawData == null) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
-                // Start memory stream from which to read.
-                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-                MemoryStream stream = new(byteArray);
-                // Start Reading from stream.
-                transferOrders = NAVStreamToTransferOrders(stream, headDict);
-            }
-            catch (InvalidDataException)
-            {
-                throw;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            // Get raw data from clipboard and check that it has data.
+            if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+            // Start memory stream from which to read.
+            var byteArray = Encoding.UTF8.GetBytes(rawData);
+            MemoryStream stream = new(byteArray);
+            // Start Reading from stream.
+            var transferOrders = NAVStreamToTransferOrders(stream, headDict);
 
             return transferOrders;
         }
@@ -61,52 +47,46 @@ namespace Uranus
         // Convert a memory stream into a Division list.
         private static List<NAVTransferOrder> NAVStreamToTransferOrders(MemoryStream stream, Dictionary<string, int> headDict)
         {
-            List<NAVTransferOrder> tos = new() { };
-
-            string[] row;
-            int highestCol;
-            NAVTransferOrder to;
+            List<NAVTransferOrder> tos = new();
 
             IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
 
-            using (StreamReader reader = new(stream))
+            using StreamReader reader = new(stream);
+            // First set the headers.
+            var line = reader.ReadLine();
+            var headArr = line?.Split('\t');
+            SetHeadPosFromArray(ref headDict, headArr);
+            // Get highest column value to make sure that any given data line isn't cut short.
+            var highestCol = headDict.Values.Max();
+
+            line = reader.ReadLine();
+            // Add row data.
+            while (line is not null)
             {
-                // First set the headers.
-                string line = reader.ReadLine();
-                string[] headArr = line.Split('\t');
-                SetHeadPosFromArray(ref headDict, headArr);
-                // Get highest column value to make sure that any given data line isn't cut short.
-                highestCol = headDict.Values.Max();
+                var row = line.Split('\t');
+
+                if (highestCol < row.Length)
+                {
+                    if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var item)) item = 0;
+                    if (!int.TryParse(row[headDict["Quantity"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var qty)) qty = 0;
+                    if (!int.TryParse(row[headDict["Avail. UOM Fulfillment Qty"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var availQty)) availQty = 0;
+                    if (!DateTime.TryParse(row[headDict["Created On Date"]], provider, DateTimeStyles.None, out var date)) date = new();
+                    if (!DateTime.TryParse(row[headDict["Created On Time"]], provider, DateTimeStyles.NoCurrentDateDefault, out var time)) time = new();
+
+                    var to = new NAVTransferOrder
+                    {
+                        ID = row[headDict["Document No."]],
+                        StoreNumber = row[headDict["Transfer-to Code"]],
+                        ItemNumber = item,
+                        Qty = qty,
+                        UoM = EnumConverter.StringToUoM(row[headDict["Unit of Measure"]]),
+                        AvailableQty = availQty,
+                        CreationTime = date.Date.Add(time.TimeOfDay)
+                    };
+                    tos.Add(to);
+                }
 
                 line = reader.ReadLine();
-                // Add row data.
-                while (line != null)
-                {
-                    row = line.Split('\t');
-
-                    if (highestCol < row.Length)
-                    {
-                        if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int item)) item = 0;
-                        if (!int.TryParse(row[headDict["Quantity"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int qty)) qty = 0;
-                        if (!int.TryParse(row[headDict["Avail. UOM Fulfilment Qty"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int availQty)) availQty = 0;
-                        if (!DateTime.TryParse(row[headDict["Created On Date"]], provider, DateTimeStyles.None, out DateTime date)) date = new DateTime();
-                        if (!DateTime.TryParse(row[headDict["Created On Time"]], provider, DateTimeStyles.NoCurrentDateDefault, out DateTime time)) time = new DateTime();
-
-                        to = new NAVTransferOrder
-                        {
-                            ID = row[headDict["Document No."]],
-                            StoreNumber = row[headDict["Transfer-to Code"]],
-                            ItemNumber = item,
-                            Qty = qty,
-                            UoM = EnumConverter.StringToUoM(row[headDict["Unit of Measure"]]),
-                            AvailableQty = availQty,
-                            CreationTime = date.Date.Add(time.TimeOfDay)
-                        };
-                        tos.Add(to);
-                    }
-
-                    line = reader.ReadLine();
-                }
             }
 
             return tos;
@@ -115,71 +95,52 @@ namespace Uranus
         // Turns clipboard data into a list of divisions.
         public static List<NAVDivision> NAVRawStringToDivisions(string rawData)
         {
-            List<NAVDivision> divisions;
+            var headDict = Constants.NAVDivPfGenColumns;
 
-            Dictionary<string, int> headDict = Constants.NAV_DIV_PF_GEN_COLUMNS;
-
-            try
-            {
-                if (rawData == "" || rawData == null) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
-                // Start memory stream from which to read.
-                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-                MemoryStream stream = new(byteArray);
-                // Start Reading from stream.
-                divisions = NAVStreamToDivisions(stream, headDict);
-            }
-            catch (InvalidDataException)
-            {
-                throw;
-         }
-            catch (Exception)
-            {
-             throw;
-            }
+            if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+            // Start memory stream from which to read.
+            var byteArray = Encoding.UTF8.GetBytes(rawData);
+            MemoryStream stream = new(byteArray);
+            // Start Reading from stream.
+            var divisions = NAVStreamToDivisions(stream, headDict);
 
             return divisions;
         }
 
         // Convert a memory stream into a Division list.
-        private static List<NAVDivision> NAVStreamToDivisions(MemoryStream stream, Dictionary<string, int> headDict)
+        private static List<NAVDivision> NAVStreamToDivisions(Stream stream, Dictionary<string, int> headDict)
         {
-            List<NAVDivision> divs = new() { };
-
-            string[] row;
-            int highestCol;
-            NAVDivision div;
+            List<NAVDivision> divs = new();
 
             IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
 
-            using (StreamReader reader = new(stream))
+            using StreamReader reader = new(stream);
+            // First set the headers.
+            var line = reader.ReadLine();
+            var headArr = line?.Split('\t');
+            SetHeadPosFromArray(ref headDict, headArr);
+            // Get highest column value to make sure that any given data line isn't cut short.
+            var highestCol = headDict.Values.Max();
+
+            line = reader.ReadLine();
+            // Add row data.
+            while (line != null)
             {
-                // First set the headers.
-                string line = reader.ReadLine();
-                string[] headArr = line.Split('\t');
-                SetHeadPosFromArray(ref headDict, headArr);
-                // Get highest column value to make sure that any given data line isn't cut short.
-                highestCol = headDict.Values.Max();
+                var row = line.Split('\t');
+
+                if (highestCol < row.Length)
+                {
+                    if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var code)) code = 0;
+
+                    var div = new NAVDivision
+                    {
+                        Code = code,
+                        Description = row[headDict["Description"]]
+                    };
+                    divs.Add(div);
+                }
 
                 line = reader.ReadLine();
-                // Add row data.
-                while (line != null)
-                {
-                    row = line.Split('\t');
-
-                    if (highestCol < row.Length)
-                    {
-                        if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int code)) code = 0;
-
-                        div = new NAVDivision
-                        {
-                            Code = code,
-                            Description = row[headDict["Description"]]
-                        };
-                        divs.Add(div);
-                    }
-
-                    line = reader.ReadLine();
-                }
             }
 
             return divs;
@@ -188,27 +149,14 @@ namespace Uranus
         // Turns clipboard data into a list of categories.
         public static List<NAVCategory> NAVRawStringToCategories(string rawData)
         {
-            List<NAVCategory> categories;
+            var headDict = Constants.NAVCategoryColumns;
 
-            Dictionary<string, int> headDict = Constants.NAV_CATEGORY_COLUMNS;
-
-            try
-            {
-                if (rawData == "" || rawData == null) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
-                // Start memory stream from which to read.
-                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-                MemoryStream stream = new(byteArray);
-                // Start Reading from stream.
-                categories = NAVStreamToCategories(stream, headDict);
-            }
-            catch (InvalidDataException)
-            {
-                throw;
-         }
-            catch (Exception)
-            {
-             throw;
-            }
+            if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+            // Start memory stream from which to read.
+            var byteArray = Encoding.UTF8.GetBytes(rawData);
+            MemoryStream stream = new(byteArray);
+            // Start Reading from stream.
+            var categories = NAVStreamToCategories(stream, headDict);
 
             return categories;
         }
@@ -216,45 +164,39 @@ namespace Uranus
         // Convert a memory stream into a Category list.
         private static List<NAVCategory> NAVStreamToCategories(MemoryStream stream, Dictionary<string, int> headDict)
         {
-            List<NAVCategory> cats = new() { };
-
-            string[] row;
-            int highestCol;
-            NAVCategory cat;
+            List<NAVCategory> cats = new();
 
             IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
 
-            using (StreamReader reader = new(stream))
+            using StreamReader reader = new(stream);
+            // First set the headers.
+            var line = reader.ReadLine();
+            var headArr = line?.Split('\t');
+            SetHeadPosFromArray(ref headDict, headArr);
+            // Get highest column value to make sure that any given data line isn't cut short.
+            var highestCol = headDict.Values.Max();
+
+            line = reader.ReadLine();
+            // Add row data.
+            while (line != null)
             {
-                // First set the headers.
-                string line = reader.ReadLine();
-                string[] headArr = line.Split('\t');
-                SetHeadPosFromArray(ref headDict, headArr);
-                // Get highest column value to make sure that any given data line isn't cut short.
-                highestCol = headDict.Values.Max();
+                var row = line.Split('\t');
+
+                if (highestCol < row.Length)
+                {
+                    if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var code)) code = 0;
+                    if (!int.TryParse(row[headDict["Item Division Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var div)) div = 0;
+
+                    var cat = new NAVCategory
+                    {
+                        Code = code,
+                        Description = row[headDict["Description"]],
+                        DivisionCode = div
+                    };
+                    cats.Add(cat);
+                }
 
                 line = reader.ReadLine();
-                // Add row data.
-                while (line != null)
-                {
-                    row = line.Split('\t');
-
-                    if (highestCol < row.Length)
-                    {
-                        if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int code)) code = 0;
-                        if (!int.TryParse(row[headDict["Item Division Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int div)) div = 0;
-
-                        cat = new NAVCategory
-                        {
-                            Code = code,
-                            Description = row[headDict["Description"]],
-                            DivisionCode = div
-                        };
-                        cats.Add(cat);
-                    }
-
-                    line = reader.ReadLine();
-                }
             }
 
             return cats;
@@ -263,27 +205,14 @@ namespace Uranus
         // Turns clipboard data into a list of platforms.
         public static List<NAVPlatform> NAVRawStringToPlatform(string rawData)
         {
-            List<NAVPlatform> platforms;
+            var headDict = Constants.NAVDivPfGenColumns;
 
-            Dictionary<string, int> headDict = Constants.NAV_DIV_PF_GEN_COLUMNS;
-
-            try
-            {
-                if (rawData == "" || rawData == null) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
-                // Start memory stream from which to read.
-                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-                MemoryStream stream = new(byteArray);
-                // Start Reading from stream.
-                platforms = NAVStreamToPlatforms(stream, headDict);
-            }
-            catch (InvalidDataException)
-            {
-                throw;
-         }
-            catch (Exception)
-            {
-             throw;
-            }
+            if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+            // Start memory stream from which to read.
+            var byteArray = Encoding.UTF8.GetBytes(rawData);
+            MemoryStream stream = new(byteArray);
+            // Start Reading from stream.
+            var platforms = NAVStreamToPlatforms(stream, headDict);
 
             return platforms;
         }
@@ -291,43 +220,37 @@ namespace Uranus
         // Convert a memory stream into a Platform list.
         private static List<NAVPlatform> NAVStreamToPlatforms(MemoryStream stream, Dictionary<string, int> headDict)
         {
-            List<NAVPlatform> pfList = new() { };
-
-            string[] row;
-            int highestCol;
-            NAVPlatform pf;
+            List<NAVPlatform> pfList = new();
 
             IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
 
-            using (StreamReader reader = new(stream))
+            using StreamReader reader = new(stream);
+            // First set the headers.
+            var line = reader.ReadLine();
+            var headArr = line?.Split('\t');
+            SetHeadPosFromArray(ref headDict, headArr);
+            // Get highest column value to make sure that any given data line isn't cut short.
+            var highestCol = headDict.Values.Max();
+
+            line = reader.ReadLine();
+            // Add row data.
+            while (line != null)
             {
-                // First set the headers.
-                string line = reader.ReadLine();
-                string[] headArr = line.Split('\t');
-                SetHeadPosFromArray(ref headDict, headArr);
-                // Get highest column value to make sure that any given data line isn't cut short.
-                highestCol = headDict.Values.Max();
+                var row = line.Split('\t');
+
+                if (highestCol < row.Length)
+                {
+                    if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var code)) code = 0;
+
+                    var pf = new NAVPlatform
+                    {
+                        Code = code,
+                        Description = row[headDict["Description"]]
+                    };
+                    pfList.Add(pf);
+                }
 
                 line = reader.ReadLine();
-                // Add row data.
-                while (line != null)
-                {
-                    row = line.Split('\t');
-
-                    if (highestCol < row.Length)
-                    {
-                        if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int code)) code = 0;
-
-                        pf = new NAVPlatform
-                        {
-                            Code = code,
-                            Description = row[headDict["Description"]]
-                        };
-                        pfList.Add(pf);
-                    }
-
-                    line = reader.ReadLine();
-                }
             }
 
             return pfList;
@@ -336,71 +259,52 @@ namespace Uranus
         // Turns clipboard data into a list of genres.
         public static List<NAVGenre> NAVRawStringToGenres(string rawData)
         {
-            List<NAVGenre> genres;
+            var headDict = Constants.NAVDivPfGenColumns;
 
-            Dictionary<string, int> headDict = Constants.NAV_DIV_PF_GEN_COLUMNS;
-
-            try
-            {
-                if (rawData == "" || rawData == null) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
-                // Start memory stream from which to read.
-                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-                MemoryStream stream = new(byteArray);
-                // Start Reading from stream.
-                genres = NAVStreamToGenres(stream, headDict);
-            }
-            catch (InvalidDataException)
-            {
-                throw;
-         }
-            catch (Exception)
-            {
-             throw;
-            }
+            if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+            // Start memory stream from which to read.
+            var byteArray = Encoding.UTF8.GetBytes(rawData);
+            MemoryStream stream = new(byteArray);
+            // Start Reading from stream.
+            var genres = NAVStreamToGenres(stream, headDict);
 
             return genres;
         }
 
         // Convert a memory stream into a Genre list.
-        private static List<NAVGenre> NAVStreamToGenres(MemoryStream stream, Dictionary<string, int> headDict)
+        private static List<NAVGenre> NAVStreamToGenres(Stream stream, Dictionary<string, int> headDict)
         {
-            List<NAVGenre> gens = new() { };
-
-            string[] row;
-            int highestCol;
-            NAVGenre gen;
+            List<NAVGenre> gens = new();
 
             IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
 
-            using (StreamReader reader = new(stream))
+            using StreamReader reader = new(stream);
+            // First set the headers.
+            var line = reader.ReadLine();
+            var headArr = line?.Split('\t');
+            SetHeadPosFromArray(ref headDict, headArr);
+            // Get highest column value to make sure that any given data line isn't cut short.
+            var highestCol = headDict.Values.Max();
+
+            line = reader.ReadLine();
+            // Add row data.
+            while (line != null)
             {
-                // First set the headers.
-                string line = reader.ReadLine();
-                string[] headArr = line.Split('\t');
-                SetHeadPosFromArray(ref headDict, headArr);
-                // Get highest column value to make sure that any given data line isn't cut short.
-                highestCol = headDict.Values.Max();
+                var row = line.Split('\t');
+
+                if (highestCol < row.Length)
+                {
+                    if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var code)) code = 0;
+
+                    var gen = new NAVGenre
+                    {
+                        Code = code,
+                        Description = row[headDict["Description"]]
+                    };
+                    gens.Add(gen);
+                }
 
                 line = reader.ReadLine();
-                // Add row data.
-                while (line != null)
-                {
-                    row = line.Split('\t');
-
-                    if (highestCol < row.Length)
-                    {
-                        if (!int.TryParse(row[headDict["Code"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int code)) code = 0;
-
-                        gen = new NAVGenre
-                        {
-                            Code = code,
-                            Description = row[headDict["Description"]]
-                        };
-                        gens.Add(gen);
-                    }
-
-                    line = reader.ReadLine();
-                }
             }
 
             return gens;
@@ -409,21 +313,14 @@ namespace Uranus
         // Turns clipboard data into a list of locations.
         public static List<NAVLocation> NAVRawStringToLocations(string rawData)
         {
-            List<NAVLocation> locations;
+            var headDict = Constants.NAVLocationColumns;
 
-            Dictionary<string, int> headDict = Constants.NAV_LOCATION_COLUMNS;
-
-            try
-            {
-                if (rawData == "" || rawData == null) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
-                // Start memory stream from which to read.
-                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-                MemoryStream stream = new(byteArray);
-                // Start Reading from stream.
-                locations = NAVStreamToLocations(stream, headDict);
-            }
-            catch (InvalidDataException) { throw; }
-            catch (Exception) { throw; }
+            if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+            // Start memory stream from which to read.
+            var byteArray = Encoding.UTF8.GetBytes(rawData);
+            MemoryStream stream = new(byteArray);
+            // Start Reading from stream.
+            var locations = NAVStreamToLocations(stream, headDict);
 
             return locations;
         }
@@ -431,66 +328,54 @@ namespace Uranus
         // Convert a memory stream into a Location list.
         private static List<NAVLocation> NAVStreamToLocations(MemoryStream stream, Dictionary<string, int> headDict)
         {
-            List<NAVLocation> locs = new() { };
+            List<NAVLocation> locations = new();
 
-            string[] row;
-            int highestCol;
-            NAVLocation loc;
+            using StreamReader reader = new(stream)
+                ;
+            // First set the headers.
+            var line = reader.ReadLine();
+            var headArr = line?.Split('\t');
+            SetHeadPosFromArray(ref headDict, headArr);
+            // Get highest column value to make sure that any given data line isn't cut short.
+            var highestCol = headDict.Values.Max();
 
-            using (StreamReader reader = new(stream))
+            line = reader.ReadLine();
+            // Add row data.
+            while (line != null)
             {
-                // First set the headers.
-                string line = reader.ReadLine();
-                string[] headArr = line.Split('\t');
-                SetHeadPosFromArray(ref headDict, headArr);
-                // Get highest column value to make sure that any given data line isn't cut short.
-                highestCol = headDict.Values.Max();
+                var row = line.Split('\t');
+
+                if (highestCol < row.Length)
+                {
+                    var loc = new NAVLocation
+                    {
+                        Code = row[headDict["Code"]],
+                        Name = row[headDict["Name"]],
+                        CompanyCode = row[headDict["Company Code"]],
+                        IsWarehouse = row[headDict["Location Is Warehouse"]] == "Yes",
+                        IsStore = row[headDict["Location Is A Store"]] == "Yes",
+                        ActiveForRepenishment = row[headDict["Active for Replenishment"]] == "Yes"
+                    };
+                    locations.Add(loc);
+                }
 
                 line = reader.ReadLine();
-                // Add row data.
-                while (line != null)
-                {
-                    row = line.Split('\t');
-
-                    if (highestCol < row.Length)
-                    {
-                        loc = new NAVLocation
-                        {
-                            Code = row[headDict["Code"]],
-                            Name = row[headDict["Name"]],
-                            CompanyCode = row[headDict["Company Code"]],
-                            IsWarehouse = row[headDict["Location Is Warehouse"]] == "Yes",
-                            IsStore = row[headDict["Location Is A Store"]] == "Yes",
-                            ActiveForRepenishment = row[headDict["Active for Replenishment"]] == "Yes"
-                        };
-                        locs.Add(loc);
-                    }
-
-                    line = reader.ReadLine();
-                }
             }
 
-            return locs;
+            return locations;
         }
 
         // Turns clipboard data into a list of zones.
         public static List<NAVZone> NAVRawStringToZones(string rawData)
         {
-            List<NAVZone> zones;
+            var headDict = Constants.NAVZoneColumns;
 
-            Dictionary<string, int> headDict = Constants.NAV_ZONE_COLUMNS;
-
-            try
-            {
-                if (rawData == "" || rawData == null) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
-                // Start memory stream from which to read.
-                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-                MemoryStream stream = new(byteArray);
-                // Start Reading from stream.
-                zones = NAVStreamToZones(stream, headDict);
-            }
-            catch (InvalidDataException) { throw; }
-            catch (Exception) { throw; }
+            if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+            // Start memory stream from which to read.
+            var byteArray = Encoding.UTF8.GetBytes(rawData);
+            MemoryStream stream = new(byteArray);
+            // Start Reading from stream.
+            var zones = NAVStreamToZones(stream, headDict);
 
             return zones;
         }
@@ -498,48 +383,42 @@ namespace Uranus
         // Convert a memory stream into a Zone list.
         private static List<NAVZone> NAVStreamToZones(MemoryStream stream, Dictionary<string, int> headDict)
         {
-            List<NAVZone> zones = new() { };
-
-            string[] row;
-            int highestCol;
-            NAVZone zone;
+            List<NAVZone> zones = new();
 
             IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
 
-            using (StreamReader reader = new(stream))
+            using StreamReader reader = new(stream);
+            // First set the headers.
+            var line = reader.ReadLine();
+            var headArr = line?.Split('\t');
+            SetHeadPosFromArray(ref headDict, headArr);
+            // Get highest column value to make sure that any given data line isn't cut short.
+            var highestCol = headDict.Values.Max();
+
+            line = reader.ReadLine();
+            // Add row data.
+            while (line != null)
             {
-                // First set the headers.
-                string line = reader.ReadLine();
-                string[] headArr = line.Split('\t');
-                SetHeadPosFromArray(ref headDict, headArr);
-                // Get highest column value to make sure that any given data line isn't cut short.
-                highestCol = headDict.Values.Max();
+                var row = line.Split('\t');
+
+                if (highestCol < row.Length)
+                {
+                    var locCode = row[headDict["Location Code"]];
+                    var code = row[headDict["Code"]];
+                    if (!int.TryParse(row[headDict["Zone Ranking"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var rank)) rank = 0;
+
+                    var zone = new NAVZone
+                    {
+                        ID = String.Join(":", locCode, code),
+                        Code = code,
+                        LocationCode = locCode,
+                        Description = row[headDict["Description"]],
+                        Ranking = rank
+                    };
+                    zones.Add(zone);
+                }
 
                 line = reader.ReadLine();
-                // Add row data.
-                while (line != null)
-                {
-                    row = line.Split('\t');
-
-                    if (highestCol < row.Length)
-                    {
-                        string locCode = row[headDict["Location Code"]];
-                        string code = row[headDict["Code"]];
-                        if (!int.TryParse(row[headDict["Zone Ranking"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int rank)) rank = 0;
-
-                        zone = new NAVZone
-                        {
-                            ID = String.Join(":", locCode, code),
-                            Code = code,
-                            LocationCode = locCode,
-                            Description = row[headDict["Description"]],
-                            Ranking = rank
-                        };
-                        zones.Add(zone);
-                    }
-
-                    line = reader.ReadLine();
-                }
             }
 
             return zones;
@@ -548,21 +427,14 @@ namespace Uranus
         // Turns clipboard data into a list of bins.
         public static List<NAVBin> NAVRawStringToBins(string rawData)
         {
-            List<NAVBin> bins;
+            var headDict = Constants.NAVBinColumns;
 
-            Dictionary<string, int> headDict = Constants.NAV_BIN_COLUMNS;
-
-            try
-            {
-                if (rawData == "" || rawData == null) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
-                // Start memory stream from which to read.
-                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-                MemoryStream stream = new(byteArray);
-                // Start Reading from stream.
-                bins = NAVStreamToBins(stream, headDict);
-            }
-            catch (InvalidDataException) { throw; }
-            catch (Exception) { throw; }
+            if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+            // Start memory stream from which to read.
+            var byteArray = Encoding.UTF8.GetBytes(rawData);
+            MemoryStream stream = new(byteArray);
+            // Start Reading from stream.
+            var bins = NAVStreamToBins(stream, headDict);
 
             return bins;
         }
@@ -570,301 +442,259 @@ namespace Uranus
         // Convert a memory stream into a Bin list.
         private static List<NAVBin> NAVStreamToBins(MemoryStream stream, Dictionary<string, int> headDict)
         {
-            List<NAVBin> bins = new() { };
-
-            string[] row;
-            int highestCol;
-            NAVBin bin;
+            List<NAVBin> bins = new();
 
             IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
 
-            using (StreamReader reader = new(stream))
+            using StreamReader reader = new(stream);
+            // First set the headers.
+            var line = reader.ReadLine();
+            var headArr = line?.Split('\t');
+            SetHeadPosFromArray(ref headDict, headArr);
+            // Get highest column value to make sure that any given data line isn't cut short.
+            var highestCol = headDict.Values.Max();
+
+            line = reader.ReadLine();
+            // Add row data.
+            while (line != null)
             {
-                // First set the headers.
-                string line = reader.ReadLine();
-                string[] headArr = line.Split('\t');
-                SetHeadPosFromArray(ref headDict, headArr);
-                // Get highest column value to make sure that any given data line isn't cut short.
-                highestCol = headDict.Values.Max();
+                var row = line.Split('\t');
+
+                if (highestCol < row.Length)
+                {
+                    var locCode = row[headDict["Location Code"]];
+                    var zoneCode = row[headDict["Zone Code"]];
+                    var code = row[headDict["Code"]];
+                    var zoneID = string.Join(":", locCode, zoneCode);
+                    if (!int.TryParse(row[headDict["Bin Ranking"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var rank)) rank = 0;
+                    if (!double.TryParse(row[headDict["Used Cubage"]], NumberStyles.AllowThousands, provider, out var usedCube)) usedCube = 0;
+                    if (!double.TryParse(row[headDict["Maximum Cubage"]], NumberStyles.AllowThousands, provider, out var maxCube)) maxCube = 0;
+                    if (!DateTime.TryParse(row[headDict["CC Last Count Date"]], provider, DateTimeStyles.None, out var ccCount)) ccCount = new();
+                    if (!DateTime.TryParse(row[headDict["PI - Last Count Date"]], provider, DateTimeStyles.None, out var piCount)) piCount = new();
+
+                    var bin = new NAVBin
+                    {
+                        ID = string.Join(":", zoneID, code),
+                        ZoneID = zoneID,
+                        LocationCode = locCode,
+                        ZoneCode = zoneCode,
+                        Code = code,
+                        Description = row[headDict["Description"]],
+                        Empty = row[headDict["Empty"]] == "Yes",
+                        Assigned = row[headDict["Bin Assigned"]] == "Yes",
+                        Ranking = rank,
+                        UsedCube = usedCube,
+                        MaxCube = maxCube,
+                        LastCcDate = ccCount,
+                        LastPiDate = piCount
+                    };
+                    bins.Add(bin);
+                }
 
                 line = reader.ReadLine();
-                // Add row data.
-                while (line != null)
-                {
-                    row = line.Split('\t');
-
-                    if (highestCol < row.Length)
-                    {
-                        string locCode = row[headDict["Location Code"]];
-                        string zoneCode = row[headDict["Zone Code"]];
-                        string code = row[headDict["Code"]];
-                        string zoneID = string.Join(":", locCode, zoneCode);
-                        if (!int.TryParse(row[headDict["Bin Ranking"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int rank)) rank = 0;
-                        if (!double.TryParse(row[headDict["Used Cubage"]], NumberStyles.AllowThousands, provider, out double usedCube)) usedCube = 0;
-                        if (!double.TryParse(row[headDict["Maximum Cubage"]], NumberStyles.AllowThousands, provider, out double maxCube)) maxCube = 0;
-                        if (!DateTime.TryParse(row[headDict["CC Last Count Date"]], provider, DateTimeStyles.None, out DateTime ccCount)) ccCount = new DateTime();
-                        if (!DateTime.TryParse(row[headDict["PI - Last Count Date"]], provider, DateTimeStyles.None, out DateTime piCount)) piCount = new DateTime();
-
-                        bin = new NAVBin
-                        {
-                            ID = string.Join(":", zoneID, code),
-                            ZoneID = zoneID,
-                            LocationCode = locCode,
-                            ZoneCode = zoneCode,
-                            Code = code,
-                            Description = row[headDict["Description"]],
-                            Empty = row[headDict["Empty"]] == "Yes",
-                            Assigned = row[headDict["Bin Assigned"]] == "Yes",
-                            Ranking = rank,
-                            UsedCube = usedCube,
-                            MaxCube = maxCube,
-                            LastCCDate = ccCount,
-                            LastPIDate = piCount
-                        };
-                        bins.Add(bin);
-                    }
-
-                    line = reader.ReadLine();
-                }
             }
 
             return bins;
         }
 
         // Turns external data from predetermined CSV into a list of items.
-        public static List<NAVItem> NAVCSVToItems(string itemCSVLocation)
+        public static List<NAVItem> NAV_CSVToItems(string itemCSVLocation)
         {
-            List<NAVItem> items = new() { };
-            try
+            List<NAVItem> items = new();
+            IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+            var headDict = Constants.NAVItemColumns;
+            using StreamReader reader = new(File.OpenRead(itemCSVLocation));
+            var headArr = reader.ReadLine()?.Trim('"').Split(',', '"');
+            DataConversion.SetHeadPosFromArray(ref headDict, headArr);
+            var line = reader.ReadLine();
+
+            while (line != null)
             {
-                NAVItem item;
-                IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
-                Dictionary<string, int> headDict = Constants.NAV_ITEM_COLUMNS;
-                using StreamReader reader = new(File.OpenRead(itemCSVLocation));
-                string[] headArr = reader.ReadLine().Trim('"').Split(',', '"');
-                DataConversion.SetHeadPosFromArray(ref headDict, headArr);
-                string[] row;
-                string line = reader.ReadLine();
+                var row = line.Trim('"').Split(',', '"');
 
-                while (line != null)
+                if (row[0] == "AU")
                 {
-                    row = line.Trim('"').Split(',', '"');
+                    if (!int.TryParse(row[headDict["ItemCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var iNum)) iNum = 0;
+                    if (!double.TryParse(row[headDict["Length"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out var length)) length = 0;
+                    if (!double.TryParse(row[headDict["Width"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out var width)) width = 0;
+                    if (!double.TryParse(row[headDict["Height"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out var height)) height = 0;
+                    if (!double.TryParse(row[headDict["Cubage"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out var cube)) cube = 0;
+                    if (!double.TryParse(row[headDict["Weight"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out var weight)) weight = 0;
+                    if (!int.TryParse(row[headDict["DivisionCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var div)) div = 0;
+                    if (!int.TryParse(row[headDict["CategoryCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var cat)) cat = 0;
+                    if (!int.TryParse(row[headDict["PlatformCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var pf)) pf = 0;
+                    if (!int.TryParse(row[headDict["GenreCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var gen)) gen = 0;
 
-                    if (row[0] == "AU")
+                    var item = new NAVItem
                     {
-                        if (!int.TryParse(row[headDict["ItemCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int iNum)) iNum = 0;
-                        if (!double.TryParse(row[headDict["Length"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double length)) length = 0;
-                        if (!double.TryParse(row[headDict["Width"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double width)) width = 0;
-                        if (!double.TryParse(row[headDict["Height"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double height)) height = 0;
-                        if (!double.TryParse(row[headDict["Cubage"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double cube)) cube = 0;
-                        if (!double.TryParse(row[headDict["Weight"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double weight)) weight = 0;
-                        if (!int.TryParse(row[headDict["DivisionCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int div)) div = 0;
-                        if (!int.TryParse(row[headDict["CategoryCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int cat)) cat = 0;
-                        if (!int.TryParse(row[headDict["PlatformCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int pf)) pf = 0;
-                        if (!int.TryParse(row[headDict["GenreCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int gen)) gen = 0;
-
-                        item = new NAVItem
-                        {
-                            Number = iNum,
-                            Description = row[headDict["ItemName"]],
-                            Barcode = row[headDict["PrimaryBarcode"]],
-                            CategoryCode = cat,
-                            DivisionCode = div,
-                            PlatformCode = pf,
-                            GenreCode = gen,
-                            Length = length,
-                            Width = width,
-                            Height = height,
-                            Cube = cube,
-                            Weight = weight,
-                            PreOwned = row[headDict["NewUsed"]] == "Used"
-                        };
-                        items.Add(item);
-                    }
-                    line = reader.ReadLine();
+                        Number = iNum,
+                        Description = row[headDict["ItemName"]],
+                        Barcode = row[headDict["PrimaryBarcode"]],
+                        CategoryCode = cat,
+                        DivisionCode = div,
+                        PlatformCode = pf,
+                        GenreCode = gen,
+                        Length = length,
+                        Width = width,
+                        Height = height,
+                        Cube = cube,
+                        Weight = weight,
+                        PreOwned = row[headDict["NewUsed"]] == "Used"
+                    };
+                    items.Add(item);
                 }
+                line = reader.ReadLine();
             }
-            catch (Exception) { throw; }
 
             return items;
         }
 
-        // Turns clipboard data into a list of uoms.
+        // Turns clipboard data into a list of UoMs.
         public static List<NAVUoM> NAVRawStringToUoMs(string rawData)
         {
-            List<NAVUoM> uoms;
+            var headDict = Constants.NAVUOMColumns;
 
-            Dictionary<string, int> headDict = Constants.NAV_UOM_COLUMNS;
+            if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+            // Start memory stream from which to read.
+            var byteArray = Encoding.UTF8.GetBytes(rawData);
+            MemoryStream stream = new(byteArray);
+            // Start Reading from stream.
+            var uomList = NAVStreamToUoMs(stream, headDict);
 
-            try
-            {
-                if (rawData == "" || rawData == null) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
-                // Start memory stream from which to read.
-                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-                MemoryStream stream = new(byteArray);
-                // Start Reading from stream.
-                uoms = NAVStreamToUoMs(stream, headDict);
-            }
-            catch (InvalidDataException) { throw; }
-            catch (Exception) { throw; }
-
-            return uoms;
+            return uomList;
         }
 
         // Convert a memory stream into a UoM list.
         private static List<NAVUoM> NAVStreamToUoMs(MemoryStream stream, Dictionary<string, int> headDict)
         {
-            List<NAVUoM> uoms = new() { };
+            List<NAVUoM> uomList = new();
 
-            string[] row;
-            int highestCol;
-            NAVUoM uom;
             IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
-            using (StreamReader reader = new(stream))
+            using StreamReader reader = new(stream);
+            // First set the headers.
+            var line = reader.ReadLine();
+            var headArr = line?.Split('\t');
+            SetHeadPosFromArray(ref headDict, headArr);
+            // Get highest column value to make sure that any given data line isn't cut short.
+            var highestCol = headDict.Values.Max();
+
+            line = reader.ReadLine();
+            // Add row data.
+            while (line != null)
             {
-                // First set the headers.
-                string line = reader.ReadLine();
-                string[] headArr = line.Split('\t');
-                SetHeadPosFromArray(ref headDict, headArr);
-                // Get highest column value to make sure that any given data line isn't cut short.
-                highestCol = headDict.Values.Max();
-
-                line = reader.ReadLine();
-                // Add row data.
-                while (line != null)
+                var row = line.Split('\t');
+                if (highestCol < row.Length)
                 {
-                    row = line.Split('\t');
-                    if (highestCol < row.Length)
-                    {
-                        string code = row[headDict["Code"]];
-                        if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int iNum)) iNum = 0;
-                        if (!int.TryParse(row[headDict["Qty. per Unit of Measure"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int qtyPU)) qtyPU = 0;
-                        if (!int.TryParse(row[headDict["Max Qty"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int max)) max = 0;
-                        if (!double.TryParse(row[headDict["Length (CM)"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double length)) length = 0;
-                        if (!double.TryParse(row[headDict["Width (CM)"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double width)) width = 0;
-                        if (!double.TryParse(row[headDict["Height (CM)"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double height)) height = 0;
-                        if (!double.TryParse(row[headDict["CM Cubage"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double cube)) cube = 0;
-                        if (!double.TryParse(row[headDict["Weight (Kg)"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out double weight)) weight = 0;
+                    var code = row[headDict["Code"]];
+                    if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var iNum)) iNum = 0;
+                    if (!int.TryParse(row[headDict["Qty. per Unit of Measure"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var qtyPerUoM)) qtyPerUoM = 0;
+                    if (!int.TryParse(row[headDict["Max Qty"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var max)) max = 0;
+                    if (!double.TryParse(row[headDict["Length (CM)"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out var length)) length = 0;
+                    if (!double.TryParse(row[headDict["Width (CM)"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out var width)) width = 0;
+                    if (!double.TryParse(row[headDict["Height (CM)"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out var height)) height = 0;
+                    if (!double.TryParse(row[headDict["CM Cubage"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out var cube)) cube = 0;
+                    if (!double.TryParse(row[headDict["Weight (Kg)"]], NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands, provider, out var weight)) weight = 0;
 
-                        uom = new NAVUoM
-                        {
-                            ID = string.Join(":", iNum, code),
-                            Code = code,
-                            ItemNumber = iNum,
-                            QtyPerUoM = qtyPU,
-                            MaxQty = max,
-                            ExcludCartonization = row[headDict["Exclude Cartonization"]] == "Yes",
-                            Length = length,
-                            Width = width,
-                            Height = height,
-                            Cube = cube,
-                            Weight = weight
-                        };
-                        uoms.Add(uom);
-                    }
-                    line = reader.ReadLine();
+                    var uom = new NAVUoM
+                    {
+                        ID = string.Join(":", iNum, code),
+                        Code = code,
+                        ItemNumber = iNum,
+                        QtyPerUoM = qtyPerUoM,
+                        MaxQty = max,
+                        ExcludCartonization = row[headDict["Exclude Cartonization"]] == "Yes",
+                        Length = length,
+                        Width = width,
+                        Height = height,
+                        Cube = cube,
+                        Weight = weight
+                    };
+                    uomList.Add(uom);
                 }
+                line = reader.ReadLine();
             }
-            return uoms;
+
+            return uomList;
         }
 
         // Turns clipboard data into a list of stock.
         public static List<NAVStock> NAVRawStringToStock(string rawData)
         {
-            List<NAVStock> stockList;
+            var headDict = Constants.NAVStockColumns;
 
-            Dictionary<string, int> headDict = Constants.NAV_STOCK_COLUMNS;
-
-            try
-            {
-                if (rawData == "" || rawData == null) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
-                // Start memory stream from which to read.
-                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-                MemoryStream stream = new(byteArray);
-                // Start Reading from stream.
-                stockList = NAVStreamToStock(stream, headDict);
-            }
-            catch (InvalidDataException)
-            {
-                throw;
-         }
-            catch (Exception)
-            {
-             throw;
-            }
+            if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+            // Start memory stream from which to read.
+            var byteArray = Encoding.UTF8.GetBytes(rawData);
+            MemoryStream stream = new(byteArray);
+            // Start Reading from stream.
+            var stockList = NAVStreamToStock(stream, headDict);
 
             return stockList;
         }
 
         // Convert a memory stream into a stock list.
-        private static List<NAVStock> NAVStreamToStock(MemoryStream stream, Dictionary<string, int> headDict)
+        private static List<NAVStock> NAVStreamToStock(Stream stream, Dictionary<string, int> headDict)
         {
-            List<NAVStock> stockList = new() { };
-
-            string[] row;
-            int highestCol;
-            NAVStock stock;
+            List<NAVStock> stockList = new();
 
             IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
 
-            using (StreamReader reader = new(stream))
+            using StreamReader reader = new(stream);
+            // First set the headers.
+            var line = reader.ReadLine();
+            var headArr = line?.Split('\t');
+            SetHeadPosFromArray(ref headDict, headArr);
+            // Get highest column value to make sure that any given data line isn't cut short.
+            var highestCol = headDict.Values.Max();
+
+            line = reader.ReadLine();
+            // Add row data.
+            while (line != null)
             {
-                // First set the headers.
-                string line = reader.ReadLine();
-                string[] headArr = line.Split('\t');
-                SetHeadPosFromArray(ref headDict, headArr);
-                // Get highest column value to make sure that any given data line isn't cut short.
-                highestCol = headDict.Values.Max();
+                var row = line.Split('\t');
+
+                if (highestCol < row.Length)
+                {
+                    var location = row[headDict["Location Code"]];
+                    var zone = row[headDict["Zone Code"]];
+                    var bin = row[headDict["Bin Code"]];
+                    var uom = row[headDict["Unit of Measure Code"]];
+                    var zoneID = string.Join(":", location, zone);
+                    var binID = string.Join(":", zoneID, bin);
+                    if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer, provider, out var itemNo)) itemNo = 0;
+                    var uomID = string.Join(":", itemNo, uom);
+                    if (!int.TryParse(row[headDict["Quantity"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var qty)) itemNo = 0;
+                    if (!int.TryParse(row[headDict["Pick Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var pickQty)) itemNo = 0;
+                    if (!int.TryParse(row[headDict["Put-away Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var putQty)) itemNo = 0;
+                    if (!int.TryParse(row[headDict["Neg. Adjmt. Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var negQty)) itemNo = 0;
+                    if (!int.TryParse(row[headDict["Pos. Adjmt. Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var posQty)) itemNo = 0;
+                    if (!DateTime.TryParse(row[headDict["Date Created"]], provider, DateTimeStyles.None, out var dateCreated)) dateCreated = new();
+                    if (!DateTime.TryParse(row[headDict["Time Created"]], provider, DateTimeStyles.NoCurrentDateDefault, out var timeCreated)) timeCreated = new();
+
+                    var stock = new NAVStock
+                    {
+                        ID = string.Join(":", binID, uomID),
+                        BinID = binID,
+                        ZoneID = zoneID,
+                        UoMid = uomID,
+                        LocationCode = location,
+                        ZoneCode = zone,
+                        BinCode = bin,
+                        ItemNumber = itemNo,
+                        UoMCode = uom,
+                        Qty = qty,
+                        PickQty = pickQty,
+                        PutAwayQty = putQty,
+                        NegAdjQty = negQty,
+                        PosAdjQty = posQty,
+                        DateCreated = dateCreated,
+                        TimeCreated = timeCreated,
+                        Fixed = row[headDict["Fixed"]] == "Yes"
+                    };
+                    stockList.Add(stock);
+                }
 
                 line = reader.ReadLine();
-                // Add row data.
-                while (line != null)
-                {
-                    row = line.Split('\t');
-
-                    if (highestCol < row.Length)
-                    {
-                        string location = row[headDict["Location Code"]];
-                        string zone = row[headDict["Zone Code"]];
-                        string bin = row[headDict["Bin Code"]];
-                        string uom = row[headDict["Unit of Measure Code"]];
-                        string zoneID = string.Join(":", location, zone);
-                        string binID = string.Join(":", zoneID, bin);
-                        if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer, provider, out int itemNo)) itemNo = 0;
-                        string uomID = string.Join(":", itemNo, uom);
-                        if (!int.TryParse(row[headDict["Quantity"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int qty)) itemNo = 0;
-                        if (!int.TryParse(row[headDict["Pick Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int pickQty)) itemNo = 0;
-                        if (!int.TryParse(row[headDict["Put-away Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int putQty)) itemNo = 0;
-                        if (!int.TryParse(row[headDict["Neg. Adjmt. Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int negQty)) itemNo = 0;
-                        if (!int.TryParse(row[headDict["Pos. Adjmt. Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int posQty)) itemNo = 0;
-                        if (!DateTime.TryParse(row[headDict["Date Created"]], provider, DateTimeStyles.None, out DateTime dateCreated)) dateCreated = new DateTime();
-                        if (!DateTime.TryParse(row[headDict["Time Created"]], provider, DateTimeStyles.NoCurrentDateDefault, out DateTime timeCreated)) timeCreated = new DateTime();
-
-                        stock = new NAVStock
-                        {
-                            ID = string.Join(":", binID, uomID),
-                            BinID = binID,
-                            ZoneID = zoneID,
-                            UoMID = uomID,
-                            LocationCode = location,
-                            ZoneCode = zone,
-                            BinCode = bin,
-                            ItemNumber = itemNo,
-                            UoMCode = uom,
-                            Qty = qty,
-                            PickQty = pickQty,
-                            PutAwayQty = putQty,
-                            NegAdjQty = negQty,
-                            PosAdjQty = posQty,
-                            DateCreated = dateCreated,
-                            TimeCreated = timeCreated,
-                            Fixed = row[headDict["Fixed"]] == "Yes"
-                        };
-                        stockList.Add(stock);
-                    }
-
-                    line = reader.ReadLine();
-                }
             }
 
             return stockList;
@@ -874,16 +704,15 @@ namespace Uranus
         // by tabs and newlines. Converts it into an array.
         public static string[,] RawStringToArray(string rawData)
         {
-            string[] outerArray = rawData.Split(new[] { "\r\n" }, StringSplitOptions.None);
-            int maxCol = outerArray[0].Split('\t').Length;
-            int maxRow = outerArray.Length;
-            string[,] fullArray = new string[maxRow, maxCol];
-            string[] innerArray;
+            var outerArray = rawData.Split(new[] { "\r\n" }, StringSplitOptions.None);
+            var maxCol = outerArray[0].Split('\t').Length;
+            var maxRow = outerArray.Length;
+            var fullArray = new string[maxRow, maxCol];
 
-            for (int row = 0; row < outerArray.Length; ++row)
+            for (var row = 0; row < outerArray.Length; ++row)
             {
-                innerArray = outerArray[row].Split('\t');
-                for (int col = 0; col < innerArray.Length && col < maxCol; ++col)
+                var innerArray = outerArray[row].Split('\t');
+                for (var col = 0; col < innerArray.Length && col < maxCol; ++col)
                 {
                     fullArray[row, col] = innerArray[col];
                 }
@@ -895,29 +724,26 @@ namespace Uranus
         // Takes a table-like array of data and converts it to a JSON string.
         public static string ArrayToJSON(string[,] array)
         {
-            string returnString = "{\n\t";
-            string line;
-            int row, col, rowMax, colMax;
-            rowMax = array.GetLength(0);
-            colMax = array.GetLength(1);
+            var returnString = "{\n\t";
+            int row, col;
+            var rowMax = array.GetLength(0);
+            var colMax = array.GetLength(1);
             // Set headers.
-            string[] headers = new string[colMax];
+            var headers = new string[colMax];
             for (col = 0; col < colMax; ++col)
             {
                 headers[col] = array[0, col];
             }
 
-            string head, val;
-
             // Set contents
             for (row = 1; row < rowMax; ++row)
             {
-                line = "{\n\t\t";
+                var line = "{\n\t\t";
 
                 for (col = 0; col < colMax; ++col)
                 {
-                    head = headers[col] + ": ";
-                    val = array[row, col];
+                    var head = headers[col] + ": ";
+                    var val = array[row, col];
                     line += head + ((col == colMax - 1) ? val + "\n\t" : val + ",\n\t\t");
                 }
 
@@ -936,67 +762,63 @@ namespace Uranus
         public static DataTable RawStringToTable(string rawData)
         {
             DataTable data = new();
-            try
+            if (string.IsNullOrEmpty(rawData)) throw new("No data on clipboard.");
+
+            var byteArray = Encoding.UTF8.GetBytes(rawData);
+            MemoryStream stream = new(byteArray);
+
+            using StreamReader reader = new(stream);
+            // First set the headers.
+            var line = reader.ReadLine();
+            if (line is null) return new();
+
+            var headers = line.Split('\t');
+            foreach (var header in headers)
+                _ = data.Columns.Add(header);
+
+            line = reader.ReadLine();
+
+            // Add row data.
+            while (line != null)
             {
-                if (rawData == "" || rawData == null) throw new Exception("No data on clipboard.");
-
-                byte[] byteArray = Encoding.UTF8.GetBytes(rawData);
-                MemoryStream stream = new(byteArray);
-
-                using StreamReader reader = new(stream);
-                // First set the headers.
-                string line = reader.ReadLine();
-                string[] headers = line.Split('\t');
-                foreach (string header in headers)
-                    _ = data.Columns.Add(header);
-
+                var group = line.Split('\t').ToArray<object>();
+                _ = data.Rows.Add(group);
                 line = reader.ReadLine();
-
-                // Add row data.
-                while (line != null)
-                {
-                    _ = data.Rows.Add(line.Split('\t'));
-                    line = reader.ReadLine();
-                }
-            }
-            catch (Exception)
-            {
-             throw;
             }
 
             return data;
         }
 
-        // Given a datatable and a list of columns for each conversion type, sanitizes the data to convert all values
+        // Given a data-table and a list of columns for each conversion type, sanitizes the data to convert all values
         // in those columns to the appropriate type.
         public static void ConvertColumns(ref DataTable dataTable, List<string> dblColumns, List<string> intColumns, List<string> dtColumns, List<string> boolColumns)
         {
-            string[] trueVals = { "yes", "used" };
-            bool b;
+            string[] trueValues = { "yes", "used" };
             IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
             foreach (DataRow row in dataTable.Rows)
             {
-                foreach (string col in dblColumns)
+                foreach (var col in dblColumns)
                 {
-                    _ = double.TryParse(row[col].ToString(), out double dbl);
+                    _ = double.TryParse(row[col].ToString(), out var dbl);
                     row[col] = dbl;
                 }
-                foreach (string col in intColumns)
+                foreach (var col in intColumns)
                 {
-                    _ = int.TryParse(row[col].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out int i);
+                    _ = int.TryParse(row[col].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var i);
                     row[col] = i;
                 }
-                foreach (string col in dtColumns)
+                foreach (var col in dtColumns)
                 {
-                    _ = DateTime.TryParse(row[col].ToString(), out DateTime dateTime);
+                    _ = DateTime.TryParse(row[col].ToString(), out var dateTime);
                     row[col] = dateTime;
                 }
-                foreach (string col in boolColumns)
+                foreach (var col in boolColumns)
                 {
-                    if (trueVals.Contains(row[col].ToString().ToLower()))
+                    bool b;
+                    if (trueValues.Contains(row[col].ToString()?.ToLower()))
                         b = true;
                     else
-                        _ = Boolean.TryParse(row[col].ToString(), out b);
+                        _ = bool.TryParse(row[col].ToString(), out b);
                     row[col] = b;
                 }
             }

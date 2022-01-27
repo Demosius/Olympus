@@ -1,13 +1,9 @@
 ﻿using Prometheus.ViewModel.Helpers;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Prometheus.Model
 {
-    class DataCategory
+    public class DataCategory
     {
         public EDataCategory Category { get; }
         public string Name { get; set; }
@@ -20,10 +16,10 @@ namespace Prometheus.Model
             Category = category;
             Name = EnumConverter.DataCategoryToString(category);
 
-            DataTypes = new List<DataType>();
+            DataTypes = new();
             foreach (var type in EnumConverter.GetTypeList(category))
             {
-                DataTypes.Add(new DataType(this, type));
+                DataTypes.Add(new(this, type));
             }
         }
     }

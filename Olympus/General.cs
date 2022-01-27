@@ -2,12 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Olympus
@@ -34,7 +29,7 @@ namespace Olympus
         // Gets raw string data from the clipboard.
         public static string ClipboardToString()
         {
-            string rawData = "";
+            var rawData = "";
             Thread thread = new(delegate ()
             {
                 rawData = Clipboard.GetText(TextDataFormat.Text);
@@ -67,9 +62,9 @@ namespace Olympus
         /// </returns>
         public static List<string> ValidateTableData(DataTable data, Dictionary<string, string> columns)
         {
-            List<string> missing = new() { };
+            List<string> missing = new();
 
-            foreach (KeyValuePair<string, string> column in columns)
+            foreach (var column in columns)
             {
                 if (!data.Columns.Contains(column.Key))
                 {
@@ -95,7 +90,7 @@ namespace Olympus
         /// <returns></returns>
         public static List<string> ValidateTableData(DataTable data, List<string> columns)
         {
-            List<string> missing = new() { };
+            List<string> missing = new();
             foreach (var column in columns)
             {
                 if (!data.Columns.Contains(column))

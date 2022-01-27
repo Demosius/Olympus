@@ -1,10 +1,6 @@
 ﻿using SQLite;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Staff.Model
 {
@@ -29,10 +25,8 @@ namespace Uranus.Staff.Model
 
         public virtual string GetImageFilePath()
         {
-            string checkDir;
-
             // Current Directory
-            checkDir = Path.Combine(Directory.GetCurrentDirectory(), FileName);
+            var checkDir = Path.Combine(Directory.GetCurrentDirectory(), FileName);
             if (CheckPath(checkDir)) return checkDir;
 
             // User Image Directory.
@@ -41,18 +35,15 @@ namespace Uranus.Staff.Model
 
             // User Directory.
             checkDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), FileName);
-            if (CheckPath(checkDir)) return checkDir;
 
-            return "";
-
+            return CheckPath(checkDir) ? checkDir : "";
         }
 
         public virtual string GetImageFilePath(StaffReader reader)
         {
-            string checkDir;
             // Check multiple locations for the image.
 
-            checkDir = GetImageFilePath();
+            var checkDir = GetImageFilePath();
             if (CheckPath(checkDir)) return checkDir;
 
             // Database directory.
@@ -65,21 +56,17 @@ namespace Uranus.Staff.Model
 
             // Staff ProjectIcon Directory.
             checkDir = Path.Combine(reader.ProjectIconDirectory, FileName);
-            if (CheckPath(checkDir)) return checkDir;
-
-            return FileName;
+            
+            return CheckPath(checkDir) ? checkDir : FileName;
         }
 
         // Given a full directory path to a file, checks if file exists.
-        // If it does, set fullpath value to match, and return true.
+        // If it does, set full path value to match, and return true.
         private bool CheckPath(string path)
         {
-            if (File.Exists(path))
-            {
-                FullPath = path;
-                return true;
-            }
-            return false;
+            if (!File.Exists(path)) return false;
+            FullPath = path;
+            return true;
         }
     }
 }

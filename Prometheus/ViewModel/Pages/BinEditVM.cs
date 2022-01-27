@@ -1,10 +1,7 @@
 ﻿using Uranus.Inventory.Model;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Prometheus.ViewModel.Pages
 {
@@ -51,7 +48,7 @@ namespace Prometheus.ViewModel.Pages
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
     }
 }

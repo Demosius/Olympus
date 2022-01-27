@@ -4,7 +4,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Olympus.View"
         xmlns:vm="clr-namespace:Olympus.ViewModel" 
         mc:Ignorable="d"
         Background="{StaticResource BackGroundBrush}"
@@ -115,14 +114,14 @@
                 <PasswordBox PasswordChanged="PasswordBox_CnfrmPasswordChanged"/>
                 <StackPanel Margin="5">
                     <Separator/>
-                    <TextBlock Foreground="{Binding Colour_SixChar, UpdateSourceTrigger=PropertyChanged}">• Minimum 6 characters.</TextBlock>
-                    <TextBlock Foreground="{Binding Colour_Match, UpdateSourceTrigger=PropertyChanged}">• Both passwords must match.</TextBlock>
-                    <TextBlock Foreground="{Binding Colour_NoSpace, UpdateSourceTrigger=PropertyChanged}">• No white space.</TextBlock>
-                    <TextBlock Foreground="{Binding Colour_EightChar, UpdateSourceTrigger=PropertyChanged}">• Recommend: 8+ total characters.</TextBlock>
-                    <TextBlock Foreground="{Binding Colour_Lower, UpdateSourceTrigger=PropertyChanged}">• Recommend: 1+ lower case.</TextBlock>
-                    <TextBlock Foreground="{Binding Colour_Upper, UpdateSourceTrigger=PropertyChanged}">• Recommend: 1+ upper case.</TextBlock>
-                    <TextBlock Foreground="{Binding Colour_Number, UpdateSourceTrigger=PropertyChanged}">• Recommend: 1+ numeric character.</TextBlock>
-                    <TextBlock Foreground="{Binding Colour_Special, UpdateSourceTrigger=PropertyChanged}">• Recommend: 1+ special character.</TextBlock>
+                    <TextBlock Foreground="{Binding ColourSixChar, UpdateSourceTrigger=PropertyChanged}">• Minimum 6 characters.</TextBlock>
+                    <TextBlock Foreground="{Binding ColourMatch, UpdateSourceTrigger=PropertyChanged}">• Both passwords must match.</TextBlock>
+                    <TextBlock Foreground="{Binding ColourNoSpace, UpdateSourceTrigger=PropertyChanged}">• No white space.</TextBlock>
+                    <TextBlock Foreground="{Binding ColourEightChar, UpdateSourceTrigger=PropertyChanged}">• Recommend: 8+ total characters.</TextBlock>
+                    <TextBlock Foreground="{Binding ColourLower, UpdateSourceTrigger=PropertyChanged}">• Recommend: 1+ lower case.</TextBlock>
+                    <TextBlock Foreground="{Binding ColourUpper, UpdateSourceTrigger=PropertyChanged}">• Recommend: 1+ upper case.</TextBlock>
+                    <TextBlock Foreground="{Binding ColourNumber, UpdateSourceTrigger=PropertyChanged}">• Recommend: 1+ numeric character.</TextBlock>
+                    <TextBlock Foreground="{Binding ColourSpecial, UpdateSourceTrigger=PropertyChanged}">• Recommend: 1+ special character.</TextBlock>
                     <Separator/>
                 </StackPanel>
         </StackPanel>

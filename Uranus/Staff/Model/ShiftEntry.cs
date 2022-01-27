@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Staff.Model
 {
@@ -145,7 +143,7 @@ namespace Uranus.Staff.Model
             ID = Guid.NewGuid();
             EmployeeCode = employee.ID;
             Location = employee.Location;
-            DateTime d = clockTimes[0].DTDate;
+            var d = clockTimes[0].DtDate;
             Date = d.ToString("yyyy-MM-dd");
             Day = d.ToString("dddd");
 
@@ -180,7 +178,7 @@ namespace Uranus.Staff.Model
         /// <returns></returns>
         public List<ClockEvent> GetClocks()
         {
-            List<ClockEvent> returnVal = AdditionalClocks ?? new();
+            var returnVal = AdditionalClocks ?? new();
 
             if (StartShiftClock is not null) { returnVal.Add(StartShiftClock); }
             if (StartLunchClock is not null) { returnVal.Add(StartLunchClock); }
@@ -228,7 +226,7 @@ namespace Uranus.Staff.Model
             if (clockTimes.Count > 4)
             {
                 AdditionalClocks = clockTimes.Skip(3).Take(clockTimes.Count - 4).ToList();
-                foreach (ClockEvent clock in AdditionalClocks)
+                foreach (var clock in AdditionalClocks)
                 {
                     clock.Status = EClockStatus.Rejected;
                 }
@@ -319,7 +317,7 @@ namespace Uranus.Staff.Model
         public void AddClockEvents(List<ClockEvent> newClocks)
         {
             if (newClocks.Count == 0) return;
-            List<ClockEvent> clocks = ClearClocks().Concat(newClocks).ToList();
+            var clocks = ClearClocks().Concat(newClocks).ToList();
             AssignClockEvents(clocks);
             SummarizeShift();
         }
@@ -331,20 +329,20 @@ namespace Uranus.Staff.Model
         {
             // Can't be summarized if there is not at least 2 clocks.
             if (StartShiftClock is null || EndShiftClock is null) return;
-            if (StartShiftClock.DTTime < new TimeSpan(6, 50, 0))  // Use 650 as those set to start at 700 will clock in up to 10 minutes before their shift.
+            if (StartShiftClock.DtTime < new TimeSpan(6, 50, 0))  // Use 650 as those set to start at 700 will clock in up to 10 minutes before their shift.
                 ShiftType = EShiftType.M;
-            else if (EndShiftClock.DTTime > new TimeSpan(18, 0, 0))
+            else if (EndShiftClock.DtTime > new TimeSpan(18, 0, 0))
                 ShiftType = EShiftType.A;
             else
                 ShiftType = EShiftType.D;
 
             // Shift lunch break is set to 30 min for afternoon shift, otherwise is 40 mins. 
             // Regardless of actuall clocks - but only apply if start lunch is not null.
-            TimeSpan workSpan = EndShiftClock.DTTime.Subtract(StartShiftClock.DTTime);
+            var workSpan = EndShiftClock.DtTime.Subtract(StartShiftClock.DtTime);
 
             // Only subtract lunch break if shift is over 3 hours, and there is at least a initial lunch clock.
             if (StartLunchClock != null && workSpan > new TimeSpan(3, 0, 0))
-                workSpan = workSpan.Subtract(new TimeSpan(0, (ShiftType == EShiftType.A) ? 30 : 40, 0));
+                workSpan = workSpan.Subtract(new(0, (ShiftType == EShiftType.A) ? 30 : 40, 0));
 
             TimeTotal = new DateTime(workSpan.Ticks).ToString("HH:mm");
             HoursWorked = workSpan.TotalHours;
@@ -378,7 +376,7 @@ namespace Uranus.Staff.Model
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
 
         public override string ToString()

@@ -1,19 +1,12 @@
 ﻿using Uranus.Staff.Model;
-using SQLiteNetExtensions.Extensions;
-using SQLiteNetExtensions.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Windows;
 
 namespace Uranus.Staff
 {
     public class StaffChariot : MasterChariot
     {
-        public override string DatabaseName { get; } = "Staff.sqlite";
+        public override string DatabaseName => "Staff.sqlite";
         public string EmployeeIconDirectory { get; set; }
         public string EmployeeAvatarDirectory { get; set; }
         public string ProjectIconDirectory { get; set; }
@@ -34,29 +27,21 @@ namespace Uranus.Staff
         public StaffChariot(string solLocation)
         {
             // Try first to use the given directory, if not then use local file.
-            try
-            {
-                BaseDataDirectory = Path.Combine(solLocation, "Staff");
-                InitializeDatabaseConnection();
-            }
-            catch (Exception) { throw; }
+            BaseDataDirectory = Path.Combine(solLocation, "Staff");
+            InitializeDatabaseConnection();
         }
 
         /// <summary>
         /// Resets the connection using the given location string.
         /// </summary>
         /// <param name="solLocation">A directory location, in which the Staff database does/should reside.</param>
-        public void ResetConnection(string solLocation)
+        public override void ResetConnection(string solLocation)
         {
-            // First thing is to nullify the current databse (connection).
+            // First thing is to nullify the current database (connection).
             Database = null;
 
-            try
-            {
-                BaseDataDirectory = Path.Combine(solLocation, "Staff");
-                InitializeDatabaseConnection();
-            }
-            catch (Exception) { throw; }
+            BaseDataDirectory = Path.Combine(solLocation, "Staff");
+            InitializeDatabaseConnection();
         }
 
         public void CreateIconDirectories()
@@ -72,7 +57,7 @@ namespace Uranus.Staff
             if (!Directory.Exists(LicenceImageDirectory)) _ = Directory.CreateDirectory(LicenceImageDirectory);
         }
 
-        protected override void InitializeDatabaseConnection()
+        protected sealed override void InitializeDatabaseConnection()
         {
             base.InitializeDatabaseConnection();
             CreateIconDirectories();

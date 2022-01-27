@@ -4,7 +4,7 @@ namespace Uranus
 {
     public interface IProject
     {
-        EProject EProject { get; }
+        EProject Project { get; }
         public bool RequiresUser { get; }
         public void RefreshData();
     }

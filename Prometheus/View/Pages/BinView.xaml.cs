@@ -1,18 +1,6 @@
 ﻿using Prometheus.ViewModel.Helpers;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Prometheus.View.Pages
 {
@@ -30,7 +18,7 @@ namespace Prometheus.View.Pages
 
         private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
         {
-            string headerName = e.Column.Header.ToString();
+            var headerName = e.Column.Header.ToString();
 
             //Cancel the column you don't want to generate
             if (new List<string>() { "ID", "ZoneID", "Zone", "NAVStock", "Stock", "Extension", "Dimensions", "Bay", "AccessLevel" }.Contains(headerName))

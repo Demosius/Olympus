@@ -1,13 +1,8 @@
 ﻿using Prometheus.ViewModel.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Prometheus.Model
 {
-    class DataType
+    public class DataType
     {
         public EDataType Type { get; set; }
         public string Name { get; set; }

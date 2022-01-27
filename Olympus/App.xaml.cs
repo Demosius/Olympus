@@ -1,13 +1,7 @@
-﻿using Olympus.Model;
-using Styx;
+﻿using Styx;
 using Uranus;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using Olympus.Properties;
 
@@ -16,7 +10,7 @@ namespace Olympus
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App
     {
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
@@ -24,8 +18,8 @@ namespace Olympus
             e.Handled = true;
         }
 
-        public static Charon Charon { get; set; } = new Charon(Settings.Default.SolLocation);
-        public static Helios Helios { get; set; } = new Helios(Settings.Default.SolLocation);
+        public static Charon Charon { get; set; } = new(Settings.Default.SolLocation);
+        public static Helios Helios { get; set; } = new(Settings.Default.SolLocation);
 
         public static string BaseDirectory()
         {

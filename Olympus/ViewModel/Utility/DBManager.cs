@@ -1,13 +1,8 @@
 ﻿using Olympus.Properties;
 using Olympus.ViewModel.Commands;
 using Ookii.Dialogs.Wpf;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Olympus.ViewModel.Utility
@@ -58,7 +53,7 @@ namespace Olympus.ViewModel.Utility
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
 
         private static string SelectFolder()
@@ -126,7 +121,7 @@ namespace Olympus.ViewModel.Utility
 
         public void CopyDatabase()
         {
-            string path = SelectFolder();
+            var path = SelectFolder();
             // Empty string means cancelation.
             if (path == "") return;
             if (IsSubDirectory(Settings.Default.SolLocation, path))
@@ -145,7 +140,7 @@ namespace Olympus.ViewModel.Utility
 
         public void MoveDatabase()
         {
-            string path = SelectFolder();
+            var path = SelectFolder();
             // Empty string means cancelation.
             if (path == "") return;
             if (IsSubDirectory(Settings.Default.SolLocation, path))
@@ -158,7 +153,7 @@ namespace Olympus.ViewModel.Utility
             }
             // Copy existing DB across to new location, and remove from old.
             DirectoryCopy(Settings.Default.SolLocation, path);
-            string oldPath = Settings.Default.SolLocation;
+            var oldPath = Settings.Default.SolLocation;
             SetDatabase(path);
             Directory.Delete(oldPath, true);
         }
@@ -168,7 +163,7 @@ namespace Olympus.ViewModel.Utility
         /// </summary>
         public static void MergeDatabase()
         {
-            string path = GetExistingSol();
+            var path = GetExistingSol();
 
             if (path == "" || path == Settings.Default.SolLocation) return;
             // TODO: Finish merging logic.
@@ -198,10 +193,10 @@ namespace Olympus.ViewModel.Utility
         private static bool CheckSolExistance(string dirPath)
         {
             if (!Directory.Exists(dirPath)) return false;
-            string equipmentPath = Path.Join(dirPath, "Equipment", "Equipment.sqlite");
-            string staffPath = Path.Join(dirPath, "Staff", "Staff.sqlite");
-            string usersPath = Path.Join(dirPath, "Users", "Users.sqlite");
-            string inventoryPath = Path.Join(dirPath, "Inventory", "Inventory.sqlite");
+            var equipmentPath = Path.Join(dirPath, "Equipment", "Equipment.sqlite");
+            var staffPath = Path.Join(dirPath, "Staff", "Staff.sqlite");
+            var usersPath = Path.Join(dirPath, "Users", "Users.sqlite");
+            var inventoryPath = Path.Join(dirPath, "Inventory", "Inventory.sqlite");
             return Directory.Exists(equipmentPath) &&
                 Directory.Exists(staffPath) &&
                 Directory.Exists(inventoryPath) &&
@@ -220,25 +215,25 @@ namespace Olympus.ViewModel.Utility
                     + sourceDirName);
             }
 
-            DirectoryInfo[] dirs = dir.GetDirectories();
+            var dirs = dir.GetDirectories();
 
             // If the destination directory doesn't exist, create it.       
             _ = Directory.CreateDirectory(destDirName);
 
             // Get the files in the directory and copy them to the new location.
-            FileInfo[] files = dir.GetFiles();
-            foreach (FileInfo file in files)
+            var files = dir.GetFiles();
+            foreach (var file in files)
             {
-                string tempPath = Path.Combine(destDirName, file.Name);
+                var tempPath = Path.Combine(destDirName, file.Name);
                 _ = file.CopyTo(tempPath, true);
             }
 
             // If copying subdirectories, copy them and their contents to new location.
             if (copySubDirs)
             {
-                foreach (DirectoryInfo subdir in dirs)
+                foreach (var subdir in dirs)
                 {
-                    string tempPath = Path.Combine(destDirName, subdir.Name);
+                    var tempPath = Path.Combine(destDirName, subdir.Name);
                     DirectoryCopy(subdir.FullName, tempPath, copySubDirs);
                 }
             }
@@ -255,7 +250,7 @@ namespace Olympus.ViewModel.Utility
         {
             if (potentialParentDir == potentialChildDir)
                 return true;    // If they are the same, return true - as it means the same for our purposes.
-            DirectoryInfo parent = potentialChildDir.Parent;
+            var parent = potentialChildDir.Parent;
             if (parent is null)
                 return false;   // Once there is no parent, that means that it must be false.
             if (parent.FullName == potentialParentDir.FullName)

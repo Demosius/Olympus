@@ -65,17 +65,17 @@
             <!-- Third Row, Column Buttons -->
             <Button Grid.Column="0" Grid.Row="2" 
                     Content="BC Cols" 
-                    Command="{Binding ShowBCColCommand}"
+                    Command="{Binding ShowBcColCommand}"
                     Background="{DynamicResource CyanGradient}" 
                     Style="{DynamicResource MiniButton}"/>
             <Button Grid.Column="1" Grid.Row="2" 
                     Content="BL Cols" 
-                    Command="{Binding ShowBLColCommand}"
+                    Command="{Binding ShowBinListColumnCommand}"
                     Background="{DynamicResource GreenGradient}" 
                     Style="{DynamicResource MiniButton}" />
             <Button Grid.Column="2" Grid.Row="2" 
                     Content="UoM Cols" 
-                    Command="{Binding ShowULColCommand}"
+                    Command="{Binding ShowUlColCommand}"
                     Background="{DynamicResource OrangeGradient}" 
                     Style="{DynamicResource MiniButton}" />
             <Button Grid.Column="3" Grid.Row="2" 

@@ -3,9 +3,6 @@ using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Equipment.Model
 {
@@ -52,8 +49,8 @@ namespace Uranus.Equipment.Model
         public int Faults()
         {
             Pass = true;
-            int count = 0;
-            foreach (Check check in Checks)
+            var count = 0;
+            foreach (var check in Checks)
             {
                 if (check.IsFault() ?? false)
                 {

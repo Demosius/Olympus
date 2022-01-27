@@ -15,7 +15,7 @@ namespace Vulcan.View
             InitializeComponent();
         }
 
-        public EProject EProject => EProject.Vulcan;
+        public EProject Project => EProject.Vulcan;
 
         public bool RequiresUser => false;
 

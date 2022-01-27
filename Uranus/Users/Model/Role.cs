@@ -1,10 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Users.Model
 {
@@ -25,7 +21,7 @@ namespace Uranus.Users.Model
         public int ReadEmployeeSensitive { get; set; }      // Such as Phone, Address, etc.
         public int ReadEmployeeVerySensitive { get; set; }  // Pay rate and similar.
         public int UpdateEmployee { get; set; }
-        public int DeleteEmployee { get; set; } // Can only remove employee if there is no assocaiated User.
+        public int DeleteEmployee { get; set; } // Can only remove employee if there is no associated User.
 
         public bool CreateDepartment { get; set; }
         public bool UpdateDepartment { get; set; }

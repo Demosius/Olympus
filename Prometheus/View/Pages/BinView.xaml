@@ -5,7 +5,6 @@
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                   xmlns:base="clr-namespace:Prometheus.View"
                   xmlns:vm="clr-namespace:Prometheus.ViewModel.Pages"
-                  xmlns:local="clr-namespace:Prometheus.View.Pages"
                   mc:Ignorable="d" 
                   d:DesignHeight="450" d:DesignWidth="800"
                   Title="BinView">

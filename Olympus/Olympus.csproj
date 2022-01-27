@@ -129,9 +129,7 @@
     <Resource Include="Resources\Images\Icons\castle.ico" />
     <Resource Include="Resources\Images\Icons\chaos-white.ico" />
     <Resource Include="Resources\Images\Icons\dredd.ico" />
-    <Resource Include="Resources\Images\Icons\hellsing.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+	<Resource Include="Resources\Images\Icons\hellsing.ico"/>
     <Resource Include="Resources\Images\Icons\newlym.ico" />
     <Resource Include="Resources\Images\Icons\o-bolt.ico" />
     <Resource Include="Resources\Images\Icons\o-sport.ico" />

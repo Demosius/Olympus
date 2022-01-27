@@ -1,11 +1,7 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Staff.Model
 {
@@ -38,7 +34,7 @@ namespace Uranus.Staff.Model
                 if (date is null) { date = DateTime.Parse(Timestamp).ToString("yyyy-MM-dd"); }
                 return date;
             }
-            set { date = value; }
+            set => date = value;
         }
 
         private string time;
@@ -49,7 +45,7 @@ namespace Uranus.Staff.Model
                 if (time is null) { time = DateTime.Parse(Timestamp).ToString("HH:mm:ss"); }
                 return time;
             }
-            set { time = value; }
+            set => time = value;
         }
 
         public EClockStatus Status { get; set; }
@@ -58,9 +54,9 @@ namespace Uranus.Staff.Model
         public Employee Employee { get; set; }
 
         [Ignore]
-        public DateTime DTDate => DateTime.Parse(Date).Date;
+        public DateTime DtDate => DateTime.Parse(Date).Date;
         [Ignore]
-        public TimeSpan DTTime => DateTime.Parse(Time).TimeOfDay;
+        public TimeSpan DtTime => DateTime.Parse(Time).TimeOfDay;
 
         public ClockEvent()
         {
@@ -81,7 +77,7 @@ namespace Uranus.Staff.Model
 
         public void StampTime(string timestamp)
         {
-            DateTime dateTime = DateTime.Parse(timestamp);
+            var dateTime = DateTime.Parse(timestamp);
             StampTime(dateTime);
         }
 
@@ -205,7 +201,7 @@ namespace Uranus.Staff.Model
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
 
     }

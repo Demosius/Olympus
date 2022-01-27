@@ -1,9 +1,5 @@
 ﻿using Uranus.Users.Model;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Users
 {
@@ -29,17 +25,17 @@ namespace Uranus.Users
 
         public void AssureDBManagerRole()
         {
-            if (Chariot.PullObjectList<Role>().Where(Role => Role.Name == "DatabaseManager").Any()) return;
+            if (Chariot.PullObjectList<Role>().Any(role => role.Name == "DatabaseManager")) return;
 
             Role role = new();
             role.SetMaster();
             _ = Chariot.Create(role);
         }
 
-        public void Role(Role role, PushType pushType = PushType.ObjectOnly) => Chariot.Create(role, pushType);
+        public void Role(Role role, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(role, pushType);
 
-        public void User(User user, PushType pushType = PushType.ObjectOnly) => Chariot.Create(user, pushType);
+        public void User(User user, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(user, pushType);
 
-        public void Login(Login login, PushType pushType = PushType.ObjectOnly) => Chariot.Create(login, pushType);
+        public void Login(Login login, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(login, pushType);
     }
 }

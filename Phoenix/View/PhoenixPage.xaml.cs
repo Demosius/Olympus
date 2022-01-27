@@ -15,7 +15,7 @@ namespace Phoenix.View
             InitializeComponent();
         }
 
-        public EProject EProject => EProject.Phoenix;
+        public EProject Project => EProject.Phoenix;
 
         public bool RequiresUser => false;
 

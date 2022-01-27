@@ -1,10 +1,6 @@
-﻿using Uranus.Equipment.Model;
-using SQLiteNetExtensions.Extensions;
-using System;
+﻿using System;
+using Uranus.Equipment.Model;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Equipment
 {
@@ -20,8 +16,8 @@ namespace Uranus.Equipment
         /* Machines */
         public List<Machine> Machines()
         {
-            List<Machine> machines = new() { };
-            foreach (var machine in Chariot.PullObjectList<Machine>(pullType: PullType.FullRecursive))
+            List<Machine> machines = new();
+            foreach (var machine in Chariot.PullObjectList<Machine>(pullType: EPullType.FullRecursive))
             {
                 switch (machine.Type.LicenceRequired)
                 {
@@ -38,7 +34,7 @@ namespace Uranus.Equipment
                         machines.Add((Rabbit)machine);
                         break;
                     default:
-                        break;
+                        throw new ArgumentOutOfRangeException();
                 }
             }
             return machines;

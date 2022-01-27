@@ -1,11 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.IO;
-using System.Text;
-using System.Text.Json;
-using System.Windows;
 
 namespace Uranus
 {   

@@ -3,8 +3,6 @@ using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Inventory.Model
 {
@@ -24,8 +22,8 @@ namespace Uranus.Inventory.Model
         public int Ranking { get; set; }
         public double UsedCube { get; set; }
         public double MaxCube { get; set; }
-        public DateTime LastCCDate { get; set; }
-        public DateTime LastPIDate { get; set; }
+        public DateTime LastCcDate { get; set; }
+        public DateTime LastPiDate { get; set; }
 
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public NAVZone Zone { get; set; }
@@ -37,16 +35,17 @@ namespace Uranus.Inventory.Model
         public BinExtension Extension { get; set; }
 
         [Ignore]
-        public BinExtension Dimensions { get => Extension; }
+        public BinExtension Dimensions => Extension;
+
         [Ignore]
         public Bay Bay
         {
             get => Extension?.Bay; 
-            set { Extension.Bay = value; }
+            set => Extension.Bay = value;
         }
         [Ignore]
-        public EAccessLevel? AccessLevel { get => Zone?.AccessLevel; }
-        
+        public EAccessLevel? AccessLevel => Zone?.AccessLevel;
+
         public NAVBin() { }
 
         /// <summary>
@@ -63,9 +62,9 @@ namespace Uranus.Inventory.Model
             // Try to merge every stock item with every other.
             // If merge is succesful, remove the merged stock from the list.
             // Use backwards list, and merge from the i, so we remove from the end of the list safely.
-            for (int i = Stock.Count -1; i > 0; --i)
+            for (var i = Stock.Count -1; i > 0; --i)
             {
-                for (int j = i-1; j>=0; --j)
+                for (var j = i-1; j>=0; --j)
                 {
                     if (Stock[j].Merge(Stock[i]))
                     {
@@ -80,10 +79,10 @@ namespace Uranus.Inventory.Model
         public void ConvertStock()
         {
             // Make sure both lists are not null.
-            if (NAVStock is null) NAVStock = new List<NAVStock> { };
-            if (Stock is null) Stock = new List<Stock> { };
+            if (NAVStock is null) NAVStock = new();
+            if (Stock is null) Stock = new();
 
-            foreach (NAVStock ns in NAVStock)
+            foreach (var ns in NAVStock)
             {
                 Stock stock = new(ns);
                 Stock.Add(stock);
@@ -94,10 +93,10 @@ namespace Uranus.Inventory.Model
         // Returns null if the move reuires more than is available.
         public bool? IsFullQty(Move move)
         {
-            List<Stock> itemStock = Stock.Where(stock => stock.Item == move.Item).ToList();
+            var itemStock = Stock.Where(stock => stock.Item == move.Item).ToList();
             if (itemStock.Count != 1) 
                 return null; // Item is not at this bin location OR there is multiple instances of item stock - which should not occur.
-            Stock theStock = itemStock[0];
+            var theStock = itemStock[0];
             if (theStock.Cases.Qty < move.TakeCases || 
                 theStock.Packs.Qty < move.TakePacks || 
                 theStock.Eaches.Qty < move.TakeEaches)

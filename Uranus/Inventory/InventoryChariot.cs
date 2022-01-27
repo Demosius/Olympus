@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using Uranus.Inventory.Model;
@@ -60,15 +59,15 @@ namespace Uranus.Inventory
         /*                             Update Times                           */
         public bool SetStockUpdateTimes(List<NAVStock> stock)
         {
-            DateTime dateTime = DateTime.Now;
+            var dateTime = DateTime.Now;
             try
             {
                 // Convert stock to list of BCUpdate items.
-                List<NAVStock> distinctStockByZone = stock.GroupBy(s => s.ZoneID).Select(g => g.First()).ToList();
-                List<BinContentsUpdate> contentsUpdates = new() { };
-                foreach (NAVStock s in distinctStockByZone)
+                var distinctStockByZone = stock.GroupBy(s => s.ZoneID).Select(g => g.First()).ToList();
+                List<BinContentsUpdate> contentsUpdates = new();
+                foreach (var s in distinctStockByZone)
                 {
-                    contentsUpdates.Add(new BinContentsUpdate
+                    contentsUpdates.Add(new()
                     {
                         ZoneID = s.ZoneID,
                         ZoneCode = s.ZoneCode,
@@ -85,7 +84,7 @@ namespace Uranus.Inventory
             catch (Exception) { throw; }
         }
 
-        public bool SetTableUpdateTime(Type type, DateTime dateTime = new DateTime())
+        public bool SetTableUpdateTime(Type type, DateTime dateTime = new())
         {
             if (dateTime == new DateTime()) dateTime = DateTime.Now;
             try
@@ -114,9 +113,9 @@ namespace Uranus.Inventory
             {
                 Database.RunInTransaction(() =>
                 {
-                    foreach (string zoneID in zoneIDs)
+                    foreach (var zoneID in zoneIDs)
                     {
-                        string tableName = GetTableName(typeof(NAVStock));
+                        var tableName = GetTableName(typeof(NAVStock));
                         _ = Database.Execute($"DELETE FROM [{tableName}] WHERE [ZoneID]=?;", zoneID);
                     }
                 });
@@ -131,9 +130,9 @@ namespace Uranus.Inventory
             {
                 Database.RunInTransaction(() =>
                 {
-                    foreach (string uom in uomCodes)
+                    foreach (var uom in uomCodes)
                     {
-                        string tableName = GetTableName(typeof(NAVUoM));
+                        var tableName = GetTableName(typeof(NAVUoM));
                         _ = Database.Execute($"DELETE FROM [{tableName}] WHERE [Code]=?;", uom);
                     }
                 });

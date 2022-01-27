@@ -2,35 +2,30 @@
 using Uranus.Equipment;
 using Uranus.Staff;
 using Uranus.Users;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus
 {
     public class Helios
     {
-        private readonly InventoryChariot InventoryChariot;
+        private readonly InventoryChariot inventoryChariot;
         public InventoryCreator InventoryCreator { get; set; }
         public InventoryReader InventoryReader { get; set; }
         public InventoryUpdater InventoryUpdater { get; set; }
         public InventoryDeleter InventoryDeleter { get; set; }
 
-        private readonly StaffChariot StaffChariot;
+        private readonly StaffChariot staffChariot;
         public StaffCreator StaffCreator { get; set; }
         public StaffReader StaffReader { get; set; }
         public StaffUpdater StaffUpdater { get; set; }
         public StaffDeleter StaffDeleter { get; set; }
 
-        private readonly EquipmentChariot EquipmentChariot;
+        private readonly EquipmentChariot equipmentChariot;
         public EquipmentCreator EquipmentCreator { get; set; }
         public EquipmentReader EquipmentReader { get; set; }
         public EquipmentUpdater EquipmentUpdater { get; set; }
         public EquipmentDeleter EquipmentDeleter { get; set; }
 
-        private readonly UserChariot UserChariot;
+        private readonly UserChariot userChariot;
         public UserCreator UserCreator { get; set; }
         public UserReader UserReader { get; set; }
         public UserUpdater UserUpdater { get; set; }
@@ -38,37 +33,37 @@ namespace Uranus
 
         public Helios(string solLocation)
         {
-            InventoryChariot = new(solLocation);
-            InventoryCreator = new(ref InventoryChariot);
-            InventoryReader = new(ref InventoryChariot);
-            InventoryUpdater = new(ref InventoryChariot);
-            InventoryDeleter = new(ref InventoryChariot);
+            inventoryChariot = new(solLocation);
+            InventoryCreator = new(ref inventoryChariot);
+            InventoryReader = new(ref inventoryChariot);
+            InventoryUpdater = new(ref inventoryChariot);
+            InventoryDeleter = new(ref inventoryChariot);
 
-            StaffChariot = new(solLocation);
-            StaffCreator = new(ref StaffChariot);
-            StaffReader = new(ref StaffChariot);
-            StaffUpdater = new(ref StaffChariot);
-            StaffDeleter = new(ref StaffChariot);
+            staffChariot = new(solLocation);
+            StaffCreator = new(ref staffChariot);
+            StaffReader = new(ref staffChariot);
+            StaffUpdater = new(ref staffChariot);
+            StaffDeleter = new(ref staffChariot);
 
-            EquipmentChariot = new(solLocation);
-            EquipmentCreator = new(ref EquipmentChariot);
-            EquipmentReader = new(ref EquipmentChariot);
-            EquipmentUpdater = new(ref EquipmentChariot);
-            EquipmentDeleter = new(ref EquipmentChariot);
+            equipmentChariot = new(solLocation);
+            EquipmentCreator = new(ref equipmentChariot);
+            EquipmentReader = new(ref equipmentChariot);
+            EquipmentUpdater = new(ref equipmentChariot);
+            EquipmentDeleter = new(ref equipmentChariot);
 
-            UserChariot = new(solLocation);
-            UserCreator = new(ref UserChariot);
-            UserReader = new(ref UserChariot);
-            UserUpdater = new(ref UserChariot);
-            UserDeleter = new(ref UserChariot);
+            userChariot = new(solLocation);
+            UserCreator = new(ref userChariot);
+            UserReader = new(ref userChariot);
+            UserUpdater = new(ref userChariot);
+            UserDeleter = new(ref userChariot);
         }
 
         public void ResetChariots(string newSol)
         {
-            InventoryChariot.ResetConnection(newSol);
-            StaffChariot.ResetConnection(newSol);
-            EquipmentChariot.ResetConnection(newSol);
-            UserChariot.ResetConnection(newSol);
+            inventoryChariot.ResetConnection(newSol);
+            staffChariot.ResetConnection(newSol);
+            equipmentChariot.ResetConnection(newSol);
+            userChariot.ResetConnection(newSol);
         }
     }
 }

@@ -19,7 +19,7 @@
     
     <StackPanel Margin="10">
         <WrapPanel>
-            <Label Content="_User" Target="{Binding ElementName=txtUser}"/>
+            <Label Content="_User" Target="{Binding ElementName=TxtUser}"/>
             <Label>
                 <TextBlock FontSize="12" FontWeight="Light" FontStyle="Italic">(employee number)</TextBlock>
             </Label>

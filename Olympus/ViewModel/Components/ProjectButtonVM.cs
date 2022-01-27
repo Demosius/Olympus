@@ -1,11 +1,6 @@
 ﻿using Uranus.Staff.Model;
 using Olympus.ViewModel.Commands;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Olympus.ViewModel.Components
 {
@@ -37,7 +32,7 @@ namespace Olympus.ViewModel.Components
 
         public ProjectButtonVM() 
         {
-            LaunchProjectCommand = new LaunchProjectCommand(this);
+            LaunchProjectCommand = new(this);
         }
 
         public ProjectButtonVM(ProjectGroupVM projectGroup) : this()
@@ -54,7 +49,7 @@ namespace Olympus.ViewModel.Components
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
     }
 }

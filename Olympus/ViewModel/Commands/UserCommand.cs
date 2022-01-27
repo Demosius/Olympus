@@ -1,9 +1,5 @@
 ﻿using Olympus.ViewModel.Components;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Olympus.ViewModel.Commands
@@ -14,8 +10,8 @@ namespace Olympus.ViewModel.Commands
 
         public event EventHandler CanExecuteChanged
         {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
         }
 
         public UserCommand(UserHandlerVM vm)
@@ -30,7 +26,7 @@ namespace Olympus.ViewModel.Commands
 
         public void Execute(object parameter)
         {
-            string commandName = parameter as string;
+            var commandName = parameter as string;
             if (commandName == "Register")
                 VM.Register();
             else if (commandName == "Log In")

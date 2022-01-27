@@ -1,10 +1,7 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Inventory.Model
 {
@@ -18,7 +15,7 @@ namespace Uranus.Inventory.Model
         [ForeignKey(typeof(NAVZone))] // Combination of LocationCode and ZoneCode (e.g. 9600:PR)
         public string ZoneID { get; set; }
         [ForeignKey(typeof(NAVUoM))] // Combination of ItemNumber and UoMCode (e.g. 271284:CASE)
-        public string UoMID { get; set; }
+        public string UoMid { get; set; }
         [ForeignKey(typeof(NAVLocation))]
         public string LocationCode { get; set; }
         public string ZoneCode { get; set; }
@@ -44,7 +41,7 @@ namespace Uranus.Inventory.Model
 
         public int GetBaseQty()
         {
-            return Qty * (UoM ?? new NAVUoM(EUoM.EACH)).QtyPerUoM;
+            return Qty * (UoM ?? new NAVUoM(EUoM.Each)).QtyPerUoM;
         }
 
         public EUoM GetEUoM()

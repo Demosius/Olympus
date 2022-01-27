@@ -12,14 +12,12 @@ using Khaos.View;
 using Olympus.ViewModel.Components;
 using Olympus.Model;
 using Olympus.ViewModel.Commands;
-using Uranus.Inventory.Model;
 using System.IO;
 using ServiceStack.Text;
 using SQLite;
 using System.Windows;
 using Uranus.Staff.Model;
 using Uranus;
-using System;
 using Aion.View;
 using Olympus.ViewModel.Utility;
 using Olympus.Properties;
@@ -45,7 +43,7 @@ namespace Olympus.ViewModel
             set
             {
                 currentPage = value;
-                if (!(value is null)) CurrentProject = (value as IProject).EProject;
+                if (!(value is null)) CurrentProject = (value as IProject).Project;
                 OnPropertyChanged(nameof(CurrentPage));
             }
         }
@@ -76,7 +74,7 @@ namespace Olympus.ViewModel
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
 
         /* Temporary Functions */
@@ -87,7 +85,7 @@ namespace Olympus.ViewModel
         public static void AutoGenerateManagers()
         {
             // Get employees.
-            List<Employee> managers = App.Helios.StaffReader.Managers();
+            var managers = App.Helios.StaffReader.Managers();
             foreach (var m in managers)
                 App.Charon.CreateNewUser(m, "Manager");
         }
@@ -154,81 +152,81 @@ namespace Olympus.ViewModel
 
         private void LoadAion()
         {
-            if (Aion is null) Aion = new AionPage();
+            if (Aion is null) Aion = new();
             SetPage(Aion);
         }
 
         private void LoadPrometheus()
         {
-            if (Prometheus is null) Prometheus = new PrometheusPage();
+            if (Prometheus is null) Prometheus = new();
             SetPage(Prometheus);
         }
 
         private void LoadPantheon()
         {
-            if (Pantheon is null) Pantheon = new PantheonPage();
+            if (Pantheon is null) Pantheon = new();
             SetPage(Pantheon);
         }
 
         private void LoadVulcan()
         {
-            if (Vulcan is null) Vulcan = new VulcanPage();
+            if (Vulcan is null) Vulcan = new();
             SetPage(Vulcan);
         }
 
         private void LoadTorch()
         {
-            if (Phoenix is null) Phoenix = new PhoenixPage();
+            if (Phoenix is null) Phoenix = new();
             SetPage(Phoenix);
         }
 
         private void LoadKhaos()
         {
-            if (Khaos is null) Khaos = new KhaosPage();
+            if (Khaos is null) Khaos = new();
             SetPage(Khaos);
         }
 
         private void SetPage(IProject project)
         {
-            Page page = project as Page;
+            var page = project as Page;
             if (CurrentPage is null)
                 CurrentPage = page;
             else
                 _ = CurrentPage.NavigationService.Navigate(page);
         }
 
-        public static List<SKUMaster> GetMasters()
+        public static List<SkuMaster> GetMasters()
         {
             // TODO: Change to run all DB actions in a single transaction.
             // Set tasks to pull data from db.
-            Task<List<NAVItem>> getItemsTask = Task.Run(() => App.Helios.InventoryReader.NAVItems());
-            Task<Dictionary<int, List<NAVStock>>> getStockTask = Task.Run(() => App.Helios.InventoryReader.NAVAllStock()
+            var getItemsTask = Task.Run(() => App.Helios.InventoryReader.NAVItems());
+            var getStockTask = Task.Run(() => App.Helios.InventoryReader.NAVAllStock()
                 .GroupBy(s => s.ItemNumber)
                 .ToDictionary(g => g.Key, g => g.ToList()));
-            Task<Dictionary<int, Dictionary<string, NAVUoM>>> getUoMTask = Task.Run(() => App.Helios.InventoryReader.NAVUoMs()
+            var getUoMTask = Task.Run(() => App.Helios.InventoryReader.NAVUoMs()
                 .GroupBy(u => u.ItemNumber)
                 .ToDictionary(g => g.Key, g => g.ToDictionary(u => u.Code, u => u)));
-            Task<Dictionary<string, NAVBin>> getBinsTask = Task.Run(() => App.Helios.InventoryReader.NAVBins().ToDictionary(b => b.ID, b => b));
-            Task<Dictionary<int, string>> getDivsTask = Task.Run(() => App.Helios.InventoryReader.NAVDivisions().ToDictionary(d => d.Code, d => d.Description));
-            Task<Dictionary<int, string>> getCatsTask = Task.Run(() => App.Helios.InventoryReader.NAVCategorys().ToDictionary(c => c.Code, c => c.Description));
-            Task<Dictionary<int, string>> getPFsTask = Task.Run(() => App.Helios.InventoryReader.NAVPlatforms().ToDictionary(p => p.Code, p => p.Description));
-            Task<Dictionary<int, string>> getGensTask = Task.Run(() => App.Helios.InventoryReader.NAVGenres().ToDictionary(g => g.Code, g => g.Description));
+            var getBinsTask = Task.Run(() => App.Helios.InventoryReader.NAVBins().ToDictionary(b => b.ID, b => b));
+            var getDivsTask = Task.Run(() => App.Helios.InventoryReader.NAVDivisions().ToDictionary(d => d.Code, d => d.Description));
+            var getCatsTask = Task.Run(() => App.Helios.InventoryReader.NAVCategorys().ToDictionary(c => c.Code, c => c.Description));
+            var getPFsTask = Task.Run(() => App.Helios.InventoryReader.NAVPlatforms().ToDictionary(p => p.Code, p => p.Description));
+            var getGensTask = Task.Run(() => App.Helios.InventoryReader.NAVGenres().ToDictionary(g => g.Code, g => g.Description));
             // Wait for tasks to complete.
             Task.WaitAll(getBinsTask, getCatsTask, getDivsTask, getGensTask, getItemsTask, getPFsTask, getStockTask, getUoMTask);
             // Assign results to data lists/dicts.
-            List<NAVItem> navItems = getItemsTask.Result;
-            Dictionary<int, List<NAVStock>> stock = getStockTask.Result;
-            Dictionary<int, Dictionary<string, NAVUoM>> uoms = getUoMTask.Result;
-            Dictionary<string, NAVBin> bins = getBinsTask.Result;
-            Dictionary<int, string> divisions = getDivsTask.Result;
-            Dictionary<int, string> categories = getCatsTask.Result;
-            Dictionary<int, string> platforms = getPFsTask.Result;
-            Dictionary<int, string> genres = getGensTask.Result;
+            var navItems = getItemsTask.Result;
+            var stock = getStockTask.Result;
+            var uoms = getUoMTask.Result;
+            var bins = getBinsTask.Result;
+            var divisions = getDivsTask.Result;
+            var categories = getCatsTask.Result;
+            var platforms = getPFsTask.Result;
+            var genres = getGensTask.Result;
             // Generate Sku Master List
-            List<SKUMaster> masters = new();
+            List<SkuMaster> masters = new();
             foreach (var item in navItems)
             {
-                masters.Add(new SKUMaster(item, stock, uoms, bins, divisions, categories, platforms, genres));
+                masters.Add(new(item, stock, uoms, bins, divisions, categories, platforms, genres));
             }
             return masters;
         }
@@ -238,12 +236,12 @@ namespace Olympus.ViewModel
             App.Helios.StaffCreator.CopyProjectIconsFromSource(Path.Combine(App.BaseDirectory(), "Resources", "Images", "Icons"));
             List<Project> projects = new()
             {
-                new Project(EProject.Khaos, "chaos.ico", App.Helios.StaffReader,"Handles makebulk designation and separation. (Genesis)"),
-                new Project(EProject.Pantheon, "pantheon.ico", App.Helios.StaffReader, "Roster management."),
-                new Project(EProject.Prometheus, "prometheus.ico", App.Helios.StaffReader, "Data management."),
-                new Project(EProject.Phoenix, "phoenix.ico", App.Helios.StaffReader, "Pre-work automated stock maintenance. (AutoBurn)"),
-                new Project(EProject.Vulcan, "vulcan.ico", App.Helios.StaffReader, "Replenishment DDR management and work assignment. (RefOrge)"),
-                new Project(EProject.Aion, "Aion.ico", App.Helios.StaffReader, "Employee clock in and shift time managemnet.")
+                new(EProject.Khaos, "chaos.ico", App.Helios.StaffReader,"Handles makebulk designation and separation. (Genesis)"),
+                new(EProject.Pantheon, "pantheon.ico", App.Helios.StaffReader, "Roster management."),
+                new(EProject.Prometheus, "prometheus.ico", App.Helios.StaffReader, "Data management."),
+                new(EProject.Phoenix, "phoenix.ico", App.Helios.StaffReader, "Pre-work automated stock maintenance. (AutoBurn)"),
+                new(EProject.Vulcan, "vulcan.ico", App.Helios.StaffReader, "Replenishment DDR management and work assignment. (RefOrge)"),
+                new(EProject.Aion, "Aion.ico", App.Helios.StaffReader, "Employee clock in and shift time managemnet.")
             };
 
             App.Helios.StaffCreator.EstablishInitialProjects(projects);
@@ -252,49 +250,49 @@ namespace Olympus.ViewModel
 
         public static void GenerateMasterSkuList()
         {
-            List<SKUMaster> masters = GetMasters();
+            var masters = GetMasters();
 
             // Make sure the target destination exists.
-            string dirPath = Path.Combine(App.BaseDirectory(), "SKUMasterExports");
+            var dirPath = Path.Combine(App.BaseDirectory(), "SKUMasterExports");
 
             Directory.CreateDirectory(dirPath);
 
-            Task csvTask = Task.Run(() => ExportMasterSkusAsCSV(masters, dirPath));
-            Task jsonTask = Task.Run(() => ExportMasterSkusAsJSON(masters, dirPath));
-            Task xmlTask = Task.Run(() => ExportMasterSkusAsXML(masters, dirPath));
-            Task sqlTask = Task.Run(() => ExportMasterSkusIntoSQLite(masters, dirPath));
+            var csvTask = Task.Run(() => ExportMasterSkusAsCSV(masters, dirPath));
+            var jsonTask = Task.Run(() => ExportMasterSkusAsJSON(masters, dirPath));
+            var xmlTask = Task.Run(() => ExportMasterSkusAsXml(masters, dirPath));
+            var sqlTask = Task.Run(() => ExportMasterSkusIntoSqLite(masters, dirPath));
             Task.WaitAll(csvTask, jsonTask, xmlTask, sqlTask);
 
             _ = MessageBox.Show("Files exported.");
         }
 
-        public static void ExportMasterSkusAsCSV(List<SKUMaster> masters, string dirPath)
+        public static void ExportMasterSkusAsCSV(List<SkuMaster> masters, string dirPath)
         {
-            string csv = CsvSerializer.SerializeToCsv(masters);
-            string filePath = Path.Combine(dirPath, "SKUMasterExport.csv");
+            var csv = CsvSerializer.SerializeToCsv(masters);
+            var filePath = Path.Combine(dirPath, "SKUMasterExport.csv");
             File.WriteAllText(filePath, csv);
         }
 
-        public static void ExportMasterSkusAsJSON(List<SKUMaster> masters, string dirPath)
+        public static void ExportMasterSkusAsJSON(List<SkuMaster> masters, string dirPath)
         {
-            string json = System.Text.Json.JsonSerializer.Serialize(masters);
-            string filePath = Path.Combine(dirPath, "SKUMasterExport.json");
+            var json = System.Text.Json.JsonSerializer.Serialize(masters);
+            var filePath = Path.Combine(dirPath, "SKUMasterExport.json");
             File.WriteAllText(filePath, json);
         }
 
-        public static void ExportMasterSkusIntoSQLite(List<SKUMaster> masters, string dirPath)
+        public static void ExportMasterSkusIntoSqLite(List<SkuMaster> masters, string dirPath)
         {
-            string dbPath = Path.Combine(dirPath, "SKUMasterExport.sqlite");
+            var dbPath = Path.Combine(dirPath, "SKUMasterExport.sqlite");
             using SQLiteConnection database = new(dbPath);
-            _ = database.CreateTable(typeof(SKUMaster));
-            _ = database.DeleteAll<SKUMaster>();
+            _ = database.CreateTable(typeof(SkuMaster));
+            _ = database.DeleteAll<SkuMaster>();
             _ = database.InsertAll(masters);
         }
 
-        public static void ExportMasterSkusAsXML(List<SKUMaster> masters, string dirPath)
+        public static void ExportMasterSkusAsXml(List<SkuMaster> masters, string dirPath)
         {
-            string xml = XmlSerializer.SerializeToString(masters);
-            string filePath = Path.Combine(dirPath, "SKUMasterExport.xml");
+            var xml = XmlSerializer.SerializeToString(masters);
+            var filePath = Path.Combine(dirPath, "SKUMasterExport.xml");
             File.WriteAllText(filePath, xml);
         }
     }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Uranus.Staff.Model;
+﻿using Uranus.Staff.Model;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
 

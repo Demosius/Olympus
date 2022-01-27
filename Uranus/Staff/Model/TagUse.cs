@@ -1,10 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Staff.Model
 {
@@ -15,7 +11,7 @@ namespace Uranus.Staff.Model
         [ForeignKey(typeof(Employee))]
         public int EmployeeID { get; set; }
         [ForeignKey(typeof(TempTag))]
-        public string TempTagRF_ID { get; set; }
+        public string TempTagRfID { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 

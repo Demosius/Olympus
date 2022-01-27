@@ -1,10 +1,4 @@
 ﻿using Uranus.Users.Model;
-using SQLiteNetExtensions.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Users
 {
@@ -21,11 +15,11 @@ namespace Uranus.Users
 
         public Login Login(int userID) => Chariot.PullObject<Login>(userID);
 
-        public User User(int userID) => Chariot.PullObject<User>(userID, PullType.FullRecursive);
+        public User User(int userID) => Chariot.PullObject<User>(userID, EPullType.FullRecursive);
 
-        public Role Role(string roleName) => Chariot.PullObject<Role>(roleName, PullType.FullRecursive);
+        public Role Role(string roleName) => Chariot.PullObject<Role>(roleName, EPullType.FullRecursive);
 
-        public int UserCount() => Chariot.PullObjectList<User>(pullType: PullType.ObjectOnly).Count; //Chariot.Database.Execute("SELECT count(*) FROM User;");
+        public int UserCount() => Chariot.PullObjectList<User>(pullType: EPullType.ObjectOnly).Count; //Chariot.Database.Execute("SELECT count(*) FROM User;");
 
     }
 }

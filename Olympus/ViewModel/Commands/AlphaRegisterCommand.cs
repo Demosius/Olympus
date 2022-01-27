@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -14,8 +10,8 @@ namespace Olympus.ViewModel.Commands
 
         public event EventHandler CanExecuteChanged
         {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
         }
 
         public AlphaRegisterCommand(AlphaRegistrationVM vm)
@@ -32,9 +28,9 @@ namespace Olympus.ViewModel.Commands
 
         public void Execute(object parameter)
         {
-            if (VM.Register(out string message))
+            if (VM.Register(out var message))
             {
-                Window window = parameter as Window;
+                var window = parameter as Window;
                 window.Close();
             }
             // TODO: Improve this message process.

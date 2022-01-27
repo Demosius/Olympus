@@ -1,12 +1,7 @@
 ﻿using Uranus.Staff.Model;
-using Olympus.ViewModel.Commands;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Olympus.ViewModel.Components
 {
@@ -38,7 +33,7 @@ namespace Olympus.ViewModel.Components
 
         public ProjectGroupVM()
         {
-            Projects = new ObservableCollection<ProjectButtonVM>();
+            Projects = new();
         }
 
         public ProjectGroupVM(ProjectLauncherVM projectLauncher) : this()
@@ -51,7 +46,7 @@ namespace Olympus.ViewModel.Components
             ProjectButtonVM projectButton;
             foreach (var project in projects)
             {
-                projectButton = new ProjectButtonVM(this, project);
+                projectButton = new(this, project);
                 Projects.Add(projectButton);
             }
             GroupName = groupName;
@@ -63,7 +58,7 @@ namespace Olympus.ViewModel.Components
             foreach (var project in department.Projects)
             {
 
-                projectButton = new ProjectButtonVM(this, project);
+                projectButton = new(this, project);
                 Projects.Add(projectButton);
             }
             GroupName = department.Name;
@@ -73,7 +68,7 @@ namespace Olympus.ViewModel.Components
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
     }
 }

@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace Uranus.Inventory
 {
     public enum EUoM
     {
-        EACH,
-        PACK,
-        CASE
+        Each,
+        Pack,
+        Case
     }
 
     public enum EAction
@@ -49,9 +44,9 @@ namespace Uranus.Inventory
         /**************************** CONVERT Data ***************************/
         public static string UoMToString(EUoM uom)
         {
-            if (uom == EUoM.CASE)
+            if (uom == EUoM.Case)
                 return "CASE";
-            if (uom == EUoM.PACK)
+            if (uom == EUoM.Pack)
                 return "PACK";
             return "EACH";
         }
@@ -60,10 +55,10 @@ namespace Uranus.Inventory
         {
             uom = uom.ToUpper();
             if (uom == "CASE")
-                return EUoM.CASE;
+                return EUoM.Case;
             if (uom == "PACK")
-                return EUoM.PACK;
-            return EUoM.EACH;
+                return EUoM.Pack;
+            return EUoM.Each;
         }
 
         public static string ActionTypeToString(EAction actionType)
@@ -93,10 +88,10 @@ namespace Uranus.Inventory
             return "Complete";
         }
 
-        private static readonly Regex sWhitespace = new(@"\s+");
+        private static readonly Regex SWhitespace = new(@"\s+");
         public static string ReplaceWhitespace(string input, string replacement)
         {
-            return sWhitespace.Replace(input, replacement);
+            return SWhitespace.Replace(input, replacement);
         }
 
         public static EStatus StringToMoveStatus(string moveStatus)

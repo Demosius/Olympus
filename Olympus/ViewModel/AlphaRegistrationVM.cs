@@ -1,5 +1,4 @@
 ﻿using Uranus.Staff.Model;
-using Uranus.Users.Model;
 using Olympus.ViewModel.Commands;
 using System.ComponentModel;
 using System.Linq;
@@ -9,9 +8,9 @@ namespace Olympus.ViewModel
 {
     public class AlphaRegistrationVM : INotifyPropertyChanged
     {
-        private const string GOOD_COLOUR = "Green";
-        private const string WARN_COLOUR = "Orange";
-        private const string BAD_COLOUR = "Red";
+        private const string GoodColour = "Green";
+        private const string WarnColour = "Orange";
+        private const string BadColour = "Red";
 
         public Employee Employee { get; set; } 
         public Department Department { get; set; }
@@ -25,21 +24,21 @@ namespace Olympus.ViewModel
         public string ConfirmPassword { private get => confirmPassword; set { confirmPassword = value; CheckPasswords(); OnPropertyChanged(nameof(ConfirmPassword)); } }
 
         private string clrSixChar = "";
-        public string Colour_SixChar { get => clrSixChar; set { clrSixChar = value; OnPropertyChanged(nameof(Colour_SixChar)); } }
+        public string ColourSixChar { get => clrSixChar; set { clrSixChar = value; OnPropertyChanged(nameof(ColourSixChar)); } }
         private string clrMatch = "";
-        public string Colour_Match { get => clrMatch; set { clrMatch = value; OnPropertyChanged(nameof(Colour_Match)); } }
+        public string ColourMatch { get => clrMatch; set { clrMatch = value; OnPropertyChanged(nameof(ColourMatch)); } }
         private string clrNoSpace = "";
-        public string Colour_NoSpace { get => clrNoSpace; set { clrNoSpace = value; OnPropertyChanged(nameof(Colour_NoSpace)); } }
+        public string ColourNoSpace { get => clrNoSpace; set { clrNoSpace = value; OnPropertyChanged(nameof(ColourNoSpace)); } }
         private string clrEightChar = "";
-        public string Colour_EightChar { get => clrEightChar; set { clrEightChar = value; OnPropertyChanged(nameof(Colour_EightChar)); } }
+        public string ColourEightChar { get => clrEightChar; set { clrEightChar = value; OnPropertyChanged(nameof(ColourEightChar)); } }
         private string clrLower = "";
-        public string Colour_Lower { get => clrLower; set { clrLower = value; OnPropertyChanged(nameof(Colour_Lower)); } }
+        public string ColourLower { get => clrLower; set { clrLower = value; OnPropertyChanged(nameof(ColourLower)); } }
         private string clrUpper = "";
-        public string Colour_Upper { get => clrUpper; set { clrUpper = value; OnPropertyChanged(nameof(Colour_Upper)); } }
+        public string ColourUpper { get => clrUpper; set { clrUpper = value; OnPropertyChanged(nameof(ColourUpper)); } }
         private string clrNumber = "";
-        public string Colour_Number { get => clrNumber; set { clrNumber = value; OnPropertyChanged(nameof(Colour_Number)); } }
+        public string ColourNumber { get => clrNumber; set { clrNumber = value; OnPropertyChanged(nameof(ColourNumber)); } }
         private string clrSpecial = "";
-        public string Colour_Special { get => clrSpecial; set { clrSpecial = value; OnPropertyChanged(nameof(Colour_Special)); } }
+        public string ColourSpecial { get => clrSpecial; set { clrSpecial = value; OnPropertyChanged(nameof(ColourSpecial)); } }
 
         public bool PasswordGood { get; set; }
 
@@ -47,27 +46,27 @@ namespace Olympus.ViewModel
 
         public AlphaRegistrationVM()
         {
-            Employee = new Employee();
-            Department = new Department();
-            Role = new StaffRole();
-            AlphaRegisterCommand = new AlphaRegisterCommand(this);
+            Employee = new();
+            Department = new();
+            Role = new();
+            AlphaRegisterCommand = new(this);
             CheckPasswords();
         }
 
         public void CheckPasswords()
         {
-            bool isSix = Password.Length >= 6;
-            bool isMatch = Password == ConfirmPassword;
-            bool isNoSpace = !Password.Any(char.IsWhiteSpace);
+            var isSix = Password.Length >= 6;
+            var isMatch = Password == ConfirmPassword;
+            var isNoSpace = !Password.Any(char.IsWhiteSpace);
 
-            Colour_SixChar = isSix ? GOOD_COLOUR : BAD_COLOUR;
-            Colour_Match = isMatch ? GOOD_COLOUR : BAD_COLOUR;
-            Colour_NoSpace = isNoSpace ? GOOD_COLOUR : BAD_COLOUR;
-            Colour_EightChar = (Password.Length >= 8) ? GOOD_COLOUR : WARN_COLOUR;
-            Colour_Lower = (Password.Any(char.IsLower)) ? GOOD_COLOUR : WARN_COLOUR;
-            Colour_Upper = (Password.Any(char.IsUpper)) ? GOOD_COLOUR : WARN_COLOUR;
-            Colour_Number = (Password.Any(char.IsDigit)) ? GOOD_COLOUR : WARN_COLOUR;
-            Colour_Special = (!Password.All(char.IsLetterOrDigit)) ? GOOD_COLOUR : WARN_COLOUR;
+            ColourSixChar = isSix ? GoodColour : BadColour;
+            ColourMatch = isMatch ? GoodColour : BadColour;
+            ColourNoSpace = isNoSpace ? GoodColour : BadColour;
+            ColourEightChar = (Password.Length >= 8) ? GoodColour : WarnColour;
+            ColourLower = (Password.Any(char.IsLower)) ? GoodColour : WarnColour;
+            ColourUpper = (Password.Any(char.IsUpper)) ? GoodColour : WarnColour;
+            ColourNumber = (Password.Any(char.IsDigit)) ? GoodColour : WarnColour;
+            ColourSpecial = (!Password.All(char.IsLetterOrDigit)) ? GoodColour : WarnColour;
 
             PasswordGood = isSix && isMatch && isNoSpace;
         }
@@ -84,7 +83,7 @@ namespace Olympus.ViewModel
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
     }
 }

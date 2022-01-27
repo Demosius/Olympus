@@ -1,10 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Inventory.Model
 {
@@ -38,15 +34,11 @@ namespace Uranus.Inventory.Model
         public int PlaceEaches { get; set; }
 
         [Ignore]
-        public bool FullPallet 
-        { 
-            get
-            {
-                return TakeBin.IsFullQty(this) ?? false && AccessLevel != EAccessLevel.Ground;
-            }
-        }
+        public bool FullPallet => TakeBin.IsFullQty(this) ?? false && AccessLevel != EAccessLevel.Ground;
+
         [Ignore]
-        public EAccessLevel AccessLevel { get => TakeBin.Zone.AccessLevel; }
+        public EAccessLevel AccessLevel => TakeBin.Zone.AccessLevel;
+
         [Ignore]
         public int AssignedOperator { get; set; }
         public float TimeEstimate { get; set; }

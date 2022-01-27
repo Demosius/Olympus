@@ -2,9 +2,6 @@
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Uranus.Inventory.Model
 {
@@ -60,19 +57,19 @@ namespace Uranus.Inventory.Model
         public void SetUoMs()
         {
             EUoM e;
-            foreach (NAVUoM uom in UoMs)
+            foreach (var uom in UoMs)
             {
                 e = uom.UoM;
-                if (e == EUoM.CASE)
+                if (e == EUoM.Case)
                     Case = uom;
-                else if (e == EUoM.PACK)
+                else if (e == EUoM.Pack)
                     Pack = uom;
                 else
                     Each = uom;
             }
-            if (Case is null) Case = new NAVUoM(this, EUoM.CASE);
-            if (Pack is null) Pack = new NAVUoM(this, EUoM.PACK);
-            if (Each is null) Each = new NAVUoM(this, EUoM.EACH);
+            if (Case is null) Case = new(this, EUoM.Case);
+            if (Pack is null) Pack = new(this, EUoM.Pack);
+            if (Each is null) Each = new(this, EUoM.Each);
         }
 
         public int GetBaseQty(int eaches = 0, int packs = 0, int cases = 0)

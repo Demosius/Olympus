@@ -1,13 +1,8 @@
 ﻿using Uranus.Staff.Model;
-using SQLiteNetExtensions.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
-using SQLite;
 
 namespace Uranus.Staff
 {
@@ -21,16 +16,16 @@ namespace Uranus.Staff
         }
 
         /* DIRECTORIES */
-        public string BaseDirectory { get => Chariot.BaseDataDirectory; }
-        public string EmployeeIconDirectory { get => Chariot.EmployeeIconDirectory; }
-        public string EmployeeAvatarDirectory { get => Chariot.EmployeeAvatarDirectory; }
-        public string ProjectIconDirectory { get => Chariot.ProjectIconDirectory; }
-        public string LicenceImageDirectory { get => Chariot.LicenceImageDirectory; }
-         
-        /* EMPLOYEES */
-        public Employee Employee(int ID, PullType pullType = PullType.ObjectOnly) => Chariot.PullObject<Employee>(ID, pullType);
+        public string BaseDirectory => Chariot.BaseDataDirectory;
+        public string EmployeeIconDirectory => Chariot.EmployeeIconDirectory;
+        public string EmployeeAvatarDirectory => Chariot.EmployeeAvatarDirectory;
+        public string ProjectIconDirectory => Chariot.ProjectIconDirectory;
+        public string LicenceImageDirectory => Chariot.LicenceImageDirectory;
 
-        public bool EmployeeExists(int ID) => Chariot.Database.Execute("SELECT count(*) FROM Employee WHERE ID=?;", ID) > 0;
+        /* EMPLOYEES */
+        public Employee Employee(int id, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Employee>(id, pullType);
+
+        public bool EmployeeExists(int id) => Chariot.Database.Execute("SELECT count(*) FROM Employee WHERE ID=?;", id) > 0;
 
         public int EmployeeCount() => Chariot.Database.Execute("SELECT count(*) FROM Employee;");
 
@@ -40,18 +35,18 @@ namespace Uranus.Staff
         /// <returns>List of Employees</returns>
         public List<Employee> Managers()
         {
-            SQLiteConnection conn = Chariot.Database;
+            var conn = Chariot.Database;
             //List<int> employeeIDs = conn.Query<int>("SELECT DISTINCT ReportsToID FROM Employee;");
-            List<int> employeeIDs = conn.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID).ToList(); 
+            var employeeIDs = conn.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID).ToList(); 
 
             return conn.Query<Employee>($"SELECT * FROM Employee WHERE ID IN ({string.Join(", ", employeeIDs)});");
         }
 
         /* DEPARTMENTS */
-        public List<Department> Departments(Expression<Func<Department, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<Department>(filter, pullType);
+        public List<Department> Departments(Expression<Func<Department, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList<Department>(filter, pullType);
 
         /* PROJECTS */
-        public List<Project> Projects(Expression<Func<Project, bool>> filter = null, PullType pullType = PullType.ObjectOnly) => Chariot.PullObjectList<Project>(filter, pullType);
+        public List<Project> Projects(Expression<Func<Project, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList<Project>(filter, pullType);
 
     }
 }

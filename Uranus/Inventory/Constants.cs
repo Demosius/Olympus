@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Uranus.Inventory
 {
@@ -12,7 +8,7 @@ namespace Uranus.Inventory
     /// </summary>
     public static class Constants
     {
-        public static readonly Dictionary<string, int> NAV_STOCK_COLUMNS = new()
+        public static readonly Dictionary<string, int> NAVStockColumns = new()
         {
             { "Location Code", -1 },
             { "Zone Code", -1 },
@@ -30,26 +26,26 @@ namespace Uranus.Inventory
             { "Fixed", -1 }
         };
 
-        public static readonly Dictionary<string, int> NAV_DIV_PF_GEN_COLUMNS = new()
+        public static readonly Dictionary<string, int> NAVDivPfGenColumns = new()
         {
             { "Code", -1 },
             { "Description", -1 }
         };
 
-        public static readonly Dictionary<string, int> NAV_CATEGORY_COLUMNS = new()
+        public static readonly Dictionary<string, int> NAVCategoryColumns = new()
         {
             { "Code", -1 },
             { "Description", -1 },
             { "Item Division Code", -1 }
         };
 
-        public static readonly Dictionary<string, int> NAV_LOCATION_COLUMNS = new()
+        public static readonly Dictionary<string, int> NAVLocationColumns = new()
         {
             { "Code", -1 },
             { "Name", -1 }
         };
 
-        public static readonly Dictionary<string, int> NAV_ZONE_COLUMNS = new()
+        public static readonly Dictionary<string, int> NAVZoneColumns = new()
         {
             { "Locaiton Code", -1 },
             { "Code", -1 },
@@ -57,7 +53,7 @@ namespace Uranus.Inventory
             { "Zone Ranking", -1 }
         };
 
-        public static readonly Dictionary<string, int> NAV_ITEM_COLUMNS = new()
+        public static readonly Dictionary<string, int> NAVItemColumns = new()
         {
             { "ItemCode", -1 },
             { "ItemName", -1 },
@@ -74,7 +70,7 @@ namespace Uranus.Inventory
             { "Weight", -1 }
         };
 
-        public static readonly Dictionary<string, int> NAV_UOM_COLUMNS = new()
+        public static readonly Dictionary<string, int> NAVUOMColumns = new()
         {
             { "Code", -1 },
             { "Item No.", -1 },
@@ -89,7 +85,7 @@ namespace Uranus.Inventory
             { "Weight (Kg)", -1 }
         };
 
-        public static readonly Dictionary<string, int> NAV_BIN_COLUMNS = new()
+        public static readonly Dictionary<string, int> NAVBinColumns = new()
         {
             { "Location Code", -1 },
             { "Zone Code", -1 },
@@ -104,7 +100,7 @@ namespace Uranus.Inventory
             { "PI - Last Count Date", -1 }
         };
 
-        public static readonly Dictionary<string, int> NAV_TO_LINE_BATCH_COLUMNS = new()
+        public static readonly Dictionary<string, int> NAVToLineBatchColumns = new()
         {
             {"Document No.", -1 },
             {"Transfer-to Code", -1 },
@@ -116,7 +112,7 @@ namespace Uranus.Inventory
             {"Created On Time", -1 }
         };
 
-        public static readonly Dictionary<string, string> BIN_COLUMNS = new()
+        public static readonly Dictionary<string, string> BinColumns = new()
         {
             {"location", "Location Code" },
             {"zone_code", "Zone Code" },
@@ -131,7 +127,7 @@ namespace Uranus.Inventory
             {"last_pi_date", "PI - Last Count Date" }
         };
 
-        public static readonly Dictionary<string, string> UOM_COLUMNS = new()
+        public static readonly Dictionary<string, string> UOMColumns = new()
         {
             {"code", "Code" },
             {"item_number", "Item No." },
@@ -146,7 +142,7 @@ namespace Uranus.Inventory
             {"weight", "Weight (Kg)" }
         };
 
-        public static readonly Dictionary<string, string> STOCK_COLUMNS = new()
+        public static readonly Dictionary<string, string> StockColumns = new()
         {
             { "location", "Location Code" },
             { "bin_code", "Bin Code" }, 
@@ -164,7 +160,7 @@ namespace Uranus.Inventory
             { "fixed", "Fixed" }
         };
 
-        public static readonly Dictionary<string, string> ITEM_COLUMNS = new()
+        public static readonly Dictionary<string, string> ItemColumns = new()
         {
             { "number", "ItemCode" },
             { "description", "ItemName" },
@@ -181,7 +177,7 @@ namespace Uranus.Inventory
             { "weight", "Weight" }
         };
 
-        public static readonly Dictionary<string, string> ZONE_COLUMNS = new()
+        public static readonly Dictionary<string, string> ZoneColumns = new()
         {
             { "code", "Code" },
             { "type", "Type" },

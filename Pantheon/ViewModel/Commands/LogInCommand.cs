@@ -1,9 +1,5 @@
 ﻿using Pantheon.View;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -17,8 +13,8 @@ namespace Pantheon.ViewModel.Commands
 
         public event EventHandler CanExecuteChanged
         {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
         }
 
         public bool CanExecute(object parameter)
@@ -28,13 +24,12 @@ namespace Pantheon.ViewModel.Commands
 
         public void Execute(object parameter)
         {
-            if (VM.LogIn())
-            {
-                Window w = parameter as Window;
-                w.Close();
-                PantheonWindow pw = new();
-                pw.Show();
-            }
+            if (!VM.LogIn()) return;
+
+            var w = parameter as Window;
+            w?.Close();
+            PantheonWindow pw = new();
+            pw.Show();
         }
     }
 }
