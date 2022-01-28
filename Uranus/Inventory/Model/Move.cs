@@ -34,7 +34,7 @@ namespace Uranus.Inventory.Model
         public int PlaceEaches { get; set; }
 
         [Ignore]
-        public bool FullPallet => TakeBin.IsFullQty(this) ?? false && AccessLevel != EAccessLevel.Ground;
+        public bool FullPallet => (TakeBin.IsFullQty(this) ?? false) && AccessLevel != EAccessLevel.Ground;
 
         [Ignore]
         public EAccessLevel AccessLevel => TakeBin.Zone.AccessLevel;
@@ -62,13 +62,13 @@ namespace Uranus.Inventory.Model
 
         public bool LineMatch(NAVMoveLine moveLine)
         {
-            //TODO: Move line matching.
+            //TODO: PartialMove line matching.
             throw new NotImplementedException();
         }
 
         public bool MergeLine(NAVMoveLine moveLine)
         {
-            //TODO: Move line merging.
+            //TODO: PartialMove line merging.
             throw new NotImplementedException();
         }
     }

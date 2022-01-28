@@ -6,9 +6,9 @@ namespace Olympus.ViewModel.Commands
 {
     public class MergeDatabaseCommand : ICommand
     {
-        public DBManager Dbm { get; set; }
+        public DBManager DBM { get; set; }
 
-        public MergeDatabaseCommand(DBManager dbm) { Dbm = dbm; }
+        public MergeDatabaseCommand(DBManager dbm) { DBM = dbm; }
 
         public event EventHandler CanExecuteChanged
         {

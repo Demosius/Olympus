@@ -60,27 +60,27 @@
                 <Label Style="{StaticResource HeaderLabels}">Employee Details</Label>
                 <Separator/>
                 <Label>* Employee Number (ID)</Label>
-                <TextBox Text="{Binding Employee.ID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding EmployeeID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>First Name</Label>
-                <TextBox Text="{Binding Employee.FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding FirstName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>Last Name</Label>
-                <TextBox Text="{Binding Employee.LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>* Display Name</Label>
-                <TextBox Text="{Binding Employee.DisplayName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding DisplayName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>RF ID</Label>
-                <TextBox Text="{Binding Employee.RF_ID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding RF_ID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>PC ID</Label>
-                <TextBox Text="{Binding Employee.PC_ID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding PC_ID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>Department</Label>
                 <TextBox Text="{Binding DepartmentName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>Phone</Label>
-                <TextBox Text="{Binding Employee.PhoneNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding PhoneNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>Email</Label>
-                <TextBox Text="{Binding Employee.Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding Email, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>Address</Label>
-                <TextBox Text="{Binding Employee.Address, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding Address, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>Pay Rate</Label>
-                <TextBox Text="{Binding Employee.PayRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding PayRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </StackPanel>
             <Separator BorderThickness="1" BorderBrush="Gray" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
             <StackPanel>
@@ -89,14 +89,14 @@
                 <Label>* Department Name</Label>
                 <TextBox Text="{Binding DepartmentName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>Department Head</Label>
-                <TextBox Text="{Binding Employee.ID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Text="{Binding EmployeeID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             </StackPanel>
             <Separator BorderThickness="1" BorderBrush="Gray" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
             <StackPanel>
                 <Label Style="{StaticResource HeaderLabels}">Role Details</Label>
                 <Separator/>
                 <Label>* Role Name</Label>
-                <TextBox Text="{Binding Role.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding RoleName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>* Level</Label>
                 <TextBox Text="{Binding Role.Level, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>Department</Label>
@@ -107,11 +107,11 @@
                 <Label Style="{StaticResource HeaderLabels}">User Registration</Label>
                 <Separator/>
                 <Label>User ID</Label>
-                <TextBox Text="{Binding Employee.ID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Text="{Binding EmployeeID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label>Password</Label>
                 <PasswordBox PasswordChanged="PasswordBox_PasswordChanged"/>
                 <Label>Confirm Password</Label>
-                <PasswordBox PasswordChanged="PasswordBox_CnfrmPasswordChanged"/>
+                <PasswordBox PasswordChanged="PasswordBox_ConfirmPasswordChanged"/>
                 <StackPanel Margin="5">
                     <Separator/>
                     <TextBlock Foreground="{Binding ColourSixChar, UpdateSourceTrigger=PropertyChanged}">• Minimum 6 characters.</TextBlock>

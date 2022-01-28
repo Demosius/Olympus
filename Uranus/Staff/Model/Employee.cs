@@ -65,7 +65,17 @@ namespace Uranus.Staff.Model
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<ShiftRule> Rules { get; set; }
 
-        /*public override bool Equals(object obj) => Equals(obj as Employee);
+        public Employee() { }
+
+        public Employee(int id)
+        {
+            ID = id;
+        }
+
+        public override bool Equals(object obj) => Equals(obj as Employee);
+
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        public override int GetHashCode() => ID;
 
         public bool Equals(Employee employee)
         {
@@ -84,7 +94,7 @@ namespace Uranus.Staff.Model
             return rhs is null;
         }
 
-        public static bool operator !=(Employee lhs, Employee rhs) => !(lhs == rhs);*/
+        public static bool operator !=(Employee lhs, Employee rhs) => !(lhs == rhs);
 
     }
 }

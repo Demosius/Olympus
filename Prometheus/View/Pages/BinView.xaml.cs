@@ -7,7 +7,7 @@ namespace Prometheus.View.Pages
     /// <summary>
     /// Interaction logic for BinView.xaml
     /// </summary>
-    public partial class BinView : BREADBase
+    public partial class BinView
     {
         public BinView()
         {
@@ -21,7 +21,7 @@ namespace Prometheus.View.Pages
             var headerName = e.Column.Header.ToString();
 
             //Cancel the column you don't want to generate
-            if (new List<string>() { "ID", "ZoneID", "Zone", "NAVStock", "Stock", "Extension", "Dimensions", "Bay", "AccessLevel" }.Contains(headerName))
+            if (new List<string> { "ID", "ZoneID", "Zone", "NAVStock", "Stock", "Extension", "Dimensions", "Bay", "AccessLevel" }.Contains(headerName))
             {
                 e.Cancel = true;
             }

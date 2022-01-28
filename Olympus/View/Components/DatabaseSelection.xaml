@@ -45,7 +45,7 @@
                 Command="{Binding CopyDatabaseCommand}"
                 CommandParameter="{Binding DBString}"
                 Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        <Button Content="Move Database"
+        <Button Content="PartialMove Database"
                 Command="{Binding MoveDatabaseCommand}"
                 CommandParameter="{Binding DBString}"
                 Visibility="{Binding RelativeSource={RelativeSource Self}, Path=IsEnabled, Converter={StaticResource BooleanToVisibilityConverter}}"/>

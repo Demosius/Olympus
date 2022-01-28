@@ -6,7 +6,7 @@ namespace Olympus.View
     /// <summary>
     /// Interaction logic for LogIn.xaml
     /// </summary>
-    public partial class LoginWindow : Window
+    public partial class LoginWindow
     {
         public LoginWindow()
         {

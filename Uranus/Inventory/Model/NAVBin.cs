@@ -46,8 +46,6 @@ namespace Uranus.Inventory.Model
         [Ignore]
         public EAccessLevel? AccessLevel => Zone?.AccessLevel;
 
-        public NAVBin() { }
-
         /// <summary>
         /// Given the current Code, Zone, and Location, adjusts the current ID accordingly.
         /// </summary>
@@ -60,7 +58,7 @@ namespace Uranus.Inventory.Model
         public void MergeStock()
         {
             // Try to merge every stock item with every other.
-            // If merge is succesful, remove the merged stock from the list.
+            // If merge is successful, remove the merged stock from the list.
             // Use backwards list, and merge from the i, so we remove from the end of the list safely.
             for (var i = Stock.Count -1; i > 0; --i)
             {
@@ -79,18 +77,17 @@ namespace Uranus.Inventory.Model
         public void ConvertStock()
         {
             // Make sure both lists are not null.
-            if (NAVStock is null) NAVStock = new();
-            if (Stock is null) Stock = new();
+            NAVStock ??= new();
+            Stock ??= new();
 
-            foreach (var ns in NAVStock)
+            foreach (var stock in NAVStock.Select(ns => new Stock(ns)))
             {
-                Stock stock = new(ns);
                 Stock.Add(stock);
             }
         }
 
         // Returns true if the given move represents the full quantity of the bin's contents.
-        // Returns null if the move reuires more than is available.
+        // Returns null if the move requires more than is available.
         public bool? IsFullQty(Move move)
         {
             var itemStock = Stock.Where(stock => stock.Item == move.Item).ToList();
@@ -103,9 +100,9 @@ namespace Uranus.Inventory.Model
                 return null; // Too much stock trying to move.
             if (itemStock.Count != Stock.Count) 
                 return false; // There is other stock at this location.
-            return (theStock.Cases.Qty == move.TakeCases &&
-                    theStock.Packs.Qty == move.TakePacks &&
-                    theStock.Eaches.Qty == move.TakeEaches);
+            return theStock.Cases.Qty == move.TakeCases &&
+                   theStock.Packs.Qty == move.TakePacks &&
+                   theStock.Eaches.Qty == move.TakeEaches;
         }
 
         public override string ToString()

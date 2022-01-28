@@ -15,13 +15,13 @@ namespace Uranus.Staff.Model
     }
 
     /// <summary>
-    /// Represents an employee clock event, in which an amployee has physically clocked in or out.
+    /// Represents an employee clock event, in which an employee has physically clocked in or out.
     /// Can also be created manually.
     /// </summary>
     public class ClockEvent : IEquatable<ClockEvent>, INotifyPropertyChanged
     {
         [PrimaryKey]
-        public Guid ID { get; set; }
+        public Guid ID { get; }
         [ForeignKey(typeof(Employee))]
         public int EmployeeCode { get; set; }
         public string Timestamp { get; set; }
@@ -29,22 +29,14 @@ namespace Uranus.Staff.Model
         private string date;
         public string Date
         {
-            get
-            {
-                if (date is null) { date = DateTime.Parse(Timestamp).ToString("yyyy-MM-dd"); }
-                return date;
-            }
+            get => date ??= DateTime.Parse(Timestamp).ToString("yyyy-MM-dd");
             set => date = value;
         }
 
         private string time;
         public string Time
         {
-            get
-            {
-                if (time is null) { time = DateTime.Parse(Timestamp).ToString("HH:mm:ss"); }
-                return time;
-            }
+            get => time ??= DateTime.Parse(Timestamp).ToString("HH:mm:ss");
             set => time = value;
         }
 
@@ -95,7 +87,7 @@ namespace Uranus.Staff.Model
 
         public override string ToString()
         {
-            return Time[0..5];
+            return Time[..5];
         }
 
         /* Equality overloading. */
@@ -111,7 +103,7 @@ namespace Uranus.Staff.Model
                 return true;
             }
 
-            return string.Compare(Timestamp, other.Timestamp) == 0;
+            return string.CompareOrdinal(Timestamp, other.Timestamp) == 0;
         }
 
         public bool Equals(ClockEvent other)
@@ -138,12 +130,7 @@ namespace Uranus.Staff.Model
             {
                 return false;
             }
-            if (rh is null)
-            {
-                return false;
-            }
-
-            return lh.Equals(rh);
+            return rh is not null && lh.Equals(rh);
         }
 
         public static bool operator !=(ClockEvent lh, ClockEvent rh)
@@ -166,7 +153,7 @@ namespace Uranus.Staff.Model
                 return false;
             }
 
-            return string.Compare(lh.Date, rh.Date) > 0 || (lh.Date == rh.Date && string.Compare(lh.Date, rh.Date) > 0);
+            return string.CompareOrdinal(lh.Date, rh.Date) > 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) > 0;
         }
 
         public static bool operator <(ClockEvent lh, ClockEvent rh)
@@ -184,18 +171,15 @@ namespace Uranus.Staff.Model
                 return false;
             }
 
-            return string.Compare(lh.Date, rh.Date) < 0 || (lh.Date == rh.Date && string.Compare(lh.Date, rh.Date) < 0);
+            return string.CompareOrdinal(lh.Date, rh.Date) < 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) < 0;
         }
 
         public static bool operator <=(ClockEvent lh, ClockEvent rh) => lh == rh || lh < rh;
 
         public static bool operator >=(ClockEvent lh, ClockEvent rh) => lh == rh || lh > rh;
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
-
+        public override int GetHashCode() => ID.GetHashCode();
+        
         // Property changed event handling.
         public event PropertyChangedEventHandler PropertyChanged;
 

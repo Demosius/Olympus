@@ -15,10 +15,7 @@ namespace Olympus.ViewModel.Utility
             get => dbString;
             set
             {
-                if (value == App.BaseDirectory())
-                    dbString = "Local";
-                else
-                    dbString = value;
+                dbString = value == App.BaseDirectory() ? "Local" : value;
                 OnPropertyChanged(nameof(DBString));
             }
         }
@@ -67,7 +64,7 @@ namespace Olympus.ViewModel.Utility
         // or adds a Sol folder in the location and returns that.
         private static string SetSol(string path)
         {
-            // Empty string means cancelation.
+            // Empty string means cancellation.
             if (path == "") return "";
             // Make sure the last folder is 'Sol'
             if (Path.GetFileName(path) != "Sol")
@@ -94,27 +91,24 @@ namespace Olympus.ViewModel.Utility
 
         public void ChangeDatabase()
         {
-            // TODO: Validate selected folder as exisitng Sol Location.
-            string path;
+            // TODO: Validate selected folder as existing Sol Location.
 
-            path = GetExistingSol();
+            var path = GetExistingSol();
 
-            // Empty string means cancelation or failure to find existing Sol DB.
+            // Empty string means cancellation or failure to find existing Sol DB.
             if (path == "") return;
 
             SetDatabase(path);
         }
-        
+
         public void NewDatabase()
         {
-            string path;
-
-            path = SelectFolder();
-            // Empty string means cancelation.
+            var path = SelectFolder();
+            // Empty string means cancellation.
             if (path == "") return;
 
             // Make sure directory exists.
-            if (!(Directory.Exists(path)))
+            if (!Directory.Exists(path))
                 _ = Directory.CreateDirectory(path);
             SetDatabase(path);
         }
@@ -122,7 +116,7 @@ namespace Olympus.ViewModel.Utility
         public void CopyDatabase()
         {
             var path = SelectFolder();
-            // Empty string means cancelation.
+            // Empty string means cancellation.
             if (path == "") return;
             if (IsSubDirectory(Settings.Default.SolLocation, path))
             {
@@ -141,12 +135,12 @@ namespace Olympus.ViewModel.Utility
         public void MoveDatabase()
         {
             var path = SelectFolder();
-            // Empty string means cancelation.
+            // Empty string means cancellation.
             if (path == "") return;
             if (IsSubDirectory(Settings.Default.SolLocation, path))
             {
                 _ = MessageBox.Show("Cannot move to a subfolder of the current database.",
-                    "Failed Database Move",
+                    "Failed Database PartialMove",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
                 return;
@@ -159,7 +153,7 @@ namespace Olympus.ViewModel.Utility
         }
 
         /// <summary>
-        /// User selects an exisinting DB-Sol location to merge with the current location.
+        /// User selects an existing DB-Sol location to merge with the current location.
         /// </summary>
         public static void MergeDatabase()
         {
@@ -167,6 +161,9 @@ namespace Olympus.ViewModel.Utility
 
             if (path == "" || path == Settings.Default.SolLocation) return;
             // TODO: Finish merging logic.
+            {
+
+            }
         }
 
         /// <summary>
@@ -175,12 +172,10 @@ namespace Olympus.ViewModel.Utility
         /// <returns>String representing Directory Path to Sol if found, otherwise empty string.</returns>
         private static string GetExistingSol()
         {
-            string path;
-
-            path = SelectFolder();
+            var path = SelectFolder();
             SetSol(path);
 
-            if (CheckSolExistance(path)) return "";
+            if (CheckSolExistence(path)) return "";
 
             return path;
         }
@@ -190,7 +185,7 @@ namespace Olympus.ViewModel.Utility
         /// </summary>
         /// <param name="dirPath">Directory location for potential Sol.</param>
         /// <returns>True if Sol exists, else false.</returns>
-        private static bool CheckSolExistance(string dirPath)
+        private static bool CheckSolExistence(string dirPath)
         {
             if (!Directory.Exists(dirPath)) return false;
             var equipmentPath = Path.Join(dirPath, "Equipment", "Equipment.sqlite");
@@ -200,7 +195,7 @@ namespace Olympus.ViewModel.Utility
             return Directory.Exists(equipmentPath) &&
                 Directory.Exists(staffPath) &&
                 Directory.Exists(inventoryPath) &&
-                Directory.Exists(usersPath); 
+                Directory.Exists(usersPath);
         }
 
         private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs = true)
@@ -229,33 +224,31 @@ namespace Olympus.ViewModel.Utility
             }
 
             // If copying subdirectories, copy them and their contents to new location.
-            if (copySubDirs)
+            if (!copySubDirs) return;
+
+            foreach (var subDir in dirs)
             {
-                foreach (var subdir in dirs)
-                {
-                    var tempPath = Path.Combine(destDirName, subdir.Name);
-                    DirectoryCopy(subdir.FullName, tempPath, copySubDirs);
-                }
+                var tempPath = Path.Combine(destDirName, subDir.Name);
+                DirectoryCopy(subDir.FullName, tempPath);
             }
+
         }
 
-        private bool IsSubDirectory(string potentialParentDir, string potentialChildDir)
+        private static bool IsSubDirectory(string potentialParentDir, string potentialChildDir)
         {
             DirectoryInfo parent = new(potentialParentDir);
             DirectoryInfo child = new(potentialChildDir);
             return IsSubDirectory(parent, child);
         }
 
-        private bool IsSubDirectory(DirectoryInfo potentialParentDir, DirectoryInfo potentialChildDir)
+        private static bool IsSubDirectory(FileSystemInfo potentialParentDir, DirectoryInfo potentialChildDir)
         {
             if (potentialParentDir == potentialChildDir)
                 return true;    // If they are the same, return true - as it means the same for our purposes.
             var parent = potentialChildDir.Parent;
             if (parent is null)
                 return false;   // Once there is no parent, that means that it must be false.
-            if (parent.FullName == potentialParentDir.FullName)
-                return true;
-            return IsSubDirectory(potentialParentDir, parent);
+            return parent.FullName == potentialParentDir.FullName || IsSubDirectory(potentialParentDir, parent);
         }
     }
 }

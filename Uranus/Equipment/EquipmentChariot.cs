@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Uranus.Equipment
 {
-    public class EquipmentChariot : MasterChariot
+    public sealed class EquipmentChariot : MasterChariot
     {
         public override string DatabaseName { get; } = "Equipment.sqlite";
 
@@ -18,29 +18,21 @@ namespace Uranus.Equipment
         public EquipmentChariot(string solLocation)
         {
             // Try first to use the given directory, if not then use local file.
-            try
-            {
-                BaseDataDirectory = Path.Combine(solLocation, "Equipment");
-                InitializeDatabaseConnection();
-            }
-            catch (Exception) { throw; }
+            BaseDataDirectory = Path.Combine(solLocation, "Equipment");
+            InitializeDatabaseConnection();
         }
 
         /// <summary>
         /// Resets the connection using the given location string.
         /// </summary>
         /// <param name="solLocation">A directory location, in which the Equipment database does/should reside.</param>
-        public void ResetConnection(string solLocation)
+        public override void ResetConnection(string solLocation)
         {
-            // First thing is to nullify the current databse (connection).
+            // First thing is to nullify the current database (connection).
             Database = null;
 
-            try
-            {
-                BaseDataDirectory = Path.Combine(solLocation, "Equipment");
-                InitializeDatabaseConnection();
-            }
-            catch (Exception) { throw; }
+            BaseDataDirectory = Path.Combine(solLocation, "Equipment");
+            InitializeDatabaseConnection();
         }
 
         /***************************** CREATE Data ****************************/

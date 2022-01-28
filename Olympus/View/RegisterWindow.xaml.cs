@@ -1,22 +1,14 @@
-﻿using System.Windows;
-
-namespace Olympus.View
+﻿namespace Olympus.View
 {
     /// <summary>
-    /// Interaction logic for Registerxaml.xaml
+    /// Interaction logic for Register xaml.xaml
     /// </summary>
-    public partial class RegisterWindow : Window
+    public partial class RegisterWindow
     {
         public RegisterWindow()
         {
             InitializeComponent();
         }
-
-        private void BtnRegister_Click(object sender, RoutedEventArgs e)
-        {
-            DialogResult = true;
-        }
-
     }
 
 }

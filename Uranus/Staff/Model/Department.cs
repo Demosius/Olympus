@@ -34,8 +34,15 @@ namespace Uranus.Staff.Model
         public List<Employee> EmployeesCanLoan { get; set; }
         [ManyToMany(typeof(DepartmentProject), "ProjectName", "Departments", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<Project> Projects { get; set; }
-        
-        /*public override bool Equals(object obj) => Equals(obj as Department);
+
+        public Department() {}
+
+        public Department(string name)
+        {
+            Name = name;
+        }
+
+        public override bool Equals(object obj) => Equals(obj as Department);
 
         public bool Equals(Department department)
         {
@@ -48,7 +55,8 @@ namespace Uranus.Staff.Model
             return Name == department.Name;
         }
 
-        public override int GetHashCode() => (Name, HeadID).GetHashCode();
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        public override int GetHashCode() => Name.GetHashCode();
 
         public static bool operator ==(Department lhs, Department rhs)
         {
@@ -56,7 +64,7 @@ namespace Uranus.Staff.Model
             return rhs is null;
         }
 
-        public static bool operator !=(Department lhs, Department rhs) => !(lhs == rhs);*/
+        public static bool operator !=(Department lhs, Department rhs) => !(lhs == rhs);
 
     }
 }

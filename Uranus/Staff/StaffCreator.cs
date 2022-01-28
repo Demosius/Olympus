@@ -33,10 +33,9 @@ namespace Uranus.Staff
 
         public void CopyProjectIconsFromSource(string sourceDirectory)
         {
-            string fileName;
             foreach (var filePath in Directory.GetFiles(sourceDirectory))
             {
-                fileName = Path.GetFileName(filePath);
+                var fileName = Path.GetFileName(filePath);
                 if (Path.GetExtension(filePath) == ".ico")
                 {
                     File.Copy(filePath, Path.Combine(Chariot.ProjectIconDirectory, fileName), true);

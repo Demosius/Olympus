@@ -30,18 +30,11 @@ namespace Pantheon.ViewModel
         {
             if (int.TryParse(UserCode, out var userID))
             {
-                if (App.Charon.LogIn(userID, Password))
-                    return true;
-                else
-                {
-                    return false;
-                }
+                return App.Charon.LogIn(userID, Password);
             }
-            else
-            {
-                MessageBox.Show("User ID must be an integer - 5 digits.", "Invalid User ID:", MessageBoxButton.OK, MessageBoxImage.Error);
-                return false;
-            }
+
+            MessageBox.Show("User ID must be an integer - 5 digits.", "Invalid User ID:", MessageBoxButton.OK, MessageBoxImage.Error);
+            return false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

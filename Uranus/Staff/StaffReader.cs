@@ -43,10 +43,10 @@ namespace Uranus.Staff
         }
 
         /* DEPARTMENTS */
-        public List<Department> Departments(Expression<Func<Department, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList<Department>(filter, pullType);
+        public List<Department> Departments(Expression<Func<Department, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
         /* PROJECTS */
-        public List<Project> Projects(Expression<Func<Project, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList<Project>(filter, pullType);
+        public List<Project> Projects(Expression<Func<Project, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     }
 }

@@ -31,7 +31,7 @@ namespace Uranus.Inventory.Model
 
         public NAVMoveLine()
         {
-            // Moves copied from NAV do not have associated location code in clipbaord, so assume 9600 at default.
+            // Moves copied from NAV do not have associated location code in clipboard, so assume 9600 at default.
             LocationCode = "9600";
         }
 

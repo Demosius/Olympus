@@ -72,9 +72,9 @@ namespace Uranus.Inventory.Model
         }
 
         // Move full stock to specified bin.
-        public void Move(NAVBin toBin)
+        public void FullMove(NAVBin toBin)
         {
-            // Handle obect moving.
+            // Handle object moving.
             _ = Bin.Stock.Remove(this);
             Bin = toBin;
             Bin.Stock.Add(this);
@@ -121,7 +121,7 @@ namespace Uranus.Inventory.Model
             // Stock ID must match (same bin and item, etc.) but must not be the same object.
             if (ReferenceEquals(this, newStock) || this.ID != newStock.ID)
                 return false;
-            // Increas Stock qtys.
+            // Increase Stock quantities.
             Eaches.Qty += newStock.Eaches.Qty;
             Packs.Qty += newStock.Packs.Qty;
             Cases.Qty += newStock.Cases.Qty;

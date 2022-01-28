@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 
 namespace Olympus.ViewModel.Components
 {
@@ -43,24 +44,21 @@ namespace Olympus.ViewModel.Components
 
         public ProjectGroupVM(ProjectLauncherVM projectLauncher, List<Project> projects, string groupName) : this(projectLauncher)
         {
-            ProjectButtonVM projectButton;
-            foreach (var project in projects)
+            foreach (var projectButton in projects.Select(project => new ProjectButtonVM(this, project)))
             {
-                projectButton = new(this, project);
                 Projects.Add(projectButton);
             }
+
             GroupName = groupName;
         }
 
         public ProjectGroupVM(ProjectLauncherVM projectLauncher, Department department) : this(projectLauncher)
         {
-            ProjectButtonVM projectButton;
-            foreach (var project in department.Projects)
+            foreach (var projectButton in department.Projects.Select(project => new ProjectButtonVM(this, project)))
             {
-
-                projectButton = new(this, project);
                 Projects.Add(projectButton);
             }
+
             GroupName = department.Name;
         }
 

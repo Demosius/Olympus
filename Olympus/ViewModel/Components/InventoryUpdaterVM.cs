@@ -141,50 +141,50 @@ namespace Olympus.ViewModel.Components
 
         public static void ShowInfo()
         {
-            _ = MessageBox.Show($"Click on the large buttons to update the designated data.\n\n" +
-                            $"Stock (Bin Contents), Bins (Bin List), and UoM (Item Units of Measure) require data coppied from NAV.\n\n" +
-                            $"Item List takes data from an external workbook (Pricebook Report) and requires nothing other than pressing the button.\n\n" +
-                            $"Click on the small [xx Col] buttons to be shown the required columns (and where to get the data) for the specific data type.\n\n",
-                            $"Data Upload Help",
+            _ = MessageBox.Show("Click on the large buttons to update the designated data.\n\n" +
+                            "Stock (Bin Contents), Bins (Bin List), and UoM (Item Units of Measure) require data copied from NAV.\n\n" +
+                            "Item List takes data from an external workbook (Price book Report) and requires nothing other than pressing the button.\n\n" +
+                            "Click on the small [xx Col] buttons to be shown the required columns (and where to get the data) for the specific data type.\n\n",
+                            "Data Upload Help",
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);
         }
 
         public static void BcInfo()
         {
-            _ = MessageBox.Show($"Find the Data:\n" +
-                            $"[NAV > Warehouse > Planning & Execution > Bin Contents]\n\n" +
-                            $"Required Columns:\n\n" +
-                            $"{String.Join("\n", Constants.NAVStockColumns.Keys)}\n\n" +
-                            $"(Filter to Zone Code as required, and Location Code = '9600')\n" +
-                            $"(Update to the minute, as required.)",
-                            $"Stock/Bin Contents Requirements",
+            _ = MessageBox.Show("Find the Data:\n" +
+                            "[NAV > Warehouse > Planning & Execution > Bin Contents]\n\n" +
+                            "Required Columns:\n\n" +
+                            $"{string.Join("\n", Constants.NAVStockColumns.Keys)}\n\n" +
+                            "(Filter to Zone Code as required, and Location Code = '9600')\n" +
+                            "(Update to the minute, as required.)",
+                            "Stock/Bin Contents Requirements",
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);
         }
 
         public static void BlInfo()
         {
-            _ = MessageBox.Show($"Find the Data:\n" +
-                            $"[NAV > Warehouse > Planning & Execution > Bin Contents >> Bin Code]\n\n" +
-                            $"Required Columns:\n\n" +
+            _ = MessageBox.Show("Find the Data:\n" +
+                            "[NAV > Warehouse > Planning & Execution > Bin Contents >> Bin Code]\n\n" +
+                            "Required Columns:\n\n" +
                             $"{String.Join("\n", Constants.NAVBinColumns.Keys)}\n\n" +
-                            $"(No filtering required.)\n" +
-                            $"(Update when changes are made to bin/zone layouts, or when Count Dates are required.)",
-                            $"Bin List Requirements",
+                            "(No filtering required.)\n" +
+                            "(Update when changes are made to bin/zone layouts, or when Count Dates are required.)",
+                            "Bin List Requirements",
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);
         }
 
         public static void UoMInfo()
         {
-            _ = MessageBox.Show($"Find the Data:\n" +
-                            $"[NAV > Warehouse > Planning & Execution > Bin Contents >> Unit of Measure Code]\n\n" +
-                            $"Required Columns:\n\n" +
-                            $"{String.Join("\n", Constants.NAVUOMColumns.Keys)}\n\n" +
-                            $"(Unfilter All, then filter Code to \"<>EACH\".)\n" +
-                            $"(Update Daily. End of previous work day, or begining of current.)",
-                            $"UoM Data Requirements",
+            _ = MessageBox.Show("Find the Data:\n" +
+                            "[NAV > Warehouse > Planning & Execution > Bin Contents >> Unit of Measure Code]\n\n" +
+                            "Required Columns:\n\n" +
+                            $"{String.Join("\n", Constants.NAV_UOMColumns.Keys)}\n\n" +
+                            "(Un-filter All, then filter Code to \"<>EACH\".)\n" +
+                            "(Update Daily. End of previous work day, or beginning of current.)",
+                            "UoM Data Requirements",
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);
         }

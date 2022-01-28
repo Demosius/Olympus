@@ -34,18 +34,17 @@ namespace Uranus.Inventory
             return false;
         }
 
-        public bool NAVUoMs(List<NAVUoM> uoms)
+        public bool NAVUoMs(List<NAVUoM> uomList)
         {
-            if (uoms.Count == 0) return false;
+            if (uomList.Count == 0) return false;
             // Remove previous data with relevant UoMCode 
             // (Expect for ease/speed updates will happen one UoMCode at a time)
-            Chariot.UoMCodeDelete(uoms.Select(s => s.Code).Distinct().ToList());
-            if (Chariot.InsertIntoTable(uoms))
-            {
-                _ = Chariot.SetTableUpdateTime(typeof(NAVUoM));
-                return true;
-            }
-            return false;
+            Chariot.UoMCodeDelete(uomList.Select(s => s.Code).Distinct().ToList());
+            
+            if (!Chariot.InsertIntoTable(uomList)) return false;
+            
+            _ = Chariot.SetTableUpdateTime(typeof(NAVUoM));
+            return true;
         }
 
         public bool NAVStock(List<NAVStock> stock)

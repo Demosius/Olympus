@@ -354,7 +354,7 @@ namespace Uranus
                         CompanyCode = row[headDict["Company Code"]],
                         IsWarehouse = row[headDict["Location Is Warehouse"]] == "Yes",
                         IsStore = row[headDict["Location Is A Store"]] == "Yes",
-                        ActiveForRepenishment = row[headDict["Active for Replenishment"]] == "Yes"
+                        ActiveForReplenishment = row[headDict["Active for Replenishment"]] == "Yes"
                     };
                     locations.Add(loc);
                 }
@@ -525,9 +525,8 @@ namespace Uranus
                     if (!int.TryParse(row[headDict["PlatformCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var pf)) pf = 0;
                     if (!int.TryParse(row[headDict["GenreCode"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var gen)) gen = 0;
 
-                    var item = new NAVItem
+                    var item = new NAVItem(iNum)
                     {
-                        Number = iNum,
                         Description = row[headDict["ItemName"]],
                         Barcode = row[headDict["PrimaryBarcode"]],
                         CategoryCode = cat,
@@ -552,7 +551,7 @@ namespace Uranus
         // Turns clipboard data into a list of UoMs.
         public static List<NAVUoM> NAVRawStringToUoMs(string rawData)
         {
-            var headDict = Constants.NAVUOMColumns;
+            var headDict = Constants.NAV_UOMColumns;
 
             if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
             // Start memory stream from which to read.
@@ -602,7 +601,7 @@ namespace Uranus
                         ItemNumber = iNum,
                         QtyPerUoM = qtyPerUoM,
                         MaxQty = max,
-                        ExcludCartonization = row[headDict["Exclude Cartonization"]] == "Yes",
+                        ExcludeCartonization = row[headDict["Exclude Cartonization"]] == "Yes",
                         Length = length,
                         Width = width,
                         Height = height,
@@ -744,10 +743,10 @@ namespace Uranus
                 {
                     var head = headers[col] + ": ";
                     var val = array[row, col];
-                    line += head + ((col == colMax - 1) ? val + "\n\t" : val + ",\n\t\t");
+                    line += head + (col == colMax - 1 ? val + "\n\t" : val + ",\n\t\t");
                 }
 
-                line += (row == rowMax - 1) ? "}\n" : "},\n\t";
+                line += row == rowMax - 1 ? "}\n" : "},\n\t";
 
                 returnString += line;
             }

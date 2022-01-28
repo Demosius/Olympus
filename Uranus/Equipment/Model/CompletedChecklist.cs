@@ -3,6 +3,7 @@ using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Uranus.Equipment.Model
 {
@@ -13,7 +14,7 @@ namespace Uranus.Equipment.Model
         [ForeignKey(typeof(Checklist))]
         public string ChecklistName { get; set; }
         [ForeignKey(typeof(Machine))]
-        public int MachinSerialNumber { get; set; }
+        public int MachineSerialNumber { get; set; }
         public int EmployeeID { get; set; }
         public DateTime CompletedTime { get; set; }
 
@@ -36,7 +37,7 @@ namespace Uranus.Equipment.Model
             OriginalChecklist = checklist;
             Checks = checklist.Checks;
             ChecklistName = checklist.Name;
-            MachinSerialNumber = machineSerialNumber;
+            MachineSerialNumber = machineSerialNumber;
             EmployeeID = employeeID;
         }
 
@@ -50,13 +51,10 @@ namespace Uranus.Equipment.Model
         {
             Pass = true;
             var count = 0;
-            foreach (var check in Checks)
+            foreach (var check in Checks.Where(check => check.IsFault() ?? false))
             {
-                if (check.IsFault() ?? false)
-                {
-                    count++;
-                    if (Pass) Pass = !check.FaultFails;
-                }
+                count++;
+                if (Pass) Pass = !check.FaultFails;
             }
             return count;
         }

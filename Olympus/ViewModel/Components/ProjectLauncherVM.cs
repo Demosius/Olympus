@@ -30,31 +30,23 @@ namespace Olympus.ViewModel.Components
         {
             AllProjects = App.Helios.StaffReader.Projects(pullType: EPullType.FullRecursive);
             Departments = App.Helios.StaffReader.Departments(pullType: EPullType.IncludeChildren);
-            if (App.Charon.UserEmployee is null)
-                UserProjects = new();
-            else
-                UserProjects = App.Charon.UserEmployee.Projects;
+            UserProjects = App.Charon.UserEmployee is null ? new() : App.Charon.UserEmployee.Projects;
 
             // Set Icons for projects.
             foreach (var p in AllProjects)
                 p.Icon.SetImageFilePath(App.Helios.StaffReader);
 
-            ProjectGroupVM projectGroup;
-
             ProjectGroups = new();
 
-            projectGroup = new(this, AllProjects, "All");
+            ProjectGroupVM projectGroup = new(this, AllProjects, "All");
             ProjectGroups.Add(projectGroup);
             projectGroup = new(this, UserProjects, "User");
             ProjectGroups.Add(projectGroup);
 
-            foreach (var dep in Departments)
+            foreach (var dep in Departments.Where(dep => dep.Projects.Any()))
             {
-                if (dep.Projects.Any())
-                {
-                    projectGroup = new(this, dep);
-                    ProjectGroups.Add(projectGroup);
-                }
+                projectGroup = new(this, dep);
+                ProjectGroups.Add(projectGroup);
             }
         }
 

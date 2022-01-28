@@ -73,7 +73,7 @@ namespace Uranus.Inventory.Model
             ID = string.Join(":", StockID, UoMCode);
         }
 
-        // Returns true if there is something in substock that 
+        // Returns true if there is something in sub-stock that 
         // should prevent the stock from being moved.
         public bool PreventsMove()
         {

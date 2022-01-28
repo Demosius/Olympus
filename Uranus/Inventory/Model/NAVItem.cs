@@ -9,7 +9,7 @@ namespace Uranus.Inventory.Model
     public class NAVItem
     {
         [PrimaryKey]
-        public int Number { get; set; }
+        public int Number { get; }
         public string Description { get; set; }
         public string Barcode { get; set; }
         [ForeignKey(typeof(NAVCategory))]
@@ -53,23 +53,36 @@ namespace Uranus.Inventory.Model
         [Ignore]
         public NAVUoM Each { get; set; }
 
-        // Sets the specific uoms, so we don't need to pull from an "unorderred" list all the time.
+        public NAVItem() {}
+
+        public NAVItem(int num)
+        {
+            Number = num;
+        }
+
+        // Sets the specific UoMs, so we don't need to pull from an "unordered" list all the time.
         public void SetUoMs()
         {
-            EUoM e;
             foreach (var uom in UoMs)
             {
-                e = uom.UoM;
-                if (e == EUoM.Case)
-                    Case = uom;
-                else if (e == EUoM.Pack)
-                    Pack = uom;
-                else
-                    Each = uom;
+                var e = uom.UoM;
+                switch (e)
+                {
+                    case EUoM.Case:
+                        Case = uom;
+                        break;
+                    case EUoM.Pack:
+                        Pack = uom;
+                        break;
+                    case EUoM.Each:
+                    default:
+                        Each = uom;
+                        break;
+                }
             }
-            if (Case is null) Case = new(this, EUoM.Case);
-            if (Pack is null) Pack = new(this, EUoM.Pack);
-            if (Each is null) Each = new(this, EUoM.Each);
+            Case ??= new(this, EUoM.Case);
+            Pack ??= new(this, EUoM.Pack);
+            Each ??= new(this, EUoM.Each);
         }
 
         public int GetBaseQty(int eaches = 0, int packs = 0, int cases = 0)
@@ -85,33 +98,23 @@ namespace Uranus.Inventory.Model
         {
             if (item is null) return false;
 
-            if (Object.ReferenceEquals(this, item)) return true;
+            if (ReferenceEquals(this, item)) return true;
 
-            if (this.GetType() != item.GetType()) return false;
+            if (GetType() != item.GetType()) return false;
 
-            return (Number == item.Number) && (Description == item.Description) && (Barcode == item.Barcode) 
-                && (CategoryCode == item.CategoryCode) && (PlatformCode == item.PlatformCode)
-                && (DivisionCode == item.DivisionCode) && (GenreCode == item.GenreCode)
-                && (Length == item.Length) && (Width == item.Width) && (Height == item.Height)
-                && (Cube == item.Cube) && (Weight == item.Weight) && (PreOwned == item.PreOwned);
+            return Number == item.Number && Description == item.Description && Barcode == item.Barcode 
+                && CategoryCode == item.CategoryCode && PlatformCode == item.PlatformCode
+                && DivisionCode == item.DivisionCode && GenreCode == item.GenreCode
+                && Math.Abs(Length - item.Length) < 0.0001 && Math.Abs(Width - item.Width) < 0.0001 && Math.Abs(Height - item.Height) < 0.0001
+                && Math.Abs(Cube - item.Cube) < 0.0001 && Math.Abs(Weight - item.Weight) < 0.0001 && PreOwned == item.PreOwned;
         }
 
-        public override int GetHashCode() => (Number, Description, Barcode, 
-                                              CategoryCode, DivisionCode, 
-                                              PlatformCode, GenreCode, Length, 
-                                              Width, Height, Weight, Cube, PreOwned).GetHashCode();
+        public override int GetHashCode() => Number.GetHashCode();
 
         public static bool operator ==(NAVItem lhs, NAVItem rhs)
         {
-            if (lhs is null)
-            {
-                if (rhs is null)
-                {
-                    return true;
-                }
-                return false;
-            }
-            return lhs.Equals(rhs);
+            if (lhs is not null) return lhs.Equals(rhs);
+            return rhs is null;
         }
 
         public static bool operator !=(NAVItem lhs, NAVItem rhs) => !(lhs == rhs);

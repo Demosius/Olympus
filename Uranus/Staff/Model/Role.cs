@@ -1,6 +1,7 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Uranus.Staff.Model
 {
@@ -17,13 +18,21 @@ namespace Uranus.Staff.Model
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Department Department { get; set; }
         [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public Role ReprortsToRole { get; set; }
+        public Role ReportsToRole { get; set; }
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<Employee> Employees { get; set; }
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<Role> Reports { get; set; }
 
-        public Role() { }
+        public Role()
+        {
+            Name = "UniqueRole";
+        }
+
+        public Role(string name)
+        {
+            Name = name;
+        }
 
         public bool LookDown(ref int down, ref Role targetRole)
         {
@@ -34,11 +43,9 @@ namespace Uranus.Staff.Model
             }
             foreach (var role in Reports)
             {
-                if (role.LookDown(ref down, ref targetRole))
-                {
-                    ++down;
-                    return true;
-                }
+                if (!role.LookDown(ref down, ref targetRole)) continue;
+                ++down;
+                return true;
             }
             return false;
         }
@@ -47,19 +54,13 @@ namespace Uranus.Staff.Model
         {
             ++up;
             if (this == targetRole) return true;
-            foreach(var role in Reports)
+            foreach (var role in Reports.Where(role => role != refRole))
             {
-                if (role != refRole)
-                {
-                    if (role.LookDown(ref down, ref targetRole))
-                    {
-                        ++down;
-                        return true;
-                    }
-                }
+                if (!role.LookDown(ref down, ref targetRole)) continue;
+                ++down;
+                return true;
             }
-            if (ReprortsToRole is null) return false;
-            return ReprortsToRole.LookUp(ref up, ref down, this, ref targetRole);
+            return ReportsToRole is not null && ReportsToRole.LookUp(ref up, ref down, this, ref targetRole);
         }
 
 
@@ -76,19 +77,13 @@ namespace Uranus.Staff.Model
             return Name == role.Name;
         }
 
-        public override int GetHashCode() => (Name, DepartmentName, Level, ReportsToRoleName).GetHashCode();
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        public override int GetHashCode() => Name.GetHashCode();
 
         public static bool operator ==(Role lhs, Role rhs)
         {
-            if (lhs is null)
-            {
-                if (rhs is null)
-                {
-                    return true;
-                }
-                return false;
-            }
-            return lhs.Equals(rhs);
+            if (lhs is not null) return lhs.Equals(rhs);
+            return rhs is null;
         }
 
         public static bool operator !=(Role lhs, Role rhs) => !(lhs == rhs);

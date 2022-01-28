@@ -180,9 +180,9 @@ namespace Styx
             {
                 // Skip validation checks (as there is no user to validate)
                 // and delete what might have been created in previous process.
-                _ = userChariot.DeleteByKey<Employee>(employee.ID);
-                _ = userChariot.DeleteByKey<Department>(department.Name);
-                _ = userChariot.DeleteByKey<StaffRole>(staffRole.Name);
+                _ = staffChariot.DeleteByKey<Employee>(employee.ID);
+                _ = staffChariot.DeleteByKey<Department>(department.Name);
+                _ = staffChariot.DeleteByKey<StaffRole>(staffRole.Name);
                 _ = userChariot.DeleteByKey<User>(employee.ID);
                 throw;
             }

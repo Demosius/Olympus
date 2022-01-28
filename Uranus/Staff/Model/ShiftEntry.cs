@@ -31,7 +31,7 @@ namespace Uranus.Staff.Model
         private string comments;
 
         [PrimaryKey]
-        public Guid ID { get; set; }
+        public Guid ID { get; }
         [ForeignKey(typeof(Employee))]
         public int EmployeeCode { get; set; }
         public string Location
@@ -160,16 +160,14 @@ namespace Uranus.Staff.Model
             Day = date.ToString("dddd");
         }
 
+        // ReSharper disable once RedundantAssignment
         private static Guid SetClock(ref ClockEvent clock, ClockEvent newClockValue)
         {
             clock = newClockValue;
             if (clock is null)
                 return Guid.NewGuid();
-            else
-            {
-                clock.Status = EClockStatus.Approved;
-                return clock.ID;
-            }
+            clock.Status = EClockStatus.Approved;
+            return clock.ID;
         }
 
         /// <summary>
@@ -336,13 +334,13 @@ namespace Uranus.Staff.Model
             else
                 ShiftType = EShiftType.D;
 
-            // Shift lunch break is set to 30 min for afternoon shift, otherwise is 40 mins. 
-            // Regardless of actuall clocks - but only apply if start lunch is not null.
+            // Shift lunch break is set to 30 min for afternoon shift, otherwise is 40 minutes. 
+            // Regardless of actual clocks - but only apply if start lunch is not null.
             var workSpan = EndShiftClock.DtTime.Subtract(StartShiftClock.DtTime);
 
             // Only subtract lunch break if shift is over 3 hours, and there is at least a initial lunch clock.
             if (StartLunchClock != null && workSpan > new TimeSpan(3, 0, 0))
-                workSpan = workSpan.Subtract(new(0, (ShiftType == EShiftType.A) ? 30 : 40, 0));
+                workSpan = workSpan.Subtract(new(0, ShiftType == EShiftType.A ? 30 : 40, 0));
 
             TimeTotal = new DateTime(workSpan.Ticks).ToString("HH:mm");
             HoursWorked = workSpan.TotalHours;
@@ -393,7 +391,7 @@ namespace Uranus.Staff.Model
             {
                 return false;
             }
-            if (ReferenceEquals(this, other))
+            if (ReferenceEquals(this, obj))
             {
                 return true;
             }
@@ -453,7 +451,7 @@ namespace Uranus.Staff.Model
                 return false;
             }
 
-            return string.Compare(lh.Date, rh.Date) > 0 || (lh.Date == rh.Date && string.Compare(lh.Date, rh.Date) > 0);
+            return string.CompareOrdinal(lh.Date, rh.Date) > 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) > 0;
         }
 
         public static bool operator <(ShiftEntry lh, ShiftEntry rh)
@@ -471,17 +469,14 @@ namespace Uranus.Staff.Model
                 return false;
             }
 
-            return string.Compare(lh.Date, rh.Date) < 0 || (lh.Date == rh.Date && string.Compare(lh.Date, rh.Date) < 0);
+            return string.CompareOrdinal(lh.Date, rh.Date) < 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) < 0;
         }
 
         public static bool operator <=(ShiftEntry lh, ShiftEntry rh) => lh == rh || lh < rh;
 
         public static bool operator >=(ShiftEntry lh, ShiftEntry rh) => lh == rh || lh > rh;
 
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+        public override int GetHashCode() => ID.GetHashCode();
     }
 
 }

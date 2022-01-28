@@ -12,11 +12,152 @@ namespace Olympus.ViewModel
         private const string WarnColour = "Orange";
         private const string BadColour = "Red";
 
-        public Employee Employee { get; set; } 
+        public Employee Employee { get; set; }
         public Department Department { get; set; }
         public StaffRole Role { get; set; }
 
-        public string DepartmentName { get => Department.Name; set { Department.Name = value; OnPropertyChanged(nameof(DepartmentName)); } }
+        private string departmentName;
+        public string DepartmentName
+        {
+            get => departmentName;
+            set
+            {
+                departmentName = value;
+                OnPropertyChanged(nameof(DepartmentName));
+            }
+        }
+
+        private string roleName;
+        public string RoleName
+        {
+            get => roleName;
+            set
+            {
+                roleName = value;
+                OnPropertyChanged(nameof(RoleName));
+            }
+        }
+
+        private string employeeID;
+        public string EmployeeID
+        {
+            get => employeeID;
+            set
+            {
+                employeeID = value;
+                OnPropertyChanged(nameof(EmployeeID));
+            }
+        }
+
+        private string displayName;
+        public string DisplayName
+        {
+            get => displayName;
+            set
+            {
+                displayName = value;
+                OnPropertyChanged(nameof(DisplayName));
+            }
+        }
+
+        private string firstName;
+        public string FirstName
+        {
+            get => firstName;
+            set
+            {
+                firstName = value;
+                OnPropertyChanged(nameof(FirstName));
+            }
+        }
+
+        private string lastName;
+        public string LastName
+        {
+            get => lastName;
+            set
+            {
+                lastName = value;
+                OnPropertyChanged(nameof(lastName));
+            }
+        }
+
+        private string rfID;
+        public string RF_ID
+        {
+            get => rfID;
+            set
+            {
+                rfID = value;
+                OnPropertyChanged(nameof(RF_ID));
+            }
+        }
+
+        private string pcID;
+        public string PC_ID
+        {
+            get => pcID;
+            set
+            {
+                pcID = value;
+                OnPropertyChanged(nameof(PC_ID));
+            }
+        }
+
+        private string phoneNumber;
+        public string PhoneNumber
+        {
+            get => phoneNumber;
+            set
+            {
+                phoneNumber = value;
+                OnPropertyChanged(nameof(PhoneNumber));
+            }
+        }
+
+        private string email;
+        public string Email
+        {
+            get => email;
+            set
+            {
+                email = value;
+                OnPropertyChanged(nameof(Email));
+            }
+        }
+
+        private string address;
+        public string Address
+        {
+            get => address;
+            set
+            {
+                address = value;
+                OnPropertyChanged(nameof(Address));
+            }
+        }
+
+        private decimal? payRate;
+        public decimal? PayRate
+        {
+            get => payRate;
+            set
+            {
+                payRate = value;
+                OnPropertyChanged(nameof(PayRate));
+            }
+        }
+
+        private int roleLevel;
+        public int RoleLevel
+        {
+            get => roleLevel;
+            set
+            {
+                roleLevel = value;
+                OnPropertyChanged(nameof(RoleLevel));
+            }
+        }
 
         private string password = "";
         public string Password { private get => password; set { password = value; CheckPasswords(); OnPropertyChanged(nameof(Password)); } }
@@ -43,12 +184,8 @@ namespace Olympus.ViewModel
         public bool PasswordGood { get; set; }
 
         public AlphaRegisterCommand AlphaRegisterCommand { get; set; }
-
         public AlphaRegistrationVM()
         {
-            Employee = new();
-            Department = new();
-            Role = new();
             AlphaRegisterCommand = new(this);
             CheckPasswords();
         }
@@ -62,20 +199,43 @@ namespace Olympus.ViewModel
             ColourSixChar = isSix ? GoodColour : BadColour;
             ColourMatch = isMatch ? GoodColour : BadColour;
             ColourNoSpace = isNoSpace ? GoodColour : BadColour;
-            ColourEightChar = (Password.Length >= 8) ? GoodColour : WarnColour;
-            ColourLower = (Password.Any(char.IsLower)) ? GoodColour : WarnColour;
-            ColourUpper = (Password.Any(char.IsUpper)) ? GoodColour : WarnColour;
-            ColourNumber = (Password.Any(char.IsDigit)) ? GoodColour : WarnColour;
-            ColourSpecial = (!Password.All(char.IsLetterOrDigit)) ? GoodColour : WarnColour;
+            ColourEightChar = Password.Length >= 8 ? GoodColour : WarnColour;
+            ColourLower = Password.Any(char.IsLower) ? GoodColour : WarnColour;
+            ColourUpper = Password.Any(char.IsUpper) ? GoodColour : WarnColour;
+            ColourNumber = Password.Any(char.IsDigit) ? GoodColour : WarnColour;
+            ColourSpecial = !Password.All(char.IsLetterOrDigit) ? GoodColour : WarnColour;
 
             PasswordGood = isSix && isMatch && isNoSpace;
         }
 
         public bool Register(out string message)
         {
-            Employee.DepartmentName = Department.Name;
-            Role.DepartmentName = Department.Name;
-            Department.HeadID = Employee.ID;
+            if (!int.TryParse(EmployeeID, out var id))
+            {
+                message = "Employee number must be a number.";
+                return false;
+            }
+            Employee = new(id)
+            {
+                FirstName = FirstName,
+                LastName = LastName,
+                DisplayName = DisplayName,
+                RF_ID = RF_ID,
+                PC_ID = PC_ID,
+                DepartmentName = DepartmentName,
+                PhoneNumber = PhoneNumber,
+                Email = Email,
+                Address = Address,
+                PayRate = PayRate
+            };
+            Department = new(DepartmentName)
+            {
+                HeadID = Employee.ID
+            };
+            Role = new(RoleName)
+            {
+                DepartmentName = Department.Name
+            };
             return App.Charon.RegisterAlphaUser(Employee, Department, Role, Password, ConfirmPassword, out message);
         }
 

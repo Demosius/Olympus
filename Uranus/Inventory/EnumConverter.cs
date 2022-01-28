@@ -44,48 +44,49 @@ namespace Uranus.Inventory
         /**************************** CONVERT Data ***************************/
         public static string UoMToString(EUoM uom)
         {
-            if (uom == EUoM.Case)
-                return "CASE";
-            if (uom == EUoM.Pack)
-                return "PACK";
-            return "EACH";
+            return uom switch
+            {
+                EUoM.Case => "CASE",
+                EUoM.Pack => "PACK",
+                _ => "EACH"
+            };
         }
 
         public static EUoM StringToUoM(string uom)
         {
             uom = uom.ToUpper();
-            if (uom == "CASE")
-                return EUoM.Case;
-            if (uom == "PACK")
-                return EUoM.Pack;
-            return EUoM.Each;
+            return uom switch
+            {
+                "CASE" => EUoM.Case,
+                "PACK" => EUoM.Pack,
+                _ => EUoM.Each
+            };
         }
 
         public static string ActionTypeToString(EAction actionType)
         {
-            if (actionType == EAction.Take)
-                return "Take";
-            if (actionType == EAction.Place)
-                return "Place";
-            return null;
+            return actionType switch
+            {
+                EAction.Take => "Take",
+                EAction.Place => "Place",
+                _ => null
+            };
         }
 
         public static EAction StringToActionType(string actionType)
         {
-            if (actionType.ToLower() == "take")
-                return EAction.Take;
-            return EAction.Place;
+            return actionType.ToLower() == "take" ? EAction.Take : EAction.Place;
         }
 
         public static string MoveStatusToString(EStatus moveStatus)
         {
-            if (moveStatus == EStatus.Open)
-                return "Open";
-            if (moveStatus == EStatus.Waiting)
-                return "Waiting";
-            if (moveStatus == EStatus.OnBoard)
-                return "On Board";
-            return "Complete";
+            return moveStatus switch
+            {
+                EStatus.Open => "Open",
+                EStatus.Waiting => "Waiting",
+                EStatus.OnBoard => "On Board",
+                _ => "Complete"
+            };
         }
 
         private static readonly Regex SWhitespace = new(@"\s+");
@@ -97,33 +98,33 @@ namespace Uranus.Inventory
         public static EStatus StringToMoveStatus(string moveStatus)
         {
             moveStatus = ReplaceWhitespace(moveStatus.ToLower(), "");
-            if (moveStatus == "open")
-                return EStatus.Open;
-            if (moveStatus == "waiting")
-                return EStatus.Waiting;
-            if (moveStatus == "onboard")
-                return EStatus.OnBoard;
-            return EStatus.Complete;
+            return moveStatus switch
+            {
+                "open" => EStatus.Open,
+                "waiting" => EStatus.Waiting,
+                @"onboard" => EStatus.OnBoard,
+                _ => EStatus.Complete
+            };
         }
 
         public static string VolumeToString(EVolume volume)
         {
-            if (volume == EVolume.Low)
-                return "LV";
-            if (volume == EVolume.Medium)
-                return "MV";
-            if (volume == EVolume.High)
-                return "HV";
-            return null;
+            return volume switch
+            {
+                EVolume.Low => "LV",
+                EVolume.Medium => "MV",
+                EVolume.High => "HV",
+                _ => null
+            };
         }
 
         public static EVolume StringToVolume(string volume)
         {
             return ReplaceWhitespace(volume.ToUpper(), "") switch
             {
-                "LV" or "LOWVOLUME" or "LOW" => EVolume.Low,
-                "MV" or "MEDIUMVOLUME" or "MEDIUM" => EVolume.Medium,
-                "HV" or "HIGHVOLUME" or "HIGH" => EVolume.High,
+                "LV" or @"LOWVOLUME" or "LOW" => EVolume.Low,
+                "MV" or @"MEDIUMVOLUME" or "MEDIUM" => EVolume.Medium,
+                "HV" or @"HIGHVOLUME" or "HIGH" => EVolume.High,
                 _ => EVolume.Low,
             };
         }

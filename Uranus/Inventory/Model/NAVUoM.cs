@@ -14,23 +14,20 @@ namespace Uranus.Inventory.Model
         public int ItemNumber { get; set; }
         public int QtyPerUoM { get; set; }
         public int MaxQty { get; set; }
-        public bool ExcludCartonization { get; set; }
+        public bool ExcludeCartonization { get; set; }
         public double Length { get; set; }
         public double Width { get; set; }
         public double Height { get; set; }
         public double Cube { get; set; }
         public double Weight { get; set; }
 
-        private EUoM? uom = null;
+        private EUoM? uom;
         [Ignore]
         public EUoM UoM 
         {
             get
             {
-                if (uom == null)
-                {
-                    uom = EnumConverter.StringToUoM(Code);
-                }
+                uom ??= EnumConverter.StringToUoM(Code);
                 return (EUoM)uom;
             }
         }

@@ -27,12 +27,18 @@ namespace Olympus.ViewModel.Commands
         public void Execute(object parameter)
         {
             var commandName = parameter as string;
-            if (commandName == "Register")
-                VM.Register();
-            else if (commandName == "Log In")
-                VM.LogIn();
-            else
-                VM.LogOut();
+            switch (commandName)
+            {
+                case "Register":
+                    VM.Register();
+                    break;
+                case "Log In":
+                    VM.LogIn();
+                    break;
+                default:
+                    VM.LogOut();
+                    break;
+            }
         }
     }
 }

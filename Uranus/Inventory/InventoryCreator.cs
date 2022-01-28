@@ -15,44 +15,32 @@ namespace Uranus.Inventory
 
         public bool NAVBins(List<NAVBin> bins)
         {
-            if (Chariot.ReplaceFullTable(bins))
-            {
-                _ = Chariot.SetTableUpdateTime(typeof(NAVBin));
-                return true;
-            }
-            return false;
+            if (!Chariot.ReplaceFullTable(bins)) return false;
+            _ = Chariot.SetTableUpdateTime(typeof(NAVBin));
+            return true;
         }
 
         public bool NAVItems(List<NAVItem> items, DateTime dateTime)
         {
-            if (Chariot.ReplaceFullTable(items))
-            {
-                _ = Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime);
-                return true;
-            }
-            return false;
+            if (!Chariot.ReplaceFullTable(items)) return false;
+            _ = Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime);
+            return true;
         }
 
-        public bool NAVUoMs(List<NAVUoM> uoms)
+        public bool NAVUoMs(List<NAVUoM> uomList)
         {
-            if (Chariot.ReplaceFullTable(uoms))
-            {
-                _ = Chariot.SetTableUpdateTime(typeof(NAVUoM));
-                return true;
-            }
-            return false;
+            if (!Chariot.ReplaceFullTable(uomList)) return false;
+            _ = Chariot.SetTableUpdateTime(typeof(NAVUoM));
+            return true;
         }
 
         public bool NAVStock(List<NAVStock> stock)
         {
-            if (Chariot.ReplaceFullTable(stock))
-            {
-                _ = Chariot.EmptyTable<BinContentsUpdate>();
-                _ = Chariot.SetTableUpdateTime(typeof(NAVStock));
-                _ = Chariot.SetStockUpdateTimes(stock);
-                return true;
-            }
-            return false;
+            if (!Chariot.ReplaceFullTable(stock)) return false;
+            _ = Chariot.EmptyTable<BinContentsUpdate>();
+            _ = Chariot.SetTableUpdateTime(typeof(NAVStock));
+            _ = Chariot.SetStockUpdateTimes(stock);
+            return true;
         }
 
         public bool NAVZone(List<NAVZone> zones) => Chariot.ReplaceFullTable(zones);

@@ -15,8 +15,6 @@ namespace Uranus.Inventory.Model
         [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<NAVTransferOrder> TransferOrders { get; set; }
 
-        public Store() { }
-
         public string Wave()
         {
             return $"W{WaveNumber:00}";

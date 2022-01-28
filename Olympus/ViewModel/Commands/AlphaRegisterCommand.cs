@@ -21,9 +21,11 @@ namespace Olympus.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            return VM.PasswordGood && VM.Employee.ID > 0 && 
-                   VM.Employee.DisplayName != "" && 
-                   VM.Department.Name != "" && VM.Role.Name != "";
+            return VM.PasswordGood &&
+                   int.TryParse(VM.EmployeeID, out _) &&
+                   VM.DisplayName != "" &&
+                   VM.DepartmentName != "" && 
+                   VM.RoleName != "";
         }
 
         public void Execute(object parameter)
@@ -31,10 +33,10 @@ namespace Olympus.ViewModel.Commands
             if (VM.Register(out var message))
             {
                 var window = parameter as Window;
-                window.Close();
+                window?.Close();
             }
             // TODO: Improve this message process.
-            MessageBox.Show(message);
+            MessageBox.Show(message, "Failure To Register", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

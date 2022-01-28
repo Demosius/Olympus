@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 
@@ -9,13 +10,13 @@ namespace Olympus
 {
     public class FileDoesNotExistException : Exception
     {
-        public FileDoesNotExistException() : base() { }
+        public FileDoesNotExistException() { }
         public FileDoesNotExistException(string message) : base(message) { }
     }
 
     public class WrongFileExtensionException : Exception
     {
-        public WrongFileExtensionException() : base() { }
+        public WrongFileExtensionException() { }
         public WrongFileExtensionException(string message) : base(message) { }
     }
 
@@ -53,7 +54,7 @@ namespace Olympus
         /// </summary>
         /// <param name="data">A data table.</param>
         /// <param name="columns">
-        /// A dictionary of <string, string> value pairs.
+        /// A dictionary of string - string value pairs.
         /// The key is the necessary column, and the value is a backup column name.
         /// </param>
         /// <returns>
@@ -64,26 +65,22 @@ namespace Olympus
         {
             List<string> missing = new();
 
-            foreach (var column in columns)
+            foreach (var (key, value) in columns.Where(column => !data.Columns.Contains(column.Key)))
             {
-                if (!data.Columns.Contains(column.Key))
+                if (data.Columns.Contains(value))
                 {
-                    if (data.Columns.Contains(column.Value))
-                    {
-                        data.Columns[column.Value].ColumnName = column.Key;
-                    }
-                    else
-                    {
-                        missing.Add(column.Value);
-                    }
-
+                    data.Columns[value]!.ColumnName = key;
+                }
+                else
+                {
+                    missing.Add(value);
                 }
             }
             return missing;
         }
 
         /// <summary>
-        ///  Checks if the given list of columns are contained in the datatable.
+        ///  Checks if the given list of columns are contained in the data-table.
         /// </summary>
         /// <param name="data"></param>
         /// <param name="columns"></param>
@@ -103,7 +100,7 @@ namespace Olympus
 
         public static bool MoveDataBase(string newLocation)
         {
-            // TODO: Expand on this to make sure everything that should happen during database re-assignement, does.
+            // TODO: Expand on this to make sure everything that should happen during database re-assignment, does.
             try
             {
                 Settings.Default.SolLocation = newLocation;

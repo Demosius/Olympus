@@ -1,4 +1,5 @@
-﻿using Uranus.Inventory;
+﻿using System;
+using Uranus.Inventory;
 using Uranus.Inventory.Model;
 using SQLite;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace Olympus.Model
 
     public enum EDeptType
     {
-        Frontline,
+        FrontLine,
         PreOwned,
         Supplies
     }
@@ -146,7 +147,7 @@ namespace Olympus.Model
             else if (item.PreOwned)
                 DeptTypeCode = EDeptType.PreOwned;
             else
-                DeptTypeCode = EDeptType.Frontline;
+                DeptTypeCode = EDeptType.FrontLine;
             DeptType = DeptTypeCode.ToString();
 
             // Units per Case/Pack/Carton(largest thereof)
@@ -158,17 +159,8 @@ namespace Olympus.Model
                 UnitsPerPack = null;
             else
                 UnitsPerPack = item.Pack.QtyPerUoM;
-            if (UnitsPerCase is null)
-                UnitsPerCarton = UnitsPerPack;
-            else
-                UnitsPerCarton = UnitsPerCase;
-
-            //// Basic dimensions.
-            //Length = item.Length;
-            //Width = item.Width;
-            //Height = item.Height;
-            //Weight = item.Weight;
-
+            UnitsPerCarton = UnitsPerCase ?? UnitsPerPack;
+            
             // Total Cartons/Units on hand, check for current pick bin,
             // gather list of pallet sizes, and verify if item picks in cases and/or split cases.
             List<string> osZones = new() { "OS", "PR", "HR" };
@@ -182,8 +174,8 @@ namespace Olympus.Model
                 "SP PK",
                 "SUP PK"
             };
-            List<string> zones = new();
-            List<string> bins = new();
+            /*List<string> zones = new();
+            List<string> bins = new();*/
             List<int> palletSizes = new();
             if (UnitsPerCarton is null)
                 TotalCartonsOnHand = null;
@@ -203,8 +195,8 @@ namespace Olympus.Model
                     TotalCartonsOnHand += stock.Qty;
                 if (primaryZones.Contains(stock.ZoneCode))
                 {
-                    zones.Add(stock.ZoneCode);
-                    bins.Add(stock.BinCode);
+                    /*zones.Add(stock.ZoneCode);
+                    bins.Add(stock.BinCode);*/
                     if (stock.UoM.UoM < uomCheck)
                         SplitCase = true;
                 }
@@ -230,11 +222,12 @@ namespace Olympus.Model
         }
 
         /// <summary>
-        /// Constructor taking basic objects with multiple lists/dicts to cross-reference.
+        /// Constructor taking basic objects with multiple lists/dict to cross-reference.
         /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public SkuMaster(NAVItem item,
                         Dictionary<int, List<NAVStock>> stock,
-                        Dictionary<int, Dictionary<string, NAVUoM>> uoms,
+                        Dictionary<int, Dictionary<string, NAVUoM>> uomDict,
                         Dictionary<string, NAVBin> bins,
                         Dictionary<int, string> divisions, Dictionary<int, string> categories,
                         Dictionary<int, string> platforms, Dictionary<int, string> genres)
@@ -265,15 +258,15 @@ namespace Olympus.Model
             else if (item.PreOwned)
                 DeptTypeCode = EDeptType.PreOwned;
             else
-                DeptTypeCode = EDeptType.Frontline;
+                DeptTypeCode = EDeptType.FrontLine;
             DeptType = DeptTypeCode.ToString();
 
             // Units and Dims per Case/Pack/Each/Carton(largest thereof)
-            _ = uoms.TryGetValue(Sku, out var itemUoMs);
+            _ = uomDict.TryGetValue(Sku, out var itemUoMs);
             NAVUoM caseUoM = null, packUoM = null, eachUoM = null;
-            _ = (itemUoMs?.TryGetValue("CASE", out caseUoM));
-            _ = (itemUoMs?.TryGetValue("PACK", out packUoM));
-            _ = (itemUoMs?.TryGetValue("EACH", out eachUoM));
+            _ = itemUoMs?.TryGetValue("CASE", out caseUoM);
+            _ = itemUoMs?.TryGetValue("PACK", out packUoM);
+            _ = itemUoMs?.TryGetValue("EACH", out eachUoM);
             var ctnUoM = caseUoM ?? packUoM ?? eachUoM;
 
             if (caseUoM is null)
@@ -360,7 +353,7 @@ namespace Olympus.Model
                 uomCheck = EUoM.Each;
 
             _ = stock.TryGetValue(Sku, out var skuStock);
-            if (skuStock is null) skuStock = new();
+            skuStock ??= new();
             foreach (var s in skuStock)
             {
                 var zone = s.ZoneCode;
@@ -379,6 +372,8 @@ namespace Olympus.Model
                         s.UoM = eachUoM;
                         TotalEachesOnHand += s.Qty;
                         break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(uom),"Unexpected UoM value.");
                 }
                 BaseUnitsOnHand += s.GetBaseQty();
                 TotalWeight += s.GetWeight();
@@ -394,14 +389,14 @@ namespace Olympus.Model
                 else if (overstockZones.Contains(zone))
                 {
                     osBins.Add(s.BinCode);
-                    if (zone != "OS")
-                    {
-                        var qty = s.Qty;
-                        _ = bins.TryGetValue(s.BinID, out var bin);
-                        if (bin != null && bin.Description.Contains("Double"))
-                            palletSizes.Add(qty / 2);
-                        palletSizes.Add(qty);
-                    }
+                    
+                    if (zone == "OS") continue;
+                    
+                    var qty = s.Qty;
+                    _ = bins.TryGetValue(s.BinID, out var bin);
+                    if (bin != null && bin.Description.Contains("Double"))
+                        palletSizes.Add(qty / 2);
+                    palletSizes.Add(qty);
 
                 }
                 else if (virtualZones.Contains(zone))

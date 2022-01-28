@@ -35,10 +35,7 @@ namespace Olympus.ViewModel
 
         public bool LogIn()
         {
-            if (int.TryParse(UserID, out var id))
-                return App.Charon.LogIn(id, Password);
-            else 
-                return false;
+            return int.TryParse(UserID, out var id) && App.Charon.LogIn(id, Password);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -37,18 +37,14 @@ namespace Uranus.Users
         {
             // Can't delete roles that have users attached.
             var users = Chariot.PullObjectList<User>(pullType: EPullType.ObjectOnly).Where(u => u.RoleName == role.Name).ToList();
-            if (users.Count > 0)
-                return false;
-            return Chariot.Delete(role);
+            return users.Count <= 0 && Chariot.Delete(role);
         }
 
         public bool Role(string roleName)
         {
             // Can't delete roles that have users attached.
             var users = Chariot.PullObjectList<User>(pullType: EPullType.ObjectOnly).Where(u => u.RoleName == roleName).ToList();
-            if (users.Count > 0)
-                return false;
-            return Chariot.DeleteByKey<Role>(roleName);
+            return users.Count <= 0 && Chariot.DeleteByKey<Role>(roleName);
         }
 
 

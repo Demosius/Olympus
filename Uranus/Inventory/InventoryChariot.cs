@@ -10,7 +10,7 @@ namespace Uranus.Inventory
     ///  The chariot class for transferring inventory data back and forth between the database.
     ///  Primarily handles data in DataTable formats, both for input and output.
     /// </summary>
-    public class InventoryChariot : MasterChariot
+    public sealed class InventoryChariot : MasterChariot
     {
         public override string DatabaseName { get; } = "Inventory.sqlite";
 
@@ -29,29 +29,21 @@ namespace Uranus.Inventory
         public InventoryChariot(string solLocation)
         {
             // Try first to use the given directory, if not then use local file.
-            try
-            {
-                BaseDataDirectory = Path.Combine(solLocation, "Inventory");
-                InitializeDatabaseConnection();
-            }
-            catch { throw; }
+            BaseDataDirectory = Path.Combine(solLocation, "Inventory");
+            InitializeDatabaseConnection();
         }
 
         /// <summary>
         /// Resets the connection using the given location string.
         /// </summary>
         /// <param name="solLocation">A directory location, in which the Inventory database does/should reside.</param>
-        public void ResetConnection(string solLocation)
+        public override void ResetConnection(string solLocation)
         {
-            // First thing is to nullify the current databse (connection).
+            // First thing is to nullify the current database (connection).
             Database = null;
 
-            try
-            {
-                BaseDataDirectory = Path.Combine(solLocation, "Inventory");
-                InitializeDatabaseConnection();
-            }
-            catch (Exception) { throw; }
+            BaseDataDirectory = Path.Combine(solLocation, "Inventory");
+            InitializeDatabaseConnection();
         }
 
         /***************************** CREATE Data ****************************/
@@ -60,44 +52,36 @@ namespace Uranus.Inventory
         public bool SetStockUpdateTimes(List<NAVStock> stock)
         {
             var dateTime = DateTime.Now;
-            try
+            // Convert stock to list of BCUpdate items.
+            var distinctStockByZone = stock.GroupBy(s => s.ZoneID).Select(g => g.First()).ToList();
+            List<BinContentsUpdate> contentsUpdates = new();
+            foreach (var s in distinctStockByZone)
             {
-                // Convert stock to list of BCUpdate items.
-                var distinctStockByZone = stock.GroupBy(s => s.ZoneID).Select(g => g.First()).ToList();
-                List<BinContentsUpdate> contentsUpdates = new();
-                foreach (var s in distinctStockByZone)
+                contentsUpdates.Add(new()
                 {
-                    contentsUpdates.Add(new()
-                    {
-                        ZoneID = s.ZoneID,
-                        ZoneCode = s.ZoneCode,
-                        LocationCode = s.LocationCode,
-                        LastUpdate = dateTime
-                    });
-                }
-
-                // Update Database
-                _ = UpdateTable(contentsUpdates);
-
-                return true;
+                    ZoneID = s.ZoneID,
+                    ZoneCode = s.ZoneCode,
+                    LocationCode = s.LocationCode,
+                    LastUpdate = dateTime
+                });
             }
-            catch (Exception) { throw; }
+
+            // Update Database
+            _ = UpdateTable(contentsUpdates);
+
+            return true;
         }
 
         public bool SetTableUpdateTime(Type type, DateTime dateTime = new())
         {
             if (dateTime == new DateTime()) dateTime = DateTime.Now;
-            try
+            TableUpdate update = new()
             {
-                TableUpdate update = new()
-                {
-                    TableName = Database.GetMapping(type).TableName,
-                    LastUpdate = dateTime
-                };
-                _ = Database.InsertOrReplace(update);
-                return true;
-            }
-            catch (Exception) { throw; }
+                TableName = Database.GetMapping(type).TableName,
+                LastUpdate = dateTime
+            };
+            _ = Database.InsertOrReplace(update);
+            return true;
         }
 
         /***************************** READ Data ******************************/
@@ -109,35 +93,27 @@ namespace Uranus.Inventory
         // Used by more than just deleter.
         public void StockZoneDeletes(List<string> zoneIDs)
         {
-            try
+            Database.RunInTransaction(() =>
             {
-                Database.RunInTransaction(() =>
+                foreach (var zoneID in zoneIDs)
                 {
-                    foreach (var zoneID in zoneIDs)
-                    {
-                        var tableName = GetTableName(typeof(NAVStock));
-                        _ = Database.Execute($"DELETE FROM [{tableName}] WHERE [ZoneID]=?;", zoneID);
-                    }
-                });
-            }
-            catch (Exception) { throw; }
+                    var tableName = GetTableName(typeof(NAVStock));
+                    _ = Database.Execute($"DELETE FROM [{tableName}] WHERE [ZoneID]=?;", zoneID);
+                }
+            });
         }
 
         /* UOM */
         public void UoMCodeDelete(List<string> uomCodes)
         {
-            try
+            Database.RunInTransaction(() =>
             {
-                Database.RunInTransaction(() =>
+                foreach (var uom in uomCodes)
                 {
-                    foreach (var uom in uomCodes)
-                    {
-                        var tableName = GetTableName(typeof(NAVUoM));
-                        _ = Database.Execute($"DELETE FROM [{tableName}] WHERE [Code]=?;", uom);
-                    }
-                });
-            }
-            catch (Exception) { throw; }
+                    var tableName = GetTableName(typeof(NAVUoM));
+                    _ = Database.Execute($"DELETE FROM [{tableName}] WHERE [Code]=?;", uom);
+                }
+            });
         }
     }
 }

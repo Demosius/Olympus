@@ -1,14 +1,12 @@
-﻿using System.Windows;
-using System.Threading;
-using System.Globalization;
+﻿using System.Threading;
 using Olympus.Properties;
 
-namespace Olympus
+namespace Olympus.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         public MainWindow()
         {

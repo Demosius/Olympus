@@ -6,7 +6,7 @@ namespace Olympus.View
     /// <summary>
     /// Interaction logic for AlphaRegistrationWindow.xaml
     /// </summary>
-    public partial class AlphaRegistrationWindow : Window
+    public partial class AlphaRegistrationWindow
     {
         public AlphaRegistrationWindow()
         {
@@ -18,7 +18,7 @@ namespace Olympus.View
             if (VM != null) { VM.Password = ((PasswordBox)sender).Password; }
         }
 
-        private void PasswordBox_CnfrmPasswordChanged(object sender, RoutedEventArgs e)
+        private void PasswordBox_ConfirmPasswordChanged(object sender, RoutedEventArgs e)
         {
             if (VM != null) { VM.ConfirmPassword = ((PasswordBox)sender).Password; }
         }

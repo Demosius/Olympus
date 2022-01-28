@@ -21,8 +21,7 @@ namespace Olympus.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            var dbLocation = (parameter ?? "null") as string;
-            return App.Charon.CanCopyDatabase() || dbLocation.ToLower() == "local";
+            return (parameter ?? "null") is string dbLocation && (App.Charon.CanCopyDatabase() || dbLocation.ToLower() == "local");
         }
 
         public void Execute(object parameter)
