@@ -28,6 +28,7 @@ namespace Uranus.Staff.Model
         public string DepartmentName { get; set; }
         [ForeignKey(typeof(Role))]
         public string RoleName { get; set; }    // Also known as Job Classification.
+        [ForeignKey(typeof(Employee))]
         public int ReportsToID { get; set; }    // Specific Employee this employee reports to, bypassing Role and RoleReports.
         public string PayPoint { get; set; }
         public EEmploymentType EmploymentType { get; set; }
@@ -43,6 +44,8 @@ namespace Uranus.Staff.Model
         public Department Department { get; set; }
         [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Role Role { get; set; }
+        [ManyToOne("ReportsToID", "Reports", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public Employee ReportsTo { get; set; }
 
         [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Locker Locker { get; set; }
@@ -51,7 +54,7 @@ namespace Uranus.Staff.Model
         [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public EmployeeIcon Icon { get; set; }
 
-        [ManyToMany(typeof(EmployeeVehicle), "VehicleRego" , "Owners" , CascadeOperations = CascadeOperation.All)]
+        [ManyToMany(typeof(EmployeeVehicle), "VehicleRego", "Owners", CascadeOperations = CascadeOperation.All)]
         public List<Vehicle> Vehicles { get; set; }
         [ManyToMany(typeof(EmployeeShift), "ShiftName", "Employees", CascadeOperations = CascadeOperation.All)]
         public List<Shift> Shifts { get; set; }
@@ -64,12 +67,23 @@ namespace Uranus.Staff.Model
         public List<EmployeeInductionReference> InductionReferences { get; set; }
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<ShiftRule> Rules { get; set; }
+        [OneToMany("ReportsToID", "ReportsTo", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<Employee> Reports { get; set; }
+        [OneToMany("EmployeeID", "Employee", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<ShiftEntry> ShiftEntries { get; set; }
+
+        [Ignore] public string FullName => $"{FirstName} {LastName}";
 
         public Employee() { }
 
         public Employee(int id)
         {
             ID = id;
+        }
+
+        public override string ToString()
+        {
+            return $"{FirstName} {LastName}";
         }
 
         public override bool Equals(object obj) => Equals(obj as Employee);

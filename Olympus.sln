@@ -9,17 +9,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Uranus", "Uranus\Uranus.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Styx", "Styx\Styx.csproj", "{3399630F-31DF-4E9D-B2DF-2D37D6382571}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Khaos", "Khaos\Khaos.csproj", "{0EA467BE-9751-4BCB-B87D-A923B26E67AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Khaos", "Khaos\Khaos.csproj", "{0EA467BE-9751-4BCB-B87D-A923B26E67AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phoenix", "Phoenix\Phoenix.csproj", "{FB241CE8-9AD2-4C25-ADC6-C8655AB9B6E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Phoenix", "Phoenix\Phoenix.csproj", "{FB241CE8-9AD2-4C25-ADC6-C8655AB9B6E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pantheon", "Pantheon\Pantheon.csproj", "{A9E92F45-D423-4CB4-B1D3-3122E86FA89B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pantheon", "Pantheon\Pantheon.csproj", "{A9E92F45-D423-4CB4-B1D3-3122E86FA89B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prometheus", "Prometheus\Prometheus.csproj", "{64C6AB66-71C7-4052-A227-68EC9322487E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prometheus", "Prometheus\Prometheus.csproj", "{64C6AB66-71C7-4052-A227-68EC9322487E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vulcan", "Vulcan\Vulcan.csproj", "{76E00E8D-B46E-4582-9658-3D9D6E603DAC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vulcan", "Vulcan\Vulcan.csproj", "{76E00E8D-B46E-4582-9658-3D9D6E603DAC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aion", "..\Aion\Aion\Aion.csproj", "{3352EDA7-9062-453B-9640-1F50D65A0616}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AionClock", "..\Aion\AionClock\AionClock.csproj", "{2DFADCA4-D9AE-4BAF-B50C-E8C3D32EB4C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,6 +84,12 @@ Global
 		{3352EDA7-9062-453B-9640-1F50D65A0616}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3352EDA7-9062-453B-9640-1F50D65A0616}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3352EDA7-9062-453B-9640-1F50D65A0616}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DFADCA4-D9AE-4BAF-B50C-E8C3D32EB4C1}.ClockDebug|Any CPU.ActiveCfg = ClockDebug|Any CPU
+		{2DFADCA4-D9AE-4BAF-B50C-E8C3D32EB4C1}.ClockDebug|Any CPU.Build.0 = ClockDebug|Any CPU
+		{2DFADCA4-D9AE-4BAF-B50C-E8C3D32EB4C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DFADCA4-D9AE-4BAF-B50C-E8C3D32EB4C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DFADCA4-D9AE-4BAF-B50C-E8C3D32EB4C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DFADCA4-D9AE-4BAF-B50C-E8C3D32EB4C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

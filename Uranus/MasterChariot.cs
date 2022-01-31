@@ -149,6 +149,12 @@ namespace Uranus
             return true;
         }
 
+        public bool InsertOrUpdate<T>(T item)
+        {
+            _ = Database.InsertOrReplace(item);
+            return true;
+        }
+
         /**************************** DELETE Data ****************************/
         public bool EmptyTable<T>()
         {

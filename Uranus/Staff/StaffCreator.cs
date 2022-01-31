@@ -1,6 +1,8 @@
-﻿using Uranus.Staff.Model;
+﻿using System;
+using Uranus.Staff.Model;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Uranus.Staff
 {
@@ -14,6 +16,40 @@ namespace Uranus.Staff
         }
 
         public bool Employee(Employee employee, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(employee, pushType);
+
+        public bool ClockEvent(ClockEvent clockEvent) => Chariot.Create(clockEvent);
+
+        public bool SetShiftEntry(DateTime date, Employee employee)
+        {
+            var returnVal = false;
+            Chariot.Database.RunInTransaction(() =>
+            {
+                // Get suitable clock events.
+                var clocks = Chariot.Database.Query<ClockEvent>(
+                    "SELECT * FROM ClockEvent WHERE Date = ? AND EmployeeID = ? AND Status <> ?;",
+                    date.ToString("yyyy-MM-dd"), employee.ID, EClockStatus.Deleted);
+
+                if (!clocks.Any()) return;
+
+                // Get existing entry - if it exists.
+                var entryList = Chariot.Database.Query<ShiftEntry>(
+                    "SELECT * FROM ShiftEntry WHERE Date = ? AND EmployeeID = ?;",
+                    date.ToString("yyyy-MM-dd"), employee.ID);
+
+                var entry = entryList.Any() ? entryList.First() : new(employee, date);
+
+                entry.ApplyClockTimes(clocks);
+
+                foreach (var clockEvent in clocks)
+                {
+                    Chariot.InsertOrUpdate(clockEvent);
+                }
+
+                returnVal = Chariot.InsertOrUpdate(entry);
+            });
+
+            return returnVal;
+        }
 
         public bool Department(Department department, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(department, pushType);
 
@@ -42,5 +78,6 @@ namespace Uranus.Staff
                 }
             }
         }
+        
     }
 }

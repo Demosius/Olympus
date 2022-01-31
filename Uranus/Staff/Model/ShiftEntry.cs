@@ -19,21 +19,16 @@ namespace Uranus.Staff.Model
     /// </summary>
     public class ShiftEntry : INotifyPropertyChanged
     {
-        // Fields for event properties.
-        private string location;
-        private ClockEvent startShiftClock;
-        private ClockEvent startLunchClock;
-        private ClockEvent endLunchClock;
-        private ClockEvent endShiftClock;
-        private EShiftType shiftType;
-        private string timeTotal;
-        private double hoursWorked;
-        private string comments;
+        [PrimaryKey] public Guid ID { get; set; }
+        [ForeignKey(typeof(Employee))] public int EmployeeID { get; set; }
+        [ForeignKey(typeof(Shift))] public string ShiftName { get; set; }
 
-        [PrimaryKey]
-        public Guid ID { get; }
-        [ForeignKey(typeof(Employee))]
-        public int EmployeeCode { get; set; }
+        public string ShiftStartTime { get; set; }
+        public string ShiftEndTime { get; set; }
+        public string LunchStartTime { get; set; }
+        public string LunchEndTime { get; set; }
+
+        private string location;
         public string Location
         {
             get => location;
@@ -43,16 +38,12 @@ namespace Uranus.Staff.Model
                 OnPropertyChanged(nameof(Location));
             }
         }
+
         public string Date { get; set; }
+
         public string Day { get; set; }
-        [ForeignKey(typeof(ClockEvent))]
-        public Guid StartShiftClockID { get; set; }
-        [ForeignKey(typeof(ClockEvent))]
-        public Guid StartLunchClockID { get; set; }
-        [ForeignKey(typeof(ClockEvent))]
-        public Guid EndLunchClockID { get; set; }
-        [ForeignKey(typeof(ClockEvent))]
-        public Guid EndShiftClockID { get; set; }
+
+        private EShiftType shiftType;
         public EShiftType ShiftType
         {
             get => shiftType;
@@ -62,6 +53,8 @@ namespace Uranus.Staff.Model
                 OnPropertyChanged(nameof(ShiftType));
             }
         }
+
+        private string timeTotal;
         public string TimeTotal
         {
             get => timeTotal;
@@ -71,6 +64,8 @@ namespace Uranus.Staff.Model
                 OnPropertyChanged(nameof(TimeTotal));
             }
         }
+
+        private double hoursWorked;
         public double HoursWorked
         {
             get => hoursWorked;
@@ -80,6 +75,8 @@ namespace Uranus.Staff.Model
                 OnPropertyChanged(nameof(HoursWorked));
             }
         }
+
+        private string comments;
         public string Comments
         {
             get => comments;
@@ -90,286 +87,114 @@ namespace Uranus.Staff.Model
             }
         }
 
-        [ManyToOne]
+        [ManyToOne("EmployeeID","ShiftEntries", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public Employee Employee { get; set; }
-        [OneToOne(foreignKey: nameof(StartShiftClockID))]
-        public ClockEvent StartShiftClock
-        {
-            get => startShiftClock;
-            set
-            {
-                StartShiftClockID = SetClock(ref startShiftClock, value);
-                OnPropertyChanged(nameof(StartShiftClock));
-            }
-        }
-        [OneToOne(foreignKey: nameof(StartLunchClockID))]
-        public ClockEvent StartLunchClock
-        {
-            get => startLunchClock;
-            set
-            {
-                StartLunchClockID = SetClock(ref startLunchClock, value);
-                OnPropertyChanged(nameof(StartLunchClock));
-            }
-        }
-        [OneToOne(foreignKey: nameof(EndLunchClockID))]
-        public ClockEvent EndLunchClock
-        {
-            get => endLunchClock;
-            set
-            {
-                EndLunchClockID = SetClock(ref endLunchClock, value);
-                OnPropertyChanged(nameof(EndLunchClock));
-            }
-        }
-        [OneToOne(foreignKey: nameof(EndShiftClockID))]
-        public ClockEvent EndShiftClock
-        {
-            get => endShiftClock;
-            set
-            {
-                EndShiftClockID = SetClock(ref endShiftClock, value);
-                OnPropertyChanged(nameof(EndShiftClock));
-            }
-        }
 
         [Ignore]
-        public List<ClockEvent> AdditionalClocks { get; set; }
+        public List<ClockEvent> ClockEvents { get; set; }
 
         public ShiftEntry() { }
 
         public ShiftEntry(Employee employee, List<ClockEvent> clockTimes)
         {
             ID = Guid.NewGuid();
-            EmployeeCode = employee.ID;
+            EmployeeID = employee.ID;
             Location = employee.Location;
             var d = clockTimes[0].DtDate;
             Date = d.ToString("yyyy-MM-dd");
             Day = d.ToString("dddd");
 
-            AssignClockEvents(clockTimes);
+            ApplyClockTimes(clockTimes);
             SummarizeShift();
         }
 
         public ShiftEntry(Employee employee, DateTime date)
         {
             ID = Guid.NewGuid();
-            EmployeeCode = employee.ID;
+            EmployeeID = employee.ID;
             Location = employee.Location;
             Date = date.ToString("yyyy-MM-dd");
             Day = date.ToString("dddd");
         }
 
-        // ReSharper disable once RedundantAssignment
-        private static Guid SetClock(ref ClockEvent clock, ClockEvent newClockValue)
-        {
-            clock = newClockValue;
-            if (clock is null)
-                return Guid.NewGuid();
-            clock.Status = EClockStatus.Approved;
-            return clock.ID;
-        }
-
         /// <summary>
-        /// Pulls a list of all the clocks, including rejected(additional) clocks and the approved clocks.
+        /// Sets the times based on the current clock events.
+        /// (Start/End Shift/Lunch)
         /// </summary>
-        /// <returns></returns>
-        public List<ClockEvent> GetClocks()
+        public void ApplyClockTimes()
         {
-            var returnVal = AdditionalClocks ?? new();
-
-            if (StartShiftClock is not null) { returnVal.Add(StartShiftClock); }
-            if (StartLunchClock is not null) { returnVal.Add(StartLunchClock); }
-            if (EndLunchClock is not null) { returnVal.Add(EndLunchClock); }
-            if (EndShiftClock is not null) { returnVal.Add(EndShiftClock); }
-
-            return returnVal;
+            ApplyClockTimes(ClockEvents);
         }
 
         /// <summary>
-        /// Auto assign clock times to specific events.
+        /// Sets the times based on the given clock events.
         /// (Start/End Shift/Lunch)
         /// </summary>
         /// <param name="clockTimes"></param>
-        private void AssignClockEvents(List<ClockEvent> clockTimes)
+        public void ApplyClockTimes(List<ClockEvent> clockTimes)
         {
             // Make sure we grab the most relevant clocks first, if there is not a full count.
             clockTimes = clockTimes.OrderBy(c => c.Timestamp).ToList();
             if (clockTimes.Count > 0)
             {
-                StartShiftClock = clockTimes[0];
-                StartShiftClockID = StartShiftClock.ID;
-                StartShiftClock.Status = EClockStatus.Approved;
+                ShiftStartTime = clockTimes[0].Time;
+                clockTimes[0].Status = EClockStatus.Approved;
             }
             if (clockTimes.Count > 1)
             {
-                EndShiftClock = clockTimes.Last();
-                EndShiftClockID = EndShiftClock.ID;
-                EndShiftClock.Status = EClockStatus.Approved;
+                ShiftEndTime = clockTimes.Last().Time;
+                clockTimes.Last().Status = EClockStatus.Approved;
             }
             if (clockTimes.Count > 2)
             {
-                StartLunchClock = clockTimes[1];
-                StartLunchClockID = StartLunchClock.ID;
-                StartLunchClock.Status = EClockStatus.Approved;
+                LunchStartTime = clockTimes[1].Time;
+                clockTimes[1].Status = EClockStatus.Approved;
             }
             if (clockTimes.Count > 3)
             {
-                EndLunchClock = clockTimes[2];
-                EndLunchClockID = EndLunchClock.ID;
-                EndLunchClock.Status = EClockStatus.Approved;
+                LunchEndTime = clockTimes[2].Time;
+                clockTimes[2].Status = EClockStatus.Approved;
             }
 
             // Reject additional times - which should be all except the last one, and the first 3.
-            if (clockTimes.Count > 4)
+            if (clockTimes.Count <= 4) return;
+            
+            ClockEvents = clockTimes.Skip(3).Take(clockTimes.Count - 4).ToList();
+            foreach (var clock in ClockEvents)
             {
-                AdditionalClocks = clockTimes.Skip(3).Take(clockTimes.Count - 4).ToList();
-                foreach (var clock in AdditionalClocks)
-                {
-                    clock.Status = EClockStatus.Rejected;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Clear the specific clocks from properties, and returns them as a loose list.
-        /// </summary>
-        /// <returns>List of Clocks that were previously assigned.</returns>
-        private List<ClockEvent> ClearClocks()
-        {
-            List<ClockEvent> clocks = new();
-            if (StartShiftClock != null)
-            {
-                clocks.Add(StartShiftClock);
-                StartShiftClock.Status = EClockStatus.Pending;
-                StartShiftClock = null;
-            }
-            if (StartLunchClock != null)
-            {
-                clocks.Add(StartLunchClock);
-                StartLunchClock.Status = EClockStatus.Pending;
-                StartLunchClock = null;
-            }
-            if (EndLunchClock != null)
-            {
-                clocks.Add(EndLunchClock);
-                EndLunchClock.Status = EClockStatus.Pending;
-                EndLunchClock = null;
-            }
-            if (EndShiftClock != null)
-            {
-                clocks.Add(EndShiftClock);
-                EndShiftClock.Status = EClockStatus.Pending;
-                EndShiftClock = null;
-            }
-            StartShiftClockID = Guid.Empty;
-            StartLunchClockID = Guid.Empty;
-            EndLunchClockID = Guid.Empty;
-            EndShiftClockID = Guid.Empty;
-
-            return clocks;
-        }
-
-        /// <summary>
-        /// Assuming the entry has no clock objects assigned
-        /// </summary>
-        /// <param name="clocks"></param>
-        public void ApplyClocks(Dictionary<Guid, ClockEvent> clocks)
-        {
-            if (clocks.TryGetValue(StartShiftClockID, out var clock))
-            {
-                clock.Status = EClockStatus.Approved;
-                StartShiftClock = clock;
-                clocks.Remove(StartShiftClockID);
+                clock.Status = EClockStatus.Rejected;
             }
 
-            if (clocks.TryGetValue(StartLunchClockID, out clock))
-            {
-                clock.Status = EClockStatus.Approved;
-                StartLunchClock = clock;
-                clocks.Remove(StartLunchClockID);
-            }
-
-            if (clocks.TryGetValue(EndLunchClockID, out clock))
-            {
-                clock.Status = EClockStatus.Approved;
-                EndLunchClock = clock;
-                clocks.Remove(EndLunchClockID);
-            }
-
-            if (clocks.TryGetValue(EndShiftClockID, out clock))
-            {
-                clock.Status = EClockStatus.Approved;
-                EndShiftClock = clock;
-                clocks.Remove(EndShiftClockID);
-            }
-
-            AdditionalClocks = new();
-            foreach (var c in clocks.Values)
-            {
-                c.Status = EClockStatus.Rejected;
-                AdditionalClocks.Add(c);
-            }
-        }
-
-        public void AddClockEvents(List<ClockEvent> newClocks)
-        {
-            if (newClocks.Count == 0) return;
-            var clocks = ClearClocks().Concat(newClocks).ToList();
-            AssignClockEvents(clocks);
             SummarizeShift();
         }
-
+        
         /// <summary>
-        /// Given the shift clock times, summarizes the total shift and break times, and shift type.
+        /// Given the shift times, summarizes the total shift and break times, and shift type.
         /// </summary>
         public void SummarizeShift()
         {
-            // Can't be summarized if there is not at least 2 clocks.
-            if (StartShiftClock is null || EndShiftClock is null) return;
-            if (StartShiftClock.DtTime < new TimeSpan(6, 50, 0))  // Use 650 as those set to start at 700 will clock in up to 10 minutes before their shift.
+            // Can't be summarized if there is not at least 2 applied times.
+            if (ShiftStartTime is null or "" || ShiftEndTime is null or "") return;
+            
+            if (DateTime.Parse(ShiftStartTime).TimeOfDay < new TimeSpan(6, 50, 0))  // Use 650 as those set to start at 700 will clock in up to 10 minutes before their shift.
                 ShiftType = EShiftType.M;
-            else if (EndShiftClock.DtTime > new TimeSpan(18, 0, 0))
+            else if (DateTime.Parse(ShiftEndTime).TimeOfDay > new TimeSpan(18, 0, 0))
                 ShiftType = EShiftType.A;
             else
                 ShiftType = EShiftType.D;
 
             // Shift lunch break is set to 30 min for afternoon shift, otherwise is 40 minutes. 
             // Regardless of actual clocks - but only apply if start lunch is not null.
-            var workSpan = EndShiftClock.DtTime.Subtract(StartShiftClock.DtTime);
+            var workSpan = DateTime.Parse(ShiftEndTime).TimeOfDay.Subtract(DateTime.Parse(ShiftStartTime).TimeOfDay);
 
             // Only subtract lunch break if shift is over 3 hours, and there is at least a initial lunch clock.
-            if (StartLunchClock != null && workSpan > new TimeSpan(3, 0, 0))
+            if (LunchStartTime is not null and not "" && workSpan > new TimeSpan(3, 0, 0))
                 workSpan = workSpan.Subtract(new(0, ShiftType == EShiftType.A ? 30 : 40, 0));
 
             TimeTotal = new DateTime(workSpan.Ticks).ToString("HH:mm");
             HoursWorked = workSpan.TotalHours;
         }
-
-        public void SetStartShiftClock(ClockEvent newStart)
-        {
-            StartShiftClock = newStart;
-            StartShiftClockID = newStart.ID;
-        }
-
-        public void SetStartLunchClock(ClockEvent newStart)
-        {
-            StartLunchClock = newStart;
-            StartLunchClockID = newStart.ID;
-        }
-
-        public void SetEndLunchClock(ClockEvent newEnd)
-        {
-            EndLunchClock = newEnd;
-            EndLunchClockID = newEnd.ID;
-        }
-
-        public void SetEndShiftClock(ClockEvent newEnd)
-        {
-            EndShiftClock = newEnd;
-            EndShiftClockID = newEnd.ID;
-        }
-
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnPropertyChanged(string propertyName)
@@ -379,7 +204,7 @@ namespace Uranus.Staff.Model
 
         public override string ToString()
         {
-            return $"{EmployeeCode} - {Employee?.FirstName} {Employee?.LastName}: {Day} {Date}";
+            return $"{EmployeeID} - {Employee?.FirstName} {Employee?.LastName}: {Day} {Date}";
         }
 
 
@@ -423,12 +248,7 @@ namespace Uranus.Staff.Model
             {
                 return false;
             }
-            if (rh is null)
-            {
-                return false;
-            }
-
-            return lh.Equals(rh);
+            return rh is not null && lh.Equals(rh);
         }
 
         public static bool operator !=(ShiftEntry lh, ShiftEntry rh)
@@ -476,6 +296,7 @@ namespace Uranus.Staff.Model
 
         public static bool operator >=(ShiftEntry lh, ShiftEntry rh) => lh == rh || lh > rh;
 
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
         public override int GetHashCode() => ID.GetHashCode();
     }
 

@@ -12,9 +12,9 @@ namespace Uranus.Inventory
     /// </summary>
     public sealed class InventoryChariot : MasterChariot
     {
-        public override string DatabaseName { get; } = "Inventory.sqlite";
+        public override string DatabaseName => "Inventory.sqlite";
 
-        public override Type[] Tables { get; } = new Type[] 
+        public override Type[] Tables { get; } = 
         {
             typeof(Batch), typeof(Bay), typeof(BayZone), typeof(BinContentsUpdate),
             typeof(BinExtension), typeof(Move), typeof(NAVBin), typeof(NAVCategory),

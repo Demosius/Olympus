@@ -1,8 +1,4 @@
-﻿using System;
-using SQLite;
-using SQLiteNetExtensions.Attributes;
-
-namespace Uranus.Staff.Model
+﻿namespace Uranus.Staff.Model
 {
     public class DepartmentProject
     {

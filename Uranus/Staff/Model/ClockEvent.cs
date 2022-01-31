@@ -21,9 +21,9 @@ namespace Uranus.Staff.Model
     public class ClockEvent : IEquatable<ClockEvent>, INotifyPropertyChanged
     {
         [PrimaryKey]
-        public Guid ID { get; }
+        public Guid ID { get; set; }
         [ForeignKey(typeof(Employee))]
-        public int EmployeeCode { get; set; }
+        public int EmployeeID { get; set; }
         public string Timestamp { get; set; }
 
         private string date;
@@ -178,6 +178,7 @@ namespace Uranus.Staff.Model
 
         public static bool operator >=(ClockEvent lh, ClockEvent rh) => lh == rh || lh > rh;
 
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
         public override int GetHashCode() => ID.GetHashCode();
         
         // Property changed event handling.

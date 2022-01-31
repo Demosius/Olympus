@@ -6,9 +6,9 @@ namespace Uranus.Equipment
 {
     public sealed class EquipmentChariot : MasterChariot
     {
-        public override string DatabaseName { get; } = "Equipment.sqlite";
+        public override string DatabaseName => "Equipment.sqlite";
 
-        public override Type[] Tables { get; } = new Type[] 
+        public override Type[] Tables { get; } =
         {
             typeof(Checklist), typeof(CompletedChecklist), typeof(MachineType), typeof(Machine)
         };
