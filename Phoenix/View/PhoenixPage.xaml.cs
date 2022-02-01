@@ -17,7 +17,7 @@ namespace Phoenix.View
 
         public EProject Project => EProject.Phoenix;
 
-        public bool RequiresUser => false;
+        public static bool RequiresUser => false;
 
         public void RefreshData()
         {

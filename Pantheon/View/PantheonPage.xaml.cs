@@ -17,7 +17,7 @@ namespace Pantheon.View
 
         public EProject Project => EProject.Pantheon;
 
-        public bool RequiresUser => true;
+        public static bool RequiresUser => true;
 
         public void RefreshData()
         {

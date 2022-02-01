@@ -1,17 +1,9 @@
-﻿using System;
-using Phoenix.View;
-using Uranus.Staff;
-using Pantheon.View;
-using Prometheus.View;
-using Vulcan.View;
+﻿using Uranus.Staff;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Khaos.View;
 using Olympus.ViewModel.Components;
-using Olympus.Model;
 using Olympus.ViewModel.Commands;
 using System.IO;
 using ServiceStack.Text;
@@ -19,33 +11,25 @@ using SQLite;
 using System.Windows;
 using Uranus.Staff.Model;
 using Uranus;
-using Aion.View;
 using Olympus.ViewModel.Utility;
 using Olympus.Properties;
+using Uranus.Inventory.Model;
 
 namespace Olympus.ViewModel
 {
 
     public class OlympusVM : INotifyPropertyChanged
     {
-        public PrometheusPage Prometheus { get; set; }
-        public PantheonPage Pantheon { get; set; }
-        public VulcanPage Vulcan { get; set; }
-        public PhoenixPage Phoenix { get; set; }
-        public KhaosPage Khaos { get; set; }
-        public AionPage Aion { get; set; }
+        public Dictionary<EProject, IProject> RunningProjects { get; set; }
 
-        public EProject CurrentProject { get; set; }
-
-        private Page currentPage;
-        public Page CurrentPage
+        private IProject currentProject;
+        public IProject CurrentProject
         {
-            get => currentPage;
+            get => currentProject;
             set
             {
-                currentPage = value;
-                if (value is not null) CurrentProject = ((IProject) value).Project;
-                OnPropertyChanged(nameof(CurrentPage));
+                currentProject = value;
+                OnPropertyChanged(nameof(CurrentProject));
             }
         }
 
@@ -61,6 +45,8 @@ namespace Olympus.ViewModel
         /* Constructor(s) */
         public OlympusVM()
         {
+            RunningProjects = new();
+
             EstablishInitialProjectIcons();
 
             DBManager = new(this);
@@ -93,12 +79,10 @@ namespace Olympus.ViewModel
 
         internal void RefreshData()
         {
-            Prometheus?.RefreshData();
-            Pantheon?.RefreshData();
-            Vulcan?.RefreshData();
-            Aion?.RefreshData();
-            Phoenix?.RefreshData();
-            Khaos?.RefreshData();
+            foreach (var project in RunningProjects)
+            {
+                project.Value.RefreshData();
+            }
         }
 
         internal void ResetDB()
@@ -115,119 +99,32 @@ namespace Olympus.ViewModel
             OnPropertyChanged(nameof(ProjectLauncherVM));
             OnPropertyChanged(nameof(InventoryUpdaterVM));
 
-            Prometheus = null;
-            Pantheon = null;
-            Vulcan = null;
-            Aion = null;
-            Phoenix = null;
-            Khaos = null;
+            CurrentProject = null;
+            RunningProjects = new();
         }
 
         /* Projects */
         public void LoadProject(EProject project)
         {
-            switch (project)
+            if (!RunningProjects.TryGetValue(project, out var loadedProject))
             {
-                case EProject.Vulcan:
-                    LoadVulcan();
-                    break;
-                case EProject.Prometheus:
-                    LoadPrometheus();
-                    break;
-                case EProject.Pantheon:
-                    LoadPantheon();
-                    break;
-                case EProject.Phoenix:
-                    LoadTorch();
-                    break;
-                case EProject.Khaos:
-                    LoadKhaos();
-                    break;
-                case EProject.Aion:
-                    LoadAion();
-                    break;
-                case EProject.None:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(project), project, null);
+                loadedProject = ProjectFactory.GetProject(project);
+                RunningProjects.Add(project, loadedProject);
             }
+            SetPage(loadedProject);
         }
-
-        private void LoadAion()
-        {
-            Aion ??= new();
-            SetPage(Aion);
-        }
-
-        private void LoadPrometheus()
-        {
-            Prometheus ??= new();
-            SetPage(Prometheus);
-        }
-
-        private void LoadPantheon()
-        {
-            Pantheon ??= new();
-            SetPage(Pantheon);
-        }
-
-        private void LoadVulcan()
-        {
-            Vulcan ??= new();
-            SetPage(Vulcan);
-        }
-
-        private void LoadTorch()
-        {
-            Phoenix ??= new();
-            SetPage(Phoenix);
-        }
-
-        private void LoadKhaos()
-        {
-            Khaos ??= new();
-            SetPage(Khaos);
-        }
-
+        
         private void SetPage(IProject project)
         {
-            var page = project as Page;
-            if (CurrentPage is null)
-                CurrentPage = page;
-            else if (CurrentPage.NavigationService != null) 
-                _ = CurrentPage.NavigationService.Navigate(page);
+            CurrentProject = project;
+            
+            var navigationService = ((Page) CurrentProject).NavigationService;
+            if (navigationService != null)
+                _ = navigationService.Navigate((Page) project);
+            
         }
 
-        public static List<SkuMaster> GetMasters()
-        {
-            // TODO: Change to run all DB actions in a single transaction.
-            // Set tasks to pull data from db.
-            var getItemsTask = Task.Run(() => App.Helios.InventoryReader.NAVItems());
-            var getStockTask = Task.Run(() => App.Helios.InventoryReader.NAVAllStock()
-                .GroupBy(s => s.ItemNumber)
-                .ToDictionary(g => g.Key, g => g.ToList()));
-            var getUoMTask = Task.Run(() => App.Helios.InventoryReader.NAVUoMs()
-                .GroupBy(u => u.ItemNumber)
-                .ToDictionary(g => g.Key, g => g.ToDictionary(u => u.Code, u => u)));
-            var getBinsTask = Task.Run(() => App.Helios.InventoryReader.NAVBins().ToDictionary(b => b.ID, b => b));
-            var getDivsTask = Task.Run(() => App.Helios.InventoryReader.NAVDivisions().ToDictionary(d => d.Code, d => d.Description));
-            var getCatsTask = Task.Run(() => App.Helios.InventoryReader.NAVCategories().ToDictionary(c => c.Code, c => c.Description));
-            var getPFsTask = Task.Run(() => App.Helios.InventoryReader.NAVPlatforms().ToDictionary(p => p.Code, p => p.Description));
-            var getGensTask = Task.Run(() => App.Helios.InventoryReader.NAVGenres().ToDictionary(g => g.Code, g => g.Description));
-            // Wait for tasks to complete.
-            Task.WaitAll(getBinsTask, getCatsTask, getDivsTask, getGensTask, getItemsTask, getPFsTask, getStockTask, getUoMTask);
-            // Assign results to data lists/dict.
-            var navItems = getItemsTask.Result;
-            var stock = getStockTask.Result;
-            var uomDict = getUoMTask.Result;
-            var bins = getBinsTask.Result;
-            var divisions = getDivsTask.Result;
-            var categories = getCatsTask.Result;
-            var platforms = getPFsTask.Result;
-            var genres = getGensTask.Result;
-            // Generate Sku Master List
-            return navItems.Select(item => new SkuMaster(item, stock, uomDict, bins, divisions, categories, platforms, genres)).ToList();
-        }
+        
 
         private static void EstablishInitialProjectIcons()
         {
@@ -248,7 +145,7 @@ namespace Olympus.ViewModel
 
         public static void GenerateMasterSkuList()
         {
-            var masters = GetMasters();
+            var masters = App.Helios.InventoryReader.GetMasters();
 
             // Make sure the target destination exists.
             var dirPath = Path.Combine(App.BaseDirectory(), "SKUMasterExports");
@@ -258,27 +155,27 @@ namespace Olympus.ViewModel
             var csvTask = Task.Run(() => ExportMasterSkuAsCSV(masters, dirPath));
             var jsonTask = Task.Run(() => ExportMasterSkuAsJSON(masters, dirPath));
             var xmlTask = Task.Run(() => ExportMasterSkuAsXml(masters, dirPath));
-            var sqlTask = Task.Run(() => ExportMasterSkuIntoSqLite(masters, dirPath));
-            Task.WaitAll(csvTask, jsonTask, xmlTask, sqlTask);
+            //var sqlTask = Task.Run(() => ExportMasterSkuIntoSqLite(masters, dirPath));
+            Task.WaitAll(csvTask, jsonTask, xmlTask);//, sqlTask);
 
             _ = MessageBox.Show("Files exported.");
         }
 
-        public static void ExportMasterSkuAsCSV(List<SkuMaster> masters, string dirPath)
+        public static void ExportMasterSkuAsCSV(IEnumerable<SkuMaster> masters, string dirPath)
         {
             var csv = CsvSerializer.SerializeToCsv(masters);
             var filePath = Path.Combine(dirPath, "SKUMasterExport.csv");
             File.WriteAllText(filePath, csv);
         }
 
-        public static void ExportMasterSkuAsJSON(List<SkuMaster> masters, string dirPath)
+        public static void ExportMasterSkuAsJSON(IEnumerable<SkuMaster> masters, string dirPath)
         {
             var json = System.Text.Json.JsonSerializer.Serialize(masters);
             var filePath = Path.Combine(dirPath, "SKUMasterExport.json");
             File.WriteAllText(filePath, json);
         }
 
-        public static void ExportMasterSkuIntoSqLite(List<SkuMaster> masters, string dirPath)
+        public static void ExportMasterSkuIntoSqLite(IEnumerable<SkuMaster> masters, string dirPath)
         {
             var dbPath = Path.Combine(dirPath, "SKUMasterExport.sqlite");
             using SQLiteConnection database = new(dbPath);
@@ -287,7 +184,7 @@ namespace Olympus.ViewModel
             _ = database.InsertAll(masters);
         }
 
-        public static void ExportMasterSkuAsXml(List<SkuMaster> masters, string dirPath)
+        public static void ExportMasterSkuAsXml(IEnumerable<SkuMaster> masters, string dirPath)
         {
             var xml = XmlSerializer.SerializeToString(masters);
             var filePath = Path.Combine(dirPath, "SKUMasterExport.xml");

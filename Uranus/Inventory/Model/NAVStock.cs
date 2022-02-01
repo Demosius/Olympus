@@ -41,7 +41,7 @@ namespace Uranus.Inventory.Model
 
         public int GetBaseQty()
         {
-            return Qty * (UoM ?? new NAVUoM(EUoM.Each)).QtyPerUoM;
+            return Qty * (UoM ?? new NAVUoM(EUoM.EACH)).QtyPerUoM;
         }
 
         public EUoM GetEUoM()

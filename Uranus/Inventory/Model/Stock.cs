@@ -34,9 +34,9 @@ namespace Uranus.Inventory.Model
         
         public Stock()
         {
-            Cases = new(this, EUoM.Case);
-            Packs = new(this, EUoM.Pack);
-            Eaches = new(this, EUoM.Each);
+            Cases = new(this, EUoM.CASE);
+            Packs = new(this, EUoM.PACK);
+            Eaches = new(this, EUoM.EACH);
         }
 
         public Stock(NAVStock navStock) : this()

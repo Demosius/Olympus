@@ -29,14 +29,7 @@ namespace Styx
                 currentUser = value;
             }
         }
-        public Employee UserEmployee
-        {
-            get
-            {
-                if (CurrentUser is null) return null;
-                return CurrentUser.Employee;
-            }
-        }
+        public Employee UserEmployee => CurrentUser?.Employee;
 
         // User manipulations.
         private readonly UserChariot userChariot;
@@ -290,6 +283,9 @@ namespace Styx
         /// <exception cref="PasswordException"></exception>
         private static bool ValidatePassword(string password, string confirmPassword, out string message)
         {
+            if (password == null) throw new ArgumentNullException(nameof(password));
+            if (confirmPassword == null) throw new ArgumentNullException(nameof(confirmPassword));
+
             // Check that password rules are adhered to.
             if (password.Length < 6) throw new("Password is too short.");
 

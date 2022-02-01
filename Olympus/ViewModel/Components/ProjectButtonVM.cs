@@ -1,6 +1,9 @@
-﻿using Uranus.Staff.Model;
+﻿using System.Collections;
+using Uranus.Staff.Model;
 using Olympus.ViewModel.Commands;
 using System.ComponentModel;
+using System.Diagnostics;
+using Uranus;
 
 namespace Olympus.ViewModel.Components
 {
@@ -44,7 +47,7 @@ namespace Olympus.ViewModel.Components
         {
             Project = project;
         }
-
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnPropertyChanged(string propertyName)

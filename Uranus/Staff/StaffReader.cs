@@ -51,7 +51,7 @@ namespace Uranus.Staff
 
             Chariot.Database.RunInTransaction(() =>
             {
-                managerIDs = Chariot.Database.Query<Employee>("SELECT DISTINCT ReportsToCode FROM Employee;").Select(e => e.ReportsToID);
+                managerIDs = Chariot.Database.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID);
                 employees = Chariot.Database.Table<Employee>();
                 locations = Chariot.Database.Query<Employee>("SELECT DISTINCT Location FROM Employee;").Select(e => e.Location);
                 payPoints = Chariot.Database.Query<Employee>("SELECT DISTINCT PayPoint FROM Employee;").Select(e => e.PayPoint);
@@ -67,7 +67,7 @@ namespace Uranus.Staff
             roleList = roles;
         }
 
-        public List<int> GetManagerIDs() => Chariot.Database.Query<Employee>("SELECT DISTINCT ReportsToCode FROM Employee;").Select(e => e.ReportsToID).ToList();
+        public List<int> GetManagerIDs() => Chariot.Database.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID).ToList();
 
         public IEnumerable<string> Locations() => Chariot.Database.Query<Employee>("SELECT DISTINCT Location FROM Employee;").Select(e => e.Location);
 
@@ -113,8 +113,8 @@ namespace Uranus.Staff
             Chariot.Database.RunInTransaction(() =>
             {
                 employees = Employees().ToDictionary(e => e.ID, e => e);
-                entries = Chariot.Database.Query<ShiftEntry>("SELECT DailyEntry.* FROM DailyEntry JOIN Employee E on DailyEntry.EmployeeID = E.Code " +
-                                                             "WHERE E.ReportsToCode = ? AND Date BETWEEN ? AND ?;",
+                entries = Chariot.Database.Query<ShiftEntry>("SELECT ShiftEntry.* FROM ShiftEntry JOIN Employee E on ShiftEntry.EmployeeID = E.ID " +
+                                                             "WHERE E.ReportsToID = ? AND Date BETWEEN ? AND ?;",
                     managerID, startString, endString).ToList();
 
             });
@@ -194,7 +194,7 @@ namespace Uranus.Staff
         public List<Department> Departments(Expression<Func<Department, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
         /* PROJECTS */
-        public List<Project> Projects(Expression<Func<Project, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+        public IEnumerable<Project> Projects(Expression<Func<Project, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType).OrderBy(p => p.Name);
 
     }
 }

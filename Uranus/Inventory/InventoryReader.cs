@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace Uranus.Inventory
 {
@@ -64,14 +65,14 @@ namespace Uranus.Inventory
 
         // ZoneID = <locationCode>:<zoneCode>
         public NAVStock NAVStock(string zoneID, string binCode, int itemNumber, string uomCode, EPullType pullType = EPullType.ObjectOnly) => NAVStock(string.Join(":", zoneID, binCode, itemNumber, uomCode), pullType);
-    
+
         // UoMID = <itemNumber>:<uomCode>
         public NAVStock NAVStock(string locationCode, string zoneCode, string binCode, string uomID, EPullType pullType = EPullType.ObjectOnly) => NAVStock(string.Join(":", locationCode, zoneCode, binCode, uomID), pullType);
 
         public NAVStock NAVStock(string locationCode, string zoneCode, string binCode, int itemNumber, string uomCode, EPullType pullType = EPullType.ObjectOnly) => NAVStock(string.Join(":", locationCode, zoneCode, binCode, itemNumber, uomCode), pullType);
 
         public List<NAVStock> NAVAllStock(Expression<Func<NAVStock, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
-       
+
         public List<NAVStock> NAVItemStock(int itemNumber, EPullType pullType = EPullType.ObjectOnly)
         {
             if (pullType == EPullType.ObjectOnly)
@@ -90,7 +91,7 @@ namespace Uranus.Inventory
 
         /* UOM */
         public NAVUoM NAVUoM(string uomID, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVUoM>(uomID, pullType);
-       
+
         public List<NAVUoM> NAVUoMs(Expression<Func<NAVUoM, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
         public List<NAVUoM> NAVItemUoMs(int itemNumber, EPullType pullType = EPullType.ObjectOnly)
@@ -116,18 +117,18 @@ namespace Uranus.Inventory
         }
 
         /* LOCATION */
-        public NAVLocation NAVLocation(string locationCode, EPullType pullType = EPullType.ObjectOnly)  => Chariot.PullObject<NAVLocation>(locationCode, pullType);
+        public NAVLocation NAVLocation(string locationCode, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVLocation>(locationCode, pullType);
 
         public List<NAVLocation> NAVLocations(Expression<Func<NAVLocation, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
         /* DIVISION */
         public NAVDivision NAVDivision(int divCode, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVDivision>(divCode, pullType);
-        
+
         public List<NAVDivision> NAVDivisions(Expression<Func<NAVDivision, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
         /* CATEGORY */
         public NAVCategory NAVCategory(int catCode, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVCategory>(catCode, pullType);
-        
+
         public List<NAVCategory> NAVCategories(Expression<Func<NAVCategory, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
         /* Platform */
@@ -153,15 +154,66 @@ namespace Uranus.Inventory
         {
             // NAV list of stock updates
             var contentsUpdates = Chariot.Database.Table<BinContentsUpdate>().ToList();
-            
+
             // If one of the zoneIds is not present in list, it isn't present so return new datetime value.
             var existZones = contentsUpdates.Select(bcu => bcu.ZoneID).ToList();
-            
+
             // NAV the min/smallest/oldest update time/s from the list.
-            return zoneIDs.Any(zoneID => !existZones.Contains(zoneID)) 
-                ? new() 
+            return zoneIDs.Any(zoneID => !existZones.Contains(zoneID))
+                ? new()
                 : contentsUpdates.Where(bcu => zoneIDs.Contains(bcu.ZoneID)).ToList().Min()!.LastUpdate;
         }
 
+        public IEnumerable<SkuMaster> GetMasters()
+        {
+            /*
+            // TODO: Change to run all DB actions in a single transaction.
+            // Set tasks to pull data from db.
+            var getItemsTask = Task.Run(() => NAVItems());
+            var getStockTask = Task.Run(() => NAVAllStock()
+                .GroupBy(s => s.ItemNumber)
+                .ToDictionary(g => g.Key, g => g.ToList()));
+            var getUoMTask = Task.Run(() => NAVUoMs()
+                .GroupBy(u => u.ItemNumber)
+                .ToDictionary(g => g.Key, g => g.ToDictionary(u => u.Code, u => u)));
+            var getBinsTask = Task.Run(() => NAVBins().ToDictionary(b => b.ID, b => b));
+            var getDivsTask = Task.Run(() => NAVDivisions().ToDictionary(d => d.Code, d => d.Description));
+            var getCatsTask = Task.Run(() => NAVCategories().ToDictionary(c => c.Code, c => c.Description));
+            var getPFsTask = Task.Run(() => NAVPlatforms().ToDictionary(p => p.Code, p => p.Description));
+            var getGensTask = Task.Run(() => NAVGenres().ToDictionary(g => g.Code, g => g.Description));
+            // Wait for tasks to complete.
+            Task.WaitAll(getBinsTask, getCatsTask, getDivsTask, getGensTask, getItemsTask, getPFsTask, getStockTask, getUoMTask);*/
+            // Assign results to data lists/dict.
+            /*var navItems = getItemsTask.Result;
+            var stock = getStockTask.Result;
+            var uomDict = getUoMTask.Result;
+            var bins = getBinsTask.Result;
+            var divisions = getDivsTask.Result;
+            var categories = getCatsTask.Result;
+            var platforms = getPFsTask.Result;
+            var genres = getGensTask.Result;*/
+
+            IEnumerable<SkuMaster> returnVal = null;
+
+            Chariot.Database.RunInTransaction(() =>
+            {
+                var navItems = NAVItems();
+                var stock = NAVAllStock()
+                    .GroupBy(s => s.ItemNumber)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+                var uomDict = NAVUoMs()
+                    .GroupBy(u => u.ItemNumber)
+                    .ToDictionary(g => g.Key, g => g.ToDictionary(u => u.Code, u => u));
+                var bins = NAVBins().ToDictionary(b => b.ID, b => b);
+                var divisions = NAVDivisions().ToDictionary(d => d.Code, d => d.Description);
+                var categories = NAVCategories().ToDictionary(c => c.Code, c => c.Description);
+                var platforms = NAVPlatforms().ToDictionary(p => p.Code, p => p.Description);
+                var genres = NAVGenres().ToDictionary(g => g.Code, g => g.Description);
+                returnVal = navItems.Select(item => new SkuMaster(item, stock, uomDict, bins, divisions, categories, platforms, genres));
+            });
+
+            return returnVal;
+            // Generate Sku Master List
+        }
     }
 }

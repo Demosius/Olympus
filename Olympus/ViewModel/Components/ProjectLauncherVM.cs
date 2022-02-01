@@ -28,7 +28,7 @@ namespace Olympus.ViewModel.Components
 
         public ProjectLauncherVM()
         {
-            AllProjects = App.Helios.StaffReader.Projects(pullType: EPullType.FullRecursive);
+            AllProjects = App.Helios.StaffReader.Projects(pullType: EPullType.FullRecursive).ToList();
             Departments = App.Helios.StaffReader.Departments(pullType: EPullType.IncludeChildren);
             UserProjects = App.Charon.UserEmployee is null ? new() : App.Charon.UserEmployee.Projects;
 

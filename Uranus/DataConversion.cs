@@ -505,7 +505,7 @@ namespace Uranus
             var headDict = Constants.NAVItemColumns;
             using StreamReader reader = new(File.OpenRead(itemCSVLocation));
             var headArr = reader.ReadLine()?.Trim('"').Split(',', '"');
-            DataConversion.SetHeadPosFromArray(ref headDict, headArr);
+            SetHeadPosFromArray(ref headDict, headArr);
             var line = reader.ReadLine();
 
             while (line != null)

@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using System;
+using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
 
@@ -20,7 +21,7 @@ namespace Uranus.Staff.Model
         public List<Department> Departments { get; set; }
         [ManyToMany(typeof(EmployeeProject), "EmployeeID", "Projects", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<Employee> Employees { get; set; }
-
+        
         public Project() { }
              
         // Create project and projectIcon together.

@@ -4,9 +4,9 @@ namespace Uranus.Inventory
 {
     public enum EUoM
     {
-        Each,
-        Pack,
-        Case
+        EACH,
+        PACK,
+        CASE
     }
 
     public enum EAction
@@ -46,8 +46,8 @@ namespace Uranus.Inventory
         {
             return uom switch
             {
-                EUoM.Case => "CASE",
-                EUoM.Pack => "PACK",
+                EUoM.CASE => "CASE",
+                EUoM.PACK => "PACK",
                 _ => "EACH"
             };
         }
@@ -57,9 +57,9 @@ namespace Uranus.Inventory
             uom = uom.ToUpper();
             return uom switch
             {
-                "CASE" => EUoM.Case,
-                "PACK" => EUoM.Pack,
-                _ => EUoM.Each
+                "CASE" => EUoM.CASE,
+                "PACK" => EUoM.PACK,
+                _ => EUoM.EACH
             };
         }
 

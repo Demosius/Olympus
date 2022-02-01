@@ -8,7 +8,7 @@ namespace Khaos.View
     /// <summary>
     /// Interaction logic for KhaosPage.xaml
     /// </summary>
-    public partial class KhaosPage : Page, IProject
+    public partial class KhaosPage : IProject
     {
         public KhaosPage()
         {
@@ -17,7 +17,7 @@ namespace Khaos.View
 
         public EProject Project => EProject.Khaos;
 
-        public bool RequiresUser => false;
+        public static bool RequiresUser => false;
 
         public void RefreshData()
         {

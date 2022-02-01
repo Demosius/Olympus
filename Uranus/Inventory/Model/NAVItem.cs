@@ -9,7 +9,7 @@ namespace Uranus.Inventory.Model
     public class NAVItem
     {
         [PrimaryKey]
-        public int Number { get; }
+        public int Number { get; set; }
         public string Description { get; set; }
         public string Barcode { get; set; }
         [ForeignKey(typeof(NAVCategory))]
@@ -68,21 +68,21 @@ namespace Uranus.Inventory.Model
                 var e = uom.UoM;
                 switch (e)
                 {
-                    case EUoM.Case:
+                    case EUoM.CASE:
                         Case = uom;
                         break;
-                    case EUoM.Pack:
+                    case EUoM.PACK:
                         Pack = uom;
                         break;
-                    case EUoM.Each:
+                    case EUoM.EACH:
                     default:
                         Each = uom;
                         break;
                 }
             }
-            Case ??= new(this, EUoM.Case);
-            Pack ??= new(this, EUoM.Pack);
-            Each ??= new(this, EUoM.Each);
+            Case ??= new(this, EUoM.CASE);
+            Pack ??= new(this, EUoM.PACK);
+            Each ??= new(this, EUoM.EACH);
         }
 
         public int GetBaseQty(int eaches = 0, int packs = 0, int cases = 0)
@@ -109,6 +109,7 @@ namespace Uranus.Inventory.Model
                 && Math.Abs(Cube - item.Cube) < 0.0001 && Math.Abs(Weight - item.Weight) < 0.0001 && PreOwned == item.PreOwned;
         }
 
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
         public override int GetHashCode() => Number.GetHashCode();
 
         public static bool operator ==(NAVItem lhs, NAVItem rhs)

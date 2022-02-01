@@ -2,6 +2,7 @@
 using Olympus.ViewModel.Components;
 using System;
 using System.Windows.Input;
+using Olympus.ViewModel.Utility;
 
 namespace Olympus.ViewModel.Commands
 {
@@ -22,9 +23,9 @@ namespace Olympus.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            var eProject = EnumConverter.StringToProject(parameter as string);
+            var eProject = (EProject) Enum.Parse(typeof(EProject), (string) parameter ?? "None");
             if (VM.ProjectGroup is null) return false;
-            return VM.ProjectGroup.ProjectLauncher.OlympusVM.CurrentProject != eProject;
+            return VM.ProjectGroup.ProjectLauncher.OlympusVM.CurrentProject?.Project != eProject && ProjectFactory.CanLaunch(eProject, App.Charon);
         }
 
         public void Execute(object parameter)

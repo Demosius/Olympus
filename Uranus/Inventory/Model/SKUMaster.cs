@@ -1,12 +1,10 @@
 ﻿using System;
-using Uranus.Inventory;
-using Uranus.Inventory.Model;
-using SQLite;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using SQLite;
 
-namespace Olympus.Model
+namespace Uranus.Inventory.Model
 {
     public enum EProductType
     {
@@ -183,11 +181,11 @@ namespace Olympus.Model
                 TotalCartonsOnHand = 0;
             EUoM uomCheck;
             if (UnitsPerCase != null)
-                uomCheck = EUoM.Case;
+                uomCheck = EUoM.CASE;
             else if (UnitsPerPack != null)
-                uomCheck = EUoM.Pack;
+                uomCheck = EUoM.PACK;
             else
-                uomCheck = EUoM.Each;
+                uomCheck = EUoM.EACH;
             foreach (var stock in item.NAVStock)
             {
                 BaseUnitsOnHand += stock.GetBaseQty();
@@ -346,11 +344,11 @@ namespace Olympus.Model
             
             EUoM uomCheck;
             if (UnitsPerCase != null)
-                uomCheck = EUoM.Case;
+                uomCheck = EUoM.CASE;
             else if (UnitsPerPack != null)
-                uomCheck = EUoM.Pack;
+                uomCheck = EUoM.PACK;
             else
-                uomCheck = EUoM.Each;
+                uomCheck = EUoM.EACH;
 
             _ = stock.TryGetValue(Sku, out var skuStock);
             skuStock ??= new();
@@ -360,15 +358,15 @@ namespace Olympus.Model
                 var uom = s.GetEUoM();
                 switch (uom)
                 {
-                    case EUoM.Case:
+                    case EUoM.CASE:
                         s.UoM = caseUoM;
                         TotalCasesOnHand += s.Qty;
                         break;
-                    case EUoM.Pack:
+                    case EUoM.PACK:
                         s.UoM = packUoM;
                         TotalPacksOnHand += s.Qty;
                         break;
-                    case EUoM.Each:
+                    case EUoM.EACH:
                         s.UoM = eachUoM;
                         TotalEachesOnHand += s.Qty;
                         break;

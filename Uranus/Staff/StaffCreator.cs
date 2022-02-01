@@ -69,6 +69,7 @@ namespace Uranus.Staff
 
         public void CopyProjectIconsFromSource(string sourceDirectory)
         {
+            // TODO: Address error that occurs when switching to the same Sol directory.
             foreach (var filePath in Directory.GetFiles(sourceDirectory))
             {
                 var fileName = Path.GetFileName(filePath);

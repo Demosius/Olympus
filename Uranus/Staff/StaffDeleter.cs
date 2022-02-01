@@ -23,5 +23,17 @@ namespace Uranus.Staff
             });
         }
 
+        public void ShiftEntry(ShiftEntry selectedEntry) => Chariot.Database.Delete(selectedEntry);
+
+        public void ShiftEntries(IEnumerable<ShiftEntry> deletedEntries)
+        {
+            Chariot.Database.RunInTransaction(() =>
+            {
+                foreach (var deletedEntry in deletedEntries)
+                {
+                    ShiftEntry(deletedEntry);
+                }
+            });
+        }
     }
 }

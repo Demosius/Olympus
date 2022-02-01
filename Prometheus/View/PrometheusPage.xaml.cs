@@ -8,7 +8,7 @@ namespace Prometheus.View
     /// <summary>
     /// Interaction logic for Prometheus.xaml
     /// </summary>
-    public partial class PrometheusPage : Page, IProject
+    public partial class PrometheusPage : IProject
     {
         //public DataSet UserData { get; set; }
         //public DataSet StaffData { get; set; }
@@ -31,7 +31,7 @@ namespace Prometheus.View
 
         public EProject Project => EProject.Prometheus;
 
-        public bool RequiresUser => false;
+        public static bool RequiresUser => false;
 
         public void RefreshData()
         {

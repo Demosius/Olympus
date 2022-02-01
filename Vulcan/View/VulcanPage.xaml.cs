@@ -17,7 +17,7 @@ namespace Vulcan.View
 
         public EProject Project => EProject.Vulcan;
 
-        public bool RequiresUser => false;
+        public static bool RequiresUser => false;
 
         public void RefreshData()
         {
