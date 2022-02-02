@@ -12,7 +12,16 @@
     <Page.DataContext>
         <vm:BinVM x:Name="VM"/>
     </Page.DataContext>
-    
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="../../Themes/MSControls.Toolkit.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
     <DockPanel>
         <ToolBar DockPanel.Dock="Top">
             <TextBox Width="250" 
@@ -52,7 +61,7 @@
         </ListView>-->
     </DockPanel>
 
-    <Page.Resources>
+    <!--<Page.Resources>
         <Style TargetType="Button">
             <Setter Property="Margin" Value="0,15"/>
             <Setter Property="Background" Value="{DynamicResource ResourceKey=BreadButtonBrush}" />
@@ -82,5 +91,5 @@
             <GradientStop Color="SlateGray"  Offset="0"/>
             <GradientStop Color="DarkSlateGray" Offset="1"/>
         </LinearGradientBrush>
-    </Page.Resources>
+    </Page.Resources>-->
 </base:BREADBase>

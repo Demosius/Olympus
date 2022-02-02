@@ -92,7 +92,7 @@ namespace Uranus.Inventory.Model
         }
 
         /* Equality and Operator Overloading */
-        public override bool Equals(object obj) => this.Equals(obj as NAVItem);
+        public override bool Equals(object obj) => Equals(obj as NAVItem);
         
         public bool Equals(NAVItem item)
         {

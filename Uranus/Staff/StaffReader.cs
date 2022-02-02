@@ -37,17 +37,17 @@ namespace Uranus.Staff
         public List<ShiftEntry> ShiftEntries(Expression<Func<ShiftEntry, bool>> filter = null,
             EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
-        public List<int> EmployeeIDs() => Chariot.Database.Query<Employee>("SELECT DISTINCT Code FROM Employee;").Select(e => e.ID).OrderBy(c => c).ToList();
+        public List<int> EmployeeIDs() => Chariot.Database.Query<Employee>("SELECT DISTINCT ID FROM Employee;").Select(e => e.ID).OrderBy(c => c).ToList();
 
         public void AionEmployeeRefresh(out List<int> managerIDList, out List<Employee> employeeList, out IEnumerable<string> locationList,
-            out IEnumerable<string> payPointList, out IEnumerable<EEmploymentType> employmentTypeList, out IEnumerable<string> roleList)
+            out IEnumerable<string> payPointList, out IEnumerable<EEmploymentType> employmentTypeList, out IEnumerable<Role> roleList)
         {
             IEnumerable<int> managerIDs = null;
             IEnumerable<Employee> employees = null;
             IEnumerable<string> locations = null;
             IEnumerable<string> payPoints = null;
             IEnumerable<EEmploymentType> employmentTypes = null;
-            IEnumerable<string> roles = null;
+            IEnumerable<Role> roles = null;
 
             Chariot.Database.RunInTransaction(() =>
             {
@@ -56,7 +56,7 @@ namespace Uranus.Staff
                 locations = Chariot.Database.Query<Employee>("SELECT DISTINCT Location FROM Employee;").Select(e => e.Location);
                 payPoints = Chariot.Database.Query<Employee>("SELECT DISTINCT PayPoint FROM Employee;").Select(e => e.PayPoint);
                 employmentTypes = Chariot.Database.Query<Employee>("SELECT DISTINCT EmploymentType FROM Employee;").Select(e => e.EmploymentType);
-                roles = Chariot.Database.Query<Employee>("SELECT DISTINCT JobClassification FROM Employee;").Select(e => e.RoleName);
+                roles = Chariot.PullObjectList<Role>().OrderBy(r => r.Name);
             });
 
             managerIDList = managerIDs.ToList();

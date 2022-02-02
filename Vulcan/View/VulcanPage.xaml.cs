@@ -1,6 +1,4 @@
 ﻿using Uranus.Staff;
-using System;
-using System.Windows.Controls;
 using Uranus;
 
 namespace Vulcan.View
@@ -8,7 +6,7 @@ namespace Vulcan.View
     /// <summary>
     /// Interaction logic for VulcanPage.xaml
     /// </summary>
-    public partial class VulcanPage : Page, IProject
+    public partial class VulcanPage : IProject
     {
         public VulcanPage()
         {
@@ -21,7 +19,7 @@ namespace Vulcan.View
 
         public void RefreshData()
         {
-            throw new NotImplementedException();
+            VM.RefreshData();
         }
     }
 }

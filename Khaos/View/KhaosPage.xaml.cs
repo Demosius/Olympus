@@ -1,6 +1,5 @@
 ﻿using Uranus.Staff;
 using System;
-using System.Windows.Controls;
 using Uranus;
 
 namespace Khaos.View

@@ -5,12 +5,17 @@ using Prometheus.ViewModel.Helpers;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Styx;
+using Uranus;
 using ProEnums = Prometheus.ViewModel.Helpers.EnumConverter;
 
 namespace Prometheus.ViewModel
 {
     public class PrometheusVM : INotifyPropertyChanged
     {
+        public Helios Helios { get; set; }
+        public Charon Charon { get; set; }
+
         public ObservableCollection<DataCategory> Categories { get; set; }
         public ObservableCollection<DataType> Types { get; set; }
         public Dictionary<EDataType, BREADBase> DataPages { get; set; }
@@ -60,6 +65,12 @@ namespace Prometheus.ViewModel
             {
                 Categories.Add(new(category));
             }
+        }
+
+        public void SetDataSources(Helios helios, Charon charon)
+        {
+            Helios = helios;
+            Charon = charon;
         }
 
         public void SetTypes()

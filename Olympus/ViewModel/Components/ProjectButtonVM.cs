@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using Uranus.Staff.Model;
+﻿using Uranus.Staff.Model;
 using Olympus.ViewModel.Commands;
 using System.ComponentModel;
-using System.Diagnostics;
-using Uranus;
 
 namespace Olympus.ViewModel.Components
 {

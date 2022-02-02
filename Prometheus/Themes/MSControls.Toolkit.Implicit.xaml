@@ -3,33 +3,38 @@
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     mc:Ignorable="d">
-		
+                    <!--xmlns:inputToolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Input.Toolkit" 
+                    xmlns:inputToolkitPrimitives="clr-namespace:System.Windows.Controls.Primitives;assembly=System.Windows.Controls.Input.Toolkit" 
+                    xmlns:layoutToolkitPrimitives="clr-namespace:System.Windows.Controls.Primitives;assembly=System.Windows.Controls.Layout.Toolkit" 
+                    xmlns:layoutToolkit="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Layout.Toolkit" 
+                    xmlns:vsm="clr-namespace:System.Windows;assembly=WPFToolkit"--> 
+
 	<!-- *********************************  RESOURCES  ********************************* -->
 	<ResourceDictionary.MergedDictionaries>
 		<ResourceDictionary Source="Styles.WPF.xaml" />
 	</ResourceDictionary.MergedDictionaries>
 
 	<!-- *********************************  BRUSHES  ********************************* -->
-	<!-- Rating Brushes -->
-	<SolidColorBrush x:Key="RatingReadOnlyBackgroundBrush" Color="{StaticResource Color013}" />
-	<SolidColorBrush x:Key="RatingReadOnlyBorderBrush" Color="{StaticResource Color013}" />
-	<SolidColorBrush x:Key="RatingDisabledBackgroundBrush" Color="{StaticResource Color004}" />
-	<SolidColorBrush x:Key="RatingDisabledBorderBrush" Color="{StaticResource Color013}" />
+    <!-- Rating Brushes -->
+    <SolidColorBrush x:Key="RatingReadOnlyBackgroundBrush" Color="{StaticResource Color013}" />
+    <SolidColorBrush x:Key="RatingReadOnlyBorderBrush" Color="{StaticResource Color013}" />
+    <SolidColorBrush x:Key="RatingDisabledBackgroundBrush" Color="{StaticResource Color004}" />
+    <SolidColorBrush x:Key="RatingDisabledBorderBrush" Color="{StaticResource Color013}" />
 
-	<!-- RatingItem Brushes -->
-	<SolidColorBrush x:Key="RatingItemBackgroundBrush" Color="{StaticResource Color009}" />
-	<SolidColorBrush x:Key="RatingItemBorderBrush" Color="{StaticResource Color004}" />
-	<SolidColorBrush x:Key="RatingItemHoverBackgroundBrush" Color="{StaticResource Color023}" />
-	<SolidColorBrush x:Key="RatingItemHoverBorderBrush" Color="{StaticResource Color023}" />
-	<SolidColorBrush x:Key="RatingItemActiveBackgroundBrush" Color="{StaticResource Color024}" />
-	<SolidColorBrush x:Key="RatingItemActiveBorderBrush" Color="{StaticResource Color024}" />
-	<SolidColorBrush x:Key="RatingItemReadOnlyBackgroundBrush" Color="{StaticResource Color024}" />
-	<SolidColorBrush x:Key="RatingItemReadOnlyBorderBrush" Color="{StaticResource Color024}" />
-	<SolidColorBrush x:Key="RatingItemDisabledBackgroundBrush" Color="{StaticResource Color008}" />
-	<SolidColorBrush x:Key="RatingItemDisabledBorderBrush" Color="{StaticResource Color005}" />
+    <!-- RatingItem Brushes -->
+    <SolidColorBrush x:Key="RatingItemBackgroundBrush" Color="{StaticResource Color009}" />
+    <SolidColorBrush x:Key="RatingItemBorderBrush" Color="{StaticResource Color004}" />
+    <SolidColorBrush x:Key="RatingItemHoverBackgroundBrush" Color="{StaticResource Color023}" />
+    <SolidColorBrush x:Key="RatingItemHoverBorderBrush" Color="{StaticResource Color023}" />
+    <SolidColorBrush x:Key="RatingItemActiveBackgroundBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="RatingItemActiveBorderBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="RatingItemReadOnlyBackgroundBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="RatingItemReadOnlyBorderBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="RatingItemDisabledBackgroundBrush" Color="{StaticResource Color008}" />
+    <SolidColorBrush x:Key="RatingItemDisabledBorderBrush" Color="{StaticResource Color005}" />
 
     <!-- Accordion Brushes -->
-	<SolidColorBrush x:Key="AccordionBorderBrush" Color="{StaticResource Color004}" />
+    <SolidColorBrush x:Key="AccordionBorderBrush" Color="{StaticResource Color004}" />
     <SolidColorBrush x:Key="AccordionBackgroundBrush" Color="{StaticResource Color009}" />
     <SolidColorBrush x:Key="AccordionItemBackgroundBrush" Color="{StaticResource Color009}" />
     <SolidColorBrush x:Key="AccordionButtonBackgroundBrush" Color="{StaticResource Color009}" />
@@ -43,8 +48,8 @@
     <SolidColorBrush x:Key="AccordionArrowBackgroundBrush" Color="{StaticResource Color003}" />
     <SolidColorBrush x:Key="AccordionArrowExpandedBackgroundBrush" Color="{StaticResource Color009}" />
 
-	<!--********************************** RatingItem Style **********************************-->
-	<!--<Style x:Key="RatingItemStyle" TargetType="{x:Type inputToolkit:RatingItem}">
+    <!--********************************** RatingItem Style **********************************-->
+	<!--<Style x:Key="RatingItemStyle"
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type inputToolkit:RatingItem}">
@@ -407,10 +412,7 @@
 										<DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Duration="00:00:00.0010000" Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="MouseOverBackground">
 											<SplineDoubleKeyFrame KeyTime="00:00:00" Value="1" />
 										</DoubleAnimationUsingKeyFrames>
-                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Foreground)" Storyboard.TargetName="contentControl">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource LightForegroundBrush}" />
-                                        </ObjectAnimationUsingKeyFrames>
-                                    </Storyboard>
+									</Storyboard>
 								</vsm:VisualState>
 								<vsm:VisualState x:Name="Pressed">
 									<Storyboard>
@@ -506,7 +508,6 @@
 		<Setter Property="FontFamily" Value="Segoe UI" />
 		<Setter Property="FontSize" Value="14.667" />
 		<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
-        <Setter Property="Background" Value="{StaticResource AccordionItemBackgroundBrush}" />
 		<Setter Property="BorderThickness" Value="0" />
 		<Setter Property="MinHeight" Value="30" />
 		<Setter Property="Margin" Value="0" />
@@ -786,7 +787,6 @@
 	<!-- *********************************  Accordion Style  ********************************* -->
 	<!--<Style x:Key="AccordionStyle" TargetType="layoutToolkit:Accordion">
 		<Setter Property="BorderBrush" Value="{StaticResource AccordionBorderBrush}" />
-        <Setter Property="Background" Value="{StaticResource AccordionBackgroundBrush}" />
 		<Setter Property="BorderThickness" Value="1" />
 		<Setter Property="Padding" Value="0" />
 		<Setter Property="Margin" Value="0" />
@@ -835,7 +835,7 @@
 		<Setter Property="FontFamily" Value="Segoe UI" />
 		<Setter Property="FontSize" Value="14.667" />
 		<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
-        <Setter Property="Background" Value="{StaticResource TextBoxBackgroundBrush}" />
+		<Setter Property="Background" Value="{StaticResource LightForegroundBrush}" />
 		<Setter Property="BorderBrush" Value="{StaticResource TextBoxBorderBrush}" />
 		<Setter Property="BorderThickness" Value="1" />
 		<Setter Property="Padding" Value="6,4" />
@@ -851,22 +851,23 @@
 						<Border x:Name="ValidationErrorElement" BorderBrush="{StaticResource ValidationErrorElement}" BorderThickness="1" CornerRadius="1" Visibility="Collapsed">
 							<Border.ToolTip>
 								<ToolTip x:Name="validationTooltip" Placement="Right" Template="{StaticResource ValidationToolTipTemplate}">
-                                    <ToolTip.Triggers>
-                                        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="IsHitTestVisible" Storyboard.TargetName="validationTooltip">
-                                                        <DiscreteObjectKeyFrame KeyTime="0">
-                                                            <DiscreteObjectKeyFrame.Value>
-                                                                <sys:Boolean>True</sys:Boolean>
-                                                            </DiscreteObjectKeyFrame.Value>
-                                                        </DiscreteObjectKeyFrame>
-                                                    </ObjectAnimationUsingKeyFrames>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger>
-                                    </ToolTip.Triggers>
-                                </ToolTip>
+									<ToolTip.Triggers>
+										<EventTrigger RoutedEvent="FrameworkElement.Loaded">
+											<BeginStoryboard>
+												<Storyboard>
+													<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="IsHitTestVisible" Storyboard.TargetName="validationTooltip">
+														<DiscreteObjectKeyFrame KeyTime="0">
+															<DiscreteObjectKeyFrame.Value>
+																<sys:Boolean>True</sys:Boolean>
+															</DiscreteObjectKeyFrame.Value>
+														</DiscreteObjectKeyFrame>
+													</ObjectAnimationUsingKeyFrames>
+												</Storyboard>
+											</BeginStoryboard>
+										</EventTrigger>
+									</ToolTip.Triggers>
+									
+								</ToolTip>
 							</Border.ToolTip>
 							<Grid Background="Transparent" HorizontalAlignment="Right" Height="12" Margin="1,-4,-4,0" VerticalAlignment="Top" Width="12">
 								<Path Data="M 1,0 L6,0 A 2,2 90 0 1 8,2 L8,7 z" Fill="{StaticResource ValidationErrorElement}" Margin="1,3,0,0" />
@@ -895,7 +896,7 @@
 			</Setter.Value>
 		</Setter>
 	</Style>-->
-    
+
     <!--********************** Implicit Styles *********************** -->
     <!--<Style BasedOn="{StaticResource RatingItemStyle}" TargetType="{x:Type inputToolkit:RatingItem}" />
     <Style BasedOn="{StaticResource RatingStyle}" TargetType="{x:Type inputToolkit:Rating}" />

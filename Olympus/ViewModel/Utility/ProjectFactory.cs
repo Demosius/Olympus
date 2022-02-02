@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Aion.View;
 using Khaos.View;
 using Pantheon.View;
@@ -25,11 +21,11 @@ namespace Olympus.ViewModel.Utility
             return project switch
             {
                 EProject.Vulcan => new VulcanPage(),
-                EProject.Prometheus => new PrometheusPage(),
+                EProject.Prometheus => new PrometheusPage(App.Helios, App.Charon),
                 EProject.Pantheon => new PantheonPage(),
                 EProject.Phoenix => new PhoenixPage(),
                 EProject.Khaos => new KhaosPage(),
-                EProject.Aion => new AionPage(),
+                EProject.Aion => new AionPage(App.Helios, App.Charon),
                 EProject.None => null,
                 _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
             };

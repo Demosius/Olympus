@@ -119,7 +119,7 @@ namespace Uranus.Inventory.Model
         public bool Merge(Stock newStock)
         {
             // Stock ID must match (same bin and item, etc.) but must not be the same object.
-            if (ReferenceEquals(this, newStock) || this.ID != newStock.ID)
+            if (ReferenceEquals(this, newStock) || ID != newStock.ID)
                 return false;
             // Increase Stock quantities.
             Eaches.Qty += newStock.Eaches.Qty;

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace Uranus.Inventory
 {
@@ -164,35 +163,12 @@ namespace Uranus.Inventory
                 : contentsUpdates.Where(bcu => zoneIDs.Contains(bcu.ZoneID)).ToList().Min()!.LastUpdate;
         }
 
+        /// <summary>
+        /// Pulls multiple sets of data from the inventory database and combines them into the SKUMaster data set.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<SkuMaster> GetMasters()
         {
-            /*
-            // TODO: Change to run all DB actions in a single transaction.
-            // Set tasks to pull data from db.
-            var getItemsTask = Task.Run(() => NAVItems());
-            var getStockTask = Task.Run(() => NAVAllStock()
-                .GroupBy(s => s.ItemNumber)
-                .ToDictionary(g => g.Key, g => g.ToList()));
-            var getUoMTask = Task.Run(() => NAVUoMs()
-                .GroupBy(u => u.ItemNumber)
-                .ToDictionary(g => g.Key, g => g.ToDictionary(u => u.Code, u => u)));
-            var getBinsTask = Task.Run(() => NAVBins().ToDictionary(b => b.ID, b => b));
-            var getDivsTask = Task.Run(() => NAVDivisions().ToDictionary(d => d.Code, d => d.Description));
-            var getCatsTask = Task.Run(() => NAVCategories().ToDictionary(c => c.Code, c => c.Description));
-            var getPFsTask = Task.Run(() => NAVPlatforms().ToDictionary(p => p.Code, p => p.Description));
-            var getGensTask = Task.Run(() => NAVGenres().ToDictionary(g => g.Code, g => g.Description));
-            // Wait for tasks to complete.
-            Task.WaitAll(getBinsTask, getCatsTask, getDivsTask, getGensTask, getItemsTask, getPFsTask, getStockTask, getUoMTask);*/
-            // Assign results to data lists/dict.
-            /*var navItems = getItemsTask.Result;
-            var stock = getStockTask.Result;
-            var uomDict = getUoMTask.Result;
-            var bins = getBinsTask.Result;
-            var divisions = getDivsTask.Result;
-            var categories = getCatsTask.Result;
-            var platforms = getPFsTask.Result;
-            var genres = getGensTask.Result;*/
-
             IEnumerable<SkuMaster> returnVal = null;
 
             Chariot.Database.RunInTransaction(() =>
@@ -213,7 +189,6 @@ namespace Uranus.Inventory
             });
 
             return returnVal;
-            // Generate Sku Master List
         }
     }
 }

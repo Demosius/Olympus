@@ -63,6 +63,10 @@ namespace Uranus.Staff.Model
             return ReportsToRole is not null && ReportsToRole.LookUp(ref up, ref down, this, ref targetRole);
         }
 
+        public override string ToString()
+        {
+            return Name;
+        }
 
         public override bool Equals(object obj) => Equals(obj as Role);
 

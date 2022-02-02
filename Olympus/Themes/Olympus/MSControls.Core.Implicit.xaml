@@ -11,26 +11,26 @@
 
 	<!-- *********************************  BRUSHES  ********************************* -->
 	<!--  Slider Brushes -->
-	<SolidColorBrush x:Key="SliderThumbBackgroundBrush" Color="{StaticResource Color_003}" />
-	<SolidColorBrush x:Key="SliderThumbHoverBackgroundBrush" Color="{StaticResource Color_002}" />
-	<SolidColorBrush x:Key="SliderThumbPressedBackgroundBrush" Color="{StaticResource Color_024}" />
-	<SolidColorBrush x:Key="SliderThumbDisabledBackgroundBrush" Color="{StaticResource Color_005}" />
-	<SolidColorBrush x:Key="SliderTrackDisabledOverlayBackgroundBrush" Color="{StaticResource Color_008}" />
-	<SolidColorBrush x:Key="SliderThumbFocusedBorderBrush" Color="{StaticResource Color_024}" />
-	<SolidColorBrush x:Key="SliderTrackBackgroundBrush" Color="{StaticResource Color_005}" />
-	<SolidColorBrush x:Key="SliderSelectionRangeBackgroundBrush" Color="{StaticResource Color_024}" />
+	<SolidColorBrush x:Key="SliderThumbBackgroundBrush" Color="{StaticResource Color003}" />
+	<SolidColorBrush x:Key="SliderThumbHoverBackgroundBrush" Color="{StaticResource Color002}" />
+	<SolidColorBrush x:Key="SliderThumbPressedBackgroundBrush" Color="{StaticResource Color024}" />
+	<SolidColorBrush x:Key="SliderThumbDisabledBackgroundBrush" Color="{StaticResource Color005}" />
+	<SolidColorBrush x:Key="SliderTrackDisabledOverlayBackgroundBrush" Color="{StaticResource Color008}" />
+	<SolidColorBrush x:Key="SliderThumbFocusedBorderBrush" Color="{StaticResource Color024}" />
+	<SolidColorBrush x:Key="SliderTrackBackgroundBrush" Color="{StaticResource Color005}" />
+	<SolidColorBrush x:Key="SliderSelectionRangeBackgroundBrush" Color="{StaticResource Color024}" />
 
 	<!--  GridSplitter Brushes -->
-	<SolidColorBrush x:Key="GridSplitterBackgroundBrush" Color="{StaticResource Color_008}" />
-	<SolidColorBrush x:Key="GridSplitterBorderBrush" Color="{StaticResource Color_004}" />
-	<SolidColorBrush x:Key="GridSplitterHoverBackgroundBrush" Color="{StaticResource Color_006}" />
-	<SolidColorBrush x:Key="GridSplitterHoverBorderBrush" Color="{StaticResource Color_003}" />
-	<SolidColorBrush x:Key="GridSplitterPressedBackgroundBrush" Color="{StaticResource Color_024}" />
-	<SolidColorBrush x:Key="GridSplitterFocusedBorderBrush" Color="{StaticResource Color_024}" />
+	<SolidColorBrush x:Key="GridSplitterBackgroundBrush" Color="{StaticResource Color008}" />
+	<SolidColorBrush x:Key="GridSplitterBorderBrush" Color="{StaticResource Color004}" />
+	<SolidColorBrush x:Key="GridSplitterHoverBackgroundBrush" Color="{StaticResource Color006}" />
+	<SolidColorBrush x:Key="GridSplitterHoverBorderBrush" Color="{StaticResource Color003}" />
+	<SolidColorBrush x:Key="GridSplitterPressedBackgroundBrush" Color="{StaticResource Color024}" />
+	<SolidColorBrush x:Key="GridSplitterFocusedBorderBrush" Color="{StaticResource Color024}" />
 
 	<!-- ProgressBar Brushes -->
-	<SolidColorBrush x:Key="ProgressBarBackgroundBrush" Color="{StaticResource Color_005}" />
-	<SolidColorBrush x:Key="ProgressBarForegroundBrush" Color="{StaticResource Color_024}" />
+	<SolidColorBrush x:Key="ProgressBarBackgroundBrush" Color="{StaticResource Color005}" />
+	<SolidColorBrush x:Key="ProgressBarForegroundBrush" Color="{StaticResource Color024}" />
 	<LinearGradientBrush x:Key="ProgressBarIndeterminateBackgroundBrush" EndPoint="0,1" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="20,1" Opacity="0.8">
 		<LinearGradientBrush.Transform>
 			<TransformGroup>
@@ -38,33 +38,33 @@
 				<SkewTransform AngleX="-30" />
 			</TransformGroup>
 		</LinearGradientBrush.Transform>
-		<GradientStop Color="{StaticResource Color_023}" Offset="0.249" />
-		<GradientStop Color="{StaticResource Color_024}" Offset=".25" />
-		<GradientStop Color="{StaticResource Color_024}" Offset="0.75" />
-		<GradientStop Color="{StaticResource Color_023}" Offset="0.751" />
+		<GradientStop Color="{StaticResource Color023}" Offset="0.249" />
+		<GradientStop Color="{StaticResource Color024}" Offset=".25" />
+		<GradientStop Color="{StaticResource Color024}" Offset="0.75" />
+		<GradientStop Color="{StaticResource Color023}" Offset="0.751" />
 	</LinearGradientBrush>
 
 	<!-- Tooltip Brushes -->
-	<SolidColorBrush x:Key="TooltipBackgroundBrush" Color="{StaticResource Color_009}" />
-	<SolidColorBrush x:Key="TooltipBorderBrush" Color="{StaticResource Color_004}" />
+	<SolidColorBrush x:Key="TooltipBackgroundBrush" Color="{StaticResource Color009}" />
+	<SolidColorBrush x:Key="TooltipBorderBrush" Color="{StaticResource Color004}" />
 
 	<!-- Expander Brushes -->
-	<SolidColorBrush x:Key="ExpanderButtonBackgroundBrush" Color="{StaticResource Color_009}" />
-	<SolidColorBrush x:Key="ExpanderButtonBorderBrush" Color="{StaticResource Color_004}" />
-	<SolidColorBrush x:Key="ExpanderButtonHoverBackgroundBrush" Color="{StaticResource Color_007}" />
-	<SolidColorBrush x:Key="ExpanderButtonHoverBorderBrush" Color="{StaticResource Color_003}" />
-	<SolidColorBrush x:Key="ExpanderButtonPressedBackgroundBrush" Color="{StaticResource Color_024}" />
-	<SolidColorBrush x:Key="ExpanderButtonPressedBorderBrush" Color="{StaticResource Color_024}" />
-	<SolidColorBrush x:Key="ExpanderArrowHoverBorderBrush" Color="{StaticResource Color_002}" />
-	<SolidColorBrush x:Key="ExpanderArrowPressedBorderBrush" Color="{StaticResource Color_009}" />
-	<SolidColorBrush x:Key="ExpanderDisabledForegroundBrush" Color="{StaticResource Color_007}" />
-	<SolidColorBrush x:Key="ExpanderDisabledBackgroundBrush" Color="{StaticResource Color_007}" />
+	<SolidColorBrush x:Key="ExpanderButtonBackgroundBrush" Color="{StaticResource Color009}" />
+	<SolidColorBrush x:Key="ExpanderButtonBorderBrush" Color="{StaticResource Color004}" />
+	<SolidColorBrush x:Key="ExpanderButtonHoverBackgroundBrush" Color="{StaticResource Color007}" />
+	<SolidColorBrush x:Key="ExpanderButtonHoverBorderBrush" Color="{StaticResource Color003}" />
+	<SolidColorBrush x:Key="ExpanderButtonPressedBackgroundBrush" Color="{StaticResource Color024}" />
+	<SolidColorBrush x:Key="ExpanderButtonPressedBorderBrush" Color="{StaticResource Color024}" />
+	<SolidColorBrush x:Key="ExpanderArrowHoverBorderBrush" Color="{StaticResource Color002}" />
+	<SolidColorBrush x:Key="ExpanderArrowPressedBorderBrush" Color="{StaticResource Color009}" />
+	<SolidColorBrush x:Key="ExpanderDisabledForegroundBrush" Color="{StaticResource Color007}" />
+	<SolidColorBrush x:Key="ExpanderDisabledBackgroundBrush" Color="{StaticResource Color007}" />
 
 	<!-- GroupBox Brushes -->
-	<SolidColorBrush x:Key="GroupBoxBorderBrush" Color="{StaticResource Color_003}" />
+	<SolidColorBrush x:Key="GroupBoxBorderBrush" Color="{StaticResource Color003}" />
 
 	<!-- PassWordBox Brushes -->
-	<SolidColorBrush x:Key="PasswordBoxForegroundBrush" Color="{StaticResource Color_024}" />
+	<SolidColorBrush x:Key="PasswordBoxForegroundBrush" Color="{StaticResource Color024}" />
 
 	<!-- *********************************  TextBlock Style  ********************************* -->
 	<Style x:Key="TextBlockStyle" TargetType="TextBlock">
@@ -465,9 +465,8 @@
 							<Setter Property="Visibility" TargetName="Indicator" Value="Collapsed" />
 							<Setter Property="Visibility" TargetName="IndeterminateRoot" Value="Visible" />
 						</Trigger>
-						<Trigger Property="IsIndeterminate" Value="false">
-						</Trigger>
-					</ControlTemplate.Triggers>
+						<Trigger Property="IsIndeterminate" Value="false" />
+                    </ControlTemplate.Triggers>
 				</ControlTemplate>
 			</Setter.Value>
 		</Setter>
@@ -906,9 +905,8 @@
 									<Binding Path="ActualHeight" RelativeSource="{RelativeSource Self}" />
 								</MultiBinding>
 							</Border.OpacityMask>
-							<Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-							</Border>
-						</Border>
+							<Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+                        </Border>
 					</Grid>
 				</ControlTemplate>
 			</Setter.Value>

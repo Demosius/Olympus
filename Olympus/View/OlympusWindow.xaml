@@ -42,9 +42,8 @@
             </MenuItem>
         </Menu>
 
-        <ToolBarTray DockPanel.Dock="Top">
-        </ToolBarTray>
-        
+        <ToolBarTray DockPanel.Dock="Top" />
+
         <StatusBar DockPanel.Dock="Bottom"
                    Background="{DynamicResource PurpleGradient}"
                    Padding="0">
