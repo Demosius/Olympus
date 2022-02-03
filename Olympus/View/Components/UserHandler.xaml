@@ -24,12 +24,12 @@
     </StackPanel>
 
     <UserControl.Resources>
-        <Style BasedOn="{StaticResource OButton}" TargetType="Button">
+        <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
             <Setter Property="Margin" Value="2,0"/>
             <Setter Property="Background" Value="{StaticResource RedGradient}"/>
             <Setter Property="BorderBrush" Value="{StaticResource GreenGradient}"/>
         </Style>
-        <Style TargetType="Label" BasedOn="{StaticResource OLabel}">
+        <Style TargetType="Label" BasedOn="{StaticResource LabelStyle}">
             <Setter Property="Margin" Value="2,0"/>
         </Style>
     </UserControl.Resources>

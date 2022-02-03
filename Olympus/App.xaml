@@ -1,154 +1,16 @@
 ﻿<Application x:Class="Olympus.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             DispatcherUnhandledException="Application_DispatcherUnhandledException"
              StartupUri="View/OlympusWindow.xaml">
+             <!--DispatcherUnhandledException="Application_DispatcherUnhandledException"-->
 
+        <!--<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>-->
     <Application.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-
-        <!-- Image Resources -->
-        <Image x:Key="IcoForge" Source="./Resources/Images/Icons/forge.ico" />
-        <Image x:Key="IcoPrometheus" Source="./Resources/Images/Icons/prometheus.ico" />
-        <Image x:Key="IcoBurn" Source="./Resources/Images/Icons/burn.ico" />
-        <Image x:Key="IcoDrac" Source="./Resources/Images/Icons/vampire.ico" />
-
-        <!-- Tab Control Styling -->
-        <Style TargetType="TabItem">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TabItem">
-                        <Grid Name="Panel">
-                            <ContentPresenter x:Name="ContentSite"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"
-                                        ContentSource="Header"
-                                        Margin="10,2"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Panel" Property="Background" Value="{DynamicResource BackGradient}" />
-                                <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="{DynamicResource ForeGradient}" />
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="False">
-                                <Setter TargetName="Panel" Property="Background" Value="{DynamicResource InactiveBackGradient}" />
-                                <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="{DynamicResource InactiveForeGradient}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="TabControl">
-            <Setter Property="Background" Value="{DynamicResource BackGroundBrush}"/>
-            <Setter Property="BorderBrush" Value="#055" />
-        </Style>
-
-        <!--Standard Button Styling-->
-        <Style x:Key="OButton" TargetType="Button">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="MinHeight" Value="20"/>
-            <Setter Property="MinWidth" Value="20"/>
-            <Setter Property="Background" Value="{DynamicResource ResourceKey=MainGradient}" />
-            <Setter Property="Foreground" Value="WhiteSmoke" />
-            <Setter Property="BorderBrush" Value="#055" />
-            <Setter Property="TextBlock.TextAlignment" Value="Center" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontFamily" Value="Arial" />
-            <Setter Property="Padding" Value="5"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="Red"/>
-                    <Setter Property="Foreground" Value="Black" />
-                    <Setter Property="BorderBrush" Value="DarkRed" />
-                </Trigger>
-            </Style.Triggers>
-            <Style.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="3"/>
-                </Style>
-            </Style.Resources>
-        </Style>
-
-        <!--Standard Label Styling-->
-        <Style TargetType="Label" x:Key="OLabel">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="TextBlock.FontSize" Value="14"/>
-            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
-            <Setter Property="Foreground" Value="WhiteSmoke"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-        </Style>
-
-        <LinearGradientBrush x:Key="BackGroundBrush" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="#044" Offset="0"/>
-            <GradientStop Color="#022" Offset="1"/>
-        </LinearGradientBrush>
-
-        <SolidColorBrush x:Key="SolidBackDark" Color="#022"/>
-        <SolidColorBrush x:Key="SolidBackMedium" Color="#044"/>
-        <SolidColorBrush x:Key="SolidBackLight" Color="#066"/>
-
-        <LinearGradientBrush x:Key="MainGradient" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="#0AA" Offset="0"/>
-            <GradientStop Color="#022" Offset="1"/>
-        </LinearGradientBrush>
-
-        <LinearGradientBrush x:Key="BackGradient" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="#0BA" Offset="0"/>
-            <GradientStop Color="#032" Offset="1"/>
-        </LinearGradientBrush>
-
-        <LinearGradientBrush x:Key="PurpleGradient" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="#75A" Offset="0"/>
-            <GradientStop Color="#213" Offset="1"/>
-        </LinearGradientBrush>
-
-        <LinearGradientBrush x:Key="ForeGradient" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="Gainsboro" Offset="0"/>
-            <GradientStop Color="BlanchedAlmond" Offset="1"/>
-        </LinearGradientBrush>
-
-        <LinearGradientBrush x:Key="InactiveBackGradient" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="#BDC" Offset="0"/>
-            <GradientStop Color="#9BA" Offset="1"/>
-        </LinearGradientBrush>
-
-        <LinearGradientBrush x:Key="InactiveForeGradient" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="DarkSlateGray" Offset="0"/>
-            <GradientStop Color="SlateGray" Offset="1"/>
-        </LinearGradientBrush>
-
-        <!-- Data Colour Gradients -->
-        <LinearGradientBrush x:Key="CyanGradient" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="Cyan" Offset="0"/>
-            <GradientStop Color="DarkCyan" Offset="1"/>
-        </LinearGradientBrush>
-        <LinearGradientBrush x:Key="GreenGradient" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="Lime" Offset="0"/>
-            <GradientStop Color="Green" Offset="1"/>
-        </LinearGradientBrush>
-        <LinearGradientBrush x:Key="OrangeGradient" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="DarkOrange" Offset="0"/>
-            <GradientStop Color="OrangeRed" Offset="1"/>
-        </LinearGradientBrush>
-        <LinearGradientBrush x:Key="Graydient" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="White" Offset="0"/>
-            <GradientStop Color="Gray" Offset="1"/>
-        </LinearGradientBrush>
-        
-        <!-- Other Colour Gradients -->
-        <LinearGradientBrush x:Key="RedGradient" EndPoint="0,1" StartPoint="0,0">
-            <GradientStop Color="DarkRed" Offset="0"/>
-            <GradientStop Color="#200" Offset="1"/>
-        </LinearGradientBrush>
-
-        <!-- Implicit styling -->
-        <Style BasedOn="{StaticResource OButton}" TargetType="Button"/>
-        <Style BasedOn="{StaticResource OLabel}" TargetType="Label"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/Olympus/MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
 
     </Application.Resources>
 

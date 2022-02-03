@@ -10,7 +10,36 @@
 	</ResourceDictionary.MergedDictionaries>
 
 	<!-- *********************************  BRUSHES  ********************************* -->
-	<!--  Slider Brushes -->
+    <!-- Prometheus Brushes -->
+    <LinearGradientBrush x:Key="RedGradientBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="DarkRed" Offset="0"/>
+        <GradientStop Color="#500" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ReVGradientBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="#500" Offset="0"/>
+        <GradientStop Color="DarkRed" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="PinkGradientBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="PaleVioletRed" Offset="0"/>
+        <GradientStop Color="MediumVioletRed" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="OrangeGradientBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="DarkOrange" Offset="0"/>
+        <GradientStop Color="Orange" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="MedRedGradientBrush" EndPoint="0,1" StartPoint="0,0">
+        <GradientStop Color="IndianRed" Offset="0"/>
+        <GradientStop Color="PaleVioletRed" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="BoneGradient" StartPoint="1,1" EndPoint="0,0" >
+        <GradientStop Color="{StaticResource Color002}" Offset="0"/>
+        <GradientStop Color="{StaticResource Color001}" Offset="1"/>
+    </LinearGradientBrush>
+
+	<!-- Datagrid Brushes -->
+	<SolidColorBrush x:Key="DataGridLineBrush" Color="{StaticResource Color026}"/> 
+
+    <!--  Slider Brushes -->
 	<SolidColorBrush x:Key="SliderThumbBackgroundBrush" Color="{StaticResource Color003}" />
 	<SolidColorBrush x:Key="SliderThumbHoverBackgroundBrush" Color="{StaticResource Color002}" />
 	<SolidColorBrush x:Key="SliderThumbPressedBackgroundBrush" Color="{StaticResource Color024}" />
@@ -913,24 +942,27 @@
 		</Setter>
 	</Style>
 
+    <!-- *********************************  Custom Prometheus Styling  ********************************* -->
+
     <!--ListView Styling-->
     <Style x:Key="ListViewStyle" TargetType="ListView">
-        <Setter Property="Background" Value="#500"/>
-        <Setter Property="BorderBrush" Value="SlateGray"/>
+        <Setter Property="Background" Value="{StaticResource ButtonBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ButtonBorderBrush}"/>
     </Style>
 
     <!--ListView Item Styling-->
     <Style x:Key="ListViewItemStyle" TargetType="ListViewItem">
-        <Setter Property="Background" Value="#500"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource PopupBackgroundBrush}"/>
+        <!--<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>-->
         <Setter Property="FontSize" Value="10"/>
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Margin" Value="2" />
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="BorderBrush" Value="Orange"/>
+                <Setter Property="BorderBrush" Value="{StaticResource ButtonPressedBorderBrush}"/>
+                <Setter Property="Background" Value="{StaticResource ButtonPressedBackgroundBrush}"/>
                 <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="Foreground" Value="Orange"/>
+                <!--<Setter Property="Foreground" Value="{StaticResource Button}"/>-->
             </Trigger>
         </Style.Triggers>
         <Style.Resources>
@@ -975,7 +1007,7 @@
         <Setter Property="FontWeight" Value="Bold"/>
         <Setter Property="FontSize" Value="12" />
         <Setter Property="FontFamily" Value="Arial" />
-        <Setter Property="Background" Value="{DynamicResource OrangeGradientBrush}" />
+        <Setter Property="Background" Value="{StaticResource OrangeGradientBrush}" />
         <Setter Property="BorderBrush" Value="Black" />
         <Style.Triggers>
             <Trigger Property="IsChecked" Value="{x:Null}">
@@ -998,10 +1030,12 @@
     <Style x:Key="DataGridStyle" TargetType="{x:Type DataGrid}">
         <Setter Property="ColumnHeaderStyle" Value="{DynamicResource DataGridColumnHeaderStyle}"/>
         <Setter Property="RowHeaderStyle" Value="{DynamicResource RowHeaderStyle}" />
-        <Setter Property="RowBackground" Value="{DynamicResource ResourceKey=RedGradientBrush}" />
-        <Setter Property="Background" Value="#500" />
-        <Setter Property="Foreground" Value="White" />
-        <Setter Property="BorderBrush" Value="SlateGray" />
+        <Setter Property="RowBackground" Value="{StaticResource PopupBackgroundBrush}" />
+        <Setter Property="Background" Value="{StaticResource TextBoxReadOnlyBackgroundBrush}" />
+        <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource ButtonPressedBorderBrush}" />
+		<Setter Property="HorizontalGridLinesBrush" Value="{StaticResource DataGridLineBrush}"/>
+		<Setter Property="VerticalGridLinesBrush" Value="{StaticResource DataGridLineBrush}"/>
         <Setter Property="RowHeight" Value="20" />
         <Setter Property="AllowDrop" Value="True" />
         <Setter Property="Block.TextAlignment" Value="Right" />
@@ -1010,8 +1044,8 @@
     <Style x:Key="DataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
         <Setter Property="Height" Value="30"/>
         <Setter Property="Padding" Value="8,0,8,0"/>
-        <Setter Property="Background" Value="#500"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource PopupBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="TextElement.FontStretch" Value="Expanded"/>
         <Setter Property="FontSize" Value="16" />
@@ -1039,15 +1073,11 @@
         <Setter Property="Width" Value="16" />
         <Setter Property="BorderBrush" Value="Black" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Background" Value="{DynamicResource ResourceKey=BoneGradient}" />
+        <Setter Property="Background" Value="{StaticResource BoneGradient}" />
         <Style.Resources>
             <Style TargetType="Border">
                 <Setter Property="CornerRadius" Value="5"/>
             </Style>
-            <LinearGradientBrush x:Key="BoneGradient" StartPoint="1,1" EndPoint="0,0" >
-                <GradientStop Color="Tan" Offset="0"/>
-                <GradientStop Color="Ivory" Offset="1"/>
-            </LinearGradientBrush>
         </Style.Resources>
     </Style>
 
@@ -1055,7 +1085,7 @@
     <Style x:Key="DataGridCellStyle" TargetType="{x:Type DataGridCell}">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Path=Content.Text, RelativeSource={RelativeSource Self}}"  Value="" >
-                <Setter Property="Background" Value="DarkRed"/>
+                <Setter Property="Background" Value="{StaticResource CheckBoxHoverBackgroundBrush}"/>
             </DataTrigger>
             <Trigger Property="IsSelected" Value="True">
                 <Setter Property="FontWeight" Value="Bold"/>
@@ -1071,21 +1101,21 @@
 
     <!-- TreeView Style -->
     <Style x:Key="TreeViewStyle" TargetType="{x:Type TreeView}">
-        <Setter Property="Background" Value="#500"/>
-        <Setter Property="BorderBrush" Value="SlateGray"/>
+        <Setter Property="Background" Value="{StaticResource ButtonBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ButtonBorderBrush}"/>
     </Style>
     <!--TreeViewItemStyle-->
     <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
-        <Setter Property="Background" Value="#500"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource ButtonBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource LightForegroundBrush}"/>
         <Setter Property="FontSize" Value="24"/>
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="Margin" Value="2" />
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="BorderBrush" Value="Orange"/>
+                <Setter Property="BorderBrush" Value="{StaticResource ButtonPressedBorderBrush}"/>
                 <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="Foreground" Value="Orange"/>
+                <Setter Property="Foreground" Value="{StaticResource ButtonPressedBackgroundBrush}"/>
             </Trigger>
         </Style.Triggers>
         <Style.Resources>
@@ -1098,27 +1128,6 @@
             </LinearGradientBrush>
         </Style.Resources>
     </Style>
-
-    <LinearGradientBrush x:Key="RedGradientBrush" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="DarkRed" Offset="0"/>
-        <GradientStop Color="#500" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="ReVGradientBrush" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="#500" Offset="0"/>
-        <GradientStop Color="DarkRed" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="PinkGradientBrush" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="PaleVioletRed" Offset="0"/>
-        <GradientStop Color="MediumVioletRed" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="OrangeGradientBrush" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="DarkOrange" Offset="0"/>
-        <GradientStop Color="Orange" Offset="1"/>
-    </LinearGradientBrush>
-    <LinearGradientBrush x:Key="MedRedGradientBrush" EndPoint="0,1" StartPoint="0,0">
-        <GradientStop Color="IndianRed" Offset="0"/>
-        <GradientStop Color="PaleVioletRed" Offset="1"/>
-    </LinearGradientBrush>
 
     <!--********************** Implicit Styles *********************** -->
     <Style BasedOn="{StaticResource ButtonStyle}" TargetType="{x:Type Button}" />

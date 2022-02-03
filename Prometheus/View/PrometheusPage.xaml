@@ -16,7 +16,6 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Themes/MSControls.Core.Implicit.xaml"/>
-                <ResourceDictionary Source="../Themes/MSControls.Toolkit.Implicit.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>

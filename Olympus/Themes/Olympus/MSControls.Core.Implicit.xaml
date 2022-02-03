@@ -10,79 +10,113 @@
 	</ResourceDictionary.MergedDictionaries>
 
 	<!-- *********************************  BRUSHES  ********************************* -->
-	<!--  Slider Brushes -->
-	<SolidColorBrush x:Key="SliderThumbBackgroundBrush" Color="{StaticResource Color003}" />
-	<SolidColorBrush x:Key="SliderThumbHoverBackgroundBrush" Color="{StaticResource Color002}" />
-	<SolidColorBrush x:Key="SliderThumbPressedBackgroundBrush" Color="{StaticResource Color024}" />
-	<SolidColorBrush x:Key="SliderThumbDisabledBackgroundBrush" Color="{StaticResource Color005}" />
-	<SolidColorBrush x:Key="SliderTrackDisabledOverlayBackgroundBrush" Color="{StaticResource Color008}" />
-	<SolidColorBrush x:Key="SliderThumbFocusedBorderBrush" Color="{StaticResource Color024}" />
-	<SolidColorBrush x:Key="SliderTrackBackgroundBrush" Color="{StaticResource Color005}" />
-	<SolidColorBrush x:Key="SliderSelectionRangeBackgroundBrush" Color="{StaticResource Color024}" />
+    <!--  Slider Brushes -->
+    <SolidColorBrush x:Key="SliderThumbBackgroundBrush" Color="{StaticResource Color005}" />
+    <SolidColorBrush x:Key="SliderThumbHoverBackgroundBrush" Color="{StaticResource Color002}" />
+    <SolidColorBrush x:Key="SliderThumbPressedBackgroundBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="SliderThumbDisabledBackgroundBrush" Color="{StaticResource Color005}" />
+    <SolidColorBrush x:Key="SliderTrackDisabledOverlayBackgroundBrush" Color="{StaticResource Color008}" />
+    <SolidColorBrush x:Key="SliderThumbFocusedBorderBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="SliderTrackBackgroundBrush" Color="{StaticResource Color003}" />
+    <SolidColorBrush x:Key="SliderSelectionRangeBackgroundBrush" Color="{StaticResource Color024}" />
 
-	<!--  GridSplitter Brushes -->
-	<SolidColorBrush x:Key="GridSplitterBackgroundBrush" Color="{StaticResource Color008}" />
-	<SolidColorBrush x:Key="GridSplitterBorderBrush" Color="{StaticResource Color004}" />
-	<SolidColorBrush x:Key="GridSplitterHoverBackgroundBrush" Color="{StaticResource Color006}" />
-	<SolidColorBrush x:Key="GridSplitterHoverBorderBrush" Color="{StaticResource Color003}" />
-	<SolidColorBrush x:Key="GridSplitterPressedBackgroundBrush" Color="{StaticResource Color024}" />
-	<SolidColorBrush x:Key="GridSplitterFocusedBorderBrush" Color="{StaticResource Color024}" />
+    <!--  GridSplitter Brushes -->
+    <SolidColorBrush x:Key="GridSplitterBackgroundBrush" Color="{StaticResource Color008}" />
+    <SolidColorBrush x:Key="GridSplitterBorderBrush" Color="{StaticResource Color004}" />
+    <SolidColorBrush x:Key="GridSplitterHoverBackgroundBrush" Color="{StaticResource Color006}" />
+    <SolidColorBrush x:Key="GridSplitterHoverBorderBrush" Color="{StaticResource Color003}" />
+    <SolidColorBrush x:Key="GridSplitterPressedBackgroundBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="GridSplitterFocusedBorderBrush" Color="{StaticResource Color024}" />
 
-	<!-- ProgressBar Brushes -->
-	<SolidColorBrush x:Key="ProgressBarBackgroundBrush" Color="{StaticResource Color005}" />
-	<SolidColorBrush x:Key="ProgressBarForegroundBrush" Color="{StaticResource Color024}" />
-	<LinearGradientBrush x:Key="ProgressBarIndeterminateBackgroundBrush" EndPoint="0,1" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="20,1" Opacity="0.8">
-		<LinearGradientBrush.Transform>
-			<TransformGroup>
-				<TranslateTransform X="0" />
-				<SkewTransform AngleX="-30" />
-			</TransformGroup>
-		</LinearGradientBrush.Transform>
-		<GradientStop Color="{StaticResource Color023}" Offset="0.249" />
-		<GradientStop Color="{StaticResource Color024}" Offset=".25" />
-		<GradientStop Color="{StaticResource Color024}" Offset="0.75" />
-		<GradientStop Color="{StaticResource Color023}" Offset="0.751" />
-	</LinearGradientBrush>
+    <!-- ProgressBar Brushes -->
+    <SolidColorBrush x:Key="ProgressBarBackgroundBrush" Color="{StaticResource Color005}" />
+    <SolidColorBrush x:Key="ProgressBarForegroundBrush" Color="{StaticResource Color024}" />
+    <LinearGradientBrush x:Key="ProgressBarIndeterminateBackgroundBrush" EndPoint="0,1" MappingMode="Absolute" SpreadMethod="Repeat" StartPoint="20,1" Opacity="0.8">
+        <LinearGradientBrush.Transform>
+            <TransformGroup>
+                <TranslateTransform X="0" />
+                <SkewTransform AngleX="-30" />
+            </TransformGroup>
+        </LinearGradientBrush.Transform>
+        <GradientStop Color="{StaticResource Color023}" Offset="0.249" />
+        <GradientStop Color="{StaticResource Color024}" Offset=".25" />
+        <GradientStop Color="{StaticResource Color024}" Offset="0.75" />
+        <GradientStop Color="{StaticResource Color023}" Offset="0.751" />
+    </LinearGradientBrush>
 
-	<!-- Tooltip Brushes -->
-	<SolidColorBrush x:Key="TooltipBackgroundBrush" Color="{StaticResource Color009}" />
-	<SolidColorBrush x:Key="TooltipBorderBrush" Color="{StaticResource Color004}" />
+    <!-- Tooltip Brushes -->
+    <SolidColorBrush x:Key="TooltipBackgroundBrush" Color="{StaticResource Color009}" />
+    <SolidColorBrush x:Key="TooltipBorderBrush" Color="{StaticResource Color004}" />
 
-	<!-- Expander Brushes -->
-	<SolidColorBrush x:Key="ExpanderButtonBackgroundBrush" Color="{StaticResource Color009}" />
-	<SolidColorBrush x:Key="ExpanderButtonBorderBrush" Color="{StaticResource Color004}" />
-	<SolidColorBrush x:Key="ExpanderButtonHoverBackgroundBrush" Color="{StaticResource Color007}" />
-	<SolidColorBrush x:Key="ExpanderButtonHoverBorderBrush" Color="{StaticResource Color003}" />
-	<SolidColorBrush x:Key="ExpanderButtonPressedBackgroundBrush" Color="{StaticResource Color024}" />
-	<SolidColorBrush x:Key="ExpanderButtonPressedBorderBrush" Color="{StaticResource Color024}" />
-	<SolidColorBrush x:Key="ExpanderArrowHoverBorderBrush" Color="{StaticResource Color002}" />
-	<SolidColorBrush x:Key="ExpanderArrowPressedBorderBrush" Color="{StaticResource Color009}" />
-	<SolidColorBrush x:Key="ExpanderDisabledForegroundBrush" Color="{StaticResource Color007}" />
-	<SolidColorBrush x:Key="ExpanderDisabledBackgroundBrush" Color="{StaticResource Color007}" />
+    <!-- Expander Brushes -->
+    <SolidColorBrush x:Key="ExpanderButtonBackgroundBrush" Color="{StaticResource Color009}" />
+    <SolidColorBrush x:Key="ExpanderButtonBorderBrush" Color="{StaticResource Color004}" />
+    <SolidColorBrush x:Key="ExpanderButtonHoverBackgroundBrush" Color="{StaticResource Color007}" />
+    <SolidColorBrush x:Key="ExpanderButtonHoverBorderBrush" Color="{StaticResource Color003}" />
+    <SolidColorBrush x:Key="ExpanderButtonPressedBackgroundBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="ExpanderButtonPressedBorderBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="ExpanderArrowHoverBorderBrush" Color="{StaticResource Color002}" />
+    <SolidColorBrush x:Key="ExpanderArrowPressedBorderBrush" Color="{StaticResource Color009}" />
+    <SolidColorBrush x:Key="ExpanderDisabledForegroundBrush" Color="{StaticResource Color007}" />
+    <SolidColorBrush x:Key="ExpanderDisabledBackgroundBrush" Color="{StaticResource Color007}" />
+    <SolidColorBrush x:Key="ExpanderBackgroundBrush" Color="{StaticResource Color009}" />
 
-	<!-- GroupBox Brushes -->
-	<SolidColorBrush x:Key="GroupBoxBorderBrush" Color="{StaticResource Color003}" />
+    <!-- GroupBox Brushes -->
+    <SolidColorBrush x:Key="GroupBoxBorderBrush" Color="{StaticResource Color003}" />
 
-	<!-- PassWordBox Brushes -->
-	<SolidColorBrush x:Key="PasswordBoxForegroundBrush" Color="{StaticResource Color024}" />
+    <!-- PassWordBox Brushes -->
+    <SolidColorBrush x:Key="PasswordBoxForegroundBrush" Color="{StaticResource Color024}" />
 
-	<!-- *********************************  TextBlock Style  ********************************* -->
+    <!-- *********************************  Tab Control Style  ********************************* -->
+    <Style x:Key="TabItemStyle" TargetType="{x:Type TabItem}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Grid Name="Panel">
+                        <ContentPresenter x:Name="ContentSite"
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Center"
+                                          ContentSource="Header"
+                                          Margin="10,2"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Panel" Property="Background" Value="{DynamicResource BackGradient}" />
+                            <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="{DynamicResource ForeGradient}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="False">
+                            <Setter TargetName="Panel" Property="Background" Value="{DynamicResource InactiveBackGradient}" />
+                            <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="{DynamicResource InactiveForeGradient}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TabControlStyle" TargetType="{x:Type TabControl}">
+        <Setter Property="Background" Value="{DynamicResource BackGroundBrush}"/>
+        <Setter Property="BorderBrush" Value="#055" />
+    </Style>
+
+    <!-- *********************************  TextBlock Style  ********************************* -->
 	<Style x:Key="TextBlockStyle" TargetType="TextBlock">
-		<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
+		<Setter Property="Foreground" Value="{StaticResource ForeGradient}" />
 		<Setter Property="FontSize" Value="13.333" />
 		<Setter Property="FontFamily" Value="Segoe UI" />
 	</Style>
 
 	<!-- *********************************  Label Style  ********************************* -->
-	<Style x:Key="LabelStyle" TargetType="{x:Type Label}">
-		<Setter Property="FontFamily" Value="Segoe UI" />
-		<Setter Property="FontSize" Value="13.333" />
-		<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
-		<Setter Property="IsTabStop" Value="False" />
-		<Setter Property="HorizontalContentAlignment" Value="Left" />
-	</Style>
+    <Style x:Key="LabelStyle" TargetType="Label">
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextBlock.FontSize" Value="14"/>
+        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="{StaticResource ForeGradient}"/>
+        <Setter Property="Margin" Value="5"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
 
-	<!-- *********************************  SliderRepeatButton Style  ********************************* -->
+    <!-- *********************************  SliderRepeatButton Style  ********************************* -->
 	<Style x:Key="SliderRepeatButtonStyle" TargetType="{x:Type RepeatButton}">
 		<Setter Property="OverridesDefaultStyle" Value="true" />
 		<Setter Property="Focusable" Value="false" />
@@ -372,7 +406,7 @@
 		<Setter Property="PreviewStyle">
 			<Setter.Value>
 				<Style TargetType="Control">
-					<Setter Property="Control.Template">
+					<Setter Property="Template">
 						<Setter.Value>
 							<ControlTemplate>
 								<Rectangle Fill="{StaticResource GridSplitterPressedBackgroundBrush}" Opacity="0.8" />
@@ -701,7 +735,7 @@
 								<ColumnDefinition Width="*" />
 							</Grid.ColumnDefinitions>
 							<Rectangle x:Name="rectangle" Width="30" Height="30" Fill="{StaticResource ExpanderButtonBackgroundBrush}" HorizontalAlignment="Center" Stroke="{StaticResource ExpanderButtonBorderBrush}" VerticalAlignment="Center" />
-							<Path x:Name="arrow" Width="10" Height="6" Fill="{StaticResource GlyphBackgroundBrush}" Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z " Stretch="Fill" RenderTransformOrigin="0.5, 0.5" />
+							<Path Grid.Column="0" x:Name="arrow" Width="10" Height="6" Fill="{StaticResource GlyphBackgroundBrush}" Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z " Stretch="Fill" RenderTransformOrigin="0.5, 0.5" />
 							<ContentPresenter Grid.Column="1" HorizontalAlignment="Stretch" Margin="4,0,0,0" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Center" />
 						</Grid>
 					</Border>
@@ -770,7 +804,19 @@
 		</Setter>
 	</Style>
 
-	<!-- *********************************  ToggleButton Style  ********************************* -->
+    <!-- ***********************************  TreeView Style  *********************************** -->
+    <Style x:Key="TreeViewStyle" TargetType="{x:Type TreeView}">
+        <Setter Property="Padding" Value="10,5"/>
+    </Style>
+
+    <!-- *********************************  TreeViewItem Style  ********************************* -->
+    <Style x:Key="TreeViewItemStyle" TargetType="{x:Type TreeViewItem}">
+        <Setter Property="FontFamily" Value="Segoe UI" />
+        <Setter Property="FontSize" Value="14.667"/>
+        <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
+    </Style>
+
+<!-- *********************************  ToggleButton Style  ********************************* -->
 	<Style x:Key="ToggleButtonStyle" TargetType="{x:Type ToggleButton}">
 		<Setter Property="FontFamily" Value="Segoe UI" />
 		<Setter Property="FontSize" Value="14.667" />
@@ -897,7 +943,7 @@
 							<ContentPresenter ContentSource="Header" Height="30" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
 						</Border>
 						<ContentPresenter Grid.ColumnSpan="2" Grid.Column="1" Margin="{TemplateBinding Padding}" Grid.Row="2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-						<Border Grid.ColumnSpan="4" Grid.Row="1" Grid.RowSpan="3">
+						<Border Grid.ColumnSpan="4" Grid.Column="0" Grid.Row="1" Grid.RowSpan="3">
 							<Border.OpacityMask>
 								<MultiBinding ConverterParameter="7" Converter="{StaticResource BorderGapMaskConverter}">
 									<Binding ElementName="Header" Path="ActualWidth" />
@@ -912,7 +958,7 @@
 			</Setter.Value>
 		</Setter>
 	</Style>
-    
+
     <!--********************** Implicit Styles *********************** -->
     <Style BasedOn="{StaticResource ButtonStyle}" TargetType="{x:Type Button}" />
     <Style BasedOn="{StaticResource ScrollBarStyle}" TargetType="{x:Type ScrollBar}" />
@@ -933,5 +979,9 @@
     <Style BasedOn="{StaticResource ExpanderStyle}" TargetType="{x:Type Expander}" />
     <Style BasedOn="{StaticResource ToggleButtonStyle}" TargetType="{x:Type ToggleButton}" />
     <Style BasedOn="{StaticResource GroupBoxStyle}" TargetType="{x:Type GroupBox}" />
-	
+    <Style BasedOn="{StaticResource TreeViewStyle}" TargetType="{x:Type TreeView}"/>
+    <Style BasedOn="{StaticResource TreeViewItemStyle}" TargetType="{x:Type TreeViewItem}"/>
+    <Style BasedOn="{StaticResource TabItemStyle}" TargetType="{x:Type TabItem}"/>
+    <Style BasedOn="{StaticResource TabControlStyle}" TargetType="{x:Type TabControl}"/>
+
 </ResourceDictionary>

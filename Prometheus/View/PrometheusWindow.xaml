@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="PrometheusWindow" Height="450" Width="800">
-    <Frame Source="./PrometheusPage.xaml"
-           Margin="2"
-           Height="Auto" 
-           HorizontalAlignment="Stretch" 
-           VerticalAlignment="Stretch"
-           BorderThickness="1" 
-           BorderBrush="SlateGray"
-           NavigationUIVisibility="Hidden"/>
+    <DockPanel>
+        <Frame Source="./PrometheusPage.xaml"
+               Height="Auto" 
+               HorizontalAlignment="Stretch" 
+               VerticalAlignment="Stretch"
+               BorderThickness="1" 
+               BorderBrush="SlateGray"
+               NavigationUIVisibility="Hidden"/>
+    </DockPanel>
 </Window>
