@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Uranus.Staff.Model;
 
 namespace Uranus.Staff
@@ -13,7 +14,7 @@ namespace Uranus.Staff
             Chariot = chariot;
         }
 
-        public bool ClockEvent(ClockEvent clock) => Chariot.Update(clock);
+        public int ClockEvent(ClockEvent clock) => Chariot.Update(clock);
 
         public void Employee(Employee employee) => Chariot.Update(employee);
 
@@ -23,7 +24,7 @@ namespace Uranus.Staff
             {
                 foreach (var clockEvent in clocks)
                 {
-                    Chariot.Update(clockEvent);
+                    Chariot.InsertOrUpdate(clockEvent);
                 }
             });
         }
@@ -36,7 +37,7 @@ namespace Uranus.Staff
             {
                 foreach (var entry in shiftEntries)
                 {
-                    Chariot.Update(entry);
+                    Chariot.InsertOrUpdate(entry);
                 }
             });
         }
@@ -85,6 +86,49 @@ namespace Uranus.Staff
         public void SetPending(string date, Employee employee)
         {
             SetPending(date, employee.ID);
+        }
+
+        /// <summary>
+        /// Gets the pending clock events and applies them to existing and new Shift Entries.
+        /// </summary>
+        public void ApplyPendingClockEvents()
+        {
+            Chariot.Database.RunInTransaction(() =>
+            {
+                // Get full clocks and shifts.
+                var clockDict = Chariot.Database.Query<ClockEvent>("SELECT * FROM ClockEvent WHERE Status <> ?;", EClockStatus.Deleted)
+                    .GroupBy(c => (c.EmployeeID, c.Date))
+                    .ToDictionary(g => g.Key, g => g.ToList());
+                var entryDict = Chariot.Database.Table<ShiftEntry>()
+                    .ToDictionary(e => (e.EmployeeID, e.Date), e => e);
+
+                // Get list of dates and employee IDs for pending clock events.
+                var checkList = clockDict.SelectMany(d => d.Value)
+                    .Where(c => c.Status == EClockStatus.Pending)
+                    .Select(c => (c.EmployeeID, c.Date));
+
+                // Set up lists for holding updated values.
+                List<ClockEvent> updatedClockEvents = new();
+                List<ShiftEntry> updatedEntries = new();
+
+                // Iterate through the check list to identify what clock groups and entries we need to modify.
+                foreach (var valueTuple in checkList)
+                {
+                    if (!clockDict.TryGetValue(valueTuple, out var clocks)) continue; // This should not occur, as the date and employee ID tuples are based on existing clocks, but let us be sure.
+
+                    if (!entryDict.TryGetValue(valueTuple, out var entry))
+                        entry = new() { Date = valueTuple.Date, EmployeeID = valueTuple.EmployeeID };
+
+                    entry.ApplyClockTimes(clocks);
+
+                    updatedEntries.Add(entry);
+                    updatedClockEvents.AddRange(clocks);
+                }
+
+                // Apply changed object updates to the database.
+                ShiftEntries(updatedEntries);
+                ClockEvents(updatedClockEvents);
+            });
         }
     }
 }

@@ -93,7 +93,10 @@ namespace Uranus.Staff.Model
         [Ignore]
         public List<ClockEvent> ClockEvents { get; set; }
 
-        public ShiftEntry() { }
+        public ShiftEntry()
+        {
+            ID = Guid.NewGuid();
+        }
 
         public ShiftEntry(Employee employee, List<ClockEvent> clockTimes)
         {

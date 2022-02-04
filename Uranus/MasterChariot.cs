@@ -60,28 +60,35 @@ namespace Uranus
         }
 
         /***************************** CREATE Data *****************************/
-
-        // Most basic building block for updating db tables.
-        // Removes all previous data and fully replaces it.
-        public bool ReplaceFullTable<T>(List<T> objList)
+        /// <summary>
+        /// Most basic building block for updating db tables.
+        /// Removes all previous data and fully replaces it.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="objList"></param>
+        /// <returns>Difference between objects deleted and objects inserted.</returns>
+        public int ReplaceFullTable<T>(List<T> objList)
         {
+            var line = 0;
             Database.RunInTransaction(() =>
             {
-                _ = Database.DeleteAll<T>();
-                _ = Database.InsertAll(objList);
+                line -= Database.DeleteAll<T>();
+                line += Database.InsertAll(objList);
             });
-            return true;
+            return line;
         }
 
         // Insert data into a table. Assumes that there will be no issues with duplicate data.
-        public bool InsertIntoTable<T>(List<T> objList)
+        public int InsertIntoTable<T>(IEnumerable<T> objList)
         {
-            if (objList.Count == 0) return false;
+            var enumerable = objList as T[] ?? objList.ToArray();
+            if (!enumerable.Any()) return 0;
+            var lines = 0;
             Database.RunInTransaction(() =>
             {
-                _ = Database.InsertAll(objList);
+                lines = Database.InsertAll(enumerable);
             });
-            return true;
+            return lines;
         }
 
         public bool Create<T>(T item, EPushType pushType = EPushType.ObjectOnly)
@@ -129,7 +136,12 @@ namespace Uranus
 
         /**************************** UPDATE Data ****************************/
 
-        // Update an existing table - replacing duplicate data (and adding new data).
+        /// <summary>
+        /// Update an existing table - replacing duplicate data (and adding new data).
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="objList"></param>
+        /// <returns></returns>
         public bool UpdateTable<T>(List<T> objList)
         {
             if (objList.Count == 0) return false;
@@ -143,17 +155,9 @@ namespace Uranus
             return true;
         }
 
-        public bool Update<T>(T item)
-        {
-            _ = Database.Update(item);
-            return true;
-        }
+        public int Update<T>(T item) => Database.Update(item);
 
-        public bool InsertOrUpdate<T>(T item)
-        {
-            _ = Database.InsertOrReplace(item);
-            return true;
-        }
+        public int InsertOrUpdate<T>(T item) => Database.InsertOrReplace(item);
 
         /**************************** DELETE Data ****************************/
         public bool EmptyTable<T>()

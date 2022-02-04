@@ -11,7 +11,7 @@ namespace Uranus.Users
             Chariot = chariot;
         }
 
-        public bool Login(Login login)
+        public int Login(Login login)
         {
             return Chariot.Update(login);
         }

@@ -196,5 +196,16 @@ namespace Uranus.Staff
         /* PROJECTS */
         public IEnumerable<Project> Projects(Expression<Func<Project, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType).OrderBy(p => p.Name);
 
+        public AionDataSet GetAionDataSet()
+        {
+            AionDataSet newSet = new();
+            Chariot.Database.RunInTransaction(() =>
+            {
+                newSet.ClockEvents = ClockEvents().ToDictionary(c => c.ID, c => c);
+                newSet.Employees = Employees().ToDictionary(e => e.ID, e => e);
+                newSet.ShiftEntries = ShiftEntries().ToDictionary(e => e.ID, e => e);
+            });
+            return newSet;
+        }
     }
 }

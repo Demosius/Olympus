@@ -57,22 +57,28 @@ namespace Olympus.ViewModel.Components
 
         public void Register()
         {
+            var user = App.Charon.CurrentUser;
             AlphaRegistrationWindow alpha = new();
             _ = alpha.ShowDialog();
             CheckUser();
+            if (user != App.Charon.CurrentUser) ParentVM.ClearRunningProjects();
         }
 
         public void LogIn()
         {
+            var user = App.Charon.CurrentUser;
             LoginWindow login = new();
             _ = login.ShowDialog();
             CheckUser();
+            if (user != App.Charon.CurrentUser) ParentVM.ClearRunningProjects();
         }
 
         public void LogOut()
         {
+            var user = App.Charon.CurrentUser;
             App.Charon.LogOut();
             CheckUser();
+            if (user != App.Charon.CurrentUser) ParentVM.ClearRunningProjects();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

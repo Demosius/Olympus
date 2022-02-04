@@ -123,7 +123,12 @@ namespace Olympus.ViewModel
                 _ = navigationService.Navigate((Page) project);
             
         }
-
+        
+        public void ClearRunningProjects()
+        {
+            CurrentProject = null;
+            RunningProjects = new();
+        }
         
 
         private static void EstablishInitialProjectIcons()

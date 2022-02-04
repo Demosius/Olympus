@@ -8,7 +8,7 @@ namespace Uranus.Staff
 {
     public class StaffCreator
     {
-        public StaffChariot Chariot { get; set; }
+        private StaffChariot Chariot { get; }
 
         public StaffCreator(ref StaffChariot chariot)
         {
@@ -45,7 +45,7 @@ namespace Uranus.Staff
                     Chariot.InsertOrUpdate(clockEvent);
                 }
 
-                returnVal = Chariot.InsertOrUpdate(entry);
+                returnVal = Chariot.InsertOrUpdate(entry) > 0;
             });
 
             return returnVal;
@@ -80,6 +80,25 @@ namespace Uranus.Staff
                 catch (IOException) {} // If the file can't be copied across, continue anyway.
             }
         }
+
+        public int Employees(IEnumerable<Employee> employees) => Chariot.InsertIntoTable(employees);
+
+        public int ShiftEntries(IEnumerable<ShiftEntry> entries) => Chariot.InsertIntoTable(entries);
+
+        public int ClockEvents(IEnumerable<ClockEvent> clocks) => Chariot.InsertIntoTable(clocks);
+
+        public int AionDataSet(AionDataSet dataSet)
+        {
+            var lines = 0;
+            Chariot.Database.RunInTransaction(() =>
+            {
+                if (dataSet.HasEmployees()) lines += Employees(dataSet.Employees.Select(entry => entry.Value));
+                if (dataSet.HasClockEvents()) lines += ClockEvents(dataSet.ClockEvents.Select(entry => entry.Value));
+                if (dataSet.HasShiftEntries()) lines += ShiftEntries(dataSet.ShiftEntries.Select(entry => entry.Value));
+            });
+            return lines;
+        }
+
         
     }
 }

@@ -41,7 +41,7 @@ namespace Uranus.Inventory
             // (Expect for ease/speed updates will happen one UoMCode at a time)
             Chariot.UoMCodeDelete(uomList.Select(s => s.Code).Distinct().ToList());
             
-            if (!Chariot.InsertIntoTable(uomList)) return false;
+            if (Chariot.InsertIntoTable(uomList) == 0) return false;
             
             _ = Chariot.SetTableUpdateTime(typeof(NAVUoM));
             return true;
@@ -52,13 +52,11 @@ namespace Uranus.Inventory
             if (stock.Count == 0) return false;
             // Remove from stock table anything with zones equal to what is being put in.
             Chariot.StockZoneDeletes(stock.Select(s => s.ZoneID).Distinct().ToList());
-            if (Chariot.InsertIntoTable(stock))  
-            {
-                _ = Chariot.SetTableUpdateTime(typeof(NAVStock));
-                _ = Chariot.SetStockUpdateTimes(stock);
-                return true;
-            }
-            return false;
+            if (Chariot.InsertIntoTable(stock) <= 0) return false;
+
+            _ = Chariot.SetTableUpdateTime(typeof(NAVStock));
+            _ = Chariot.SetStockUpdateTimes(stock);
+            return true;
         }
 
         public bool NAVZones(List<NAVZone> zones) => Chariot.UpdateTable(zones);
