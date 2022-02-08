@@ -1,0 +1,9 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AionClock.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="SolLocation" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\ausefpdfs01ns\Shares\Public\DC_Data\Olympus\PROD\Sol</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

@@ -1,0 +1,69 @@
+﻿<Window x:Class="Aion.View.ClockCreationWindow"
+        x:Name="ClockCreator"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Aion.ViewModel"
+        mc:Ignorable="d"
+        Title="Create New Timestamp" Height="300" Width="450"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
+    
+    <Window.DataContext>
+        <vm:ClockCreationVM x:Name="VM"/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Light Theme -->
+                <ResourceDictionary Source="../Themes/Metro/Light/Metro.MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary Source="../Themes/Metro/Light/Metro.MSControls.Toolkit.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <StackPanel Orientation="Vertical"
+                    Margin="15"
+                    VerticalAlignment="Center">
+            <Label Content="Select Employee"
+                   Margin="15,0"
+                   FontSize="16"
+                   FontWeight="Black"/>
+            <ComboBox Margin="15"
+                      ItemsSource="{Binding Employees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedValue="{Binding SelectedEmployee}"
+                      IsEditable="True"
+                      FontSize="16"
+                      FontWeight="Bold"
+                      HorizontalContentAlignment="Center"/>
+            <StackPanel Orientation="Horizontal"
+                        Margin="15,0">
+                <Label Content="Select Date"
+                   FontSize="16"
+                   FontWeight="Black"/>
+                <Separator/>
+                <DatePicker SelectedDate="{Binding Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"
+                        Margin="15"
+                        HorizontalAlignment="Right">
+                <Button Content="Cancel"
+                        IsCancel="True"/>
+                <Button Content="Create"
+                        IsDefault="True"
+                        Command="{Binding CreateClockCommand}"
+                        CommandParameter="{Binding ElementName=ClockCreator}"/>
+                <StackPanel.Resources>
+                    <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+                        <Setter Property="Margin" Value="15,0,0,0"/>
+                        <Setter Property="MinHeight" Value="25"/>
+                        <Setter Property="MinWidth" Value="75"/>
+                    </Style>
+                </StackPanel.Resources>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

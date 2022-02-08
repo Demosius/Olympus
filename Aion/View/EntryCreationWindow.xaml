@@ -1,0 +1,205 @@
+﻿<Window x:Class="Aion.View.SimpleEntryCreationWindow"
+        x:Name="SimpeEntryCreatorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Aion.ViewModel"
+        mc:Ignorable="d"
+        Title="Simple Shift Creator" Height="800" Width="550" 
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.DataContext>
+        <vm:EntryCreationVM x:Name="VM"/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Light Theme -->
+                <ResourceDictionary Source="../Themes/Metro/Light/Metro.MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary Source="../Themes/Metro/Light/Metro.MSControls.Toolkit.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Date -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal"
+                    HorizontalAlignment="Center">
+        <DatePicker SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    HorizontalAlignment="Center"
+                    FontSize="18"
+                    TextBlock.TextAlignment="Center"/>
+            <TextBlock Text="{Binding SelectedDate.DayOfWeek, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="20"
+                       Margin="30,0,0,0"/>
+        </StackPanel>
+        <!-- Employee -->
+        <ComboBox Grid.Row="1"
+                  ItemsSource="{Binding Employees}"
+                  SelectedItem="{Binding SelectedEmployee}"
+                  IsEditable="True"
+                  HorizontalContentAlignment="Center"
+                  FontSize="16"/>
+        
+        <!-- Template Row -->
+        <Grid Grid.Row="2"
+              Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <!-- First time -->
+            <Label Grid.Row="0" Grid.Column="0"
+                   Content="Start Shift" 
+                   FontSize="8"/>
+            <TextBox Grid.Row="1" Grid.Column="0"
+                     Text="{Binding StartShiftTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <!-- Second time -->
+            <Label Grid.Row="0" Grid.Column="1"
+                   Content="Start Lunch" 
+                   FontSize="8"/>
+            <TextBox Grid.Row="1" Grid.Column="1"
+                     Text="{Binding StartLunchTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <!-- Third time -->
+            <Label Grid.Row="0" Grid.Column="2"
+                   Content="End Lunch" 
+                   FontSize="8"/>
+            <TextBox Grid.Row="1" Grid.Column="2"
+                     Text="{Binding EndLunchTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <!-- Fourth time -->
+            <Label Grid.Row="0" Grid.Column="3"
+                   Content="End Shift" 
+                   FontSize="8"/>
+            <TextBox Grid.Row="1" Grid.Column="3"
+                     Text="{Binding EndShiftTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <!-- Comments -->
+            <Label Grid.Row="0" Grid.Column="4"
+                   Content="Comments" 
+                   FontSize="8"/>
+            <TextBox Grid.Row="1" Grid.Column="4"
+                     Text="{Binding Comment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            
+            <!-- Create Shift Entry Button -->
+            <Button Grid.Row="0" Grid.Column="5" Grid.RowSpan="2"
+                    Margin="10,0"
+                    Command="{Binding CreateEntryCommand}"
+                    Content="Create Shift Entry"
+                    FontSize="10"
+                    VerticalAlignment="Bottom"/>
+
+            <Grid.Resources>
+                <Style BasedOn="{StaticResource TextBoxStyle}" TargetType="TextBox">
+                    <Setter Property="Margin" Value="0,0,5,0"/>
+                </Style>
+            </Grid.Resources>
+
+        </Grid>
+        
+        <!-- Entry Display -->
+        <ListView Grid.Row="3"
+                  ItemsSource="{Binding Entries, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedValue="{Binding SelectedEntry}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="#F9F9FF" HorizontalAlignment="Stretch"
+                            BorderBrush="SteelBlue"
+                            BorderThickness="1">
+                        <Grid Margin="5,2" HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="90"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="160"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Day}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Date}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="2" Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Shift: "/>
+                                    <TextBlock Text="{Binding In}"/>
+                                    <TextBlock Text=" - "/>
+                                    <TextBlock Text="{Binding Out}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Lunch: "/>
+                                    <TextBlock Text="{Binding OutToLunch}"/>
+                                    <TextBlock Text=" - "/>
+                                    <TextBlock Text="{Binding InFromLunch}"/>
+                                </StackPanel>
+                                <StackPanel.Resources>
+                                    <Style BasedOn="{StaticResource TextBlockStyle}" TargetType="TextBlock">
+                                        <Setter Property="FontSize" Value="8"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                            </StackPanel>
+                            <TextBlock Grid.Column="3" Text="{Binding Comments}"
+                                       FontSize="12" 
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Left"
+                                       TextWrapping="Wrap"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        
+        <!-- Delete Shift Button-->
+        <StackPanel Grid.Row="4" Orientation="Horizontal"
+                    Margin="5,5,5,15"
+                    HorizontalAlignment="Center">
+            <Button Content="_Delete Shift"
+                    Command="{Binding DeleteEntryCommand}"/>
+        </StackPanel>
+
+        <!-- Cancel/Confirm -->
+        <StackPanel Grid.Row="5" Orientation="Horizontal"
+                    Margin="15,5,5,5"
+                    HorizontalAlignment="Right">
+            <Button Content="Cancel"
+                    IsCancel="True"/>
+            <Button Content="Confirm"
+                    IsDefault="True"
+                    Command="{Binding ConfirmEntryCreationCommand}"
+                    CommandParameter="{Binding ElementName=SimpleEntryCreatorWindow}"/>
+        </StackPanel>
+        <Grid.Resources>
+            <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+                <Setter Property="MinWidth" Value="75"/>
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="Margin" Value="10,0,0,0"/>
+            </Style>
+            <Style BasedOn="{StaticResource ComboBoxStyle}" TargetType="ComboBox">
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+            <Style TargetType="DatePicker">
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+        </Grid.Resources>
+    </Grid>
+</Window>

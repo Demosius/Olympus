@@ -1,0 +1,63 @@
+﻿<Page x:Class="Aion.View.AionPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Aion.ViewModel"
+        mc:Ignorable="d" 
+        d:DesignHeight="450" d:DesignWidth="800"
+        Title="Manage Staff">
+    
+    <Page.DataContext>
+        <vm:AionVM x:Name="VM"/>
+    </Page.DataContext>
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Light Theme -->
+                <ResourceDictionary Source="../Themes/Metro/Light/Metro.MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary Source="../Themes/Metro/Light/Metro.MSControls.Toolkit.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <DockPanel Background="White">
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ToggleButton Grid.Column="2" Content="Shift Entries" 
+                          Command="{Binding ShowEntryEditCommand}"/>
+            <ToggleButton Grid.Column="1" Content="Employees"
+                          Command="{Binding ShowEmployeesCommand}"/>
+
+            <Button Grid.Column="4"
+                    Command="{Binding ImportOldDataCommand}"
+                    ToolTip="Import and convert old Aion Data."
+                    Padding="0">
+                <Image Source="../refresh.png"
+                       Width="20"/>
+            </Button>
+            <Grid.Resources>
+                <Style BasedOn="{StaticResource ToggleButtonStyle}" TargetType="ToggleButton">
+                    <Setter Property="MinWidth" Value="90"/>
+                </Style>
+            </Grid.Resources>
+        </Grid>
+        <Frame  Content="{Binding CurrentPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                Margin="0" 
+                x:Name="OView"
+                Height="Auto" 
+                HorizontalAlignment="Stretch" 
+                VerticalAlignment="Stretch"
+                BorderThickness="1" 
+                BorderBrush="SlateGray"
+                NavigationUIVisibility="Hidden"/>
+
+    </DockPanel>
+</Page>

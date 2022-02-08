@@ -117,7 +117,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Aion\Aion\Aion.csproj" />
     <ProjectReference Include="..\Khaos\Khaos.csproj" />
     <ProjectReference Include="..\Pantheon\Pantheon.csproj" />
     <ProjectReference Include="..\Phoenix\Phoenix.csproj" />
