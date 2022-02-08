@@ -30,8 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Olympus\Styx\Styx.csproj" />
-    <ProjectReference Include="..\..\Olympus\Uranus\Uranus.csproj" />
+    <ProjectReference Include="..\Styx\Styx.csproj" />
+    <ProjectReference Include="..\Uranus\Uranus.csproj" />
   </ItemGroup>
 
   <ItemGroup>
