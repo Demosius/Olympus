@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:vm="clr-namespace:Aion.ViewModel"
+      xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
       mc:Ignorable="d" 
       d:DesignHeight="1080" d:DesignWidth="1920"
       Title="EntryEditPage">
@@ -54,7 +55,7 @@
                 </StackPanel>
             </ToolBar>
         </ToolBarTray>
-        <StackPanel Orientation="Horizontal" 
+        <!--<StackPanel Orientation="Horizontal" 
                     DockPanel.Dock="Top"
                     Margin="3">
             <TextBlock Text="Manager: "/>
@@ -66,7 +67,7 @@
                     <Setter Property="VerticalAlignment" Value="Center"/>
                 </Style>
             </StackPanel.Resources>
-        </StackPanel>
+        </StackPanel>-->
         <Border BorderThickness="1" BorderBrush="Gray">
             <StackPanel Orientation="Vertical"
                         DockPanel.Dock="Left">
@@ -105,10 +106,19 @@
 
             <ListView Grid.Row="1" DockPanel.Dock="Right"
                       ItemsSource="{Binding Clocks, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedValue="{Binding SelectedClock}">
+                      SelectedValue="{Binding SelectedClock}"
+                      Width="150">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Time}"/>
+                        <xctk:MaskedTextBox Mask="00:00:00"
+                                            FontFamily="Courier New"
+                                            FontSize="20"
+                                            InsertKeyMode="Overwrite"
+                                            Text="{Binding Time, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            HorizontalAlignment="Center"
+                                            Width="120"
+                                            Margin="8,0"
+                                            HorizontalContentAlignment="Center"/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
@@ -129,33 +139,98 @@
                     <GridViewColumn Header="Name"
                                     DisplayMemberBinding="{Binding Employee.FullName}"/>
                     <GridViewColumn Header="Location"
-                                    DisplayMemberBinding="{Binding Location}"/>
-                    <GridViewColumn DisplayMemberBinding="{Binding Date}">
+                                    Width="115">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBox Text="Date" />
+                                <ComboBox ItemsSource="{Binding ElementName=VM, Path=Locations}"
+                                          SelectedValue="{Binding Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          IsEditable="True"
+                                          MinWidth="100"
+                                          HorizontalContentAlignment="Center"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                                    
-                    <GridViewColumn Header="Day"
+                    <GridViewColumn Header="Date"
                                     DisplayMemberBinding="{Binding Date}"/>
-                    <GridViewColumn Header="In"
-                                    DisplayMemberBinding="{Binding ShiftStartTime}"/>
+                    <GridViewColumn Header="Day"
+                                    DisplayMemberBinding="{Binding Day}"/>
+                    <GridViewColumn Header="In">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding ShiftStartTime}" 
+                                         Width="68"
+                                         HorizontalContentAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Out"
-                                    DisplayMemberBinding="{Binding LunchStartTime}"/>
+                                    Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding LunchStartTime}" 
+                                         Width="68"
+                                         HorizontalContentAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="In" 
-                                    DisplayMemberBinding="{Binding LunchEndTime}"/>
+                                    Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding LunchEndTime}" 
+                                         Width="68"
+                                         HorizontalContentAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Out"
-                                    DisplayMemberBinding="{Binding ShiftEndTime}"/>
+                                    Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding ShiftEndTime}" 
+                                         Width="68"
+                                         HorizontalContentAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Shift Type"
-                                    DisplayMemberBinding="{Binding ShiftType}"/>
+                                    Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding ShiftType}" 
+                                         Width="68"
+                                         HorizontalContentAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Total"
-                                    DisplayMemberBinding="{Binding TimeTotal}"/>
+                                    Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding TimeTotal}" 
+                                         Width="68"
+                                         HorizontalContentAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Time Worked"
-                                    DisplayMemberBinding="{Binding HoursWorked}"/>
-                    <GridViewColumn Header="Comments"
-                                    DisplayMemberBinding="{Binding Comments}"/>
+                                    Width="80">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding HoursWorked, StringFormat=N2}"
+                                         Width="68"
+                                         HorizontalContentAlignment="Center"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Comments">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="{Binding Comments}" 
+                                         MinWidth="150"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
                 
             </ListView.View>

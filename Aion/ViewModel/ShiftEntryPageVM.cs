@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using Styx;
 using Uranus;
-using ExportEntry = Aion.Model.ExportEntry;
 using Uranus.Staff.Model;
 
 namespace Aion.ViewModel
@@ -28,6 +27,17 @@ namespace Aion.ViewModel
             {
                 manager = value;
                 OnPropertyChanged(nameof(Manager));
+            }
+        }
+
+        private ObservableCollection<string> locations;
+        public ObservableCollection<string> Locations
+        {
+            get => locations;
+            set
+            {
+                locations = value;
+                OnPropertyChanged(nameof(Locations));
             }
         }
 
@@ -195,8 +205,7 @@ namespace Aion.ViewModel
             OnPropertyChanged(nameof(SelectedEmployee));
             temp.Insert(0, selectedEmployee);
             Employees = new(temp);
-
-
+            
             Task.Run(SetEntries);
         }
 
@@ -213,7 +222,9 @@ namespace Aion.ViewModel
             });
 
             FullEntries = Helios.StaffReader.GetFilteredEntries(StartDate, EndDate, Manager.ID);
-            
+
+            Locations = new(FullEntries.Select(e => e.Location).Distinct());
+
             DeletedEntries = new();
 
             ApplyFilters();
@@ -348,9 +359,10 @@ namespace Aion.ViewModel
         /// </summary>
         private void SetClocks()
         {
-            if (FullClockDictionary.TryGetValue((selectedEntry.EmployeeID, SelectedEntry.Date), out var newClockList))
+            if (selectedEntry is not null && FullClockDictionary.TryGetValue((selectedEntry.EmployeeID, SelectedEntry.Date), out var newClockList))
                 Clocks = new(newClockList.Where(c => c.Status != EClockStatus.Deleted));
-            Clocks = new();
+            else
+                Clocks = new();
         }
         
         public void DeleteSelectedClock()
