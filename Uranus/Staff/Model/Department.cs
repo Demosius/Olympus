@@ -24,6 +24,8 @@ namespace Uranus.Staff.Model
         public List<Clan> Clans { get; set; }
         [OneToMany(CascadeOperations = CascadeOperation.All)]
         public List<Role> Roles { get; set; }
+        [OneToMany(nameof(Roster.DepartmentName), nameof(Roster.Department), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+        public List<Roster> Rosters { get; set; }
 
         [OneToMany(inverseProperty: "OverDepartment")]
         public List<Department> SubDepartments { get; set; }

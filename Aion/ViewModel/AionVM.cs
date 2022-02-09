@@ -53,8 +53,7 @@ namespace Aion.ViewModel
         public bool EmployeeView { get => employeeView; set { employeeView = value; OnPropertyChanged(nameof(EmployeeView)); } }
 
         /* Commands */
-        public ShowEntryEditCommand ShowEntryEditCommand { get; set; }
-        public ShowEntryViewCommand ShowEntryViewCommand { get; set; }
+        public ShowEntriesCommand ShowEntriesCommand { get; set; }
         public ShowEmployeesCommand ShowEmployeesCommand { get; set; }
         public ImportOldDataCommand ImportOldDataCommand { get; set; }
         public RefreshDataCommand RefreshDataCommand { get; set; }
@@ -62,8 +61,7 @@ namespace Aion.ViewModel
         public AionVM()
         {
             // Commands
-            ShowEntryViewCommand = new(this);
-            ShowEntryEditCommand = new(this);
+            ShowEntriesCommand = new(this);
             ShowEmployeesCommand = new(this);
             ImportOldDataCommand = new(this);
             RefreshDataCommand = new(this);

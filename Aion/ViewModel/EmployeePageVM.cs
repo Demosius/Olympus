@@ -90,6 +90,7 @@ namespace Aion.ViewModel
         {
             Helios = helios;
             Charon = charon;
+            allEmployees ??= new(Helios.StaffReader.GetManagedEmployees(Charon.UserEmployee));
             Task.Run(RefreshData);
         }
 
@@ -98,8 +99,6 @@ namespace Aion.ViewModel
         /// </summary>
         public void ApplyFilters()
         {
-            allEmployees ??= new(Helios.StaffReader.Employees());
-
             if ((empSearchString ?? "") != "")
             {
                 Regex rex = new(EmpSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);

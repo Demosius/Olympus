@@ -5,9 +5,9 @@ namespace Aion.ViewModel.Commands
 {
     public class ExportEntriesToCSVCommand : ICommand
     {
-        public EntryViewPageVM VM { get; set; }
+        public ShiftEntryPageVM VM { get; set; }
 
-        public ExportEntriesToCSVCommand(EntryViewPageVM vm) { VM = vm; }
+        public ExportEntriesToCSVCommand(ShiftEntryPageVM vm) { VM = vm; }
 
         public event EventHandler CanExecuteChanged
         {

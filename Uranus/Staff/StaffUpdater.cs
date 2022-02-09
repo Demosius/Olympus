@@ -42,6 +42,22 @@ namespace Uranus.Staff
             });
         }
 
+        public void EntriesAndClocks(IEnumerable<ShiftEntry> shiftEntries, IEnumerable<ClockEvent> clockEvents)
+        {
+            Chariot.Database.RunInTransaction(() =>
+            {
+                foreach (var entry in shiftEntries)
+                {
+                    Chariot.InsertOrUpdate(entry);
+                }
+
+                foreach (var clockEvent in clockEvents)
+                {
+                    Chariot.InsertOrUpdate(clockEvent);
+                }
+            });
+        }
+
         /// <summary>
         /// Denotes a deleted shift entry, and sets the associated Clock Events to pending.
         /// </summary>

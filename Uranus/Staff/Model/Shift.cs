@@ -22,6 +22,8 @@ namespace Uranus.Staff.Model
         [ManyToMany(typeof(EmployeeShift), "EmployeeID", "Shifts", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<Employee> Employees { get; set; }
 
+        [OneToMany(nameof(Roster.ShiftName), nameof(Roster.Shift), CascadeOperations = CascadeOperation.CascadeInsert | CascadeOperation.CascadeRead)]
+        public List<Roster> Rosters { get; set; }
     }
 
     public class Break

@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Aion.View;
+using System;
 using System.Windows.Input;
 
 namespace Aion.ViewModel.Commands
 {
-    public class LaunchClockCreatorCommand : ICommand
+    public class ShowEntriesCommand : ICommand
     {
-        public EntryViewPageVM VM { get; set; }
+        public AionVM VM { get; set; }
 
-        public LaunchClockCreatorCommand(EntryViewPageVM vm) { VM = vm; }
+        public ShowEntriesCommand(AionVM vm) { VM = vm; }
 
         public event EventHandler CanExecuteChanged
         {
@@ -17,12 +18,12 @@ namespace Aion.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            return true;
+            return VM.CurrentPage != VM.ShiftEntryPage || VM.CurrentPage is null;
         }
 
         public void Execute(object parameter)
         {
-            VM.LaunchClockCreator();
+            VM.ShowEntryPage();
         }
     }
 }

@@ -5,9 +5,9 @@ namespace Aion.ViewModel.Commands
 {
     public class LaunchShiftCreatorCommand : ICommand
     {
-        public EntryViewPageVM VM { get; set; }
+        public ShiftEntryPageVM VM { get; set; }
 
-        public LaunchShiftCreatorCommand(EntryViewPageVM vm) { VM = vm; }
+        public LaunchShiftCreatorCommand(ShiftEntryPageVM vm) { VM = vm; }
 
         public event EventHandler CanExecuteChanged
         {

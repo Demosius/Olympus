@@ -71,6 +71,8 @@ namespace Uranus.Staff.Model
         public List<Employee> Reports { get; set; }
         [OneToMany("EmployeeID", "Employee", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
         public List<ShiftEntry> ShiftEntries { get; set; }
+        [OneToMany(nameof(Roster.EmployeeID), nameof(Roster.Employee))]
+        public List<Roster> Rosters { get; set; }
 
         [Ignore] public string FullName => $"{FirstName} {LastName}";
 

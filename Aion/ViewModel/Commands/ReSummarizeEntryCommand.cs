@@ -7,11 +7,11 @@ using System.Windows.Input;
 
 namespace Aion.ViewModel.Commands
 {
-    public class CreateNewClockCommand : ICommand
+    public class ReSummarizeEntryCommand : ICommand
     {
         public ShiftEntryPageVM VM { get; set; }
 
-        public CreateNewClockCommand(ShiftEntryPageVM vm) { VM = vm; }
+        public ReSummarizeEntryCommand(ShiftEntryPageVM vm) { VM = vm; }
 
         public bool CanExecute(object parameter)
         {
@@ -20,7 +20,7 @@ namespace Aion.ViewModel.Commands
 
         public void Execute(object parameter)
         {
-            VM.CreateNewClock();
+            VM.ReSummarizeEntry();
         }
 
         public event EventHandler CanExecuteChanged

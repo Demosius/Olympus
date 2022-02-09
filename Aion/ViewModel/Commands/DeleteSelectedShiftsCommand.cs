@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows.Input;
 using Aion.Model;
+using Uranus.Staff.Model;
 
 namespace Aion.ViewModel.Commands
 {
@@ -26,7 +27,7 @@ namespace Aion.ViewModel.Commands
         public void Execute(object parameter)
         {
             var items = (System.Collections.IList)parameter; 
-            var selection = items?.Cast<ExportEntry>();
+            var selection = items?.Cast<ShiftEntry>();
             if (selection != null) VM.DeleteSelectedShifts(selection.ToList());
         }
     }

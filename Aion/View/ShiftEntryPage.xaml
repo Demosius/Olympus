@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:vm="clr-namespace:Aion.ViewModel"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="1080" d:DesignWidth="1920"
       Title="EntryEditPage">
 
     <Page.DataContext>
@@ -76,11 +76,13 @@
                         <AccessText  Text="_Refresh Data" VerticalAlignment="Center" Margin="10,0"/>
                     </StackPanel>
                 </Button>
-                <Button Content="Create _New Shift Entries"
-                        Command="{Binding LaunchSimpleShiftCreatorCommand}"/>
-                <Button Content="_Delete Selected Entries"
-                        CommandParameter="{Binding ElementName=EntryGrid, Path=SelectedItems}"
-                        Command="{Binding  DeleteSelectedShiftsCommand}"/>
+                <Button Command="{Binding LaunchSimpleShiftCreatorCommand}">
+                    <AccessText Text="Create _New Shift Entries"/>
+                </Button>
+                <Button CommandParameter="{Binding ElementName=EntryGrid, Path=SelectedItems}"
+                        Command="{Binding  DeleteSelectedShiftsCommand}">
+                    <AccessText Text="_Delete Selected Entries"/>
+                </Button>
                 <Button Command="{Binding SaveEntryChangesCommand}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="../save.png"/>
@@ -89,7 +91,81 @@
                 </Button>
             </StackPanel>
         </Border>
-        <DataGrid x:Name="EntryGrid"
+        <Grid DockPanel.Dock="Right">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" MinHeight="200"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Label Content="Clock Events" HorizontalAlignment="Center"/>
+
+            <ListView Grid.Row="1" DockPanel.Dock="Right"
+                      ItemsSource="{Binding Clocks, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedValue="{Binding SelectedClock}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Time}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <Button Grid.Row="2" Content="Apply"
+                    Command="{Binding ReSummarizeEntryCommand}" Margin="5,5,5,5"/>
+            <Button Grid.Row="3" Content="New"
+                    Command="{Binding CreateNewClockCommand}" Margin="5,5,5,5"/>
+            <Button Grid.Row="4" Content="Delete"
+                    Command="{Binding DeleteClockCommand}"/>
+        </Grid>
+        <ListView ItemsSource="{Binding Entries, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedValue="{Binding SelectedEntry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Associate Number"
+                                    DisplayMemberBinding="{Binding EmployeeID}"/>
+                    <GridViewColumn Header="Name"
+                                    DisplayMemberBinding="{Binding Employee.FullName}"/>
+                    <GridViewColumn Header="Location"
+                                    DisplayMemberBinding="{Binding Location}"/>
+                    <GridViewColumn DisplayMemberBinding="{Binding Date}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Text="Date" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                                    
+                    <GridViewColumn Header="Day"
+                                    DisplayMemberBinding="{Binding Date}"/>
+                    <GridViewColumn Header="In"
+                                    DisplayMemberBinding="{Binding ShiftStartTime}"/>
+                    <GridViewColumn Header="Out"
+                                    DisplayMemberBinding="{Binding LunchStartTime}"/>
+                    <GridViewColumn Header="In" 
+                                    DisplayMemberBinding="{Binding LunchEndTime}"/>
+                    <GridViewColumn Header="Out"
+                                    DisplayMemberBinding="{Binding ShiftEndTime}"/>
+                    <GridViewColumn Header="Shift Type"
+                                    DisplayMemberBinding="{Binding ShiftType}"/>
+                    <GridViewColumn Header="Total"
+                                    DisplayMemberBinding="{Binding TimeTotal}"/>
+                    <GridViewColumn Header="Time Worked"
+                                    DisplayMemberBinding="{Binding HoursWorked}"/>
+                    <GridViewColumn Header="Comments"
+                                    DisplayMemberBinding="{Binding Comments}"/>
+                </GridView>
+                
+            </ListView.View>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBox Text="{}"></TextBox>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <!--<DataGrid x:Name="EntryGrid"
                   ItemsSource="{Binding Entries, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   SelectedValue="{Binding SelectedEntry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   AutoGenerateColumns="True"
@@ -113,7 +189,7 @@
                     </Style.Triggers>
                 </Style>
             </DataGrid.CellStyle>
-        </DataGrid>
+        </DataGrid>-->
         <DockPanel.Resources>
             <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
                 <Setter Property="Margin" Value="5"/>

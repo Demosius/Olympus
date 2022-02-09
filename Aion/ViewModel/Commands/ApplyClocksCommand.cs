@@ -3,11 +3,11 @@ using System.Windows.Input;
 
 namespace Aion.ViewModel.Commands
 {
-    public class ShowEntryViewCommand : ICommand
+    public class ApplyClocksCommand : ICommand
     {
-        public AionVM VM { get; set; }
+        public ShiftEntryPageVM VM { get; set; }
 
-        public ShowEntryViewCommand(AionVM vm) { VM = vm; }
+        public ApplyClocksCommand(ShiftEntryPageVM vm) { VM = vm; }
 
         public event EventHandler CanExecuteChanged
         {
@@ -17,12 +17,12 @@ namespace Aion.ViewModel.Commands
 
         public bool CanExecute(object parameter)
         {
-            return VM.CurrentPage != VM.EntryViewPage || VM.CurrentPage is null;
+            return true;
         }
 
         public void Execute(object parameter)
         {
-            VM.ShowEntryView();
+            VM.ApplyPendingClocks();
         }
     }
 }

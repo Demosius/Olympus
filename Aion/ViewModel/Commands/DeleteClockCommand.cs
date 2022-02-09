@@ -5,9 +5,9 @@ namespace Aion.ViewModel.Commands
 {
     public class DeleteClockCommand : ICommand
     {
-        public EntryEditVM VM { get; set; }
+        public ShiftEntryPageVM VM { get; set; }
 
-        public DeleteClockCommand(EntryEditVM vm) { VM = vm; }
+        public DeleteClockCommand(ShiftEntryPageVM vm) { VM = vm; }
 
         public event EventHandler CanExecuteChanged
         {

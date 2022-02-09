@@ -19,10 +19,7 @@ namespace Aion.ViewModel
     {
         public Helios Helios { get; set; }
         public Charon Charon { get; set; }
-
-        private readonly DateTime minDate = DateTime.Now.AddMonths(-2).Date;
-        private readonly DateTime maxDate = DateTime.Now.AddYears(1).Date;
-
+        
         private Employee manager;
         public Employee Manager
         {
@@ -58,11 +55,10 @@ namespace Aion.ViewModel
         }
 
         private List<ShiftEntry> FullEntries { get; set; }
-        private List<ExportEntry> EditableEntries { get; set; }
-        private List<ExportEntry> DeletedEntries { get; set; }
+        private List<ShiftEntry> DeletedEntries { get; set; }
 
-        private ObservableCollection<ExportEntry> entries;
-        public ObservableCollection<ExportEntry> Entries
+        private ObservableCollection<ShiftEntry> entries;
+        public ObservableCollection<ShiftEntry> Entries
         {
             get => entries;
             set
@@ -72,14 +68,48 @@ namespace Aion.ViewModel
             }
         }
 
-        private ExportEntry selectedEntry;
-        public ExportEntry SelectedEntry
+        private ShiftEntry selectedEntry;
+        public ShiftEntry SelectedEntry
         {
             get => selectedEntry;
             set
             {
                 selectedEntry = value;
                 OnPropertyChanged(nameof(SelectedEntry));
+                SetClocks();
+            }
+        }
+        
+        private Dictionary<(int, string), List<ClockEvent>> fullClockDictionary;
+        public Dictionary<(int, string), List<ClockEvent>> FullClockDictionary
+        {
+            get => fullClockDictionary;
+            set
+            {
+                fullClockDictionary = value;
+                OnPropertyChanged(nameof(FullClockDictionary));
+            }
+        }
+
+        private ObservableCollection<ClockEvent> clocks;
+        public ObservableCollection<ClockEvent> Clocks
+        {
+            get => clocks;
+            set
+            {
+                clocks = value;
+                OnPropertyChanged(nameof(Clocks));
+            }
+        }
+
+        private ClockEvent selectedClock;
+        public ClockEvent SelectedClock
+        {
+            get => selectedClock;
+            set
+            {
+                selectedClock = value;
+                OnPropertyChanged(nameof(selectedClock));
             }
         }
 
@@ -89,8 +119,6 @@ namespace Aion.ViewModel
             get => startDate;
             set
             {
-                if (value > maxDate) value = maxDate;
-                if (value < minDate) value = minDate;
                 startDate = value;
                 if (startDate > endDate)
                 {
@@ -108,8 +136,6 @@ namespace Aion.ViewModel
             get => endDate;
             set
             {
-                if (value > maxDate) value = maxDate;
-                if (value < minDate) value = minDate;
                 endDate = value;
                 if (endDate < startDate)
                 {
@@ -128,6 +154,14 @@ namespace Aion.ViewModel
         public SaveEntryChangesCommand SaveEntryChangesCommand { get; set; }
         public DeleteSelectedShiftsCommand DeleteSelectedShiftsCommand { get; set; }
         public LaunchSimpleShiftCreatorCommand LaunchSimpleShiftCreatorCommand { get; set; }
+        public ApplyClocksCommand ApplyClocksCommand { get; set; }
+        public DeleteClockCommand DeleteClockCommand { get; set; }
+        public DeleteShiftCommand DeleteShiftCommand { get; set; }
+        public ExportEntriesToCSVCommand ExportEntriesToCSVCommand { get; set; }
+        public LaunchShiftCreatorCommand LaunchShiftCreatorCommand { get; set; }
+        public ReSummarizeEntriesCommand ReSummarizeEntriesCommand { get; set; }
+        public ReSummarizeEntryCommand ReSummarizeEntryCommand { get; set; }
+        public CreateNewClockCommand CreateNewClockCommand { get; set; }
 
         public ShiftEntryPageVM()
         {
@@ -135,11 +169,20 @@ namespace Aion.ViewModel
             endDate = DateTime.Now.AddDays(-1).Date;
 
             Entries = new();
+
             // Commands
             RefreshDataCommand = new(this);
             SaveEntryChangesCommand = new(this);
             DeleteSelectedShiftsCommand = new(this);
             LaunchSimpleShiftCreatorCommand = new(this);
+            ApplyClocksCommand = new(this);
+            DeleteClockCommand = new(this);
+            DeleteShiftCommand = new(this);
+            ExportEntriesToCSVCommand = new(this);
+            LaunchShiftCreatorCommand = new(this);
+            ReSummarizeEntriesCommand = new(this);
+            ReSummarizeEntryCommand = new(this);
+            CreateNewClockCommand = new(this);
         }
 
         public void SetDataSources(Helios helios, Charon charon)
@@ -149,8 +192,10 @@ namespace Aion.ViewModel
             Manager = charon.UserEmployee;
             var temp = Helios.StaffReader.GetManagedEmployees(Manager).ToList();
             selectedEmployee = new() { FirstName = "<- None", LastName = "Selected ->", ID = -1 };
+            OnPropertyChanged(nameof(SelectedEmployee));
             temp.Insert(0, selectedEmployee);
             Employees = new(temp);
+
 
             Task.Run(SetEntries);
         }
@@ -160,15 +205,15 @@ namespace Aion.ViewModel
         /// </summary>
         private void SetEntries()
         {
-            if (Manager is null) return;
-            // Update with pending clocks first.
-            UpdateEntries();
+            Task.Run(() =>
+            {
+                FullClockDictionary = Helios.StaffReader.ClockEvents(startDate, endDate)
+                    .GroupBy(c => (c.EmployeeID, c.Date))
+                    .ToDictionary(g => g.Key, g => g.ToList());
+            });
 
-            // Get the required entries with applied clock times.
-            FullEntries = Helios.StaffReader.GetFilteredEntries(minDate, maxDate, Manager.ID);
-
-            // Get the rejected clock times.
-            EditableEntries = new();
+            FullEntries = Helios.StaffReader.GetFilteredEntries(StartDate, EndDate, Manager.ID);
+            
             DeletedEntries = new();
 
             ApplyFilters();
@@ -186,14 +231,14 @@ namespace Aion.ViewModel
             {
                 Entries = new
                 (
-                    EditableEntries.Where(e => e.AssociateNumber == SelectedEmployee.ID && string.CompareOrdinal(e.Date, startString) >= 0 && String.CompareOrdinal(e.Date, endString) <= 0)
+                    FullEntries.Where(e => e.EmployeeID == SelectedEmployee.ID && string.CompareOrdinal(e.Date, startString) >= 0 && string.CompareOrdinal(e.Date, endString) <= 0)
                 );
             }
             else
             {
                 Entries = new
                 (
-                    EditableEntries.Where(e => String.CompareOrdinal(e.Date, startString) >= 0 && String.CompareOrdinal(e.Date, endString) <= 0)
+                    FullEntries.Where(e => string.CompareOrdinal(e.Date, startString) >= 0 && string.CompareOrdinal(e.Date, endString) <= 0)
                 );
             }
             SetExportString();
@@ -203,60 +248,11 @@ namespace Aion.ViewModel
         /// <summary>
         /// Converts all the clock times for Employees into Daily Entries, updating the database in the process.
         /// </summary>
-        public void UpdateEntries()
+        public void ApplyPendingClocks()
         {
-            // Get all pending clocks. Sort into employee groups.
-            var clockList = Helios.StaffReader.GetPendingClocks(Manager.ID, minDate, maxDate).ToList();
-            var pendingClocks = clockList.GroupBy(c => c.EmployeeID).ToDictionary(g => g.Key, g => g.ToList());
-
-            // Get list of relevant employees, and pull those from DB.
-            var empCodes = pendingClocks.Select(e => e.Key).ToList();
-            var employeeList = Helios.StaffReader.Employees(e => empCodes.Contains(e.ID));
-
-            var validEntries = Helios.StaffReader.ShiftEntries(e => empCodes.Contains(e.EmployeeID))
-                .GroupBy(e => e.EmployeeID).ToDictionary(g => g.Key, g => g.ToList());
-
-            // For keeping track of the adjusted entries.
-            List<ShiftEntry> entryConfirmation = new();
-
-            // Loop through employees and assign clocks and DEs before running their clock convert function.
-            foreach (var employee in employeeList)
-            {
-                var employeeClockEvents = pendingClocks[employee.ID];
-                _ = validEntries.TryGetValue(employee.ID, out var empEntries);
-                employee.ShiftEntries = empEntries ?? new();
-                ConvertClockToEntries(employee, employeeClockEvents);
-                entryConfirmation = entryConfirmation.Concat(employee.ShiftEntries).ToList();
-            }
-
-            Helios.StaffUpdater.ShiftEntries(entryConfirmation);
-            Helios.StaffUpdater.ClockEvents(clockList);
+            Helios.StaffUpdater.ApplyPendingClockEvents();
         }
-
-        private static void ConvertClockToEntries(Employee employee, List<ClockEvent> clocks)
-        {
-            if (clocks is null || employee is null) return;
-            var pendingClocks = clocks.Where(c => c.Status == EClockStatus.Pending)
-                .GroupBy(c => c.DtDate.ToString("yyyy-MM-dd"))
-                .ToDictionary(g => g.Key, g => g.ToList());
-            if (pendingClocks.Count == 0) return;
-
-            // Get existing Daily Entries in dictionary form for quick look up.
-            var currentEntries = employee.ShiftEntries.ToDictionary(d => d.Date, d => d);
-
-            foreach (var (key, value) in pendingClocks)
-            {
-                if (currentEntries.ContainsKey(key))
-                {
-                    currentEntries[key].ApplyClockTimes(value);
-                }
-                else
-                {
-                    employee.ShiftEntries.Add(new(employee, value));
-                }
-            }
-        }
-
+        
         /// <summary>
         /// Removes daily entries offered from an external source.
         /// These should represent entries deleted from the database.
@@ -264,14 +260,11 @@ namespace Aion.ViewModel
         /// <param name="entryList">A list of the base daily entries that are to be removed.</param>
         public void RemoveEntries(List<ShiftEntry> entryList)
         {
-            foreach (var daily in entryList)
+            foreach (var entry in entryList)
             {
-                FullEntries.Remove(daily);
-                // Get the ExportEntry representing this daily.
-                var export = EditableEntries.FirstOrDefault(e => e.ShiftEntry == daily);
-                EditableEntries.Remove(export);
-                Entries.Remove(export);
-                DeletedEntries.Remove(export);
+                FullEntries.Remove(entry);
+                Entries.Remove(entry);
+                DeletedEntries.Remove(entry);
             }
         }
 
@@ -280,13 +273,12 @@ namespace Aion.ViewModel
         /// These should represent entries that have been added to the database.
         /// </summary>
         /// <param name="entryList">List of new export entries - which should each reference a daily entry.</param>
-        public void AddEntries(List<ExportEntry> entryList)
+        public void AddEntries(List<ShiftEntry> entryList)
         {
-            foreach (var export in entryList)
+            foreach (var entry in entryList)
             {
-                FullEntries.Add(export.ShiftEntry);
-                EditableEntries.Add(export);
-                Entries.Add(export);
+                FullEntries.Add(entry);
+                Entries.Add(entry);
             }
         }
 
@@ -296,7 +288,7 @@ namespace Aion.ViewModel
         /// </summary>
         public void ApplySorting()
         {
-            Entries = new(Entries.OrderBy(e => e.Date).ThenBy(e => e.Name));
+            Entries = new(Entries.OrderBy(e => e.Date).ThenBy(e => e.Employee.FullName));
         }
 
         public void SetExportString()
@@ -320,10 +312,16 @@ namespace Aion.ViewModel
 
         public void SaveEntryChanges()
         {
-            foreach (var e in EditableEntries) { e.ConvertEntry(); }
+            var uTask = Task.Run(() =>
+            {
+                Helios.StaffUpdater.EntriesAndClocks(FullEntries, FullClockDictionary.SelectMany(d => d.Value));
+            });
+            var dTask = Task.Run(() =>
+            {
+                Helios.StaffDeleter.ShiftEntries(DeletedEntries);
+            });
 
-            Helios.StaffUpdater.ShiftEntries(EditableEntries.Select(e => e.ShiftEntry));
-            Helios.StaffDeleter.ShiftEntries(DeletedEntries.Select(e => e.ShiftEntry));
+            Task.WaitAll(uTask, dTask);
 
             RefreshData(true);
         }
@@ -335,14 +333,60 @@ namespace Aion.ViewModel
             ApplySorting();
         }
 
-        public void DeleteSelectedShifts(List<ExportEntry> selectedShifts)
+        public void DeleteSelectedShifts(List<ShiftEntry> selectedShifts)
         {
             foreach (var s in selectedShifts)
             {
-                EditableEntries.Remove(s);
+                FullEntries.Remove(s);
                 DeletedEntries.Add(s);
                 Entries.Remove(s);
             }
+        }
+
+        /// <summary>
+        /// Changes the observable clocks based on the Entry Selection.
+        /// </summary>
+        private void SetClocks()
+        {
+            if (FullClockDictionary.TryGetValue((selectedEntry.EmployeeID, SelectedEntry.Date), out var newClockList))
+                Clocks = new(newClockList.Where(c => c.Status != EClockStatus.Deleted));
+            Clocks = new();
+        }
+        
+        public void DeleteSelectedClock()
+        {
+            SelectedClock.Status = EClockStatus.Deleted;
+            Clocks.Remove(SelectedClock);
+        }
+
+        public void DeleteShift()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ExportEntriesAsCSV()
+        {
+            throw new NotImplementedException();
+        }
+        
+        public void LaunchShiftCreator()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReSummarizeEntries()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ReSummarizeEntry()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CreateNewClock()
+        {
+            throw new NotImplementedException();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

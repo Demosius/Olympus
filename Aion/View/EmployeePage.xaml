@@ -25,14 +25,14 @@
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar Name="FilterBar" ToolTip="Filters">
-                <StackPanel Orientation="Horizontal">
+                <!--<StackPanel Orientation="Horizontal">
                     <Label Content="Manager: "
                            VerticalAlignment="Center"/>
                     <ComboBox ItemsSource="{Binding Managers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"                               
                               VerticalAlignment="Center"
                               SelectedValue="{Binding SelectedManager}"/>
                 </StackPanel>
-                <Separator Margin="5"/>
+                <Separator Margin="5"/>-->
                 <StackPanel Orientation="Horizontal">
                     <Label Content="Employee: "
                            VerticalAlignment="Center"/>
@@ -53,15 +53,19 @@
         <Border BorderThickness="1" BorderBrush="Gray">
             <StackPanel Orientation="Vertical"
                         DockPanel.Dock="Left">
-                <Button Content="Add _New Employee"
-                        Command="{Binding LaunchEmployeeCreatorCommand}"/>
-                <Button Content="_Edit Employee"
-                        Command="{Binding LaunchEmployeeEditorCommand}"/>
-                <Button Content="_Delete Employee"
-                        Command="{Binding DeleteEmployeeCommand}"/>
+                <Button Command="{Binding LaunchEmployeeCreatorCommand}">
+                    <AccessText Text="Add _New Employee"/>
+                </Button>
+                <Button Command="{Binding LaunchEmployeeEditorCommand}">
+                    <AccessText Text="_Edit Employee"/>
+                </Button>
+                <Button Command="{Binding DeleteEmployeeCommand}">
+                    <AccessText Text="_Delete Employee"/>
+                </Button>
                 <Separator/>
-                <Button Content="_Print Employee BarCodes"
-                        Command="{Binding }"/>
+                <Button Command="{Binding }">
+                    <AccessText Text="_Print Employee BarCodes"/>
+                </Button>
             </StackPanel>
         </Border>
         <DataGrid ItemsSource="{Binding Employees}"

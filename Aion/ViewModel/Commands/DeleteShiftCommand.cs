@@ -5,9 +5,9 @@ namespace Aion.ViewModel.Commands
 {
     public class DeleteShiftCommand : ICommand
     {
-        public EntryViewPageVM VM { get; set; }
+        public ShiftEntryPageVM VM { get; set; }
 
-        public DeleteShiftCommand(EntryViewPageVM vm) { VM = vm; }
+        public DeleteShiftCommand(ShiftEntryPageVM vm) { VM = vm; }
 
         public event EventHandler CanExecuteChanged
         {

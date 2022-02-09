@@ -6,9 +6,9 @@ namespace Aion.ViewModel.Commands
 {
     public class ReSummarizeEntriesCommand : ICommand
     {
-        public EntryViewPageVM VM { get; set; }
+        public ShiftEntryPageVM VM { get; set; }
 
-        public ReSummarizeEntriesCommand(EntryViewPageVM vm) { VM = vm; }
+        public ReSummarizeEntriesCommand(ShiftEntryPageVM vm) { VM = vm; }
 
         public event EventHandler CanExecuteChanged
         {

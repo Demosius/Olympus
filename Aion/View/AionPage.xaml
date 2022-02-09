@@ -31,9 +31,9 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <ToggleButton Grid.Column="2" Content="Shift Entries" 
-                          Command="{Binding ShowEntryEditCommand}"/>
-            <ToggleButton Grid.Column="1" Content="Employees"
+            <ToggleButton Grid.Column="1" Content="Shift Entries" 
+                          Command="{Binding ShowEntriesCommand}"/>
+            <ToggleButton Grid.Column="2" Content="Employees"
                           Command="{Binding ShowEmployeesCommand}"/>
 
             <Button Grid.Column="4"
