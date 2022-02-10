@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Windows.Input;
+using Aion.ViewModel.Interfaces;
 
 namespace Aion.ViewModel.Commands
 {
-    public class LaunchSimpleShiftCreatorCommand : ICommand
+    public class ApplyFiltersCommand : ICommand
     {
-        public ShiftEntryPageVM VM { get; set; }
+        public IFilters VM { get; set; }
 
-        public LaunchSimpleShiftCreatorCommand(ShiftEntryPageVM vm) { VM = vm; }
+        public ApplyFiltersCommand(IFilters vm) { VM = vm; }
 
         public event EventHandler CanExecuteChanged
         {
@@ -22,7 +23,7 @@ namespace Aion.ViewModel.Commands
 
         public void Execute(object parameter)
         {
-            VM.LaunchSimpleShiftCreator();
+            VM.ApplyFilters();
         }
     }
 }

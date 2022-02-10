@@ -43,7 +43,7 @@
                     <Button Content="🔍"
                             MinWidth="25"
                             IsDefault="True"
-                            Command="{Binding FilterEmployeesCommand}"/>
+                            Command="{Binding ApplyFiltersCommand}"/>
                 </StackPanel>
                 <Separator/>
                 <Button Content="Clear Filters"

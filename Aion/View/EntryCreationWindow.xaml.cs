@@ -6,9 +6,9 @@ namespace Aion.View
     /// <summary>
     /// Interaction logic for SimpleEntryCreationView.xaml
     /// </summary>
-    public partial class SimpleEntryCreationWindow
+    public partial class EntryCreationWindow
     {
-        public SimpleEntryCreationWindow(Helios helios, ShiftEntryPageVM editorVM)
+        public EntryCreationWindow(Helios helios, ShiftEntryPageVM editorVM)
         {
             InitializeComponent();
             VM.SetData(helios, editorVM);

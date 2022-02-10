@@ -76,8 +76,51 @@ namespace Uranus.Staff
 
         public IEnumerable<string> Locations() => Chariot.Database.Query<Employee>("SELECT DISTINCT Location FROM Employee;").Select(e => e.Location);
 
-        public IEnumerable<Employee> GetManagedEmployees(Employee manager) =>
-            Chariot.Database.Query<Employee>("SELECT * FROM Employee WHERE ReportsToID = ?;", manager.ID);
+        public IEnumerable<Employee> GetManagedEmployees(int managerID)
+        {
+            var fullEmployees = EmployeesRecursiveReports().ToDictionary(e => e.ID, e => e);
+
+            if (!fullEmployees.TryGetValue(managerID, out var manager)) return new List<Employee>();
+
+            fullEmployees.Clear();
+
+            GetReports(manager, ref fullEmployees);
+
+            return fullEmployees.Select(d => d.Value);
+        }
+
+        /// <summary>
+        /// Recursively go through the employees and their reports to return a full dictionary of
+        /// employees.
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <param name="returnDict"></param>
+        private static void GetReports(Employee employee, ref Dictionary<int, Employee> returnDict)
+        {
+            returnDict ??= new();
+
+            foreach (var report in employee.Reports)
+            {
+                if (returnDict.ContainsKey(report.ID)) continue;
+                returnDict.Add(report.ID, report);
+                GetReports(report, ref returnDict);
+            }
+        }
+
+        public IEnumerable<Employee> EmployeesRecursiveReports()
+        {
+            var fullEmployees = Chariot.Database.Table<Employee>().ToDictionary(e => e.ID, e => e);
+
+            foreach (var (id, employee) in fullEmployees)
+            {
+                if (!fullEmployees.TryGetValue(employee.ReportsToID, out var manager)) continue;
+                manager.Reports ??= new();
+                manager.Reports.Add(employee);
+                employee.ReportsTo = manager;
+            }
+
+            return fullEmployees.Select(e => e.Value);
+        }
 
         public List<ShiftEntry> GetFilteredEntries(DateTime minDate, DateTime maxDate)
         {

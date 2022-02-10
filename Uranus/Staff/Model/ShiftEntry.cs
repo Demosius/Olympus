@@ -93,6 +93,9 @@ namespace Uranus.Staff.Model
         [Ignore]
         public List<ClockEvent> ClockEvents { get; set; }
 
+        [Ignore] public string Department => Employee?.DepartmentName;
+        [Ignore] public string EmployeeName => Employee?.FullName;
+
         public ShiftEntry()
         {
             ID = Guid.NewGuid();
@@ -136,6 +139,12 @@ namespace Uranus.Staff.Model
         /// <param name="clockTimes"></param>
         public void ApplyClockTimes(List<ClockEvent> clockTimes)
         {
+            // Clear any potential current times.
+            ShiftStartTime = "";
+            ShiftEndTime = "";
+            LunchStartTime = "";
+            LunchEndTime = "";
+
             // Make sure we grab the most relevant clocks first, if there is not a full count.
             clockTimes = clockTimes.OrderBy(c => c.Timestamp).ToList();
             if (clockTimes.Count > 0)

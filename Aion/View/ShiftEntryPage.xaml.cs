@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using Styx;
 using Uranus;
 
@@ -32,45 +33,87 @@ namespace Aion.View
             var headerName = e.Column.Header.ToString();
 
             //Cancel the column you don't want to generate
-            if (new List<string> { "ID", "StartShiftClockID", "StartLunchClockID", "EndLunchClockID", "EndShiftClockID", "ClockEvents" }.Contains(headerName))
+            if (new List<string> { "ID", "ShiftName", "ClockEvents", "Employee" }.Contains(headerName))
             {
                 e.Cancel = true;
             }
 
-            //update column details when generating
-            if (headerName == "AssociateNumber")
+            switch (headerName)
             {
-                e.Column.Header = "Associate Number";
-                e.Column.IsReadOnly = true;
+                //update column details when generating
+                case "EmployeeID":
+                    e.Column.Header = "Associate Number";
+                    e.Column.IsReadOnly = true;
+                    break;
+                case "EmployeeName":
+                    e.Column.Header = "Name";
+                    e.Column.Width = 150;
+                    e.Column.IsReadOnly = true;
+                    break;
+                case "Location":
+                    try
+                    {
+                        DataGridComboBoxColumn col = new()
+                        {
+                            Header = "Location",
+                            ItemsSource = VM.Locations,
+                            SelectedValueBinding = new Binding("Location")
+                        };
+
+                        e.Column = col;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Unexpected Exception in Entry Column Auto-generate:\n\n{ex}",
+                            "Unexpected Exception");
+                    }
+
+                    break;
+                case "ShiftStartTime":
+                    e.Column.Header = "In";
+                    e.Column.Width = 80;
+                    break;
+                case "LunchStartTime":
+                    e.Column.Header = "Out (Lunch)";
+                    e.Column.Width = 80;
+                    break;
+                case "LunchEndTime":
+                    e.Column.Header = "In (Lunch)";
+                    e.Column.Width = 80;
+                    break;
+                case "ShiftEndTime":
+                    e.Column.Header = "Out";
+                    e.Column.Width = 80;
+                    break;
+                case "ShiftType":
+                    e.Column.Width = 80;
+                    e.Column.Header = "Shift\n(D/M/A)";
+                    break;
+                case "TimeTotal":
+                    e.Column.Width = 80;
+                    e.Column.Header = "Total";
+                    ((DataGridTextColumn)e.Column).Binding.StringFormat = "HH:mm";
+                    break;
+                case "HoursWorked":
+                    e.Column.Width = 80;
+                    e.Column.Header = "Time Worked";
+                    ((DataGridTextColumn)e.Column).Binding.StringFormat = "0.00";
+                    break;
+                case "Comments":
+                    e.Column.Width = new(1, DataGridLengthUnitType.Star);
+                    break;
+                case "Department":
+                    e.Column.Width = 80;
+                    e.Column.IsReadOnly = true;
+                    break;
+                case "Day" or "Date":
+                    e.Column.Width = 100;
+                    e.Column.IsReadOnly = true;
+                    break;
+                default:
+                    e.Column.Width = 80;
+                    break;
             }
-            else if (headerName == "Name")
-            {
-                e.Column.Width = 150;
-                e.Column.IsReadOnly = true;
-            }
-            else if (headerName == "ShiftTypeAlpha")
-            {
-                e.Column.Width = 80;
-                e.Column.Header = "Shift\n(D/M/A)";
-            }
-            else if (headerName == "TimeTotal")
-            {
-                e.Column.Width = 80;
-                e.Column.Header = "Total";
-                ((DataGridTextColumn) e.Column).Binding.StringFormat = "HH:mm";
-            }
-            else if (headerName == "HoursWorked")
-            {
-                e.Column.Width = 80;
-                e.Column.Header = "Time Worked";
-                ((DataGridTextColumn) e.Column).Binding.StringFormat = "0.00";
-            }
-            else if (headerName == "Comments")
-                e.Column.Width = new(1, DataGridLengthUnitType.Star);
-            else if (headerName is "Day" or "Date")
-                e.Column.Width = 100;
-            else
-                e.Column.Width = 80;
 
             if (e.Column is DataGridTextColumn column && headerName != "Comments") column.ElementStyle = centerStyle;
         }
@@ -80,49 +123,26 @@ namespace Aion.View
             var grid = (DataGrid)sender;
             foreach (var item in grid.Columns)
             {
-                switch (item.Header.ToString())
+                item.DisplayIndex = item.Header.ToString() switch
                 {
-                    case "Associate Number":
-                        item.DisplayIndex = 0;
-                        break;
-                    case "Name":
-                        item.DisplayIndex = 1;
-                        break;
-                    case "Location":
-                        item.DisplayIndex = 2;
-                        break;
-                    case "Date":
-                        item.DisplayIndex = 3;
-                        break;
-                    case "Day":
-                        item.DisplayIndex = 4;
-                        break;
-                    case "In":
-                        item.DisplayIndex = 5;
-                        break;
-                    case "Out - Lunch":
-                        item.DisplayIndex = 6;
-                        break;
-                    case "In - Lunch":
-                        item.DisplayIndex = 7;
-                        break;
-                    case "Out":
-                        item.DisplayIndex = 8;
-                        break;
-                    case "Shift\n(D/M/A)":
-                        item.DisplayIndex = 9;
-                        break;
-                    case "Total":
-                        item.DisplayIndex = 10;
-                        break;
-                    case "Time Worked":
-                        item.DisplayIndex = 11;
-                        break;
-                    case "Comments":
-                        item.DisplayIndex = 12;
-                        break;
-                }
+                    "Associate Number" => 0,
+                    "Name" => 1,
+                    "Location" => 2,
+                    "Date" => 3,
+                    "Day" => 4,
+                    "In" => 5,
+                    "Out (Lunch)" => 6,
+                    "In  (Lunch)" => 7,
+                    "Out" => 8,
+                    "Shift\n(D/M/A)" => 9,
+                    "Total" => 10,
+                    "Time Worked" => 11,
+                    "Comments" => 12,
+                    "Department" => 13,
+                    _ => item.DisplayIndex
+                };
             }
         }
+
     }
 }

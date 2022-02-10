@@ -72,7 +72,7 @@ namespace Aion.ViewModel
         public LaunchEmployeeCreatorCommand LaunchEmployeeCreatorCommand { get; set; }
         public LaunchEmployeeEditorCommand LaunchEmployeeEditorCommand { get; set; }
         public DeleteEmployeeCommand DeleteEmployeeCommand { get; set; }
-        public FilterEmployeesCommand FilterEmployeesCommand { get; set; }
+        public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
         public ClearFiltersCommand ClearFiltersCommand { get; set; }
         public RefreshDataCommand RefreshDataCommand { get; set; }
 
@@ -82,7 +82,7 @@ namespace Aion.ViewModel
             LaunchEmployeeEditorCommand = new(this);
             LaunchEmployeeCreatorCommand = new(this);
             DeleteEmployeeCommand = new(this);
-            FilterEmployeesCommand = new(this);
+            ApplyFiltersCommand = new(this);
             ClearFiltersCommand = new(this);
         }
 
@@ -90,7 +90,7 @@ namespace Aion.ViewModel
         {
             Helios = helios;
             Charon = charon;
-            allEmployees ??= new(Helios.StaffReader.GetManagedEmployees(Charon.UserEmployee));
+            allEmployees ??= new(Helios.StaffReader.GetManagedEmployees(Charon.UserEmployee.ID));
             Task.Run(RefreshData);
         }
 
@@ -142,7 +142,7 @@ namespace Aion.ViewModel
 
         public void RefreshData()
         {
-            allEmployees = new(Helios.StaffReader.Employees());
+            allEmployees = new(Helios.StaffReader.GetManagedEmployees(Charon.UserEmployee.ID));
             // Set managers, including a 'clear' one for removing manager filter.
             Managers = new(Helios.StaffReader.GetManagers().OrderBy(m => m.ToString()));
             SelectedManager = new() { FirstName = "<- None", LastName = "Selected ->", ID = -1 };
