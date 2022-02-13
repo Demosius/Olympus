@@ -99,6 +99,8 @@ namespace Uranus.Staff
         {
             returnDict ??= new();
 
+            if (employee.Reports is null) return;
+
             foreach (var report in employee.Reports)
             {
                 if (returnDict.ContainsKey(report.ID)) continue;
@@ -111,7 +113,7 @@ namespace Uranus.Staff
         {
             var fullEmployees = Chariot.Database.Table<Employee>().ToDictionary(e => e.ID, e => e);
 
-            foreach (var (id, employee) in fullEmployees)
+            foreach (var (_, employee) in fullEmployees)
             {
                 if (!fullEmployees.TryGetValue(employee.ReportsToID, out var manager)) continue;
                 manager.Reports ??= new();
@@ -185,6 +187,16 @@ namespace Uranus.Staff
                 "AND Date BETWEEN ? AND ?;",
                 managerCode, EClockStatus.Pending,
                 fromDate.ToString("yyyy-MM-dd"), toDate.ToString("yyyy-MM-dd"));
+        }
+
+        public int GetPendingCount(IEnumerable<int> employeeIDs, DateTime startDate, DateTime endDate)
+        {
+            return Chariot.Database.ExecuteScalar<int>(
+                $"SELECT COUNT(*) FROM ClockEvent " +
+                $"WHERE EmployeeID IN ({string.Join(", ", employeeIDs)}) AND " +
+                $"Status = ? AND " +
+                $"Date BETWEEN '{startDate:yyyy-MM-dd}' AND '{endDate:yyyy-MM-dd}';",
+                EClockStatus.Pending);
         }
 
         /// <summary>

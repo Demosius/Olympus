@@ -8,8 +8,11 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using Aion.Annotations;
 using CsvHelper;
 using Ookii.Dialogs.Wpf;
 using Styx;
@@ -18,10 +21,30 @@ using Uranus.Staff.Model;
 
 namespace Aion.ViewModel
 {
+    public enum EEntrySortOption
+    {
+        DateEmployee,
+        EmployeeDate,
+        DepartmentDateEmployee,
+        DayDateEmployee
+    }
+
     public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
     {
         public Helios Helios { get; set; }
         public Charon Charon { get; set; }
+        public List<Employee> Employees { get; set; }
+        
+        private EEntrySortOption sortOption;
+        public EEntrySortOption SortOption
+        {
+            get => sortOption;
+            set
+            {
+                sortOption = value;
+                OnPropertyChanged(nameof(SortOption));
+            }
+        }
 
         private DateTime minDate;
         public DateTime MinDate
@@ -42,6 +65,17 @@ namespace Aion.ViewModel
             {
                 maxDate = value;
                 OnPropertyChanged(nameof(MaxDate));
+            }
+        }
+
+        private List<Day> days;
+        public List<Day> Days
+        {
+            get => days;
+            set
+            {
+                days = value;
+                OnPropertyChanged(nameof(Days));
             }
         }
 
@@ -66,30 +100,7 @@ namespace Aion.ViewModel
                 OnPropertyChanged(nameof(Locations));
             }
         }
-
-        private ObservableCollection<Employee> employees;
-        public ObservableCollection<Employee> Employees
-        {
-            get => employees;
-            set
-            {
-                employees = value;
-                OnPropertyChanged(nameof(Employees));
-            }
-        }
-
-        private Employee selectedEmployee;
-        public Employee SelectedEmployee
-        {
-            get => selectedEmployee;
-            set
-            {
-                selectedEmployee = value;
-                OnPropertyChanged(nameof(SelectedEmployee));
-                ApplyFilters();
-            }
-        }
-
+        
         private List<ShiftEntry> FullEntries { get; set; }
         private List<ShiftEntry> DeletedEntries { get; set; }
 
@@ -124,6 +135,17 @@ namespace Aion.ViewModel
             {
                 missingEntryCount = value;
                 OnPropertyChanged(nameof(MissingEntryCount));
+            }
+        }
+
+        private int pendingClockCount;
+        public int PendingClockCount
+        {
+            get => pendingClockCount;
+            set
+            {
+                pendingClockCount = value;
+                OnPropertyChanged(nameof(PendingClockCount));
             }
         }
 
@@ -177,7 +199,6 @@ namespace Aion.ViewModel
                     OnPropertyChanged(nameof(EndDate));
                 }
                 OnPropertyChanged(nameof(StartDate));
-                ApplyFilters();
             }
         }
 
@@ -197,11 +218,44 @@ namespace Aion.ViewModel
                 }
 
                 OnPropertyChanged(nameof(EndDate));
-                ApplyFilters();
             }
         }
 
         public string ExportString { get; set; }
+
+        /* Filtering Strings */
+        private string employeeSearchString;
+        public string EmployeeSearchString
+        {
+            get => employeeSearchString;
+            set
+            {
+                employeeSearchString = value;
+                OnPropertyChanged(nameof(EmployeeSearchString));
+            }
+        }
+
+        private string departmentSearchString;
+        public string DepartmentSearchString
+        {
+            get => departmentSearchString;
+            set
+            {
+                departmentSearchString = value;
+                OnPropertyChanged(nameof(DepartmentSearchString));
+            }
+        }
+
+        private string daySearchString;
+        public string DaySearchString
+        {
+            get => daySearchString;
+            set
+            {
+                daySearchString = value;
+                OnPropertyChanged(nameof(DaySearchString));
+            }
+        }
 
         /* Commands */
         public RefreshDataCommand RefreshDataCommand { get; set; }
@@ -209,7 +263,6 @@ namespace Aion.ViewModel
         public DeleteSelectedShiftsCommand DeleteSelectedShiftsCommand { get; set; }
         public ApplyClocksCommand ApplyClocksCommand { get; set; }
         public DeleteClockCommand DeleteClockCommand { get; set; }
-        public DeleteShiftCommand DeleteShiftCommand { get; set; }
         public ExportEntriesToCSVCommand ExportEntriesToCSVCommand { get; set; }
         public LaunchShiftCreatorCommand LaunchShiftCreatorCommand { get; set; }
         public ReSummarizeEntriesCommand ReSummarizeEntriesCommand { get; set; }
@@ -218,10 +271,12 @@ namespace Aion.ViewModel
         public LaunchDateRangeCommand LaunchDateRangeCommand { get; set; }
         public ClearFiltersCommand ClearFiltersCommand { get; set; }
         public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
+        public CreateMissingShiftsCommand CreateMissingShiftsCommand { get; set; }
+        public ApplySortingCommand ApplySortingCommand { get; set; }
 
         public ShiftEntryPageVM()
         {
-            minDate = DateTime.Now.AddDays(-((int)DateTime.Now.DayOfWeek - 1) - 7 - ((int)DateTime.Now.DayOfWeek <= 1 ? 7 : 0));
+            minDate = DateTime.Now.AddDays(-((int)DateTime.Now.DayOfWeek - 1) - 7 - ((int)DateTime.Now.DayOfWeek <= 1 ? 7 : 0)).Date;
             maxDate = DateTime.Now.AddDays(-1).Date;
 
             Entries = new();
@@ -232,7 +287,6 @@ namespace Aion.ViewModel
             DeleteSelectedShiftsCommand = new(this);
             ApplyClocksCommand = new(this);
             DeleteClockCommand = new(this);
-            DeleteShiftCommand = new(this);
             ExportEntriesToCSVCommand = new(this);
             LaunchShiftCreatorCommand = new(this);
             ReSummarizeEntriesCommand = new(this);
@@ -241,6 +295,8 @@ namespace Aion.ViewModel
             LaunchDateRangeCommand = new(this);
             ClearFiltersCommand = new(this);
             ApplyFiltersCommand = new(this);
+            CreateMissingShiftsCommand = new(this);
+            ApplySortingCommand = new(this);
         }
 
         public bool CheckDateChange()
@@ -260,12 +316,8 @@ namespace Aion.ViewModel
             Helios = helios;
             Charon = charon;
             Manager = charon.UserEmployee;
-            var temp = Helios.StaffReader.GetManagedEmployees(Manager.ID).ToList();
-            selectedEmployee = new() { FirstName = "<- None", LastName = "Selected ->", ID = -1 };
-            OnPropertyChanged(nameof(SelectedEmployee));
-            temp.Insert(0, selectedEmployee);
-            Employees = new(temp);
-
+            Employees = Helios.StaffReader.GetManagedEmployees(Manager.ID).ToList();
+            
             Task.Run(SetEntries);
         }
 
@@ -274,8 +326,8 @@ namespace Aion.ViewModel
         /// </summary>
         private void SetEntries()
         {
-            startDate = minDate;
-            endDate = maxDate;
+            StartDate = minDate;
+            EndDate = maxDate;
 
             Task.Run(() =>
             {
@@ -289,6 +341,17 @@ namespace Aion.ViewModel
 
             Locations = new(FullEntries.Select(e => e.Location).Distinct().Where(e => e is not null or ""));
 
+            Days = new()
+            {
+                new(DayOfWeek.Sunday),
+                new(DayOfWeek.Monday),
+                new(DayOfWeek.Tuesday),
+                new(DayOfWeek.Wednesday),
+                new(DayOfWeek.Thursday),
+                new(DayOfWeek.Friday),
+                new(DayOfWeek.Saturday)
+            };
+            
             DeletedEntries = new();
             DeletedClocks = new();
 
@@ -299,7 +362,12 @@ namespace Aion.ViewModel
         
         public void ClearFilters()
         {
-            throw new NotImplementedException();
+            EmployeeSearchString = "";
+            DepartmentSearchString = "";
+            DaySearchString = "";
+            StartDate = MinDate;
+            EndDate = MaxDate;
+            ApplyFilters();
         }
 
         /// <summary>
@@ -308,29 +376,53 @@ namespace Aion.ViewModel
         public void ApplyFilters()
         {
             if (Manager is null) return;
-            var startString = startDate.ToString("yyyy-MM-dd");
-            var endString = endDate.ToString("yyyy-MM-dd");
-            if ((SelectedEmployee?.ID ?? -1) != -1)
-            {
-                Entries = new
-                (
-                    FullEntries.Where(e => e.EmployeeID == SelectedEmployee.ID && string.CompareOrdinal(e.Date, startString) >= 0 && string.CompareOrdinal(e.Date, endString) <= 0)
-                );
-            }
-            else
-            {
-                Entries = new
-                (
-                    FullEntries.Where(e => string.CompareOrdinal(e.Date, startString) >= 0 && string.CompareOrdinal(e.Date, endString) <= 0)
-                );
-            }
+
+            IEnumerable<ShiftEntry> shiftEntries = FullEntries;
+
+            FilterEmployee(ref shiftEntries);
+            FilterDepartment(ref shiftEntries);
+            FilterDay(ref shiftEntries);
+            FilterDate(ref shiftEntries);
+
+            Entries = new(shiftEntries);
+            PendingClockCount = Helios.StaffReader.GetPendingCount(Employees.Select(e => e.ID), MinDate, MaxDate);
+
             SetExportString();
             ApplySorting();
         }
 
+        private void FilterEmployee(ref IEnumerable<ShiftEntry> shiftEntries)
+        {
+            if ((employeeSearchString ?? "") == "") return;
+
+            Regex rex = new(employeeSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            shiftEntries = shiftEntries?.Where(s => rex.IsMatch(s.EmployeeName));
+        }
+
+        private void FilterDepartment(ref IEnumerable<ShiftEntry> shiftEntries)
+        {
+            if ((departmentSearchString ?? "") == "") return;
+
+            Regex rex = new(departmentSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            shiftEntries = shiftEntries?.Where(s => rex.IsMatch(s.Department));
+        }
+
+        private void FilterDay(ref IEnumerable<ShiftEntry> shiftEntries)
+        {
+            shiftEntries = shiftEntries?.Where(e => Days.Where(d => d.InUse).Select(d => d.DayOfWeek).Contains(e.Day));
+        }
+
+        private void FilterDate(ref IEnumerable<ShiftEntry> shiftEntries)
+        {
+            var startString = startDate.ToString("yyyy-MM-dd");
+            var endString = endDate.ToString("yyyy-MM-dd");
+
+            shiftEntries = shiftEntries?.Where(e =>
+                string.CompareOrdinal(e.Date, startString) >= 0 && string.CompareOrdinal(e.Date, endString) <= 0);
+        }
+
         /// <summary>
-        /// Converts all the clock times for Employees into Daily Entries, updating the database in the process.
-        /// Will then refresh the data.
+        /// Converts all the clock times for Employees into Daily Entries.
         /// </summary>
         public void ApplyPendingClocks()
         {
@@ -388,7 +480,7 @@ namespace Aion.ViewModel
         /// </summary>
         public void ApplySorting()
         {
-            Entries = new(Entries.OrderBy(e => e.Date).ThenBy(e => e.Employee.FullName));
+            Entries = new(Entries.OrderBy(e => e.Date).ThenBy(e => e.EmployeeName));
         }
 
         public void SetExportString()
@@ -551,16 +643,16 @@ namespace Aion.ViewModel
             var lastDate = endDate.Date > DateTime.Now.Date ? DateTime.Now.Date : endDate.Date;
 
             var entryDict = FullEntries.ToDictionary(e => (e.EmployeeID, e.Date), e => e);
-
+            
             foreach (var employee in Employees)
             {
                 if (employee.EmploymentType is not (EEmploymentType.FP or EEmploymentType.SA)) continue;
                 var checkDate = startDate;
                 while (checkDate.Date <= lastDate.Date)
                 {
+                    if (checkDate.DayOfWeek is not (DayOfWeek.Sunday or DayOfWeek.Saturday)) 
+                        if (!entryDict.ContainsKey((employee.ID, checkDate.ToString("yyyy-MM-dd")))) ++count;
                     checkDate = checkDate.AddDays(1);
-                    if (checkDate.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Saturday) continue;
-                    if (!entryDict.ContainsKey((employee.ID, checkDate.ToString("yyyy-MM-dd")))) ++count;
                 }
             }
 
@@ -591,15 +683,19 @@ namespace Aion.ViewModel
                 var checkDate = startDate;
                 while (checkDate.Date <= lastDate.Date)
                 {
+                    if (checkDate.DayOfWeek is not (DayOfWeek.Sunday or DayOfWeek.Saturday))
+                    {
+                        if (!entryDict.ContainsKey((employee.ID, checkDate.ToString("yyyy-MM-dd"))))
+                        {
+                            if (FullClockDictionary.TryGetValue((employee.ID, checkDate.ToString("yyyy-MM-dd")),
+                                    out var clockEvents))
+                                FullEntries.Add(new(employee, clockEvents) {Comments = comment});
+                            FullEntries.Add(new(employee, checkDate) {Comments = comment});
+
+                            newEntries = true;
+                        }
+                    }
                     checkDate = checkDate.AddDays(1);
-                    if (checkDate.DayOfWeek is DayOfWeek.Sunday or DayOfWeek.Saturday) continue;
-                    if (entryDict.ContainsKey((employee.ID, checkDate.ToString("yyyy-MM-dd")))) continue;
-
-                    if (FullClockDictionary.TryGetValue((employee.ID, checkDate.ToString("yyyy-MM-dd")), out var clockEvents))
-                        FullEntries.Add(new(employee, clockEvents) { Comments = comment });
-                    FullEntries.Add(new(employee, checkDate) { Comments = comment });
-
-                    newEntries = true;
                 }
             }
 
@@ -621,6 +717,57 @@ namespace Aion.ViewModel
             DateRangeWindow datePicker = new(this);
 
             datePicker.ShowDialog();
+        }
+    }
+
+    public class Day : INotifyPropertyChanged
+    {
+        private DayOfWeek dayOfWeek;
+        public DayOfWeek DayOfWeek
+        {
+            get => dayOfWeek;
+            set
+            {
+                dayOfWeek = value;
+                OnPropertyChanged(nameof(DayOfWeek));
+            }
+        }
+
+        private bool inUse;
+        public bool InUse
+        {
+            get => inUse;
+            set
+            {
+                inUse = value;
+                OnPropertyChanged(nameof(InUse));
+            }
+        }
+
+        public Day()
+        {
+            DayOfWeek = DayOfWeek.Sunday;
+            InUse = true;
+        }
+
+        public Day(DayOfWeek weekDay)
+        {
+            DayOfWeek = weekDay;
+            InUse = true;
+        }
+
+        public Day(DayOfWeek weekDay, bool isInUse)
+        {
+            DayOfWeek = weekDay;
+            inUse = isInUse;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new(propertyName));
         }
     }
 }

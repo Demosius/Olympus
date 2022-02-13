@@ -161,7 +161,7 @@ namespace Aion.ViewModel
         public void SetEditorSourceVM(ShiftEntryPageVM editorVM)
         {
             EditorVM = editorVM;
-            Employees = editorVM.Employees;
+            Employees = new(editorVM.Employees);
             MinDate = editorVM.StartDate;
             MaxDate = editorVM.EndDate;
             SelectedDate = MinDate;

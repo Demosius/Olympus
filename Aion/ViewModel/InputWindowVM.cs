@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Aion.Annotations;
+using Aion.ViewModel.Commands;
 
 namespace Aion.ViewModel
 {
@@ -39,10 +40,14 @@ namespace Aion.ViewModel
             }
         }
 
+        public ConfirmInputCommand ConfirmInputCommand { get; set; }
+
         public InputWindowVM()
         {
             Title = "Input Window";
             Prompt = "Enter Text";
+
+            ConfirmInputCommand = new();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

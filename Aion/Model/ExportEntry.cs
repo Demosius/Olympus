@@ -41,7 +41,7 @@ namespace Aion.Model
             Name = ShiftEntry.Employee?.ToString();
             Location = ShiftEntry.Location;
             Date = ShiftEntry.Date;
-            Day = ShiftEntry.Day;
+            Day = ShiftEntry.Day.ToString();
             In = ShiftEntry.ShiftStartTime;
             OutToLunch = ShiftEntry.LunchStartTime;
             InFromLunch = ShiftEntry.LunchEndTime;

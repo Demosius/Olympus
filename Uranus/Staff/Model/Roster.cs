@@ -18,7 +18,7 @@ namespace Uranus.Staff.Model
         [ForeignKey(typeof(Employee))] public int EmployeeID { get; set; }
         [ForeignKey(typeof(Shift))] public string ShiftName { get; set; }
         [ForeignKey(typeof(Department))] public string DepartmentName { get; set; }
-        public string Day { get; set; }
+        public DayOfWeek Day { get; set; }
         public string Date { get; set; }
         public ERosterType RosterType { get; set; }
 

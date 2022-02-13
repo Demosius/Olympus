@@ -41,7 +41,7 @@ namespace Uranus.Staff.Model
 
         public string Date { get; set; }
 
-        public string Day { get; set; }
+        public DayOfWeek Day { get; set; }
 
         private EShiftType shiftType;
         public EShiftType ShiftType
@@ -105,11 +105,11 @@ namespace Uranus.Staff.Model
         {
             ID = Guid.NewGuid();
             EmployeeID = employee.ID;
+            Employee = employee;
             Location = employee.Location;
             var d = clockTimes[0].DtDate;
             Date = d.ToString("yyyy-MM-dd");
-            Day = d.ToString("dddd");
-
+            Day = d.DayOfWeek;
             ApplyClockTimes(clockTimes);
             SummarizeShift();
         }
@@ -118,9 +118,10 @@ namespace Uranus.Staff.Model
         {
             ID = Guid.NewGuid();
             EmployeeID = employee.ID;
+            Employee = employee;
             Location = employee.Location;
             Date = date.ToString("yyyy-MM-dd");
-            Day = date.ToString("dddd");
+            Day = date.DayOfWeek;
         }
 
         /// <summary>

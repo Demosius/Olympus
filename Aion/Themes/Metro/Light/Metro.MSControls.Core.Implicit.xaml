@@ -701,7 +701,7 @@
 								<ColumnDefinition Width="*" />
 							</Grid.ColumnDefinitions>
 							<Rectangle x:Name="rectangle" Width="30" Height="30" Fill="{StaticResource ExpanderButtonBackgroundBrush}" HorizontalAlignment="Center" Stroke="{StaticResource ExpanderButtonBorderBrush}" VerticalAlignment="Center" />
-							<Path x:Name="arrow" Width="10" Height="6" Fill="{StaticResource GlyphBackgroundBrush}" Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z " Stretch="Fill" RenderTransformOrigin="0.5, 0.5" />
+							<Path Grid.Column="0" x:Name="arrow" Width="10" Height="6" Fill="{StaticResource GlyphBackgroundBrush}" Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z " Stretch="Fill" RenderTransformOrigin="0.5, 0.5" />
 							<ContentPresenter Grid.Column="1" HorizontalAlignment="Stretch" Margin="4,0,0,0" RecognizesAccessKey="True" SnapsToDevicePixels="True" VerticalAlignment="Center" />
 						</Grid>
 					</Border>
@@ -897,7 +897,7 @@
 							<ContentPresenter ContentSource="Header" Height="30" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
 						</Border>
 						<ContentPresenter Grid.ColumnSpan="2" Grid.Column="1" Margin="{TemplateBinding Padding}" Grid.Row="2" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-						<Border Grid.ColumnSpan="4" Grid.Row="1" Grid.RowSpan="3">
+						<Border Grid.ColumnSpan="4" Grid.Column="0" Grid.Row="1" Grid.RowSpan="3">
 							<Border.OpacityMask>
 								<MultiBinding ConverterParameter="7" Converter="{StaticResource BorderGapMaskConverter}">
 									<Binding ElementName="Header" Path="ActualWidth" />
@@ -933,5 +933,11 @@
     <Style BasedOn="{StaticResource ExpanderStyle}" TargetType="{x:Type Expander}" />
     <Style BasedOn="{StaticResource ToggleButtonStyle}" TargetType="{x:Type ToggleButton}" />
     <Style BasedOn="{StaticResource GroupBoxStyle}" TargetType="{x:Type GroupBox}" />
+    <Style BasedOn="{StaticResource DatePickerStyle}" TargetType="{x:Type DatePicker}">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Height" Value="128" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
 	
 </ResourceDictionary>

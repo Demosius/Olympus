@@ -40,7 +40,7 @@
                     Command="{Binding ImportOldDataCommand}"
                     ToolTip="Import and convert old Aion Data."
                     Padding="0">
-                <Image Source="../refresh.png"
+                <Image Source="../database-import.png"
                        Width="20"/>
             </Button>
             <Grid.Resources>

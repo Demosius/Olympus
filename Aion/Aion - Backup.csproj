@@ -18,7 +18,6 @@
     <None Remove="database-import.png" />
     <None Remove="plus-circle-frame.png" />
     <None Remove="refresh.png" />
-    <None Remove="Resources\clock--arrow.png" />
     <None Remove="save.png" />
     <None Remove="sort.png" />
   </ItemGroup>
@@ -37,22 +36,33 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\calculator--plus.png" />
-    <Resource Include="Resources\clock--arrow.png" />
-    <Resource Include="Resources\csv.png" />
-    <Resource Include="Resources\database-import.png" />
-    <Resource Include="Resources\plus-circle-frame.png" />
-    <Resource Include="Resources\refresh.png" />
-    <Resource Include="Resources\save.png" />
-    <Resource Include="Resources\sort.png" />
+    <Resource Include="calculator--plus.png" />
+    <Resource Include="csv.png" />
+    <Resource Include="database-import.png" />
+    <Resource Include="plus-circle-frame.png" />
+    <Resource Include="refresh.png" />
+    <Resource Include="save.png" />
+    <Resource Include="sort.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

@@ -79,7 +79,7 @@ namespace Aion.ViewModel.Utility
                 ID = entry.ID,
                 EmployeeID = entry.EmployeeCode,
                 Date = entry.Date,
-                Day = entry.Day,
+                Day = (DayOfWeek)Enum.Parse(typeof(DayOfWeek), entry.Day),
                 ShiftType = (EShiftType)entry.ShiftTypeAlpha,
                 Location = entry.Location,
                 TimeTotal = entry.TimeTotal,

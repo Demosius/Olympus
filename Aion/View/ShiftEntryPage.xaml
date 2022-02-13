@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:vm="clr-namespace:Aion.ViewModel"
       xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+      xmlns:sys="clr-namespace:System;assembly=System.Runtime"
       mc:Ignorable="d" 
       d:DesignHeight="1080" d:DesignWidth="1920"
       Title="EntryEditPage">
@@ -43,72 +44,17 @@
                 <Setter Property="HorizontalAlignment" Value="Center"/>
                 <Setter Property="FontSize" Value="15"></Setter>
             </Style>
+            <ObjectDataProvider x:Key="DaysOfWeek"
+                                MethodName="GetValues" 
+                                ObjectType="{x:Type sys:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="vm:EEntrySortOption"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
         </DockPanel.Resources>
-        <ToolBarTray DockPanel.Dock="Top">
-            <ToolBar Name="FilterBar" ToolTip="Filters">
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="Employee: "
-                           VerticalAlignment="Center"/>
-                    <TextBox Text="{Binding EmpSearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             VerticalContentAlignment="Center"
-                             MinWidth="75"
-                             Margin="0,5"/>
-                </StackPanel>
-                <!--<StackPanel Orientation="Horizontal">
-                    <Label Content="Employee: "
-                           VerticalAlignment="Center"
-                           Foreground="Black"/>
-                    <ComboBox ItemsSource="{Binding Employees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                              VerticalAlignment="Center"
-                              SelectedValue="{Binding SelectedEmployee}"/>
-                </StackPanel>-->
-                <Separator/>
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="From:"
-                           VerticalAlignment="Center" Target="{Binding ElementName=FromDate}"/>
-                    <DatePicker Name="FromDate" SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-                <Separator/>
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="To:"
-                                       VerticalAlignment="Center"
-                               Target="{Binding ElementName=ToDate}"/>
-                    <DatePicker Name="ToDate" SelectedDate="{Binding EndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </StackPanel>
-                <Separator/>
-                <Button Content="🔍"
-                        MinWidth="25"
-                        IsDefault="True"
-                        Command="{Binding ApplyFiltersCommand}"/>
-                <Separator/>
-                <Button Content="Clear Filters"
-                        Command="{Binding ClearFiltersCommand}"/>
-            </ToolBar>
-            <ToolBar x:Name="ActionBar"
-                     ToolTip="Action Buttons">
-                <Button Command="{Binding ExportEntriesToCSVCommand}"
-                        ToolTip="Export To CSV">
-                    <Image Source="../csv.png"></Image>
-                </Button>
-                <Button Command="{Binding ExportEntriesToCSVCommand}"
-                        ToolTip="">
-                    <Image Source="../refresh.png"></Image>
-                </Button>
-                <Button Command="{Binding ExportEntriesToCSVCommand}">
-                    <Image Source="../refresh.png"></Image>
-                </Button>
-                <Button Command="{Binding ExportEntriesToCSVCommand}">
-                    <Image Source="../refresh.png"></Image>
-                </Button>
-                <Button Command="{Binding ExportEntriesToCSVCommand}">
-                    <Image Source="../refresh.png"></Image>
-                </Button>
-                <Button Command="{Binding ExportEntriesToCSVCommand}">
-                    <Image Source="../refresh.png"></Image>
-                </Button>
-            </ToolBar>
-        </ToolBarTray>
-        <Grid DockPanel.Dock="Top">
+        <!--Header Data-->
+        <Grid DockPanel.Dock="Top"
+              Background="Wheat">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -129,32 +75,159 @@
             </StackPanel>
             <!-- Date range -->
             <StackPanel Grid.Column="2" 
-                        Orientation="Horizontal"
-                        Background="Wheat">
+                        Orientation="Horizontal">
                 <Label Content="Date Range:"
                        VerticalAlignment="Center"
                        Margin="5,0"
                        FontWeight="Bold"/>
-                <TextBlock Text="{Binding MinDate, UpdateSourceTrigger=PropertyChanged}"
+                <TextBlock Text="{Binding MinDate, UpdateSourceTrigger=PropertyChanged, StringFormat=dd-MM-yyyy}"
                            VerticalAlignment="Center"
                            Margin="5,0"/>
                 <TextBlock Text="to"
                            VerticalAlignment="Center"
                            Margin="5,0"/>
-                <TextBlock Text="{Binding MaxDate, UpdateSourceTrigger=PropertyChanged}"
+                <TextBlock Text="{Binding MaxDate, UpdateSourceTrigger=PropertyChanged, StringFormat=dd-MM-yyyy}"
                            VerticalAlignment="Center"
                            Margin="5,0"/>
                 <Button Content="Change"
                         VerticalAlignment="Center"
-                        Margin="5,2"/>
+                        Margin="5,2"
+                        Command="{Binding LaunchDateRangeCommand}"/>
             </StackPanel>
         </Grid>
+        <!--ToolBar-->
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar Name="FilterBar" ToolTip="Filters">
+                <!--Employees-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="5,0">
+                    <Label Content="Employee: "
+                           VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding EmployeeSearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalContentAlignment="Center"
+                             MinWidth="75"
+                             Margin="0,5"/>
+                </StackPanel>
+                <Separator/>
+                <!--Departments-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="5,0">
+                    <Label Content="Department: "
+                           VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding DepartmentSearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalContentAlignment="Center"
+                             MinWidth="75"
+                             Margin="0,5"/>
+                </StackPanel>
+                <Separator/>
+                <!--Day Of Week-->
+                <Expander x:Name="Expander" ExpandDirection="Down" IsExpanded="False" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                    <Expander.Header>
+                        <TextBlock TextAlignment="Left" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Days"/>
+                    </Expander.Header>
+                    <Popup PlacementTarget="{Binding ElementName=Expander}"
+                           Placement="Bottom"
+                           IsOpen="{Binding IsExpanded, ElementName=Expander}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="600" HorizontalAlignment="Stretch"
+                                      Background="White">
+                            <ItemsControl ItemsSource="{Binding Days, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding InUse, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                  Content="{Binding DayOfWeek, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Popup>
+                </Expander>
+                <Separator/>
+                <!--Dates-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="5,0"
+                            Height="Auto"
+                            VerticalAlignment="Center">
+                    <Label Content="From:"
+                           VerticalAlignment="Center" 
+                           Target="{Binding ElementName=FromDate}"/>
+                    <DatePicker Name="FromDate" SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal"
+                            Margin="5,0">
+                    <Label Content="To:"
+                           VerticalAlignment="Center"
+                           Target="{Binding ElementName=ToDate}"/>
+                    <DatePicker Name="ToDate" SelectedDate="{Binding EndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+                <Separator/>
+                <Button Content="🔍"
+                        ToolTip="Apply Filters"
+                        Margin="5,0"
+                        MinWidth="25"
+                        IsDefault="True"
+                        Command="{Binding ApplyFiltersCommand}"/>
+                <Separator/>
+                <Button Content="Clear Filters"
+                        Command="{Binding ClearFiltersCommand}"/>
+            </ToolBar>
+            <!--Sorting-->
+            <ToolBar x:Name="SortBar"
+                     ToolTip="Sort Functionality">
+                <ComboBox ItemsSource="{Binding Source={StaticResource DaysOfWeek}}" 
+                          SelectedValue="{Binding SortOption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button ToolTip="Apply Sorting"
+                        Command="{Binding ApplySortingCommand}">
+                    <Image Source="../Resources/sort.png"/>
+                </Button>
+            </ToolBar>
+            <!--Action Bar!-->
+            <ToolBar x:Name="ActionBar"
+                     ToolTip="Action Buttons">
+                <Button Command="{Binding ExportEntriesToCSVCommand}"
+                        ToolTip="Export To CSV">
+                    <Image Source="../Resources/csv.png"/>
+                </Button>
+                <Button Command="{Binding CreateMissingShiftsCommand}"
+                        ToolTip="Creates any shifts that should exists, but don't. -- Based on Employment type and date.">
+                    <Grid>
+                        <Image Source="../Resources/plus-circle-frame.png"/>
+                        <TextBlock Text="{Binding MissingEntryCount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                   Foreground="Red"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontFamily="Times New Roman"/>
+                    </Grid>
+                </Button>
+                <Button Command="{Binding ReSummarizeEntriesCommand}"
+                        ToolTip="ReSummarize all entry times - overwriting manual changes.">
+                    <Image Source="../Resources/calculator--plus.png"/>
+                </Button>
+                <Button Command="{Binding ApplyClocksCommand}"
+                        ToolTip="Apply pending clock events to create new shifts, and adjust existing ones.">
+                    <Grid>
+                        <Image Source="../Resources/clock--arrow.png"/>
+                        <TextBlock Text="{Binding PendingClockCount, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                   Foreground="Purple"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontFamily="Times New Roman"/>
+                    </Grid>
+                </Button>
+                <Button Command="{Binding ExportEntriesToCSVCommand}">
+                    <Image Source="../Resources/refresh.png"/>
+                </Button>
+                <Button Command="{Binding ExportEntriesToCSVCommand}">
+                    <Image Source="../Resources/refresh.png"/>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        
         <Border BorderThickness="1" BorderBrush="Gray">
             <StackPanel Orientation="Vertical"
                         DockPanel.Dock="Left">
                 <Button Command="{Binding RefreshDataCommand}">
                     <StackPanel Orientation="Horizontal">
-                        <Image Source="../refresh.png"/>
+                        <Image Source="../Resources/refresh.png"/>
                         <AccessText  Text="_Refresh Data" VerticalAlignment="Center" Margin="10,0"/>
                     </StackPanel>
                 </Button>
@@ -167,7 +240,7 @@
                 </Button>
                 <Button Command="{Binding SaveEntryChangesCommand}">
                     <StackPanel Orientation="Horizontal">
-                        <Image Source="../save.png"/>
+                        <Image Source="../Resources/save.png"/>
                         <AccessText Text="_Save Changes" VerticalAlignment="Center" Margin="10,0"/>
                     </StackPanel>
                 </Button>

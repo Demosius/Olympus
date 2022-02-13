@@ -132,7 +132,7 @@ namespace Aion.View
                     "Day" => 4,
                     "In" => 5,
                     "Out (Lunch)" => 6,
-                    "In  (Lunch)" => 7,
+                    "In (Lunch)" => 7,
                     "Out" => 8,
                     "Shift\n(D/M/A)" => 9,
                     "Total" => 10,
