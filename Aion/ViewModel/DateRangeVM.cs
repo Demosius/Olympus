@@ -56,6 +56,12 @@ namespace Aion.ViewModel
             SetDateRangeCommand = new(this);
         }
 
+        public void SetEditorVM(ShiftEntryPageVM editorVM)
+        {
+            ShiftEntryPageVM = editorVM;
+            SetDateValues(ShiftEntryPageVM.MinDate, ShiftEntryPageVM.MaxDate);
+        }
+
         public void SetDateValues(DateTime min, DateTime max)
         {
             MinDate = min;

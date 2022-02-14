@@ -110,7 +110,13 @@ namespace Aion.ViewModel
         public void RefreshData()
         {
             EmployeePage?.VM.RefreshData();
-            ShiftEntryPage?.VM.RefreshData();
+            ShiftEntryPage?.VM.RefreshData(true);
+        }
+
+        public void RepairData()
+        {
+            EmployeePage?.VM.RepairData();
+            ShiftEntryPage?.VM.RepairData();
         }
 
         public void ImportOldData()

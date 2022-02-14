@@ -12,6 +12,7 @@ namespace Uranus.Staff.Model
         public int HeadID { get; set; }
         [ForeignKey(typeof(Department))]
         public string OverDepartmentName { get; set; }
+        public string PayPoint { get; set; }
 
         [OneToOne]
         public Employee Head { get; set; }

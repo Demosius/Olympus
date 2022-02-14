@@ -10,7 +10,7 @@ namespace Aion.View
         public DateRangeWindow(ShiftEntryPageVM editorVM)
         {
             InitializeComponent();
-            VM.ShiftEntryPageVM = editorVM;
+            VM.SetEditorVM(editorVM);
         }
     }
 }

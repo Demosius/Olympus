@@ -37,7 +37,11 @@ namespace Uranus.Staff.Model
         public string Time
         {
             get => time ??= DateTime.Parse(Timestamp).ToString("HH:mm:ss");
-            set => time = value;
+            set
+            {
+                time = value.Replace('_', '0');; 
+                OnPropertyChanged(nameof(Time));
+            }
         }
 
         public EClockStatus Status { get; set; }

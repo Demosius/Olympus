@@ -23,10 +23,49 @@ namespace Uranus.Staff.Model
         [ForeignKey(typeof(Employee))] public int EmployeeID { get; set; }
         [ForeignKey(typeof(Shift))] public string ShiftName { get; set; }
 
-        public string ShiftStartTime { get; set; }
-        public string ShiftEndTime { get; set; }
-        public string LunchStartTime { get; set; }
-        public string LunchEndTime { get; set; }
+        private string shiftStartTime;
+        public string ShiftStartTime
+        {
+            get => shiftStartTime;
+            set
+            {
+                shiftStartTime = value;
+                OnPropertyChanged(nameof(ShiftStartTime));
+            }
+        }
+
+        private string shiftEndTime;
+        public string ShiftEndTime
+        {
+            get => shiftEndTime;
+            set
+            {
+                shiftEndTime = value;
+                OnPropertyChanged(nameof(ShiftEndTime));
+            }
+        }
+
+        private string lunchStartTime;
+        public string LunchStartTime
+        {
+            get => lunchStartTime;
+            set
+            {
+                lunchStartTime = value;
+                OnPropertyChanged(nameof(lunchStartTime));
+            }
+        }
+
+        private string lunchEndTime;
+        public string LunchEndTime
+        {
+            get => lunchEndTime;
+            set
+            {
+                lunchEndTime = value;
+                OnPropertyChanged(nameof(LunchEndTime));
+            }
+        }
 
         private string location;
         public string Location
@@ -147,7 +186,7 @@ namespace Uranus.Staff.Model
             LunchEndTime = "";
 
             // Make sure we grab the most relevant clocks first, if there is not a full count.
-            clockTimes = clockTimes.OrderBy(c => c.Timestamp).ToList();
+            clockTimes = clockTimes.OrderBy(c => c.Time).ToList();
             if (clockTimes.Count > 0)
             {
                 ShiftStartTime = clockTimes[0].Time;
@@ -170,12 +209,13 @@ namespace Uranus.Staff.Model
             }
 
             // Reject additional times - which should be all except the last one, and the first 3.
-            if (clockTimes.Count <= 4) return;
-            
-            ClockEvents = clockTimes.Skip(3).Take(clockTimes.Count - 4).ToList();
-            foreach (var clock in ClockEvents)
+            if (clockTimes.Count > 4)
             {
-                clock.Status = EClockStatus.Rejected;
+                ClockEvents = clockTimes.Skip(3).Take(clockTimes.Count - 4).ToList();
+                foreach (var clock in ClockEvents)
+                {
+                    clock.Status = EClockStatus.Rejected;
+                }
             }
 
             SummarizeShift();

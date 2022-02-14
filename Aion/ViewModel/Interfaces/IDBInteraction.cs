@@ -7,5 +7,6 @@ namespace Aion.ViewModel.Interfaces
         public RefreshDataCommand RefreshDataCommand { get; set; }
 
         public void RefreshData();
+        public void RepairData();
     }
 }

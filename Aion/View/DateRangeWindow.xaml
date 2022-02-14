@@ -6,10 +6,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Aion.ViewModel"
         mc:Ignorable="d"
-        Title="Set Date Range" Height="300" Width="500">
+        Title="Set Date Range" Height="300" Width="300">
     <Window.DataContext>
         <vm:DateRangeVM x:Name="VM"/>
     </Window.DataContext>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Light Theme -->
+                <ResourceDictionary Source="../Themes/Metro/Light/Metro.MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary Source="../Themes/Metro/Light/Metro.MSControls.Toolkit.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -32,7 +42,7 @@
                    Text="TO"/>
         <!-- Max Date-->
         <DatePicker Grid.Row="3" 
-                    SelectedDate="{Binding MaxDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    SelectedDate="{Binding MaxDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <!-- Buttons -->
         <StackPanel Grid.Row="5" 
                     Orientation="Horizontal"
@@ -41,7 +51,8 @@
                     IsCancel="True"/>
             <Button Content="Confirm"
                     IsDefault="True"
-                    Command="{Binding SetDateRangeCommand}"/>
+                    Command="{Binding SetDateRangeCommand}"
+                    CommandParameter="{Binding ElementName=DatePicker}"/>
             <StackPanel.Resources>
                 <Style BasedOn="{StaticResource ButtonStyle}" TargetType="{x:Type Button}">
                     <Setter Property="Margin" Value="20,20,0,0"></Setter>

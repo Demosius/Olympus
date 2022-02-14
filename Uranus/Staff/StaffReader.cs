@@ -162,10 +162,11 @@ namespace Uranus.Staff
 
             Chariot.Database.RunInTransaction(() =>
             {
-                employees = Employees().ToDictionary(e => e.ID, e => e);
-                entries = Chariot.Database.Query<ShiftEntry>("SELECT ShiftEntry.* FROM ShiftEntry JOIN Employee E on ShiftEntry.EmployeeID = E.ID " +
-                                                             "WHERE E.ReportsToID = ? AND Date BETWEEN ? AND ?;",
-                    managerID, startString, endString).ToList();
+                employees = GetManagedEmployees(managerID).ToDictionary(e => e.ID, e => e);
+                entries = Chariot.Database.Query<ShiftEntry>("SELECT * FROM ShiftEntry " +
+                                                             $"WHERE EmployeeID IN ({string.Join(", ", employees.Select(d => d.Value.ID))}) " +
+                                                             "AND Date BETWEEN ? AND ?;",
+                    startString, endString).ToList();
 
             });
 

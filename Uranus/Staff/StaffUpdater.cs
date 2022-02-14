@@ -146,5 +146,56 @@ namespace Uranus.Staff
                 ClockEvents(updatedClockEvents);
             });
         }
+
+        /// <summary>
+        /// Repair Aion Related data, fixing known potential issues such
+        /// as duplicate data, or missing fields from tables.
+        /// </summary>
+        /// <returns>The number of rows of data affected by the repairs.</returns>
+        public int RepairAionData()
+        {
+            var returnValue = 0;
+
+            Chariot.Database.RunInTransaction(() =>
+            {
+                // Remove duplicate values.
+                returnValue += RemoveDuplicateShiftEntries();
+
+                //Remove any entries without an employee or date value
+                returnValue +=
+                    Chariot.Database.Execute("DELETE FROM ShiftEntry WHERE Location is NULL or EmployeeID is NULL");
+
+                // Make sure location is not null - use employeeID
+                returnValue += Chariot.Database.Execute("UPDATE ShiftEntry " +
+                                                        "SET Location = (SELECT Employee.Location FROM Employee WHERE ShiftEntry.EmployeeID = Employee.ID) " +
+                                                        "WHERE EXISTS " +
+                                                        "(SELECT * FROM Employee " +
+                                                        "WHERE ShiftEntry.EmployeeID = Employee.ID) " +
+                                                        "AND ShiftEntry.Location is NULL;");
+
+                // Get the shift entries to check and modify.
+                IEnumerable<ShiftEntry> shiftEntries = Chariot.Database.Table<ShiftEntry>();
+                // Change the Day to match the date, as appropriate, and insert the data back into the database.
+                foreach (var shiftEntry in shiftEntries)
+                {
+                    var day = DateTime.Parse(shiftEntry.Date).DayOfWeek;
+                    if (shiftEntry.Day == day) continue;
+                    shiftEntry.Day = day;
+                    returnValue += Chariot.Database.InsertOrReplace(shiftEntry);
+                }
+            });
+
+            return returnValue;
+        }
+
+        /// <summary>
+        /// Remove duplicate (employee - date) shift entries.
+        /// </summary>
+        /// <returns>The number of rows removed.</returns>
+        public int RemoveDuplicateShiftEntries()
+        {
+            return Chariot.Database.Execute("DELETE FROM ShiftEntry WHERE ID NOT IN " +
+                                            "(SELECT MIN(ID) FROM ShiftEntry GROUP BY EmployeeID, Date)");
+        }
     }
 }

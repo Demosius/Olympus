@@ -149,6 +149,11 @@ namespace Aion.ViewModel
             Managers.Insert(0, SelectedManager);
         }
 
+        public void RepairData()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void OnPropertyChanged(string propertyName)

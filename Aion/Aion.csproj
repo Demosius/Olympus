@@ -19,6 +19,7 @@
     <None Remove="plus-circle-frame.png" />
     <None Remove="refresh.png" />
     <None Remove="Resources\clock--arrow.png" />
+    <None Remove="Resources\repair.png" />
     <None Remove="save.png" />
     <None Remove="sort.png" />
   </ItemGroup>
@@ -43,6 +44,7 @@
     <Resource Include="Resources\database-import.png" />
     <Resource Include="Resources\plus-circle-frame.png" />
     <Resource Include="Resources\refresh.png" />
+    <Resource Include="Resources\repair.png" />
     <Resource Include="Resources\save.png" />
     <Resource Include="Resources\sort.png" />
   </ItemGroup>

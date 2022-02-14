@@ -246,6 +246,18 @@ namespace Aion.ViewModel
             }
         }
 
+        private string commentSearchString;
+
+        public string CommentSearchString
+        {
+            get => commentSearchString;
+            set
+            {
+                commentSearchString = value;
+                OnPropertyChanged(nameof(CommentSearchString));
+            }
+        }
+
         private string daySearchString;
         public string DaySearchString
         {
@@ -273,6 +285,7 @@ namespace Aion.ViewModel
         public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
         public CreateMissingShiftsCommand CreateMissingShiftsCommand { get; set; }
         public ApplySortingCommand ApplySortingCommand { get; set; }
+        public RepairDataCommand RepairDataCommand { get; set; }
 
         public ShiftEntryPageVM()
         {
@@ -297,6 +310,7 @@ namespace Aion.ViewModel
             ApplyFiltersCommand = new(this);
             CreateMissingShiftsCommand = new(this);
             ApplySortingCommand = new(this);
+            RepairDataCommand = new(this);
         }
 
         public bool CheckDateChange()
@@ -379,8 +393,18 @@ namespace Aion.ViewModel
 
             IEnumerable<ShiftEntry> shiftEntries = FullEntries;
 
-            FilterEmployee(ref shiftEntries);
-            FilterDepartment(ref shiftEntries);
+            try
+            {
+                FilterEmployee(ref shiftEntries);
+                FilterDepartment(ref shiftEntries);
+                FilterComment(ref shiftEntries);
+            }
+            catch (RegexParseException ex)
+            {
+                MessageBox.Show("Issue with pattern matching in filters:\n\n" +
+                                $"{ex.Message}", "RegEx Exception", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+
             FilterDay(ref shiftEntries);
             FilterDate(ref shiftEntries);
 
@@ -396,7 +420,7 @@ namespace Aion.ViewModel
             if ((employeeSearchString ?? "") == "") return;
 
             Regex rex = new(employeeSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            shiftEntries = shiftEntries?.Where(s => rex.IsMatch(s.EmployeeName));
+            shiftEntries = shiftEntries?.Where(s => rex.IsMatch(s.EmployeeName ?? "") || rex.IsMatch(s.EmployeeID.ToString()));
         }
 
         private void FilterDepartment(ref IEnumerable<ShiftEntry> shiftEntries)
@@ -404,7 +428,15 @@ namespace Aion.ViewModel
             if ((departmentSearchString ?? "") == "") return;
 
             Regex rex = new(departmentSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            shiftEntries = shiftEntries?.Where(s => rex.IsMatch(s.Department));
+            shiftEntries = shiftEntries?.Where(s => rex.IsMatch(s.Department ?? ""));
+        }
+
+        private void FilterComment(ref IEnumerable<ShiftEntry> shiftEntries)
+        {
+            if ((commentSearchString ?? "") == "") return;
+
+            Regex rex = new(commentSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            shiftEntries = shiftEntries?.Where(s => rex.IsMatch(s.Comments ?? ""));
         }
 
         private void FilterDay(ref IEnumerable<ShiftEntry> shiftEntries)
@@ -502,30 +534,45 @@ namespace Aion.ViewModel
                 Task.Run(SetEntries);
         }
 
+        /// <summary>
+        /// Repairs data in the database, checking for know potential issues, such as duplicate data,
+        /// or missing fields in tables.
+        /// </summary>
+        /// <returns>The number of rows of data affected by the repairs.</returns>
+        public void RepairData()
+        {
+            if (MessageBox.Show(
+                    "This action will reset the data, and undo any unsaved changes that have been made.\n\nDo you want to continue?",
+                    "Refresh Data?", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+            
+            var linesAffected = Helios.StaffUpdater.RepairAionData();
+            RefreshData(true);
+            MessageBox.Show($"The repair process affected {linesAffected} rows of data.", "Complete",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
         public void SaveEntryChanges()
         {
-            var uTask = Task.Run(() =>
-            {
-                Helios.StaffUpdater.EntriesAndClocks(FullEntries, FullClockDictionary.SelectMany(d => d.Value));
-            });
-            var dTask = Task.Run(() =>
-            {
-                Helios.StaffDeleter.EntriesAndClocks(DeletedEntries, DeletedClocks);
-            });
-
-            Task.WaitAll(uTask, dTask);
+            Helios.StaffUpdater.EntriesAndClocks(FullEntries, FullClockDictionary.SelectMany(d => d.Value));
+            Helios.StaffDeleter.EntriesAndClocks(DeletedEntries, DeletedClocks);
 
             RefreshData(true);
         }
 
         public void DeleteSelectedShifts(List<ShiftEntry> selectedShifts)
         {
-            foreach (var s in selectedShifts)
+            FullEntries.RemoveAll(e => selectedShifts.Select(s => s.ID).Contains(e.ID));
+            DeletedEntries.AddRange(selectedShifts.Where(s => !DeletedEntries.Select(d => d.ID).Contains(s.ID)));
+            ApplyFilters();
+            CheckForMissingShifts();
+            /*foreach (var s in selectedShifts)
             {
-                FullEntries.Remove(s);
-                DeletedEntries.Add(s);
-                Entries.Remove(s);
-            }
+                var fe = FullEntries.SingleOrDefault(e => e.ID == s.ID);
+                FullEntries.Remove(fe);
+                if (DeletedEntries.All(e => e.ID != s.ID)) DeletedEntries.Add(s);
+                var ee = Entries.Single(e => e.ID == s.ID);
+                Entries.Remove(ee);
+            }*/
         }
 
         /// <summary>
@@ -542,8 +589,10 @@ namespace Aion.ViewModel
         public void DeleteSelectedClock()
         {
             SelectedClock.Status = EClockStatus.Deleted;
-            Clocks.Remove(SelectedClock);
+            // We will only delete the clock event from the DB if the timestamp does not match the date - denoting that it was not created by a physical clock event (but through the Aion Manager instead).
+            // (In practice, actual clock events should remain recorded, for posterity.)
             if (SelectedClock.Date != DateTime.Parse(SelectedClock.Timestamp).ToString("yyyy-MM-dd")) DeletedClocks.Add(SelectedClock);
+            Clocks.Remove(SelectedClock);
         }
 
         public void DeleteShift()
@@ -630,6 +679,8 @@ namespace Aion.ViewModel
             });
 
             Clocks = new(Clocks.OrderBy(c => c.Time));
+
+            FullClockDictionary[(SelectedEntry.EmployeeID, selectedEntry.Date)] = new(Clocks);
         }
 
         /// <summary>

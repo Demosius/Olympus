@@ -248,6 +248,11 @@ namespace Aion.ViewModel
             SetReportList();
         }
 
+        public void RepairData()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void ConfirmEdit()
         {
             employee.FirstName = FirstName;

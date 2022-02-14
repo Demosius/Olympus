@@ -16,7 +16,11 @@
 
     <Page.InputBindings>
         <KeyBinding Command="{Binding SaveEntryChangesCommand}"
-              Gesture="CTRL+S" />
+                    Gesture="CTRL+S" />
+        <KeyBinding Command="{Binding RefreshDataCommand}"
+                    Gesture="CTRL+R" />
+        <KeyBinding Command="{Binding ApplyFiltersCommand}"
+                    Gesture="F7" />
     </Page.InputBindings>
 
     <Page.Resources>
@@ -120,6 +124,17 @@
                              Margin="0,5"/>
                 </StackPanel>
                 <Separator/>
+                <!--Comments-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="5,0">
+                    <Label Content="Comment: "
+                           VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding CommentSearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalContentAlignment="Center"
+                             MinWidth="75"
+                             Margin="0,5"/>
+                </StackPanel>
+                <Separator/>
                 <!--Day Of Week-->
                 <Expander x:Name="Expander" ExpandDirection="Down" IsExpanded="False" HorizontalAlignment="Stretch" VerticalAlignment="Center">
                     <Expander.Header>
@@ -130,7 +145,10 @@
                            IsOpen="{Binding IsExpanded, ElementName=Expander}">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="600" HorizontalAlignment="Stretch"
                                       Background="White">
-                            <ItemsControl ItemsSource="{Binding Days, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ItemsControl ItemsSource="{Binding Days, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          Background="White"
+                                          BorderThickness="1"
+                                          Padding="0,0,5,0">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <CheckBox IsChecked="{Binding InUse, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -150,21 +168,24 @@
                     <Label Content="From:"
                            VerticalAlignment="Center" 
                            Target="{Binding ElementName=FromDate}"/>
-                    <DatePicker Name="FromDate" SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <DatePicker Name="FromDate" SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Height="28"
+                                Padding="0"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal"
                             Margin="5,0">
                     <Label Content="To:"
                            VerticalAlignment="Center"
                            Target="{Binding ElementName=ToDate}"/>
-                    <DatePicker Name="ToDate" SelectedDate="{Binding EndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <DatePicker Name="ToDate" SelectedDate="{Binding EndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Height="28"
+                                Padding="0"/>
                 </StackPanel>
                 <Separator/>
                 <Button Content="🔍"
-                        ToolTip="Apply Filters"
+                        ToolTip="Apply Filters (F7)"
                         Margin="5,0"
                         MinWidth="25"
-                        IsDefault="True"
                         Command="{Binding ApplyFiltersCommand}"/>
                 <Separator/>
                 <Button Content="Clear Filters"
@@ -213,11 +234,9 @@
                                    FontFamily="Times New Roman"/>
                     </Grid>
                 </Button>
-                <Button Command="{Binding ExportEntriesToCSVCommand}">
-                    <Image Source="../Resources/refresh.png"/>
-                </Button>
-                <Button Command="{Binding ExportEntriesToCSVCommand}">
-                    <Image Source="../Resources/refresh.png"/>
+                <Button Command="{Binding RepairDataCommand}"
+                        ToolTip="Repair: Fix potential duplicate data, and other data related issues.">
+                    <Image Source="../Resources/repair.png"/>
                 </Button>
             </ToolBar>
         </ToolBarTray>
