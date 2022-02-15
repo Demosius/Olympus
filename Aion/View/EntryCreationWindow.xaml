@@ -35,33 +35,34 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
-        <!-- Date Range -->
-
-        <Grid Grid.Row="0"
-              Margin="0,0,0,15">
+        <!-- Date range -->
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-
-            <Label Grid.Column="0"
-                   Content="Working Date Range:"
-                   FontSize="8"
-                   FontWeight="Bold"
-                   VerticalAlignment="Center"/>
-
-            <DatePicker Grid.Column="2"
-                        SelectedDate="{Binding EditorVM.StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <TextBlock  Grid.Column="3"
-                            Text="to"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"/>
-            <DatePicker Grid.Column="4"
-                        SelectedDate="{Binding EditorVM.EndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Label Content="Date Range:"
+                   VerticalAlignment="Center"
+                   Margin="5,0"
+                   FontWeight="Bold"/>
+            <TextBlock Grid.Column="1"
+                       Text="{Binding EditorVM.MinDate, UpdateSourceTrigger=PropertyChanged, StringFormat=dd-MM-yyyy}"
+                       VerticalAlignment="Center"
+                       Margin="5,0"/>
+            <TextBlock Grid.Column="2" Text="to"
+                       VerticalAlignment="Center"
+                       Margin="5,0"/>
+            <TextBlock Grid.Column="3"
+                       Text="{Binding EditorVM.MaxDate, UpdateSourceTrigger=PropertyChanged, StringFormat=dd-MM-yyyy}"
+                       VerticalAlignment="Center"
+                       Margin="5,0"/>
+            <Button Grid.Column="4" Content="Change"
+                    VerticalAlignment="Center"
+                    Margin="5,2"
+                    Command="{Binding EditorVM.LaunchDateRangeCommand}"/>
         </Grid>
 
         <!-- Date -->

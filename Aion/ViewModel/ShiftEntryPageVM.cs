@@ -23,8 +23,8 @@ namespace Aion.ViewModel
 {
     public enum EEntrySortOption
     {
-        DateEmployee,
         EmployeeDate,
+        DateEmployee,
         DepartmentDateEmployee,
         DayDateEmployee
     }
@@ -34,7 +34,7 @@ namespace Aion.ViewModel
         public Helios Helios { get; set; }
         public Charon Charon { get; set; }
         public List<Employee> Employees { get; set; }
-        
+
         private EEntrySortOption sortOption;
         public EEntrySortOption SortOption
         {
@@ -100,8 +100,8 @@ namespace Aion.ViewModel
                 OnPropertyChanged(nameof(Locations));
             }
         }
-        
-        private List<ShiftEntry> FullEntries { get; set; }
+
+        public List<ShiftEntry> FullEntries { get; set; }
         private List<ShiftEntry> DeletedEntries { get; set; }
 
         private ObservableCollection<ShiftEntry> entries;
@@ -291,6 +291,7 @@ namespace Aion.ViewModel
         {
             minDate = DateTime.Now.AddDays(-((int)DateTime.Now.DayOfWeek - 1) - 7 - ((int)DateTime.Now.DayOfWeek <= 1 ? 7 : 0)).Date;
             maxDate = DateTime.Now.AddDays(-1).Date;
+            sortOption = EEntrySortOption.EmployeeDate;
 
             Entries = new();
 
@@ -331,7 +332,7 @@ namespace Aion.ViewModel
             Charon = charon;
             Manager = charon.UserEmployee;
             Employees = Helios.StaffReader.GetManagedEmployees(Manager.ID).ToList();
-            
+
             Task.Run(SetEntries);
         }
 
@@ -343,9 +344,9 @@ namespace Aion.ViewModel
             StartDate = minDate;
             EndDate = maxDate;
 
-            Task.Run(() =>
+            var dTask = Task.Run(() =>
             {
-                FullClockDictionary = Helios.StaffReader.ClockEvents(startDate, endDate)
+                FullClockDictionary = Helios.StaffReader.ClockEvents(Employees.Select(e => e.ID), startDate, endDate)
                     .Where(c => c.Status != EClockStatus.Deleted)
                     .GroupBy(c => (c.EmployeeID, c.Date))
                     .ToDictionary(g => g.Key, g => g.ToList());
@@ -365,20 +366,61 @@ namespace Aion.ViewModel
                 new(DayOfWeek.Friday),
                 new(DayOfWeek.Saturday)
             };
-            
+
             DeletedEntries = new();
             DeletedClocks = new();
 
-            CheckForMissingShifts();
+            // Check for duplicate entries.
+            if (CheckForDuplicateEntries()) return;
 
+            dTask.Wait();
+
+            CheckData();
             ApplyFilters();
         }
-        
+
+        /// <summary>
+        /// Checks for duplicate (date-employee) entries.
+        /// Will offer to run a repair if there is.
+        /// </summary>
+        /// <returns>True if there is still duplicates by the end of the function.</returns>
+        private bool CheckForDuplicateEntries()
+        {
+            if (!FullEntries.GroupBy(x => new { x.Date, x.EmployeeID }).Any(x => x.Skip(1).Any()))
+                return false;
+
+            var result = MessageBox.Show(
+                "There are duplicate values in the Shift Entries. This will need to be rectified before we can continue.\n\n" +
+                "Would you like to run a data repair now?\n\n" +
+                "(It may be possible to continue with a different date range, depending on the extent of the fault.)", "Duplicate Fault Found",
+                MessageBoxButton.YesNo, MessageBoxImage.Error);
+
+            if (result != MessageBoxResult.Yes) return true;
+
+            var linesAffected = Helios.StaffUpdater.RepairAionData();
+
+            MessageBox.Show($"The repair process affected {linesAffected} rows of data.", "Complete",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+
+            FullEntries = new(Helios.StaffReader.GetFilteredEntries(StartDate, EndDate, Manager.ID));
+
+
+            if (!FullEntries.GroupBy(x => new { x.Date, x.EmployeeID }).Any(x => x.Skip(1).Any()))
+                return false;
+
+            MessageBox.Show(
+                "Duplicates still found after repair. Please Aion Development or Database managers to rectify this issue.\n\n" +
+                "(It may be possible to continue with a different date range, depending on the extent of the fault.)");
+            return true;
+
+        }
+
         public void ClearFilters()
         {
             EmployeeSearchString = "";
             DepartmentSearchString = "";
             DaySearchString = "";
+            CommentSearchString = "";
             StartDate = MinDate;
             EndDate = MaxDate;
             ApplyFilters();
@@ -397,6 +439,7 @@ namespace Aion.ViewModel
             {
                 FilterEmployee(ref shiftEntries);
                 FilterDepartment(ref shiftEntries);
+                // ReSharper disable once PossibleMultipleEnumeration
                 FilterComment(ref shiftEntries);
             }
             catch (RegexParseException ex)
@@ -405,14 +448,13 @@ namespace Aion.ViewModel
                                 $"{ex.Message}", "RegEx Exception", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
+            // ReSharper disable once PossibleMultipleEnumeration
             FilterDay(ref shiftEntries);
             FilterDate(ref shiftEntries);
-
-            Entries = new(shiftEntries);
-            PendingClockCount = Helios.StaffReader.GetPendingCount(Employees.Select(e => e.ID), MinDate, MaxDate);
+            
+            ApplySorting(shiftEntries);
 
             SetExportString();
-            ApplySorting();
         }
 
         private void FilterEmployee(ref IEnumerable<ShiftEntry> shiftEntries)
@@ -474,45 +516,78 @@ namespace Aion.ViewModel
                 newEntry = true;
             }
 
-            if (newEntry) ApplyFilters();
+            if (!newEntry) return;
+
+            ApplyFilters();
+            CheckData();
         }
 
         /// <summary>
-        /// Removes daily entries offered from an external source.
-        /// These should represent entries deleted from the database.
+        /// Removes given list of daily entries - which may represent an internal list, or sourced externally.
         /// </summary>
         /// <param name="entryList">A list of the base daily entries that are to be removed.</param>
         public void RemoveEntries(List<ShiftEntry> entryList)
         {
-            foreach (var entry in entryList)
+            FullEntries.RemoveAll(e => entryList.Select(s => s.ID).Contains(e.ID));
+            DeletedEntries.AddRange(entryList.Where(s => !DeletedEntries.Select(d => d.ID).Contains(s.ID)));
+            // Set associated clocks to pending.
+            foreach (var shiftEntry in entryList)
             {
-                FullEntries.Remove(entry);
-                Entries.Remove(entry);
-                DeletedEntries.Remove(entry);
+                if (!FullClockDictionary.TryGetValue((shiftEntry.EmployeeID, shiftEntry.Date), out var clockEvents)) continue;
+
+                foreach (var clockEvent in clockEvents)
+                {
+                    clockEvent.Status = clockEvent.Status != EClockStatus.Deleted
+                        ? EClockStatus.Pending
+                        : EClockStatus.Deleted;
+                }
             }
+            ApplyFilters();
+            CheckData();
         }
 
         /// <summary>
         /// Adds new shift entries from an external source.
-        /// These should represent entries that have been added to the database.
         /// </summary>
         /// <param name="entryList">List of new export entries - which should each reference a daily entry.</param>
         public void AddEntries(List<ShiftEntry> entryList)
         {
-            foreach (var entry in entryList)
-            {
-                FullEntries.Add(entry);
-                Entries.Add(entry);
-            }
+            FullEntries.AddRange(entryList.Where(s => !FullEntries.Select(f => f.ID).Contains(s.ID)));
+            ApplyFilters();
+            CheckData();
         }
 
         /// <summary>
         /// Applies the selected sorting to the entry list.
-        /// (Temporarily applies simple single sorting style.)
         /// </summary>
         public void ApplySorting()
         {
-            Entries = new(Entries.OrderBy(e => e.Date).ThenBy(e => e.EmployeeName));
+            ApplySorting(Entries);
+        }
+
+        /// <summary>
+        /// Applies the selected sorting to the given shift list.
+        /// </summary>
+        public void ApplySorting(IEnumerable<ShiftEntry> shiftEntries)
+        {
+            var shifts = shiftEntries as ShiftEntry[] ?? shiftEntries.ToArray();
+            if (!shifts.Any())
+            {
+                Entries = new();
+                return;
+            }
+            Entries = SortOption switch
+            {
+                EEntrySortOption.DateEmployee =>
+                    new(shifts.OrderBy(e => e.Date).ThenBy(e => e.EmployeeName)),
+                EEntrySortOption.DayDateEmployee =>
+                    new(shifts.OrderBy(e => e.Day).ThenBy(e => e.Date).ThenBy(e => e.EmployeeName)),
+                EEntrySortOption.DepartmentDateEmployee =>
+                    new(shifts.OrderBy(e => e.Department).ThenBy(e => e.Date).ThenBy(e => e.EmployeeName)),
+                EEntrySortOption.EmployeeDate =>
+                    new(shifts.OrderBy(e => e.EmployeeName).ThenBy(e => e.Date)),
+                _ => new(shifts)
+            };
         }
 
         public void SetExportString()
@@ -544,7 +619,7 @@ namespace Aion.ViewModel
             if (MessageBox.Show(
                     "This action will reset the data, and undo any unsaved changes that have been made.\n\nDo you want to continue?",
                     "Refresh Data?", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
-            
+
             var linesAffected = Helios.StaffUpdater.RepairAionData();
             RefreshData(true);
             MessageBox.Show($"The repair process affected {linesAffected} rows of data.", "Complete",
@@ -561,18 +636,7 @@ namespace Aion.ViewModel
 
         public void DeleteSelectedShifts(List<ShiftEntry> selectedShifts)
         {
-            FullEntries.RemoveAll(e => selectedShifts.Select(s => s.ID).Contains(e.ID));
-            DeletedEntries.AddRange(selectedShifts.Where(s => !DeletedEntries.Select(d => d.ID).Contains(s.ID)));
-            ApplyFilters();
-            CheckForMissingShifts();
-            /*foreach (var s in selectedShifts)
-            {
-                var fe = FullEntries.SingleOrDefault(e => e.ID == s.ID);
-                FullEntries.Remove(fe);
-                if (DeletedEntries.All(e => e.ID != s.ID)) DeletedEntries.Add(s);
-                var ee = Entries.Single(e => e.ID == s.ID);
-                Entries.Remove(ee);
-            }*/
+            RemoveEntries(selectedShifts);
         }
 
         /// <summary>
@@ -684,6 +748,35 @@ namespace Aion.ViewModel
         }
 
         /// <summary>
+        /// Checks data for missing shifts, pending clocks, etc.
+        /// </summary>
+        public void CheckData()
+        {
+            CheckForMissingShifts();
+            CheckForPendingClocks();
+        }
+
+        public void CheckForPendingClocks()
+        {
+            // Set any clocks with no shifts assigned to be pending.
+            Dictionary<(int, string), ShiftEntry> entryDict =
+                FullEntries.ToDictionary(e => (e.EmployeeID, e.Date), e => e);
+
+            foreach (var (_, clockEvents) in FullClockDictionary.Where(dictEntry => !entryDict.ContainsKey(dictEntry.Key)))
+            {
+                foreach (var clockEvent in clockEvents)
+                {
+                    clockEvent.Status = clockEvent.Status == EClockStatus.Deleted
+                        ? EClockStatus.Deleted
+                        : EClockStatus.Pending;
+                }
+            }
+
+            // Set the count based on total clocks with pending status.
+            PendingClockCount = (int) FullClockDictionary?.SelectMany(d => d.Value).Count(c => c.Status == EClockStatus.Pending);
+        }
+
+        /// <summary>
         /// Checks for missing shift entries amongst the employees within the date range.
         /// Does not check beyond today - as they are expected to yet be created.
         /// </summary>
@@ -692,16 +785,29 @@ namespace Aion.ViewModel
             var count = 0;
 
             var lastDate = endDate.Date > DateTime.Now.Date ? DateTime.Now.Date : endDate.Date;
+            Dictionary<(int, string), ShiftEntry> entryDict;
 
-            var entryDict = FullEntries.ToDictionary(e => (e.EmployeeID, e.Date), e => e);
-            
+            try
+            {
+                entryDict = FullEntries.ToDictionary(e => (e.EmployeeID, e.Date), e => e);
+            }
+            catch (ArgumentException ex)
+            {
+                MessageBox.Show(
+                    $"There appears to be an issue with the data:\n\n{ex.Message}\n\nA common cause is duplicate shift entries.\nPlease run a repair when possible.",
+                    "Data Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MissingEntryCount = -1;
+                return;
+            }
+
+
             foreach (var employee in Employees)
             {
                 if (employee.EmploymentType is not (EEmploymentType.FP or EEmploymentType.SA)) continue;
                 var checkDate = startDate;
                 while (checkDate.Date <= lastDate.Date)
                 {
-                    if (checkDate.DayOfWeek is not (DayOfWeek.Sunday or DayOfWeek.Saturday)) 
+                    if (checkDate.DayOfWeek is not (DayOfWeek.Sunday or DayOfWeek.Saturday))
                         if (!entryDict.ContainsKey((employee.ID, checkDate.ToString("yyyy-MM-dd")))) ++count;
                     checkDate = checkDate.AddDays(1);
                 }
@@ -740,8 +846,9 @@ namespace Aion.ViewModel
                         {
                             if (FullClockDictionary.TryGetValue((employee.ID, checkDate.ToString("yyyy-MM-dd")),
                                     out var clockEvents))
-                                FullEntries.Add(new(employee, clockEvents) {Comments = comment});
-                            FullEntries.Add(new(employee, checkDate) {Comments = comment});
+                                FullEntries.Add(new(employee, clockEvents) { Comments = comment });
+                            else
+                                FullEntries.Add(new(employee, checkDate) { Comments = comment });
 
                             newEntries = true;
                         }

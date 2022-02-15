@@ -1,5 +1,4 @@
-﻿using ExportEntry = Aion.Model.ExportEntry;
-using Aion.ViewModel.Commands;
+﻿using Aion.ViewModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,8 +13,8 @@ namespace Aion.ViewModel
     {
         public Helios Helios { get; set; }
 
-        private List<ExportEntry> newEntries = new();
-        private List<ExportEntry> deletedEntries = new();
+        private List<ShiftEntry> newEntries = new();
+        private List<ShiftEntry> deletedEntries = new();
 
         private DateTime MinDate { get; set; }
         private DateTime MaxDate { get; set; }
@@ -46,8 +45,8 @@ namespace Aion.ViewModel
             }
         }
 
-        private ObservableCollection<ExportEntry> entries;
-        public ObservableCollection<ExportEntry> Entries
+        private ObservableCollection<ShiftEntry> entries;
+        public ObservableCollection<ShiftEntry> Entries
         {
             get => entries;
             set
@@ -57,8 +56,8 @@ namespace Aion.ViewModel
             }
         }
 
-        private ExportEntry selectedEntry;
-        public ExportEntry SelectedEntry
+        private ShiftEntry selectedEntry;
+        public ShiftEntry SelectedEntry
         {
             get => selectedEntry;
             set
@@ -181,24 +180,10 @@ namespace Aion.ViewModel
         {
             Entries = new();
             if (SelectedEmployee is not null && SelectedEmployee.ID != -1)
-            {
-                var shiftEntries = Helios.StaffReader.ShiftEntries(entry => entry.EmployeeID == SelectedEmployee.ID 
-                    && string.CompareOrdinal(entry.Date, MinDate.ToString("yyyy-MM-dd")) >= 0 
-                    && string.CompareOrdinal(entry.Date, MaxDate.ToString("yyyy-MM-dd")) <= 0)
-                    .OrderBy(e => e.Date); 
-
-                Dictionary<(int, DateTime), List<ClockEvent>> clocks = Helios.StaffReader.ClockEvents()
-                    .GroupBy(c => (c.EmployeeID, DTDate: c.DtDate))
-                    .ToDictionary(g => g.Key, g => g.ToList());
-
-                foreach (var entry in shiftEntries)
-                {
-                    if (clocks.TryGetValue((entry.EmployeeID, DateTime.Parse(entry.Date)), out var clockList))
-                        entry.ApplyClockTimes(clockList);
-                    ExportEntry export = new(new());
-                    Entries.Add(export);
-                }
-            }
+                Entries = new(EditorVM.FullEntries.Where(s => s.EmployeeID == selectedEmployee.ID).OrderBy(s => s.Date));
+            else
+                Entries = new();
+            
             newEntries = new();
             deletedEntries = new();
         }
@@ -208,36 +193,27 @@ namespace Aion.ViewModel
             if (SelectedEmployee.ID == -1) return;
 
             // I there already exists an entry for this date, move to the next date that has no entry.
-            if (entries.Any(e => e.ShiftEntry.Date == SelectedDate.ToString("yyyy-MM-dd")))
+            if (entries.Any(e => e.Date == SelectedDate.ToString("yyyy-MM-dd")))
             {
                 SelectedDate = SelectedDate.AddDays(1);
-                while (entries.Any(e => e.ShiftEntry.Date == SelectedDate.ToString("yyyy-MM-dd")) && SelectedDate < MaxDate)
+                while (entries.Any(e => e.Date == SelectedDate.ToString("yyyy-MM-dd")) && SelectedDate < MaxDate)
                     SelectedDate = SelectedDate.AddDays(1);
                 return;
             }
 
-            ShiftEntry newEntry = new(SelectedEmployee, SelectedDate);
-            AddEntry(newEntry);
+            ShiftEntry shiftEntry = new(SelectedEmployee, SelectedDate);
+            AddEntry(shiftEntry);
             Entries = new(Entries.OrderBy(e => e.Date));
 
             // Default to next valid date.
-            while (entries.Any(e => e.ShiftEntry.Date == SelectedDate.ToString("yyyy-MM-dd")) && SelectedDate < MaxDate)
+            while (entries.Any(e => e.Date == SelectedDate.ToString("yyyy-MM-dd")) && SelectedDate < MaxDate)
                 SelectedDate = SelectedDate.AddDays(1);
         }
 
-        public void AddEntry(ShiftEntry daily)
+        public void AddEntry(ShiftEntry shiftEntry)
         {
-            ExportEntry export = new(daily)
-            {
-                In = StartShiftTime,
-                OutToLunch = StartLunchTime,
-                InFromLunch = EndLunchTime,
-                Out = EndShiftTime,
-                Comments = Comment
-            };
-
-            newEntries.Add(export);
-            Entries.Add(export);
+            newEntries.Add(shiftEntry);
+            Entries.Add(shiftEntry);
         }
 
         public void DeleteSelectedEntry()
@@ -252,26 +228,13 @@ namespace Aion.ViewModel
 
         /// <summary>
         /// Confirms the changes from the VM, including both the newly created entries, and the deleted entries.
+        /// Apply these changes to the parent VM, from where it can then be saved to the database.
         /// </summary>
         public void ConfirmAll()
         {
-            // Add new ShiftEntries to the database and parent vm.
-            /*DBUtil.Conn().RunInTransaction(() =>
-            {
-                using var conn = DBUtil.Conn();
-                foreach (var e in newEntries) { conn.Insert(e.ShiftEntry); }
-                EditorVM.AddEntries(newEntries);
-                newEntries = new();
-                // Remove Deleted Entries from the database and the parent (editor) VM.
-                foreach (var e in deletedEntries)
-                {
-                    conn.Delete(e.ShiftEntry);
-                    EditorVM.RemoveEntries(deletedEntries.Select(entry => entry.ShiftEntry).ToList());
-                }
-                deletedEntries = new();
-            });*/
-            _ = deletedEntries;
-            deletedEntries = new();
+            EditorVM.AddEntries(newEntries);
+            EditorVM.RemoveEntries(deletedEntries);
+            SetEntries();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

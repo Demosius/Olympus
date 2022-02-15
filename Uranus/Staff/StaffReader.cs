@@ -39,6 +39,12 @@ namespace Uranus.Staff
             return Chariot.Database.Query<ClockEvent>("SELECT * FROM ClockEvent WHERE Date BETWEEN ? AND ?;", startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
         }
 
+        public List<ClockEvent> ClockEvents(IEnumerable<int> employeeIDs, DateTime startDate, DateTime endDate)
+        {
+            return Chariot.Database.Query<ClockEvent>($"SELECT * FROM ClockEvent WHERE EmployeeID in ({string.Join(", ", employeeIDs)}) AND Date BETWEEN ? AND ?;",
+                startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+        }
+
         public List<ShiftEntry> ShiftEntries(Expression<Func<ShiftEntry, bool>> filter = null,
             EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 

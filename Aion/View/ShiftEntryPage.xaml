@@ -21,6 +21,9 @@
                     Gesture="CTRL+R" />
         <KeyBinding Command="{Binding ApplyFiltersCommand}"
                     Gesture="F7" />
+        <KeyBinding Command="{Binding ClearFiltersCommand}"
+                    Key="F7" 
+                    Modifiers="Control+Shift"/>
     </Page.InputBindings>
 
     <Page.Resources>
@@ -189,6 +192,7 @@
                         Command="{Binding ApplyFiltersCommand}"/>
                 <Separator/>
                 <Button Content="Clear Filters"
+                        ToolTip="(Ctr+Shift+F7)"
                         Command="{Binding ClearFiltersCommand}"/>
             </ToolBar>
             <!--Sorting-->
@@ -303,116 +307,6 @@
             <Button Grid.Row="4" Content="Delete"
                     Command="{Binding DeleteClockCommand}"/>
         </Grid>
-        <!--<ListView ItemsSource="{Binding Entries, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedValue="{Binding SelectedEntry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Associate Number"
-                                    DisplayMemberBinding="{Binding EmployeeID}"/>
-                    <GridViewColumn Header="Name"
-                                    DisplayMemberBinding="{Binding Employee.FullName}"/>
-                    <GridViewColumn Header="Location"
-                                    Width="115">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ComboBox ItemsSource="{Binding ElementName=VM, Path=Locations}"
-                                          SelectedValue="{Binding Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          IsEditable="True"
-                                          MinWidth="100"
-                                          HorizontalContentAlignment="Center"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Date"
-                                    DisplayMemberBinding="{Binding Date}"/>
-                    <GridViewColumn Header="Day"
-                                    DisplayMemberBinding="{Binding Day}"/>
-                    <GridViewColumn Header="In">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ShiftStartTime}" 
-                                         Width="68"
-                                         HorizontalContentAlignment="Center"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Out"
-                                    Width="80">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding LunchStartTime}" 
-                                         Width="68"
-                                         HorizontalContentAlignment="Center"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="In" 
-                                    Width="80">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding LunchEndTime}" 
-                                         Width="68"
-                                         HorizontalContentAlignment="Center"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Out"
-                                    Width="80">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ShiftEndTime}" 
-                                         Width="68"
-                                         HorizontalContentAlignment="Center"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Shift Type"
-                                    Width="80">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding ShiftType}" 
-                                         Width="68"
-                                         HorizontalContentAlignment="Center"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Total"
-                                    Width="80">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding TimeTotal}" 
-                                         Width="68"
-                                         HorizontalContentAlignment="Center"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Time Worked"
-                                    Width="80">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding HoursWorked, StringFormat=N2}"
-                                         Width="68"
-                                         HorizontalContentAlignment="Center"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Comments">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding Comments}" 
-                                         MinWidth="150"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-                
-            </ListView.View>
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <TextBox Text="{}"></TextBox>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>-->
         <DataGrid x:Name="EntryGrid"
                   ItemsSource="{Binding Entries, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   SelectedValue="{Binding SelectedEntry, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

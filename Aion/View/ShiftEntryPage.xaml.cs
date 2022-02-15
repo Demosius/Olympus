@@ -70,7 +70,7 @@ namespace Aion.View
 
                     break;
                 case "ShiftStartTime":
-                    e.Column.Header = "In";
+                    /*e.Column.Header = "In";*/
                     e.Column.Width = 80;
                     break;
                 case "LunchStartTime":
@@ -123,6 +123,7 @@ namespace Aion.View
             var grid = (DataGrid)sender;
             foreach (var item in grid.Columns)
             {
+                MessageBox.Show($"{item.Header}: {item.DisplayIndex}");
                 item.DisplayIndex = item.Header.ToString() switch
                 {
                     "Associate Number" => 0,
@@ -130,6 +131,7 @@ namespace Aion.View
                     "Location" => 2,
                     "Date" => 3,
                     "Day" => 4,
+                    "ShiftStartTime" => 5,
                     "In" => 5,
                     "Out (Lunch)" => 6,
                     "In (Lunch)" => 7,
@@ -141,6 +143,7 @@ namespace Aion.View
                     "Department" => 13,
                     _ => item.DisplayIndex
                 };
+                MessageBox.Show($"{item.Header}: {item.DisplayIndex}");
             }
         }
 
