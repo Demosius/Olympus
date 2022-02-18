@@ -45,6 +45,11 @@ namespace Uranus.Staff.Model
             Name = name;
         }
 
+        public override string ToString()
+        {
+            return Name;
+        }
+
         public override bool Equals(object obj) => Equals(obj as Department);
 
         public bool Equals(Department department)

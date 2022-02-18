@@ -1,15 +1,14 @@
 ﻿#nullable enable
 using System;
 using System.Windows.Input;
-using Aion.ViewModel.Interfaces;
 
 namespace Aion.ViewModel.Commands
 {
-    public class ApplySortingCommand : ICommand
+    public class AddPayPointCommand : ICommand
     {
-        public IFilters VM { get; set; }
+        public EmployeeEditorVM VM { get; set; }
 
-        public ApplySortingCommand(IFilters vm)
+        public AddPayPointCommand(EmployeeEditorVM vm)
         {
             VM = vm;
         }
@@ -21,7 +20,7 @@ namespace Aion.ViewModel.Commands
 
         public void Execute(object? parameter)
         {
-            VM.ApplySorting();
+            VM.AddPayPoint();
         }
 
         public event EventHandler? CanExecuteChanged

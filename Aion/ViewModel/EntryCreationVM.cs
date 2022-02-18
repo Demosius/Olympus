@@ -4,21 +4,21 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
+using Aion.View;
+using Aion.ViewModel.Interfaces;
 using Uranus;
 using Uranus.Staff.Model;
 
 namespace Aion.ViewModel
 {
-    public class EntryCreationVM : INotifyPropertyChanged
+    public class EntryCreationVM : INotifyPropertyChanged, IDateRange
     {
         public Helios Helios { get; set; }
 
         private List<ShiftEntry> newEntries = new();
         private List<ShiftEntry> deletedEntries = new();
-
-        private DateTime MinDate { get; set; }
-        private DateTime MaxDate { get; set; }
-
+        
         public ShiftEntryPageVM EditorVM { get; set; }
 
         private ObservableCollection<Employee> employees;
@@ -135,16 +135,41 @@ namespace Aion.ViewModel
             }
         }
 
+        private DateTime minDate;
+        public DateTime MinDate
+        {
+            get => minDate;
+            set
+            {
+                minDate = value;
+                OnPropertyChanged(nameof(MinDate));
+            }
+        }
+
+        private DateTime maxDate;
+        public DateTime MaxDate
+        {
+            get => maxDate;
+            set
+            {
+                maxDate = value;
+                OnPropertyChanged(nameof(MaxDate));
+            }
+        }
+
         /* Commands */
         public CreateEntryCommand CreateEntryCommand { get; set; }
         public DeleteEntryCommand DeleteEntryCommand { get; set; }
         public ConfirmEntryCreationCommand ConfirmEntryCreationCommand { get; set; }
+        public LaunchDateRangeCommand LaunchDateRangeCommand { get; set; }
 
         public EntryCreationVM()
         {
             CreateEntryCommand = new(this);
             DeleteEntryCommand = new(this);
             ConfirmEntryCreationCommand = new(this);
+            LaunchDateRangeCommand = new(this);
+            SelectedEmployee = null;
         }
 
         public EntryCreationVM(ShiftEntryPageVM editorVM)
@@ -160,9 +185,9 @@ namespace Aion.ViewModel
         public void SetEditorSourceVM(ShiftEntryPageVM editorVM)
         {
             EditorVM = editorVM;
+            MinDate = editorVM.MinDate;
+            MaxDate = editorVM.MaxDate;
             Employees = new(editorVM.Employees);
-            MinDate = editorVM.StartDate;
-            MaxDate = editorVM.EndDate;
             SelectedDate = MinDate;
             SetEntries();
         }
@@ -224,6 +249,30 @@ namespace Aion.ViewModel
                 deletedEntries.Add(SelectedEntry);
 
             Entries.Remove(SelectedEntry);
+        }
+
+        public bool CheckDateChange()
+        {
+            var result = MessageBox.Show("Changing the working date range will reset the data.\n\n" +
+                                         "Would you like to save your changes before you continue.",
+                "Caution: Data Reset", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+                EditorVM.SaveEntryChanges();
+
+            return result != MessageBoxResult.Cancel;
+        }
+
+        public void LaunchDateRangeWindow()
+        {
+            if (!CheckDateChange()) return;
+
+            DateRangeWindow datePicker = new(EditorVM);
+
+            datePicker.ShowDialog();
+
+            MinDate = EditorVM.MinDate;
+            MaxDate = EditorVM.MaxDate;
         }
 
         /// <summary>

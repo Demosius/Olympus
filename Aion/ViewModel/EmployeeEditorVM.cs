@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using Aion.View;
 using Uranus;
 using Uranus.Staff.Model;
 
@@ -19,7 +20,7 @@ namespace Aion.ViewModel
 
         private List<Employee> employees;
         private List<int> managerIDs;
-
+        
         private bool useManagers;
         public bool UseManagers
         {
@@ -51,6 +52,17 @@ namespace Aion.ViewModel
             {
                 reports = value;
                 OnPropertyChanged(nameof(Reports));
+            }
+        }
+
+        private ObservableCollection<Department> departments;
+        public ObservableCollection<Department> Departments
+        {
+            get => departments;
+            set
+            {
+                departments = value;
+                OnPropertyChanged(nameof(Departments));
             }
         }
 
@@ -142,6 +154,18 @@ namespace Aion.ViewModel
             }
         }
 
+        private Department department;
+        public Department Department
+        {
+            get => department;
+            set
+            {
+                department = value;
+                PayPoint = department?.PayPoint ?? "";
+                OnPropertyChanged(nameof(Department));
+            }
+        }
+
         private string payPoint;
         public string PayPoint
         {
@@ -177,10 +201,17 @@ namespace Aion.ViewModel
 
         public ConfirmEmployeeEditCommand ConfirmEmployeeEditCommand { get; set; }
         public RefreshDataCommand RefreshDataCommand { get; set; }
+        public AddLocationCommand AddLocationCommand { get; set; }
+        public AddPayPointCommand AddPayPointCommand { get; set; }
+        public RepairDataCommand RepairDataCommand { get; set; }
 
         public EmployeeEditorVM()
         {
             ConfirmEmployeeEditCommand = new(this);
+            RefreshDataCommand = new(this);
+            AddLocationCommand = new(this);
+            AddPayPointCommand = new(this);
+            RepairDataCommand = new(this);
             UseManagers = true;
         }
 
@@ -208,6 +239,7 @@ namespace Aion.ViewModel
             FirstName = newEmployee.FirstName;
             Surname = newEmployee.LastName;
             Location = newEmployee.Location;
+            Department = Departments.FirstOrDefault(d => d.Name == newEmployee.DepartmentName);
             ReportsTo = employees.FirstOrDefault(e => e.ID == newEmployee.ReportsToID);
             PayPoint = newEmployee.PayPoint;
             EmploymentType = newEmployee.EmploymentType;
@@ -229,21 +261,23 @@ namespace Aion.ViewModel
             if (employees is null) { return; }
 
             if (useManagers)
-                Reports = new(employees.Where(e => managerIDs.Contains(e.ID)));
+                Reports = new(employees.Where(e => managerIDs.Contains(e.ID)).OrderBy(e => e.FullName));
             else
-                Reports = new(employees);
+                Reports = new(employees.OrderBy(e => e.FullName));
         }
 
         public void RefreshData()
         {
             Helios.StaffReader.AionEmployeeRefresh(out managerIDs, out employees, 
                 out var locationsList, out var payPointList, 
-                out var employmentTypeList, out var roleList);
+                out var employmentTypeList, out var roleList,
+                out var departmentList);
             
-            Locations = new(locationsList);
-            PayPoints = new(payPointList);
+            Locations = new(locationsList.OrderBy(s => s));
+            PayPoints = new(payPointList.OrderBy(s => s));
             EmploymentTypes = new(employmentTypeList);
-            JobClassifications = new(roleList);
+            JobClassifications = new(roleList.OrderBy(r => r.Name));
+            Departments = new(departmentList.OrderBy(d => d.Name));
             
             SetReportList();
         }
@@ -266,6 +300,26 @@ namespace Aion.ViewModel
             employee.Role = JobClassification;
 
             Helios.StaffUpdater.Employee(employee);
+        }
+
+        public void AddLocation()
+        {
+            InputWindow input = new();
+            if (input.ShowDialog() != true) return;
+
+            Locations.Add(input.Input.Text);
+            Locations = new(Locations.OrderBy(s => s));
+            Location = input.Input.Text;
+        }
+
+        public void AddPayPoint()
+        {
+            InputWindow input = new();
+            if (input.ShowDialog() != true) return;
+
+            PayPoints.Add(input.Input.Text);
+            PayPoints = new(PayPoints.OrderBy(s => s));
+            PayPoint = input.Input.Text;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

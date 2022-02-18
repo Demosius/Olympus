@@ -137,28 +137,7 @@ namespace Aion.View
             grid.Columns.First(c => c.Header.ToString() == "Time Worked").DisplayIndex = 11;
             grid.Columns.First(c => c.Header.ToString() == "Comments").DisplayIndex = 12;
             grid.Columns.First(c => c.Header.ToString() == "Department").DisplayIndex = 13;
-
-            /*foreach (var item in grid.Columns)
-            {
-                item.DisplayIndex = item.Header.ToString() switch
-                {
-                    "Associate Number" => 0,
-                    "Name" => 1,
-                    "Location" => 2,
-                    "Date" => 3,
-                    "Day" => 4,
-                    "In" => 5,
-                    "Out (Lunch)" => 6,
-                    "In (Lunch)" => 7,
-                    "Out" => 8,
-                    "Shift\n(D/M/A)" => 9,
-                    "Total" => 10,
-                    "Time Worked" => 11,
-                    "Comments" => 12,
-                    "Department" => 13,
-                    _ => item.DisplayIndex
-                };
-            }*/
+            
         }
 
     }

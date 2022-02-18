@@ -29,7 +29,7 @@ namespace Aion.ViewModel
         DayDateEmployee
     }
 
-    public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
+    public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters, IDateRange
     {
         public Helios Helios { get; set; }
         public Charon Charon { get; set; }
@@ -706,7 +706,7 @@ namespace Aion.ViewModel
         public void LaunchShiftCreator()
         {
             EntryCreationWindow entryCreator = new(Helios, this);
-            entryCreator.ShowDialog();
+            entryCreator.Show();
             ApplySorting();
         }
 

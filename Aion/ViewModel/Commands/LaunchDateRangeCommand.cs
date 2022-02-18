@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
+using Aion.ViewModel.Interfaces;
 
 namespace Aion.ViewModel.Commands
 {
     public class LaunchDateRangeCommand : ICommand
     {
-        public ShiftEntryPageVM VM { get; set; }
+        public IDateRange VM { get; set; }
 
-        public LaunchDateRangeCommand(ShiftEntryPageVM vm)
+        public LaunchDateRangeCommand(IDateRange vm)
         {
             VM = vm;
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -56,6 +57,7 @@ namespace Aion.ViewModel.Utility
 
         public static Employee ConvertEmployee(BrokeEmployee employee)
         {
+            Debug.Assert(employee.EmploymentType != "PP - Part-time Permanent");
             Enum.TryParse(typeof(EEmploymentType), (employee.EmploymentType ?? "CA")[..2], true, out var result);
             var eType = (EEmploymentType)(result ?? EEmploymentType.CA.ToString());
             return new()

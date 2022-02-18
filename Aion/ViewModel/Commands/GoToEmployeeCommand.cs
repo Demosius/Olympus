@@ -1,27 +1,26 @@
 ﻿#nullable enable
 using System;
 using System.Windows.Input;
-using Aion.ViewModel.Interfaces;
 
 namespace Aion.ViewModel.Commands
 {
-    public class ApplySortingCommand : ICommand
+    public class GoToEmployeeCommand : ICommand
     {
-        public IFilters VM { get; set; }
+        public EmployeePageVM VM { get; set; }
 
-        public ApplySortingCommand(IFilters vm)
+        public GoToEmployeeCommand(EmployeePageVM vm)
         {
             VM = vm;
         }
 
         public bool CanExecute(object? parameter)
         {
-            return true;
+            return VM.SelectedReport is not null;
         }
 
         public void Execute(object? parameter)
         {
-            VM.ApplySorting();
+            VM.GoToEmployee();
         }
 
         public event EventHandler? CanExecuteChanged

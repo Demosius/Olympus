@@ -51,7 +51,7 @@
                 <Setter Property="HorizontalAlignment" Value="Center"/>
                 <Setter Property="FontSize" Value="15"></Setter>
             </Style>
-            <ObjectDataProvider x:Key="DaysOfWeek"
+            <ObjectDataProvider x:Key="EntrySortOptions"
                                 MethodName="GetValues" 
                                 ObjectType="{x:Type sys:Enum}">
                 <ObjectDataProvider.MethodParameters>
@@ -198,7 +198,7 @@
             <!--Sorting-->
             <ToolBar x:Name="SortBar"
                      ToolTip="Sort Functionality">
-                <ComboBox ItemsSource="{Binding Source={StaticResource DaysOfWeek}}" 
+                <ComboBox ItemsSource="{Binding Source={StaticResource EntrySortOptions}}" 
                           SelectedValue="{Binding SortOption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Button ToolTip="Apply Sorting"
                         Command="{Binding ApplySortingCommand}">

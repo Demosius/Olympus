@@ -14,6 +14,18 @@ using Uranus.Staff.Model;
 
 namespace Aion.ViewModel
 {
+    public enum EEmployeeSortOption
+    {
+        EmployeeID,
+        EmployeeLastName,
+        EmployeeFirstName,
+        Department,
+        ReportsToID,
+        ReportsToLastName,
+        ReportsToFirstName,
+        JobClassification
+    }
+
     public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
     {
         public Helios Helios { get; set; }
@@ -43,28 +55,69 @@ namespace Aion.ViewModel
             }
         }
 
-        public ObservableCollection<Employee> Managers { get; set; }
-
-        private Employee selectedManager;
-        public Employee SelectedManager
+        private Employee selectedReport;
+        public Employee SelectedReport
         {
-            get => selectedManager;
+            get => selectedReport;
             set
             {
-                selectedManager = value;
-                OnPropertyChanged(nameof(SelectedManager));
-                ApplyFilters();
+                selectedReport = value;
+                OnPropertyChanged(nameof(SelectedReport));
+            }
+        }
+        
+        private string employeeSearchString;
+        public string EmployeeSearchString
+        {
+            get => employeeSearchString;
+            set
+            {
+                employeeSearchString = value;
+                OnPropertyChanged(nameof(EmployeeSearchString));
             }
         }
 
-        private string empSearchString;
-        public string EmpSearchString
+        private string departmentSearchString;
+        public string DepartmentSearchString
         {
-            get => empSearchString;
+            get => departmentSearchString;
             set
             {
-                empSearchString = value;
-                OnPropertyChanged(nameof(EmpSearchString));
+                departmentSearchString = value;
+                OnPropertyChanged(nameof(DepartmentSearchString));
+            }
+        }
+
+        private string reportSearchString;
+        public string ReportSearchString
+        {
+            get => reportSearchString;
+            set
+            {
+                reportSearchString = value;
+                OnPropertyChanged(nameof(ReportSearchString));
+            }
+        }
+
+        private string roleSearchString;
+        public string RoleSearchString
+        {
+            get => roleSearchString;
+            set
+            {
+                roleSearchString = value;
+                OnPropertyChanged(nameof(RoleSearchString));
+            }
+        }
+
+        private EEmployeeSortOption sortOption;
+        public EEmployeeSortOption SortOption
+        {
+            get => sortOption;
+            set
+            {
+                sortOption = value;
+                OnPropertyChanged(nameof(SortOption));
             }
         }
 
@@ -75,6 +128,9 @@ namespace Aion.ViewModel
         public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
         public ClearFiltersCommand ClearFiltersCommand { get; set; }
         public RefreshDataCommand RefreshDataCommand { get; set; }
+        public ApplySortingCommand ApplySortingCommand { get; set; }
+        public GoToEmployeeCommand GoToEmployeeCommand { get; set; }
+        public RepairDataCommand RepairDataCommand { get; set; }
 
         public EmployeePageVM()
         {
@@ -84,6 +140,10 @@ namespace Aion.ViewModel
             DeleteEmployeeCommand = new(this);
             ApplyFiltersCommand = new(this);
             ClearFiltersCommand = new(this);
+            RefreshDataCommand = new(this);
+            ApplySortingCommand = new(this);
+            GoToEmployeeCommand = new(this);
+            RepairDataCommand = new(this);
         }
 
         public void SetDataSources(Helios helios, Charon charon)
@@ -95,20 +155,104 @@ namespace Aion.ViewModel
         }
 
         /// <summary>
-        /// Apply appropriate filters to the viewable employee list.
+        /// Applies the listed filters for Employee Name/Department/ReportsTo/Role.
         /// </summary>
         public void ApplyFilters()
         {
-            if ((empSearchString ?? "") != "")
-            {
-                Regex rex = new(EmpSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-                Employees = new(allEmployees.Where(e => rex.IsMatch(e.ToString())));
-            }
-            else
-                Employees = new(allEmployees);
+            if (Charon.CurrentUser is null) return;
 
-            if (SelectedManager.ID != -1)
-                Employees = new(Employees.Where(e => e.ReportsToID == SelectedManager.ID));
+            IEnumerable<Employee> employeeBase = allEmployees;
+
+            try
+            {
+                FilterName(ref employeeBase);
+                FilterDepartment(ref employeeBase);
+                // ReSharper disable once PossibleMultipleEnumeration
+                FilterReports(ref employeeBase);
+                // ReSharper disable once PossibleMultipleEnumeration
+                FilterRole(ref employeeBase);
+            }
+            catch (RegexParseException ex)
+            {
+                MessageBox.Show("Issue with pattern matching in filters:\n\n" +
+                                $"{ex.Message}", "RegEx Exception", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+
+            // ReSharper disable once PossibleMultipleEnumeration
+            ApplySorting(employeeBase);
+        }
+
+        private void FilterName(ref IEnumerable<Employee> employeeGroup)
+        {
+            if ((employeeSearchString ?? "") == "") return;
+
+            Regex rex = new(employeeSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            employeeGroup = employeeGroup?.Where(employee => rex.IsMatch(employee.FullName ?? "") || rex.IsMatch(employee.ID.ToString()));
+        }
+
+        private void FilterDepartment(ref IEnumerable<Employee> employeeGroup)
+        {
+            if ((departmentSearchString ?? "") == "") return;
+
+            Regex rex = new(departmentSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            employeeGroup = employeeGroup?.Where(employee => rex.IsMatch(employee.DepartmentName ?? ""));
+        }
+
+        private void FilterReports(ref IEnumerable<Employee> employeeGroup)
+        {
+            if ((reportSearchString ?? "") == "") return;
+
+            Regex rex = new(reportSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            employeeGroup = employeeGroup?.Where(employee => rex.IsMatch(employee.ReportsTo?.FullName ?? "") || rex.IsMatch(employee.ReportsTo?.ID.ToString() ?? ""));
+        }
+
+        private void FilterRole(ref IEnumerable<Employee> employeeGroup)
+        {
+            if ((roleSearchString ?? "") == "") return;
+
+            Regex rex = new(roleSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            employeeGroup = employeeGroup?.Where(employee => rex.IsMatch(employee.RoleName));
+        }
+
+        /// <summary>
+        /// Applies the selected sorting to the employee list.
+        /// </summary>
+        public void ApplySorting()
+        {
+            ApplySorting(Employees);
+        }
+
+        /// <summary>
+        /// Applies the selected sorting to the given employee list.
+        /// </summary>
+        public void ApplySorting(IEnumerable<Employee> employeeGroup)
+        {
+            var employeeArray = employeeGroup as Employee[] ?? employeeGroup.ToArray();
+            if (!employeeArray.Any())
+            {
+                Employees = new();
+                return;
+            }
+            Employees = SortOption switch
+            {
+                EEmployeeSortOption.Department =>
+                    new(employeeArray.OrderBy(e => e.DepartmentName)),
+                EEmployeeSortOption.JobClassification =>
+                    new(employeeArray.OrderBy(e => e.RoleName)),
+                EEmployeeSortOption.EmployeeLastName =>
+                    new(employeeArray.OrderBy(e => e.LastName).ThenBy(e => e.FirstName)),
+                EEmployeeSortOption.EmployeeFirstName =>
+                    new(employeeArray.OrderBy(e => e.FirstName).ThenBy(e => e.LastName)),
+                EEmployeeSortOption.EmployeeID => 
+                    new(employeeArray.OrderBy(e => e.ID)),
+                EEmployeeSortOption.ReportsToLastName =>
+                    new(employeeArray.OrderBy(e => e.ReportsTo?.LastName).ThenBy(e => e.ReportsTo?.FirstName)),
+                EEmployeeSortOption.ReportsToFirstName =>
+                    new(employeeArray.OrderBy(e => e.ReportsTo?.FirstName).ThenBy(e => e.ReportsTo?.LastName)),
+                EEmployeeSortOption.ReportsToID =>
+                    new(employeeArray.OrderBy(e => e.ReportsTo?.ID)),
+                _ => new(employeeArray)
+            };
         }
 
         internal void LaunchEmployeeCreator()
@@ -133,20 +277,33 @@ namespace Aion.ViewModel
             MessageBox.Show("This feature is not yet implemented","Feature Missing",MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
+        public void GoToEmployee()
+        {
+            if (SelectedReport is null) return;
+
+            if (allEmployees.All(e => e.ID != selectedReport.ID))
+            {
+                MessageBox.Show(
+                    $"ERROR: Selected report employee, {SelectedReport.FullName}, (reports to {SelectedEmployee.FullName}) was not found in the primary employee list.",
+                    "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            SelectedEmployee = allEmployees.First(e => e.ID == SelectedReport.ID);
+        }
+
         public void ClearFilters()
         {
-            SelectedManager = Managers[0];
-            EmpSearchString = "";
+            EmployeeSearchString = "";
+            DepartmentSearchString = "";
+            ReportSearchString = "";
+            RoleSearchString = "";
             ApplyFilters();
         }
 
         public void RefreshData()
         {
             allEmployees = new(Helios.StaffReader.GetManagedEmployees(Charon.UserEmployee.ID));
-            // Set managers, including a 'clear' one for removing manager filter.
-            Managers = new(Helios.StaffReader.GetManagers().OrderBy(m => m.ToString()));
-            SelectedManager = new() { FirstName = "<- None", LastName = "Selected ->", ID = -1 };
-            Managers.Insert(0, SelectedManager);
+            ClearFilters();
         }
 
         public void RepairData()

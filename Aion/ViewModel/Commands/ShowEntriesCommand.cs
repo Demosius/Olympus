@@ -1,5 +1,4 @@
-﻿using Aion.View;
-using System;
+﻿using System;
 using System.Windows.Input;
 
 namespace Aion.ViewModel.Commands

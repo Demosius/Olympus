@@ -1,14 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using Aion.View;
 using Aion.ViewModel.Commands;
 using Aion.ViewModel.Interfaces;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Aion.ViewModel.Utility;
 using Styx;
 using Uranus;
+using Uranus.Staff.Model;
 
 namespace Aion.ViewModel
 {
@@ -16,7 +19,7 @@ namespace Aion.ViewModel
     {
         public Helios Helios { get; set; }
         public Charon Charon { get; set; }
-        
+
         public ShiftEntryPage ShiftEntryPage { get; set; }
         public EmployeePage EmployeePage { get; set; }
 
@@ -57,6 +60,7 @@ namespace Aion.ViewModel
         public ShowEmployeesCommand ShowEmployeesCommand { get; set; }
         public ImportOldDataCommand ImportOldDataCommand { get; set; }
         public RefreshDataCommand RefreshDataCommand { get; set; }
+        public RepairDataCommand RepairDataCommand { get; set; }
 
         public AionVM()
         {
@@ -65,13 +69,14 @@ namespace Aion.ViewModel
             ShowEmployeesCommand = new(this);
             ImportOldDataCommand = new(this);
             RefreshDataCommand = new(this);
+            RepairDataCommand = new(this);
         }
 
         public void SetDataSources(Helios helios, Charon charon)
         {
             Helios = helios;
             Charon = charon;
-            
+
             SetChecks();
         }
 
@@ -127,7 +132,7 @@ namespace Aion.ViewModel
                 if (archivedData is null || !archivedData.HasData()) return;
 
                 var currentData = Helios.StaffReader.GetAionDataSet();
-
+                
                 // Remove non-unique data - where keys or specific unique combinations already exist.
                 if (archivedData.HasEmployees())
                     archivedData.Employees = archivedData.Employees.Select(e => e.Value)

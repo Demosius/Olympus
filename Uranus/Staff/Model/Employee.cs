@@ -9,7 +9,7 @@ namespace Uranus.Staff.Model
         SA, // Salaried
         CA, // Casual
         FP, // Full-time Permanent
-        PP, // Part-time Permanent
+        PP  // Part-time Permanent
     }
 
     public class Employee
@@ -75,6 +75,7 @@ namespace Uranus.Staff.Model
         public List<Roster> Rosters { get; set; }
 
         [Ignore] public string FullName => $"{FirstName} {LastName}";
+        [Ignore] public string ReportsToName => ReportsTo?.FullName ?? "";
 
         public Employee() { }
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Input;
-using Aion.Model;
 using Uranus.Staff.Model;
 
 namespace Aion.ViewModel.Commands

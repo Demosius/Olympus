@@ -51,7 +51,7 @@ namespace Uranus.Staff
         public List<int> EmployeeIDs() => Chariot.Database.Query<Employee>("SELECT DISTINCT ID FROM Employee;").Select(e => e.ID).OrderBy(c => c).ToList();
 
         public void AionEmployeeRefresh(out List<int> managerIDList, out List<Employee> employeeList, out IEnumerable<string> locationList,
-            out IEnumerable<string> payPointList, out IEnumerable<EEmploymentType> employmentTypeList, out IEnumerable<Role> roleList)
+            out IEnumerable<string> payPointList, out IEnumerable<EEmploymentType> employmentTypeList, out IEnumerable<Role> roleList, out IEnumerable<Department> departmentList)
         {
             IEnumerable<int> managerIDs = null;
             IEnumerable<Employee> employees = null;
@@ -59,6 +59,7 @@ namespace Uranus.Staff
             IEnumerable<string> payPoints = null;
             IEnumerable<EEmploymentType> employmentTypes = null;
             IEnumerable<Role> roles = null;
+            IEnumerable<Department> departments = null;
 
             Chariot.Database.RunInTransaction(() =>
             {
@@ -68,6 +69,7 @@ namespace Uranus.Staff
                 payPoints = Chariot.Database.Query<Employee>("SELECT DISTINCT PayPoint FROM Employee;").Select(e => e.PayPoint);
                 employmentTypes = Chariot.Database.Query<Employee>("SELECT DISTINCT EmploymentType FROM Employee;").Select(e => e.EmploymentType);
                 roles = Chariot.PullObjectList<Role>().OrderBy(r => r.Name);
+                departments = Chariot.Database.Table<Department>();
             });
 
             managerIDList = managerIDs.ToList();
@@ -76,6 +78,7 @@ namespace Uranus.Staff
             payPointList = payPoints;
             employmentTypeList = employmentTypes;
             roleList = roles;
+            departmentList = departments;
         }
 
         public List<int> GetManagerIDs() => Chariot.Database.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID).ToList();

@@ -4,13 +4,22 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:vm="clr-namespace:Aion.ViewModel"
+      xmlns:sys="clr-namespace:System;assembly=System.Runtime"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="1080" d:DesignWidth="1920"
       Title="EmployeePage">
 
     <Page.DataContext>
         <vm:EmployeePageVM x:Name="VM"/>
     </Page.DataContext>
+
+    <Page.InputBindings>
+        <KeyBinding Command="{Binding ApplyFiltersCommand}"
+                    Gesture="F7" />
+        <KeyBinding Command="{Binding ClearFiltersCommand}"
+                    Key="F7" 
+                    Modifiers="Control+Shift"/>
+    </Page.InputBindings>
 
     <Page.Resources>
         <ResourceDictionary>
@@ -23,30 +32,78 @@
     </Page.Resources>
 
     <DockPanel>
+        <DockPanel.Resources>
+            <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="MinWidth" Value="150"/>
+            </Style>
+            <Style TargetType="DataGridColumnHeader">
+                <Setter Property="HorizontalContentAlignment"
+                        Value="Center" />
+            </Style>
+            <ObjectDataProvider x:Key="EmployeeSortOptions"
+                                MethodName="GetValues" 
+                                ObjectType="{x:Type sys:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="vm:EEmployeeSortOption"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </DockPanel.Resources>
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar Name="FilterBar" ToolTip="Filters">
-                <!--<StackPanel Orientation="Horizontal">
-                    <Label Content="Manager: "
-                           VerticalAlignment="Center"/>
-                    <ComboBox ItemsSource="{Binding Managers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"                               
-                              VerticalAlignment="Center"
-                              SelectedValue="{Binding SelectedManager}"/>
-                </StackPanel>
-                <Separator Margin="5"/>-->
-                <StackPanel Orientation="Horizontal">
+                <!--Employee Name-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="5,0">
                     <Label Content="Employee: "
                            VerticalAlignment="Center"/>
-                    <TextBox Text="{Binding EmpSearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    <TextBox Text="{Binding EmployeeSearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              VerticalContentAlignment="Center"
                              MinWidth="75"
                              Margin="0,5"/>
-                    <Button Content="🔍"
-                            MinWidth="25"
-                            IsDefault="True"
-                            Command="{Binding ApplyFiltersCommand}"/>
                 </StackPanel>
                 <Separator/>
+                <!--Departments-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="5,0">
+                    <Label Content="Department: "
+                           VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding DepartmentSearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalContentAlignment="Center"
+                             MinWidth="75"
+                             Margin="0,5"/>
+                </StackPanel>
+                <Separator/>
+                <!--Reports-->
+                <StackPanel Orientation="Horizontal"
+                            Margin="5,0">
+                    <Label Content="Reports To: "
+                           VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding ReportSearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalContentAlignment="Center"
+                             MinWidth="75"
+                             Margin="0,5"/>
+                </StackPanel>
+                <Separator/>
+                <!--Job Classification -->
+                <StackPanel Orientation="Horizontal"
+                            Margin="5,0">
+                    <Label Content="Job Classification: "
+                           VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding RoleSearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             VerticalContentAlignment="Center"
+                             MinWidth="75"
+                             Margin="0,5"/>
+                </StackPanel>
+                <Separator/>
+                <Button Content="🔍"
+                        ToolTip="Apply Filters (F7)"
+                        Margin="5,0"
+                        MinWidth="25"
+                        Command="{Binding ApplyFiltersCommand}"/>
+                <Separator/>
                 <Button Content="Clear Filters"
+                        ToolTip="(Ctr+Shift+F7)"
                         Command="{Binding ClearFiltersCommand}"/>
             </ToolBar>
         </ToolBarTray>
@@ -68,8 +125,38 @@
                 </Button>
             </StackPanel>
         </Border>
-        <DataGrid ItemsSource="{Binding Employees}"
-                  SelectedValue="{Binding SelectedEmployee}"
+        <Grid DockPanel.Dock="Right">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" MinHeight="200"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Label Content="Reports" HorizontalAlignment="Center"/>
+
+            <ListView Grid.Row="1" DockPanel.Dock="Right"
+                      ItemsSource="{Binding SelectedEmployee.Reports, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedValue="{Binding SelectedReport, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Width="200"
+                      MaxHeight="300">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding FullName}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <Button Grid.Row="2" Content="GoTo"
+                    x:Name="GoToButton"
+                    Command="{Binding GoToEmployeeCommand}" Margin="5,5,5,5"
+                    Click="GoToButton_OnClick"/>
+        </Grid>
+        <DataGrid x:Name="EmployeeGrid"
+                  ItemsSource="{Binding Employees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedValue="{Binding SelectedEmployee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   AutoGenerateColumns="True"
                   AutoGeneratingColumn="Employees_AutoGeneratingColumn"
                   AutoGeneratedColumns="Employees_AutoGeneratedColumns"
@@ -77,17 +164,6 @@
                   HorizontalScrollBarVisibility="Auto"
                   IsReadOnly="True"
                   RowHeaderWidth="15"/>
-        <DockPanel.Resources>
-            <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
-                <Setter Property="Margin" Value="5"/>
-                <Setter Property="Height" Value="25"/>
-                <Setter Property="MinWidth" Value="150"/>
-            </Style>
-            <Style TargetType="DataGridColumnHeader">
-                <Setter Property="HorizontalContentAlignment"
-                     Value="Center" />
-            </Style>
-        </DockPanel.Resources>
     </DockPanel>
 
 </Page>

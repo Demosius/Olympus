@@ -49,20 +49,23 @@
                    Margin="5,0"
                    FontWeight="Bold"/>
             <TextBlock Grid.Column="1"
-                       Text="{Binding EditorVM.MinDate, UpdateSourceTrigger=PropertyChanged, StringFormat=dd-MM-yyyy}"
+                       Text="{Binding MinDate, UpdateSourceTrigger=PropertyChanged, StringFormat=dd-MM-yyyy}"
                        VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
                        Margin="5,0"/>
             <TextBlock Grid.Column="2" Text="to"
                        VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
                        Margin="5,0"/>
             <TextBlock Grid.Column="3"
-                       Text="{Binding EditorVM.MaxDate, UpdateSourceTrigger=PropertyChanged, StringFormat=dd-MM-yyyy}"
+                       Text="{Binding MaxDate, UpdateSourceTrigger=PropertyChanged, StringFormat=dd-MM-yyyy}"
                        VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
                        Margin="5,0"/>
             <Button Grid.Column="4" Content="Change"
                     VerticalAlignment="Center"
                     Margin="5,2"
-                    Command="{Binding EditorVM.LaunchDateRangeCommand}"/>
+                    Command="{Binding LaunchDateRangeCommand}"/>
         </Grid>
 
         <!-- Date -->
@@ -173,15 +176,15 @@
                             <StackPanel Grid.Column="2" Orientation="Vertical">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Shift: "/>
-                                    <TextBlock Text="{Binding In}"/>
+                                    <TextBlock Text="{Binding ShiftStartTime}"/>
                                     <TextBlock Text=" - "/>
-                                    <TextBlock Text="{Binding Out}"/>
+                                    <TextBlock Text="{Binding ShiftEndTime}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="Lunch: "/>
-                                    <TextBlock Text="{Binding OutToLunch}"/>
+                                    <TextBlock Text="{Binding LunchStartTime}"/>
                                     <TextBlock Text=" - "/>
-                                    <TextBlock Text="{Binding InFromLunch}"/>
+                                    <TextBlock Text="{Binding LunchEndTime}"/>
                                 </StackPanel>
                                 <StackPanel.Resources>
                                     <Style BasedOn="{StaticResource TextBlockStyle}" TargetType="TextBlock">

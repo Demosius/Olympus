@@ -197,5 +197,20 @@ namespace Uranus.Staff
             return Chariot.Database.Execute("DELETE FROM ShiftEntry WHERE ID NOT IN " +
                                             "(SELECT MIN(ID) FROM ShiftEntry GROUP BY EmployeeID, Date)");
         }
+
+        /// <summary>
+        /// Update the given list of employees in the database.
+        /// </summary>
+        /// <param name="employees"></param>
+        /// <returns>Number of DB rows affected</returns>
+        public int Employees(IEnumerable<Employee> employees)
+        {
+            var returnVal = 0;
+            Chariot.Database.RunInTransaction(() =>
+            {
+                returnVal = employees.Sum(employee => Chariot.Database.InsertOrReplace(employee));
+            });
+            return returnVal;
+        }
     }
 }
