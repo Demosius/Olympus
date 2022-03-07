@@ -2,19 +2,18 @@
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
 
-namespace Uranus.Staff.Model
+namespace Uranus.Staff.Model;
+
+public class Vehicle
 {
-    public class Vehicle
-    {
-        [PrimaryKey]
-        public string Rego { get; set; }
-        public string Colour { get; set; }
-        public string Make { get; set; }
-        public string Model { get; set; }
-        public string Description { get; set; }
+    [PrimaryKey]
+    public string Rego { get; set; }
+    public string Colour { get; set; }
+    public string Make { get; set; }
+    public string Model { get; set; }
+    public string Description { get; set; }
 
-        [ManyToMany(typeof(EmployeeVehicle), "EmployeeID", "Vehicles", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public List<Employee> Owners { get; set; } 
+    [ManyToMany(typeof(EmployeeVehicle), "EmployeeID", "Vehicles", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<Employee> Owners { get; set; } 
 
-    }
 }

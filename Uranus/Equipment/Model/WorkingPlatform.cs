@@ -1,7 +1,6 @@
-﻿namespace Uranus.Equipment.Model
-{
-    public class WorkingPlatform : Machine
-    {
+﻿namespace Uranus.Equipment.Model;
 
-    }
+public class WorkingPlatform : Machine
+{
+
 }

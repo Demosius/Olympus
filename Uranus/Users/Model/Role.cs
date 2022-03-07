@@ -2,148 +2,147 @@
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
 
-namespace Uranus.Users.Model
+namespace Uranus.Users.Model;
+
+public class Role
 {
-    public class Role
+    [PrimaryKey]
+    public string Name { get; set; }
+
+    // Use int to refer to the difference between the user and the target user employee levels.
+    public int CreateUser { get; set; }
+    public int ReadUser { get; set; }
+    public int UpdateUser { get; set; }
+    public int DeleteUser { get; set; }
+
+    // Use int to refer to the difference between the user and the target employee levels.
+    public int CreateEmployee { get; set; }
+    public int ReadEmployee { get; set; }               // Basic visibility beyond name and department.
+    public int ReadEmployeeSensitive { get; set; }      // Such as Phone, Address, etc.
+    public int ReadEmployeeVerySensitive { get; set; }  // Pay rate and similar.
+    public int UpdateEmployee { get; set; }
+    public int DeleteEmployee { get; set; } // Can only remove employee if there is no associated User.
+
+    public bool CreateDepartment { get; set; }
+    public bool UpdateDepartment { get; set; }
+    public bool DeleteDepartment { get; set; } // Can only be deleted if there are no employees associated.
+
+    public bool AssignRole { get; set; }
+    public bool EditRoles { get; set; } // Includes creation and deletion.
+
+    public bool CreateClan { get; set; }
+    public bool UpdateClan { get; set; }
+    public bool DeleteClan { get; set; } // Can be done while employees are a part of the clan - but SHOULD also remove clan from the employee.
+
+    // Three options: -1: No, 0: Same Department Only, 1: For Any.
+    public int CreateShift { get; set; }
+    public int UpdateShift { get; set; }
+    public int DeleteShift { get; set; }
+
+    public bool CreateLicence { get; set; }
+    public bool ReadLicence { get; set; }
+    public bool UpdateLicence { get; set; }
+    public bool DeleteLicence { get; set; }
+
+    public bool CreateVehicle { get; set; }
+    public bool ReadVehicle { get; set; }
+    public bool UpdateVehicle { get; set; }
+    public bool DeleteVehicle { get; set; }
+
+    // Whole database operations.
+    public bool CopyDatabase { get; set; }  // Most
+    public bool MoveDatabase { get; set; }  // Only db admin/manager.
+
+    [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<User> Users { get; set; }
+
+    public void SetDefault()
     {
-        [PrimaryKey]
-        public string Name { get; set; }
+        Name = "Default";
 
-        // Use int to refer to the difference between the user and the target user employee levels.
-        public int CreateUser { get; set; }
-        public int ReadUser { get; set; }
-        public int UpdateUser { get; set; }
-        public int DeleteUser { get; set; }
+        CreateUser = -3;
+        ReadUser = -3;
+        UpdateUser = -3;
+        DeleteUser = -3;
 
-        // Use int to refer to the difference between the user and the target employee levels.
-        public int CreateEmployee { get; set; }
-        public int ReadEmployee { get; set; }               // Basic visibility beyond name and department.
-        public int ReadEmployeeSensitive { get; set; }      // Such as Phone, Address, etc.
-        public int ReadEmployeeVerySensitive { get; set; }  // Pay rate and similar.
-        public int UpdateEmployee { get; set; }
-        public int DeleteEmployee { get; set; } // Can only remove employee if there is no associated User.
+        CreateEmployee = -3;
+        ReadEmployee = -3;
+        ReadEmployeeSensitive = -5;
+        ReadEmployeeVerySensitive = -10;
+        UpdateEmployee = -3;
+        DeleteEmployee = -3;
 
-        public bool CreateDepartment { get; set; }
-        public bool UpdateDepartment { get; set; }
-        public bool DeleteDepartment { get; set; } // Can only be deleted if there are no employees associated.
+        CreateDepartment = false;
+        UpdateDepartment = false;
+        DeleteDepartment = false;
 
-        public bool AssignRole { get; set; }
-        public bool EditRoles { get; set; } // Includes creation and deletion.
+        AssignRole = false;
+        EditRoles = false;
 
-        public bool CreateClan { get; set; }
-        public bool UpdateClan { get; set; }
-        public bool DeleteClan { get; set; } // Can be done while employees are a part of the clan - but SHOULD also remove clan from the employee.
+        CreateClan = false;
+        UpdateClan = false;
+        DeleteClan = false;
 
-        // Three options: -1: No, 0: Same Department Only, 1: For Any.
-        public int CreateShift { get; set; }
-        public int UpdateShift { get; set; }
-        public int DeleteShift { get; set; }
+        CreateShift = -1;
+        UpdateShift = -1;
+        DeleteShift = -1;
 
-        public bool CreateLicence { get; set; }
-        public bool ReadLicence { get; set; }
-        public bool UpdateLicence { get; set; }
-        public bool DeleteLicence { get; set; }
+        CreateLicence = false;
+        ReadLicence = false;
+        UpdateLicence = false;
+        DeleteLicence = false;
 
-        public bool CreateVehicle { get; set; }
-        public bool ReadVehicle { get; set; }
-        public bool UpdateVehicle { get; set; }
-        public bool DeleteVehicle { get; set; }
+        CreateVehicle = false;
+        ReadVehicle = false;
+        UpdateVehicle = false;
+        DeleteVehicle = false;
 
-        // Whole database operations.
-        public bool CopyDatabase { get; set; }  // Most
-        public bool MoveDatabase { get; set; }  // Only db admin/manager.
+        CopyDatabase = false;
+        MoveDatabase = false;
+    }
 
-        [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public List<User> Users { get; set; }
+    public void SetMaster()
+    {
+        Name = "DatabaseManager";
 
-        public void SetDefault()
-        {
-            Name = "Default";
+        CreateUser = 1000;
+        ReadUser = 1000;
+        UpdateUser = 1000;
+        DeleteUser = 1000;
 
-            CreateUser = -3;
-            ReadUser = -3;
-            UpdateUser = -3;
-            DeleteUser = -3;
+        CreateEmployee = 1000;
+        ReadEmployee = 1000;
+        ReadEmployeeSensitive = 1000;
+        ReadEmployeeVerySensitive = 1000;
+        UpdateEmployee = 1000;
+        DeleteEmployee = 1000;
 
-            CreateEmployee = -3;
-            ReadEmployee = -3;
-            ReadEmployeeSensitive = -5;
-            ReadEmployeeVerySensitive = -10;
-            UpdateEmployee = -3;
-            DeleteEmployee = -3;
+        CreateDepartment = true;
+        UpdateDepartment = true;
+        DeleteDepartment = true;
 
-            CreateDepartment = false;
-            UpdateDepartment = false;
-            DeleteDepartment = false;
+        AssignRole = true;
+        EditRoles = true;
 
-            AssignRole = false;
-            EditRoles = false;
+        CreateClan = true;
+        UpdateClan = true;
+        DeleteClan = true;
 
-            CreateClan = false;
-            UpdateClan = false;
-            DeleteClan = false;
+        CreateShift = 1;
+        UpdateShift = 1;
+        DeleteShift = 1;
 
-            CreateShift = -1;
-            UpdateShift = -1;
-            DeleteShift = -1;
+        CreateLicence = true;
+        ReadLicence = true;
+        UpdateLicence = true;
+        DeleteLicence = true;
 
-            CreateLicence = false;
-            ReadLicence = false;
-            UpdateLicence = false;
-            DeleteLicence = false;
+        CreateVehicle = true;
+        ReadVehicle = true;
+        UpdateVehicle = true;
+        DeleteVehicle = true;
 
-            CreateVehicle = false;
-            ReadVehicle = false;
-            UpdateVehicle = false;
-            DeleteVehicle = false;
-
-            CopyDatabase = false;
-            MoveDatabase = false;
-        }
-
-        public void SetMaster()
-        {
-            Name = "DatabaseManager";
-
-            CreateUser = 1000;
-            ReadUser = 1000;
-            UpdateUser = 1000;
-            DeleteUser = 1000;
-
-            CreateEmployee = 1000;
-            ReadEmployee = 1000;
-            ReadEmployeeSensitive = 1000;
-            ReadEmployeeVerySensitive = 1000;
-            UpdateEmployee = 1000;
-            DeleteEmployee = 1000;
-
-            CreateDepartment = true;
-            UpdateDepartment = true;
-            DeleteDepartment = true;
-
-            AssignRole = true;
-            EditRoles = true;
-
-            CreateClan = true;
-            UpdateClan = true;
-            DeleteClan = true;
-
-            CreateShift = 1;
-            UpdateShift = 1;
-            DeleteShift = 1;
-
-            CreateLicence = true;
-            ReadLicence = true;
-            UpdateLicence = true;
-            DeleteLicence = true;
-
-            CreateVehicle = true;
-            ReadVehicle = true;
-            UpdateVehicle = true;
-            DeleteVehicle = true;
-
-            CopyDatabase = true;
-            MoveDatabase = true;
-        }
+        CopyDatabase = true;
+        MoveDatabase = true;
     }
 }

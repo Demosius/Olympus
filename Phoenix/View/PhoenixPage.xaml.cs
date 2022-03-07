@@ -3,25 +3,24 @@ using System;
 using System.Windows.Controls;
 using Uranus;
 
-namespace Phoenix.View
+namespace Phoenix.View;
+
+/// <summary>
+/// Interaction logic for TorchPage.xaml
+/// </summary>
+public partial class PhoenixPage : Page, IProject
 {
-    /// <summary>
-    /// Interaction logic for TorchPage.xaml
-    /// </summary>
-    public partial class PhoenixPage : Page, IProject
+    public PhoenixPage()
     {
-        public PhoenixPage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        public EProject Project => EProject.Phoenix;
+    public EProject Project => EProject.Phoenix;
 
-        public static bool RequiresUser => false;
+    public static bool RequiresUser => false;
 
-        public void RefreshData()
-        {
-            throw new NotImplementedException();
-        }
+    public void RefreshData()
+    {
+        throw new NotImplementedException();
     }
 }

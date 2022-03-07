@@ -2,51 +2,50 @@
 using System.IO;
 using System.Text.Json;
 
-namespace Aion.ViewModel.Utility
+namespace Aion.ViewModel.Utility;
+
+public class Options
 {
-    public class Options
+    private static readonly string JsonFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "options.json");
+
+    public string DBLocation { get; set; }
+
+    public Options()
     {
-        private static readonly string JSONFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "options.json");
+        var data = File.ReadAllText(JsonFile);
+        var o = JsonSerializer.Deserialize<Opt>(data);
 
-        public string DBLocation { get; set; }
-
-        public Options()
-        {
-            var data = File.ReadAllText(JSONFile);
-            var o = JsonSerializer.Deserialize<Opt>(data);
-
-            // Set properties.
-            if (o != null) DBLocation = o.DBLocation;
-        }
-
-        public static string GetDBLocation()
-        {
-            var data = File.ReadAllText(JSONFile);
-            return JsonSerializer.Deserialize<Options>(data)?.DBLocation;
-        }
-
-        public void LoadOptions()
-        {
-            SetFromOther(new());
-        }
-
-        public void SaveOptions()
-        {
-            var data = JsonSerializer.Serialize(this, new() { WriteIndented = true });
-            File.WriteAllText(JSONFile, data);
-        }
-
-        public void SetFromOther(Options options)
-        {
-            DBLocation = options.DBLocation;
-        }
+        // Set properties.
+        if (o != null) DBLocation = o.DBLocation;
     }
 
-    /// <summary>
-    /// Intermediate option class for converting to and from JSON
-    /// </summary>
-    public class Opt
+    public static string GetDBLocation()
     {
-        public string DBLocation { get; set; }
+        var data = File.ReadAllText(JsonFile);
+        return JsonSerializer.Deserialize<Options>(data)?.DBLocation;
     }
+
+    public void LoadOptions()
+    {
+        SetFromOther(new Options());
+    }
+
+    public void SaveOptions()
+    {
+        var data = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
+        File.WriteAllText(JsonFile, data);
+    }
+
+    public void SetFromOther(Options options)
+    {
+        DBLocation = options.DBLocation;
+    }
+}
+
+/// <summary>
+/// Intermediate option class for converting to and from JSON
+/// </summary>
+public class Opt
+{
+    public string DBLocation { get; set; }
 }

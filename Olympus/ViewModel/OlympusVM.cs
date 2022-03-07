@@ -13,187 +13,180 @@ using Uranus.Staff.Model;
 using Uranus;
 using Olympus.ViewModel.Utility;
 using Olympus.Properties;
+using Olympus.View;
 using Uranus.Inventory.Model;
 
-namespace Olympus.ViewModel
+namespace Olympus.ViewModel;
+
+public class OlympusVM : INotifyPropertyChanged
 {
+    public Dictionary<EProject, IProject> RunningProjects { get; set; }
 
-    public class OlympusVM : INotifyPropertyChanged
+    private IProject currentProject;
+    public IProject CurrentProject
     {
-        public Dictionary<EProject, IProject> RunningProjects { get; set; }
-
-        private IProject currentProject;
-        public IProject CurrentProject
+        get => currentProject;
+        set
         {
-            get => currentProject;
-            set
-            {
-                currentProject = value;
-                OnPropertyChanged(nameof(CurrentProject));
-            }
+            currentProject = value;
+            OnPropertyChanged(nameof(CurrentProject));
         }
+    }
 
-        /* Sub ViewModels - Components */
-        public DBManager DBManager { get; set; }
-        public InventoryUpdaterVM InventoryUpdaterVM { get; set; }
-        public ProjectLauncherVM ProjectLauncherVM { get; set; }
-        public UserHandlerVM UserHandlerVM { get; set; }
+    /* Sub ViewModels - Components */
+    public DBManager DBManager { get; set; }
+    public InventoryUpdaterVM InventoryUpdaterVM { get; set; }
+    public ProjectLauncherVM ProjectLauncherVM { get; set; }
+    public UserHandlerVM UserHandlerVM { get; set; }
 
-        /* Commands */
-        public GenerateMasterSkuListCommand GenerateMasterSkuListCommand { get; set; }
+    /* Commands */
+    public GenerateMasterSkuListCommand GenerateMasterSkuListCommand { get; set; }
+    public ChangePasswordCommand ChangePasswordCommand { get; set; }
 
-        /* Constructor(s) */
-        public OlympusVM()
+    /* Constructor(s) */
+    public OlympusVM()
+    {
+        RunningProjects = new Dictionary<EProject, IProject>();
+
+        EstablishInitialProjectIcons();
+
+        DBManager = new DBManager(this);
+        UserHandlerVM = new UserHandlerVM(this);
+        ProjectLauncherVM = new ProjectLauncherVM(this);
+        InventoryUpdaterVM = new InventoryUpdaterVM(this);
+
+        GenerateMasterSkuListCommand = new GenerateMasterSkuListCommand(this);
+        ChangePasswordCommand = new ChangePasswordCommand(this);
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    private void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+    
+    internal void RefreshData()
+    {
+        foreach (var project in RunningProjects)
         {
-            RunningProjects = new();
-
-            EstablishInitialProjectIcons();
-
-            DBManager = new(this);
-            UserHandlerVM = new(this);
-            ProjectLauncherVM = new(this);
-            InventoryUpdaterVM = new(this);
-
-            GenerateMasterSkuListCommand = new(this);
+            project.Value.RefreshData();
         }
+    }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+    internal void ResetDB()
+    {
+        App.Helios.ResetChariots(Settings.Default.SolLocation);
+        App.Charon.DatabaseReset(Settings.Default.SolLocation);
 
-        private void OnPropertyChanged(string propertyName)
+        EstablishInitialProjectIcons();
+
+        UserHandlerVM.CheckUser();
+        ProjectLauncherVM = new ProjectLauncherVM(this);
+        InventoryUpdaterVM = new InventoryUpdaterVM(this);
+
+        OnPropertyChanged(nameof(ProjectLauncherVM));
+        OnPropertyChanged(nameof(InventoryUpdaterVM));
+
+        CurrentProject = null;
+        RunningProjects = new Dictionary<EProject, IProject>();
+    }
+
+    /* Projects */
+    public void LoadProject(EProject project)
+    {
+        if (!RunningProjects.TryGetValue(project, out var loadedProject))
         {
-            PropertyChanged?.Invoke(this, new(propertyName));
+            loadedProject = ProjectFactory.GetProject(project);
+            RunningProjects.Add(project, loadedProject);
         }
-
-        /* Temporary Functions */
-
-        /// <summary>
-        /// Takes all the employees that have any direct reports, and creates a User for each of those employees with the manager role.
-        /// </summary>
-        public static void AutoGenerateManagers()
-        {
-            // Get employees.
-            var managers = App.Helios.StaffReader.Managers();
-            foreach (var m in managers)
-                App.Charon.CreateNewUser(m, "Manager");
-        }
-
-        internal void RefreshData()
-        {
-            foreach (var project in RunningProjects)
-            {
-                project.Value.RefreshData();
-            }
-        }
-
-        internal void ResetDB()
-        {
-            App.Helios.ResetChariots(Settings.Default.SolLocation);
-            App.Charon.DatabaseReset(Settings.Default.SolLocation);
-
-            EstablishInitialProjectIcons();
-
-            UserHandlerVM.CheckUser();
-            ProjectLauncherVM = new(this);
-            InventoryUpdaterVM = new(this);
-
-            OnPropertyChanged(nameof(ProjectLauncherVM));
-            OnPropertyChanged(nameof(InventoryUpdaterVM));
-
-            CurrentProject = null;
-            RunningProjects = new();
-        }
-
-        /* Projects */
-        public void LoadProject(EProject project)
-        {
-            if (!RunningProjects.TryGetValue(project, out var loadedProject))
-            {
-                loadedProject = ProjectFactory.GetProject(project);
-                RunningProjects.Add(project, loadedProject);
-            }
-            SetPage(loadedProject);
-        }
+        SetPage(loadedProject);
+    }
         
-        private void SetPage(IProject project)
-        {
-            CurrentProject = project;
+    private void SetPage(IProject project)
+    {
+        CurrentProject = project;
             
-            var navigationService = ((Page) CurrentProject).NavigationService;
-            if (navigationService != null)
-                _ = navigationService.Navigate((Page) project);
+        var navigationService = ((Page) CurrentProject).NavigationService;
+        if (navigationService != null)
+            _ = navigationService.Navigate((Page) project);
             
-        }
+    }
         
-        public void ClearRunningProjects()
-        {
-            CurrentProject = null;
-            RunningProjects = new();
-        }
-        
+    public void ClearRunningProjects()
+    {
+        CurrentProject = null;
+        RunningProjects = new Dictionary<EProject, IProject>();
+    }
 
-        private static void EstablishInitialProjectIcons()
+    public void LaunchPasswordChanger()
+    {
+        var changePasswordWindow = new ChangePasswordWindow(App.Charon);
+        changePasswordWindow.ShowDialog();
+    }
+    
+    private static void EstablishInitialProjectIcons()
+    {
+        App.Helios.StaffCreator.CopyProjectIconsFromSource(Path.Combine(App.BaseDirectory(), "Resources", "Images", "Icons"));
+        List<Project> projects = new()
         {
-            App.Helios.StaffCreator.CopyProjectIconsFromSource(Path.Combine(App.BaseDirectory(), "Resources", "Images", "Icons"));
-            List<Project> projects = new()
-            {
-                new(EProject.Khaos, "chaos.ico", App.Helios.StaffReader,"Handles make-bulk designation and separation. (Genesis)"),
-                new(EProject.Pantheon, "pantheon.ico", App.Helios.StaffReader, "Roster management."),
-                new(EProject.Prometheus, "prometheus.ico", App.Helios.StaffReader, "Data management."),
-                new(EProject.Phoenix, "phoenix.ico", App.Helios.StaffReader, "Pre-work automated stock maintenance. (AutoBurn)"),
-                new(EProject.Vulcan, "vulcan.ico", App.Helios.StaffReader, "Replenishment DDR management and work assignment. (RefOrge)"),
-                new(EProject.Aion, "Aion.ico", App.Helios.StaffReader, "Employee clock in and shift time management.")
-            };
+            new Project(EProject.Khaos, "chaos.ico", App.Helios.StaffReader,"Handles make-bulk designation and separation. (Genesis)"),
+            new Project(EProject.Pantheon, "pantheon.ico", App.Helios.StaffReader, "Roster management."),
+            new Project(EProject.Prometheus, "prometheus.ico", App.Helios.StaffReader, "Data management."),
+            new Project(EProject.Phoenix, "phoenix.ico", App.Helios.StaffReader, "Pre-work automated stock maintenance. (AutoBurn)"),
+            new Project(EProject.Vulcan, "vulcan.ico", App.Helios.StaffReader, "Replenishment DDR management and work assignment. (RefOrge)"),
+            new Project(EProject.Aion, "Aion.ico", App.Helios.StaffReader, "Employee clock in and shift time management.")
+        };
 
-            App.Helios.StaffCreator.EstablishInitialProjects(projects);
+        App.Helios.StaffCreator.EstablishInitialProjects(projects);
             
-        }
+    }
 
-        public static void GenerateMasterSkuList()
-        {
-            var masters = App.Helios.InventoryReader.GetMasters();
+    public static void GenerateMasterSkuList()
+    {
+        var masters = App.Helios.InventoryReader.GetMasters();
 
-            // Make sure the target destination exists.
-            var dirPath = Path.Combine(App.BaseDirectory(), "SKUMasterExports");
+        // Make sure the target destination exists.
+        var dirPath = Path.Combine(App.BaseDirectory(), "SKUMasterExports");
 
-            Directory.CreateDirectory(dirPath);
+        Directory.CreateDirectory(dirPath);
 
-            var csvTask = Task.Run(() => ExportMasterSkuAsCSV(masters, dirPath));
-            var jsonTask = Task.Run(() => ExportMasterSkuAsJSON(masters, dirPath));
-            var xmlTask = Task.Run(() => ExportMasterSkuAsXml(masters, dirPath));
-            //var sqlTask = Task.Run(() => ExportMasterSkuIntoSqLite(masters, dirPath));
-            Task.WaitAll(csvTask, jsonTask, xmlTask);//, sqlTask);
+        var csvTask = Task.Run(() => ExportMasterSkuAsCSV(masters, dirPath));
+        var jsonTask = Task.Run(() => ExportMasterSkuAsJson(masters, dirPath));
+        var xmlTask = Task.Run(() => ExportMasterSkuAsXml(masters, dirPath));
+        //var sqlTask = Task.Run(() => ExportMasterSkuIntoSqLite(masters, dirPath));
+        Task.WaitAll(csvTask, jsonTask, xmlTask);//, sqlTask);
 
-            _ = MessageBox.Show("Files exported.");
-        }
+        _ = MessageBox.Show("Files exported.");
+    }
 
-        public static void ExportMasterSkuAsCSV(IEnumerable<SkuMaster> masters, string dirPath)
-        {
-            var csv = CsvSerializer.SerializeToCsv(masters);
-            var filePath = Path.Combine(dirPath, "SKUMasterExport.csv");
-            File.WriteAllText(filePath, csv);
-        }
+    public static void ExportMasterSkuAsCSV(IEnumerable<SkuMaster> masters, string dirPath)
+    {
+        var csv = CsvSerializer.SerializeToCsv(masters);
+        var filePath = Path.Combine(dirPath, "SKUMasterExport.csv");
+        File.WriteAllText(filePath, csv);
+    }
 
-        public static void ExportMasterSkuAsJSON(IEnumerable<SkuMaster> masters, string dirPath)
-        {
-            var json = System.Text.Json.JsonSerializer.Serialize(masters);
-            var filePath = Path.Combine(dirPath, "SKUMasterExport.json");
-            File.WriteAllText(filePath, json);
-        }
+    public static void ExportMasterSkuAsJson(IEnumerable<SkuMaster> masters, string dirPath)
+    {
+        var json = System.Text.Json.JsonSerializer.Serialize(masters);
+        var filePath = Path.Combine(dirPath, "SKUMasterExport.json");
+        File.WriteAllText(filePath, json);
+    }
 
-        public static void ExportMasterSkuIntoSqLite(IEnumerable<SkuMaster> masters, string dirPath)
-        {
-            var dbPath = Path.Combine(dirPath, "SKUMasterExport.sqlite");
-            using SQLiteConnection database = new(dbPath);
-            _ = database.CreateTable(typeof(SkuMaster));
-            _ = database.DeleteAll<SkuMaster>();
-            _ = database.InsertAll(masters);
-        }
+    public static void ExportMasterSkuIntoSqLite(IEnumerable<SkuMaster> masters, string dirPath)
+    {
+        var dbPath = Path.Combine(dirPath, "SKUMasterExport.sqlite");
+        using SQLiteConnection database = new(dbPath);
+        _ = database.CreateTable(typeof(SkuMaster));
+        _ = database.DeleteAll<SkuMaster>();
+        _ = database.InsertAll(masters);
+    }
 
-        public static void ExportMasterSkuAsXml(IEnumerable<SkuMaster> masters, string dirPath)
-        {
-            var xml = XmlSerializer.SerializeToString(masters);
-            var filePath = Path.Combine(dirPath, "SKUMasterExport.xml");
-            File.WriteAllText(filePath, xml);
-        }
+    public static void ExportMasterSkuAsXml(IEnumerable<SkuMaster> masters, string dirPath)
+    {
+        var xml = XmlSerializer.SerializeToString(masters);
+        var filePath = Path.Combine(dirPath, "SKUMasterExport.xml");
+        File.WriteAllText(filePath, xml);
     }
 }

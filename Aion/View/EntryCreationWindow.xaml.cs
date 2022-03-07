@@ -1,17 +1,16 @@
 ﻿using Aion.ViewModel;
 using Uranus;
 
-namespace Aion.View
+namespace Aion.View;
+
+/// <summary>
+/// Interaction logic for SimpleEntryCreationView.xaml
+/// </summary>
+public partial class EntryCreationWindow
 {
-    /// <summary>
-    /// Interaction logic for SimpleEntryCreationView.xaml
-    /// </summary>
-    public partial class EntryCreationWindow
+    public EntryCreationWindow(Helios helios, ShiftEntryPageVM editorVM)
     {
-        public EntryCreationWindow(Helios helios, ShiftEntryPageVM editorVM)
-        {
-            InitializeComponent();
-            VM.SetData(helios, editorVM);
-        }
+        InitializeComponent();
+        VM.SetData(helios, editorVM);
     }
 }

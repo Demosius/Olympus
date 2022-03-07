@@ -1,13 +1,12 @@
-﻿namespace Khaos.View
+﻿namespace Khaos.View;
+
+/// <summary>
+/// Interaction logic for KhaosWindow.xaml
+/// </summary>
+public partial class KhaosWindow
 {
-    /// <summary>
-    /// Interaction logic for KhaosWindow.xaml
-    /// </summary>
-    public partial class KhaosWindow
+    public KhaosWindow()
     {
-        public KhaosWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

@@ -2,25 +2,24 @@
 using System;
 using System.Windows.Input;
 
-namespace Aion.ViewModel.Commands
+namespace Aion.ViewModel.Commands;
+
+public class LaunchManagerCommand : ICommand
 {
-    public class LaunchManagerCommand : ICommand
+    public event EventHandler CanExecuteChanged
     {
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public void Execute(object parameter)
-        {
-            AionWindow aionWindow = new();
-            aionWindow.ShowDialog();
-        }
+    public void Execute(object parameter)
+    {
+        AionWindow aionWindow = new();
+        aionWindow.ShowDialog();
     }
 }

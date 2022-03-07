@@ -2,54 +2,53 @@
 using Olympus.ViewModel.Commands;
 using System.ComponentModel;
 
-namespace Olympus.ViewModel.Components
+namespace Olympus.ViewModel.Components;
+
+public class ProjectButtonVM : INotifyPropertyChanged
 {
-    public class ProjectButtonVM : INotifyPropertyChanged
+    private ProjectGroupVM projectGroup;
+    public ProjectGroupVM ProjectGroup 
     {
-        private ProjectGroupVM projectGroup;
-        public ProjectGroupVM ProjectGroup 
+        get => projectGroup;
+        set
         {
-            get => projectGroup;
-            set
-            {
-                projectGroup = value;
-                OnPropertyChanged(nameof(ProjectGroup));
-            }
+            projectGroup = value;
+            OnPropertyChanged(nameof(ProjectGroup));
         }
+    }
 
-        private Project project;
-        public Project Project 
+    private Project project;
+    public Project Project 
+    {
+        get => project; 
+        set
         {
-            get => project; 
-            set
-            {
-                project = value;
-                OnPropertyChanged(nameof(Project));
-            } 
-        }
+            project = value;
+            OnPropertyChanged(nameof(Project));
+        } 
+    }
 
-        public LaunchProjectCommand LaunchProjectCommand { get; set; }
+    public LaunchProjectCommand LaunchProjectCommand { get; set; }
 
-        public ProjectButtonVM() 
-        {
-            LaunchProjectCommand = new(this);
-        }
+    public ProjectButtonVM() 
+    {
+        LaunchProjectCommand = new LaunchProjectCommand(this);
+    }
 
-        public ProjectButtonVM(ProjectGroupVM projectGroup) : this()
-        {
-            ProjectGroup = projectGroup;
-        }
+    public ProjectButtonVM(ProjectGroupVM projectGroup) : this()
+    {
+        ProjectGroup = projectGroup;
+    }
 
-        public ProjectButtonVM(ProjectGroupVM projectGroup, Project project) : this(projectGroup)
-        {
-            Project = project;
-        }
+    public ProjectButtonVM(ProjectGroupVM projectGroup, Project project) : this(projectGroup)
+    {
+        Project = project;
+    }
         
-        public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler PropertyChanged;
 
-        private void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new(propertyName));
-        }
+    private void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

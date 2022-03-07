@@ -4,81 +4,80 @@ using System.Runtime.CompilerServices;
 using Aion.Annotations;
 using Aion.ViewModel.Commands;
 
-namespace Aion.ViewModel
-{
-    public class DateRangeVM : INotifyPropertyChanged
-    {
-        public ShiftEntryPageVM ShiftEntryPageVM { get; set; }
+namespace Aion.ViewModel;
 
-        private DateTime minDate;
-        public DateTime MinDate
+public class DateRangeVM : INotifyPropertyChanged
+{
+    public ShiftEntryPageVM ShiftEntryPageVM { get; set; }
+
+    private DateTime minDate;
+    public DateTime MinDate
+    {
+        get => minDate;
+        set
         {
-            get => minDate;
-            set
+            minDate = value;
+            if (minDate > maxDate)
             {
-                minDate = value;
-                if (minDate > maxDate)
-                {
-                    maxDate = minDate;
-                    OnPropertyChanged(nameof(MaxDate));
-                }
-                OnPropertyChanged(nameof(MinDate));
-            }
-        }
-        
-        private DateTime maxDate;
-        public DateTime MaxDate
-        {
-            get => maxDate;
-            set
-            {
-                maxDate = value;
-                if (maxDate < minDate)
-                {
-                    minDate = maxDate;
-                    OnPropertyChanged(nameof(MinDate));
-                }
+                maxDate = minDate;
                 OnPropertyChanged(nameof(MaxDate));
             }
+            OnPropertyChanged(nameof(MinDate));
         }
-
-        public DateTime InitialMin { get; set; }
-        public DateTime InitialMax { get; set; }
-
-        public SetDateRangeCommand SetDateRangeCommand { get; set; }
-
-        public DateRangeVM()
+    }
+        
+    private DateTime maxDate;
+    public DateTime MaxDate
+    {
+        get => maxDate;
+        set
         {
-            SetDateRangeCommand = new(this);
+            maxDate = value;
+            if (maxDate < minDate)
+            {
+                minDate = maxDate;
+                OnPropertyChanged(nameof(MinDate));
+            }
+            OnPropertyChanged(nameof(MaxDate));
         }
+    }
 
-        public void SetEditorVM(ShiftEntryPageVM editorVM)
-        {
-            ShiftEntryPageVM = editorVM;
-            SetDateValues(ShiftEntryPageVM.MinDate, ShiftEntryPageVM.MaxDate);
-        }
+    public DateTime InitialMin { get; set; }
+    public DateTime InitialMax { get; set; }
 
-        public void SetDateValues(DateTime min, DateTime max)
-        {
-            MinDate = min;
-            InitialMin = min;
-            MaxDate = max;
-            InitialMax = max;
-        } 
+    public SetDateRangeCommand SetDateRangeCommand { get; set; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+    public DateRangeVM()
+    {
+        SetDateRangeCommand = new SetDateRangeCommand(this);
+    }
 
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new(propertyName));
-        }
+    public void SetEditorVM(ShiftEntryPageVM editorVM)
+    {
+        ShiftEntryPageVM = editorVM;
+        SetDateValues(ShiftEntryPageVM.MinDate, ShiftEntryPageVM.MaxDate);
+    }
 
-        public void SetDateRange()
-        {
-            ShiftEntryPageVM.MinDate = MinDate;
-            ShiftEntryPageVM.MaxDate = MaxDate;
-            ShiftEntryPageVM.RefreshData(true);
-        }
+    public void SetDateValues(DateTime min, DateTime max)
+    {
+        MinDate = min;
+        InitialMin = min;
+        MaxDate = max;
+        InitialMax = max;
+    } 
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void SetDateRange()
+    {
+        ShiftEntryPageVM.MinDate = MinDate;
+        ShiftEntryPageVM.MaxDate = MaxDate;
+        ShiftEntryPageVM.RefreshData(true);
     }
 }

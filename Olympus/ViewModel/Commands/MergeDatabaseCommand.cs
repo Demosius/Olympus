@@ -2,28 +2,27 @@
 using System;
 using System.Windows.Input;
 
-namespace Olympus.ViewModel.Commands
+namespace Olympus.ViewModel.Commands;
+
+public class MergeDatabaseCommand : ICommand
 {
-    public class MergeDatabaseCommand : ICommand
+    public DBManager DBM { get; set; }
+
+    public MergeDatabaseCommand(DBManager dbm) { DBM = dbm; }
+
+    public event EventHandler CanExecuteChanged
     {
-        public DBManager DBM { get; set; }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public MergeDatabaseCommand(DBManager dbm) { DBM = dbm; }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            DBManager.MergeDatabase();
-        }
+    public void Execute(object parameter)
+    {
+        DBManager.MergeDatabase();
     }
 }

@@ -2,28 +2,27 @@
 using System.Windows.Input;
 using Aion.ViewModel.Interfaces;
 
-namespace Aion.ViewModel.Commands
+namespace Aion.ViewModel.Commands;
+
+public class ApplyFiltersCommand : ICommand
 {
-    public class ApplyFiltersCommand : ICommand
+    public IFilters VM { get; set; }
+
+    public ApplyFiltersCommand(IFilters vm) { VM = vm; }
+
+    public event EventHandler CanExecuteChanged
     {
-        public IFilters VM { get; set; }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public ApplyFiltersCommand(IFilters vm) { VM = vm; }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            VM.ApplyFilters();
-        }
+    public void Execute(object parameter)
+    {
+        VM.ApplyFilters();
     }
 }

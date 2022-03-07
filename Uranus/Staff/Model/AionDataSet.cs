@@ -2,35 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Uranus.Staff.Model
+namespace Uranus.Staff.Model;
+
+/// <summary>
+/// A class for holding (converted to current) aion-relevant data.
+/// </summary>
+public class AionDataSet
 {
-    /// <summary>
-    /// A class for holding (converted to current) aion-relevant data.
-    /// </summary>
-    public class AionDataSet
+    public Dictionary<int, Employee> Employees { get; set; }
+    public Dictionary<Guid, ClockEvent> ClockEvents { get; set; }
+    public Dictionary<Guid, ShiftEntry> ShiftEntries { get; set; }
+
+    public bool HasData()
     {
-        public Dictionary<int, Employee> Employees { get; set; }
-        public Dictionary<Guid, ClockEvent> ClockEvents { get; set; }
-        public Dictionary<Guid, ShiftEntry> ShiftEntries { get; set; }
+        return HasEmployees() || HasClockEvents() || HasShiftEntries();
+    }
 
-        public bool HasData()
-        {
-            return HasEmployees() || HasClockEvents() || HasShiftEntries();
-        }
+    public bool HasEmployees()
+    {
+        return Employees is not null && Employees.Any();
+    }
 
-        public bool HasEmployees()
-        {
-            return Employees is not null && Employees.Any();
-        }
+    public bool HasClockEvents()
+    {
+        return ClockEvents is not null && ClockEvents.Any();
+    }
 
-        public bool HasClockEvents()
-        {
-            return ClockEvents is not null && ClockEvents.Any();
-        }
-
-        public bool HasShiftEntries()
-        {
-            return ShiftEntries is not null && ShiftEntries.Any();
-        }
+    public bool HasShiftEntries()
+    {
+        return ShiftEntries is not null && ShiftEntries.Any();
     }
 }

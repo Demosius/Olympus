@@ -2,25 +2,24 @@
 using System;
 using Uranus;
 
-namespace Khaos.View
+namespace Khaos.View;
+
+/// <summary>
+/// Interaction logic for KhaosPage.xaml
+/// </summary>
+public partial class KhaosPage : IProject
 {
-    /// <summary>
-    /// Interaction logic for KhaosPage.xaml
-    /// </summary>
-    public partial class KhaosPage : IProject
+    public KhaosPage()
     {
-        public KhaosPage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        public EProject Project => EProject.Khaos;
+    public EProject Project => EProject.Khaos;
 
-        public static bool RequiresUser => false;
+    public static bool RequiresUser => false;
 
-        public void RefreshData()
-        {
-            throw new NotImplementedException();
-        }
+    public void RefreshData()
+    {
+        throw new NotImplementedException();
     }
 }

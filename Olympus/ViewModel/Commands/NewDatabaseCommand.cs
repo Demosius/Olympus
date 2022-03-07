@@ -2,28 +2,27 @@
 using System;
 using System.Windows.Input;
 
-namespace Olympus.ViewModel.Commands
+namespace Olympus.ViewModel.Commands;
+
+public class NewDatabaseCommand : ICommand
 {
-    public class NewDatabaseCommand : ICommand
+    public DBManager Dbm { get; set; }
+
+    public NewDatabaseCommand(DBManager dbm) { Dbm = dbm; }
+
+    public event EventHandler CanExecuteChanged
     {
-        public DBManager Dbm { get; set; }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public NewDatabaseCommand(DBManager dbm) { Dbm = dbm; }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            Dbm.NewDatabase();
-        }
+    public void Execute(object parameter)
+    {
+        Dbm.NewDatabase();
     }
 }

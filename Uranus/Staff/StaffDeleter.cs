@@ -1,57 +1,56 @@
 ﻿using System.Collections.Generic;
 using Uranus.Staff.Model;
 
-namespace Uranus.Staff
+namespace Uranus.Staff;
+
+public class StaffDeleter
 {
-    public class StaffDeleter
+    private StaffChariot Chariot { get; }
+
+    public StaffDeleter(ref StaffChariot chariot)
     {
-        private StaffChariot Chariot { get; }
+        Chariot = chariot;
+    }
 
-        public StaffDeleter(ref StaffChariot chariot)
+    public void ClockEvent(ClockEvent clockEvent) => Chariot.Database.Delete(clockEvent);
+
+    public void ClockEvents(IEnumerable<ClockEvent> clockEvents)
+    {
+        Chariot.Database.RunInTransaction(() =>
         {
-            Chariot = chariot;
-        }
-
-        public void ClockEvent(ClockEvent clockEvent) => Chariot.Database.Delete(clockEvent);
-
-        public void ClockEvents(IEnumerable<ClockEvent> clockEvents)
-        {
-            Chariot.Database.RunInTransaction(() =>
+            foreach (var clockEvent in clockEvents)
             {
-                foreach (var clockEvent in clockEvents)
-                {
-                    Chariot.Delete(clockEvent);
-                }
-            });
-        }
+                Chariot.Delete(clockEvent);
+            }
+        });
+    }
 
-        public void ShiftEntry(ShiftEntry selectedEntry) => Chariot.Database.Delete(selectedEntry);
+    public void ShiftEntry(ShiftEntry selectedEntry) => Chariot.Database.Delete(selectedEntry);
 
-        public void ShiftEntries(IEnumerable<ShiftEntry> deletedEntries)
+    public void ShiftEntries(IEnumerable<ShiftEntry> deletedEntries)
+    {
+        Chariot.Database.RunInTransaction(() =>
         {
-            Chariot.Database.RunInTransaction(() =>
+            foreach (var deletedEntry in deletedEntries)
             {
-                foreach (var deletedEntry in deletedEntries)
-                {
-                    ShiftEntry(deletedEntry);
-                }
-            });
-        }
+                ShiftEntry(deletedEntry);
+            }
+        });
+    }
 
-        public void EntriesAndClocks(IEnumerable<ShiftEntry> deletedEntries, IEnumerable<ClockEvent> deletedClocks)
+    public void EntriesAndClocks(IEnumerable<ShiftEntry> deletedEntries, IEnumerable<ClockEvent> deletedClocks)
+    {
+        Chariot.Database.RunInTransaction(() =>
         {
-            Chariot.Database.RunInTransaction(() =>
+            foreach (var deletedEntry in deletedEntries)
             {
-                foreach (var deletedEntry in deletedEntries)
-                {
-                    ShiftEntry(deletedEntry);
-                }
+                ShiftEntry(deletedEntry);
+            }
 
-                foreach (var deletedClock in deletedClocks)
-                {
-                    ClockEvent(deletedClock);
-                }
-            });
-        }
+            foreach (var deletedClock in deletedClocks)
+            {
+                ClockEvent(deletedClock);
+            }
+        });
     }
 }

@@ -4,190 +4,188 @@ using System;
 using System.ComponentModel;
 using Uranus.Staff.Model;
 
-namespace Aion.Model
+namespace Aion.Model;
+
+public enum EClockStatus
 {
-    public enum EClockStatus
+    Pending,
+    Approved,
+    Rejected
+}
+
+public class ClockTime : IEquatable<ClockTime>, INotifyPropertyChanged
+{
+    [PrimaryKey]
+    public Guid ID { get; set; }
+    [ForeignKey(typeof(Employee))]
+    public int EmployeeCode { get; set; }
+    public string Timestamp { get; set; }
+
+    private string date;
+    public string Date
     {
-        Pending,
-        Approved,
-        Rejected
+        get => date ??= DateTime.Parse(Timestamp).ToString("yyyy-MM-dd");
+        set => date = value;
     }
 
-    public class ClockTime : IEquatable<ClockTime>, INotifyPropertyChanged
+    private string time;
+    public string Time
     {
-        [PrimaryKey]
-        public Guid ID { get; set; }
-        [ForeignKey(typeof(Employee))]
-        public int EmployeeCode { get; set; }
-        public string Timestamp { get; set; }
+        get => time ??= DateTime.Parse(Timestamp).ToString("HH:mm:ss");
+        set => time = value;
+    }
 
-        private string date;
-        public string Date
+    public EClockStatus Status { get; set; }
+
+    [ManyToOne(inverseProperty: "ClockTimes")]
+    public Employee Employee { get; set; }
+
+    [Ignore]
+    public DateTime DtDate => DateTime.Parse(Date).Date;
+    [Ignore]
+    public TimeSpan DtTime => DateTime.Parse(Time).TimeOfDay;
+
+    public ClockTime()
+    {
+        ID = Guid.NewGuid();
+    }
+
+    public void StampTime()
+    {
+        StampTime(DateTime.Now);
+    }
+
+    public void StampTime(DateTime dateTime)
+    {
+        Timestamp = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
+        Date = dateTime.ToString("yyyy-MM-dd");
+        Time = dateTime.ToString("HH:mm:ss");
+    }
+
+    public void StampTime(string timestamp)
+    {
+        var dateTime = DateTime.Parse(timestamp);
+        StampTime(dateTime);
+    }
+
+    public void Approve()
+    {
+        Status = EClockStatus.Approved;
+        OnPropertyChanged(nameof(Status));
+    }
+
+    public void Reject()
+    {
+        Status = EClockStatus.Rejected;
+        OnPropertyChanged(nameof(Status));
+    }
+
+    public override string ToString()
+    {
+        return Time[..5];
+    }
+
+    /* Equality overloading. */
+
+    public override bool Equals(object obj)
+    {
+        if (obj is not ClockTime other)
         {
-            get => date ??= DateTime.Parse(Timestamp).ToString("yyyy-MM-dd");
-            set => date = value;
+            return false;
+        }
+        if (ReferenceEquals(this, other))
+        {
+            return true;
         }
 
-        private string time;
-        public string Time
+        return string.CompareOrdinal(Timestamp, other.Timestamp) == 0;
+    }
+
+    public bool Equals(ClockTime other)
+    {
+        if (other is null)
         {
-            get => time ??= DateTime.Parse(Timestamp).ToString("HH:mm:ss");
-            set => time = value;
+            return false;
+        }
+        if (ReferenceEquals(this, other))
+        {
+            return true;
         }
 
-        public EClockStatus Status { get; set; }
+        return Date == other.Date && Time == other.Time;
+    }
 
-        [ManyToOne(inverseProperty: "ClockTimes")]
-        public Employee Employee { get; set; }
-
-        [Ignore]
-        public DateTime DtDate => DateTime.Parse(Date).Date;
-        [Ignore]
-        public TimeSpan DtTime => DateTime.Parse(Time).TimeOfDay;
-
-        public ClockTime()
+    public static bool operator ==(ClockTime lh, ClockTime rh)
+    {
+        if (ReferenceEquals(lh, rh))
         {
-            ID = Guid.NewGuid();
+            return true;
+        }
+        if (lh is null)
+        {
+            return false;
+        }
+        if (rh is null)
+        {
+            return false;
         }
 
-        public void StampTime()
+        return lh.Equals(rh);
+    }
+
+    public static bool operator !=(ClockTime lh, ClockTime rh)
+    {
+        return !(lh == rh);
+    }
+
+    public static bool operator >(ClockTime lh, ClockTime rh)
+    {
+        if (ReferenceEquals(lh, rh))
         {
-            StampTime(DateTime.Now);
+            return false;
+        }
+        if (lh is null)
+        {
+            return false;
+        }
+        if (rh is null)
+        {
+            return false;
         }
 
-        public void StampTime(DateTime dateTime)
+        return string.CompareOrdinal(lh.Date, rh.Date) > 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) > 0;
+    }
+
+    public static bool operator <(ClockTime lh, ClockTime rh)
+    {
+        if (ReferenceEquals(lh, rh))
         {
-            Timestamp = dateTime.ToString("yyyy-MM-dd HH:mm:ss");
-            Date = dateTime.ToString("yyyy-MM-dd");
-            Time = dateTime.ToString("HH:mm:ss");
+            return false;
+        }
+        if (lh is null)
+        {
+            return false;
+        }
+        if (rh is null)
+        {
+            return false;
         }
 
-        public void StampTime(string timestamp)
-        {
-            var dateTime = DateTime.Parse(timestamp);
-            StampTime(dateTime);
-        }
+        return string.CompareOrdinal(lh.Date, rh.Date) < 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) < 0;
+    }
 
-        public void Approve()
-        {
-            Status = EClockStatus.Approved;
-            OnPropertyChanged(nameof(Status));
-        }
+    public static bool operator <=(ClockTime lh, ClockTime rh) => lh == rh || lh < rh;
 
-        public void Reject()
-        {
-            Status = EClockStatus.Rejected;
-            OnPropertyChanged(nameof(Status));
-        }
+    public static bool operator >=(ClockTime lh, ClockTime rh) => lh == rh || lh > rh;
 
-        public override string ToString()
-        {
-            return Time[..5];
-        }
+    public override int GetHashCode() => ID.GetHashCode();
 
-        /* Equality overloading. */
+    // Property changed event handling.
+    public event PropertyChangedEventHandler PropertyChanged;
 
-        public override bool Equals(object obj)
-        {
-            if (obj is not ClockTime other)
-            {
-                return false;
-            }
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-
-            return string.CompareOrdinal(Timestamp, other.Timestamp) == 0;
-        }
-
-        public bool Equals(ClockTime other)
-        {
-            if (other is null)
-            {
-                return false;
-            }
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-
-            return Date == other.Date && Time == other.Time;
-        }
-
-        public static bool operator ==(ClockTime lh, ClockTime rh)
-        {
-            if (ReferenceEquals(lh, rh))
-            {
-                return true;
-            }
-            if (lh is null)
-            {
-                return false;
-            }
-            if (rh is null)
-            {
-                return false;
-            }
-
-            return lh.Equals(rh);
-        }
-
-        public static bool operator !=(ClockTime lh, ClockTime rh)
-        {
-            return !(lh == rh);
-        }
-
-        public static bool operator >(ClockTime lh, ClockTime rh)
-        {
-            if (ReferenceEquals(lh, rh))
-            {
-                return false;
-            }
-            if (lh is null)
-            {
-                return false;
-            }
-            if (rh is null)
-            {
-                return false;
-            }
-
-            return string.CompareOrdinal(lh.Date, rh.Date) > 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) > 0;
-        }
-
-        public static bool operator <(ClockTime lh, ClockTime rh)
-        {
-            if (ReferenceEquals(lh, rh))
-            {
-                return false;
-            }
-            if (lh is null)
-            {
-                return false;
-            }
-            if (rh is null)
-            {
-                return false;
-            }
-
-            return string.CompareOrdinal(lh.Date, rh.Date) < 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) < 0;
-        }
-
-        public static bool operator <=(ClockTime lh, ClockTime rh) => lh == rh || lh < rh;
-
-        public static bool operator >=(ClockTime lh, ClockTime rh) => lh == rh || lh > rh;
-
-        public override int GetHashCode() => ID.GetHashCode();
-
-        // Property changed event handling.
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new(propertyName));
-        }
-
+    private void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
 }

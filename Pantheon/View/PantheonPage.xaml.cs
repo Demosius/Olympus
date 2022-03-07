@@ -2,26 +2,25 @@
 using System;
 using Uranus;
 
-namespace Pantheon.View
+namespace Pantheon.View;
+
+/// <summary>
+/// Interaction logic for PantheonPage.xaml
+/// </summary>
+public partial class PantheonPage : IProject
+
 {
-    /// <summary>
-    /// Interaction logic for PantheonPage.xaml
-    /// </summary>
-    public partial class PantheonPage : IProject
-
+    public PantheonPage()
     {
-        public PantheonPage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        public EProject Project => EProject.Pantheon;
+    public EProject Project => EProject.Pantheon;
 
-        public static bool RequiresUser => true;
+    public static bool RequiresUser => true;
 
-        public void RefreshData()
-        {
-            throw new NotImplementedException();
-        }
+    public void RefreshData()
+    {
+        throw new NotImplementedException();
     }
 }

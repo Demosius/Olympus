@@ -1,28 +1,27 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace Aion.ViewModel.Commands
+namespace Aion.ViewModel.Commands;
+
+public class LaunchEmployeePrinterCommand : ICommand
 {
-    public class LaunchEmployeePrinterCommand : ICommand
+    public EmployeePageVM VM { get; set; }
+
+    public LaunchEmployeePrinterCommand(EmployeePageVM vm) { VM = vm; }
+
+    public event EventHandler CanExecuteChanged
     {
-        public EmployeePageVM VM { get; set; }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public LaunchEmployeePrinterCommand(EmployeePageVM vm) { VM = vm; }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            throw new NotImplementedException();
-        }
+    public void Execute(object parameter)
+    {
+        throw new NotImplementedException();
     }
 }

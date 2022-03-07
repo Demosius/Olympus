@@ -1,28 +1,27 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace Aion.ViewModel.Commands
+namespace Aion.ViewModel.Commands;
+
+public class LaunchEmployeeCreatorCommand : ICommand
 {
-    public class LaunchEmployeeCreatorCommand : ICommand
+    public EmployeePageVM VM { get; set; }
+
+    public LaunchEmployeeCreatorCommand(EmployeePageVM vm) { VM = vm; }
+
+    public event EventHandler CanExecuteChanged
     {
-        public EmployeePageVM VM { get; set; }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public LaunchEmployeeCreatorCommand(EmployeePageVM vm) { VM = vm; }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            VM.LaunchEmployeeCreator();
-        }
+    public void Execute(object parameter)
+    {
+        VM.LaunchEmployeeCreator();
     }
 }

@@ -1,8 +1,7 @@
-﻿namespace Uranus.Staff.Model
+﻿namespace Uranus.Staff.Model;
+
+public class DepartmentProject
 {
-    public class DepartmentProject
-    {
-        public string DepartmentName { get; set; }
-        public string ProjectName { get; set; }
-    }
+    public string DepartmentName { get; set; }
+    public string ProjectName { get; set; }
 }

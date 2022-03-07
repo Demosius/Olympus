@@ -2,61 +2,60 @@
 using System.ComponentModel;
 using Uranus.Staff.Model;
 
-namespace AionClock.ViewModel
+namespace AionClock.ViewModel;
+
+public class ClockSuccessVM : INotifyPropertyChanged
 {
-    public class ClockSuccessVM : INotifyPropertyChanged
+    private ClockEvent clock;
+    public ClockEvent Clock 
     {
-        private ClockEvent clock;
-        public ClockEvent Clock 
+        get => clock; 
+        set
         {
-            get => clock; 
-            set
-            {
-                clock = value;
-                EmployeeName = clock.Employee.ToString();
-                TimeStamp = DateTime.Parse(clock.Timestamp).ToString("dddd, d-MMM-yyyy, HH:mmtt");
-                Action = App.Helios.StaffReader.GetClockCount(clock.EmployeeID) % 2 == 0 ? "OUT" : "IN"; 
-            }
+            clock = value;
+            EmployeeName = clock.Employee.ToString();
+            TimeStamp = DateTime.Parse(clock.Timestamp).ToString("dddd, d-MMM-yyyy, HH:mmtt");
+            Action = App.Helios.StaffReader.GetClockCount(clock.EmployeeID) % 2 == 0 ? "OUT" : "IN"; 
         }
+    }
 
-        private string employeeName;
-        public string EmployeeName 
+    private string employeeName;
+    public string EmployeeName 
+    {
+        get => employeeName; 
+        set
         {
-            get => employeeName; 
-            set
-            {
-                employeeName = value;
-                OnPropertyChanged(nameof(EmployeeName));
-            }
+            employeeName = value;
+            OnPropertyChanged(nameof(EmployeeName));
         }
+    }
         
-        private string timeStamp;
-        public string TimeStamp 
+    private string timeStamp;
+    public string TimeStamp 
+    {
+        get => timeStamp;
+        set
         {
-            get => timeStamp;
-            set
-            {
-                timeStamp = value;
-                OnPropertyChanged(nameof(TimeStamp));
-            }
+            timeStamp = value;
+            OnPropertyChanged(nameof(TimeStamp));
         }
+    }
 
-        private string action = "IN"; // In/Out
-        public string Action 
-        { 
-            get => action;
-            set
-            {
-                action = value;
-                OnPropertyChanged(nameof(Action));
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void OnPropertyChanged(string propertyName)
+    private string action = "IN"; // In/Out
+    public string Action 
+    { 
+        get => action;
+        set
         {
-            PropertyChanged?.Invoke(this, new(propertyName));
+            action = value;
+            OnPropertyChanged(nameof(Action));
         }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

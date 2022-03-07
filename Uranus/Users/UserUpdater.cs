@@ -1,20 +1,19 @@
 ﻿using Uranus.Users.Model;
 
-namespace Uranus.Users
+namespace Uranus.Users;
+
+public class UserUpdater
 {
-    public class UserUpdater
+    public UserChariot Chariot { get; set; }
+
+    public UserUpdater(ref UserChariot chariot)
     {
-        public UserChariot Chariot { get; set; }
-
-        public UserUpdater(ref UserChariot chariot)
-        {
-            Chariot = chariot;
-        }
-
-        public int Login(Login login)
-        {
-            return Chariot.Update(login);
-        }
-
+        Chariot = chariot;
     }
+
+    public int Login(Login login)
+    {
+        return Chariot.Update(login);
+    }
+
 }

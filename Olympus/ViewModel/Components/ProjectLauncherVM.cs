@@ -5,61 +5,60 @@ using System.Linq;
 using Uranus;
 using System.Collections.ObjectModel;
 
-namespace Olympus.ViewModel.Components
+namespace Olympus.ViewModel.Components;
+
+public class ProjectLauncherVM : INotifyPropertyChanged
 {
-    public class ProjectLauncherVM : INotifyPropertyChanged
+    public OlympusVM OlympusVM { get; set; }
+
+    public List<Department> Departments { get; set; }
+    public List<Project> AllProjects { get; set; }
+    public List<Project> UserProjects { get; set; }
+
+    private ObservableCollection<ProjectGroupVM> projectGroups;
+    public ObservableCollection<ProjectGroupVM> ProjectGroups
     {
-        public OlympusVM OlympusVM { get; set; }
-
-        public List<Department> Departments { get; set; }
-        public List<Project> AllProjects { get; set; }
-        public List<Project> UserProjects { get; set; }
-
-        private ObservableCollection<ProjectGroupVM> projectGroups;
-        public ObservableCollection<ProjectGroupVM> ProjectGroups
+        get => projectGroups;
+        set
         {
-            get => projectGroups;
-            set
-            {
-                projectGroups = value;
-                OnPropertyChanged(nameof(ProjectGroups));
-            }
+            projectGroups = value;
+            OnPropertyChanged(nameof(ProjectGroups));
         }
+    }
 
-        public ProjectLauncherVM()
+    public ProjectLauncherVM()
+    {
+        AllProjects = App.Helios.StaffReader.Projects(pullType: EPullType.FullRecursive).ToList();
+        Departments = App.Helios.StaffReader.Departments(pullType: EPullType.IncludeChildren);
+        UserProjects = App.Charon.UserEmployee is null ? new List<Project>() : App.Charon.UserEmployee.Projects;
+
+        // Set Icons for projects.
+        foreach (var p in AllProjects)
+            p.Icon.SetImageFilePath(App.Helios.StaffReader);
+
+        ProjectGroups = new ObservableCollection<ProjectGroupVM>();
+
+        ProjectGroupVM projectGroup = new(this, AllProjects, "All");
+        ProjectGroups.Add(projectGroup);
+        projectGroup = new ProjectGroupVM(this, UserProjects, "User");
+        ProjectGroups.Add(projectGroup);
+
+        foreach (var dep in Departments.Where(dep => dep.Projects.Any()))
         {
-            AllProjects = App.Helios.StaffReader.Projects(pullType: EPullType.FullRecursive).ToList();
-            Departments = App.Helios.StaffReader.Departments(pullType: EPullType.IncludeChildren);
-            UserProjects = App.Charon.UserEmployee is null ? new() : App.Charon.UserEmployee.Projects;
-
-            // Set Icons for projects.
-            foreach (var p in AllProjects)
-                p.Icon.SetImageFilePath(App.Helios.StaffReader);
-
-            ProjectGroups = new();
-
-            ProjectGroupVM projectGroup = new(this, AllProjects, "All");
+            projectGroup = new ProjectGroupVM(this, dep);
             ProjectGroups.Add(projectGroup);
-            projectGroup = new(this, UserProjects, "User");
-            ProjectGroups.Add(projectGroup);
-
-            foreach (var dep in Departments.Where(dep => dep.Projects.Any()))
-            {
-                projectGroup = new(this, dep);
-                ProjectGroups.Add(projectGroup);
-            }
         }
+    }
 
-        public ProjectLauncherVM(OlympusVM olympusVM) : this()
-        {
-            OlympusVM = olympusVM;
-        }
+    public ProjectLauncherVM(OlympusVM olympusVM) : this()
+    {
+        OlympusVM = olympusVM;
+    }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler PropertyChanged;
 
-        private void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new(propertyName));
-        }
+    private void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

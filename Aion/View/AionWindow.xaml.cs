@@ -1,13 +1,12 @@
-﻿namespace Aion.View
+﻿namespace Aion.View;
+
+/// <summary>
+/// Interaction logic for AionWindow.xaml
+/// </summary>
+public partial class AionWindow
 {
-    /// <summary>
-    /// Interaction logic for AionWindow.xaml
-    /// </summary>
-    public partial class AionWindow
+    public AionWindow()
     {
-        public AionWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

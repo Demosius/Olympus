@@ -1,13 +1,12 @@
-﻿namespace Uranus.Equipment
-{
-    public class EquipmentDeleter
-    {
-        public EquipmentChariot Chariot { get; set; }
+﻿namespace Uranus.Equipment;
 
-        public EquipmentDeleter(ref EquipmentChariot chariot)
-        {
-            Chariot = chariot;
-        }
-       
+public class EquipmentDeleter
+{
+    public EquipmentChariot Chariot { get; set; }
+
+    public EquipmentDeleter(ref EquipmentChariot chariot)
+    {
+        Chariot = chariot;
     }
+       
 }

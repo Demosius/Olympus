@@ -1,13 +1,12 @@
-﻿namespace Olympus.View.Components
+﻿namespace Olympus.View.Components;
+
+/// <summary>
+/// Interaction logic for ProjectLauncher.xaml
+/// </summary>
+public partial class ProjectLauncher
 {
-    /// <summary>
-    /// Interaction logic for ProjectLauncher.xaml
-    /// </summary>
-    public partial class ProjectLauncher
+    public ProjectLauncher()
     {
-        public ProjectLauncher()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

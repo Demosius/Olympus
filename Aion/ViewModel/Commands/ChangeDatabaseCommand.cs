@@ -2,31 +2,30 @@
 using System.Windows.Input;
 using Aion.ViewModel.Utility;
 
-namespace Aion.ViewModel.Commands
+namespace Aion.ViewModel.Commands;
+
+public class ChangeDatabaseCommand : ICommand
 {
-    public class ChangeDatabaseCommand : ICommand
+    public DBManager VM { get; set; }
+
+    public event EventHandler CanExecuteChanged
     {
-        public DBManager VM { get; set; }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
+    public ChangeDatabaseCommand(DBManager vm)
+    {
+        VM = vm;
+    }
 
-        public ChangeDatabaseCommand(DBManager vm)
-        {
-            VM = vm;
-        }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            VM.ChangeDatabase();
-        }
+    public void Execute(object parameter)
+    {
+        VM.ChangeDatabase();
     }
 }

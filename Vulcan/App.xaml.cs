@@ -4,19 +4,18 @@ using System.IO;
 using Uranus;
 using Vulcan.Properties;
 
-namespace Vulcan
-{
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class App
-    {
-        public static Charon Charon { get; set; } = new(Settings.Default.SolLocation);
-        public static Helios Helios { get; set; } = new(Settings.Default.SolLocation);
+namespace Vulcan;
 
-        public static string BaseDirectory()
-        {
-            return Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
-        }
+/// <summary>
+/// Interaction logic for App.xaml
+/// </summary>
+public partial class App
+{
+    public static Charon Charon { get; set; } = new(Settings.Default.SolLocation);
+    public static Helios Helios { get; set; } = new(Settings.Default.SolLocation);
+
+    public static string BaseDirectory()
+    {
+        return Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
     }
 }

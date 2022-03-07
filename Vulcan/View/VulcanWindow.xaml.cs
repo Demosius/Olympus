@@ -1,13 +1,12 @@
-﻿namespace Vulcan.View
+﻿namespace Vulcan.View;
+
+/// <summary>
+/// Interaction logic for VulcanWindow.xaml
+/// </summary>
+public partial class VulcanWindow
 {
-    /// <summary>
-    /// Interaction logic for VulcanWindow.xaml
-    /// </summary>
-    public partial class VulcanWindow
+    public VulcanWindow()
     {
-        public VulcanWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

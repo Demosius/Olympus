@@ -1,28 +1,27 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace Aion.ViewModel.Commands
+namespace Aion.ViewModel.Commands;
+
+public class SaveEntryChangesCommand : ICommand
 {
-    public class SaveEntryChangesCommand : ICommand
+    public ShiftEntryPageVM VM { get; set; }
+
+    public SaveEntryChangesCommand(ShiftEntryPageVM vm) { VM = vm; }
+
+    public event EventHandler CanExecuteChanged
     {
-        public ShiftEntryPageVM VM { get; set; }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public SaveEntryChangesCommand(ShiftEntryPageVM vm) { VM = vm; }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            VM.SaveEntryChanges();
-        }
+    public void Execute(object parameter)
+    {
+        VM.SaveEntryChanges();
     }
 }

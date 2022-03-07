@@ -1,13 +1,12 @@
-﻿namespace Olympus.View.Components
+﻿namespace Olympus.View.Components;
+
+/// <summary>
+/// Interaction logic for ProjectGroup.xaml
+/// </summary>
+public partial class ProjectGroup
 {
-    /// <summary>
-    /// Interaction logic for ProjectGroup.xaml
-    /// </summary>
-    public partial class ProjectGroup
+    public ProjectGroup()
     {
-        public ProjectGroup()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

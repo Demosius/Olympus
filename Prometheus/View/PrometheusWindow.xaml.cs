@@ -1,13 +1,12 @@
-﻿namespace Prometheus.View
+﻿namespace Prometheus.View;
+
+/// <summary>
+/// Interaction logic for PrometheusWindow.xaml
+/// </summary>
+public partial class PrometheusWindow
 {
-    /// <summary>
-    /// Interaction logic for PrometheusWindow.xaml
-    /// </summary>
-    public partial class PrometheusWindow
+    public PrometheusWindow()
     {
-        public PrometheusWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

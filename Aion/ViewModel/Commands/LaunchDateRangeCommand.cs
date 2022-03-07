@@ -2,31 +2,30 @@
 using System.Windows.Input;
 using Aion.ViewModel.Interfaces;
 
-namespace Aion.ViewModel.Commands
+namespace Aion.ViewModel.Commands;
+
+public class LaunchDateRangeCommand : ICommand
 {
-    public class LaunchDateRangeCommand : ICommand
+    public IDateRange VM { get; set; }
+
+    public LaunchDateRangeCommand(IDateRange vm)
     {
-        public IDateRange VM { get; set; }
+        VM = vm;
+    }
 
-        public LaunchDateRangeCommand(IDateRange vm)
-        {
-            VM = vm;
-        }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
+    public void Execute(object parameter)
+    {
+        VM.LaunchDateRangeWindow();
+    }
 
-        public void Execute(object parameter)
-        {
-            VM.LaunchDateRangeWindow();
-        }
-
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
+    public event EventHandler CanExecuteChanged
+    {
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
     }
 }

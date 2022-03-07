@@ -1,28 +1,27 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace Aion.ViewModel.Commands
+namespace Aion.ViewModel.Commands;
+
+public class CreateEntryCommand : ICommand
 {
-    public class CreateEntryCommand : ICommand
+    public EntryCreationVM VM { get; set; }
+
+    public CreateEntryCommand(EntryCreationVM vm) { VM = vm; }
+
+    public event EventHandler CanExecuteChanged
     {
-        public EntryCreationVM VM { get; set; }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public CreateEntryCommand(EntryCreationVM vm) { VM = vm; }
+    public bool CanExecute(object parameter)
+    {
+        return VM.SelectedEmployee?.ID != -1;
+    }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return VM.SelectedEmployee?.ID != -1;
-        }
-
-        public void Execute(object parameter)
-        {
-            VM.CreateEntry();
-        }
+    public void Execute(object parameter)
+    {
+        VM.CreateEntry();
     }
 }

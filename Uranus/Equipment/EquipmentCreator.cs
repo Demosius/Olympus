@@ -1,13 +1,12 @@
-﻿namespace Uranus.Equipment
+﻿namespace Uranus.Equipment;
+
+public class EquipmentCreator
 {
-    public class EquipmentCreator
+    public EquipmentChariot Chariot { get; set; }
+
+    public EquipmentCreator(ref EquipmentChariot chariot)
     {
-        public EquipmentChariot Chariot { get; set; }
-
-        public EquipmentCreator(ref EquipmentChariot chariot)
-        {
-            Chariot = chariot;
-        }
-
+        Chariot = chariot;
     }
+
 }

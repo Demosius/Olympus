@@ -3,26 +3,25 @@ using System;
 using System.Windows;
 using System.Windows.Input;
 
-namespace Aion.ViewModel.Commands
+namespace Aion.ViewModel.Commands;
+
+public class ConfirmInputCommand : ICommand
 {
-    public class ConfirmInputCommand : ICommand
+    public bool CanExecute(object? parameter)
     {
-        public bool CanExecute(object? parameter)
-        {
-            return true;
-        }
+        return true;
+    }
 
-        public void Execute(object? parameter)
-        {
-            var w = (Window) parameter!;
-            w.DialogResult = true;
-            w.Close();
-        }
+    public void Execute(object? parameter)
+    {
+        var w = (Window) parameter!;
+        w.DialogResult = true;
+        w.Close();
+    }
 
-        public event EventHandler? CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
+    public event EventHandler? CanExecuteChanged
+    {
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
     }
 }

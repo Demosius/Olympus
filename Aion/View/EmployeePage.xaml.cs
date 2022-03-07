@@ -6,100 +6,99 @@ using System.Windows.Controls;
 using Styx;
 using Uranus;
 
-namespace Aion.View
+namespace Aion.View;
+
+/// <summary>
+/// Interaction logic for EmployeePage.xaml
+/// </summary>
+public partial class EmployeePage
 {
-    /// <summary>
-    /// Interaction logic for EmployeePage.xaml
-    /// </summary>
-    public partial class EmployeePage
+    public EmployeePage(Helios helios, Charon charon)
     {
-        public EmployeePage(Helios helios, Charon charon)
+        InitializeComponent();
+        VM.SetDataSources(helios, charon);
+    }
+
+    private readonly Style centerStyle = new()
+    {
+        TargetType = typeof(TextBlock),
+        Setters =
         {
-            InitializeComponent();
-            VM.SetDataSources(helios, charon);
+            new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Center),
+        }
+    };
+
+    /// <summary>
+    /// Change the names and other column values while generating.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void Employees_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
+    {
+        var headerName = e.Column.Header.ToString();
+
+        //Cancel the column you don't want to generate
+        if (new List<string> { "DisplayName", "PayRate", "RF_ID", "PC_ID", "ReportsToID", "LockerID", "PhoneNumber", "Email", "Email", "Address", "IconName", 
+                "Department", "Role", "Locker", "Licence", "Icon", "Vehicles", "Shifts", "DepartmentsCanWorkIn", "Projects", "InductionReferences", "Rules", 
+                "Reports", "ShiftEntries", "Rosters", "FullName", "ReportsTo" }.Contains(headerName))
+        {
+            e.Cancel = true;
         }
 
-        private readonly Style centerStyle = new()
+        switch (headerName)
         {
-            TargetType = typeof(TextBlock),
-            Setters =
-                    {
-                        new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Center),
-                    }
-        };
-
-        /// <summary>
-        /// Change the names and other column values while generating.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Employees_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
-        {
-            var headerName = e.Column.Header.ToString();
-
-            //Cancel the column you don't want to generate
-            if (new List<string> { "DisplayName", "PayRate", "RF_ID", "PC_ID", "ReportsToID", "LockerID", "PhoneNumber", "Email", "Email", "Address", "IconName", 
-                    "Department", "Role", "Locker", "Licence", "Icon", "Vehicles", "Shifts", "DepartmentsCanWorkIn", "Projects", "InductionReferences", "Rules", 
-                    "Reports", "ShiftEntries", "Rosters", "FullName", "ReportsTo" }.Contains(headerName))
-            {
-                e.Cancel = true;
-            }
-
-            switch (headerName)
-            {
-                //update column details when generating
-                case "FirstName":
-                    e.Column.Header = "First Name";
-                    break;
-                case "LastName":
-                    e.Column.Header = "Last Name";
-                    break;
-                case "ReportsToName":
-                    e.Column.Header = "Reports To";
-                    break;
-                case "DepartmentName":
-                    e.Column.Header = "Department";
-                    break;
-                case "PayPoint":
-                    e.Column.Header = "Pay Point";
-                    break;
-                case "EmploymentType":
-                    e.Column.Header = "Employment Type";
-                    if (e.Column is DataGridTextColumn column) column.ElementStyle = centerStyle;
-                    break;
-                case "RoleName":
-                    e.Column.Header = "Job Classification";
-                    break;
-                default:
-                    e.Column.Width = 80;
-                    break;
-            }
+            //update column details when generating
+            case "FirstName":
+                e.Column.Header = "First Name";
+                break;
+            case "LastName":
+                e.Column.Header = "Last Name";
+                break;
+            case "ReportsToName":
+                e.Column.Header = "Reports To";
+                break;
+            case "DepartmentName":
+                e.Column.Header = "Department";
+                break;
+            case "PayPoint":
+                e.Column.Header = "Pay Point";
+                break;
+            case "EmploymentType":
+                e.Column.Header = "Employment Type";
+                if (e.Column is DataGridTextColumn column) column.ElementStyle = centerStyle;
+                break;
+            case "RoleName":
+                e.Column.Header = "Job Classification";
+                break;
+            default:
+                e.Column.Width = 80;
+                break;
         }
+    }
 
-        /// <summary>
-        /// Set the order once they've been generated.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Employees_AutoGeneratedColumns(object sender, EventArgs e)
-        {
-            var grid = (DataGrid)sender;
+    /// <summary>
+    /// Set the order once they've been generated.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void Employees_AutoGeneratedColumns(object sender, EventArgs e)
+    {
+        var grid = (DataGrid)sender;
 
-            grid.Columns.First(c => c.Header.ToString() == "Location").DisplayIndex = 0;
-            grid.Columns.First(c => c.Header.ToString() == "ID").DisplayIndex = 1;
-            grid.Columns.First(c => c.Header.ToString() == "First Name").DisplayIndex = 2;
-            grid.Columns.First(c => c.Header.ToString() == "Last Name").DisplayIndex = 3;
-            grid.Columns.First(c => c.Header.ToString() == "Department").DisplayIndex = 4;
-            grid.Columns.First(c => c.Header.ToString() == "Pay Point").DisplayIndex = 5;
-            grid.Columns.First(c => c.Header.ToString() == "Job Classification").DisplayIndex = 6;
-            grid.Columns.First(c => c.Header.ToString() == "Employment Type").DisplayIndex = 7;
-            grid.Columns.First(c => c.Header.ToString() == "Reports To").DisplayIndex = 8;
-        }
+        grid.Columns.First(c => c.Header.ToString() == "Location").DisplayIndex = 0;
+        grid.Columns.First(c => c.Header.ToString() == "ID").DisplayIndex = 1;
+        grid.Columns.First(c => c.Header.ToString() == "First Name").DisplayIndex = 2;
+        grid.Columns.First(c => c.Header.ToString() == "Last Name").DisplayIndex = 3;
+        grid.Columns.First(c => c.Header.ToString() == "Department").DisplayIndex = 4;
+        grid.Columns.First(c => c.Header.ToString() == "Pay Point").DisplayIndex = 5;
+        grid.Columns.First(c => c.Header.ToString() == "Job Classification").DisplayIndex = 6;
+        grid.Columns.First(c => c.Header.ToString() == "Employment Type").DisplayIndex = 7;
+        grid.Columns.First(c => c.Header.ToString() == "Reports To").DisplayIndex = 8;
+    }
 
-        private void GoToButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            GoToButton.Command.Execute(GoToButton.CommandParameter);
-            EmployeeGrid.ScrollIntoView(EmployeeGrid.SelectedItem);
-        }
+    private void GoToButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        GoToButton.Command.Execute(GoToButton.CommandParameter);
+        EmployeeGrid.ScrollIntoView(EmployeeGrid.SelectedItem);
     }
 }

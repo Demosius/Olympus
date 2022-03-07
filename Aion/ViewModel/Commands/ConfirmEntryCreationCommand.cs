@@ -2,30 +2,29 @@
 using System.Windows;
 using System.Windows.Input;
 
-namespace Aion.ViewModel.Commands
+namespace Aion.ViewModel.Commands;
+
+public class ConfirmEntryCreationCommand : ICommand
 {
-    public class ConfirmEntryCreationCommand : ICommand
+    public EntryCreationVM VM { get; set; }
+
+    public ConfirmEntryCreationCommand(EntryCreationVM vm) { VM = vm; }
+
+    public event EventHandler CanExecuteChanged
     {
-        public EntryCreationVM VM { get; set; }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public ConfirmEntryCreationCommand(EntryCreationVM vm) { VM = vm; }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            var w = parameter as Window;
-            VM.ConfirmAll();
-            w?.Close();
-        }
+    public void Execute(object parameter)
+    {
+        var w = parameter as Window;
+        VM.ConfirmAll();
+        w?.Close();
     }
 }

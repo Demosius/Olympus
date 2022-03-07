@@ -1,13 +1,12 @@
-﻿namespace Olympus.View.Components
+﻿namespace Olympus.View.Components;
+
+/// <summary>
+/// Interaction logic for InvUpdate.xaml
+/// </summary>
+public partial class InventoryUpdater
 {
-    /// <summary>
-    /// Interaction logic for InvUpdate.xaml
-    /// </summary>
-    public partial class InventoryUpdater
+    public InventoryUpdater()
     {
-        public InventoryUpdater()
-        {
-            InitializeComponent();
-        } 
-    }
+        InitializeComponent();
+    } 
 }

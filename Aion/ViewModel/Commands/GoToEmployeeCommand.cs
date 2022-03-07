@@ -2,31 +2,30 @@
 using System;
 using System.Windows.Input;
 
-namespace Aion.ViewModel.Commands
+namespace Aion.ViewModel.Commands;
+
+public class GoToEmployeeCommand : ICommand
 {
-    public class GoToEmployeeCommand : ICommand
+    public EmployeePageVM VM { get; set; }
+
+    public GoToEmployeeCommand(EmployeePageVM vm)
     {
-        public EmployeePageVM VM { get; set; }
+        VM = vm;
+    }
 
-        public GoToEmployeeCommand(EmployeePageVM vm)
-        {
-            VM = vm;
-        }
+    public bool CanExecute(object? parameter)
+    {
+        return VM.SelectedReport is not null;
+    }
 
-        public bool CanExecute(object? parameter)
-        {
-            return VM.SelectedReport is not null;
-        }
+    public void Execute(object? parameter)
+    {
+        VM.GoToEmployee();
+    }
 
-        public void Execute(object? parameter)
-        {
-            VM.GoToEmployee();
-        }
-
-        public event EventHandler? CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
+    public event EventHandler? CanExecuteChanged
+    {
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
     }
 }

@@ -3,20 +3,19 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace AionClock.ViewModel.Converters
-{
-    public class BoolColourConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value != null && (bool)value)
-                return new SolidColorBrush(Colors.Green);
-            return new SolidColorBrush(Colors.Red);
-        }
+namespace AionClock.ViewModel.Converters;
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
+public class BoolColourConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value != null && (bool)value)
+            return new SolidColorBrush(Colors.Green);
+        return new SolidColorBrush(Colors.Red);
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
     }
 }

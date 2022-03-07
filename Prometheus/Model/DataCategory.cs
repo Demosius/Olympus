@@ -1,26 +1,25 @@
 ﻿using Prometheus.ViewModel.Helpers;
 using System.Collections.Generic;
 
-namespace Prometheus.Model
+namespace Prometheus.Model;
+
+public class DataCategory
 {
-    public class DataCategory
+    public EDataCategory Category { get; }
+    public string Name { get; set; }
+    public List<DataType> DataTypes { get; set; }
+
+    public DataCategory() { }
+
+    public DataCategory(EDataCategory category) : this()
     {
-        public EDataCategory Category { get; }
-        public string Name { get; set; }
-        public List<DataType> DataTypes { get; set; }
+        Category = category;
+        Name = EnumConverter.DataCategoryToString(category);
 
-        public DataCategory() { }
-
-        public DataCategory(EDataCategory category) : this()
+        DataTypes = new List<DataType>();
+        foreach (var type in EnumConverter.GetTypeList(category))
         {
-            Category = category;
-            Name = EnumConverter.DataCategoryToString(category);
-
-            DataTypes = new();
-            foreach (var type in EnumConverter.GetTypeList(category))
-            {
-                DataTypes.Add(new(this, type));
-            }
+            DataTypes.Add(new DataType(this, type));
         }
     }
 }

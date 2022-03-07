@@ -1,13 +1,12 @@
 ﻿using Uranus;
 
-namespace Aion.View
+namespace Aion.View;
+
+public partial class EmployeeCreationWindow
 {
-    public partial class EmployeeCreationWindow
+    public EmployeeCreationWindow(Helios helios)
     {
-        public EmployeeCreationWindow(Helios helios)
-        {
-            InitializeComponent();
-            VM.SetDataSource(helios);
-        }
+        InitializeComponent();
+        VM.SetDataSource(helios);
     }
 }

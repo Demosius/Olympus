@@ -2,43 +2,42 @@
 using System;
 using System.Windows.Input;
 
-namespace Olympus.ViewModel.Commands
+namespace Olympus.ViewModel.Commands;
+
+public class UserCommand : ICommand
 {
-    public class UserCommand : ICommand
+    public UserHandlerVM VM { get; set; }
+
+    public event EventHandler CanExecuteChanged
     {
-        public UserHandlerVM VM { get; set; }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
+    public UserCommand(UserHandlerVM vm)
+    {
+        VM = vm;
+    }
 
-        public UserCommand(UserHandlerVM vm)
-        {
-            VM = vm;
-        }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public bool CanExecute(object parameter)
+    public void Execute(object parameter)
+    {
+        var commandName = parameter as string;
+        switch (commandName)
         {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            var commandName = parameter as string;
-            switch (commandName)
-            {
-                case "Register":
-                    VM.Register();
-                    break;
-                case "Log In":
-                    VM.LogIn();
-                    break;
-                default:
-                    VM.LogOut();
-                    break;
-            }
+            case "Register":
+                VM.Register();
+                break;
+            case "Log In":
+                VM.LogIn();
+                break;
+            default:
+                VM.LogOut();
+                break;
         }
     }
 }

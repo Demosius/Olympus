@@ -1,15 +1,14 @@
 ﻿using Uranus.Staff.Model;
 using SQLite;
 
-namespace Vulcan.Model
+namespace Vulcan.Model;
+
+internal class Operator
 {
-    internal class Operator
-    {
-        [Ignore]
-        public Employee Employee { get; set; }
-        [Ignore]
-        public int MyProperty { get; set; }
+    [Ignore]
+    public Employee Employee { get; set; }
+    [Ignore]
+    public int MyProperty { get; set; }
 
 
-    }
 }

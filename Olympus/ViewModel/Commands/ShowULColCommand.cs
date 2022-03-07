@@ -2,31 +2,30 @@
 using System;
 using System.Windows.Input;
 
-namespace Olympus.ViewModel.Commands
+namespace Olympus.ViewModel.Commands;
+
+public class ShowUlColCommand : ICommand
 {
-    public class ShowUlColCommand : ICommand
+    public InventoryUpdaterVM VM { get; set; }
+
+    public event EventHandler CanExecuteChanged
     {
-        public InventoryUpdaterVM VM { get; set; }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
+    public ShowUlColCommand(InventoryUpdaterVM vm)
+    {
+        VM = vm;
+    }
 
-        public ShowUlColCommand(InventoryUpdaterVM vm)
-        {
-            VM = vm;
-        }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            InventoryUpdaterVM.UoMInfo();
-        }
+    public void Execute(object parameter)
+    {
+        InventoryUpdaterVM.UoMInfo();
     }
 }

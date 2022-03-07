@@ -1,17 +1,16 @@
 ﻿using Uranus;
 using Uranus.Staff.Model;
 
-namespace Aion.View
+namespace Aion.View;
+
+/// <summary>
+/// Interaction logic for EditEmployeeView.xaml
+/// </summary>
+public partial class EmployeeEditorWindow
 {
-    /// <summary>
-    /// Interaction logic for EditEmployeeView.xaml
-    /// </summary>
-    public partial class EmployeeEditorWindow
+    public EmployeeEditorWindow(Helios helios, Employee employee, bool isNew)
     {
-        public EmployeeEditorWindow(Helios helios, Employee employee, bool isNew)
-        {
-            InitializeComponent();
-            VM.SetData(helios, employee, isNew);
-        }
+        InitializeComponent();
+        VM.SetData(helios, employee, isNew);
     }
 }

@@ -1,15 +1,12 @@
-﻿namespace Olympus.View
+﻿namespace Olympus.View;
+
+/// <summary>
+/// Interaction logic for Register xaml.xaml
+/// </summary>
+public partial class RegisterWindow
 {
-    /// <summary>
-    /// Interaction logic for Register xaml.xaml
-    /// </summary>
-    public partial class RegisterWindow
+    public RegisterWindow()
     {
-        public RegisterWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
-
 }
-

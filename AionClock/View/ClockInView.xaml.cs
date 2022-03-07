@@ -1,13 +1,12 @@
-﻿namespace AionClock.View
+﻿namespace AionClock.View;
+
+/// <summary>
+/// Interaction logic for ClockInView.xaml
+/// </summary>
+public partial class ClockInView
 {
-    /// <summary>
-    /// Interaction logic for ClockInView.xaml
-    /// </summary>
-    public partial class ClockInView
+    public ClockInView()
     {
-        public ClockInView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

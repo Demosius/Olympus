@@ -1,29 +1,28 @@
 ﻿using System;
 using System.Windows.Threading;
 
-namespace AionClock.View
+namespace AionClock.View;
+
+/// <summary>
+/// Interaction logic for ClockRejectionView.xaml
+/// </summary>
+public partial class ClockRejectionView
 {
-    /// <summary>
-    /// Interaction logic for ClockRejectionView.xaml
-    /// </summary>
-    public partial class ClockRejectionView
+    public ClockRejectionView(string rejectReason = "Too soon between clock events.")
     {
-        public ClockRejectionView(string rejectReason = "Too soon between clock events.")
-        {
-            InitializeComponent();
-            VM.SetReason(rejectReason);
+        InitializeComponent();
+        VM.SetReason(rejectReason);
 
-            DispatcherTimer timer = new()
-            {
-                Interval = TimeSpan.FromSeconds(1.2)
-            };
-            timer.Tick += CloseUp;
-            timer.Start();
-        }
-
-        private void CloseUp(object sender, EventArgs e)
+        DispatcherTimer timer = new()
         {
-            Close();
-        }
+            Interval = TimeSpan.FromSeconds(1.2)
+        };
+        timer.Tick += CloseUp;
+        timer.Start();
+    }
+
+    private void CloseUp(object sender, EventArgs e)
+    {
+        Close();
     }
 }

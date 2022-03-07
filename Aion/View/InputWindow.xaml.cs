@@ -1,26 +1,25 @@
-﻿namespace Aion.View
+﻿namespace Aion.View;
+
+/// <summary>
+/// Interaction logic for InputWindow.xaml
+/// </summary>
+public partial class InputWindow
 {
-    /// <summary>
-    /// Interaction logic for InputWindow.xaml
-    /// </summary>
-    public partial class InputWindow
+    public InputWindow()
     {
-        public InputWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        public InputWindow(string prompt)
-        {
-            InitializeComponent();
-            VM.Prompt = prompt;
-        }
+    public InputWindow(string prompt)
+    {
+        InitializeComponent();
+        VM.Prompt = prompt;
+    }
 
-        public InputWindow(string prompt, string title)
-        {
-            InitializeComponent();
-            VM.Prompt = prompt;
-            VM.Title = title;
-        }
+    public InputWindow(string prompt, string title)
+    {
+        InitializeComponent();
+        VM.Prompt = prompt;
+        VM.Title = title;
     }
 }

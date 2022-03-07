@@ -2,19 +2,18 @@
 using Styx;
 
 
-namespace Olympus.View.Components
-{
-    /// <summary>
-    /// Interaction logic for SignIn.xaml
-    /// </summary>
-    public partial class UserHandler
-    {
-        public Charon Charon { get; set; }
+namespace Olympus.View.Components;
 
-        public UserHandler()
-        {
-            InitializeComponent();
-            Charon = new(Settings.Default.SolLocation);
-        }
+/// <summary>
+/// Interaction logic for SignIn.xaml
+/// </summary>
+public partial class UserHandler
+{
+    public Charon Charon { get; set; }
+
+    public UserHandler()
+    {
+        InitializeComponent();
+        Charon = new Charon(Settings.Default.SolLocation);
     }
 }

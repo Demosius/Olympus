@@ -2,74 +2,73 @@
 using SQLiteNetExtensions.Attributes;
 using System;
 
-namespace Uranus.Inventory.Model
+namespace Uranus.Inventory.Model;
+
+public class Move
 {
-    public class Move
+    [PrimaryKey]
+    public Guid ID { get; set; }
+    [ForeignKey(typeof(NAVItem))]
+    public int ItemNumber { get; set; }
+    [ForeignKey(typeof(NAVBin))]
+    public string TakeBinID { get; set; }
+    [ForeignKey(typeof(NAVBin))]
+    public string PlaceBinID { get; set; }
+    [ForeignKey(typeof(Batch))]
+    public string BatchID { get; set; }
+
+    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public NAVItem Item { get; set; }
+    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public NAVBin TakeBin { get; set; }
+    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public NAVBin PlaceBin { get; set; }
+    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public Batch Batch { get; set; }
+
+    public int TakeCases { get; set; }
+    public int TakePacks { get; set; }
+    public int TakeEaches { get; set; }
+    public int PlaceCases { get; set; }
+    public int PlacePacks { get; set; }
+    public int PlaceEaches { get; set; }
+
+    [Ignore]
+    public bool FullPallet => (TakeBin.IsFullQty(this) ?? false) && AccessLevel != EAccessLevel.Ground;
+
+    [Ignore]
+    public EAccessLevel AccessLevel => TakeBin.Zone.AccessLevel;
+
+    [Ignore]
+    public int AssignedOperator { get; set; }
+    public float TimeEstimate { get; set; }
+
+    public Move() { }
+
+    public Move(NAVMoveLine moveLine)
     {
-        [PrimaryKey]
-        public Guid ID { get; set; }
-        [ForeignKey(typeof(NAVItem))]
-        public int ItemNumber { get; set; }
-        [ForeignKey(typeof(NAVBin))]
-        public string TakeBinID { get; set; }
-        [ForeignKey(typeof(NAVBin))]
-        public string PlaceBinID { get; set; }
-        [ForeignKey(typeof(Batch))]
-        public string BatchID { get; set; }
-
-        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public NAVItem Item { get; set; }
-        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public NAVBin TakeBin { get; set; }
-        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public NAVBin PlaceBin { get; set; }
-        [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-        public Batch Batch { get; set; }
-
-        public int TakeCases { get; set; }
-        public int TakePacks { get; set; }
-        public int TakeEaches { get; set; }
-        public int PlaceCases { get; set; }
-        public int PlacePacks { get; set; }
-        public int PlaceEaches { get; set; }
-
-        [Ignore]
-        public bool FullPallet => (TakeBin.IsFullQty(this) ?? false) && AccessLevel != EAccessLevel.Ground;
-
-        [Ignore]
-        public EAccessLevel AccessLevel => TakeBin.Zone.AccessLevel;
-
-        [Ignore]
-        public int AssignedOperator { get; set; }
-        public float TimeEstimate { get; set; }
-
-        public Move() { }
-
-        public Move(NAVMoveLine moveLine)
+        ItemNumber = moveLine.ItemNumber;
+        if (moveLine.ActionType == EAction.Place)
         {
-            ItemNumber = moveLine.ItemNumber;
-            if (moveLine.ActionType == EAction.Place)
-            {
-                PlaceBin = moveLine.Bin;
-                PlaceBinID = moveLine.BinID;
-            }
-            else // MUST be take.
-            {
-                TakeBin = moveLine.Bin;
-                PlaceBinID = moveLine.BinID;
-            }
+            PlaceBin = moveLine.Bin;
+            PlaceBinID = moveLine.BinID;
         }
-
-        public bool LineMatch(NAVMoveLine moveLine)
+        else // MUST be take.
         {
-            //TODO: PartialMove line matching.
-            throw new NotImplementedException();
+            TakeBin = moveLine.Bin;
+            PlaceBinID = moveLine.BinID;
         }
+    }
 
-        public bool MergeLine(NAVMoveLine moveLine)
-        {
-            //TODO: PartialMove line merging.
-            throw new NotImplementedException();
-        }
+    public bool LineMatch(NAVMoveLine moveLine)
+    {
+        //TODO: PartialMove line matching.
+        throw new NotImplementedException();
+    }
+
+    public bool MergeLine(NAVMoveLine moveLine)
+    {
+        //TODO: PartialMove line merging.
+        throw new NotImplementedException();
     }
 }

@@ -1,11 +1,10 @@
 ﻿using Uranus.Staff;
 
-namespace Uranus
+namespace Uranus;
+
+public interface IProject
 {
-    public interface IProject
-    {
-        EProject Project { get; }
-        public static bool RequiresUser { get; }
-        public void RefreshData();
-    }
+    EProject Project { get; }
+    public static bool RequiresUser { get; }
+    public void RefreshData();
 }

@@ -2,31 +2,30 @@
 using System;
 using System.Windows.Input;
 
-namespace Olympus.ViewModel.Commands
+namespace Olympus.ViewModel.Commands;
+
+public class ShowBcColCommand : ICommand
 {
-    public class ShowBcColCommand : ICommand
+    public InventoryUpdaterVM VM { get; set; }
+
+    public event EventHandler CanExecuteChanged
     {
-        public InventoryUpdaterVM VM { get; set; }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
+    public ShowBcColCommand(InventoryUpdaterVM vm)
+    {
+        VM = vm;
+    }
 
-        public ShowBcColCommand(InventoryUpdaterVM vm)
-        {
-            VM = vm;
-        }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            InventoryUpdaterVM.BcInfo();
-        }
+    public void Execute(object parameter)
+    {
+        InventoryUpdaterVM.BcInfo();
     }
 }

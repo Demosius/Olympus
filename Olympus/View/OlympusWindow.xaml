@@ -40,6 +40,14 @@
                           Command="{Binding GenerateMasterSkuListCommand}"/>
                 
             </MenuItem>
+            <MenuItem Header="User">
+                <MenuItem Name="Log"
+                          Header="{Binding UserHandlerVM.ButtonString, UpdateSourceTrigger=PropertyChanged}"
+                          Command="{Binding UserHandlerVM.UserCommand}"
+                          CommandParameter="{Binding UserHandlerVM.ButtonString}"/>
+                <MenuItem Header="Change Password"
+                          Command="{Binding ChangePasswordCommand}"/>
+            </MenuItem>
         </Menu>
 
         <ToolBarTray DockPanel.Dock="Top" />

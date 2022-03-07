@@ -1,17 +1,16 @@
 ﻿using Uranus.Staff.Model;
 
-namespace AionClock.View
+namespace AionClock.View;
+
+/// <summary>
+/// Interaction logic for ClockConfirmationView.xaml
+/// </summary>
+public partial class ClockConfirmationView
 {
-    /// <summary>
-    /// Interaction logic for ClockConfirmationView.xaml
-    /// </summary>
-    public partial class ClockConfirmationView
+    public ClockConfirmationView(Employee employee)
     {
-        public ClockConfirmationView(Employee employee)
-        {
-            InitializeComponent();
-            VM.Employee = employee;
-            VM.SetDisplay();
-        }
+        InitializeComponent();
+        VM.Employee = employee;
+        VM.SetDisplay();
     }
 }

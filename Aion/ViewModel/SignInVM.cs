@@ -3,71 +3,70 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Uranus.Staff.Model;
 
-namespace Aion.ViewModel
+namespace Aion.ViewModel;
+
+public class SignInVM : INotifyPropertyChanged
 {
-    public class SignInVM : INotifyPropertyChanged
+
+
+    private ObservableCollection<Employee> managers;
+    public ObservableCollection<Employee> Managers 
     {
-
-
-        private ObservableCollection<Employee> managers;
-        public ObservableCollection<Employee> Managers 
+        get => managers; 
+        set
         {
-            get => managers; 
-            set
-            {
-                managers = value;
-                OnPropertyChanged(nameof(Managers));
-            }
+            managers = value;
+            OnPropertyChanged(nameof(Managers));
         }
+    }
 
-        private Employee selectedManager;
-        public Employee SelectedManager
+    private Employee selectedManager;
+    public Employee SelectedManager
+    {
+        get  => selectedManager; 
+        set 
         {
-            get  => selectedManager; 
-            set 
-            {
-                selectedManager = value;
-                OnPropertyChanged(nameof(SelectedManager));
-                Code = "";
-            }
+            selectedManager = value;
+            OnPropertyChanged(nameof(SelectedManager));
+            Code = "";
         }
+    }
 
-        private string code;
-        public string Code
+    private string code;
+    public string Code
+    {
+        get => code;
+        set
         {
-            get => code;
-            set
-            {
-                code = value;
-                OnPropertyChanged(nameof(Code));
-            }
+            code = value;
+            OnPropertyChanged(nameof(Code));
         }
+    }
 
-        // Command(s)
-        public SignInCommand SignInCommand { get; set; }
+    // Command(s)
+    public SignInCommand SignInCommand { get; set; }
 
-        public SignInVM()
-        {
-            Managers = new(App.Helios.StaffReader.GetManagers());
-            SignInCommand = new(this);
-        }
+    public SignInVM()
+    {
+        Managers = new ObservableCollection<Employee>(App.Helios.StaffReader.GetManagers());
+        SignInCommand = new SignInCommand(this);
+    }
 
-        /// <summary>
-        /// Compares input code to Selected manager.
-        /// </summary>
-        /// <returns>Bool: true if Code is correct, otherwise - false.</returns>
-        public bool SignIn()
-        {
-            if (SelectedManager is null || Code?.Length <= 0) return false;
-            _ = int.TryParse(Code, out var tryID);
-            return SelectedManager.ID == tryID;
-        }
+    /// <summary>
+    /// Compares input code to Selected manager.
+    /// </summary>
+    /// <returns>Bool: true if Code is correct, otherwise - false.</returns>
+    public bool SignIn()
+    {
+        if (SelectedManager is null || Code?.Length <= 0) return false;
+        _ = int.TryParse(Code, out var tryID);
+        return SelectedManager.ID == tryID;
+    }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler PropertyChanged;
 
-        private void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new(propertyName));
-        }
+    private void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

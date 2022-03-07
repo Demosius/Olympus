@@ -1,13 +1,12 @@
-﻿namespace Phoenix.View
+﻿namespace Phoenix.View;
+
+/// <summary>
+/// Interaction logic for PhoenixWindow.xaml
+/// </summary>
+public partial class PhoenixWindow
 {
-    /// <summary>
-    /// Interaction logic for PhoenixWindow.xaml
-    /// </summary>
-    public partial class PhoenixWindow
+    public PhoenixWindow()
     {
-        public PhoenixWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

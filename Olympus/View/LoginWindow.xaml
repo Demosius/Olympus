@@ -25,8 +25,9 @@
         </WrapPanel>
         <TextBox Name="TxtUser"
                  Text="{Binding UserID}"/>
-        <Label Target="{Binding ElementName=txtPassword}">_Password</Label>
-        <PasswordBox PasswordChanged="PasswordBox_PasswordChanged"/>
+        <Label Target="{Binding ElementName=TxtPassword}">_Password</Label>
+        <PasswordBox Name="TxtPassword" 
+                     PasswordChanged="PasswordBox_PasswordChanged"/>
         <StackPanel Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Right">
             <Button IsCancel="True"
                     Content="_Cancel"/>

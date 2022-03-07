@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows7.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>AionClock.ico</ApplicationIcon>
     <Version>0.5.0</Version>
@@ -10,6 +10,7 @@
     <Company>Olympus</Company>
     <Configurations>Debug;Release;ClockDebug</Configurations>
     <SignAssembly>true</SignAssembly>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
   <ItemGroup>

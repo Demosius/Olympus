@@ -1,7 +1,6 @@
-﻿namespace Uranus.Equipment.Model
+﻿namespace Uranus.Equipment.Model;
+
+public class Stockpicker : Machine
 {
-    public class Stockpicker : Machine
-    {
-        public bool HighReach() => Type.AccessLevel == Inventory.EAccessLevel.HighReach;
-    }
+    public bool HighReach() => Type.AccessLevel == Inventory.EAccessLevel.HighReach;
 }

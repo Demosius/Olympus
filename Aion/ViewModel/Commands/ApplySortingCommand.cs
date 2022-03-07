@@ -3,31 +3,30 @@ using System;
 using System.Windows.Input;
 using Aion.ViewModel.Interfaces;
 
-namespace Aion.ViewModel.Commands
+namespace Aion.ViewModel.Commands;
+
+public class ApplySortingCommand : ICommand
 {
-    public class ApplySortingCommand : ICommand
+    public IFilters VM { get; set; }
+
+    public ApplySortingCommand(IFilters vm)
     {
-        public IFilters VM { get; set; }
+        VM = vm;
+    }
 
-        public ApplySortingCommand(IFilters vm)
-        {
-            VM = vm;
-        }
+    public bool CanExecute(object? parameter)
+    {
+        return true;
+    }
 
-        public bool CanExecute(object? parameter)
-        {
-            return true;
-        }
+    public void Execute(object? parameter)
+    {
+        VM.ApplySorting();
+    }
 
-        public void Execute(object? parameter)
-        {
-            VM.ApplySorting();
-        }
-
-        public event EventHandler? CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
+    public event EventHandler? CanExecuteChanged
+    {
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
     }
 }

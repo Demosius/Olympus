@@ -4,7 +4,6 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:vm="clr-namespace:Aion.ViewModel"
-      xmlns:sys="clr-namespace:System;assembly=System.Runtime"
       mc:Ignorable="d" 
       d:DesignHeight="1080" d:DesignWidth="1920"
       Title="EmployeePage">
@@ -42,13 +41,6 @@
                 <Setter Property="HorizontalContentAlignment"
                         Value="Center" />
             </Style>
-            <ObjectDataProvider x:Key="EmployeeSortOptions"
-                                MethodName="GetValues" 
-                                ObjectType="{x:Type sys:Enum}">
-                <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="vm:EEmployeeSortOption"/>
-                </ObjectDataProvider.MethodParameters>
-            </ObjectDataProvider>
         </DockPanel.Resources>
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar Name="FilterBar" ToolTip="Filters">
@@ -128,7 +120,8 @@
         <Grid DockPanel.Dock="Right">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto" MinHeight="200"/>
+                <RowDefinition Height="Auto" 
+                               MinHeight="200"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>

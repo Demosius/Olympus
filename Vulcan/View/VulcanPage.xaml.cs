@@ -1,25 +1,24 @@
 ﻿using Uranus.Staff;
 using Uranus;
 
-namespace Vulcan.View
+namespace Vulcan.View;
+
+/// <summary>
+/// Interaction logic for VulcanPage.xaml
+/// </summary>
+public partial class VulcanPage : IProject
 {
-    /// <summary>
-    /// Interaction logic for VulcanPage.xaml
-    /// </summary>
-    public partial class VulcanPage : IProject
+    public VulcanPage()
     {
-        public VulcanPage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        public EProject Project => EProject.Vulcan;
+    public EProject Project => EProject.Vulcan;
 
-        public static bool RequiresUser => false;
+    public static bool RequiresUser => false;
 
-        public void RefreshData()
-        {
-            VM.RefreshData();
-        }
+    public void RefreshData()
+    {
+        VM.RefreshData();
     }
 }

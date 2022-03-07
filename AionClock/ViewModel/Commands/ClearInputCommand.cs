@@ -1,28 +1,27 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace AionClock.ViewModel.Commands
+namespace AionClock.ViewModel.Commands;
+
+public class ClearInputCommand : ICommand
 {
-    public class ClearInputCommand : ICommand
+    public ClockInVM VM { get; set; }
+
+    public ClearInputCommand(ClockInVM vm) { VM = vm; }
+
+    public event EventHandler CanExecuteChanged
     {
-        public ClockInVM VM { get; set; }
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
+    }
 
-        public ClearInputCommand(ClockInVM vm) { VM = vm; }
+    public bool CanExecute(object parameter)
+    {
+        return true;
+    }
 
-        public event EventHandler CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
-
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public void Execute(object parameter)
-        {
-            VM.Input = "";
-        }
+    public void Execute(object parameter)
+    {
+        VM.Input = "";
     }
 }

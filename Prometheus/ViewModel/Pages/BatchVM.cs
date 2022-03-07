@@ -1,7 +1,6 @@
-﻿namespace Prometheus.ViewModel.Pages
-{
-    public class BatchVM
-    {
+﻿namespace Prometheus.ViewModel.Pages;
 
-    }
+public class BatchVM
+{
+
 }
