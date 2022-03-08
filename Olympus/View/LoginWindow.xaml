@@ -25,7 +25,7 @@
         </WrapPanel>
         <TextBox Name="TxtUser"
                  Text="{Binding UserID}"/>
-        <Label Target="{Binding ElementName=TxtPassword}">_Password</Label>
+        <Label Target="{Binding ElementName=TxtPassword, Mode=OneWay}">_Password</Label>
         <PasswordBox Name="TxtPassword" 
                      PasswordChanged="PasswordBox_PasswordChanged"/>
         <StackPanel Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Right">

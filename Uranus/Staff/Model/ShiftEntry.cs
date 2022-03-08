@@ -29,6 +29,7 @@ public class ShiftEntry : INotifyPropertyChanged
         get => shiftStartTime;
         set
         {
+            if (!DateTime.TryParse(value, out _)) value = "";
             shiftStartTime = value;
             OnPropertyChanged(nameof(ShiftStartTime));
         }
@@ -40,6 +41,7 @@ public class ShiftEntry : INotifyPropertyChanged
         get => shiftEndTime;
         set
         {
+            if (!DateTime.TryParse(value, out _)) value = "";
             shiftEndTime = value;
             OnPropertyChanged(nameof(ShiftEndTime));
         }
@@ -51,6 +53,7 @@ public class ShiftEntry : INotifyPropertyChanged
         get => lunchStartTime;
         set
         {
+            if (!DateTime.TryParse(value, out _)) value = "";
             lunchStartTime = value;
             OnPropertyChanged(nameof(lunchStartTime));
         }
@@ -62,6 +65,7 @@ public class ShiftEntry : INotifyPropertyChanged
         get => lunchEndTime;
         set
         {
+            if (!DateTime.TryParse(value, out _)) value = "";
             lunchEndTime = value;
             OnPropertyChanged(nameof(LunchEndTime));
         }
@@ -265,7 +269,7 @@ public class ShiftEntry : INotifyPropertyChanged
 
     public override bool Equals(object obj)
     {
-        if (obj is not ClockEvent other)
+        if (obj is not ShiftEntry other)
         {
             return false;
         }

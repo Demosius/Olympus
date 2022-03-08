@@ -5,14 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using Aion.Annotations;
+using Aion.ViewModel.Utility;
 using CsvHelper;
 using Ookii.Dialogs.Wpf;
 using Styx;
@@ -686,11 +689,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
             var exportFileName = $"{ExportString}_[{DateTime.Now:yyyy-MM-dd-HHmm}].csv";
             var fullFilePath = Path.Combine(exportLocation, exportFileName);
 
-            using (var writer = new StreamWriter(fullFilePath))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-            {
-                csv.WriteRecords(Entries);
-            }
+           GetDataTableFromEntries().WriteToCsvFile(fullFilePath);
 
             // Success.
             MessageBox.Show($"Successfully Exported to file:\n\n{fullFilePath}", "Success", MessageBoxButton.OK, MessageBoxImage.Asterisk);
@@ -700,13 +699,52 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
             // Failure.
             MessageBox.Show($"Failed to export file.\n\n{ex}", "Failure", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
 
+    private DataTable GetDataTableFromEntries()
+    {
+        var dt = new DataTable();
+
+        dt.Columns.Add(new DataColumn("Associate Number"));
+        dt.Columns.Add(new DataColumn("Name"));
+        dt.Columns.Add(new DataColumn("Location"));
+        dt.Columns.Add(new DataColumn("Date"));
+        dt.Columns.Add(new DataColumn("Day"));
+        dt.Columns.Add(new DataColumn("In"));
+        dt.Columns.Add(new DataColumn("Out (Lunch)"));
+        dt.Columns.Add(new DataColumn("In (Lunch)"));
+        dt.Columns.Add(new DataColumn("Out"));
+        dt.Columns.Add(new DataColumn("Shift\n(D/M/A)"));
+        dt.Columns.Add(new DataColumn("Total"));
+        dt.Columns.Add(new DataColumn("Time Worked"));
+        dt.Columns.Add(new DataColumn("Comments"));
+
+        foreach (var shiftEntry in Entries)
+        {
+            var row = dt.NewRow();
+            row["Associate Number"] = shiftEntry.EmployeeID;
+            row["Name"] = shiftEntry.EmployeeName;
+            row["Location"] = shiftEntry.Location;
+            row["Date"] = shiftEntry.Date;
+            row["Day"] = shiftEntry.Day;
+            if (DateTime.TryParse(shiftEntry.ShiftStartTime, out var time)) row["In"] = time.ToString("HH:mm");
+            if (DateTime.TryParse(shiftEntry.LunchStartTime, out time)) row["Out (Lunch)"] = time.ToString("HH:mm");
+            if (DateTime.TryParse(shiftEntry.LunchEndTime, out time)) row["In (Lunch)"] = time.ToString("HH:mm");
+            if (DateTime.TryParse(shiftEntry.ShiftEndTime, out time)) row["Out"] = time.ToString("HH:mm");
+            row["Shift\n(D/M/A)"] = shiftEntry.ShiftType;
+            row["Total"] = shiftEntry.TimeTotal;
+            row["Time Worked"] = $"{shiftEntry.HoursWorked:#,##0.00}";
+            row["Comments"] = shiftEntry.Comments;
+            dt.Rows.Add(row);
+        }
+
+        return dt;
     }
 
     public void LaunchShiftCreator()
     {
         EntryCreationWindow entryCreator = new(Helios, this);
-        entryCreator.Show();
+        entryCreator.ShowDialog();
         ApplySorting();
     }
 
@@ -844,11 +882,10 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
                 {
                     if (!entryDict.ContainsKey((employee.ID, checkDate.ToString("yyyy-MM-dd"))))
                     {
-                        if (FullClockDictionary.TryGetValue((employee.ID, checkDate.ToString("yyyy-MM-dd")),
-                                out var clockEvents))
-                            FullEntries.Add(new ShiftEntry(employee, clockEvents) { Comments = comment });
-                        else
-                            FullEntries.Add(new ShiftEntry(employee, checkDate) { Comments = comment });
+                        FullEntries.Add(FullClockDictionary.TryGetValue((employee.ID, checkDate.ToString("yyyy-MM-dd")),
+                            out var clockEvents)
+                            ? new ShiftEntry(employee, clockEvents) {Comments = comment}
+                            : new ShiftEntry(employee, checkDate) {Comments = comment});
 
                         newEntries = true;
                     }

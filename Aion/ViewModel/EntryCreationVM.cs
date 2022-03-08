@@ -226,7 +226,15 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
             return;
         }
 
-        ShiftEntry shiftEntry = new(SelectedEmployee, SelectedDate);
+        ShiftEntry shiftEntry = new(SelectedEmployee, SelectedDate)
+        {
+            ShiftStartTime = StartShiftTime,
+            ShiftEndTime = EndShiftTime,
+            LunchStartTime = StartLunchTime,
+            LunchEndTime = EndLunchTime,
+            Comments = Comment
+        };
+        shiftEntry.SummarizeShift();
         AddEntry(shiftEntry);
         Entries = new ObservableCollection<ShiftEntry>(Entries.OrderBy(e => e.Date));
 
@@ -273,6 +281,8 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
 
         MinDate = EditorVM.MinDate;
         MaxDate = EditorVM.MaxDate;
+
+        SetEntries();
     }
 
     /// <summary>
@@ -281,8 +291,8 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
     /// </summary>
     public void ConfirmAll()
     {
-        EditorVM.AddEntries(newEntries);
         EditorVM.RemoveEntries(deletedEntries);
+        EditorVM.AddEntries(newEntries);
         SetEntries();
     }
 

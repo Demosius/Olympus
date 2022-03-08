@@ -57,7 +57,6 @@ public static class OldDataUtil
 
     public static Employee ConvertEmployee(BrokeEmployee employee)
     {
-        Debug.Assert(employee.EmploymentType != "PP - Part-time Permanent");
         Enum.TryParse(typeof(EEmploymentType), (employee.EmploymentType ?? "CA")[..2], true, out var result);
         var eType = (EEmploymentType)(result ?? EEmploymentType.CA.ToString());
         return new Employee
