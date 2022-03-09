@@ -103,7 +103,7 @@ public class DBManager : INotifyPropertyChanged
     {
         var path = SelectFolder();
         // Empty string means cancellation.
-        if (path == "") return;
+        if (path is null or "") return;
 
         // Make sure directory exists.
         if (!Directory.Exists(path))
@@ -173,9 +173,7 @@ public class DBManager : INotifyPropertyChanged
         var path = SelectFolder();
         SetSol(path);
 
-        if (CheckSolExistence(path)) return "";
-
-        return path;
+        return CheckSolExistence(path) ? "" : path;
     }
 
     /// <summary>

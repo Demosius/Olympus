@@ -1,12 +1,12 @@
-﻿using Aion.ViewModel.Commands;
+﻿using Aion.View;
+using Aion.ViewModel.Commands;
+using Aion.ViewModel.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using Aion.View;
-using Aion.ViewModel.Interfaces;
 using Uranus;
 using Uranus.Staff.Model;
 
@@ -18,7 +18,7 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
 
     private List<ShiftEntry> newEntries = new();
     private List<ShiftEntry> deletedEntries = new();
-        
+
     public ShiftEntryPageVM EditorVM { get; set; }
 
     private ObservableCollection<Employee> employees;
@@ -208,7 +208,7 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
             Entries = new ObservableCollection<ShiftEntry>(EditorVM.FullEntries.Where(s => s.EmployeeID == selectedEmployee.ID).OrderBy(s => s.Date));
         else
             Entries = new ObservableCollection<ShiftEntry>();
-            
+
         newEntries = new List<ShiftEntry>();
         deletedEntries = new List<ShiftEntry>();
     }

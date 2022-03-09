@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -10,7 +11,16 @@ namespace Olympus.ViewModel;
 
 internal class ChangePasswordVM : INotifyPropertyChanged
 {
-    public Charon Charon { get; set; }
+    private Charon charon;
+    public Charon Charon
+    {
+        get => charon;
+        set
+        {
+            charon = value;
+            OnPropertyChanged(nameof(Charon));
+        }
+    }
         
     private string currentPassword;
     public string CurrentPassword

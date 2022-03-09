@@ -1,4 +1,5 @@
-﻿using Styx;
+﻿using System.Windows.Input;
+using Styx;
 using Uranus;
 using Uranus.Staff;
 
@@ -12,6 +13,21 @@ public partial class AionPage : IProject
     public AionPage(Helios helios, Charon charon)
     {
         InitializeComponent();
+
+        KeyGesture backKeyGesture = null;
+        foreach (InputGesture browseBackInputGesture in NavigationCommands.BrowseBack.InputGestures)
+        {
+            if (browseBackInputGesture is KeyGesture {Key: Key.Back, Modifiers: ModifierKeys.None} keyGesture)
+            {
+                backKeyGesture = keyGesture;
+            }
+        }
+
+        if (backKeyGesture != null)
+        {
+            NavigationCommands.BrowseBack.InputGestures.Remove(backKeyGesture);
+        }
+
         VM.SetDataSources(helios, charon);
     }
 
