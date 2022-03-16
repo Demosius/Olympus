@@ -1,21 +1,23 @@
-﻿using Uranus.Staff.Model;
-using SQLite;
+﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
+using Uranus.Staff.Model;
 
 namespace Uranus.Users.Model;
 
 public class User
 {
-    [PrimaryKey]
-    public int ID { get; set; }
-    [ForeignKey(typeof(Role))]
-    public string RoleName { get; set; }
+    [PrimaryKey] public int ID { get; set; }
+    [ForeignKey(typeof(Role))] public string RoleName { get; set; }
 
-    private Role role;
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Role Role { get => role; set { role = value; RoleName = value.Name; } }
+    [ManyToOne(nameof(RoleName), nameof(Model.Role.Users), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public Role Role { get; set; }
 
     [Ignore]
     public Employee Employee { get; set; }
 
+    public void SetRole(Role role)
+    {
+        Role = role;
+        RoleName = role.Name;
+    }
 }

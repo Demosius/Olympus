@@ -6,8 +6,7 @@ namespace Uranus.Users.Model;
 
 public class Role
 {
-    [PrimaryKey]
-    public string Name { get; set; }
+    [PrimaryKey] public string Name { get; set; }
 
     // Use int to refer to the difference between the user and the target user employee levels.
     public int CreateUser { get; set; }
@@ -53,7 +52,7 @@ public class Role
     public bool CopyDatabase { get; set; }  // Most
     public bool MoveDatabase { get; set; }  // Only db admin/manager.
 
-    [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToMany(nameof(User.RoleName), nameof(User.Role), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<User> Users { get; set; }
 
     public void SetDefault()
