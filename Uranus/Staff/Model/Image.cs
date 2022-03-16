@@ -6,17 +6,15 @@ namespace Uranus.Staff.Model;
 
 public class Image
 {
-    [PrimaryKey]
-    public string Name { get; set; }
+    [PrimaryKey] public string Name { get; set; }
     public string FileName { get; set; }
 
     private string fullPath;
-    [Ignore]
-    public string FullPath 
+    [Ignore] public string FullPath 
     {
         get
         {
-            if ((fullPath ?? "") == "")
+            if (fullPath is null or "")
                 fullPath = GetImageFilePath();
             return fullPath;
         }

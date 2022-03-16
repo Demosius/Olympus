@@ -19,10 +19,8 @@ public enum EClockStatus
 /// </summary>
 public class ClockEvent : IEquatable<ClockEvent>, INotifyPropertyChanged
 {
-    [PrimaryKey]
-    public Guid ID { get; set; }
-    [ForeignKey(typeof(Employee))]
-    public int EmployeeID { get; set; }
+    [PrimaryKey] public Guid ID { get; set; }
+    [ForeignKey(typeof(Employee))] public int EmployeeID { get; set; }
     public string Timestamp { get; set; }
 
     private string date;
@@ -38,20 +36,18 @@ public class ClockEvent : IEquatable<ClockEvent>, INotifyPropertyChanged
         get => time ??= DateTime.Parse(Timestamp).ToString("HH:mm:ss");
         set
         {
-            time = value.Replace('_', '0');; 
+            time = value.Replace('_', '0');
             OnPropertyChanged(nameof(Time));
         }
     }
 
     public EClockStatus Status { get; set; }
 
-    [ManyToOne(inverseProperty: "ClockTimes")]
+    [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.ClockEvents), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Employee Employee { get; set; }
 
-    [Ignore]
-    public DateTime DtDate => DateTime.Parse(Date).Date;
-    [Ignore]
-    public TimeSpan DtTime => DateTime.Parse(Time).TimeOfDay;
+    [Ignore] public DateTime DtDate => DateTime.Parse(Date).Date;
+    [Ignore] public TimeSpan DtTime => DateTime.Parse(Time).TimeOfDay;
 
     public ClockEvent()
     {
@@ -183,7 +179,7 @@ public class ClockEvent : IEquatable<ClockEvent>, INotifyPropertyChanged
 
     // ReSharper disable once NonReadonlyMemberInGetHashCode
     public override int GetHashCode() => ID.GetHashCode();
-        
+
     // Property changed event handling.
     public event PropertyChangedEventHandler PropertyChanged;
 

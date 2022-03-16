@@ -27,8 +27,8 @@ public class LogInCommand : ICommand
         if (!VM.LogIn()) return;
 
         var w = parameter as Window;
+        PantheonWindow pw = new(App.Charon, App.Helios);
         w?.Close();
-        PantheonWindow pw = new();
         pw.Show();
     }
 }

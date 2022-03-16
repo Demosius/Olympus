@@ -3,14 +3,30 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Pantheon.ViewModel"
         mc:Ignorable="d"
-        Title="Pantheon" Height="450" Width="800">
+        Title="Pantheon" MinHeight="450" MinWidth="800"
+        WindowState="Maximized">
+    <Window.DataContext>
+        <vm:AppVM x:Name="VM"/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Dark Theme -->
+                <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File"/>
             <MenuItem Header="User"/>
         </Menu>
-        <Frame Source="./PantheonPage.xaml"
+        <Frame Content="{Binding PantheonPage}"
                Height="Auto" 
                HorizontalAlignment="Stretch" 
                VerticalAlignment="Stretch"

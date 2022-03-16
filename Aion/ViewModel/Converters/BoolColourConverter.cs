@@ -11,8 +11,7 @@ public class BoolColourConverter : IValueConverter
     {
         if (value != null && (bool)value)
             return new SolidColorBrush(Colors.Green);
-        else
-            return new SolidColorBrush(Colors.Red);
+        return new SolidColorBrush(Colors.Red);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

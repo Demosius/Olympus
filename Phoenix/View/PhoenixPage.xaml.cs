@@ -1,14 +1,13 @@
 ﻿using Uranus.Staff;
 using System;
-using System.Windows.Controls;
-using Uranus;
+using Uranus.Interfaces;
 
 namespace Phoenix.View;
 
 /// <summary>
 /// Interaction logic for TorchPage.xaml
 /// </summary>
-public partial class PhoenixPage : Page, IProject
+public partial class PhoenixPage : IProject
 {
     public PhoenixPage()
     {

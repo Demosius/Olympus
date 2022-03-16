@@ -1,25 +1,22 @@
 ﻿using SQLiteNetExtensions.Attributes;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Uranus.Staff.Model;
 
 public class ProjectIcon : Image
 {
-    [ForeignKey(typeof(Project))]
-    public string ProjectName { get; set; }
-
-    [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Project Project { get; set; }
+    [OneToMany(nameof(Project.IconName), nameof(Project.Icon), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<Project> Projects { get; set; }
 
     public ProjectIcon() { }
 
     // Creation of a new project icon with an already specified project.
     public ProjectIcon(Project project, string iconFileName)
     {
-        Project = project;
+        Projects = new List<Project> { project };
         FileName = iconFileName;
-        ProjectName = project.Name;
-        Name = ProjectName;
+        Name = project.Name;
     }
 
     public void SetImageFilePath(StaffReader reader)

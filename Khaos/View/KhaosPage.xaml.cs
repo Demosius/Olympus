@@ -1,6 +1,6 @@
 ﻿using Uranus.Staff;
 using System;
-using Uranus;
+using Uranus.Interfaces;
 
 namespace Khaos.View;
 

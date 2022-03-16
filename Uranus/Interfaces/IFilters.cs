@@ -1,6 +1,6 @@
-﻿using Aion.ViewModel.Commands;
+﻿using Uranus.Commands;
 
-namespace Aion.ViewModel.Interfaces;
+namespace Uranus.Interfaces;
 
 public interface IFilters
 {

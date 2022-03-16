@@ -1,9 +1,8 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using Aion.Annotations;
+using Aion.Properties;
 using Olympus.ViewModel.Commands;
 using Styx;
 

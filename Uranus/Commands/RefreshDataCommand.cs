@@ -1,20 +1,18 @@
-﻿using Aion.ViewModel.Interfaces;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Uranus.Interfaces;
 
-namespace Aion.ViewModel.Commands;
+namespace Uranus.Commands;
 
 public class RefreshDataCommand : ICommand
 {
     public IDBInteraction VM { get; set; }
 
     public RefreshDataCommand(IDBInteraction vm) { VM = vm; }
-
-    public event EventHandler CanExecuteChanged
-    {
-        add => CommandManager.RequerySuggested += value;
-        remove => CommandManager.RequerySuggested -= value;
-    }
+    
+#pragma warning disable 67
+    public event EventHandler CanExecuteChanged;
+#pragma warning restore 67
 
     public bool CanExecute(object parameter)
     {

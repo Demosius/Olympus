@@ -1,6 +1,8 @@
 ﻿using Uranus.Staff;
 using System;
+using Styx;
 using Uranus;
+using Uranus.Interfaces;
 
 namespace Pantheon.View;
 
@@ -10,9 +12,10 @@ namespace Pantheon.View;
 public partial class PantheonPage : IProject
 
 {
-    public PantheonPage()
+    public PantheonPage(Charon charon, Helios helios)
     {
         InitializeComponent();
+        VM.SetDataSources(charon, helios);
     }
 
     public EProject Project => EProject.Pantheon;

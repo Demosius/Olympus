@@ -9,12 +9,28 @@
         Title="Log In" Height="350" Width="400"
         Background="#333"
         FocusManager.FocusedElement="{Binding ElementName=UserBox}">
-    
+
     <Window.DataContext>
         <vm:LoginVM x:Name="VM"/>
     </Window.DataContext>
-    
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Dark Theme -->
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Grid Margin="15">
+        <Grid.Resources>
+            <Style TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="MinWidth" Value="70"/>
+            </Style>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -49,11 +65,5 @@
                     CommandParameter="{Binding ElementName=LogInWindow}"/>
         </StackPanel>
     </Grid>
-    
-    <Window.Resources>
-        <Style TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="MinWidth" Value="70"/>
-        </Style>
-    </Window.Resources>
+
 </Window>

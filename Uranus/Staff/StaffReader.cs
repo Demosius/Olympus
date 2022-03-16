@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Serilog;
 
 namespace Uranus.Staff;
 
@@ -31,6 +32,8 @@ public class StaffReader
 
     public int EmployeeCount() => Chariot.Database.Execute("SELECT count(*) FROM Employee;");
 
+    public Role Role(string roleName, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Role>(roleName, pullType);
+    
     public List<ClockEvent> ClockEvents(Expression<Func<ClockEvent, bool>> filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
@@ -115,6 +118,90 @@ public class StaffReader
             if (returnDict.ContainsKey(report.ID)) continue;
             returnDict.Add(report.ID, report);
             GetReports(report, ref returnDict);
+        }
+    }
+
+    /// <summary>
+    /// Get all the employees that recursively have roles that report to the given role.
+    /// </summary>
+    /// <param name="headRole">The role of the employee for whom we are gathering reporting employees.</param>
+    /// <returns></returns>
+    public IEnumerable<Employee> GetReportsByRole(Role headRole)
+    {
+        var roles = GetReportingRoles(headRole);
+        var employees = roles.SelectMany(r => r.Employees ?? new List<Employee>());
+        
+        return employees;
+    }
+
+    /// <summary>
+    /// Get all the reporting roles based on the given role.
+    /// </summary>
+    /// <param name="headRole"></param>
+    /// <returns>A collection of roles, each of which containing the relevant employees.</returns>
+    public IEnumerable<Role> GetReportingRoles(Role headRole)
+    {
+        Dictionary<string, Role> roleDict = null;
+        Dictionary<string, List<Employee>> employeeDict = null;
+
+        try
+        {
+            Chariot.Database.RunInTransaction(() =>
+            {
+                roleDict = Chariot.PullObjectList<Role>()
+                    .ToDictionary(r => r.Name, r => r);
+                employeeDict = Employees(pullType: EPullType.IncludeChildren)
+                    .GroupBy(e => e.RoleName)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+            });
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Unable to pull Roles and/or Employees from {}, defaulting to empty.",Chariot.DatabaseName);
+            roleDict = new Dictionary<string, Role>();
+            employeeDict = new Dictionary<string, List<Employee>>();
+        }
+
+        if (roleDict is null || employeeDict is null) return new List<Role>();
+
+        foreach (var (_, role) in roleDict)
+        {
+            if (roleDict.TryGetValue(role.ReportsToRoleName, out var upperRole))
+                upperRole.AddReportingRole(role);
+        }
+
+        foreach (var (roleName,employees) in employeeDict)
+        {
+            if (roleDict.TryGetValue(roleName, out var role))
+                role.AddEmployees(employees);
+        }
+
+        roleDict.TryGetValue(headRole.Name, out headRole);
+
+        roleDict.Clear();
+
+        GetRoleReports(headRole, ref roleDict);
+
+        return roleDict.Values;
+    }
+
+    /// <summary>
+    /// Recursively go through the roles and their reports to return a full dictionary of
+    /// roles.
+    /// </summary>
+    /// <param name="role">The role as a starting point to get reports.</param>
+    /// <param name="returnDict">A dictionary of reports</param>
+    private static void GetRoleReports(Role role, ref Dictionary<string, Role> returnDict)
+    {
+        returnDict ??= new Dictionary<string, Role>();
+
+        if (role.Reports is null) return;
+
+        foreach (var report in role.Reports)
+        {
+            if (returnDict.ContainsKey(report.Name)) continue;
+            returnDict.Add(report.Name, report);
+            GetRoleReports(report, ref returnDict);
         }
     }
 
@@ -263,6 +350,78 @@ public class StaffReader
     /* DEPARTMENTS */
     public List<Department> Departments(Expression<Func<Department, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
+    /// <summary>
+    /// Pulls all relevant sub departments according to the given department name.
+    /// Will also fill relevant department data, such as shifts.
+    /// </summary>
+    /// <param name="departmentName"></param>
+    /// <returns></returns>
+    public IEnumerable<Department> SubDepartments(string departmentName)
+    {
+        Dictionary<string, Department> deptDict = null;
+        Dictionary<string, List<Shift>> shiftDict = null;
+
+        try
+        {
+            Chariot.Database.RunInTransaction(() =>
+            {
+                deptDict = Chariot.PullObjectList<Department>().ToDictionary(d => d.Name, d => d);
+                shiftDict = Chariot.PullObjectList<Shift>()
+                    .GroupBy(s => s.DepartmentName)
+                    .ToDictionary(g => g.Key, g => g.ToList());
+            });
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to pull shift and/or department data from {}. Defaulted to null values.", Chariot.DatabaseName);
+            deptDict = new Dictionary<string, Department>();
+            shiftDict = new Dictionary<string, List<Shift>>();
+        }
+
+        if (deptDict is null || shiftDict is null) return Array.Empty<Department>();
+
+        foreach (var (deptName, shifts) in shiftDict)
+        {
+            if (deptDict.TryGetValue(deptName, out var department))
+                department.AddShifts(shifts);
+        }
+
+        foreach (var (_, department) in deptDict)
+        {
+            if (deptDict.TryGetValue(department.OverDepartmentName ?? "", out var overDepartment))
+                overDepartment.AddSubDepartment(department);
+        }
+
+        deptDict.TryGetValue(departmentName, out var headDepartment);
+
+        deptDict.Clear();
+
+        GetSubDepartments(headDepartment, ref deptDict);
+
+        deptDict.Add(departmentName, headDepartment);
+
+        return deptDict.Select(d => d.Value);
+    }
+
+    /// <summary>
+    /// Gets a dict of departments that are all  recursively under the given (potential) head department.
+    /// </summary>
+    /// <param name="department"></param>
+    /// <param name="returnDict"></param>
+    private static void GetSubDepartments(Department department, ref Dictionary<string, Department> returnDict)
+    {
+        returnDict ??= new Dictionary<string, Department>();
+
+        if (department.SubDepartments is null) return;
+
+        foreach (var sub in department.SubDepartments)
+        {
+            if (returnDict.ContainsKey(sub.Name)) continue;
+            returnDict.Add(sub.Name, sub);
+            GetSubDepartments(sub, ref returnDict);
+        }
+    }
+
     /* PROJECTS */
     public IEnumerable<Project> Projects(Expression<Func<Project, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType).OrderBy(p => p.Name);
 
@@ -276,5 +435,21 @@ public class StaffReader
             newSet.ShiftEntries = ShiftEntries().ToDictionary(e => e.ID, e => e);
         });
         return newSet;
+    }
+
+    /// <summary>
+    /// Gets all of the shifts applicable to the current User - based on department.
+    /// </summary>
+    /// <param name="currentUser"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public IEnumerable<Shift> Shifts(Employee currentUser)
+    {
+        // Get a list of all relevant departments.
+        var departments = SubDepartments(currentUser.DepartmentName);
+
+
+
+        return departments.SelectMany(d => d.Shifts);
     }
 }

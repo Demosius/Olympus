@@ -1,18 +1,18 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
+using System.Collections.Generic;
 
 namespace Uranus.Staff.Model;
 
 public class TempTag
 {
-    [PrimaryKey]
     // ReSharper disable once InconsistentNaming
-    public string RF_ID { get; set; }
-    [ForeignKey(typeof(Employee))]
-    public int EmployeeID { get; set; }
+    [PrimaryKey] public string RF_ID { get; set; }
+    [ForeignKey(typeof(Employee))] public int EmployeeID { get; set; }
 
-    [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public TagUse TagUse { get; set; }
-    [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToMany(nameof(Model.TagUse.TempTagRFID), nameof(Model.TagUse.TempTag), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<TagUse> TagUse { get; set; }
+
+    [OneToOne(nameof(EmployeeID), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Employee Employee { get; set; }
 }

@@ -42,7 +42,7 @@
             <Label Content="Database:"/>
             <Label Content="{Binding DBManager.DBString}"/>
         </StatusBar>
-        <Frame Source="./AionPage.xaml"
+        <Frame Source="{Binding AionPage, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
            Height="Auto" 
            HorizontalAlignment="Stretch" 
            VerticalAlignment="Stretch"

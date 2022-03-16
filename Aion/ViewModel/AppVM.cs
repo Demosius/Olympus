@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Aion.Properties;
+using Aion.View;
 using Aion.ViewModel.Utility;
 
 namespace Aion.ViewModel;
@@ -7,10 +8,12 @@ namespace Aion.ViewModel;
 public class AppVM : INotifyPropertyChanged
 {
     public DBManager DBManager { get; set; }
+    public AionPage AionPage { get; set; }
 
     public AppVM()
     {
         DBManager = new DBManager(this);
+        AionPage = new AionPage(App.Helios, App.Charon);
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

@@ -208,7 +208,7 @@
 							</VisualStateGroup>
 						</VisualStateManager.VisualStateGroups>
 						<Rectangle x:Name="Bg" Grid.RowSpan="3" Fill="{StaticResource ScrollbarBackgroundBrush}" Margin="0" />
-						<RepeatButton x:Name="repeatButton" Command="{x:Static ScrollBar.LineUpCommand}" IsEnabled="True" Style="{StaticResource ScrollBarButtonStyle}" HorizontalAlignment="Center" />
+						<RepeatButton Grid.Row="0" x:Name="repeatButton" Command="{x:Static ScrollBar.LineUpCommand}" IsEnabled="True" Style="{StaticResource ScrollBarButtonStyle}" HorizontalAlignment="Center" />
 						<Track x:Name="PART_Track" IsDirectionReversed="true" IsEnabled="True" Grid.Row="1">
 							<Track.DecreaseRepeatButton>
 								<RepeatButton Command="{x:Static ScrollBar.PageUpCommand}" Style="{StaticResource ScrollBarPageButtonStyle}" />
@@ -274,7 +274,7 @@
 									</VisualStateGroup>
 								</VisualStateManager.VisualStateGroups>
 								<Rectangle x:Name="Bg" Grid.ColumnSpan="5" Fill="{StaticResource ScrollbarBackgroundBrush}" Margin="0" />
-								<RepeatButton x:Name="repeatButton" Command="{x:Static ScrollBar.LineLeftCommand}" IsEnabled="True" Style="{DynamicResource ScrollBarButtonStyle}" Opacity="1" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Center">
+								<RepeatButton Grid.Column="0" x:Name="repeatButton" Command="{x:Static ScrollBar.LineLeftCommand}" IsEnabled="True" Style="{DynamicResource ScrollBarButtonStyle}" Opacity="1" RenderTransformOrigin="0.5,0.5" VerticalAlignment="Center">
 									<RepeatButton.RenderTransform>
 										<TransformGroup>
 											<ScaleTransform />
@@ -442,8 +442,10 @@
 				</VisualStateGroup>
 			</VisualStateManager.VisualStateGroups>
 			<Rectangle x:Name="normal" Fill="{StaticResource ComboBoxBackgroundBrush}" Stroke="{StaticResource ComboBoxBorderBrush}" StrokeThickness="1" Grid.ColumnSpan="2" />
-			<Rectangle x:Name="hover" Fill="{StaticResource ComboBoxHoverBackgroundBrush}" Stroke="{StaticResource ComboBoxHoverBorderBrush}" StrokeThickness="1" Visibility="Collapsed" Grid.ColumnSpan="2" />
-			<Popup x:Name="PART_Popup" AllowsTransparency="true" Grid.ColumnSpan="2" IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}" Margin="1" PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}" Placement="Bottom">
+			<Rectangle x:Name="hover" Fill="{StaticResource ComboBoxHoverBackgroundBrush}" Stroke="{StaticResource ComboBoxHoverBorderBrush}" StrokeThickness="1" Visibility="Collapsed" Grid.ColumnSpan="2"
+                       Grid.Column="0" />
+			<Popup x:Name="PART_Popup" AllowsTransparency="true" Grid.ColumnSpan="2" Grid.Column="0"
+                   IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}" Margin="1" PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}" Placement="Bottom">
 				<Border x:Name="DropDownBorder" HorizontalAlignment="Stretch" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupBorderBrush}" BorderThickness="1" MaxHeight="{TemplateBinding MaxDropDownHeight}" MinWidth="{Binding ActualWidth, ElementName=MainGrid}" CornerRadius="2">
 					<ScrollViewer x:Name="DropDownScrollViewer" Style="{StaticResource ScrollViewerStyle}">
 						<Grid RenderOptions.ClearTypeHint="Enabled">
@@ -456,9 +458,11 @@
 				</Border>
 			</Popup>
 			<ToggleButton BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" Grid.Column="0" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxToggleButtonStyle}" />
-			<TextBox x:Name="PART_EditableTextBox" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxEditableTextBoxStyle}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Margin="0,0,31,0" VerticalAlignment="Center" />
-			<Rectangle x:Name="focused" Stroke="{StaticResource ComboBoxFocusedBorderBrush}" StrokeThickness="1" Visibility="Collapsed" Grid.ColumnSpan="2" />
-			<Rectangle x:Name="disabled" Fill="{StaticResource ComboBoxDisabledBackgroundBrush}" Visibility="Collapsed" Grid.ColumnSpan="2" />
+			<TextBox Grid.Column="0" x:Name="PART_EditableTextBox" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" IsReadOnly="{Binding IsReadOnly, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxEditableTextBoxStyle}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Margin="0,0,31,0" VerticalAlignment="Center" />
+			<Rectangle x:Name="focused" Stroke="{StaticResource ComboBoxFocusedBorderBrush}" StrokeThickness="1" Visibility="Collapsed" Grid.ColumnSpan="2"
+                       Grid.Column="0" />
+			<Rectangle x:Name="disabled" Fill="{StaticResource ComboBoxDisabledBackgroundBrush}" Visibility="Collapsed" Grid.ColumnSpan="2"
+                       Grid.Column="0" />
 		</Grid>
 	</ControlTemplate>
 
@@ -542,8 +546,10 @@
 							</VisualStateGroup>
 						</VisualStateManager.VisualStateGroups>
 						<Rectangle x:Name="normal" Fill="{StaticResource ComboBoxBackgroundBrush}" Stroke="{StaticResource ComboBoxBorderBrush}" StrokeThickness="1" Grid.ColumnSpan="2" />
-						<Rectangle x:Name="hover" Fill="{StaticResource ComboBoxHoverBackgroundBrush}" Stroke="{StaticResource ComboBoxHoverBorderBrush}" StrokeThickness="1" Visibility="Collapsed" Grid.ColumnSpan="2" />
-						<Popup x:Name="PART_Popup" AllowsTransparency="true" Grid.ColumnSpan="2" IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}" Margin="1" PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}" Placement="Bottom">
+						<Rectangle x:Name="hover" Fill="{StaticResource ComboBoxHoverBackgroundBrush}" Stroke="{StaticResource ComboBoxHoverBorderBrush}" StrokeThickness="1" Visibility="Collapsed" Grid.ColumnSpan="2"
+                                   Grid.Column="0" />
+						<Popup x:Name="PART_Popup" AllowsTransparency="true" Grid.ColumnSpan="2" Grid.Column="0"
+                               IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}" Margin="1" PopupAnimation="{DynamicResource {x:Static SystemParameters.ComboBoxPopupAnimationKey}}" Placement="Bottom">
 							<Border x:Name="DropDownBorder" HorizontalAlignment="Stretch" Background="{StaticResource PopupBackgroundBrush}" BorderBrush="{StaticResource PopupBorderBrush}" BorderThickness="1" MaxHeight="{TemplateBinding MaxDropDownHeight}" MinWidth="{Binding ActualWidth, ElementName=MainGrid}" CornerRadius="2">
 								<ScrollViewer x:Name="DropDownScrollViewer" Style="{StaticResource ScrollViewerStyle}">
 									<Grid RenderOptions.ClearTypeHint="Enabled">
@@ -555,12 +561,16 @@
 								</ScrollViewer>
 							</Border>
 						</Popup>
-						<ToggleButton BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" Grid.ColumnSpan="2" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxToggleButtonStyle}" />
-						<ContentControl x:Name="contentControl" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" IsHitTestVisible="false" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+						<ToggleButton BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" Grid.ColumnSpan="2"
+                                      Grid.Column="0"
+                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ComboBoxToggleButtonStyle}" />
+						<ContentControl Grid.Column="0" x:Name="contentControl" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" IsHitTestVisible="false" Margin="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
 							<ContentPresenter ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Content="{TemplateBinding SelectionBoxItem}" ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}" IsHitTestVisible="false" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
 						</ContentControl>
-						<Rectangle x:Name="focused" Stroke="{StaticResource ComboBoxFocusedBorderBrush}" StrokeThickness="1" Visibility="Collapsed" Grid.ColumnSpan="2" />
-						<Rectangle x:Name="disabled" Fill="{StaticResource ComboBoxDisabledBackgroundBrush}" Visibility="Collapsed" Grid.ColumnSpan="2" />
+						<Rectangle x:Name="focused" Stroke="{StaticResource ComboBoxFocusedBorderBrush}" StrokeThickness="1" Visibility="Collapsed" Grid.ColumnSpan="2"
+                                   Grid.Column="0" />
+						<Rectangle x:Name="disabled" Fill="{StaticResource ComboBoxDisabledBackgroundBrush}" Visibility="Collapsed" Grid.ColumnSpan="2"
+                                   Grid.Column="0" />
 					</Grid>
 					<ControlTemplate.Triggers>
 						<Trigger Property="HasItems" Value="false">

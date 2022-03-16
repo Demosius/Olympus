@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Vulcan.Annotations;
+using Vulcan.Properties;
 
 namespace Vulcan.ViewModel;
 

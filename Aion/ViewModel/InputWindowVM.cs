@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Aion.Annotations;
+using Aion.Properties;
 using Aion.ViewModel.Commands;
 
 namespace Aion.ViewModel;

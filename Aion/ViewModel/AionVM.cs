@@ -1,7 +1,6 @@
 ﻿using System;
 using Aion.View;
 using Aion.ViewModel.Commands;
-using Aion.ViewModel.Interfaces;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -9,6 +8,8 @@ using System.Windows.Controls;
 using Aion.ViewModel.Utility;
 using Styx;
 using Uranus;
+using Uranus.Commands;
+using Uranus.Interfaces;
 
 namespace Aion.ViewModel;
 

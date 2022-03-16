@@ -16,7 +16,7 @@ public class Role
     public int DeleteUser { get; set; }
 
     // Use int to refer to the difference between the user and the target employee levels.
-    public int CreateEmployee { get; set; }
+    public bool CreateEmployee { get; set; }
     public int ReadEmployee { get; set; }               // Basic visibility beyond name and department.
     public int ReadEmployeeSensitive { get; set; }      // Such as Phone, Address, etc.
     public int ReadEmployeeVerySensitive { get; set; }  // Pay rate and similar.
@@ -65,7 +65,7 @@ public class Role
         UpdateUser = -3;
         DeleteUser = -3;
 
-        CreateEmployee = -3;
+        CreateEmployee = false;
         ReadEmployee = -3;
         ReadEmployeeSensitive = -5;
         ReadEmployeeVerySensitive = -10;
@@ -110,7 +110,7 @@ public class Role
         UpdateUser = 1000;
         DeleteUser = 1000;
 
-        CreateEmployee = 1000;
+        CreateEmployee = true;
         ReadEmployee = 1000;
         ReadEmployeeSensitive = 1000;
         ReadEmployeeVerySensitive = 1000;

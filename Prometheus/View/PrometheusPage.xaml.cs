@@ -1,6 +1,7 @@
 ﻿using System;
 using Styx;
 using Uranus;
+using Uranus.Interfaces;
 using Uranus.Staff;
 
 namespace Prometheus.View;

@@ -6,10 +6,10 @@ namespace Styx;
 public partial class Charon
 {
     // Using Employee objects.
-    public bool CanCreateEmployee(Employee employee) 
+    public bool CanCreateEmployee() 
     {
         if (CurrentUser is null) return false;
-        return CurrentUser.Role.CreateEmployee >= GetLevelDifference(employee) || UserEmployee == employee;
+        return CurrentUser.Role.CreateEmployee;
     }
         
     public bool CanReadEmployee(Employee employee) 
@@ -43,12 +43,6 @@ public partial class Charon
     }
 
     // Using Employee ID as int.
-    public bool CanCreateEmployee(int employeeID) 
-    {
-        if (CurrentUser is null) return false;
-        return CurrentUser.Role.CreateEmployee >= GetLevelDifference(employeeID) || UserEmployee.ID == employeeID;
-    }
-        
     public bool CanReadEmployee(int employeeID)
     {
         if (CurrentUser is null) return false;

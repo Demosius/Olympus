@@ -130,11 +130,10 @@ public class ShiftEntry : INotifyPropertyChanged
         }
     }
 
-    [ManyToOne("EmployeeID","ShiftEntries", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.ShiftEntries), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Employee Employee { get; set; }
 
-    [Ignore]
-    public List<ClockEvent> ClockEvents { get; set; }
+    [Ignore] public List<ClockEvent> ClockEvents { get; set; }
 
     [Ignore] public string Department => Employee?.DepartmentName;
     [Ignore] public string EmployeeName => Employee?.FullName;
@@ -224,7 +223,7 @@ public class ShiftEntry : INotifyPropertyChanged
 
         SummarizeShift();
     }
-        
+
     /// <summary>
     /// Given the shift times, summarizes the total shift and break times, and shift type.
     /// </summary>
@@ -232,7 +231,7 @@ public class ShiftEntry : INotifyPropertyChanged
     {
         // Can't be summarized if there is not at least 2 applied times.
         if (ShiftStartTime is null or "" || ShiftEndTime is null or "") return;
-            
+
         if (DateTime.Parse(ShiftStartTime).TimeOfDay < new TimeSpan(6, 50, 0))  // Use 650 as those set to start at 700 will clock in up to 10 minutes before their shift.
             ShiftType = EShiftType.M;
         else if (DateTime.Parse(ShiftEndTime).TimeOfDay > new TimeSpan(18, 0, 0))
@@ -251,7 +250,7 @@ public class ShiftEntry : INotifyPropertyChanged
         TimeTotal = new DateTime(workSpan.Ticks).ToString("HH:mm");
         HoursWorked = workSpan.TotalHours;
     }
-        
+
     public event PropertyChangedEventHandler PropertyChanged;
 
     private void OnPropertyChanged(string propertyName)

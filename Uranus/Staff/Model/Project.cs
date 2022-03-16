@@ -6,23 +6,21 @@ namespace Uranus.Staff.Model;
 
 public class Project
 {
-    [PrimaryKey]
-    public string Name { get; set; }
+    [PrimaryKey] public string Name { get; set; }
     public EProject Reference { get; set; }
     public string ToolTip { get; set; }
-    [ForeignKey(typeof(ProjectIcon))]
-    public string IconName { get; set; }
+    [ForeignKey(typeof(ProjectIcon))] public string IconName { get; set; }
 
-    [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(IconName), nameof(ProjectIcon.Projects), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public ProjectIcon Icon { get; set; }
 
-    [ManyToMany(typeof(DepartmentProject), "DepartmentName", "Projects", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToMany(typeof(DepartmentProject), nameof(DepartmentProject.ProjectName), nameof(Department.Projects), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Department> Departments { get; set; }
-    [ManyToMany(typeof(EmployeeProject), "EmployeeID", "Projects", CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToMany(typeof(EmployeeProject), nameof(EmployeeProject.ProjectName), nameof(Employee.Projects), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Employee> Employees { get; set; }
-        
+
     public Project() { }
-             
+
     // Create project and projectIcon together.
     public Project(EProject eProject, string iconFileName, StaffReader reader, string toolTip = "")
     {

@@ -1,27 +1,26 @@
-﻿using SQLite;
+﻿using System;
+using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Uranus.Staff.Model;
 
-public class Role
+public class Role : IComparable
 {
-    [PrimaryKey]
-    public string Name { get; set; }
-    [ForeignKey(typeof(Department)), NotNull]
-    public string DepartmentName { get; set; }
+    [PrimaryKey] public string Name { get; set; }
+    [ForeignKey(typeof(Department)), NotNull] public string DepartmentName { get; set; }
     public int Level { get; set; }
-    [ForeignKey(typeof(Role))]
-    public string ReportsToRoleName { get; set; }
+    [ForeignKey(typeof(Role))] public string ReportsToRoleName { get; set; }
 
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(DepartmentName), nameof(Model.Department.Roles), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Department Department { get; set; }
-    [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(ReportsToRoleName), nameof(Reports), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Role ReportsToRole { get; set; }
-    [OneToMany(CascadeOperations = CascadeOperation.All)]
+
+    [OneToMany(nameof(Employee.RoleName), nameof(Employee.Role), CascadeOperations = CascadeOperation.All)]
     public List<Employee> Employees { get; set; }
-    [OneToMany(CascadeOperations = CascadeOperation.All)]
+    [OneToMany(nameof(ReportsToRoleName), nameof(ReportsToRole), CascadeOperations = CascadeOperation.All)]
     public List<Role> Reports { get; set; }
 
     public Role()
@@ -63,9 +62,46 @@ public class Role
         return ReportsToRole is not null && ReportsToRole.LookUp(ref up, ref down, this, ref targetRole);
     }
 
+    public void AddReportingRole(Role reportingRole)
+    {
+        reportingRole.ReportsToRole = this;
+        Reports ??= new List<Role>();
+        Reports.Add(reportingRole);
+    }
+
+    public void AddEmployee(Employee employee)
+    {
+        if (employee is null) return;
+        employee.Role = this;
+        employee.RoleName = Name;
+        Employees.Add(employee);
+    }
+
+    public void AddEmployees(IEnumerable<Employee> newEmployees)
+    {
+        if (newEmployees is null) return;
+        var employeeArray = newEmployees as Employee[] ?? newEmployees.ToArray();
+        foreach (var employee in employeeArray)
+        {
+            employee.Role = this;
+            employee.RoleName = Name;
+        }
+
+        Employees ??= new List<Employee>();
+        Employees.AddRange(employeeArray);
+    }
+
     public override string ToString()
     {
         return Name;
+    }
+
+    public int CompareTo(object obj)
+    {
+        if (obj is not Role otherRole) return -1;
+
+        if (Level < otherRole.Level) return 1;
+        return Level > otherRole.Level ? -1 : string.Compare(Name, otherRole.Name, StringComparison.Ordinal);
     }
 
     public override bool Equals(object obj) => Equals(obj as Role);
@@ -91,4 +127,19 @@ public class Role
     }
 
     public static bool operator !=(Role lhs, Role rhs) => !(lhs == rhs);
+
+    public static bool operator >(Role lhs, Role rhs)
+    {
+        return lhs.Level > rhs.Level ||
+               lhs.Level == rhs.Level && string.CompareOrdinal(lhs.Name, rhs.Name) > 0;
+    }
+
+    public static bool operator <(Role lhs, Role rhs)
+    {
+        return lhs.Level < rhs.Level ||
+               lhs.Level == rhs.Level && string.CompareOrdinal(lhs.Name, rhs.Name) < 0;
+    }
+
+    public static bool operator >=(Role lhs, Role rhs) => lhs > rhs || lhs == rhs;
+    public static bool operator <=(Role lhs, Role rhs) => lhs < rhs || lhs == rhs;
 }

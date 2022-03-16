@@ -1,5 +1,5 @@
 ﻿using Uranus.Staff;
-using Uranus;
+using Uranus.Interfaces;
 
 namespace Vulcan.View;
 

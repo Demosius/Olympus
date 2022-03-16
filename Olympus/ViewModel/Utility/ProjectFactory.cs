@@ -5,7 +5,7 @@ using Pantheon.View;
 using Phoenix.View;
 using Prometheus.View;
 using Styx;
-using Uranus;
+using Uranus.Interfaces;
 using Uranus.Staff;
 using Uranus.Staff.Model;
 using Vulcan.View;
@@ -22,7 +22,7 @@ public static class ProjectFactory
         {
             EProject.Vulcan => new VulcanPage(),
             EProject.Prometheus => new PrometheusPage(App.Helios, App.Charon),
-            EProject.Pantheon => new PantheonPage(),
+            EProject.Pantheon => new PantheonPage(App.Charon, App.Helios),
             EProject.Phoenix => new PhoenixPage(),
             EProject.Khaos => new KhaosPage(),
             EProject.Aion => new AionPage(App.Helios, App.Charon),

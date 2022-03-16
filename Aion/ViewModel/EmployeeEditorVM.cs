@@ -1,11 +1,12 @@
 ﻿using Aion.ViewModel.Commands;
-using Aion.ViewModel.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using Aion.View;
 using Uranus;
+using Uranus.Commands;
+using Uranus.Interfaces;
 using Uranus.Staff.Model;
 
 namespace Aion.ViewModel;

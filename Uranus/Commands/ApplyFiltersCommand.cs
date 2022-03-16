@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows.Input;
-using Aion.ViewModel.Interfaces;
+using Uranus.Interfaces;
 
-namespace Aion.ViewModel.Commands;
+namespace Uranus.Commands;
 
 public class ApplyFiltersCommand : ICommand
 {
@@ -10,11 +10,9 @@ public class ApplyFiltersCommand : ICommand
 
     public ApplyFiltersCommand(IFilters vm) { VM = vm; }
 
-    public event EventHandler CanExecuteChanged
-    {
-        add => CommandManager.RequerySuggested += value;
-        remove => CommandManager.RequerySuggested -= value;
-    }
+#pragma warning disable 67
+    public event EventHandler CanExecuteChanged;
+#pragma warning restore 67
 
     public bool CanExecute(object parameter)
     {

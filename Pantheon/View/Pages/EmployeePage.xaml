@@ -1,0 +1,175 @@
+﻿<Page x:Class="Pantheon.View.Pages.EmployeePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:vm="clr-namespace:Pantheon.ViewModel.Pages"
+      xmlns:converter="clr-namespace:Pantheon.ViewModel.Converter"
+      xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+      xmlns:model="clr-namespace:Uranus.Staff.Model;assembly=Uranus"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="EmployeePage">
+
+    <Page.DataContext>
+        <vm:EmployeePageVM x:Name="VM"/>
+    </Page.DataContext>
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Dark Theme -->
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <DockPanel>
+        <DockPanel.Resources>
+            <converter:EmploymentToStringConverter x:Key="EmploymentTypeConverter"/>
+            <ObjectDataProvider x:Key="EmploymentTypes"
+                                MethodName="GetValues" 
+                                ObjectType="{x:Type sys:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="model:EEmploymentType"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+            <ObjectDataProvider x:Key="SortMethods"
+                                MethodName="GetValues" 
+                                ObjectType="{x:Type sys:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="vm:ESortMethod"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </DockPanel.Resources>
+        <ToolBarTray DockPanel.Dock="Top">
+            <!-- Search / Filter -->
+            <ToolBar>
+                <TextBox Text="{Binding EmployeeSearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip="Employee Search Text"
+                         MinWidth="100"
+                         Margin="2,0"
+                         Style="{StaticResource TextBoxStyle}"/>
+                <ComboBox ItemsSource="{Binding Source={StaticResource EmploymentTypes}}"
+                          SelectedValue="{Binding SelectedEmploymentType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmploymentTypeConverter}}"
+                          ToolTip="Filter Employment Type"
+                          IsEditable="True"
+                          MinWidth="100"
+                          Margin="2,0"
+                          Style="{StaticResource ComboBoxStyle}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource EmploymentTypeConverter}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <ComboBox ItemsSource="{Binding Roles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          SelectedValue="{Binding SelectedRole, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          ToolTip="Filter Role (Job Description)"
+                          IsEditable="True"
+                          MinWidth="100"
+                          Margin="2,0"
+                          Style="{StaticResource ComboBoxStyle}"/>
+                <ComboBox ItemsSource="{Binding Departments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          SelectedValue="{Binding SelectedDepartment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          ToolTip="Filter Department"
+                          IsEditable="True"
+                          MinWidth="100"
+                          Margin="2,0"
+                          Style="{StaticResource ComboBoxStyle}"/>
+                <Button Content="Clear"
+                        Command="{Binding ClearFiltersCommand}"
+                        ToolTip="Clear Filters"
+                        Margin="2,0"
+                        Style="{StaticResource ButtonStyle}"/>
+            </ToolBar>
+            <!-- Sorting -->
+            <ToolBar>
+                <ComboBox ItemsSource="{Binding Source={StaticResource SortMethods}}"
+                          SelectedValue="{Binding SelectedESortMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          ToolTip="Sort Method"
+                          IsEditable="True"
+                          MinWidth="100"
+                          Margin="2,0"
+                          Style="{StaticResource ComboBoxStyle}">
+
+                </ComboBox>
+            </ToolBar>
+        </ToolBarTray>
+
+        <!-- Employee Editing Panel -->
+        <Grid DockPanel.Dock="Right">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- ID -->
+
+<!-- First Name -->
+<!-- Last Name -->
+<!-- -->
+        </Grid>
+
+        <!-- Employee Avatar -->
+        <Image DockPanel.Dock="Right"
+               Source="{Binding SelectedEmployee.Icon.FullPath}"/>
+
+        <Button DockPanel.Dock="Bottom" Content="New Employee"
+                Command="{Binding }"/>
+
+        <!-- List of Employees -->
+        <ListView ItemsSource="{Binding Employees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedValue="{Binding SelectedEmployee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:ItemsSource="{d:SampleData ItemCount=5}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                       FontSize="14"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource LightForegroundBrush}"/>
+                            <Label Content=" - "
+                                       FontSize="14"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource LightForegroundBrush}"/>
+                            <Label Content="{Binding ID, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                       FontSize="14"
+                                       FontStyle="Italic"
+                                       Foreground="{StaticResource LightForegroundBrush}"/>
+                        </StackPanel>
+                        <WrapPanel Orientation="Horizontal">
+                            <TextBlock Text="Employment: "/>
+                            <TextBlock Text="{Binding EmploymentType, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmploymentTypeConverter}}"/>
+                            <Separator/>
+                            <TextBlock Text="Role: "/>
+                            <TextBlock Text="{Binding RoleName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Separator/>
+                            <TextBlock Text="Department: "/>
+                            <TextBlock Text="{Binding DepartmentName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+
+                        </WrapPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.Resources>
+                <Style TargetType="Separator" BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}">
+                    <Setter Property="Margin" Value="5,0"/>
+                </Style>
+            </ListView.Resources>
+        </ListView>
+
+    </DockPanel>
+</Page>

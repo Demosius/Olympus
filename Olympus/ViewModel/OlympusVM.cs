@@ -10,10 +10,10 @@ using ServiceStack.Text;
 using SQLite;
 using System.Windows;
 using Uranus.Staff.Model;
-using Uranus;
 using Olympus.ViewModel.Utility;
 using Olympus.Properties;
 using Olympus.View;
+using Uranus.Interfaces;
 using Uranus.Inventory.Model;
 
 namespace Olympus.ViewModel;

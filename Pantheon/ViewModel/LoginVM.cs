@@ -7,7 +7,7 @@ namespace Pantheon.ViewModel;
 public class LoginVM : INotifyPropertyChanged
 {
     private string userCode;
-    public string UserCode 
+    public string UserCode
     {
         get => userCode;
         set
@@ -24,13 +24,20 @@ public class LoginVM : INotifyPropertyChanged
     public LoginVM()
     {
         LogInCommand = new LogInCommand(this);
+        UserCode = "";
+        Password = "";
     }
 
     internal bool LogIn()
     {
         if (int.TryParse(UserCode, out var userID))
         {
-            return App.Charon.LogIn(userID, Password);
+            if( App.Charon.LogIn(userID, Password))
+                return true;
+
+            MessageBox.Show("Incorrect User ID and Password combination.", "Invalid Log In", MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            return false;
         }
 
         MessageBox.Show("User ID must be an integer - 5 digits.", "Invalid User ID:", MessageBoxButton.OK, MessageBoxImage.Error);

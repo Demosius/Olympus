@@ -7,12 +7,10 @@ namespace Uranus.Staff.Model;
 // Each entry is another rule, and multiple rules can apply to a single employee.
 public class ShiftRule
 {
-    [PrimaryKey, AutoIncrement]
-    public int ID { get; set; }
-    [ForeignKey(typeof(Employee))]
-    public int EmployeeID { get; set; }
+    [PrimaryKey, AutoIncrement] public int ID { get; set; }
+    [ForeignKey(typeof(Employee))] public int EmployeeID { get; set; }
     public string Rule { get; set; }
 
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.Rules), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Employee Employee { get; set; }
 }
