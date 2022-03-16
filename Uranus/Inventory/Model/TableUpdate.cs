@@ -6,12 +6,12 @@ namespace Uranus.Inventory.Model;
 [Table("UpdateTimes")]
 public class TableUpdate
 {
-    [PrimaryKey]
-    public string TableName { get; set; }
+    [PrimaryKey] public string TableName { get; set; }
     public DateTime LastUpdate { get; set; }
 
+
     /* OPERATOR OVERLOADING */
-    /*public override bool Equals(object obj) => this.Equals(obj as TableUpdate);
+    public override bool Equals(object obj) => this.Equals(obj as TableUpdate);
 
     public bool Equals(TableUpdate tableUpdate)
     {
@@ -44,8 +44,15 @@ public class TableUpdate
         return lhs.LastUpdate < rhs.LastUpdate;
     }
 
+    public override int GetHashCode()
+    {
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        return TableName.GetHashCode();
+    }
+
+
     public static bool operator >=(TableUpdate lhs, TableUpdate rhs) => lhs == rhs || lhs > rhs;
 
-    public static bool operator <=(TableUpdate lhs, TableUpdate rhs) => lhs == rhs || lhs < rhs;*/
-        
+    public static bool operator <=(TableUpdate lhs, TableUpdate rhs) => lhs == rhs || lhs < rhs;
+
 }

@@ -1,5 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
+using System;
 
 namespace Uranus.Inventory.Model;
 
@@ -14,35 +15,37 @@ public class Stock
     [ForeignKey(typeof(SubStock))] public string PackID { get; set; }
     [ForeignKey(typeof(SubStock))] public string EachID { get; set; }
 
-    [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToOne(nameof(CaseID), nameof(SubStock.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public SubStock Cases { get; set; }
-    [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToOne(nameof(PackID), nameof(SubStock.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public SubStock Packs { get; set; }
-    [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToOne(nameof(EachID), nameof(SubStock.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public SubStock Eaches { get; set; }
 
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(BinID), nameof(NAVBin.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVBin Bin { get; set; }
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(ItemNumber), nameof(NAVItem.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVItem Item { get; set; }
-        
-    public Stock()
-    {
-        Cases = new SubStock(this, EUoM.CASE);
-        Packs = new SubStock(this, EUoM.PACK);
-        Eaches = new SubStock(this, EUoM.EACH);
-    }
+
+    public Stock() { }
 
     public Stock(NAVStock navStock) : this()
     {
         // Handle the UoMs
-        var uom = navStock.UoMCode.ToUpper();
-        if (uom == "CASE")
-            Cases = new SubStock(this, navStock);
-        else if (uom == "PACK")
-            Packs = new SubStock(this, navStock);
-        else
-            Eaches = new SubStock(this, navStock);
+        var uom = (EUoM)Enum.Parse(typeof(EUoM), navStock.UoMCode);
+        switch (uom)
+        {
+            case EUoM.CASE:
+                Cases = new SubStock(this, navStock);
+                break;
+            case EUoM.PACK:
+                Packs = new SubStock(this, navStock);
+                break;
+            case EUoM.EACH:
+            default:
+                Eaches = new SubStock(this, navStock);
+                break;
+        }
 
         // Objects
         Bin = navStock.Bin;

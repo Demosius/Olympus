@@ -20,4 +20,6 @@ public class NAVLocation
     public List<NAVMoveLine> MoveLines { get; set; }
     [OneToMany(nameof(NAVStock.LocationCode), nameof(NAVStock.Location), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVStock> Stock { get; set; }
+    [OneToMany(nameof(Store.Number), nameof(Store.Location), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<Store> Stores { get; set; }
 }

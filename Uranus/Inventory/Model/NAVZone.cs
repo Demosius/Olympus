@@ -7,12 +7,11 @@ namespace Uranus.Inventory.Model;
 [Table("ZoneList")]
 public class NAVZone
 {
-    [PrimaryKey] public string ID { get; set; } // Combination of LocationCode and Code (e.g. 9600:PK)
+    [PrimaryKey, ForeignKey(typeof(ZoneExtension))] public string ID { get; set; } // Combination of LocationCode and Code (e.g. 9600:PK)
     public string Code { get; set; }
     [ForeignKey(typeof(NAVLocation))] public string LocationCode { get; set; }
     public string Description { get; set; }
     public int Ranking { get; set; }
-    public EAccessLevel AccessLevel { get; set; }
 
     [ManyToOne(nameof(LocationCode), nameof(NAVLocation.Zones), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVLocation Location { get; set; }
@@ -26,4 +25,14 @@ public class NAVZone
 
     [ManyToMany(typeof(BayZone), nameof(BayZone.ZoneID), nameof(Bay.Zones), CascadeOperations = CascadeOperation.All)]
     public List<Bay> Bays { get; set; }
+
+    [OneToOne(nameof(ID), nameof(ZoneExtension.Zone), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public ZoneExtension Extension { get; set; }
+
+    [Ignore]
+    public EAccessLevel AccessLevel
+    {
+        get => (Extension ??= new ZoneExtension(this)).AccessLevel;
+        set => (Extension ??= new ZoneExtension(this)).AccessLevel = value;
+    }
 }
