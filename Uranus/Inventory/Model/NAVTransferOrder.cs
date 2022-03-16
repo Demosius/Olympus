@@ -7,20 +7,17 @@ namespace Uranus.Inventory.Model;
 [Table("TOLineBatchAnalysis")]
 public class NAVTransferOrder
 {
-    [PrimaryKey] // Document/Transfer No. 
-    public string ID { get; set; }
-    [ForeignKey(typeof(Store))]
-    public string StoreNumber { get; set; }     // Transfer-to Code
-    [ForeignKey(typeof(NAVItem))]
-    public int ItemNumber { get; set; }
+    [PrimaryKey] public string ID { get; set; } // Document/Transfer No.
+    [ForeignKey(typeof(Store))] public string StoreNumber { get; set; } // Transfer-to Code
+    [ForeignKey(typeof(NAVItem))] public int ItemNumber { get; set; }
     public int Qty { get; set; }
     public EUoM UoM { get; set; }
     public int AvailableQty { get; set; }
     public DateTime CreationTime { get; set; }
 
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(StoreNumber), nameof(Model.Store.TransferOrders), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Store Store { get; set; }
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(ItemNumber), nameof(NAVItem.TransferOrders), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVItem Item { get; set; }
 
 }

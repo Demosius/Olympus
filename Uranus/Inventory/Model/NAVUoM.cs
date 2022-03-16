@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using System;
+using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
 
@@ -7,11 +8,10 @@ namespace Uranus.Inventory.Model;
 [Table("ItemUoM")]
 public class NAVUoM
 {
-    [PrimaryKey] // Combination of ItemNumber and Code (e.g. 271284:CASE)
-    public string ID { get; set; }
+    // Combination of ItemNumber and Code (e.g. 271284:CASE)
+    [PrimaryKey] public string ID { get; set; }
     public string Code { get; set; }
-    [ForeignKey(typeof(NAVItem))]
-    public int ItemNumber { get; set; }
+    [ForeignKey(typeof(NAVItem))] public int ItemNumber { get; set; }
     public int QtyPerUoM { get; set; }
     public int MaxQty { get; set; }
     public bool ExcludeCartonization { get; set; }
@@ -22,19 +22,19 @@ public class NAVUoM
     public double Weight { get; set; }
 
     private EUoM? uom;
-    [Ignore]
-    public EUoM UoM 
+    [Ignore] public EUoM UoM
     {
         get
         {
-            uom ??= EnumConverter.StringToUoM(Code);
+            uom ??= (EUoM)Enum.Parse(typeof(EUoM), Code);
             return (EUoM)uom;
         }
     }
 
-    [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToMany(nameof(NAVStock.UoMID), nameof(NAVStock.UoM), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVStock> Stock { get; set; }
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+
+    [ManyToOne(nameof(ItemNumber), nameof(NAVItem.UoMs), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVItem Item { get; set; }
 
     public NAVUoM()

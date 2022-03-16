@@ -675,7 +675,7 @@ public static class DataConversion
                     ID = string.Join(":", binID, uomID),
                     BinID = binID,
                     ZoneID = zoneID,
-                    UoMid = uomID,
+                    UoMID = uomID,
                     LocationCode = location,
                     ZoneCode = zone,
                     BinCode = bin,

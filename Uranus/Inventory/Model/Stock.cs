@@ -6,19 +6,13 @@ namespace Uranus.Inventory.Model;
 [Table("RealStock")]
 public class Stock
 {
-    [PrimaryKey]
-    public string ID { get; set; } // Combination of BinID and ItemNumber (e.g. 9600:PR:PR18 058:271284)
-    [ForeignKey(typeof(NAVBin))]
-    public string BinID { get; set; } // Combination of LocationCode, ZoneCode, and BinCode (e.g. 9600:PR:PR18 058)
-    [ForeignKey(typeof(NAVItem))]
-    public int ItemNumber { get; set; }
+    [PrimaryKey] public string ID { get; set; } // Combination of BinID and ItemNumber (e.g. 9600:PR:PR18 058:271284)
+    [ForeignKey(typeof(NAVBin))] public string BinID { get; set; } // Combination of LocationCode, ZoneCode, and BinCode (e.g. 9600:PR:PR18 058)
+    [ForeignKey(typeof(NAVItem))] public int ItemNumber { get; set; }
 
-    [ForeignKey(typeof(SubStock))]
-    public string CaseID { get; set; }
-    [ForeignKey(typeof(SubStock))]
-    public string PackID { get; set; }
-    [ForeignKey(typeof(SubStock))]
-    public string EachID { get; set; }
+    [ForeignKey(typeof(SubStock))] public string CaseID { get; set; }
+    [ForeignKey(typeof(SubStock))] public string PackID { get; set; }
+    [ForeignKey(typeof(SubStock))] public string EachID { get; set; }
 
     [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public SubStock Cases { get; set; }

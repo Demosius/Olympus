@@ -7,10 +7,9 @@ namespace Uranus.Inventory.Model;
 [Table("ItemGenre")]
 public class NAVGenre
 {
-    [PrimaryKey]
-    public int Code { get; set; }
+    [PrimaryKey] public int Code { get; set; }
     public string Description { get; set; }
 
-    [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToMany(nameof(NAVItem.GenreCode), nameof(NAVItem.Genre), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVItem> Items { get; set; }
 }

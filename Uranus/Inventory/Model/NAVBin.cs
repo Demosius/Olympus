@@ -9,10 +9,10 @@ namespace Uranus.Inventory.Model;
 [Table("BinList")]
 public class NAVBin
 {
-    [PrimaryKey, ForeignKey(typeof(BinExtension))] // Combination of ZoneID and Code (e.g. 9600:PR:PR18 058)
-    public string ID { get; set; }
-    [ForeignKey(typeof(NAVZone))] // Combination of LocationCode and ZoneCode (e.g. 9600:PR)
-    public string ZoneID { get; set; }
+    // Combination of ZoneID and Code (e.g. 9600:PR:PR18 058)
+    [PrimaryKey, ForeignKey(typeof(BinExtension))] public string ID { get; set; }
+    // Combination of LocationCode and ZoneCode (e.g. 9600:PR)
+    [ForeignKey(typeof(NAVZone))] public string ZoneID { get; set; }
     public string LocationCode { get; set; }
     public string ZoneCode { get; set; }
     public string Code { get; set; }
@@ -27,24 +27,31 @@ public class NAVBin
 
     [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVZone Zone { get; set; }
+
     [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVStock> NAVStock { get; set; }
     [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Stock> Stock { get; set; }
-    [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToMany(nameof(Move.TakeBinID), nameof(Move.TakeBin), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<Move> FromMoves { get; set; }
+    [OneToMany(nameof(Move.PlaceBinID), nameof(Move.PlaceBin), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<Move> ToMoves { get; set; }
+    [OneToMany(nameof(NAVMoveLine.BinID), nameof(NAVMoveLine.Bin), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<NAVMoveLine> MoveLines { get; set; }
+
+    [OneToOne(nameof(ID), nameof(BinExtension.BinID), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public BinExtension Extension { get; set; }
 
-    [Ignore]
-    public BinExtension Dimensions => Extension;
+    [Ignore] public BinExtension Dimensions => Extension;
 
     [Ignore]
     public Bay Bay
     {
-        get => Extension?.Bay; 
+        get => Extension?.Bay;
         set => Extension.Bay = value;
     }
-    [Ignore]
-    public EAccessLevel? AccessLevel => Zone?.AccessLevel;
+
+    [Ignore] public EAccessLevel? AccessLevel => Zone?.AccessLevel;
 
     /// <summary>
     /// Given the current Code, Zone, and Location, adjusts the current ID accordingly.
@@ -60,15 +67,14 @@ public class NAVBin
         // Try to merge every stock item with every other.
         // If merge is successful, remove the merged stock from the list.
         // Use backwards list, and merge from the i, so we remove from the end of the list safely.
-        for (var i = Stock.Count -1; i > 0; --i)
+        for (var i = Stock.Count - 1; i > 0; --i)
         {
-            for (var j = i-1; j>=0; --j)
+            for (var j = i - 1; j >= 0; --j)
             {
-                if (Stock[j].Merge(Stock[i]))
-                {
-                    Stock.RemoveAt(i);
-                    break;
-                }
+                if (!Stock[j].Merge(Stock[i])) continue;
+
+                Stock.RemoveAt(i);
+                break;
             }
         }
     }
@@ -91,14 +97,14 @@ public class NAVBin
     public bool? IsFullQty(Move move)
     {
         var itemStock = Stock.Where(stock => stock.Item == move.Item).ToList();
-        if (itemStock.Count != 1) 
+        if (itemStock.Count != 1)
             return null; // Item is not at this bin location OR there is multiple instances of item stock - which should not occur.
         var theStock = itemStock[0];
-        if (theStock.Cases.Qty < move.TakeCases || 
-            theStock.Packs.Qty < move.TakePacks || 
+        if (theStock.Cases.Qty < move.TakeCases ||
+            theStock.Packs.Qty < move.TakePacks ||
             theStock.Eaches.Qty < move.TakeEaches)
             return null; // Too much stock trying to move.
-        if (itemStock.Count != Stock.Count) 
+        if (itemStock.Count != Stock.Count)
             return false; // There is other stock at this location.
         return theStock.Cases.Qty == move.TakeCases &&
                theStock.Packs.Qty == move.TakePacks &&
@@ -107,6 +113,6 @@ public class NAVBin
 
     public override string ToString()
     {
-        return $"{Code} - {ZoneCode} - {UsedCube}m³/{MaxCube}m³"; 
+        return $"{Code} - {ZoneCode} - {UsedCube}m³/{MaxCube}m³";
     }
 }

@@ -6,24 +6,19 @@ namespace Uranus.Inventory.Model;
 
 public class Move
 {
-    [PrimaryKey]
-    public Guid ID { get; set; }
-    [ForeignKey(typeof(NAVItem))]
-    public int ItemNumber { get; set; }
-    [ForeignKey(typeof(NAVBin))]
-    public string TakeBinID { get; set; }
-    [ForeignKey(typeof(NAVBin))]
-    public string PlaceBinID { get; set; }
-    [ForeignKey(typeof(Batch))]
-    public string BatchID { get; set; }
+    [PrimaryKey] public Guid ID { get; set; }
+    [ForeignKey(typeof(NAVItem))] public int ItemNumber { get; set; }
+    [ForeignKey(typeof(NAVBin))] public string TakeBinID { get; set; }
+    [ForeignKey(typeof(NAVBin))] public string PlaceBinID { get; set; }
+    [ForeignKey(typeof(Batch))] public string BatchID { get; set; }
 
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(ItemNumber), nameof(NAVItem.Moves), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVItem Item { get; set; }
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(TakeBinID), nameof(NAVBin.FromMoves), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVBin TakeBin { get; set; }
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(PlaceBinID), nameof(NAVBin.ToMoves), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVBin PlaceBin { get; set; }
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(BatchID), nameof(Model.Batch.Moves), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Batch Batch { get; set; }
 
     public int TakeCases { get; set; }
@@ -33,14 +28,11 @@ public class Move
     public int PlacePacks { get; set; }
     public int PlaceEaches { get; set; }
 
-    [Ignore]
-    public bool FullPallet => (TakeBin.IsFullQty(this) ?? false) && AccessLevel != EAccessLevel.Ground;
+    [Ignore] public bool FullPallet => (TakeBin.IsFullQty(this) ?? false) && AccessLevel != EAccessLevel.Ground;
 
-    [Ignore]
-    public EAccessLevel AccessLevel => TakeBin.Zone.AccessLevel;
+    [Ignore] public EAccessLevel AccessLevel => TakeBin.Zone.AccessLevel;
 
-    [Ignore]
-    public int AssignedOperator { get; set; }
+    [Ignore] public int AssignedOperator { get; set; }
     public float TimeEstimate { get; set; }
 
     public Move() { }

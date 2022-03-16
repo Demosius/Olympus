@@ -1,8 +1,8 @@
-﻿using System;
+﻿using SQLite;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using SQLite;
 
 namespace Uranus.Inventory.Model;
 
@@ -23,99 +23,53 @@ public enum EDeptType
 [DataContract]
 public class SkuMaster
 {
-    [PrimaryKey, DataMember]
-    public int Sku { get; set; }
-    [DataMember]
-    public int DivisionCode { get; set; }
-    [DataMember]
-    public string DivisionName { get; set; }
-    [DataMember]
-    public int CategoryCode { get; set; }
-    [DataMember]
-    public string CategoryName { get; set; }
-    [DataMember]
-    public int PlatformCode { get; set; }
-    [DataMember]
-    public string PlatformName { get; set; }
-    [DataMember]
-    public int GenreCode { get; set; }
-    [DataMember]
-    public string GenreName { get; set; }
-    [DataMember]
-    public EProductType ProductTypeCode { get; set; }
-    [DataMember]
-    public string ProductType { get; set; }
-    [DataMember]
-    public EDeptType DeptTypeCode { get; set; }
-    [DataMember]
-    public string DeptType { get; set; }
-    [DataMember]
-    public string ItemDescription { get; set; }
-    [DataMember]
-    public bool CasePick { get; set; }
-    [DataMember]
-    public bool SplitCase { get; set; }
-    [DataMember]
-    public int? UnitsPerCase { get; set; }
-    [DataMember]
-    public int? UnitsPerPack { get; set; }
-    [DataMember]
-    public int? UnitsPerCarton { get; set; }    // Use packs if no cases - null if no packs or cases. 
-    [DataMember]
-    public int? CartonsPerPallet { get; set; }   // Use packs if no cases - units if no packs or cases.
-    [DataMember]
-    public double EachLength { get; set; }
-    [DataMember]
-    public double EachWidth { get; set; }
-    [DataMember]
-    public double EachHeight { get; set; }
-    [DataMember]
-    public double EachWeight { get; set; }
-    [DataMember]
-    public double PackLength { get; set; }
-    [DataMember]
-    public double PackWidth { get; set; }
-    [DataMember]
-    public double PackHeight { get; set; }
-    [DataMember]
-    public double PackWeight { get; set; }
-    [DataMember]
-    public double CaseLength { get; set; }
-    [DataMember]
-    public double CaseWidth { get; set; }
-    [DataMember]
-    public double CaseHeight { get; set; }
-    [DataMember]
-    public double CaseWeight { get; set; }
-    [DataMember]
-    public double CartonLength { get; set; }
-    [DataMember]
-    public double CartonWidth { get; set; }
-    [DataMember]
-    public double CartonHeight { get; set; }
-    [DataMember]
-    public double CartonWeight { get; set; }
-    [DataMember]
-    public int? TotalEachesOnHand { get; set; } 
-    [DataMember]
-    public int? TotalPacksOnHand { get; set; } 
-    [DataMember]
-    public int? TotalCasesOnHand { get; set; } 
-    [DataMember]
-    public int? TotalCartonsOnHand { get; set; } // Equal to highest UoM
-    [DataMember]
-    public double TotalWeight { get; set; }
-    [DataMember]
-    public int BaseUnitsOnHand { get; set; }
-    [DataMember]
-    public string CurrentPickZones { get; set; }
-    [DataMember]
-    public string CurrentPickBins { get; set; }
-    [DataMember]
-    public string CurrentOverstockBins { get; set; }
-    [DataMember]
-    public string CurrentVirtualBins { get; set; }
-        
+    [PrimaryKey, DataMember] public int Sku { get; set; }
+    [DataMember] public int DivisionCode { get; set; }
+    [DataMember] public string DivisionName { get; set; }
+    [DataMember] public int CategoryCode { get; set; }
+    [DataMember] public string CategoryName { get; set; }
+    [DataMember] public int PlatformCode { get; set; }
+    [DataMember] public string PlatformName { get; set; }
+    [DataMember] public int GenreCode { get; set; }
+    [DataMember] public string GenreName { get; set; }
+    [DataMember] public EProductType ProductTypeCode { get; set; }
+    [DataMember] public string ProductType { get; set; }
+    [DataMember] public EDeptType DeptTypeCode { get; set; }
+    [DataMember] public string DeptType { get; set; }
+    [DataMember] public string ItemDescription { get; set; }
+    [DataMember] public bool CasePick { get; set; }
+    [DataMember] public bool SplitCase { get; set; }
+    [DataMember] public int? UnitsPerCase { get; set; }
+    [DataMember] public int? UnitsPerPack { get; set; }
+    [DataMember] public int? UnitsPerCarton { get; set; }    // Use packs if no cases - null if no packs or cases. 
+    [DataMember] public int? CartonsPerPallet { get; set; }   // Use packs if no cases - units if no packs or cases.
+    [DataMember] public double EachLength { get; set; }
+    [DataMember] public double EachWidth { get; set; }
+    [DataMember] public double EachHeight { get; set; }
+    [DataMember] public double EachWeight { get; set; }
+    [DataMember] public double PackLength { get; set; }
+    [DataMember] public double PackWidth { get; set; }
+    [DataMember] public double PackHeight { get; set; }
+    [DataMember] public double PackWeight { get; set; }
+    [DataMember] public double CaseLength { get; set; }
+    [DataMember] public double CaseWidth { get; set; }
+    [DataMember] public double CaseHeight { get; set; }
+    [DataMember] public double CaseWeight { get; set; }
+    [DataMember] public double CartonLength { get; set; }
+    [DataMember] public double CartonWidth { get; set; }
+    [DataMember] public double CartonHeight { get; set; }
+    [DataMember] public double CartonWeight { get; set; }
+    [DataMember] public int? TotalEachesOnHand { get; set; }
+    [DataMember] public int? TotalPacksOnHand { get; set; }
+    [DataMember] public int? TotalCasesOnHand { get; set; }
+    [DataMember] public int? TotalCartonsOnHand { get; set; } // Equal to highest UoM
+    [DataMember] public double TotalWeight { get; set; }
+    [DataMember] public int BaseUnitsOnHand { get; set; }
+    [DataMember] public string CurrentPickZones { get; set; }
+    [DataMember] public string CurrentPickBins { get; set; }
+    [DataMember] public string CurrentOverstockBins { get; set; }
+    [DataMember] public string CurrentVirtualBins { get; set; }
+
     /// <summary>
     /// Constructor assuming fully filled item.
     /// </summary>
@@ -158,7 +112,7 @@ public class SkuMaster
         else
             UnitsPerPack = item.Pack.QtyPerUoM;
         UnitsPerCarton = UnitsPerCase ?? UnitsPerPack;
-            
+
         // Total Cartons/Units on hand, check for current pick bin,
         // gather list of pallet sizes, and verify if item picks in cases and/or split cases.
         List<string> osZones = new() { "OS", "PR", "HR" };
@@ -326,7 +280,7 @@ public class SkuMaster
         List<string> overstockZones = new() { "OS", "PR", "HR", "OZ" };
         List<string> virtualZones = new() { "CP", "DCP", "SUP CP", "TM", "HZ", "PARK", "WEB TP" };
         List<string> vPickZones = new() { "CP", "DCP", "SUP CP", "TM", "WEB TP" };
-        List<string> casePickZones = new() { "CP", "DCP"};
+        List<string> casePickZones = new() { "CP", "DCP" };
         List<string> primaryZones = new()
         {
             "BLK PK",
@@ -341,7 +295,7 @@ public class SkuMaster
         List<string> osBins = new();
         List<string> vBins = new();
         List<int> palletSizes = new();
-            
+
         EUoM uomCheck;
         if (UnitsPerCase != null)
             uomCheck = EUoM.CASE;
@@ -371,7 +325,7 @@ public class SkuMaster
                     TotalEachesOnHand += s.Qty;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(uom),"Unexpected UoM value.");
+                    throw new ArgumentOutOfRangeException(nameof(uom), "Unexpected UoM value.");
             }
             BaseUnitsOnHand += s.GetBaseQty();
             TotalWeight += s.GetWeight();
@@ -387,9 +341,9 @@ public class SkuMaster
             else if (overstockZones.Contains(zone))
             {
                 osBins.Add(s.BinCode);
-                    
+
                 if (zone == "OS") continue;
-                    
+
                 var qty = s.Qty;
                 _ = bins.TryGetValue(s.BinID, out var bin);
                 if (bin != null && bin.Description.Contains("Double"))
