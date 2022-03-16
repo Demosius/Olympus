@@ -1,25 +1,25 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
+using System.Dynamic;
 
 namespace Uranus.Equipment.Model;
 
 public class Checklist
 {
-    [PrimaryKey]
-    public string Name { get; set; }
-    [ForeignKey(typeof(MachineType))]
-    public string TypeCode { get; set; }
+    [PrimaryKey] public string Name { get; set; }
+    [ForeignKey(typeof(MachineType))] public string TypeCode { get; set; }
     public string CheckCode { get; set; }
 
-    [Ignore]
-    public List<Check> Checks { get; set; }
-
-    [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToMany(nameof(Machine.ChecklistName), nameof(Machine.Checklist), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Machine> Machines { get; set; }
+    [OneToMany(nameof(CompletedChecklist.ChecklistName), nameof(CompletedChecklist.OriginalChecklist), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<CompletedChecklist> CompletedChecklists { get; set; }
 
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(TypeCode), nameof(Model.MachineType.Checklists),CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public MachineType MachineType { get; set; }
+
+    [Ignore] public List<Check> Checks { get; set; }
 
     public Checklist() { }
 

@@ -9,12 +9,9 @@ namespace Uranus.Equipment.Model;
 
 public class CompletedChecklist
 {
-    [PrimaryKey]
-    public Guid ID { get; set; }
-    [ForeignKey(typeof(Checklist))]
-    public string ChecklistName { get; set; }
-    [ForeignKey(typeof(Machine))]
-    public int MachineSerialNumber { get; set; }
+    [PrimaryKey] public Guid ID { get; set; }
+    [ForeignKey(typeof(Checklist))] public string ChecklistName { get; set; }
+    [ForeignKey(typeof(Machine))] public int MachineSerialNumber { get; set; }
     public int EmployeeID { get; set; }
     public DateTime CompletedTime { get; set; }
 
@@ -22,14 +19,13 @@ public class CompletedChecklist
 
     public bool Pass { get; set; }
 
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(ChecklistName), nameof(Checklist.CompletedChecklists), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Checklist OriginalChecklist { get; set; }
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(MachineSerialNumber), nameof(Model.Machine.CompletedChecklists), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Machine Machine { get; set; }
 
-    [Ignore]
-    public List<Check> Checks { get; set; }
-        
+    [Ignore] public List<Check> Checks { get; set; }
+
     public CompletedChecklist() { }
 
     public CompletedChecklist(Checklist checklist, int machineSerialNumber, int employeeID)
