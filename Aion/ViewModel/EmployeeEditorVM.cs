@@ -239,7 +239,7 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
         Code = newEmployee.ID;
         FirstName = newEmployee.FirstName;
         Surname = newEmployee.LastName;
-        Location = newEmployee.Location;
+        Location = newEmployee.LocationCode;
         Department = Departments.FirstOrDefault(d => d.Name == newEmployee.DepartmentName);
         ReportsTo = employees.FirstOrDefault(e => e.ID == newEmployee.ReportsToID);
         PayPoint = newEmployee.PayPoint;
@@ -292,7 +292,7 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
     {
         employee.FirstName = FirstName;
         employee.LastName = Surname;
-        employee.Location = Location;
+        employee.LocationCode = Location;
         employee.ReportsToID = ReportsTo.ID;
         employee.ReportsTo = ReportsTo;
         employee.PayPoint = PayPoint;

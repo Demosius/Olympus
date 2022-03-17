@@ -14,7 +14,7 @@ public sealed class InventoryChariot : MasterChariot
 {
     public override string DatabaseName => "Inventory.sqlite";
 
-    public override Type[] Tables { get; } = 
+    public override Type[] Tables { get; } =
     {
         typeof(Batch), typeof(Bay), typeof(BayZone), typeof(BinContentsUpdate),
         typeof(BinExtension), typeof(Move), typeof(NAVBin), typeof(NAVCategory),
@@ -77,15 +77,15 @@ public sealed class InventoryChariot : MasterChariot
         if (dateTime == new DateTime()) dateTime = DateTime.Now;
         TableUpdate update = new()
         {
-            TableName = Database.GetMapping(type).TableName,
+            TableName = Database?.GetMapping(type).TableName ?? type.ToString(),
             LastUpdate = dateTime
         };
-        _ = Database.InsertOrReplace(update);
+        _ = Database?.InsertOrReplace(update);
         return true;
     }
 
     /***************************** READ Data ******************************/
-        
+
     /***************************** UPDATE Data ****************************/
 
     /***************************** DELETE Data ****************************/
@@ -93,7 +93,7 @@ public sealed class InventoryChariot : MasterChariot
     // Used by more than just deleter.
     public void StockZoneDeletes(List<string> zoneIDs)
     {
-        Database.RunInTransaction(() =>
+        Database?.RunInTransaction(() =>
         {
             foreach (var zoneID in zoneIDs)
             {
@@ -106,7 +106,7 @@ public sealed class InventoryChariot : MasterChariot
     /* UOM */
     public void UoMCodeDelete(List<string> uomCodes)
     {
-        Database.RunInTransaction(() =>
+        Database?.RunInTransaction(() =>
         {
             foreach (var uom in uomCodes)
             {

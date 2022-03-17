@@ -14,5 +14,19 @@ public class TempTag
     public List<TagUse> TagUse { get; set; }
 
     [OneToOne(nameof(EmployeeID), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Employee Employee { get; set; }
+    public Employee? Employee { get; set; }
+
+    public TempTag()
+    {
+        RF_ID = string.Empty;
+        TagUse = new List<TagUse>();
+    }
+
+    public TempTag(string rfID, int employeeID, List<TagUse> tagUse, Employee employee)
+    {
+        RF_ID = rfID;
+        EmployeeID = employeeID;
+        TagUse = tagUse;
+        Employee = employee;
+    }
 }

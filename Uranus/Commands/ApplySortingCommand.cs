@@ -14,15 +14,15 @@ public class ApplySortingCommand : ICommand
     }
 
 #pragma warning disable 67
-    public event EventHandler CanExecuteChanged;
+    public event EventHandler? CanExecuteChanged;
 #pragma warning restore 67
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return true;
     }
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
         VM.ApplySorting();
     }

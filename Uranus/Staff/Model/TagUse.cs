@@ -13,7 +13,23 @@ public class TagUse
     public DateTime EndDate { get; set; }
 
     [ManyToOne(nameof(TempTagRFID), nameof(Model.TempTag.TagUse), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public TempTag TempTag { get; set; }
+    public TempTag? TempTag { get; set; }
     [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.TagUse), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Employee Employee { get; set; }
+    public Employee? Employee { get; set; }
+
+    public TagUse()
+    {
+        TempTagRFID = string.Empty;
+    }
+
+    public TagUse(int id, int employeeID, string tempTagRFID, DateTime startDate, DateTime endDate, TempTag tempTag, Employee employee)
+    {
+        ID = id;
+        EmployeeID = employeeID;
+        TempTagRFID = tempTagRFID;
+        StartDate = startDate;
+        EndDate = endDate;
+        TempTag = tempTag;
+        Employee = employee;
+    }
 }

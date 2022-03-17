@@ -181,7 +181,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         _ = MessageBox.Show("Find the Data:\n" +
                             "[NAV > Warehouse > Planning & Execution > Bin Contents >> Unit of Measure Code]\n\n" +
                             "Required Columns:\n\n" +
-                            $"{String.Join("\n", Constants.NAV_UOMColumns.Keys)}\n\n" +
+                            $"{String.Join("\n", Constants.NAV_UoMColumns.Keys)}\n\n" +
                             "(Un-filter All, then filter Code to \"<>EACH\".)\n" +
                             "(Update Daily. End of previous work day, or beginning of current.)",
             "UoM Data Requirements",

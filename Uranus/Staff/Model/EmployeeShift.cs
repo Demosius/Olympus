@@ -3,8 +3,19 @@
 namespace Uranus.Staff.Model;
 
 // Denotes an employees eligibility for a particular shift.
-public class EmployeeShift 
+public class EmployeeShift
 {
     [ForeignKey(typeof(Employee))] public int EmployeeID { get; set; }
     [ForeignKey(typeof(Shift))] public string ShiftName { get; set; }
+
+    public EmployeeShift()
+    {
+        ShiftName = string.Empty;
+    }
+
+    public EmployeeShift(int employeeID, string shiftName)
+    {
+        EmployeeID = employeeID;
+        ShiftName = shiftName;
+    }
 }

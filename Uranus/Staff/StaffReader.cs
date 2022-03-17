@@ -1,9 +1,9 @@
-﻿using Uranus.Staff.Model;
+﻿using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Serilog;
+using Uranus.Staff.Model;
 
 namespace Uranus.Staff;
 
@@ -26,53 +26,60 @@ public class StaffReader
     /* EMPLOYEES */
     public Employee Employee(int id, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Employee>(id, pullType);
 
-    public List<Employee> Employees(Expression<Func<Employee, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<Employee> Employees(Expression<Func<Employee, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
-    public bool EmployeeExists(int id) => Chariot.Database.Execute("SELECT count(*) FROM Employee WHERE ID=?;", id) > 0;
+    public bool EmployeeExists(int id) => Chariot.Database?.Execute("SELECT count(*) FROM Employee WHERE ID=?;", id) > 0;
 
-    public int EmployeeCount() => Chariot.Database.Execute("SELECT count(*) FROM Employee;");
+    public int EmployeeCount() => Chariot.Database?.Execute("SELECT count(*) FROM Employee;") ?? 0;
 
     public Role Role(string roleName, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Role>(roleName, pullType);
-    
-    public List<ClockEvent> ClockEvents(Expression<Func<ClockEvent, bool>> filter = null,
+
+    public List<ClockEvent> ClockEvents(Expression<Func<ClockEvent, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     public List<ClockEvent> ClockEvents(DateTime startDate, DateTime endDate)
     {
-        return Chariot.Database.Query<ClockEvent>("SELECT * FROM ClockEvent WHERE Date BETWEEN ? AND ?;", startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+        return Chariot.Database?.Query<ClockEvent>(
+            "SELECT * FROM ClockEvent WHERE Date BETWEEN ? AND ?;",
+            startDate.ToString("yyyy-MM-dd"),
+            endDate.ToString("yyyy-MM-dd"))
+               ?? new List<ClockEvent>();
     }
 
     public List<ClockEvent> ClockEvents(IEnumerable<int> employeeIDs, DateTime startDate, DateTime endDate)
     {
-        return Chariot.Database.Query<ClockEvent>($"SELECT * FROM ClockEvent WHERE EmployeeID in ({string.Join(", ", employeeIDs)}) AND Date BETWEEN ? AND ?;",
-            startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+        return Chariot.Database?.Query<ClockEvent>
+        ($"SELECT * FROM ClockEvent WHERE EmployeeID in ({string.Join(", ", employeeIDs)}) AND Date BETWEEN ? AND ?;",
+            startDate.ToString("yyyy-MM-dd"),
+            endDate.ToString("yyyy-MM-dd"))
+            ?? new List<ClockEvent>();
     }
 
-    public List<ShiftEntry> ShiftEntries(Expression<Func<ShiftEntry, bool>> filter = null,
+    public List<ShiftEntry> ShiftEntries(Expression<Func<ShiftEntry, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
-    public List<int> EmployeeIDs() => Chariot.Database.Query<Employee>("SELECT DISTINCT ID FROM Employee;").Select(e => e.ID).OrderBy(c => c).ToList();
+    public List<int> EmployeeIDs() => Chariot.Database?.Query<Employee>("SELECT DISTINCT ID FROM Employee;").Select(e => e.ID).OrderBy(c => c).ToList() ?? new List<int>();
 
     public void AionEmployeeRefresh(out List<int> managerIDList, out List<Employee> employeeList, out IEnumerable<string> locationList,
         out IEnumerable<string> payPointList, out IEnumerable<EEmploymentType> employmentTypeList, out IEnumerable<Role> roleList, out IEnumerable<Department> departmentList)
     {
-        IEnumerable<int> managerIDs = null;
-        IEnumerable<Employee> employees = null;
-        IEnumerable<string> locations = null;
-        IEnumerable<string> payPoints = null;
-        IEnumerable<EEmploymentType> employmentTypes = null;
-        IEnumerable<Role> roles = null;
-        IEnumerable<Department> departments = null;
+        IEnumerable<int> managerIDs = new List<int>();
+        IEnumerable<Employee> employees = new List<Employee>();
+        IEnumerable<string> locations = new List<string>();
+        IEnumerable<string> payPoints = new List<string>();
+        IEnumerable<EEmploymentType> employmentTypes = new List<EEmploymentType>();
+        IEnumerable<Role> roles = new List<Role>();
+        IEnumerable<Department> departments = new List<Department>();
 
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
-            managerIDs = Chariot.Database.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID);
-            employees = Chariot.Database.Table<Employee>();
-            locations = Chariot.Database.Query<Employee>("SELECT DISTINCT Location FROM Employee;").Select(e => e.Location);
-            payPoints = Chariot.Database.Query<Employee>("SELECT DISTINCT PayPoint FROM Employee;").Select(e => e.PayPoint);
-            employmentTypes = Chariot.Database.Query<Employee>("SELECT DISTINCT EmploymentType FROM Employee;").Select(e => e.EmploymentType);
+            managerIDs = Chariot.Database?.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID) ?? managerIDs;
+            employees = Chariot.Database?.Table<Employee>() ?? employees;
+            locations = Chariot.Database?.Query<Employee>("SELECT DISTINCT Location FROM Employee;").Select(e => e.Location) ?? locations;
+            payPoints = Chariot.Database?.Query<Employee>("SELECT DISTINCT PayPoint FROM Employee;").Select(e => e.PayPoint) ?? payPoints;
+            employmentTypes = Chariot.Database?.Query<Employee>("SELECT DISTINCT EmploymentType FROM Employee;").Select(e => e.EmploymentType) ?? employmentTypes;
             roles = Chariot.PullObjectList<Role>().OrderBy(r => r.Name);
-            departments = Chariot.Database.Table<Department>();
+            departments = Chariot.Database?.Table<Department>() ?? departments;
         });
 
         managerIDList = managerIDs.ToList();
@@ -84,9 +91,9 @@ public class StaffReader
         departmentList = departments;
     }
 
-    public List<int> GetManagerIDs() => Chariot.Database.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID).ToList();
+    public List<int> GetManagerIDs() => Chariot.Database?.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID).ToList() ?? new List<int>();
 
-    public IEnumerable<string> Locations() => Chariot.Database.Query<Employee>("SELECT DISTINCT Location FROM Employee;").Select(e => e.Location);
+    public IEnumerable<string> Locations() => Chariot.Database?.Query<Employee>("SELECT DISTINCT Location FROM Employee;").Select(e => e.Location) ?? new List<string>();
 
     public IEnumerable<Employee> GetManagedEmployees(int managerID)
     {
@@ -109,10 +116,6 @@ public class StaffReader
     /// <param name="returnDict"></param>
     private static void GetReports(Employee employee, ref Dictionary<int, Employee> returnDict)
     {
-        returnDict ??= new Dictionary<int, Employee>();
-
-        if (employee.Reports is null) return;
-
         foreach (var report in employee.Reports)
         {
             if (returnDict.ContainsKey(report.ID)) continue;
@@ -129,8 +132,8 @@ public class StaffReader
     public IEnumerable<Employee> GetReportsByRole(Role headRole)
     {
         var roles = GetReportingRoles(headRole);
-        var employees = roles.SelectMany(r => r.Employees ?? new List<Employee>());
-        
+        var employees = roles.SelectMany(r => r.Employees);
+
         return employees;
     }
 
@@ -141,12 +144,12 @@ public class StaffReader
     /// <returns>A collection of roles, each of which containing the relevant employees.</returns>
     public IEnumerable<Role> GetReportingRoles(Role headRole)
     {
-        Dictionary<string, Role> roleDict = null;
-        Dictionary<string, List<Employee>> employeeDict = null;
+        Dictionary<string, Role>? roleDict = null;
+        Dictionary<string, List<Employee>>? employeeDict = null;
 
         try
         {
-            Chariot.Database.RunInTransaction(() =>
+            Chariot.Database?.RunInTransaction(() =>
             {
                 roleDict = Chariot.PullObjectList<Role>()
                     .ToDictionary(r => r.Name, r => r);
@@ -157,7 +160,7 @@ public class StaffReader
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Unable to pull Roles and/or Employees from {}, defaulting to empty.",Chariot.DatabaseName);
+            Log.Error(ex, "Unable to pull Roles and/or Employees from {}, defaulting to empty.", Chariot.DatabaseName);
             roleDict = new Dictionary<string, Role>();
             employeeDict = new Dictionary<string, List<Employee>>();
         }
@@ -170,19 +173,20 @@ public class StaffReader
                 upperRole.AddReportingRole(role);
         }
 
-        foreach (var (roleName,employees) in employeeDict)
+        foreach (var (roleName, employees) in employeeDict)
         {
             if (roleDict.TryGetValue(roleName, out var role))
                 role.AddEmployees(employees);
         }
 
-        roleDict.TryGetValue(headRole.Name, out headRole);
+        if (!roleDict.TryGetValue(headRole.Name, out var newHeadRole)) return new List<Role>();
 
         roleDict.Clear();
 
-        GetRoleReports(headRole, ref roleDict);
+        GetRoleReports(newHeadRole, ref roleDict);
 
         return roleDict.Values;
+
     }
 
     /// <summary>
@@ -193,10 +197,6 @@ public class StaffReader
     /// <param name="returnDict">A dictionary of reports</param>
     private static void GetRoleReports(Role role, ref Dictionary<string, Role> returnDict)
     {
-        returnDict ??= new Dictionary<string, Role>();
-
-        if (role.Reports is null) return;
-
         foreach (var report in role.Reports)
         {
             if (returnDict.ContainsKey(report.Name)) continue;
@@ -207,12 +207,11 @@ public class StaffReader
 
     public IEnumerable<Employee> EmployeesRecursiveReports()
     {
-        var fullEmployees = Chariot.Database.Table<Employee>().ToDictionary(e => e.ID, e => e);
+        var fullEmployees = Chariot.Database?.Table<Employee>().ToDictionary(e => e.ID, e => e) ?? new Dictionary<int, Employee>();
 
         foreach (var (_, employee) in fullEmployees)
         {
             if (!fullEmployees.TryGetValue(employee.ReportsToID, out var manager)) continue;
-            manager.Reports ??= new List<Employee>();
             manager.Reports.Add(employee);
             employee.ReportsTo = manager;
         }
@@ -222,19 +221,22 @@ public class StaffReader
 
     public List<ShiftEntry> GetFilteredEntries(DateTime minDate, DateTime maxDate)
     {
-        Dictionary<int, Employee> employees = null;
-        List<ShiftEntry> entries = null;
+        Dictionary<int, Employee>? employees = null;
+        List<ShiftEntry>? entries = null;
 
         var startString = minDate.ToString("yyyy-MM-dd");
         var endString = maxDate.ToString("yyyy-MM-dd");
 
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             employees = Employees().ToDictionary(e => e.ID, e => e);
-            entries = Chariot.Database.Query<ShiftEntry>("SELECT DailyEntry.* FROM DailyEntry JOIN Employee E on DailyEntry.EmployeeID = E.Code WHERE Date BETWEEN ? AND ?;",
+            entries = Chariot.Database?.Query<ShiftEntry>("SELECT DailyEntry.* FROM DailyEntry JOIN Employee E on DailyEntry.EmployeeID = E.Code WHERE Date BETWEEN ? AND ?;",
                 startString, endString).ToList();
 
         });
+
+        employees ??= new Dictionary<int, Employee>();
+        entries ??= new List<ShiftEntry>();
 
         foreach (var shiftEntry in entries)
         {
@@ -250,21 +252,24 @@ public class StaffReader
     }
     public List<ShiftEntry> GetFilteredEntries(DateTime minDate, DateTime maxDate, int managerID)
     {
-        Dictionary<int, Employee> employees = null;
-        List<ShiftEntry> entries = null;
+        Dictionary<int, Employee>? employees = null;
+        List<ShiftEntry>? entries = null;
 
         var startString = minDate.ToString("yyyy-MM-dd");
         var endString = maxDate.ToString("yyyy-MM-dd");
 
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             employees = GetManagedEmployees(managerID).ToDictionary(e => e.ID, e => e);
-            entries = Chariot.Database.Query<ShiftEntry>("SELECT * FROM ShiftEntry " +
+            entries = Chariot.Database?.Query<ShiftEntry>("SELECT * FROM ShiftEntry " +
                                                          $"WHERE EmployeeID IN ({string.Join(", ", employees.Select(d => d.Value.ID))}) " +
                                                          "AND Date BETWEEN ? AND ?;",
                 startString, endString).ToList();
 
         });
+
+        employees ??= new Dictionary<int, Employee>();
+        entries ??= new List<ShiftEntry>();
 
         foreach (var shiftEntry in entries)
         {
@@ -277,23 +282,24 @@ public class StaffReader
 
     public IEnumerable<ClockEvent> GetPendingClocks(int managerCode, DateTime fromDate, DateTime toDate)
     {
-        return Chariot.Database.Query<ClockEvent>(
+        return Chariot.Database?.Query<ClockEvent>(
             "SELECT ClockEvent.* FROM ClockEvent JOIN Employee ON ClockEvent.EmployeeID = Employee.ID " +
             "WHERE Employee.ReportsToID = ? " +
             "AND ClockEvent.Status = ?" +
             "AND Date BETWEEN ? AND ?;",
             managerCode, EClockStatus.Pending,
-            fromDate.ToString("yyyy-MM-dd"), toDate.ToString("yyyy-MM-dd"));
+            fromDate.ToString("yyyy-MM-dd"), toDate.ToString("yyyy-MM-dd"))
+               ?? new List<ClockEvent>();
     }
 
     public int GetPendingCount(IEnumerable<int> employeeIDs, DateTime startDate, DateTime endDate)
     {
-        return Chariot.Database.ExecuteScalar<int>(
-            $"SELECT COUNT(*) FROM ClockEvent " +
+        return Chariot.Database?.ExecuteScalar<int>(
+            "SELECT COUNT(*) FROM ClockEvent " +
             $"WHERE EmployeeID IN ({string.Join(", ", employeeIDs)}) AND " +
-            $"Status = ? AND " +
+            "Status = ? AND " +
             $"Date BETWEEN '{startDate:yyyy-MM-dd}' AND '{endDate:yyyy-MM-dd}';",
-            EClockStatus.Pending);
+            EClockStatus.Pending) ?? 0;
     }
 
     /// <summary>
@@ -302,16 +308,16 @@ public class StaffReader
     /// <returns></returns>
     public IEnumerable<Employee> GetManagers()
     {
-        IEnumerable<Employee> managers = null;
+        IEnumerable<Employee>? managers = null;
 
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             var managerIDs = GetManagerIDs();
-            managers = Chariot.Database.Query<Employee>(
+            managers = Chariot.Database?.Query<Employee>(
                 $"SELECT * FROM Employee WHERE ID IN ({string.Join(", ", managerIDs)});");
         });
 
-        return managers;
+        return managers ?? new List<Employee>();
     }
 
     /// <summary>
@@ -320,8 +326,8 @@ public class StaffReader
     /// <returns></returns>
     public List<ClockEvent> ClocksForToday(int employeeID)
     {
-        return Chariot.Database.Query<ClockEvent>("SELECT * FROM ClockEvent WHERE EmployeeID = ? AND Date = ? AND Status <> ?;",
-            employeeID, DateTime.Now.ToString("yyyy-MM-dd"), EClockStatus.Deleted);
+        return Chariot.Database?.Query<ClockEvent>("SELECT * FROM ClockEvent WHERE EmployeeID = ? AND Date = ? AND Status <> ?;",
+            employeeID, DateTime.Now.ToString("yyyy-MM-dd"), EClockStatus.Deleted) ?? new List<ClockEvent>();
     }
 
     /// <summary>
@@ -342,13 +348,13 @@ public class StaffReader
     {
         var conn = Chariot.Database;
         //List<int> employeeIDs = conn.Query<int>("SELECT DISTINCT ReportsToID FROM Employee;");
-        var employeeIDs = conn.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID).ToList();
+        var employeeIDs = conn?.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID).ToList() ?? new List<int>();
 
-        return conn.Query<Employee>($"SELECT * FROM Employee WHERE ID IN ({string.Join(", ", employeeIDs)});");
+        return conn?.Query<Employee>($"SELECT * FROM Employee WHERE ID IN ({string.Join(", ", employeeIDs)});") ?? new List<Employee>();
     }
 
     /* DEPARTMENTS */
-    public List<Department> Departments(Expression<Func<Department, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<Department> Departments(Expression<Func<Department, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     /// <summary>
     /// Pulls all relevant sub departments according to the given department name.
@@ -358,12 +364,12 @@ public class StaffReader
     /// <returns></returns>
     public IEnumerable<Department> SubDepartments(string departmentName)
     {
-        Dictionary<string, Department> deptDict = null;
-        Dictionary<string, List<Shift>> shiftDict = null;
+        Dictionary<string, Department>? deptDict = null;
+        Dictionary<string, List<Shift>>? shiftDict = null;
 
         try
         {
-            Chariot.Database.RunInTransaction(() =>
+            Chariot.Database?.RunInTransaction(() =>
             {
                 deptDict = Chariot.PullObjectList<Department>().ToDictionary(d => d.Name, d => d);
                 shiftDict = Chariot.PullObjectList<Shift>()
@@ -388,11 +394,11 @@ public class StaffReader
 
         foreach (var (_, department) in deptDict)
         {
-            if (deptDict.TryGetValue(department.OverDepartmentName ?? "", out var overDepartment))
+            if (deptDict.TryGetValue(department.OverDepartmentName, out var overDepartment))
                 overDepartment.AddSubDepartment(department);
         }
 
-        deptDict.TryGetValue(departmentName, out var headDepartment);
+        if (!deptDict.TryGetValue(departmentName, out var headDepartment)) return new List<Department>();
 
         deptDict.Clear();
 
@@ -410,10 +416,6 @@ public class StaffReader
     /// <param name="returnDict"></param>
     private static void GetSubDepartments(Department department, ref Dictionary<string, Department> returnDict)
     {
-        returnDict ??= new Dictionary<string, Department>();
-
-        if (department.SubDepartments is null) return;
-
         foreach (var sub in department.SubDepartments)
         {
             if (returnDict.ContainsKey(sub.Name)) continue;
@@ -423,12 +425,12 @@ public class StaffReader
     }
 
     /* PROJECTS */
-    public IEnumerable<Project> Projects(Expression<Func<Project, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType).OrderBy(p => p.Name);
+    public IEnumerable<Project> Projects(Expression<Func<Project, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType).OrderBy(p => p.Name);
 
     public AionDataSet GetAionDataSet()
     {
         AionDataSet newSet = new();
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             newSet.ClockEvents = ClockEvents().ToDictionary(c => c.ID, c => c);
             newSet.Employees = Employees().ToDictionary(e => e.ID, e => e);

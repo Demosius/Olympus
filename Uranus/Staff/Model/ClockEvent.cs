@@ -26,14 +26,14 @@ public class ClockEvent : IEquatable<ClockEvent>, INotifyPropertyChanged
     private string date;
     public string Date
     {
-        get => date ??= DateTime.Parse(Timestamp).ToString("yyyy-MM-dd");
+        get => date == string.Empty ? DateTime.Parse(Timestamp).ToString("yyyy-MM-dd") : date;
         set => date = value;
     }
 
     private string time;
     public string Time
     {
-        get => time ??= DateTime.Parse(Timestamp).ToString("HH:mm:ss");
+        get => time == string.Empty ? DateTime.Parse(Timestamp).ToString("HH:mm:ss") : time;
         set
         {
             time = value.Replace('_', '0');
@@ -44,7 +44,7 @@ public class ClockEvent : IEquatable<ClockEvent>, INotifyPropertyChanged
     public EClockStatus Status { get; set; }
 
     [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.ClockEvents), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Employee Employee { get; set; }
+    public Employee? Employee { get; set; }
 
     [Ignore] public DateTime DtDate => DateTime.Parse(Date).Date;
     [Ignore] public TimeSpan DtTime => DateTime.Parse(Time).TimeOfDay;
@@ -52,6 +52,15 @@ public class ClockEvent : IEquatable<ClockEvent>, INotifyPropertyChanged
     public ClockEvent()
     {
         ID = Guid.NewGuid();
+        Timestamp = string.Empty;
+        date = string.Empty;
+        time = string.Empty;
+    }
+
+    public ClockEvent(string timestamp, Employee employee) : this()
+    {
+        Timestamp = timestamp;
+        Employee = employee;
     }
 
     public void StampTime()
@@ -91,7 +100,7 @@ public class ClockEvent : IEquatable<ClockEvent>, INotifyPropertyChanged
 
     /* Equality overloading. */
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is not ClockEvent other)
         {
@@ -105,7 +114,7 @@ public class ClockEvent : IEquatable<ClockEvent>, INotifyPropertyChanged
         return string.CompareOrdinal(Timestamp, other.Timestamp) == 0;
     }
 
-    public bool Equals(ClockEvent other)
+    public bool Equals(ClockEvent? other)
     {
         if (other is null)
         {
@@ -119,25 +128,11 @@ public class ClockEvent : IEquatable<ClockEvent>, INotifyPropertyChanged
         return Date == other.Date && Time == other.Time;
     }
 
-    public static bool operator ==(ClockEvent lh, ClockEvent rh)
-    {
-        if (ReferenceEquals(lh, rh))
-        {
-            return true;
-        }
-        if (lh is null)
-        {
-            return false;
-        }
-        return rh is not null && lh.Equals(rh);
-    }
+    public static bool operator ==(ClockEvent? lh, ClockEvent? rh) => lh?.Equals(rh) ?? rh is null;
 
-    public static bool operator !=(ClockEvent lh, ClockEvent rh)
-    {
-        return !(lh == rh);
-    }
+    public static bool operator !=(ClockEvent? lh, ClockEvent? rh) => !(lh == rh);
 
-    public static bool operator >(ClockEvent lh, ClockEvent rh)
+    public static bool operator >(ClockEvent? lh, ClockEvent? rh)
     {
         if (ReferenceEquals(lh, rh))
         {
@@ -155,7 +150,7 @@ public class ClockEvent : IEquatable<ClockEvent>, INotifyPropertyChanged
         return string.CompareOrdinal(lh.Date, rh.Date) > 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) > 0;
     }
 
-    public static bool operator <(ClockEvent lh, ClockEvent rh)
+    public static bool operator <(ClockEvent? lh, ClockEvent? rh)
     {
         if (ReferenceEquals(lh, rh))
         {
@@ -173,15 +168,15 @@ public class ClockEvent : IEquatable<ClockEvent>, INotifyPropertyChanged
         return string.CompareOrdinal(lh.Date, rh.Date) < 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) < 0;
     }
 
-    public static bool operator <=(ClockEvent lh, ClockEvent rh) => lh == rh || lh < rh;
+    public static bool operator <=(ClockEvent? lh, ClockEvent? rh) => lh == rh || lh < rh;
 
-    public static bool operator >=(ClockEvent lh, ClockEvent rh) => lh == rh || lh > rh;
+    public static bool operator >=(ClockEvent? lh, ClockEvent? rh) => lh == rh || lh > rh;
 
     // ReSharper disable once NonReadonlyMemberInGetHashCode
     public override int GetHashCode() => ID.GetHashCode();
 
     // Property changed event handling.
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     private void OnPropertyChanged(string propertyName)
     {

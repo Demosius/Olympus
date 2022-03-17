@@ -1,6 +1,8 @@
 ﻿using System;
-using Uranus.Equipment.Model;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using Uranus.Equipment.Model;
 
 namespace Uranus.Equipment;
 
@@ -14,30 +16,18 @@ public class EquipmentReader
     }
 
     /* Machines */
-    public List<Machine> Machines()
+    public List<Machine> Machines(Expression<Func<Machine, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
+    public Dictionary<string, List<Machine>> MachineDictionary(Expression<Func<Machine, bool>>? filter = null, EPullType pullType = EPullType.IncludeChildren)
     {
-        List<Machine> machines = new();
-        foreach (var machine in Chariot.PullObjectList<Machine>(pullType: EPullType.FullRecursive))
-        {
-            switch (machine.Type.LicenceRequired)
-            {
-                case Staff.ELicence.LF:
-                    machines.Add((Forklift)machine);
-                    break;
-                case Staff.ELicence.LO:
-                    machines.Add((Stockpicker)machine);
-                    break;
-                case Staff.ELicence.WP:
-                    machines.Add((WorkingPlatform)machine);
-                    break;
-                case null:
-                    machines.Add((Rabbit)machine);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-        return machines;
+        return Machines(filter, pullType)
+            .GroupBy(m => m.TypeCode)
+            .ToDictionary(g => g.Key, g => g.ToList());
+    }
+
+    public List<Machine> Machines(string machineTypeCode, EPullType pullType = EPullType.ObjectOnly)
+    {
+        return Machines(m => m.TypeCode == machineTypeCode, pullType);
     }
 
 }

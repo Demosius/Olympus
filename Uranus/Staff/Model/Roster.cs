@@ -1,6 +1,6 @@
-﻿using System;
-using SQLite;
+﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
+using System;
 
 namespace Uranus.Staff.Model;
 
@@ -22,15 +22,32 @@ public class Roster
     public string Date { get; set; }
     public ERosterType RosterType { get; set; }
 
-    [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.Rosters),CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Employee Employee { get; set; }
+    [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public Employee? Employee { get; set; }
     [ManyToOne(nameof(ShiftName), nameof(Model.Shift.Rosters), CascadeOperations = CascadeOperation.CascadeInsert | CascadeOperation.CascadeRead)]
-    public Shift Shift { get; set; }
+    public Shift? Shift { get; set; }
     [ManyToOne(nameof(DepartmentName), nameof(Model.Department.Rosters), CascadeOperations = CascadeOperation.CascadeInsert | CascadeOperation.CascadeRead)]
-    public Department Department { get; set; }
+    public Department? Department { get; set; }
 
     public Roster()
     {
         ID = Guid.NewGuid();
+        ShiftName = string.Empty;
+        DepartmentName = string.Empty;
+        Date = string.Empty;
+    }
+
+    public Roster(Guid id, int employeeID, string shiftName, string departmentName, DayOfWeek day, string date, ERosterType rosterType, Employee employee, Shift shift, Department department)
+    {
+        ID = id;
+        EmployeeID = employeeID;
+        ShiftName = shiftName;
+        DepartmentName = departmentName;
+        Day = day;
+        Date = date;
+        RosterType = rosterType;
+        Employee = employee;
+        Shift = shift;
+        Department = department;
     }
 }

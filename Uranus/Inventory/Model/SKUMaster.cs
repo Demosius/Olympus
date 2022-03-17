@@ -79,13 +79,13 @@ public class SkuMaster
 
         Sku = item.Number;
         DivisionCode = item.DivisionCode;
-        DivisionName = item.Division.Description;
+        DivisionName = item.Division?.Description ?? string.Empty;
         CategoryCode = item.CategoryCode;
-        CategoryName = item.Category.Description;
+        CategoryName = item.Category?.Description ?? string.Empty;
         PlatformCode = item.PlatformCode;
-        PlatformName = item.Platform.Description;
+        PlatformName = item.Platform?.Description ?? string.Empty;
         GenreCode = item.GenreCode;
-        GenreName = item.Genre.Description;
+        GenreName = item.Genre?.Description ?? string.Empty;
         if (PlatformCode == 516)
             ProductTypeCode = EProductType.Pop;
         else if (DivisionCode == 550)
@@ -143,22 +143,22 @@ public class SkuMaster
         foreach (var stock in item.NAVStock)
         {
             BaseUnitsOnHand += stock.GetBaseQty();
-            if (stock.UoM.UoM == uomCheck)
+            if (stock.UoM?.UoM == uomCheck)
                 TotalCartonsOnHand += stock.Qty;
             if (primaryZones.Contains(stock.ZoneCode))
             {
                 /*zones.Add(stock.ZoneCode);
                 bins.Add(stock.BinCode);*/
-                if (stock.UoM.UoM < uomCheck)
+                if (stock.UoM?.UoM < uomCheck)
                     SplitCase = true;
             }
-            else if (osZones.Contains(stock.ZoneCode) && stock.UoM.UoM == uomCheck)
+            else if (osZones.Contains(stock.ZoneCode) && stock.UoM?.UoM == uomCheck)
             {
                 palletSizes.Add(stock.Qty);
             }
             else if (cpZones.Contains(stock.ZoneCode))
             {
-                if (stock.UoM.UoM == uomCheck)
+                if (stock.UoM?.UoM == uomCheck)
                     CasePick = true;
                 else
                     SplitCase = true;
@@ -171,6 +171,10 @@ public class SkuMaster
             .OrderByDescending(x => x.Count()).ThenBy(x => x.Key)
             .Select(x => (int?)x.Key)
             .FirstOrDefault();
+        CurrentOverstockBins ??= string.Empty;
+        CurrentPickBins ??= string.Empty;
+        CurrentPickZones ??= string.Empty;
+        CurrentVirtualBins ??= string.Empty;
     }
 
     /// <summary>
@@ -187,16 +191,16 @@ public class SkuMaster
         Sku = item.Number;
         DivisionCode = item.DivisionCode;
         _ = divisions.TryGetValue(DivisionCode, out var divName);
-        DivisionName = divName;
+        DivisionName = divName ?? string.Empty;
         CategoryCode = item.CategoryCode;
         _ = categories.TryGetValue(CategoryCode, out var catName);
-        CategoryName = catName;
+        CategoryName = catName ?? string.Empty;
         PlatformCode = item.PlatformCode;
         _ = platforms.TryGetValue(PlatformCode, out var pfName);
-        PlatformName = pfName;
+        PlatformName = pfName ?? string.Empty;
         GenreCode = item.GenreCode;
         _ = genres.TryGetValue(GenreCode, out var genName);
-        GenreName = genName;
+        GenreName = genName ?? string.Empty;
         if (PlatformCode == 516)
             ProductTypeCode = EProductType.Pop;
         else if (DivisionCode == 550)
@@ -215,7 +219,7 @@ public class SkuMaster
 
         // Units and Dims per Case/Pack/Each/Carton(largest thereof)
         _ = uomDict.TryGetValue(Sku, out var itemUoMs);
-        NAVUoM caseUoM = null, packUoM = null, eachUoM = null;
+        NAVUoM? caseUoM = null, packUoM = null, eachUoM = null;
         _ = itemUoMs?.TryGetValue("CASE", out caseUoM);
         _ = itemUoMs?.TryGetValue("PACK", out packUoM);
         _ = itemUoMs?.TryGetValue("EACH", out eachUoM);

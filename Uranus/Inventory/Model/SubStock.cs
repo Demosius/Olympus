@@ -19,16 +19,22 @@ public class SubStock
     public EUoM UoM { get; set; }
 
     [ManyToOne(nameof(StockID), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Stock Stock { get; set; }
+    public Stock? Stock { get; set; }
 
-    public SubStock(Stock stock)
+    public SubStock()
+    {
+        ID = string.Empty;
+        StockID = string.Empty;
+    }
+
+    public SubStock(Stock stock) : this()
     {
         Stock = stock;
+        StockID = stock.ID;
     }
 
     public SubStock(Stock stock, EUoM uom) : this(stock)
     {
-        StockID = Stock.ID;
         UoM = uom;
         ID = string.Join(":", StockID, UoM);
     }
@@ -48,7 +54,7 @@ public class SubStock
 
     public void SetStockID()
     {
-        StockID = Stock.ID;
+        StockID = Stock?.ID ?? string.Empty;
         ID = string.Join(":", StockID, UoM);
     }
 

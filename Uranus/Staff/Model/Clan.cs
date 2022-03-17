@@ -11,11 +11,27 @@ public class Clan
     [ForeignKey(typeof(Department))] public string DepartmentName { get; set; }
 
     [ManyToOne(nameof(DepartmentName), nameof(Model.Department.Clans), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Department Department { get; set; }
+    public Department? Department { get; set; }
 
     [OneToOne(nameof(LeaderID), nameof(Employee.Clan), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Employee Leader { get; set; }
+    public Employee? Leader { get; set; }
 
     [OneToMany(nameof(Employee.ClanName), nameof(Employee.Clan), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Employee> Employees { get; set; } = new();
+
+    public Clan()
+    {
+        Name = string.Empty;
+        DepartmentName = string.Empty;
+        Employees = new List<Employee>();
+    }
+
+    public Clan(string name, int leaderID, string departmentName, Department department, Employee leader)
+    {
+        Name = name;
+        LeaderID = leaderID;
+        DepartmentName = departmentName;
+        Department = department;
+        Leader = leader;
+    }
 }

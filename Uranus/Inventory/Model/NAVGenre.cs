@@ -12,4 +12,17 @@ public class NAVGenre
 
     [OneToMany(nameof(NAVItem.GenreCode), nameof(NAVItem.Genre), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVItem> Items { get; set; }
+
+    public NAVGenre()
+    {
+        Description = string.Empty;
+        Items = new List<NAVItem>();
+    }
+
+    public NAVGenre(int code, string description, List<NAVItem> items)
+    {
+        Code = code;
+        Description = description;
+        Items = items;
+    }
 }

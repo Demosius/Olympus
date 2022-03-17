@@ -131,21 +131,30 @@ public class ShiftEntry : INotifyPropertyChanged
     }
 
     [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.ShiftEntries), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Employee Employee { get; set; }
+    public Employee? Employee { get; set; }
 
     [Ignore] public List<ClockEvent> ClockEvents { get; set; }
 
-    [Ignore] public string Department => Employee?.DepartmentName;
-    [Ignore] public string EmployeeName => Employee?.FullName;
+    [Ignore] public string Department => Employee?.DepartmentName ?? string.Empty;
+    [Ignore] public string EmployeeName => Employee?.FullName ?? string.Empty;
 
     public ShiftEntry()
     {
         ID = Guid.NewGuid();
+        ShiftName = string.Empty;
+        shiftEndTime = string.Empty;
+        shiftStartTime = string.Empty;
+        lunchStartTime = string.Empty;
+        lunchEndTime = string.Empty;
+        location = string.Empty;
+        Date = string.Empty;
+        timeTotal = string.Empty;
+        comments = string.Empty;
+        ClockEvents = new List<ClockEvent>();
     }
 
-    public ShiftEntry(Employee employee, List<ClockEvent> clockTimes)
+    public ShiftEntry(Employee employee, List<ClockEvent> clockTimes) : this()
     {
-        ID = Guid.NewGuid();
         EmployeeID = employee.ID;
         Employee = employee;
         Location = employee.Location;
@@ -156,14 +165,33 @@ public class ShiftEntry : INotifyPropertyChanged
         SummarizeShift();
     }
 
-    public ShiftEntry(Employee employee, DateTime date)
+    public ShiftEntry(Employee employee, DateTime date) : this()
     {
-        ID = Guid.NewGuid();
         EmployeeID = employee.ID;
         Employee = employee;
         Location = employee.Location;
         Date = date.ToString("yyyy-MM-dd");
         Day = date.DayOfWeek;
+    }
+
+    public ShiftEntry(string shiftStartTime, string shiftEndTime, string lunchStartTime, string lunchEndTime, string location, EShiftType shiftType, string timeTotal, double hoursWorked, string comments, Guid id, int employeeID, string shiftName, string date, DayOfWeek day, Employee employee, List<ClockEvent> clockEvents)
+    {
+        this.shiftStartTime = shiftStartTime;
+        this.shiftEndTime = shiftEndTime;
+        this.lunchStartTime = lunchStartTime;
+        this.lunchEndTime = lunchEndTime;
+        this.location = location;
+        this.shiftType = shiftType;
+        this.timeTotal = timeTotal;
+        this.hoursWorked = hoursWorked;
+        this.comments = comments;
+        ID = id;
+        EmployeeID = employeeID;
+        ShiftName = shiftName;
+        Date = date;
+        Day = day;
+        Employee = employee;
+        ClockEvents = clockEvents;
     }
 
     /// <summary>
@@ -251,7 +279,7 @@ public class ShiftEntry : INotifyPropertyChanged
         HoursWorked = workSpan.TotalHours;
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     private void OnPropertyChanged(string propertyName)
     {
@@ -266,7 +294,7 @@ public class ShiftEntry : INotifyPropertyChanged
 
     /* Equality overloading. */
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is not ShiftEntry other)
         {
@@ -280,7 +308,7 @@ public class ShiftEntry : INotifyPropertyChanged
         return ID == other.ID;
     }
 
-    public bool Equals(ShiftEntry other)
+    public bool Equals(ShiftEntry? other)
     {
         if (other is null)
         {
@@ -294,25 +322,11 @@ public class ShiftEntry : INotifyPropertyChanged
         return ID == other.ID;
     }
 
-    public static bool operator ==(ShiftEntry lh, ShiftEntry rh)
-    {
-        if (ReferenceEquals(lh, rh))
-        {
-            return true;
-        }
-        if (lh is null)
-        {
-            return false;
-        }
-        return rh is not null && lh.Equals(rh);
-    }
+    public static bool operator ==(ShiftEntry? lh, ShiftEntry? rh) => lh?.Equals(rh) ?? rh is null;
 
-    public static bool operator !=(ShiftEntry lh, ShiftEntry rh)
-    {
-        return !(lh == rh);
-    }
+    public static bool operator !=(ShiftEntry? lh, ShiftEntry? rh) => !(lh == rh);
 
-    public static bool operator >(ShiftEntry lh, ShiftEntry rh)
+    public static bool operator >(ShiftEntry? lh, ShiftEntry? rh)
     {
         if (ReferenceEquals(lh, rh))
         {
@@ -330,7 +344,7 @@ public class ShiftEntry : INotifyPropertyChanged
         return string.CompareOrdinal(lh.Date, rh.Date) > 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) > 0;
     }
 
-    public static bool operator <(ShiftEntry lh, ShiftEntry rh)
+    public static bool operator <(ShiftEntry? lh, ShiftEntry? rh)
     {
         if (ReferenceEquals(lh, rh))
         {
@@ -348,9 +362,9 @@ public class ShiftEntry : INotifyPropertyChanged
         return string.CompareOrdinal(lh.Date, rh.Date) < 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) < 0;
     }
 
-    public static bool operator <=(ShiftEntry lh, ShiftEntry rh) => lh == rh || lh < rh;
+    public static bool operator <=(ShiftEntry? lh, ShiftEntry? rh) => lh == rh || lh < rh;
 
-    public static bool operator >=(ShiftEntry lh, ShiftEntry rh) => lh == rh || lh > rh;
+    public static bool operator >=(ShiftEntry? lh, ShiftEntry? rh) => lh == rh || lh > rh;
 
     // ReSharper disable once NonReadonlyMemberInGetHashCode
     public override int GetHashCode() => ID.GetHashCode();

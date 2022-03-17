@@ -1,6 +1,6 @@
-﻿using System;
-using SQLite;
+﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
+using System;
 using System.Collections.Generic;
 
 namespace Uranus.Inventory.Model;
@@ -22,7 +22,8 @@ public class NAVUoM
     public double Weight { get; set; }
 
     private EUoM? uom;
-    [Ignore] public EUoM UoM
+    [Ignore]
+    public EUoM UoM
     {
         get
         {
@@ -35,11 +36,14 @@ public class NAVUoM
     public List<NAVStock> Stock { get; set; }
 
     [ManyToOne(nameof(ItemNumber), nameof(NAVItem.UoMs), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public NAVItem Item { get; set; }
+    public NAVItem? Item { get; set; }
 
     public NAVUoM()
     {
-        QtyPerUoM = 0;
+        ID = string.Empty;
+        Code = string.Empty;
+        ExcludeCartonization = false;
+        Stock = new List<NAVStock>();
     }
 
     public NAVUoM(EUoM uom) : this()

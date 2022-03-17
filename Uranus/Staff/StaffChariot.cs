@@ -1,6 +1,6 @@
-﻿using Uranus.Staff.Model;
-using System;
+﻿using System;
 using System.IO;
+using Uranus.Staff.Model;
 
 namespace Uranus.Staff;
 
@@ -12,13 +12,13 @@ public class StaffChariot : MasterChariot
     public string EmployeeAvatarDirectory { get; set; }
     public string ProjectIconDirectory { get; set; }
     public string LicenceImageDirectory { get; set; }
-        
-    public override Type[] Tables { get; } = 
+
+    public override Type[] Tables { get; } =
     {
-        typeof(Clan),                       typeof(ClockEvent),         typeof(Department),                 typeof(DepartmentProject),  
-        typeof(Employee),                   typeof(EmployeeAvatar),     typeof(EmployeeDepartmentLoaning),  typeof(EmployeeIcon),       
-        typeof(EmployeeInductionReference), typeof(EmployeeProject),    typeof(EmployeeShift),              typeof(EmployeeVehicle),    
-        typeof(Induction),                  typeof(Licence),            typeof(LicenceImage),               typeof(Locker),            
+        typeof(Clan),                       typeof(ClockEvent),         typeof(Department),                 typeof(DepartmentProject),
+        typeof(Employee),                   typeof(EmployeeAvatar),     typeof(EmployeeDepartmentLoaning),  typeof(EmployeeIcon),
+        typeof(EmployeeInductionReference), typeof(EmployeeProject),    typeof(EmployeeShift),              typeof(EmployeeVehicle),
+        typeof(Induction),                  typeof(Licence),            typeof(LicenceImage),               typeof(Locker),
         typeof(Project),                    typeof(ProjectIcon),        typeof(Role),                       typeof(Roster),
         typeof(Shift),                      typeof(ShiftEntry),         typeof(ShiftRule),                  typeof(TagUse),
         typeof(TempTag),                    typeof(Vehicle)
@@ -28,8 +28,13 @@ public class StaffChariot : MasterChariot
 
     public StaffChariot(string solLocation)
     {
+        EmployeeIconDirectory = string.Empty;
+        EmployeeAvatarDirectory = string.Empty;
+        ProjectIconDirectory = string.Empty;
+        LicenceImageDirectory = string.Empty;
         // Try first to use the given directory, if not then use local file.
         BaseDataDirectory = Path.Combine(solLocation, "Staff");
+
         InitializeDatabaseConnection();
     }
 

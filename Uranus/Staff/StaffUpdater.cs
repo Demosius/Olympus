@@ -18,9 +18,9 @@ public class StaffUpdater
 
     public void Employee(Employee employee) => Chariot.Update(employee);
 
-    public void ClockEvents(IEnumerable<ClockEvent> clocks) 
+    public void ClockEvents(IEnumerable<ClockEvent> clocks)
     {
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             foreach (var clockEvent in clocks)
             {
@@ -33,7 +33,7 @@ public class StaffUpdater
 
     public void ShiftEntries(IEnumerable<ShiftEntry> shiftEntries)
     {
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             foreach (var entry in shiftEntries)
             {
@@ -44,7 +44,7 @@ public class StaffUpdater
 
     public void EntriesAndClocks(IEnumerable<ShiftEntry> shiftEntries, IEnumerable<ClockEvent> clockEvents)
     {
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             foreach (var entry in shiftEntries)
             {
@@ -74,7 +74,7 @@ public class StaffUpdater
     /// <param name="employeeID"></param>
     public void SetPending(string date, int employeeID)
     {
-        Chariot.Database.Execute("UPDATE ClockEvent SET Status = ? WHERE EmployeeID = ? AND Date = ?;",
+        Chariot.Database?.Execute("UPDATE ClockEvent SET Status = ? WHERE EmployeeID = ? AND Date = ?;",
             EClockStatus.Pending, employeeID, date);
     }
     /// <summary>
@@ -109,7 +109,7 @@ public class StaffUpdater
     /// </summary>
     public void ApplyPendingClockEvents()
     {
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             // Get full clocks and shifts.
             var clockDict = Chariot.Database.Query<ClockEvent>("SELECT * FROM ClockEvent WHERE Status <> ?;", EClockStatus.Deleted)
@@ -156,7 +156,7 @@ public class StaffUpdater
     {
         var returnValue = 0;
 
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             // Remove duplicate values.
             returnValue += RemoveDuplicateShiftEntries();
@@ -194,8 +194,8 @@ public class StaffUpdater
     /// <returns>The number of rows removed.</returns>
     public int RemoveDuplicateShiftEntries()
     {
-        return Chariot.Database.Execute("DELETE FROM ShiftEntry WHERE ID NOT IN " +
-                                        "(SELECT MIN(ID) FROM ShiftEntry GROUP BY EmployeeID, Date)");
+        return Chariot.Database?.Execute("DELETE FROM ShiftEntry WHERE ID NOT IN " +
+                                        "(SELECT MIN(ID) FROM ShiftEntry GROUP BY EmployeeID, Date)") ?? 0;
     }
 
     /// <summary>
@@ -206,7 +206,7 @@ public class StaffUpdater
     public int Employees(IEnumerable<Employee> employees)
     {
         var returnVal = 0;
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             returnVal = employees.Sum(employee => Chariot.Database.InsertOrReplace(employee));
         });

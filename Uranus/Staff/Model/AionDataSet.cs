@@ -13,6 +13,20 @@ public class AionDataSet
     public Dictionary<Guid, ClockEvent> ClockEvents { get; set; }
     public Dictionary<Guid, ShiftEntry> ShiftEntries { get; set; }
 
+    public AionDataSet()
+    {
+        Employees = new Dictionary<int, Employee>();
+        ClockEvents = new Dictionary<Guid, ClockEvent>();
+        ShiftEntries = new Dictionary<Guid, ShiftEntry>();
+    }
+
+    public AionDataSet(Dictionary<int, Employee> employees, Dictionary<Guid, ClockEvent> clockEvents, Dictionary<Guid, ShiftEntry> shiftEntries)
+    {
+        Employees = employees;
+        ClockEvents = clockEvents;
+        ShiftEntries = shiftEntries;
+    }
+
     public bool HasData()
     {
         return HasEmployees() || HasClockEvents() || HasShiftEntries();
@@ -20,16 +34,16 @@ public class AionDataSet
 
     public bool HasEmployees()
     {
-        return Employees is not null && Employees.Any();
+        return Employees.Any();
     }
 
     public bool HasClockEvents()
     {
-        return ClockEvents is not null && ClockEvents.Any();
+        return ClockEvents.Any();
     }
 
     public bool HasShiftEntries()
     {
-        return ShiftEntries is not null && ShiftEntries.Any();
+        return ShiftEntries.Any();
     }
 }

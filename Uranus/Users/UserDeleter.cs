@@ -1,5 +1,5 @@
-﻿using Uranus.Users.Model;
-using System.Linq;
+﻿using System.Linq;
+using Uranus.Users.Model;
 
 namespace Uranus.Users;
 

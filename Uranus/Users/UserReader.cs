@@ -11,7 +11,7 @@ public class UserReader
         Chariot = chariot;
     }
 
-    public bool UserExists(int userID) => Chariot.Database.ExecuteScalar<int>("SELECT count(*) FROM User WHERE ID=?;", userID) > 0; 
+    public bool UserExists(int userID) => Chariot.Database?.ExecuteScalar<int>("SELECT count(*) FROM User WHERE ID=?;", userID) > 0;
 
     public Login Login(int userID) => Chariot.PullObject<Login>(userID);
 

@@ -1,9 +1,9 @@
-﻿using Uranus.Staff.Model;
-using SQLite;
+﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Uranus.Staff.Model;
 
 namespace Uranus.Equipment.Model;
 
@@ -20,13 +20,20 @@ public class CompletedChecklist
     public bool Pass { get; set; }
 
     [ManyToOne(nameof(ChecklistName), nameof(Checklist.CompletedChecklists), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Checklist OriginalChecklist { get; set; }
+    public Checklist? OriginalChecklist { get; set; }
     [ManyToOne(nameof(MachineSerialNumber), nameof(Model.Machine.CompletedChecklists), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Machine Machine { get; set; }
+    public Machine? Machine { get; set; }
 
     [Ignore] public List<Check> Checks { get; set; }
 
-    public CompletedChecklist() { }
+    public CompletedChecklist()
+    {
+        ID = Guid.NewGuid();
+        Checks = new List<Check>();
+        ChecklistName = string.Empty;
+        CompletedTime = DateTime.MinValue;
+        Comment = string.Empty;
+    }
 
     public CompletedChecklist(Checklist checklist, int machineSerialNumber, int employeeID)
     {
@@ -35,6 +42,7 @@ public class CompletedChecklist
         ChecklistName = checklist.Name;
         MachineSerialNumber = machineSerialNumber;
         EmployeeID = employeeID;
+        Comment = string.Empty;
     }
 
     public CompletedChecklist(Checklist checklist, Machine machine, Employee employee)

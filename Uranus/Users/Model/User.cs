@@ -10,10 +10,23 @@ public class User
     [ForeignKey(typeof(Role))] public string RoleName { get; set; }
 
     [ManyToOne(nameof(RoleName), nameof(Model.Role.Users), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Role Role { get; set; }
+    public Role? Role { get; set; }
 
     [Ignore]
-    public Employee Employee { get; set; }
+    public Employee? Employee { get; set; }
+
+    public User()
+    {
+        RoleName = string.Empty;
+    }
+
+    public User(int id, string roleName, Role? role, Employee? employee)
+    {
+        ID = id;
+        RoleName = roleName;
+        Role = role;
+        Employee = employee;
+    }
 
     public void SetRole(Role role)
     {

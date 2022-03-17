@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
 using System.Data;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
 using Uranus.Inventory;
 using Uranus.Inventory.Model;
 
@@ -45,7 +45,7 @@ public static class DataConversion
     }
 
     // Convert a memory stream into a Division list.
-    private static List<NAVTransferOrder> NAVStreamToTransferOrders(MemoryStream stream, Dictionary<string, int> headDict)
+    private static List<NAVTransferOrder> NAVStreamToTransferOrders(Stream stream, Dictionary<string, int> headDict)
     {
         List<NAVTransferOrder> tos = new();
 
@@ -54,7 +54,7 @@ public static class DataConversion
         using StreamReader reader = new(stream);
         // First set the headers.
         var line = reader.ReadLine();
-        var headArr = line?.Split('\t');
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
         SetHeadPosFromArray(ref headDict, headArr);
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
@@ -117,7 +117,7 @@ public static class DataConversion
         using StreamReader reader = new(stream);
         // First set the headers.
         var line = reader.ReadLine();
-        var headArr = line?.Split('\t');
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
         SetHeadPosFromArray(ref headDict, headArr);
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
@@ -171,7 +171,7 @@ public static class DataConversion
         using StreamReader reader = new(stream);
         // First set the headers.
         var line = reader.ReadLine();
-        var headArr = line?.Split('\t');
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
         SetHeadPosFromArray(ref headDict, headArr);
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
@@ -227,7 +227,7 @@ public static class DataConversion
         using StreamReader reader = new(stream);
         // First set the headers.
         var line = reader.ReadLine();
-        var headArr = line?.Split('\t');
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
         SetHeadPosFromArray(ref headDict, headArr);
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
@@ -281,7 +281,7 @@ public static class DataConversion
         using StreamReader reader = new(stream);
         // First set the headers.
         var line = reader.ReadLine();
-        var headArr = line?.Split('\t');
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
         SetHeadPosFromArray(ref headDict, headArr);
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
@@ -334,7 +334,7 @@ public static class DataConversion
             ;
         // First set the headers.
         var line = reader.ReadLine();
-        var headArr = line?.Split('\t');
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
         SetHeadPosFromArray(ref headDict, headArr);
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
@@ -390,7 +390,7 @@ public static class DataConversion
         using StreamReader reader = new(stream);
         // First set the headers.
         var line = reader.ReadLine();
-        var headArr = line?.Split('\t');
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
         SetHeadPosFromArray(ref headDict, headArr);
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
@@ -449,7 +449,7 @@ public static class DataConversion
         using StreamReader reader = new(stream);
         // First set the headers.
         var line = reader.ReadLine();
-        var headArr = line?.Split('\t');
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
         SetHeadPosFromArray(ref headDict, headArr);
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
@@ -485,8 +485,8 @@ public static class DataConversion
                     Ranking = rank,
                     UsedCube = usedCube,
                     MaxCube = maxCube,
-                    LastCcDate = ccCount,
-                    LastPiDate = piCount
+                    LastCCDate = ccCount,
+                    LastPIDate = piCount
                 };
                 bins.Add(bin);
             }
@@ -504,7 +504,7 @@ public static class DataConversion
         IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
         var headDict = Constants.NAVItemColumns;
         using StreamReader reader = new(File.OpenRead(itemCSVLocation));
-        var headArr = reader.ReadLine()?.Trim('"').Split(',', '"');
+        var headArr = reader.ReadLine()?.Trim('"').Split(',', '"') ?? Array.Empty<string>();
         SetHeadPosFromArray(ref headDict, headArr);
         var line = reader.ReadLine();
 
@@ -551,7 +551,7 @@ public static class DataConversion
     // Turns clipboard data into a list of UoMs.
     public static List<NAVUoM> NAVRawStringToUoMs(string rawData)
     {
-        var headDict = Constants.NAV_UOMColumns;
+        var headDict = Constants.NAV_UoMColumns;
 
         if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
         // Start memory stream from which to read.
@@ -572,7 +572,7 @@ public static class DataConversion
         using StreamReader reader = new(stream);
         // First set the headers.
         var line = reader.ReadLine();
-        var headArr = line?.Split('\t');
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
         SetHeadPosFromArray(ref headDict, headArr);
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
@@ -641,7 +641,7 @@ public static class DataConversion
         using StreamReader reader = new(stream);
         // First set the headers.
         var line = reader.ReadLine();
-        var headArr = line?.Split('\t');
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
         SetHeadPosFromArray(ref headDict, headArr);
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
@@ -721,7 +721,7 @@ public static class DataConversion
     }
 
     // Takes a table-like array of data and converts it to a JSON string.
-    public static string ArrayToJSON(string[,] array)
+    public static string ArrayToJson(string[,] array)
     {
         var returnString = "{\n\t";
         int row, col;

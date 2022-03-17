@@ -22,4 +22,32 @@ public class NAVLocation
     public List<NAVStock> Stock { get; set; }
     [OneToMany(nameof(Store.Number), nameof(Store.Location), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Store> Stores { get; set; }
+
+    public NAVLocation()
+    {
+        Code = string.Empty;
+        Name = string.Empty;
+        CompanyCode = string.Empty;
+        IsWarehouse = false;
+        IsStore = false;
+        ActiveForReplenishment = false;
+        Zones = new List<NAVZone>();
+        MoveLines = new List<NAVMoveLine>();
+        Stock = new List<NAVStock>();
+        Stores = new List<Store>();
+    }
+
+    public NAVLocation(string code, string name, string companyCode, bool isWarehouse, bool isStore, bool activeForReplenishment, List<NAVZone> zones, List<NAVMoveLine> moveLines, List<NAVStock> stock, List<Store> stores)
+    {
+        Code = code;
+        Name = name;
+        CompanyCode = companyCode;
+        IsWarehouse = isWarehouse;
+        IsStore = isStore;
+        ActiveForReplenishment = activeForReplenishment;
+        Zones = zones;
+        MoveLines = moveLines;
+        Stock = stock;
+        Stores = stores;
+    }
 }

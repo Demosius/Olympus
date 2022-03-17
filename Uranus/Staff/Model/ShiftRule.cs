@@ -12,5 +12,18 @@ public class ShiftRule
     public string Rule { get; set; }
 
     [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.Rules), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Employee Employee { get; set; }
+    public Employee? Employee { get; set; }
+
+    public ShiftRule()
+    {
+        Rule = string.Empty;
+    }
+
+    public ShiftRule(int id, int employeeID, string rule, Employee employee)
+    {
+        ID = id;
+        EmployeeID = employeeID;
+        Rule = rule;
+        Employee = employee;
+    }
 }

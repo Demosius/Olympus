@@ -36,7 +36,17 @@ public abstract class MasterChariot
 {
     public string BaseDataDirectory { get; set; }
     public abstract string DatabaseName { get; }
-    public SQLiteConnection Database { get; set; }
+    public SQLiteConnection? Database { get; set; }
+
+    protected MasterChariot()
+    {
+        BaseDataDirectory = string.Empty;
+    }
+
+    protected MasterChariot(string baseDataDirectory)
+    {
+        BaseDataDirectory = baseDataDirectory;
+    }
 
     protected virtual void InitializeDatabaseConnection()
     {
@@ -70,7 +80,7 @@ public abstract class MasterChariot
     public int ReplaceFullTable<T>(List<T> objList)
     {
         var line = 0;
-        Database.RunInTransaction(() =>
+        Database?.RunInTransaction(() =>
         {
             line -= Database.DeleteAll<T>();
             line += Database.InsertAll(objList);
@@ -84,7 +94,7 @@ public abstract class MasterChariot
         var enumerable = objList as T[] ?? objList.ToArray();
         if (!enumerable.Any()) return 0;
         var lines = 0;
-        Database.RunInTransaction(() =>
+        Database?.RunInTransaction(() =>
         {
             lines = Database.InsertAll(enumerable);
         });
@@ -94,7 +104,9 @@ public abstract class MasterChariot
     public bool Create<T>(T item, EPushType pushType = EPushType.ObjectOnly)
     {
         if (pushType == EPushType.ObjectOnly)
-            _ = Database.Insert(item);
+        {
+            if (Database != null) _ = Database.Insert(item);
+        }
         else
         {
             var recursive = pushType == EPushType.FullRecursive;
@@ -106,10 +118,10 @@ public abstract class MasterChariot
 
     /**************************** READ Data ****************************/
 
-    public List<T> PullObjectList<T>(Expression<Func<T, bool>> filter = null, EPullType pullType = EPullType.ObjectOnly) where T : new()
+    public List<T> PullObjectList<T>(Expression<Func<T, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) where T : new()
     {
         if (pullType == EPullType.ObjectOnly)
-            return filter is null ? Database.Table<T>().ToList() : Database.Table<T>().Where(filter).ToList();
+            return (filter is null ? Database?.Table<T>().ToList() : Database?.Table<T>().Where(filter).ToList()) ?? new List<T>();
         var recursive = pullType == EPullType.FullRecursive;
         return Database.GetAllWithChildren(filter, recursive);
     }
@@ -117,21 +129,24 @@ public abstract class MasterChariot
     public T PullObject<T>(object primaryKey, EPullType pullType = EPullType.ObjectOnly) where T : new()
     {
         if (pullType == EPullType.ObjectOnly)
-            return Database.Find<T>(primaryKey);
+        {
+            return Database is null ? new T() : Database.Find<T>(primaryKey);
+        }
+
         var recursive = pullType == EPullType.FullRecursive;
         return Database.GetWithChildren<T>(primaryKey, recursive);
     }
 
     protected List<string> GetTableNames()
     {
-        var tableMappings = Database.TableMappings.ToList();
+        var tableMappings = Database?.TableMappings.ToList();
 
-        return tableMappings.Select(map => map.TableName).ToList();
+        return tableMappings is null ? new List<string>() : tableMappings.Select(map => map.TableName).ToList();
     }
 
     public string GetTableName(Type type)
     {
-        return Database.GetMapping(type).TableName;
+        return Database?.GetMapping(type).TableName ?? string.Empty;
     }
 
     /**************************** UPDATE Data ****************************/
@@ -145,7 +160,7 @@ public abstract class MasterChariot
     public bool UpdateTable<T>(List<T> objList)
     {
         if (objList.Count == 0) return false;
-        Database.RunInTransaction(() =>
+        Database?.RunInTransaction(() =>
         {
             foreach (var obj in objList)
             {
@@ -155,15 +170,15 @@ public abstract class MasterChariot
         return true;
     }
 
-    public int Update<T>(T item) => Database.Update(item);
+    public int Update<T>(T item) => Database?.Update(item) ?? 0;
 
-    public int InsertOrUpdate<T>(T item) => Database.InsertOrReplace(item);
+    public int InsertOrUpdate<T>(T item) => Database?.InsertOrReplace(item) ?? 0;
 
     /**************************** DELETE Data ****************************/
     public bool EmptyTable<T>()
     {
         var delCount = 0;
-        Database.RunInTransaction(() =>
+        Database?.RunInTransaction(() =>
         {
             delCount = Database.DeleteAll<T>();
         });
@@ -172,13 +187,13 @@ public abstract class MasterChariot
 
     public bool Delete(object obj)
     {
-        var rowsDeleted = Database.Delete(obj);
+        var rowsDeleted = Database?.Delete(obj);
         return rowsDeleted > 0;
     }
 
     public bool DeleteByKey<T>(object key)
     {
-        var rowsDeleted = Database.Delete<T>(key);
+        var rowsDeleted = Database?.Delete<T>(key);
         return rowsDeleted > 0;
     }
 
@@ -198,8 +213,9 @@ public abstract class MasterChariot
     /// <returns></returns>
     public virtual bool EmptyDatabase()
     {
-        var mappings = Database.TableMappings.ToList();
-        Database.RunInTransaction(() =>
+        var mappings = Database?.TableMappings.ToList();
+        if (mappings is null) return false;
+        Database?.RunInTransaction(() =>
         {
             foreach (var map in mappings)
             {
@@ -226,7 +242,7 @@ public abstract class MasterChariot
     /// <returns>True if successful.</returns>
     public virtual bool CreateTable<T>()
     {
-        var res = Database.CreateTable<T>();
+        var res = Database?.CreateTable<T>();
         return res == CreateTableResult.Created;
     }
 
@@ -236,11 +252,11 @@ public abstract class MasterChariot
     /// <returns></returns>
     public virtual bool CreateTables()
     {
-        var results = Database.CreateTables(CreateFlags.None, Tables);
+        var results = Database?.CreateTables(CreateFlags.None, Tables);
 
         // Check all results, for each table. Will return false if ANY of them are false.
 
-        return results.Results.Values.Aggregate(true, (current, res) => current && res == CreateTableResult.Created);
+        return results is not null && results.Results.Values.Aggregate(true, (current, res) => current && res == CreateTableResult.Created);
     }
 
     // Placeholder to be overriden with new.

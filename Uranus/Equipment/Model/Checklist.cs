@@ -1,7 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
-using System.Dynamic;
 
 namespace Uranus.Equipment.Model;
 
@@ -16,18 +15,29 @@ public class Checklist
     [OneToMany(nameof(CompletedChecklist.ChecklistName), nameof(CompletedChecklist.OriginalChecklist), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<CompletedChecklist> CompletedChecklists { get; set; }
 
-    [ManyToOne(nameof(TypeCode), nameof(Model.MachineType.Checklists),CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public MachineType MachineType { get; set; }
+    [ManyToOne(nameof(TypeCode), nameof(Model.MachineType.Checklists), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public MachineType? MachineType { get; set; }
 
     [Ignore] public List<Check> Checks { get; set; }
 
-    public Checklist() { }
+    public Checklist()
+    {
+        Name = string.Empty;
+        TypeCode = string.Empty;
+        CheckCode = string.Empty;
+        Checks = new List<Check>();
+        Machines = new List<Machine>();
+        CompletedChecklists = new List<CompletedChecklist>();
+    }
 
     public Checklist(string name, string typeCode, List<Check> checks)
     {
         Name = name;
         TypeCode = typeCode;
         Checks = checks;
+        CheckCode = string.Empty;
+        Machines = new List<Machine>();
+        CompletedChecklists = new List<CompletedChecklist>();
     }
 }
 
@@ -37,6 +47,19 @@ public class Check
     public bool DesiredResponse { get; set; }
     public bool? Response { get; set; }
     public bool FaultFails { get; set; }
+
+    public Check()
+    {
+        Description = string.Empty;
+    }
+
+    public Check(string description, bool desiredResponse, bool? response, bool faultFails)
+    {
+        Description = description;
+        DesiredResponse = desiredResponse;
+        Response = response;
+        FaultFails = faultFails;
+    }
 
     public bool? IsFault()
     {

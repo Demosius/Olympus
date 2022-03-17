@@ -24,20 +24,17 @@ public static class EnumConverter
     /**************************** CONVERT Data ***************************/
     public static EProject StringToProject(string project)
     {
-        project = (project ?? "none").ToUpper();
-        if (project == "VULCAN")
-            return EProject.Vulcan;
-        if (project == "PHOENIX")
-            return EProject.Phoenix;
-        if (project == "PANTHEON")
-            return EProject.Pantheon;
-        if (project == "KHAOS")
-            return EProject.Khaos;
-        if (project == "PROMETHEUS")
-            return EProject.Prometheus;
-        if (project == "AION")
-            return EProject.Aion;
-        return EProject.None;
+        project = project.ToUpper();
+        return project switch
+        {
+            "VULCAN" => EProject.Vulcan,
+            "PHOENIX" => EProject.Phoenix,
+            "PANTHEON" => EProject.Pantheon,
+            "KHAOS" => EProject.Khaos,
+            "PROMETHEUS" => EProject.Prometheus,
+            "AION" => EProject.Aion,
+            _ => EProject.None
+        };
     }
 
 }

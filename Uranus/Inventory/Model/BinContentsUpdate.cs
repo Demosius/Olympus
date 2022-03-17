@@ -11,4 +11,20 @@ public class BinContentsUpdate
     [ForeignKey(typeof(NAVLocation))] public string LocationCode { get; set; }
     public string ZoneCode { get; set; }
     public DateTime LastUpdate { get; set; }
+
+    public BinContentsUpdate()
+    {
+        ZoneID = string.Empty;
+        LocationCode = string.Empty;
+        ZoneCode = string.Empty;
+        LastUpdate = DateTime.MinValue;
+    }
+
+    public BinContentsUpdate(string zoneID, string locationCode, string zoneCode, DateTime lastUpdate)
+    {
+        ZoneID = zoneID;
+        LocationCode = locationCode;
+        ZoneCode = zoneCode;
+        LastUpdate = lastUpdate;
+    }
 }

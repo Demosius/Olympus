@@ -36,24 +36,60 @@ public class NAVItem
     public List<NAVMoveLine> MoveLines { get; set; }
 
     [ManyToOne(nameof(CategoryCode), nameof(NAVCategory.Items), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public NAVCategory Category { get; set; }
+    public NAVCategory? Category { get; set; }
     [ManyToOne(nameof(DivisionCode), nameof(NAVDivision.Items), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public NAVDivision Division { get; set; }
+    public NAVDivision? Division { get; set; }
     [ManyToOne(nameof(PlatformCode), nameof(NAVPlatform.Items), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public NAVPlatform Platform { get; set; }
+    public NAVPlatform? Platform { get; set; }
     [ManyToOne(nameof(GenreCode), nameof(NAVGenre.Items), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public NAVGenre Genre { get; set; }
+    public NAVGenre? Genre { get; set; }
 
     // Specific UoMs
-    [Ignore] public NAVUoM Case { get; set; }
-    [Ignore] public NAVUoM Pack { get; set; }
-    [Ignore] public NAVUoM Each { get; set; }
+    [Ignore] public NAVUoM? Case { get; set; }
+    [Ignore] public NAVUoM? Pack { get; set; }
+    [Ignore] public NAVUoM? Each { get; set; }
 
-    public NAVItem() { }
+    public NAVItem()
+    {
+        Description = string.Empty;
+        Barcode = string.Empty;
+        PreOwned = false;
+        UoMs = new List<NAVUoM>();
+        NAVStock = new List<NAVStock>();
+        Stock = new List<Stock>();
+        TransferOrders = new List<NAVTransferOrder>();
+        Moves = new List<Move>();
+        MoveLines = new List<NAVMoveLine>();
+    }
 
-    public NAVItem(int num)
+    public NAVItem(int num) : this()
     {
         Number = num;
+    }
+
+    public void SetData(Dictionary<int, NAVCategory> categoryDict, Dictionary<int, NAVPlatform> platformDict, Dictionary<int, NAVDivision> divisionDict, Dictionary<int, NAVGenre> genreDict)
+    {
+        if (categoryDict.TryGetValue(CategoryCode, out var navCategory))
+        {
+            Category = navCategory;
+            Category.Items.Add(this);
+        }
+
+        if (divisionDict.TryGetValue(DivisionCode, out var navDivision))
+        {
+            Division = navDivision;
+            Division.Items.Add(this);
+        }
+
+        if (platformDict.TryGetValue(PlatformCode, out var navPlatform))
+        {
+            Platform = navPlatform;
+            Platform.Items.Add(this);
+        }
+
+        if (!genreDict.TryGetValue(GenreCode, out var navGenre)) return;
+        Genre = navGenre;
+        Genre.Items.Add(this);
     }
 
     // Sets the specific UoMs, so we don't need to pull from an "unordered" list all the time.
@@ -76,21 +112,17 @@ public class NAVItem
                     break;
             }
         }
-        Case ??= new NAVUoM(this, EUoM.CASE);
-        Pack ??= new NAVUoM(this, EUoM.PACK);
-        Each ??= new NAVUoM(this, EUoM.EACH);
     }
 
     public int GetBaseQty(int eaches = 0, int packs = 0, int cases = 0)
     {
-        if (Each is null || Pack is null || Case is null) SetUoMs();
-        return eaches * Each.QtyPerUoM + packs * Pack.QtyPerUoM + cases * Case.QtyPerUoM;
+        return eaches * (Each ?? new NAVUoM()).QtyPerUoM + packs * (Pack ?? new NAVUoM()).QtyPerUoM + cases * (Case ?? new NAVUoM()).QtyPerUoM;
     }
 
     /* Equality and Operator Overloading */
-    public override bool Equals(object obj) => Equals(obj as NAVItem);
+    public override bool Equals(object? obj) => Equals(obj as NAVItem);
 
-    public bool Equals(NAVItem item)
+    public bool Equals(NAVItem? item)
     {
         if (item is null) return false;
 
@@ -108,13 +140,9 @@ public class NAVItem
     // ReSharper disable once NonReadonlyMemberInGetHashCode
     public override int GetHashCode() => Number.GetHashCode();
 
-    public static bool operator ==(NAVItem lhs, NAVItem rhs)
-    {
-        if (lhs is not null) return lhs.Equals(rhs);
-        return rhs is null;
-    }
+    public static bool operator ==(NAVItem? lhs, NAVItem? rhs) => lhs?.Equals(rhs) ?? rhs is null;
 
-    public static bool operator !=(NAVItem lhs, NAVItem rhs) => !(lhs == rhs);
+    public static bool operator !=(NAVItem? lhs, NAVItem? rhs) => !(lhs == rhs);
 
     public override string ToString()
     {

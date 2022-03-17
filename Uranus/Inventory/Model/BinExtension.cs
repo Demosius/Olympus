@@ -15,6 +15,22 @@ public class BinExtension
     [OneToOne(nameof(BinID), nameof(NAVBin.Extension), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVBin Bin { get; set; }
 
-    [ManyToOne(nameof(BayID), nameof(Model.Bay.BinBays), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(BayID), nameof(Model.Bay.BayBins), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Bay Bay { get; set; }
+
+    public BinExtension()
+    {
+        BinID = string.Empty;
+        BayID = string.Empty;
+        Bin = new NAVBin();
+        Bay = new Bay();
+    }
+
+    public BinExtension(string binID, string bayID, NAVBin bin, Bay bay)
+    {
+        BinID = binID;
+        BayID = bayID;
+        Bin = bin;
+        Bay = bay;
+    }
 }

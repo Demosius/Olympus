@@ -61,7 +61,7 @@ public static class Constants
         { "NewUsed", -1 },
         { "CategoryCode", -1 },
         { "PlatformCode", -1 },
-        { "DivisionCode", -1 }, 
+        { "DivisionCode", -1 },
         { "GenreCode", -1 },
         { "Length", -1 },
         { "Width", -1 },
@@ -70,7 +70,7 @@ public static class Constants
         { "Weight", -1 }
     };
 
-    public static readonly Dictionary<string, int> NAV_UOMColumns = new()
+    public static readonly Dictionary<string, int> NAV_UoMColumns = new()
     {
         { "Code", -1 },
         { "Item No.", -1 },
@@ -102,50 +102,51 @@ public static class Constants
 
     public static readonly Dictionary<string, int> NAVToLineBatchColumns = new()
     {
-        {"Document No.", -1 },
-        {"Transfer-to Code", -1 },
-        {"Item No.", -1 },
-        {"Quantity", -1 },
-        {"Unit of Measure", -1 },
-        {@"Avail. UOM Fulfilment Qty", -1 },
-        {"Created On Date", -1 },
-        {"Created On Time", -1 }
+        { "Document No.", -1 },
+        { "Transfer-to Code", -1 },
+        { "Item No.", -1 },
+        { "Quantity", -1 },
+        { "Unit of Measure", -1 },
+        // ReSharper disable once StringLiteralTypo
+        { @"Avail. UOM Fulfilment Qty", -1 },
+        { "Created On Date", -1 },
+        { "Created On Time", -1 }
     };
 
     public static readonly Dictionary<string, string> BinColumns = new()
     {
-        {"location", "Location Code" },
-        {"zone_code", "Zone Code" },
-        {"code", "Code" },
-        {"description", "Description" },
-        {"empty", "Empty" },
-        {"assigned", "Bin Assigned" },
-        {"ranking", "Bin Ranking" },
-        {"used_cube", "Used Cubage" },
-        {"max_cube", "Maximum Cubage" },
-        {"last_cc_date", "CC Last Count Date" },
-        {"last_pi_date", "PI - Last Count Date" }
+        { "location", "Location Code" },
+        { "zone_code", "Zone Code" },
+        { "code", "Code" },
+        { "description", "Description" },
+        { "empty", "Empty" },
+        { "assigned", "Bin Assigned" },
+        { "ranking", "Bin Ranking" },
+        { "used_cube", "Used Cubage" },
+        { "max_cube", "Maximum Cubage" },
+        { "last_cc_date", "CC Last Count Date" },
+        { "last_pi_date", "PI - Last Count Date" }
     };
 
-    public static readonly Dictionary<string, string> UOMColumns = new()
+    public static readonly Dictionary<string, string> UoMColumns = new()
     {
-        {"code", "Code" },
-        {"item_number", "Item No." },
-        {"qty_per_uom", "Qty. per Unit of Measure" },
-        {"max_qty", "Max Qty" },
-        {"inner_pack", "Inner Pack" },
-        {"exclude_cartonization", "Exclude Cartonization" },
-        {"length", "Length (CM)" },
-        {"width", "Width (CM)" },
-        {"height", "Height (CM)" },
-        {"cube", "CM Cubage" },
-        {"weight", "Weight (Kg)" }
+        { "code", "Code" },
+        { "item_number", "Item No." },
+        { "qty_per_uom", "Qty. per Unit of Measure" },
+        { "max_qty", "Max Qty" },
+        { "inner_pack", "Inner Pack" },
+        { "exclude_cartonization", "Exclude Cartonization" },
+        { "length", "Length (CM)" },
+        { "width", "Width (CM)" },
+        { "height", "Height (CM)" },
+        { "cube", "CM Cubage" },
+        { "weight", "Weight (Kg)" }
     };
 
     public static readonly Dictionary<string, string> StockColumns = new()
     {
         { "location", "Location Code" },
-        { "bin_code", "Bin Code" }, 
+        { "bin_code", "Bin Code" },
         { "item_number", "Item No." },
         { "uom_code", "Unit of Measure Code" },
         { "zone_code", "Zone Code" },

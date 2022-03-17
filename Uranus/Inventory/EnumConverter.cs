@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+// ReSharper disable StringLiteralTypo
 
 namespace Uranus.Inventory;
 
@@ -69,7 +70,7 @@ public static class EnumConverter
         {
             EAction.Take => "Take",
             EAction.Place => "Place",
-            _ => null
+            _ => string.Empty
         };
     }
 
@@ -89,10 +90,10 @@ public static class EnumConverter
         };
     }
 
-    private static readonly Regex SWhitespace = new(@"\s+");
+    private static readonly Regex sWhitespace = new(@"\s+");
     public static string ReplaceWhitespace(string input, string replacement)
     {
-        return SWhitespace.Replace(input, replacement);
+        return sWhitespace.Replace(input, replacement);
     }
 
     public static EStatus StringToMoveStatus(string moveStatus)
@@ -114,7 +115,7 @@ public static class EnumConverter
             EVolume.Low => "LV",
             EVolume.Medium => "MV",
             EVolume.High => "HV",
-            _ => null
+            _ => string.Empty
         };
     }
 

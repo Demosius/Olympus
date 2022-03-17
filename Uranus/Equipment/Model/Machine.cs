@@ -17,10 +17,39 @@ public class Machine
     [ForeignKey(typeof(Checklist))] public string ChecklistName { get; set; }
 
     [ManyToOne(nameof(ChecklistName), nameof(Model.Checklist.Machines), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Checklist Checklist { get; set; }
+    public Checklist? Checklist { get; set; }
     [ManyToOne(nameof(TypeCode), nameof(MachineType.Machines), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public MachineType Type { get; set; }
+    public MachineType? Type { get; set; }
 
     [OneToMany(nameof(CompletedChecklist.MachineSerialNumber), nameof(CompletedChecklist.Machine), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<CompletedChecklist> CompletedChecklists { get; set; }
+
+    public Machine()
+    {
+        TypeCode = string.Empty;
+        ServiceDueDate = DateTime.MinValue;
+        LastServiceDate = DateTime.MinValue;
+        LastPreOpCheck = DateTime.MinValue;
+        Ownership = string.Empty;
+        LicenceCode = string.Empty;
+        ChecklistName = string.Empty;
+        CompletedChecklists = new List<CompletedChecklist>();
+    }
+
+    public Machine(int serialNumber, string typeCode, DateTime serviceDueDate, DateTime lastServiceDate, DateTime lastPreOpCheck, string ownership, string licenceCode, string checklistName, Checklist checklist, MachineType type, List<CompletedChecklist> completedChecklists)
+    {
+        SerialNumber = serialNumber;
+        TypeCode = typeCode;
+        ServiceDueDate = serviceDueDate;
+        LastServiceDate = lastServiceDate;
+        LastPreOpCheck = lastPreOpCheck;
+        Ownership = ownership;
+        LicenceCode = licenceCode;
+        ChecklistName = checklistName;
+        Checklist = checklist;
+        Type = type;
+        CompletedChecklists = completedChecklists;
+    }
+
+    public bool HighReach() => Type?.AccessLevel == Inventory.EAccessLevel.HighReach;
 }

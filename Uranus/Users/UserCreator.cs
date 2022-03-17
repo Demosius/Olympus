@@ -1,5 +1,5 @@
-﻿using Uranus.Users.Model;
-using System.Linq;
+﻿using System.Linq;
+using Uranus.Users.Model;
 
 namespace Uranus.Users;
 
@@ -14,7 +14,7 @@ public class UserCreator
 
     public void AssureDefaultRole()
     {
-        if (Chariot.Database.Execute("SELECT count(*) FROM Role WHERE Name='Default';") > 0) return;
+        if (Chariot.Database?.Execute("SELECT count(*) FROM Role WHERE Name='Default';") > 0) return;
 
         Role role = new();
 

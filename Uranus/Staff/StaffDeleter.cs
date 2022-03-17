@@ -12,11 +12,11 @@ public class StaffDeleter
         Chariot = chariot;
     }
 
-    public void ClockEvent(ClockEvent clockEvent) => Chariot.Database.Delete(clockEvent);
+    public void ClockEvent(ClockEvent clockEvent) => Chariot.Database?.Delete(clockEvent);
 
     public void ClockEvents(IEnumerable<ClockEvent> clockEvents)
     {
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             foreach (var clockEvent in clockEvents)
             {
@@ -25,11 +25,11 @@ public class StaffDeleter
         });
     }
 
-    public void ShiftEntry(ShiftEntry selectedEntry) => Chariot.Database.Delete(selectedEntry);
+    public void ShiftEntry(ShiftEntry selectedEntry) => Chariot.Database?.Delete(selectedEntry);
 
     public void ShiftEntries(IEnumerable<ShiftEntry> deletedEntries)
     {
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             foreach (var deletedEntry in deletedEntries)
             {
@@ -40,7 +40,7 @@ public class StaffDeleter
 
     public void EntriesAndClocks(IEnumerable<ShiftEntry> deletedEntries, IEnumerable<ClockEvent> deletedClocks)
     {
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             foreach (var deletedEntry in deletedEntries)
             {

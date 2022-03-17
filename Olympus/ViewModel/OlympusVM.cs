@@ -1,20 +1,20 @@
-﻿using Uranus.Staff;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using Olympus.ViewModel.Components;
+﻿using Olympus.Properties;
+using Olympus.View;
 using Olympus.ViewModel.Commands;
-using System.IO;
+using Olympus.ViewModel.Components;
+using Olympus.ViewModel.Utility;
 using ServiceStack.Text;
 using SQLite;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
-using Uranus.Staff.Model;
-using Olympus.ViewModel.Utility;
-using Olympus.Properties;
-using Olympus.View;
+using System.Windows.Controls;
 using Uranus.Interfaces;
 using Uranus.Inventory.Model;
+using Uranus.Staff;
+using Uranus.Staff.Model;
 
 namespace Olympus.ViewModel;
 
@@ -65,7 +65,7 @@ public class OlympusVM : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-    
+
     internal void RefreshData()
     {
         foreach (var project in RunningProjects)
@@ -102,35 +102,35 @@ public class OlympusVM : INotifyPropertyChanged
         }
         SetPage(loadedProject);
     }
-        
+
     private void SetPage(IProject project)
     {
         CurrentProject = project;
-            
-        var navigationService = ((Page) CurrentProject).NavigationService;
+
+        var navigationService = ((Page)CurrentProject).NavigationService;
         if (navigationService != null)
-            _ = navigationService.Navigate((Page) project);
-            
+            _ = navigationService.Navigate((Page)project);
+
     }
-        
+
     public void ClearRunningProjects()
     {
         CurrentProject = null;
         RunningProjects = new Dictionary<EProject, IProject>();
     }
 
-    public void LaunchPasswordChanger()
+    public static void LaunchPasswordChanger()
     {
         var changePasswordWindow = new ChangePasswordWindow(App.Charon);
         changePasswordWindow.ShowDialog();
     }
-    
+
     private static void EstablishInitialProjectIcons()
     {
         App.Helios.StaffCreator.CopyProjectIconsFromSource(Path.Combine(App.BaseDirectory(), "Resources", "Images", "Icons"));
         List<Project> projects = new()
         {
-            new Project(EProject.Khaos, "chaos.ico", App.Helios.StaffReader,"Handles make-bulk designation and separation. (Genesis)"),
+            new Project(EProject.Khaos, "chaos.ico", App.Helios.StaffReader, "Handles make-bulk designation and separation. (Genesis)"),
             new Project(EProject.Pantheon, "pantheon.ico", App.Helios.StaffReader, "Roster management."),
             new Project(EProject.Prometheus, "prometheus.ico", App.Helios.StaffReader, "Data management."),
             new Project(EProject.Phoenix, "phoenix.ico", App.Helios.StaffReader, "Pre-work automated stock maintenance. (AutoBurn)"),
@@ -139,7 +139,7 @@ public class OlympusVM : INotifyPropertyChanged
         };
 
         App.Helios.StaffCreator.EstablishInitialProjects(projects);
-            
+
     }
 
     public static void GenerateMasterSkuList()

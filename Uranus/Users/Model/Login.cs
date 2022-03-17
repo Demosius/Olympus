@@ -9,4 +9,16 @@ public class Login
     public string Salt { get; set; }
     public string PasswordHash { get; set; }
 
+    public Login()
+    {
+        Salt = string.Empty;
+        PasswordHash = string.Empty;
+    }
+
+    public Login(int userID, string salt, string passwordHash)
+    {
+        UserID = userID;
+        Salt = salt;
+        PasswordHash = passwordHash;
+    }
 }

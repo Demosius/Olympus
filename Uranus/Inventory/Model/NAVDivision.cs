@@ -14,4 +14,19 @@ public class NAVDivision
     public List<NAVCategory> Categories { get; set; }
     [OneToMany(nameof(NAVItem.DivisionCode), nameof(NAVItem.Division), CascadeOperations = CascadeOperation.CascadeInsert | CascadeOperation.CascadeRead)]
     public List<NAVItem> Items { get; set; }
+
+    public NAVDivision()
+    {
+        Description = string.Empty;
+        Categories = new List<NAVCategory>();
+        Items = new List<NAVItem>();
+    }
+
+    public NAVDivision(int code, string description, List<NAVCategory> categories, List<NAVItem> items)
+    {
+        Code = code;
+        Description = description;
+        Categories = categories;
+        Items = items;
+    }
 }

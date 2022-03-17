@@ -57,22 +57,22 @@ public class Employee
     [ForeignKey(typeof(Licence))] public int LicenceNumber { get; set; }
 
     [ManyToOne(nameof(DepartmentName), nameof(Model.Department.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Department Department { get; set; }
+    public Department? Department { get; set; }
     [ManyToOne(nameof(RoleName), nameof(Model.Role.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Role Role { get; set; }
+    public Role? Role { get; set; }
     [ManyToOne(nameof(ReportsToID), nameof(Reports), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Employee ReportsTo { get; set; }
+    public Employee? ReportsTo { get; set; }
     [ManyToOne(nameof(AvatarName), nameof(EmployeeAvatar.Employees), CascadeOperations = CascadeOperation.CascadeRead)]
-    public EmployeeAvatar Avatar { get; set; }
+    public EmployeeAvatar? Avatar { get; set; }
     [ManyToOne(nameof(ClanName), nameof(Model.Clan.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Clan Clan { get; set; }
+    public Clan? Clan { get; set; }
     [ManyToOne(nameof(IconName), nameof(EmployeeIcon.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public EmployeeIcon Icon { get; set; }
+    public EmployeeIcon? Icon { get; set; }
 
     [OneToOne(nameof(LockerID), nameof(Model.Locker.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Locker Locker { get; set; }
+    public Locker? Locker { get; set; }
     [OneToOne(nameof(LicenceNumber), nameof(Model.Licence.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Licence Licence { get; set; }
+    public Licence? Licence { get; set; }
 
     [ManyToMany(typeof(EmployeeVehicle), nameof(EmployeeVehicle.EmployeeID), nameof(Vehicle.Owners), CascadeOperations = CascadeOperation.All)]
     public List<Vehicle> Vehicles { get; set; }
@@ -85,9 +85,9 @@ public class Employee
 
     [OneToMany(nameof(EmployeeInductionReference.EmployeeID), nameof(EmployeeInductionReference.Employee), CascadeOperations = CascadeOperation.All)]
     public List<EmployeeInductionReference> InductionReferences { get; set; }
-    [OneToMany(nameof(ShiftRule.EmployeeID), nameof(ShiftRule.Employee),CascadeOperations = CascadeOperation.All)]
+    [OneToMany(nameof(ShiftRule.EmployeeID), nameof(ShiftRule.Employee), CascadeOperations = CascadeOperation.All)]
     public List<ShiftRule> Rules { get; set; }
-    [OneToMany(nameof(ReportsToID),nameof(ReportsTo), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToMany(nameof(ReportsToID), nameof(ReportsTo), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Employee> Reports { get; set; }
     [OneToMany(nameof(ShiftEntry.EmployeeID), nameof(ShiftEntry.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<ShiftEntry> ShiftEntries { get; set; }
@@ -101,11 +101,93 @@ public class Employee
     [Ignore] public string FullName => $"{FirstName} {LastName}";
     [Ignore] public string ReportsToName => ReportsTo?.FullName ?? "";
 
-    public Employee() { }
+    public Employee()
+    {
+        FirstName = string.Empty;
+        LastName = string.Empty;
+        DisplayName = string.Empty;
+        RF_ID = string.Empty;
+        PC_ID = string.Empty;
+        Location = string.Empty;
+        DepartmentName = string.Empty;
+        RoleName = string.Empty;
+        ClanName = string.Empty;
+        PayPoint = string.Empty;
+        LockerID = string.Empty;
+        PhoneNumber = string.Empty;
+        Email = string.Empty;
+        Address = string.Empty;
+        IconName = string.Empty;
+        AvatarName = string.Empty;
+        Vehicles = new List<Vehicle>();
+        Shifts = new List<Shift>();
+        DepartmentsCanWorkIn = new List<Department>();
+        Projects = new List<Project>();
+        InductionReferences = new List<EmployeeInductionReference>();
+        Rules = new List<ShiftRule>();
+        Reports = new List<Employee>();
+        ShiftEntries = new List<ShiftEntry>();
+        Rosters = new List<Roster>();
+        ClockEvents = new List<ClockEvent>();
+        TagUse = new List<TagUse>();
+    }
 
-    public Employee(int id)
+    public Employee(int id) : this()
     {
         ID = id;
+    }
+
+    public Employee(int id, string firstName, string lastName, string displayName, decimal? payRate,
+        string rfID, string pcID, string location, string departmentName, string roleName,
+        int reportsToID, string clanName, string payPoint, EEmploymentType employmentType,
+        string lockerID, string phoneNumber, string email, string address, string iconName,
+        string avatarName, int licenceNumber, Department? department, Role? role, Employee? reportsTo,
+        EmployeeAvatar? avatar, Clan? clan, EmployeeIcon? icon, Locker? locker, Licence? licence,
+        List<Vehicle> vehicles, List<Shift> shifts, List<Department> departmentsCanWorkIn,
+        List<Project> projects, List<EmployeeInductionReference> inductionReferences, List<ShiftRule> rules,
+        List<Employee> reports, List<ShiftEntry> shiftEntries, List<Roster> rosters, List<ClockEvent> clockEvents,
+        List<TagUse> tagUse)
+    {
+        ID = id;
+        FirstName = firstName;
+        LastName = lastName;
+        DisplayName = displayName;
+        PayRate = payRate;
+        RF_ID = rfID;
+        PC_ID = pcID;
+        Location = location;
+        DepartmentName = departmentName;
+        RoleName = roleName;
+        ReportsToID = reportsToID;
+        ClanName = clanName;
+        PayPoint = payPoint;
+        EmploymentType = employmentType;
+        LockerID = lockerID;
+        PhoneNumber = phoneNumber;
+        Email = email;
+        Address = address;
+        IconName = iconName;
+        AvatarName = avatarName;
+        LicenceNumber = licenceNumber;
+        Department = department;
+        Role = role;
+        ReportsTo = reportsTo;
+        Avatar = avatar;
+        Clan = clan;
+        Icon = icon;
+        Locker = locker;
+        Licence = licence;
+        Vehicles = vehicles;
+        Shifts = shifts;
+        DepartmentsCanWorkIn = departmentsCanWorkIn;
+        Projects = projects;
+        InductionReferences = inductionReferences;
+        Rules = rules;
+        Reports = reports;
+        ShiftEntries = shiftEntries;
+        Rosters = rosters;
+        ClockEvents = clockEvents;
+        TagUse = tagUse;
     }
 
     public void AssignRole(Role role)
@@ -120,12 +202,12 @@ public class Employee
         return $"{FirstName} {LastName}";
     }
 
-    public override bool Equals(object obj) => Equals(obj as Employee);
+    public override bool Equals(object? obj) => Equals(obj as Employee);
 
     // ReSharper disable once NonReadonlyMemberInGetHashCode
     public override int GetHashCode() => ID;
 
-    public bool Equals(Employee employee)
+    public bool Equals(Employee? employee)
     {
         if (employee is null) return false;
 
@@ -136,12 +218,8 @@ public class Employee
         return ID == employee.ID;
     }
 
-    public static bool operator ==(Employee lhs, Employee rhs)
-    {
-        if (lhs is not null) return lhs.Equals(rhs);
-        return rhs is null;
-    }
+    public static bool operator ==(Employee? lhs, Employee? rhs) => lhs?.Equals(rhs) ?? rhs is null;
 
-    public static bool operator !=(Employee lhs, Employee rhs) => !(lhs == rhs);
+    public static bool operator !=(Employee? lhs, Employee? rhs) => !(lhs == rhs);
 
 }

@@ -55,6 +55,54 @@ public class Role
     [OneToMany(nameof(User.RoleName), nameof(User.Role), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<User> Users { get; set; }
 
+    public Role()
+    {
+        Name = string.Empty;
+        Users = new List<User>();
+    }
+
+    public Role(string name, int createUser, int readUser, int updateUser, int deleteUser, bool createEmployee, int readEmployee,
+        int readEmployeeSensitive, int readEmployeeVerySensitive, int updateEmployee, int deleteEmployee, bool createDepartment,
+        bool updateDepartment, bool deleteDepartment, bool assignRole, bool editRoles, bool createClan, bool updateClan,
+        bool deleteClan, int createShift, int updateShift, int deleteShift, bool createLicence, bool readLicence, bool updateLicence,
+        bool deleteLicence, bool createVehicle, bool readVehicle, bool updateVehicle, bool deleteVehicle, bool copyDatabase,
+        bool moveDatabase, List<User> users)
+    {
+        Name = name;
+        CreateUser = createUser;
+        ReadUser = readUser;
+        UpdateUser = updateUser;
+        DeleteUser = deleteUser;
+        CreateEmployee = createEmployee;
+        ReadEmployee = readEmployee;
+        ReadEmployeeSensitive = readEmployeeSensitive;
+        ReadEmployeeVerySensitive = readEmployeeVerySensitive;
+        UpdateEmployee = updateEmployee;
+        DeleteEmployee = deleteEmployee;
+        CreateDepartment = createDepartment;
+        UpdateDepartment = updateDepartment;
+        DeleteDepartment = deleteDepartment;
+        AssignRole = assignRole;
+        EditRoles = editRoles;
+        CreateClan = createClan;
+        UpdateClan = updateClan;
+        DeleteClan = deleteClan;
+        CreateShift = createShift;
+        UpdateShift = updateShift;
+        DeleteShift = deleteShift;
+        CreateLicence = createLicence;
+        ReadLicence = readLicence;
+        UpdateLicence = updateLicence;
+        DeleteLicence = deleteLicence;
+        CreateVehicle = createVehicle;
+        ReadVehicle = readVehicle;
+        UpdateVehicle = updateVehicle;
+        DeleteVehicle = deleteVehicle;
+        CopyDatabase = copyDatabase;
+        MoveDatabase = moveDatabase;
+        Users = users;
+    }
+
     public void SetDefault()
     {
         Name = "Default";

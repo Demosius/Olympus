@@ -1,8 +1,8 @@
 ﻿using System;
-using Uranus.Staff.Model;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Uranus.Staff.Model;
 
 namespace Uranus.Staff;
 
@@ -22,7 +22,7 @@ public class StaffCreator
     public bool SetShiftEntry(DateTime date, Employee employee)
     {
         var returnVal = false;
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             // Get suitable clock events.
             var clocks = Chariot.Database.Query<ClockEvent>(
@@ -57,7 +57,7 @@ public class StaffCreator
 
     public void EstablishInitialProjects(List<Project> newProjects)
     {
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             foreach (var project in newProjects)
             {
@@ -77,7 +77,7 @@ public class StaffCreator
                 if (Path.GetExtension(filePath) == ".ico")
                     File.Copy(filePath, Path.Combine(Chariot.ProjectIconDirectory, fileName), true);
             }
-            catch (IOException) {} // If the file can't be copied across, continue anyway.
+            catch (IOException) { } // If the file can't be copied across, continue anyway.
         }
     }
 
@@ -90,7 +90,7 @@ public class StaffCreator
     public int AionDataSet(AionDataSet dataSet)
     {
         var lines = 0;
-        Chariot.Database.RunInTransaction(() =>
+        Chariot.Database?.RunInTransaction(() =>
         {
             if (dataSet.HasEmployees()) lines += Employees(dataSet.Employees.Select(entry => entry.Value));
             if (dataSet.HasClockEvents()) lines += ClockEvents(dataSet.ClockEvents.Select(entry => entry.Value));
@@ -99,5 +99,5 @@ public class StaffCreator
         return lines;
     }
 
-        
+
 }

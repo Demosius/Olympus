@@ -10,7 +10,8 @@ public class Image
     public string FileName { get; set; }
 
     private string fullPath;
-    [Ignore] public string FullPath 
+    [Ignore]
+    public string FullPath
     {
         get
         {
@@ -19,6 +20,20 @@ public class Image
             return fullPath;
         }
         set => fullPath = value;
+    }
+
+    public Image()
+    {
+        fullPath = string.Empty;
+        Name = string.Empty;
+        FileName = string.Empty;
+    }
+
+    public Image(string fullPath, string name, string fileName)
+    {
+        this.fullPath = fullPath;
+        Name = name;
+        FileName = fileName;
     }
 
     public virtual string GetImageFilePath()
@@ -54,7 +69,7 @@ public class Image
 
         // Staff ProjectIcon Directory.
         checkDir = Path.Combine(reader.ProjectIconDirectory, FileName);
-            
+
         return CheckPath(checkDir) ? checkDir : FileName;
     }
 

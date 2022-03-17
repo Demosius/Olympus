@@ -16,18 +16,34 @@ public class Stock
     [ForeignKey(typeof(SubStock))] public string EachID { get; set; }
 
     [OneToOne(nameof(CaseID), nameof(SubStock.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public SubStock Cases { get; set; }
+    public SubStock? Cases { get; set; }
     [OneToOne(nameof(PackID), nameof(SubStock.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public SubStock Packs { get; set; }
+    public SubStock? Packs { get; set; }
     [OneToOne(nameof(EachID), nameof(SubStock.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public SubStock Eaches { get; set; }
+    public SubStock? Eaches { get; set; }
 
     [ManyToOne(nameof(BinID), nameof(NAVBin.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public NAVBin Bin { get; set; }
+    public NAVBin? Bin { get; set; }
     [ManyToOne(nameof(ItemNumber), nameof(NAVItem.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public NAVItem Item { get; set; }
+    public NAVItem? Item { get; set; }
 
-    public Stock() { }
+    public Stock()
+    {
+        ID = string.Empty;
+        BinID = string.Empty;
+        CaseID = string.Empty;
+        PackID = string.Empty;
+        EachID = string.Empty;
+    }
+
+    public Stock(string id, string binID, string caseID, string packID, string eachID)
+    {
+        ID = id;
+        BinID = binID;
+        CaseID = caseID;
+        PackID = packID;
+        EachID = eachID;
+    }
 
     public Stock(NAVStock navStock) : this()
     {
@@ -52,27 +68,27 @@ public class Stock
         Item = navStock.Item;
 
         // Handle IDs : Item should stay constant, so isn't included in the re-used SetIDs method.
-        ItemNumber = Item.Number;
+        ItemNumber = Item?.Number ?? navStock.ItemNumber;
         SetIDs();
     }
 
     private void SetIDs()
     {
-        BinID = Bin.ID;
+        BinID = Bin?.ID ?? BinID;
         ID = string.Join(":", BinID, ItemNumber);
-        Cases.SetStockID();
-        Packs.SetStockID();
-        Eaches.SetStockID();
-        CaseID = Cases.ID;
-        PackID = Packs.ID;
-        EachID = Eaches.ID;
+        Cases?.SetStockID();
+        Packs?.SetStockID();
+        Eaches?.SetStockID();
+        CaseID = Cases?.ID ?? CaseID;
+        PackID = Packs?.ID ?? PackID;
+        EachID = Eaches?.ID ?? EachID;
     }
 
     // Move full stock to specified bin.
     public void FullMove(NAVBin toBin)
     {
         // Handle object moving.
-        _ = Bin.Stock.Remove(this);
+        if (Bin != null) _ = Bin.Stock.Remove(this);
         Bin = toBin;
         Bin.Stock.Add(this);
         // Handle ID changing.
@@ -85,31 +101,36 @@ public class Stock
     public void Move(NAVBin toBin, int eaches = 0, int packs = 0, int cases = 0)
     {
         var splitStock = Split(eaches, packs, cases);
-        splitStock.Move(toBin);
+        splitStock?.Move(toBin);
     }
 
     // Pulls out the specified QTYs and return a separate stock object.
-    private Stock Split(int eaches = 0, int packs = 0, int cases = 0)
+    private Stock? Split(int eaches = 0, int packs = 0, int cases = 0)
     {
+        if (Bin is null || Item is null) return null;
+
         Stock newStock = new()
         {
             Item = Item,
             ItemNumber = Item.Number,
             Bin = Bin
         };
+
         newStock.SetIDs();
         Bin.Stock.Add(newStock);
         // Make sure to not take more than available.
-        if (eaches > Eaches.Qty) eaches = Eaches.Qty;
-        if (packs > Packs.Qty) packs = Packs.Qty;
-        if (cases > Cases.Qty) cases = Cases.Qty;
+        if (eaches > (Eaches?.Qty ?? 0)) eaches = Eaches?.Qty ?? 0;
+        if (packs > (Packs?.Qty ?? 0)) packs = Packs?.Qty ?? 0;
+        if (cases > (Cases?.Qty ?? 0)) cases = Cases?.Qty ?? 0;
         // Move qty.
-        Eaches.Qty -= eaches;
-        Packs.Qty -= packs;
-        Cases.Qty -= cases;
-        newStock.Eaches.Qty = eaches;
-        newStock.Packs.Qty = packs;
-        newStock.Cases.Qty = cases;
+        if (Eaches != null) Eaches.Qty -= eaches;
+        if (Packs != null) Packs.Qty -= packs;
+        if (Cases != null) Cases.Qty -= cases;
+
+        if (newStock.Eaches != null) newStock.Eaches.Qty = eaches;
+        if (newStock.Packs != null) newStock.Packs.Qty = packs;
+        if (newStock.Cases != null) newStock.Cases.Qty = cases;
+
         return newStock;
     }
 
@@ -118,14 +139,30 @@ public class Stock
         // Stock ID must match (same bin and item, etc.) but must not be the same object.
         if (ReferenceEquals(this, newStock) || ID != newStock.ID)
             return false;
+
         // Increase Stock quantities.
-        Eaches.Qty += newStock.Eaches.Qty;
-        Packs.Qty += newStock.Packs.Qty;
-        Cases.Qty += newStock.Cases.Qty;
-        // Empty newStock.
-        newStock.Eaches.Qty = 0;
-        newStock.Packs.Qty = 0;
-        newStock.Cases.Qty = 0;
+        if (newStock.Eaches is not null)
+        {
+            Eaches ??= new SubStock(this, EUoM.EACH);
+            Eaches.Qty += newStock.Eaches.Qty;
+            newStock.Eaches.Qty = 0;
+        }
+
+        if (newStock.Packs is not null)
+        {
+            Packs ??= new SubStock(this, EUoM.PACK);
+            Packs.Qty += newStock.Packs.Qty;
+            newStock.Packs.Qty = 0;
+        }
+
+        // ReSharper disable once InvertIf
+        if (newStock.Cases is not null)
+        {
+            Cases ??= new SubStock(this, EUoM.CASE);
+            Cases.Qty += newStock.Cases.Qty;
+            newStock.Cases.Qty = 0;
+        }
+
         return true;
     }
 
@@ -133,6 +170,6 @@ public class Stock
     // e.g. Pick Qty/Put Away Qty, etc.
     public bool CanMove()
     {
-        return !(Cases.PreventsMove() || Packs.PreventsMove() || Eaches.PreventsMove());
+        return !((Cases?.PreventsMove() ?? false) || (Packs?.PreventsMove() ?? false) || (Eaches?.PreventsMove() ?? false));
     }
 }
