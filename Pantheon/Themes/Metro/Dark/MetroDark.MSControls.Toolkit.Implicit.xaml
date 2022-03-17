@@ -3,33 +3,33 @@
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     mc:Ignorable="d">
-		
-	<!-- *********************************  RESOURCES  ********************************* -->
-	<ResourceDictionary.MergedDictionaries>
-		<ResourceDictionary Source="Styles.WPF.xaml" />
-	</ResourceDictionary.MergedDictionaries>
 
-	<!-- *********************************  BRUSHES  ********************************* -->
-	<!-- Rating Brushes -->
-	<SolidColorBrush x:Key="RatingReadOnlyBackgroundBrush" Color="{StaticResource Color013}" />
-	<SolidColorBrush x:Key="RatingReadOnlyBorderBrush" Color="{StaticResource Color013}" />
-	<SolidColorBrush x:Key="RatingDisabledBackgroundBrush" Color="{StaticResource Color004}" />
-	<SolidColorBrush x:Key="RatingDisabledBorderBrush" Color="{StaticResource Color013}" />
+    <!-- *********************************  RESOURCES  ********************************* -->
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Styles.WPF.xaml" />
+    </ResourceDictionary.MergedDictionaries>
 
-	<!-- RatingItem Brushes -->
-	<SolidColorBrush x:Key="RatingItemBackgroundBrush" Color="{StaticResource Color009}" />
-	<SolidColorBrush x:Key="RatingItemBorderBrush" Color="{StaticResource Color004}" />
-	<SolidColorBrush x:Key="RatingItemHoverBackgroundBrush" Color="{StaticResource Color023}" />
-	<SolidColorBrush x:Key="RatingItemHoverBorderBrush" Color="{StaticResource Color023}" />
-	<SolidColorBrush x:Key="RatingItemActiveBackgroundBrush" Color="{StaticResource Color024}" />
-	<SolidColorBrush x:Key="RatingItemActiveBorderBrush" Color="{StaticResource Color024}" />
-	<SolidColorBrush x:Key="RatingItemReadOnlyBackgroundBrush" Color="{StaticResource Color024}" />
-	<SolidColorBrush x:Key="RatingItemReadOnlyBorderBrush" Color="{StaticResource Color024}" />
-	<SolidColorBrush x:Key="RatingItemDisabledBackgroundBrush" Color="{StaticResource Color008}" />
-	<SolidColorBrush x:Key="RatingItemDisabledBorderBrush" Color="{StaticResource Color005}" />
+    <!-- *********************************  BRUSHES  ********************************* -->
+    <!-- Rating Brushes -->
+    <SolidColorBrush x:Key="RatingReadOnlyBackgroundBrush" Color="{StaticResource Color013}" />
+    <SolidColorBrush x:Key="RatingReadOnlyBorderBrush" Color="{StaticResource Color013}" />
+    <SolidColorBrush x:Key="RatingDisabledBackgroundBrush" Color="{StaticResource Color004}" />
+    <SolidColorBrush x:Key="RatingDisabledBorderBrush" Color="{StaticResource Color013}" />
+
+    <!-- RatingItem Brushes -->
+    <SolidColorBrush x:Key="RatingItemBackgroundBrush" Color="{StaticResource Color009}" />
+    <SolidColorBrush x:Key="RatingItemBorderBrush" Color="{StaticResource Color004}" />
+    <SolidColorBrush x:Key="RatingItemHoverBackgroundBrush" Color="{StaticResource Color023}" />
+    <SolidColorBrush x:Key="RatingItemHoverBorderBrush" Color="{StaticResource Color023}" />
+    <SolidColorBrush x:Key="RatingItemActiveBackgroundBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="RatingItemActiveBorderBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="RatingItemReadOnlyBackgroundBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="RatingItemReadOnlyBorderBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="RatingItemDisabledBackgroundBrush" Color="{StaticResource Color008}" />
+    <SolidColorBrush x:Key="RatingItemDisabledBorderBrush" Color="{StaticResource Color005}" />
 
     <!-- Accordion Brushes -->
-	<SolidColorBrush x:Key="AccordionBorderBrush" Color="{StaticResource Color004}" />
+    <SolidColorBrush x:Key="AccordionBorderBrush" Color="{StaticResource Color004}" />
     <SolidColorBrush x:Key="AccordionBackgroundBrush" Color="{StaticResource Color009}" />
     <SolidColorBrush x:Key="AccordionItemBackgroundBrush" Color="{StaticResource Color009}" />
     <SolidColorBrush x:Key="AccordionButtonBackgroundBrush" Color="{StaticResource Color009}" />
@@ -43,8 +43,8 @@
     <SolidColorBrush x:Key="AccordionArrowBackgroundBrush" Color="{StaticResource Color003}" />
     <SolidColorBrush x:Key="AccordionArrowExpandedBackgroundBrush" Color="{StaticResource Color009}" />
 
-	<!--********************************** RatingItem Style **********************************-->
-	<!--<Style x:Key="RatingItemStyle" TargetType="{x:Type inputToolkit:RatingItem}">
+    <!--********************************** RatingItem Style **********************************-->
+    <!--<Style x:Key="RatingItemStyle" TargetType="{x:Type inputToolkit:RatingItem}">
 		<Setter Property="Template">
 			<Setter.Value>
 				<ControlTemplate TargetType="{x:Type inputToolkit:RatingItem}">
@@ -94,8 +94,8 @@
 		</Setter>
 	</Style>-->
 
-	<!-- ********************************** Rating Style **********************************-->
-	<!--<Style x:Key="RatingStyle" TargetType="{x:Type inputToolkit:Rating}">
+    <!-- ********************************** Rating Style **********************************-->
+    <!--<Style x:Key="RatingStyle" TargetType="{x:Type inputToolkit:Rating}">
 		<Setter Property="Foreground" Value="{StaticResource RatingItemActiveBackgroundBrush}" />
 		<Setter Property="Background" Value="{StaticResource TransparentBrush}" />
 		<Setter Property="BorderBrush" Value="{StaticResource TransparentBrush}" />
@@ -129,8 +129,8 @@
 		</Setter>
 	</Style>-->
 
-	<!-- *********************************  AccordionButton Style  ********************************* -->
-	<!--<Style x:Key="AccordionButtonStyle" TargetType="layoutToolkitPrimitives:AccordionButton">
+    <!-- *********************************  AccordionButton Style  ********************************* -->
+    <!--<Style x:Key="AccordionButtonStyle" TargetType="layoutToolkitPrimitives:AccordionButton">
 		<Setter Property="FontFamily" Value="Segoe UI" />
 		<Setter Property="FontSize" Value="14.667" />
 		<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
@@ -481,8 +481,8 @@
 		</Setter>
 	</Style>-->
 
-	<!-- *********************************  ExpandableContentControl Style  ********************************* -->
-	<!--<Style x:Key="ExpandableContentControlStyle" TargetType="layoutToolkitPrimitives:ExpandableContentControl">
+    <!-- *********************************  ExpandableContentControl Style  ********************************* -->
+    <!--<Style x:Key="ExpandableContentControlStyle" TargetType="layoutToolkitPrimitives:ExpandableContentControl">
 		<Setter Property="FontFamily" Value="Segoe UI" />
 		<Setter Property="FontSize" Value="13.333" />
 		<Setter Property="BorderThickness" Value="0" />
@@ -501,8 +501,8 @@
 		</Setter>
 	</Style>-->
 
-	<!-- *********************************  AccordionItem Style  ********************************* -->
-	<!--<Style x:Key="AccordionItemStyle" TargetType="layoutToolkit:AccordionItem">
+    <!-- *********************************  AccordionItem Style  ********************************* -->
+    <!--<Style x:Key="AccordionItemStyle" TargetType="layoutToolkit:AccordionItem">
 		<Setter Property="FontFamily" Value="Segoe UI" />
 		<Setter Property="FontSize" Value="14.667" />
 		<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
@@ -783,8 +783,8 @@
 		</Setter>
 	</Style>-->
 
-	<!-- *********************************  Accordion Style  ********************************* -->
-	<!--<Style x:Key="AccordionStyle" TargetType="layoutToolkit:Accordion">
+    <!-- *********************************  Accordion Style  ********************************* -->
+    <!--<Style x:Key="AccordionStyle" TargetType="layoutToolkit:Accordion">
 		<Setter Property="BorderBrush" Value="{StaticResource AccordionBorderBrush}" />
         <Setter Property="Background" Value="{StaticResource AccordionBackgroundBrush}" />
 		<Setter Property="BorderThickness" Value="1" />
@@ -830,8 +830,8 @@
 		</Setter>
 	</Style>-->
 
-	<!-- *********************************  AutoCompleteBox Style  ********************************* -->
-	<!--<Style x:Key="AutoCompleteBoxStyle" TargetType="{x:Type inputToolkit:AutoCompleteBox}">
+    <!-- *********************************  AutoCompleteBox Style  ********************************* -->
+    <!--<Style x:Key="AutoCompleteBoxStyle" TargetType="{x:Type inputToolkit:AutoCompleteBox}">
 		<Setter Property="FontFamily" Value="Segoe UI" />
 		<Setter Property="FontSize" Value="14.667" />
 		<Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
@@ -895,7 +895,7 @@
 			</Setter.Value>
 		</Setter>
 	</Style>-->
-    
+
     <!--********************** Implicit Styles *********************** -->
     <!--<Style BasedOn="{StaticResource RatingItemStyle}" TargetType="{x:Type inputToolkit:RatingItem}" />
     <Style BasedOn="{StaticResource RatingStyle}" TargetType="{x:Type inputToolkit:Rating}" />
@@ -903,5 +903,5 @@
     <Style BasedOn="{StaticResource AccordionItemStyle}" TargetType="layoutToolkit:AccordionItem" />
     <Style BasedOn="{StaticResource AccordionStyle}" TargetType="layoutToolkit:Accordion" />
     <Style BasedOn="{StaticResource AutoCompleteBoxStyle}" TargetType="{x:Type inputToolkit:AutoCompleteBox}" />-->
-	
+
 </ResourceDictionary>

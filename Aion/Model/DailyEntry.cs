@@ -140,7 +140,7 @@ public class DailyEntry : INotifyPropertyChanged
     {
         ID = Guid.NewGuid();
         EmployeeCode = employee.ID;
-        Location = employee.LocationCode;
+        Location = employee.Location;
         var d = clockTimes[0].DtDate;
         Date = d.ToString("yyyy-MM-dd");
         Day = d.ToString("dddd");
@@ -153,7 +153,7 @@ public class DailyEntry : INotifyPropertyChanged
     {
         ID = Guid.NewGuid();
         EmployeeCode = employee.ID;
-        Location = employee.LocationCode;
+        Location = employee.Location;
         Date = date.ToString("yyyy-MM-dd");
         Day = date.ToString("dddd");
     }

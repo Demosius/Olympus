@@ -118,14 +118,14 @@
 
             <!-- ID -->
 
-<!-- First Name -->
-<!-- Last Name -->
-<!-- -->
+            <!-- First Name -->
+            <!-- Last Name -->
+            <!-- -->
         </Grid>
 
         <!-- Employee Avatar -->
         <Image DockPanel.Dock="Right"
-               Source="{Binding SelectedEmployee.Icon.FullPath}"/>
+               Source="{Binding Avatar.FullPath}"/>
 
         <Button DockPanel.Dock="Bottom" Content="New Employee"
                 Command="{Binding }"/>

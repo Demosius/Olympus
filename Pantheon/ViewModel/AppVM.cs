@@ -1,24 +1,24 @@
-﻿using Styx;
+﻿using Pantheon.Properties;
+using Pantheon.View;
+using Styx;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Pantheon.Properties;
-using Pantheon.View;
 using Uranus;
 
 namespace Pantheon.ViewModel;
 
 internal class AppVM : INotifyPropertyChanged
 {
-    public Charon Charon { get; set; }
-    public Helios Helios { get; set; }
+    public Charon? Charon { get; set; }
+    public Helios? Helios { get; set; }
 
-    private PantheonPage pantheonPage;
-    public PantheonPage PantheonPage
+    private PantheonPage? pantheonPage;
+    public PantheonPage? PantheonPage
     {
         get => pantheonPage;
         set
         {
-            pantheonPage = value;   
+            pantheonPage = value;
             OnPropertyChanged(nameof(PantheonPage));
         }
     }
@@ -35,10 +35,10 @@ internal class AppVM : INotifyPropertyChanged
         PantheonPage = new PantheonPage(charon, helios);
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

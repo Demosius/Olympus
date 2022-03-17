@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Pantheon.Properties;
+using Styx;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Pantheon.Properties;
-using Styx;
 using Uranus;
 using Uranus.Staff.Model;
 
@@ -12,9 +12,9 @@ namespace Pantheon.ViewModel.Pages;
 
 internal class ShiftPageVM : INotifyPropertyChanged
 {
-    public Helios Helios { get; set; }
-    public Charon Charon { get; set; }
-        
+    public Helios? Helios { get; set; }
+    public Charon? Charon { get; set; }
+
     #region NotifiableProperties
 
     private ObservableCollection<Shift> shifts;
@@ -28,8 +28,8 @@ internal class ShiftPageVM : INotifyPropertyChanged
         }
     }
 
-    private Shift selectedShift;
-    public Shift SelectedShift
+    private Shift? selectedShift;
+    public Shift? SelectedShift
     {
         get => selectedShift;
         set
@@ -50,21 +50,25 @@ internal class ShiftPageVM : INotifyPropertyChanged
         }
     }
 
-    private Department selectedDepartment;
-    public Department SelectedDepartment
+    private Department? selectedDepartment;
+    public Department? SelectedDepartment
     {
         get => selectedDepartment;
         set
         {
             selectedDepartment = value;
             OnPropertyChanged(nameof(SelectedDepartment));
-            Shifts = new ObservableCollection<Shift>(SelectedDepartment.Shifts ?? new List<Shift>());
+            Shifts = new ObservableCollection<Shift>(SelectedDepartment?.Shifts ?? new List<Shift>());
         }
     }
-        
+
     #endregion
 
-    public ShiftPageVM() { }
+    public ShiftPageVM()
+    {
+        departments = new ObservableCollection<Department>();
+        shifts = new ObservableCollection<Shift>();
+    }
 
     public void SetDataSources(Helios helios, Charon charon)
     {
@@ -73,12 +77,12 @@ internal class ShiftPageVM : INotifyPropertyChanged
 
         Departments = new ObservableCollection<Department>(Helios.StaffReader.SubDepartments(Charon.UserEmployee.DepartmentName));
         SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.UserEmployee.DepartmentName);
-    } 
+    }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

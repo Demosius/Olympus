@@ -119,7 +119,7 @@ public class OlympusVM : INotifyPropertyChanged
         RunningProjects = new Dictionary<EProject, IProject>();
     }
 
-    public static void LaunchPasswordChanger()
+    public void LaunchPasswordChanger()
     {
         var changePasswordWindow = new ChangePasswordWindow(App.Charon);
         changePasswordWindow.ShowDialog();

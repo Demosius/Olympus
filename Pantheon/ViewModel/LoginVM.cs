@@ -24,7 +24,7 @@ public class LoginVM : INotifyPropertyChanged
     public LoginVM()
     {
         LogInCommand = new LogInCommand(this);
-        UserCode = "";
+        userCode = "";
         Password = "";
     }
 
@@ -32,7 +32,7 @@ public class LoginVM : INotifyPropertyChanged
     {
         if (int.TryParse(UserCode, out var userID))
         {
-            if( App.Charon.LogIn(userID, Password))
+            if (App.Charon.LogIn(userID, Password))
                 return true;
 
             MessageBox.Show("Incorrect User ID and Password combination.", "Invalid Log In", MessageBoxButton.OK,
@@ -44,7 +44,7 @@ public class LoginVM : INotifyPropertyChanged
         return false;
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     private void OnPropertyChanged(string propertyName)
     {

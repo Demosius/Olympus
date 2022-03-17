@@ -64,7 +64,7 @@ public static class OldDataUtil
             FirstName = employee.FirstName,
             LastName = employee.Surname,
             DisplayName = employee.FirstName,
-            LocationCode = employee.Location,
+            Location = employee.Location,
             ReportsToID = employee.ReportsToCode,
             PayPoint = employee.PayPoint,
             EmploymentType = eType,

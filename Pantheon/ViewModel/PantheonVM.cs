@@ -1,22 +1,22 @@
-﻿using Styx;
+﻿using Pantheon.Properties;
+using Pantheon.View.Pages;
+using Pantheon.ViewModel.Commands;
+using Styx;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
-using Pantheon.Properties;
-using Pantheon.View.Pages;
-using Pantheon.ViewModel.Commands;
 using Uranus;
 
 namespace Pantheon.ViewModel;
 
 internal class PantheonVM : INotifyPropertyChanged
 {
-    public Charon Charon { get; set; }
-    public Helios Helios { get; set; }
+    public Charon? Charon { get; set; }
+    public Helios? Helios { get; set; }
 
-    private EmployeePage EmployeePage { get; set; }
-    private ShiftPage ShiftPage { get; set; }
-    private RosterPage RosterPage { get; set; }
+    private EmployeePage? EmployeePage { get; set; }
+    private ShiftPage? ShiftPage { get; set; }
+    private RosterPage? RosterPage { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -44,7 +44,7 @@ internal class PantheonVM : INotifyPropertyChanged
 
     public PantheonVM()
     {
-        CurrentPage = new Page();
+        currentPage = new Page();
 
         ShowEmployeePageCommand = new ShowEmployeePageCommand(this);
         ShowShiftPageCommand = new ShowShiftPageCommand(this);
@@ -59,23 +59,23 @@ internal class PantheonVM : INotifyPropertyChanged
 
     public void ShowEmployeePage()
     {
-        CurrentPage = EmployeePage ??= new EmployeePage(Charon, Helios);
+        CurrentPage = EmployeePage ??= new EmployeePage(Charon!, Helios!);
     }
 
     public void ShowShiftPage()
     {
-        CurrentPage = ShiftPage ??= new ShiftPage(Helios, Charon);
+        CurrentPage = ShiftPage ??= new ShiftPage(Helios!, Charon!);
     }
 
     public void ShowRosterPage()
     {
-        CurrentPage = RosterPage ??= new RosterPage(Helios, Charon);
+        CurrentPage = RosterPage ??= new RosterPage(Helios!, Charon!);
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
