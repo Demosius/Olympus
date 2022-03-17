@@ -11,18 +11,18 @@ public class LogInCommand : ICommand
 
     public LogInCommand(LoginVM vm) { VM = vm; }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return VM.UserCode.Length > 0 && VM.Password.Length > 0;
     }
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
         if (!VM.LogIn()) return;
 

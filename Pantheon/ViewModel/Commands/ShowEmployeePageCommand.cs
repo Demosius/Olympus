@@ -12,17 +12,17 @@ internal class ShowEmployeePageCommand : ICommand
         VM = vm;
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return true;
     }
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
         VM.ShowEmployeePage();
     }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;

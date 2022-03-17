@@ -5,7 +5,15 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>pantheon.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Model\**" />
+    <EmbeddedResource Remove="Model\**" />
+    <None Remove="Model\**" />
+    <Page Remove="Model\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Styx\Styx.csproj" />
@@ -28,10 +36,6 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Model\" />
   </ItemGroup>
 
   <ItemGroup>

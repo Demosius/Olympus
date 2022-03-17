@@ -1,6 +1,7 @@
-﻿using System;
-using Pantheon.Properties;
+﻿using Pantheon.Properties;
+using Pantheon.View;
 using Styx;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -8,7 +9,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Pantheon.View;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -34,8 +34,10 @@ internal enum ESortMethod
 
 internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
-    public Helios Helios { get; set; }
-    public Charon Charon { get; set; }
+    public Helios? Helios { get; set; }
+    public Charon? Charon { get; set; }
+
+    public EmployeeAvatar Avatar => (SelectedEmployee ?? new Employee()).Avatar ?? new EmployeeAvatar();
 
     private List<Employee> fullEmployees;
 
@@ -52,14 +54,15 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         }
     }
 
-    private Employee selectedEmployee;
-    public Employee SelectedEmployee
+    private Employee? selectedEmployee;
+    public Employee? SelectedEmployee
     {
         get => selectedEmployee;
         set
         {
             selectedEmployee = value;
             OnPropertyChanged(nameof(SelectedEmployee));
+            OnPropertyChanged(nameof(Avatar));
         }
     }
 
@@ -99,8 +102,8 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         }
     }
 
-    private Role selectedRole;
-    public Role SelectedRole
+    private Role? selectedRole;
+    public Role? SelectedRole
     {
         get => selectedRole;
         set
@@ -111,8 +114,8 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         }
     }
 
-    private Department selectedDepartment;
-    public Department SelectedDepartment
+    private Department? selectedDepartment;
+    public Department? SelectedDepartment
     {
         get => selectedDepartment;
         set
@@ -134,8 +137,8 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         }
     }
 
-    private ObservableCollection<Role> roles;
-    public ObservableCollection<Role> Roles
+    private ObservableCollection<Role?> roles;
+    public ObservableCollection<Role?> Roles
     {
         get => roles;
         set
@@ -145,8 +148,8 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         }
     }
 
-    private ObservableCollection<Department> departments;
-    public ObservableCollection<Department> Departments
+    private ObservableCollection<Department?> departments;
+    public ObservableCollection<Department?> Departments
     {
         get => departments;
         set
@@ -175,7 +178,12 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         ApplySortingCommand = new ApplySortingCommand(this);
 
         fullEmployees = new List<Employee>();
-        Employees = new ObservableCollection<Employee>();
+        employees = new ObservableCollection<Employee>();
+
+        employeeSearchString = string.Empty;
+        employmentTypes = new ObservableCollection<EEmploymentType?> { null };
+        roles = new ObservableCollection<Role?>();
+        departments = new ObservableCollection<Department?>();
     }
 
     public void SetDataSources(Helios helios, Charon charon)
@@ -188,16 +196,18 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     public void RefreshData()
     {
+        if (Charon is null || Helios is null) return;
+
         // Make sure that the user has an assigned role.
         Charon.UserEmployee.Role ??= Helios.StaffReader.Role(Charon.UserEmployee.RoleName);
 
         fullEmployees = Helios.StaffReader.GetReportsByRole(Charon.UserEmployee.Role).ToList();
         Employees = new ObservableCollection<Employee>(fullEmployees);
 
-        Departments = new ObservableCollection<Department>(fullEmployees.Select(employee => employee.Department).Distinct().OrderBy(department => department?.Name));
+        Departments = new ObservableCollection<Department?>(fullEmployees.Select(employee => employee.Department).Distinct().OrderBy(department => department?.Name));
         selectedDepartment = null;
 
-        Roles = new ObservableCollection<Role>(fullEmployees.Select(employee => employee.Role).Distinct().OrderBy(role => role.Name));
+        Roles = new ObservableCollection<Role?>(fullEmployees.Select(employee => employee.Role).Distinct().OrderBy(role => role?.Name));
         selectedRole = null;
 
         EmploymentTypes = new ObservableCollection<EEmploymentType?>(Enum.GetValues(typeof(EEmploymentType)).Cast<EEmploymentType?>());
@@ -213,10 +223,10 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         throw new NotImplementedException();
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
@@ -240,7 +250,7 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
             employeeList = employeeList.Where(e => e.EmploymentType == SelectedEmploymentType);
         if (SelectedRole is not null)
             employeeList = employeeList.Where(e => e.Role == SelectedRole);
-        if (EmployeeSearchString is not null && EmployeeSearchString != "")
+        if (EmployeeSearchString != "")
         {
             var regex = new Regex(EmployeeSearchString, RegexOptions.IgnoreCase);
             employeeList = employeeList.Where(e => regex.IsMatch(e.FullName));
@@ -277,6 +287,8 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     public void CreateNewEmployee()
     {
+        if (Helios is null) return;
+
         var employeeCreationWindow = new EmployeeCreationWindow();
         if (employeeCreationWindow.ShowDialog() != true) return;
 
@@ -291,6 +303,6 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         SelectedEmployee = newEmployee;
 
         ApplyFilters();
-            
+
     }
 }
