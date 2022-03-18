@@ -8,7 +8,7 @@
       xmlns:sys="clr-namespace:System;assembly=System.Runtime"
       xmlns:model="clr-namespace:Uranus.Staff.Model;assembly=Uranus"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="1080" d:DesignWidth="1200"
       Title="EmployeePage">
 
     <Page.DataContext>
@@ -52,7 +52,7 @@
                          Margin="2,0"
                          Style="{StaticResource TextBoxStyle}"/>
                 <ComboBox ItemsSource="{Binding Source={StaticResource EmploymentTypes}}"
-                          SelectedValue="{Binding SelectedEmploymentType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmploymentTypeConverter}}"
+                          SelectedValue="{Binding SelectedEmploymentType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           ToolTip="Filter Employment Type"
                           IsEditable="True"
                           MinWidth="100"
@@ -98,78 +98,248 @@
             </ToolBar>
         </ToolBarTray>
 
-        <!-- Employee Editing Panel -->
-        <Grid DockPanel.Dock="Right">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <!-- List of Employees -->
+        <DockPanel DockPanel.Dock="Left">
 
-            <!-- ID -->
-
-            <!-- First Name -->
-            <!-- Last Name -->
-            <!-- -->
-        </Grid>
-
-        <!-- Employee Avatar -->
-        <Image DockPanel.Dock="Right"
-               Source="{Binding Avatar.FullPath}"/>
-
-        <Button DockPanel.Dock="Bottom" Content="New Employee"
+            <Button DockPanel.Dock="Bottom" Content="New Employee"
                 Command="{Binding }"/>
 
-        <!-- List of Employees -->
-        <ListView ItemsSource="{Binding Employees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            <ListView ItemsSource="{Binding Employees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   SelectedValue="{Binding SelectedEmployee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:ItemsSource="{d:SampleData ItemCount=5}">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Vertical">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <Label Content="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                            <Image Source="{Binding Icon.FullPath, FallbackValue=''}"></Image>
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                        FontSize="14"
                                        FontWeight="Bold"
                                        Foreground="{StaticResource LightForegroundBrush}"/>
-                            <Label Content=" - "
+                                    <Label Content=" - "
                                        FontSize="14"
                                        FontWeight="Bold"
                                        Foreground="{StaticResource LightForegroundBrush}"/>
-                            <Label Content="{Binding ID, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                    <Label Content="{Binding ID, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                        FontSize="14"
                                        FontStyle="Italic"
                                        Foreground="{StaticResource LightForegroundBrush}"/>
-                        </StackPanel>
-                        <WrapPanel Orientation="Horizontal">
-                            <TextBlock Text="Employment: "/>
-                            <TextBlock Text="{Binding EmploymentType, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmploymentTypeConverter}}"/>
-                            <Separator/>
-                            <TextBlock Text="Role: "/>
-                            <TextBlock Text="{Binding RoleName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                            <Separator/>
-                            <TextBlock Text="Department: "/>
-                            <TextBlock Text="{Binding DepartmentName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+                                </StackPanel>
+                                <WrapPanel Orientation="Horizontal">
+                                    <TextBlock Text="Employment: "/>
+                                    <TextBlock Text="{Binding EmploymentType, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmploymentTypeConverter}}"/>
+                                    <Separator/>
+                                    <TextBlock Text="Role: "/>
+                                    <TextBlock Text="{Binding RoleName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <Separator/>
+                                    <TextBlock Text="Department: "/>
+                                    <TextBlock Text="{Binding DepartmentName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
 
-                        </WrapPanel>
+                                </WrapPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.Resources>
+                    <Style TargetType="Separator" BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}">
+                        <Setter Property="Margin" Value="5,0"/>
+                    </Style>
+                </ListView.Resources>
+            </ListView>
+        </DockPanel>
+
+
+        <!-- Employee Editing Panel -->
+        <DockPanel DockPanel.Dock="Left">
+
+            <Button DockPanel.Dock="Bottom" Content="Save Changes"></Button>
+
+            <ScrollViewer DockPanel.Dock="Bottom">
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- ID -->
+                    <StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3"
+                        HorizontalAlignment="Center"
+                        Orientation="Horizontal">
+                        <Label  Content="ID - "/>
+                        <Label  Content="{Binding SelectedEmployee.ID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                     </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-            <ListView.Resources>
-                <Style TargetType="Separator" BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}">
-                    <Setter Property="Margin" Value="5,0"/>
-                </Style>
-            </ListView.Resources>
-        </ListView>
+                    <!-- Icon -->
+                    <Label Grid.Column="0" Grid.Row="1" 
+                   Content="Icon: "
+                   VerticalAlignment="Top"/>
+                    <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Vertical">
+                        <Border Height="135"
+                        Width="135"
+                        BorderBrush="{StaticResource AccordionBorderBrush}"
+                        BorderThickness="1">
+                            <Image Source="{Binding SelectedEmployee.Icon.FullPath, FallbackValue=''}"/>
+                        </Border>
+                        <Button Content="Change"
+                        Width="135"
+                        Margin="5"/>
+                        <!--Command="{Binding LaunchIconiferCommand}"-->
+                    </StackPanel>
+                    <!-- First Name -->
+                    <Label Grid.Column="0" Grid.Row="2" 
+                           Content="First Name: "/>
+                    <TextBox Grid.Column="1" Grid.Row="2"
+                             Text="{Binding SelectedEmployee.FirstName, FallbackValue=''}"/>
+                    <!-- Last Name -->
+                    <Label Grid.Column="0" Grid.Row="3" 
+                           Content="Last Name: "/>
+                    <TextBox Grid.Column="1" Grid.Row="3"
+                             Text="{Binding SelectedEmployee.LastName, FallbackValue=''}"/>
+                    <!-- Display Name -->
+                    <Label Grid.Column="0" Grid.Row="4" 
+                           Content="Display Name: "/>
+                    <TextBox Grid.Column="1" Grid.Row="4"
+                             Text="{Binding SelectedEmployee.DisplayName, FallbackValue=''}"/>
+                    <!-- PC ID -->
+                    <Label Grid.Column="0" Grid.Row="5"
+                           Content="PC ID: "/>
+                    <TextBox Grid.Column="1" Grid.Row="5"
+                             Text="{Binding SelectedEmployee.PC_ID, FallbackValue=''}"/>
+                    <!-- RF ID -->
+                    <Label Grid.Column="0" Grid.Row="6"
+                           Content="RF ID: "/>
+                    <TextBox Grid.Column="1" Grid.Row="6"
+                             Text="{Binding SelectedEmployee.RF_ID, FallbackValue=''}"/>
+                    <!-- Location -->
+                    <Label Grid.Column="0" Grid.Row="7"
+                           Content="Location: "/>
+                    <ComboBox Grid.Column="1" Grid.Row="7"
+                              ItemsSource="{Binding Locations, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              SelectedValue="{Binding SelectedEmployee.Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                              HorizontalContentAlignment="Center"/>
+                    <!-- Department -->
+                    <Label Grid.Column="0" Grid.Row="8"
+                           Content="Department: "/>
+                    <ComboBox Grid.Column="1" Grid.Row="8"
+                              ItemsSource="{Binding FullDepartments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              SelectedValue="{Binding SelectedEmployee.Department, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                              HorizontalContentAlignment="Center"/>
+                    <!-- Role -->
+                    <Label Grid.Column="0" Grid.Row="9"
+                           Content="Role: "/>
+                    <ComboBox Grid.Column="1" Grid.Row="9"
+                              ItemsSource="{Binding AllRoles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              SelectedValue="{Binding SelectedEmployee.Role, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                              HorizontalContentAlignment="Center"/>
+                    <!-- Reports To -->
+                    <Label Grid.Column="0" Grid.Row="10"
+                           Content="Reports To: "/>
+                    <StackPanel Grid.Column="1" Grid.Row="10"
+                                Orientation="Horizontal">
+                        <ComboBox ItemsSource="{Binding Managers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValue="{Binding SelectedEmployee.ReportsTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                                  HorizontalContentAlignment="Center"/>
+                        <StackPanel Orientation="Vertical">
+                            <Label Content="Use All" FontSize="8" FontWeight="Light" Margin="0" Padding="0"/>
+                            <CheckBox IsChecked="{Binding UseAllAsManagers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Margin="0" Padding="0"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <!-- Clan -->
+                    <Label Grid.Column="0" Grid.Row="11"
+                           Content="Clan: "/>
+                    <ComboBox Grid.Column="1" Grid.Row="11"
+                              ItemsSource="{Binding Clans, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              SelectedValue="{Binding SelectedEmployee.Clan, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                              HorizontalContentAlignment="Center"/>
+                    <!-- Pay Point -->
+                    <Label Grid.Column="0" Grid.Row="12"
+                           Content="Pay Point: "/>
+                    <ComboBox Grid.Column="1" Grid.Row="12"
+                              ItemsSource="{Binding PayPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              SelectedValue="{Binding SelectedEmployee.PayPoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                              HorizontalContentAlignment="Center"/>
+                    <!-- Employment Type -->
+                    <Label Grid.Column="0" Grid.Row="13"
+                           Content="Employment Type: "/>
+                    <ComboBox Grid.Column="1" Grid.Row="13"
+                              ItemsSource="{Binding EmploymentTypes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              SelectedValue="{Binding SelectedEmployee.EmploymentType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                    <!-- Phone Number -->
+                    <Label Grid.Column="0" Grid.Row="14"
+                           Content="Phone: "/>
+                    <TextBox Grid.Column="1" Grid.Row="14"
+                             Text="{Binding SelectedEmployee.PhoneNumber, FallbackValue=''}"/>
+                    <!-- Email -->
+                    <Label Grid.Column="0" Grid.Row="15"
+                           Content="Email: "/>
+                    <TextBox Grid.Column="1" Grid.Row="15"
+                             Text="{Binding SelectedEmployee.Email, FallbackValue=''}"/>
+                    <!-- Address -->
+                    <Label Grid.Column="0" Grid.Row="16"
+                           Content="Address: "/>
+                    <TextBox Grid.Column="1" Grid.Row="16"
+                             Text="{Binding SelectedEmployee.Address, FallbackValue=''}"/>
+                    <!-- High Risk Licence -->
+                    <Label Grid.Column="0" Grid.Row="17"
+                           Content="High Risk Licence: "/>
+                    <TextBox Grid.Column="1" Grid.Row="17"
+                             Text="{Binding SelectedEmployee.Licence, FallbackValue=''}"/>
+                    <!-- Pay Rate -->
+                    <Label Grid.Column="0" Grid.Row="18"
+                           Content="Pay Rate: "/>
+                    <TextBox Grid.Column="1" Grid.Row="18"
+                             Text="{Binding SelectedEmployee.PayRate, FallbackValue=''}"/>
+
+                    <Grid.Resources>
+                        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                        </Style>
+                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="MinWidth" Value="200"/>
+                            <Setter Property="Margin" Value="5"/>
+                        </Style>
+                        <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
+                            <Setter Property="Margin" Value="5"/>
+                            <Setter Property="MinWidth" Value="200"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        </Style>
+                    </Grid.Resources>
+                </Grid>
+            </ScrollViewer>
+
+        </DockPanel>
+
+        <!-- Avatar -->
+        <StackPanel Orientation="Vertical">
+            <Image Source="{Binding SelectedEmployee.Avatar.FullPath, FallbackValue=''}"/>
+            <Button Content="Change Avatar"
+                    Margin="5"/>
+        </StackPanel>
 
     </DockPanel>
 </Page>

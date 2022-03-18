@@ -34,6 +34,9 @@ public class StaffReader
 
     public Role Role(string roleName, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Role>(roleName, pullType);
 
+    public IEnumerable<Role> Roles(Expression<Func<Role, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
     public List<ClockEvent> ClockEvents(Expression<Func<ClockEvent, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
@@ -122,6 +125,33 @@ public class StaffReader
             returnDict.Add(report.ID, report);
             GetReports(report, ref returnDict);
         }
+    }
+
+    /// <summary>
+    /// In a single transaction, pulls all the data required for all employees and inserts it into a single data object.
+    /// </summary>
+    /// <returns>Employee data set, containing Departments, Roles, etc. - with established relationships.</returns>
+    public EmployeeDataSet EmployeeDataSet()
+    {
+        try
+        {
+            EmployeeDataSet? data = null;
+            Chariot.Database?.RunInTransaction(() =>
+            {
+                var employees = Chariot.PullObjectList<Employee>();
+                var departments = Chariot.PullObjectList<Department>();
+                var roles = Chariot.PullObjectList<Role>();
+                var clans = Chariot.PullObjectList<Clan>();
+                data = new EmployeeDataSet(employees, departments, clans, roles);
+            });
+            if (data is not null) return data;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to pull the EmployeeDataSet");
+        }
+        return new EmployeeDataSet(new Dictionary<int, Employee>(), new Dictionary<string, Department>(),
+            new Dictionary<string, Clan>(), new Dictionary<string, Role>());
     }
 
     /// <summary>

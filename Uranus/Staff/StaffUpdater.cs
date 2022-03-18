@@ -16,7 +16,7 @@ public class StaffUpdater
 
     public int ClockEvent(ClockEvent clock) => Chariot.Update(clock);
 
-    public void Employee(Employee employee) => Chariot.Update(employee);
+    public int Employee(Employee employee) => Chariot.Update(employee);
 
     public void ClockEvents(IEnumerable<ClockEvent> clocks)
     {
