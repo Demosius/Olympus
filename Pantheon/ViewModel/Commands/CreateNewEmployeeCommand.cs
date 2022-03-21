@@ -15,7 +15,7 @@ internal class CreateNewEmployeeCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon.CanCreateEmployee();
+        return VM.Charon?.CanCreateEmployee() ?? false;
     }
 
     public void Execute(object? parameter)

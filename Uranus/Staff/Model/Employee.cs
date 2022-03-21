@@ -2,6 +2,8 @@
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Uranus.Annotations;
 
 namespace Uranus.Staff.Model;
 
@@ -32,22 +34,77 @@ public static class EmploymentTypeExtension
     }
 }
 
-public class Employee
+public class Employee : INotifyPropertyChanged
 {
+    #region Fields
+
+    private string location;
+    private string payPoint;
+    private string firstName;
+    private string lastName;
+    private EEmploymentType employmentType;
+    private Department? department;
+    private Role? role;
+    private Clan? clan;
+
+    #endregion
+
     [PrimaryKey] public int ID { get; set; } // Employee number (e.g. 60853)
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    [NotNull] public string DisplayName { get; set; }
+    public string FirstName
+    {
+        get => firstName;
+        set
+        {
+            firstName = value;
+            OnPropertyChanged(nameof(FirstName));
+            OnPropertyChanged(nameof(FullName));
+        }
+    }
+    public string LastName
+    {
+        get => lastName;
+        set
+        {
+            lastName = value;
+            OnPropertyChanged(nameof(LastName));
+            OnPropertyChanged(nameof(FullName));
+        }
+    }
+    [SQLite.NotNull] public string DisplayName { get; set; }
     public decimal? PayRate { get; set; }
     public string RF_ID { get; set; }
     public string PC_ID { get; set; }
-    public string Location { get; set; }
+    public string Location
+    {
+        get => location;
+        set
+        {
+            location = value;
+            OnPropertyChanged(nameof(Location));
+        }
+    }
     [ForeignKey(typeof(Department))] public string DepartmentName { get; set; }
     [ForeignKey(typeof(Role))] public string RoleName { get; set; }    // Also known as Job Classification.
     [ForeignKey(typeof(Employee))] public int ReportsToID { get; set; }    // Specific Employee this employee reports to, bypassing Role and RoleReports.
     [ForeignKey(typeof(Clan))] public string ClanName { get; set; }
-    public string PayPoint { get; set; }
-    public EEmploymentType EmploymentType { get; set; }
+    public string PayPoint
+    {
+        get => payPoint;
+        set
+        {
+            payPoint = value;
+            OnPropertyChanged(nameof(PayPoint));
+        }
+    }
+    public EEmploymentType EmploymentType
+    {
+        get => employmentType;
+        set
+        {
+            employmentType = value;
+            OnPropertyChanged(nameof(EmploymentType));
+        }
+    }
     [ForeignKey(typeof(Locker))] public string LockerID { get; set; }
     public string PhoneNumber { get; set; }
     public string Email { get; set; }
@@ -55,17 +112,43 @@ public class Employee
     [ForeignKey(typeof(EmployeeIcon))] public string IconName { get; set; }
     [ForeignKey(typeof(EmployeeAvatar))] public string AvatarName { get; set; }
     [ForeignKey(typeof(Licence))] public int LicenceNumber { get; set; }
-
-    [ManyToOne(nameof(DepartmentName), nameof(Model.Department.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Department? Department { get; set; }
-    [ManyToOne(nameof(RoleName), nameof(Model.Role.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Role? Role { get; set; }
+    [ManyToOne(nameof(DepartmentName), nameof(Model.Department.Employees),
+        CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public Department? Department
+    {
+        get => department;
+        set
+        {
+            department = value;
+            OnPropertyChanged(nameof(Department));
+        }
+    }
+    [ManyToOne(nameof(RoleName), nameof(Model.Role.Employees),
+        CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public Role? Role
+    {
+        get => role;
+        set
+        {
+            role = value;
+            OnPropertyChanged(nameof(Role));
+        }
+    }
     [ManyToOne(nameof(ReportsToID), nameof(Reports), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Employee? ReportsTo { get; set; }
     [ManyToOne(nameof(AvatarName), nameof(EmployeeAvatar.Employees), CascadeOperations = CascadeOperation.CascadeRead)]
     public EmployeeAvatar? Avatar { get; set; }
-    [ManyToOne(nameof(ClanName), nameof(Model.Clan.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Clan? Clan { get; set; }
+    [ManyToOne(nameof(ClanName), nameof(Model.Clan.Employees),
+        CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public Clan? Clan
+    {
+        get => clan;
+        set
+        {
+            clan = value;
+            OnPropertyChanged(nameof(Clan));
+        }
+    }
     [ManyToOne(nameof(IconName), nameof(EmployeeIcon.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public EmployeeIcon? Icon { get; set; }
 
@@ -103,16 +186,16 @@ public class Employee
 
     public Employee()
     {
-        FirstName = string.Empty;
-        LastName = string.Empty;
+        firstName = string.Empty;
+        lastName = string.Empty;
         DisplayName = string.Empty;
         RF_ID = string.Empty;
         PC_ID = string.Empty;
-        Location = string.Empty;
+        location = string.Empty;
         DepartmentName = string.Empty;
         RoleName = string.Empty;
         ClanName = string.Empty;
-        PayPoint = string.Empty;
+        payPoint = string.Empty;
         LockerID = string.Empty;
         PhoneNumber = string.Empty;
         Email = string.Empty;
@@ -149,18 +232,18 @@ public class Employee
         List<TagUse> tagUse)
     {
         ID = id;
-        FirstName = firstName;
-        LastName = lastName;
+        this.firstName = firstName;
+        this.lastName = lastName;
         DisplayName = displayName;
         PayRate = payRate;
         RF_ID = rfID;
         PC_ID = pcID;
-        Location = location;
+        this.location = location;
         DepartmentName = departmentName;
         RoleName = roleName;
         ReportsToID = reportsToID;
         ClanName = clanName;
-        PayPoint = payPoint;
+        this.payPoint = payPoint;
         EmploymentType = employmentType;
         LockerID = lockerID;
         PhoneNumber = phoneNumber;
@@ -190,11 +273,11 @@ public class Employee
         TagUse = tagUse;
     }
 
-    public void AssignRole(Role role)
+    public void AssignRole(Role newRole)
     {
-        RoleName = role.Name;
-        Role = role;
-        role.Employees.Add(this);
+        RoleName = newRole.Name;
+        Role = newRole;
+        newRole.Employees.Add(this);
     }
 
     public override string ToString()
@@ -222,4 +305,11 @@ public class Employee
 
     public static bool operator !=(Employee? lhs, Employee? rhs) => !(lhs == rhs);
 
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }

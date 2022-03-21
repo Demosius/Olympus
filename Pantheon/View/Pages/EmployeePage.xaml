@@ -101,8 +101,9 @@
         <!-- List of Employees -->
         <DockPanel DockPanel.Dock="Left">
 
-            <Button DockPanel.Dock="Bottom" Content="New Employee"
-                Command="{Binding }"/>
+            <Button DockPanel.Dock="Bottom" 
+                    Content="New Employee"
+                    Command="{Binding CreateNewEmployeeCommand}"/>
 
             <ListView ItemsSource="{Binding Employees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   SelectedValue="{Binding SelectedEmployee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:ItemsSource="{d:SampleData ItemCount=5}">
@@ -130,10 +131,10 @@
                                     <TextBlock Text="{Binding EmploymentType, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmploymentTypeConverter}}"/>
                                     <Separator/>
                                     <TextBlock Text="Role: "/>
-                                    <TextBlock Text="{Binding RoleName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBlock Text="{Binding Role, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
                                     <Separator/>
                                     <TextBlock Text="Department: "/>
-                                    <TextBlock Text="{Binding DepartmentName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+                                    <TextBlock Text="{Binding Department, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
 
                                 </WrapPanel>
                             </StackPanel>
@@ -152,7 +153,9 @@
         <!-- Employee Editing Panel -->
         <DockPanel DockPanel.Dock="Left">
 
-            <Button DockPanel.Dock="Bottom" Content="Save Changes"></Button>
+            <Button DockPanel.Dock="Bottom" 
+                    Content="Save Changes"
+                    Command="{Binding SaveEmployeeCommand}"/>
 
             <ScrollViewer DockPanel.Dock="Bottom">
                 <Grid Margin="5">
@@ -234,24 +237,37 @@
                     <!-- Location -->
                     <Label Grid.Column="0" Grid.Row="7"
                            Content="Location: "/>
-                    <ComboBox Grid.Column="1" Grid.Row="7"
-                              ItemsSource="{Binding Locations, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              SelectedValue="{Binding SelectedEmployee.Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                              HorizontalContentAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Grid.Row="7" 
+                                Orientation="Horizontal">
+                        <ComboBox ItemsSource="{Binding Locations, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValue="{Binding SelectedEmployee.Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                                  HorizontalContentAlignment="Center"/>
+                        <Button Content="Add"
+                                Command="{Binding AddLocationCommand}"/>
+                    </StackPanel>
                     <!-- Department -->
                     <Label Grid.Column="0" Grid.Row="8"
                            Content="Department: "/>
-                    <ComboBox Grid.Column="1" Grid.Row="8"
-                              ItemsSource="{Binding FullDepartments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+
+                    <StackPanel Grid.Column="1" Grid.Row="8" 
+                                Orientation="Horizontal">
+                    <ComboBox ItemsSource="{Binding FullDepartments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               SelectedValue="{Binding SelectedEmployee.Department, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
                               HorizontalContentAlignment="Center"/>
+                    <Button Content="Add"
+                            Command="{Binding AddDepartmentCommand}"/>
+                    </StackPanel>
                     <!-- Role -->
                     <Label Grid.Column="0" Grid.Row="9"
                            Content="Role: "/>
-                    <ComboBox Grid.Column="1" Grid.Row="9"
-                              ItemsSource="{Binding AllRoles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    <StackPanel Grid.Column="1" Grid.Row="9" 
+                                Orientation="Horizontal">
+                    <ComboBox ItemsSource="{Binding AllRoles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               SelectedValue="{Binding SelectedEmployee.Role, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
                               HorizontalContentAlignment="Center"/>
+                    <Button Content="Add"
+                            Command="{Binding AddRoleCommand}"/>
+                    </StackPanel>
                     <!-- Reports To -->
                     <Label Grid.Column="0" Grid.Row="10"
                            Content="Reports To: "/>
@@ -269,17 +285,25 @@
                     <!-- Clan -->
                     <Label Grid.Column="0" Grid.Row="11"
                            Content="Clan: "/>
-                    <ComboBox Grid.Column="1" Grid.Row="11"
-                              ItemsSource="{Binding Clans, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    <StackPanel Grid.Column="1" Grid.Row="11" 
+                                Orientation="Horizontal">
+                    <ComboBox ItemsSource="{Binding Clans, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               SelectedValue="{Binding SelectedEmployee.Clan, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
                               HorizontalContentAlignment="Center"/>
+                    <Button Content="Add"
+                            Command="{Binding AddClanCommand}"/>
+                    </StackPanel>
                     <!-- Pay Point -->
                     <Label Grid.Column="0" Grid.Row="12"
                            Content="Pay Point: "/>
-                    <ComboBox Grid.Column="1" Grid.Row="12"
-                              ItemsSource="{Binding PayPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    <StackPanel Grid.Column="1" Grid.Row="12" 
+                                Orientation="Horizontal">
+                    <ComboBox ItemsSource="{Binding PayPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               SelectedValue="{Binding SelectedEmployee.PayPoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
                               HorizontalContentAlignment="Center"/>
+                    <Button Content="Add"
+                            Command="{Binding AddPayPointCommand}"/>
+                    </StackPanel>
                     <!-- Employment Type -->
                     <Label Grid.Column="0" Grid.Row="13"
                            Content="Employment Type: "/>
@@ -327,6 +351,9 @@
                             <Setter Property="Margin" Value="5"/>
                             <Setter Property="MinWidth" Value="200"/>
                             <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        </Style>
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                            <Setter Property="Margin" Value="5"/>
                         </Style>
                     </Grid.Resources>
                 </Grid>

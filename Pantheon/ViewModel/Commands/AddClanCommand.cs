@@ -1,26 +1,26 @@
-﻿using System;
+﻿using Pantheon.ViewModel.Pages;
+using System;
 using System.Windows.Input;
-using Pantheon.ViewModel.Pages;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class SaveEmployeeCommand : ICommand
+internal class AddClanCommand : ICommand
 {
     public EmployeePageVM VM { get; set; }
 
-    public SaveEmployeeCommand(EmployeePageVM vm)
+    public AddClanCommand(EmployeePageVM vm)
     {
         VM = vm;
     }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon?.CanUpdateEmployee(VM.SelectedEmployee) ?? false;
+        return VM.Charon?.CanCreateClan() ?? false;
     }
 
     public void Execute(object? parameter)
     {
-        VM.SaveEmployee();
+        VM.AddClan();
     }
 
     public event EventHandler? CanExecuteChanged
@@ -28,4 +28,5 @@ internal class SaveEmployeeCommand : ICommand
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
     }
+
 }

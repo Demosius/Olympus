@@ -7,7 +7,7 @@
         xmlns:vm="clr-namespace:Pantheon.ViewModel"
         mc:Ignorable="d"
         Title="Log In" Height="350" Width="400"
-        Background="#333"
+        Background="{StaticResource  TooltipBackgroundBrush}"
         FocusManager.FocusedElement="{Binding ElementName=UserBox}">
 
     <Window.DataContext>

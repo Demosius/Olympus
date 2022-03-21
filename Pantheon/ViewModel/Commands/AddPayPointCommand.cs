@@ -4,23 +4,23 @@ using Pantheon.ViewModel.Pages;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class SaveEmployeeCommand : ICommand
+internal class AddPayPointCommand : ICommand
 {
     public EmployeePageVM VM { get; set; }
 
-    public SaveEmployeeCommand(EmployeePageVM vm)
+    public AddPayPointCommand(EmployeePageVM vm)
     {
         VM = vm;
     }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon?.CanUpdateEmployee(VM.SelectedEmployee) ?? false;
+        return VM.Charon?.CanCreateEmployee() ?? false;
     }
 
     public void Execute(object? parameter)
     {
-        VM.SaveEmployee();
+        VM.AddPayPoint();
     }
 
     public event EventHandler? CanExecuteChanged

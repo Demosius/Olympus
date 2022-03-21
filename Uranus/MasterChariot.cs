@@ -126,7 +126,7 @@ public abstract class MasterChariot
         return Database.GetAllWithChildren(filter, recursive);
     }
 
-    public T PullObject<T>(object primaryKey, EPullType pullType = EPullType.ObjectOnly) where T : new()
+    public T? PullObject<T>(object primaryKey, EPullType pullType = EPullType.ObjectOnly) where T : new()
     {
         if (pullType == EPullType.ObjectOnly)
         {

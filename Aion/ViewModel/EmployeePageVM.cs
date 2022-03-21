@@ -1,5 +1,4 @@
 ﻿using Aion.ViewModel.Commands;
-using Aion.ViewModel.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -189,7 +188,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
         if ((employeeSearchString ?? "") == "") return;
 
         Regex rex = new(employeeSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        employeeGroup = employeeGroup?.Where(employee => rex.IsMatch(employee.FullName ?? "") || rex.IsMatch(employee.ID.ToString()));
+        employeeGroup = employeeGroup?.Where(employee => rex.IsMatch(employee.FullName) || rex.IsMatch(employee.ID.ToString()));
     }
 
     private void FilterDepartment(ref IEnumerable<Employee> employeeGroup)
@@ -197,7 +196,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
         if ((departmentSearchString ?? "") == "") return;
 
         Regex rex = new(departmentSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        employeeGroup = employeeGroup?.Where(employee => rex.IsMatch(employee.DepartmentName ?? ""));
+        employeeGroup = employeeGroup?.Where(employee => rex.IsMatch(employee.DepartmentName));
     }
 
     private void FilterReports(ref IEnumerable<Employee> employeeGroup)

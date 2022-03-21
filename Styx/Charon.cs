@@ -1,13 +1,13 @@
-﻿using StaffRole = Uranus.Staff.Model.Role;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Uranus.Users.Model;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
+using Uranus;
+using Uranus.Staff;
 using Uranus.Staff.Model;
 using Uranus.Users;
-using Uranus.Staff;
-using Uranus;
-using System.Text.RegularExpressions;
-using System.Security.Cryptography;
+using Uranus.Users.Model;
+using StaffRole = Uranus.Staff.Model.Role;
 
 namespace Styx;
 
@@ -18,19 +18,19 @@ public class PasswordException : Exception
 
 public partial class Charon
 {
-    private User currentUser;
-    public User CurrentUser 
-    { 
+    private User? currentUser;
+    public User? CurrentUser
+    {
         get => currentUser;
         set
         {
             // Make sure user project icon paths are set.
             foreach (var p in value?.Employee?.Projects ?? new List<Project>())
-                p.Icon.SetImageFilePath(staffReader);
+                p.Icon?.SetImageFilePath(staffReader);
             currentUser = value;
         }
     }
-    public Employee UserEmployee => CurrentUser?.Employee;
+    public Employee? UserEmployee => CurrentUser?.Employee;
 
     // User manipulations.
     private readonly UserChariot userChariot;
@@ -68,7 +68,11 @@ public partial class Charon
 
     public int GetLevelDifference(Employee employee)
     {
-        if (CurrentUser is null || UserEmployee is null) return 999;
+        if (CurrentUser is null ||
+            UserEmployee is null ||
+            employee.Role is null ||
+            UserEmployee.Role is null) return 999;
+
         var targetRole = employee.Role;
         int up = 0, down = 0;
         if (UserEmployee.Role.LookDown(ref down, ref targetRole))
@@ -86,9 +90,9 @@ public partial class Charon
 
     public bool ChangePassword(string newPassword, string confirmPassword, out string message)
     {
-        if (!CanChangePassword(UserEmployee))
+        if (CurrentUser is null || UserEmployee is null)
         {
-            message = "Cannot change password of this employee.";
+            message = "No current user.";
             return false;
         }
         if (!ValidatePassword(newPassword, confirmPassword, out message)) return false;
@@ -105,7 +109,7 @@ public partial class Charon
         // Make sure that the target employee has a User login, and that the current user
         // has permission to reset the password.
         if (!CanUpdateUser(employee) || !userReader.UserExists(employee.ID)) return false;
-            
+
         var newLogin = GetNewLogin(employee.ID, $"password{employee.ID}");
 
         userUpdater.Login(newLogin);
@@ -120,14 +124,16 @@ public partial class Charon
     public bool LogIn(int userID, string password)
     {
         var login = userReader.Login(userID);
-            
+
         if (login is null) return false;
         if (!VerifyPassword(login, password)) return false;
-            
+
         var user = userReader.User(userID);
+        if (user is null) return false;
+
         user.Employee = staffReader.Employee(userID, EPullType.IncludeChildren);
         CurrentUser = user;
-            
+
         return true;
 
     }
@@ -279,20 +285,28 @@ public partial class Charon
     /// <summary>
     /// Validate password by comparing the two entered passwords are equal, and checking other relevant rules.
     /// </summary>
-    /// <exception cref="PasswordException"></exception>
     private static bool ValidatePassword(string password, string confirmPassword, out string message)
     {
-        if (password == null) throw new ArgumentNullException(nameof(password));
-        if (confirmPassword == null) throw new ArgumentNullException(nameof(confirmPassword));
-
         // Check that password rules are adhered to.
-        if (password.Length < 6) throw new Exception("Password is too short.");
+        if (password.Length < 6)
+        {
+            message = "Password is too short.";
+            return false;
+        }
 
         // Check that the two different passwords are a match.
-        if (password != confirmPassword) throw new Exception("Passwords don't match.");
+        if (password != confirmPassword)
+        {
+            message = "Passwords don't match.";
+            return false;
+        }
 
         // Check if the password contains spaces.
-        if (password.Contains(' ')) throw new Exception("Password cannot contain spaces.");
+        if (password.Contains(' '))
+        {
+            message = "Password cannot contain spaces.";
+            return false;
+        }
 
         // Caution user against unsafe passwords.
         Regex regex = new(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z\d])(?!.*\s).{8,255}$");
@@ -310,7 +324,7 @@ public partial class Charon
                       "     •  No spaces.";
         }
         else
-            message = null;
+            message = string.Empty;
 
         return true;
     }
@@ -331,7 +345,7 @@ public partial class Charon
     public static string GenerateSalt(int nSalt)
     {
         var saltBytes = new byte[nSalt];
-            
+
         using (var rng = RandomNumberGenerator.Create())
         {
             rng.GetNonZeroBytes(saltBytes);

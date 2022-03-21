@@ -1,5 +1,6 @@
 ﻿using Pantheon.Properties;
 using Pantheon.View;
+using Pantheon.ViewModel.Commands;
 using Styx;
 using System;
 using System.Collections.Generic;
@@ -252,6 +253,13 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public ApplySortingCommand ApplySortingCommand { get; set; }
+    public AddLocationCommand AddLocationCommand { get; set; }
+    public AddDepartmentCommand AddDepartmentCommand { get; set; }
+    public AddRoleCommand AddRoleCommand { get; set; }
+    public AddClanCommand AddClanCommand { get; set; }
+    public AddPayPointCommand AddPayPointCommand { get; set; }
+    public CreateNewEmployeeCommand CreateNewEmployeeCommand { get; set; }
+    public SaveEmployeeCommand SaveEmployeeCommand { get; set; }
     #endregion
 
     public EmployeePageVM()
@@ -261,6 +269,13 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
+        AddLocationCommand = new AddLocationCommand(this);
+        AddDepartmentCommand = new AddDepartmentCommand(this);
+        AddRoleCommand = new AddRoleCommand(this);
+        AddClanCommand = new AddClanCommand(this);
+        AddPayPointCommand = new AddPayPointCommand(this);
+        CreateNewEmployeeCommand = new CreateNewEmployeeCommand(this);
+        SaveEmployeeCommand = new SaveEmployeeCommand(this);
 
         reportingEmployees = new List<Employee>();
         employees = new ObservableCollection<Employee>();
@@ -292,12 +307,12 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         employeeDataSet = Helios.StaffReader.EmployeeDataSet();
 
         // Make sure that the user has an assigned role.
-        if (Charon.UserEmployee.Role is null)
+        if (Charon.UserEmployee is not null && Charon.UserEmployee.Role is null)
             if (employeeDataSet.Roles.TryGetValue(Charon.UserEmployee.RoleName, out var role))
                 Charon.UserEmployee.Role = role;
 
         // Reporting employees (and other collections for filtering that list) is base purely on the employees that report to the current user.
-        reportingEmployees = employeeDataSet.GetReportsByRole(Charon.UserEmployee.ID).ToList();
+        reportingEmployees = employeeDataSet.GetReportsByRole(Charon.UserEmployee?.ID ?? 0).ToList();
 
         Departments = new ObservableCollection<Department?>(reportingEmployees.Select(employee => employee.Department).Distinct().OrderBy(department => department?.Name));
         selectedDepartment = null;
@@ -420,6 +435,34 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     public void AddLocation()
     {
+        var input = new InputWindow("Enter new location:", "New Location");
+        if (input.ShowDialog() != true) return;
 
+        Locations.Add(input.VM.Input);
+        if (SelectedEmployee is not null) SelectedEmployee.Location = input.VM.Input;
+    }
+
+    public void AddDepartment()
+    {
+
+    }
+
+    public void AddRole()
+    {
+
+    }
+
+    public void AddClan()
+    {
+
+    }
+
+    public void AddPayPoint()
+    {
+        var input = new InputWindow("Enter new Pay Point:", "New PayPoint");
+        if (input.ShowDialog() != true) return;
+
+        PayPoints.Add(input.VM.Input);
+        if (SelectedEmployee is not null) SelectedEmployee.PayPoint = input.VM.Input;
     }
 }

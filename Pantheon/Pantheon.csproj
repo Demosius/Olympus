@@ -32,6 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="View\InputWindow.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
     <Page Update="View\PantheonPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
