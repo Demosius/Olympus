@@ -131,7 +131,7 @@ public partial class Charon
         var user = userReader.User(userID);
         if (user is null) return false;
 
-        user.Employee = staffReader.Employee(userID, EPullType.IncludeChildren);
+        user.Employee = staffReader.Employee(userID, EPullType.FullRecursive);
         CurrentUser = user;
 
         return true;
@@ -254,7 +254,11 @@ public partial class Charon
         // Create new user and login.
         userCreator.AssureDefaultRole();
 
-        return CreateNewUser(employee.ID, "Default");
+        if (!CreateNewUser(employee.ID, "Default")) return false;
+
+        employee.IsUser = true;
+        return true;
+
     }
 
     /// <summary>
@@ -270,7 +274,16 @@ public partial class Charon
         if (role is null) return CreateNewUser(employee);
 
         // Check that the employee doesn't already have an associated user. Create user if it doesn't.
-        return !userReader.UserExists(employee.ID) && CreateNewUser(employee.ID, roleName);
+        if (userReader.UserExists(employee.ID))
+        {
+            employee.IsUser = true;
+            return false;
+        }
+
+        if (!CreateNewUser(employee.ID, roleName)) return false;
+
+        employee.IsUser = true;
+        return true;
     }
 
     /// <summary>

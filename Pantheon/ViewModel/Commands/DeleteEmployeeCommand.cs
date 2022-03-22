@@ -1,26 +1,26 @@
-﻿using System;
+﻿using Pantheon.ViewModel.Pages;
+using System;
 using System.Windows.Input;
-using Pantheon.ViewModel.Pages;
 
 namespace Pantheon.ViewModel.Commands;
 
-public class AddLocationCommand : ICommand
+public class DeleteEmployeeCommand : ICommand
 {
     public EmployeePageVM VM { get; set; }
 
-    public AddLocationCommand(EmployeePageVM vm)
+    public DeleteEmployeeCommand(EmployeePageVM vm)
     {
         VM = vm;
     }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon?.CanCreateEmployee() ?? false;
+        return VM.SelectedEmployee is not null && (VM.Charon?.CanDeleteEmployee(VM.SelectedEmployee) ?? false);
     }
 
     public void Execute(object? parameter)
     {
-        VM.AddLocation();
+        VM.DeleteEmployee();
     }
 
     public event EventHandler? CanExecuteChanged

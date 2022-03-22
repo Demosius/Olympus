@@ -6,11 +6,7 @@ namespace Styx;
 public partial class Charon
 {
     // Using Employee objects.
-    public bool CanCreateEmployee()
-    {
-        return CurrentUser?.Role is not null &&
-               CurrentUser.Role.CreateEmployee;
-    }
+    public bool CanCreateEmployee() => CurrentUser?.Role?.CreateEmployee ?? false;
 
     public bool CanReadEmployee(Employee employee)
     {

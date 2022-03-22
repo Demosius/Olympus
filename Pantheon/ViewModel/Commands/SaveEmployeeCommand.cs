@@ -4,7 +4,7 @@ using Pantheon.ViewModel.Pages;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class SaveEmployeeCommand : ICommand
+public class SaveEmployeeCommand : ICommand
 {
     public EmployeePageVM VM { get; set; }
 
@@ -15,6 +15,7 @@ internal class SaveEmployeeCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
+        if (VM.SelectedEmployee is null) return false;
         return VM.Charon?.CanUpdateEmployee(VM.SelectedEmployee) ?? false;
     }
 

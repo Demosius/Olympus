@@ -1,15 +1,24 @@
-﻿using Pantheon.Annotations;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Pantheon.Annotations;
 using Styx;
 using Uranus;
 using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel;
 
-internal class EmployeeCreationVM : INotifyPropertyChanged
+internal class ClanCreationVM : INotifyPropertyChanged
 {
-    public Employee? Employee { get; set; }
+    #region Notifiable Properties
+
+    public Clan Clan { get; set; }
+
+    #endregion
+
+    public ClanCreationVM()
+    {
+        Clan = new Clan();
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

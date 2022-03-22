@@ -4,11 +4,11 @@ using Uranus;
 namespace Pantheon.View;
 
 /// <summary>
-/// Interaction logic for EmployeeCreationWindow.xaml
+/// Interaction logic for ClanCreationWindow.xaml
 /// </summary>
-public partial class EmployeeCreationWindow
+public partial class ClanCreationWindow
 {
-    public EmployeeCreationWindow(Helios helios, Charon charon)
+    public ClanCreationWindow(Helios helios, Charon charon)
     {
         InitializeComponent();
         VM.SetDataSources(helios, charon);

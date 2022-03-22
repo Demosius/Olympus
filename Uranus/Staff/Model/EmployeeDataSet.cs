@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Uranus.Staff.Model;
@@ -162,5 +163,113 @@ public class EmployeeDataSet
             returnDict.Add(report.Name, report);
             GetRoleReports(report, ref returnDict);
         }
+    }
+
+    public void AddDepartment(ref Department newDepartment)
+    {
+        if (Departments.ContainsKey(newDepartment.Name))
+            throw new Exception("Attempt to add department to data set that already exists in name.");
+
+        foreach (var (_, department) in Departments)
+        {
+            if (newDepartment.OverDepartmentName == department.Name)
+            {
+                newDepartment.OverDepartment = department;
+                department.SubDepartments.Add(newDepartment);
+            }
+
+            if (department.OverDepartmentName != newDepartment.Name) continue;
+
+            department.OverDepartment = newDepartment;
+            newDepartment.SubDepartments.Add(department);
+        }
+
+        foreach (var (_, clan) in Clans)
+        {
+            if (clan.DepartmentName != newDepartment.Name) continue;
+
+            clan.Department = newDepartment;
+            newDepartment.Clans.Add(clan);
+        }
+
+        foreach (var (_, role) in Roles)
+        {
+            if (role.DepartmentName != newDepartment.Name) continue;
+
+            role.Department = newDepartment;
+            newDepartment.Roles.Add(role);
+        }
+
+        foreach (var (_, employee) in Employees)
+        {
+            if (employee.ID == newDepartment.HeadID) newDepartment.Head = employee;
+
+            if (employee.DepartmentName != newDepartment.Name) continue;
+
+            employee.Department = newDepartment;
+            newDepartment.Employees.Add(employee);
+        }
+
+        Departments.Add(newDepartment.Name, newDepartment);
+    }
+
+    public void AddRole(ref Role newRole)
+    {
+        if (Roles.ContainsKey(newRole.Name))
+            throw new Exception("Attempt to add role to data set that already exists in name.");
+
+        if (Departments.TryGetValue(newRole.DepartmentName, out var department))
+        {
+            newRole.Department = department;
+            department.Roles.Add(newRole);
+        }
+
+        foreach (var (_, employee) in Employees)
+        {
+            if (employee.RoleName != newRole.Name) continue;
+
+            employee.Role = newRole;
+            newRole.Employees.Add(employee);
+        }
+
+        foreach (var (_, role) in Roles)
+        {
+            if (role.ReportsToRoleName == newRole.Name)
+            {
+                role.ReportsToRole = newRole;
+                newRole.Reports.Add(role);
+            }
+
+            if (newRole.ReportsToRoleName != role.Name) continue;
+
+            newRole.ReportsToRole = role;
+            role.Reports.Add(newRole);
+        }
+
+        Roles.Add(newRole.Name, newRole);
+    }
+
+    public void AddClan(ref Clan newClan)
+    {
+        if (Clans.ContainsKey(newClan.Name))
+            throw new Exception("Attempt to add clan to data set that already exists in name.");
+
+        if (Departments.TryGetValue(newClan.DepartmentName, out var department))
+        {
+            newClan.Department = department;
+            department.Clans.Add(newClan);
+        }
+
+        foreach (var (_, employee) in Employees)
+        {
+            if (newClan.LeaderID == employee.ID) newClan.Leader = employee;
+
+            if (employee.ClanName != newClan.Name) continue;
+
+            employee.Clan = newClan;
+            newClan.Employees.Add(employee);
+        }
+
+        Clans.Add(newClan.Name, newClan);
     }
 }

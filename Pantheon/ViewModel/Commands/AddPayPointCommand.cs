@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModel.Interface;
 using Pantheon.ViewModel.Pages;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class AddPayPointCommand : ICommand
+public class AddPayPointCommand : ICommand
 {
-    public EmployeePageVM VM { get; set; }
+    public IPayPoints VM { get; set; }
 
-    public AddPayPointCommand(EmployeePageVM vm)
+    public AddPayPointCommand(IPayPoints vm)
     {
         VM = vm;
     }

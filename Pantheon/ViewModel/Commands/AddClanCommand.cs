@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class AddClanCommand : ICommand
+public class AddClanCommand : ICommand
 {
     public EmployeePageVM VM { get; set; }
 

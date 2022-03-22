@@ -4,23 +4,25 @@ using Pantheon.ViewModel.Pages;
 
 namespace Pantheon.ViewModel.Commands;
 
-public class AddLocationCommand : ICommand
+public class ActivateUserCommand : ICommand
 {
     public EmployeePageVM VM { get; set; }
 
-    public AddLocationCommand(EmployeePageVM vm)
+    public ActivateUserCommand(EmployeePageVM vm)
     {
         VM = vm;
     }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon?.CanCreateEmployee() ?? false;
+        return VM.SelectedEmployee is not null && 
+               !VM.SelectedEmployee.IsUser &&
+               (VM.Charon?.CanCreateUser(VM.SelectedEmployee) ?? false);
     }
 
     public void Execute(object? parameter)
     {
-        VM.AddLocation();
+        VM.ActivateUser();
     }
 
     public event EventHandler? CanExecuteChanged

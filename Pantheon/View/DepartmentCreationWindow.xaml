@@ -1,0 +1,84 @@
+﻿<Window x:Class="Pantheon.View.DepartmentCreationWindow"
+        x:Name="DeptWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Pantheon.ViewModel"
+        mc:Ignorable="d"
+        Title="Create Department" 
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource TooltipBackgroundBrush}"
+        Foreground="{StaticResource LightForegroundBrush}">
+
+    <Window.DataContext>
+        <vm:DepartmentCreationVM x:Name="VM"/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <StackPanel Orientation="Vertical"
+                Margin="15">
+        <StackPanel.Resources>
+            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="IsEditable" Value="True"/>
+                <Setter Property="MinWidth" Value="150"/>
+                <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            </Style>
+            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+                <Setter Property="Margin" Value="0,10,0,0"/>
+            </Style>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="MinWidth" Value="75"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+            </Style>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        </StackPanel.Resources>
+
+        <Label Content="Enter New Department Name"/>
+        <TextBox Text="{Binding Department.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Content="Select Parent Department (if applicable)."/>
+        <ComboBox ItemsSource="{Binding Departments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedValue="{Binding Department.OverDepartmentName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Content="Pay Point"/>
+        <StackPanel Orientation="Horizontal"
+                    VerticalAlignment="Center">
+            <ComboBox ItemsSource="{Binding PayPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedValue="{Binding Department.PayPoint}"/>
+            <Button Content="Add"
+                    Command="{Binding AddPayPointCommand}"/>
+        </StackPanel>
+        <CheckBox x:Name="AssignHeadCheck"
+                  Content="Assign Department Head"
+                  IsChecked="{Binding AssignDepartmentHead, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <ComboBox ItemsSource="{Binding Employees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedValue="{Binding Department.Head, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Visibility="{Binding ElementName=AssignHeadCheck, Path=IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,10,0,0">
+            <Button Content="Cancel"
+                    IsCancel="True"/>
+            <Button Content="Confirm"
+                    Command="{Binding ConfirmDepartmentCreationCommand}"
+                    CommandParameter="{Binding ElementName=DeptWindow}"
+                    IsDefault="True"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

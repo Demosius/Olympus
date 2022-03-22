@@ -14,7 +14,7 @@ public class UserCreator
 
     public void AssureDefaultRole()
     {
-        if (Chariot.Database?.Execute("SELECT count(*) FROM Role WHERE Name='Default';") > 0) return;
+        if (Chariot.Database?.ExecuteScalar<int>("SELECT count(*) FROM Role WHERE Name='Default';") > 0) return;
 
         Role role = new();
 

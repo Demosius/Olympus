@@ -18,7 +18,6 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Light Theme -->
                 <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml" />
                 <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml" />
             </ResourceDictionary.MergedDictionaries>

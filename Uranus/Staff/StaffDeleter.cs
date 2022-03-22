@@ -53,4 +53,6 @@ public class StaffDeleter
             }
         });
     }
+
+    public void Employee(Employee selectedEmployee) => Chariot.Database?.Delete(selectedEmployee);
 }

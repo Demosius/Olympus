@@ -4,7 +4,7 @@ using Pantheon.ViewModel.Pages;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class AddDepartmentCommand : ICommand
+public class AddDepartmentCommand : ICommand
 {
     public EmployeePageVM VM { get; set; }
 

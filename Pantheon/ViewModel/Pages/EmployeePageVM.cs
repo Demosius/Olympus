@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using Pantheon.ViewModel.Interface;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -18,7 +19,7 @@ using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Pages;
 
-internal enum ESortMethod
+public enum ESortMethod
 {
     [Description("Full Name")]
     Name,
@@ -34,7 +35,7 @@ internal enum ESortMethod
     ID
 }
 
-internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
+public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, IPayPoints
 {
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }
@@ -43,7 +44,7 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     private EmployeeDataSet? employeeDataSet;
 
-    private List<Employee> reportingEmployees;
+    public List<Employee> ReportingEmployees { get; set; }
 
     #region OnPropertyChanged_Properties
 
@@ -67,6 +68,8 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
             selectedEmployee = value;
             OnPropertyChanged(nameof(SelectedEmployee));
             OnPropertyChanged(nameof(Avatar));
+            OnPropertyChanged(nameof(SensitiveVisibility));
+            OnPropertyChanged(nameof(VerySensitiveVisibility));
         }
     }
 
@@ -245,6 +248,10 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         }
     }
 
+    // As determined by employee.
+    public bool SensitiveVisibility => SelectedEmployee is not null && (Charon?.CanReadEmployeeSensitive(SelectedEmployee) ?? false);
+    public bool VerySensitiveVisibility => SelectedEmployee is not null && (Charon?.CanReadEmployeeVerySensitive(SelectedEmployee) ?? false);
+
     #endregion
 
     #region Commands
@@ -260,6 +267,8 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public AddPayPointCommand AddPayPointCommand { get; set; }
     public CreateNewEmployeeCommand CreateNewEmployeeCommand { get; set; }
     public SaveEmployeeCommand SaveEmployeeCommand { get; set; }
+    public DeleteEmployeeCommand DeleteEmployeeCommand { get; set; }
+    public ActivateUserCommand ActivateUserCommand { get; set; }
     #endregion
 
     public EmployeePageVM()
@@ -276,8 +285,10 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         AddPayPointCommand = new AddPayPointCommand(this);
         CreateNewEmployeeCommand = new CreateNewEmployeeCommand(this);
         SaveEmployeeCommand = new SaveEmployeeCommand(this);
+        DeleteEmployeeCommand = new DeleteEmployeeCommand(this);
+        ActivateUserCommand = new ActivateUserCommand(this);
 
-        reportingEmployees = new List<Employee>();
+        ReportingEmployees = new List<Employee>();
         employees = new ObservableCollection<Employee>();
 
         employeeSearchString = string.Empty;
@@ -312,12 +323,12 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
                 Charon.UserEmployee.Role = role;
 
         // Reporting employees (and other collections for filtering that list) is base purely on the employees that report to the current user.
-        reportingEmployees = employeeDataSet.GetReportsByRole(Charon.UserEmployee?.ID ?? 0).ToList();
+        ReportingEmployees = employeeDataSet.GetReportsByRole(Charon.UserEmployee?.ID ?? 0).ToList();
 
-        Departments = new ObservableCollection<Department?>(reportingEmployees.Select(employee => employee.Department).Distinct().OrderBy(department => department?.Name));
+        Departments = new ObservableCollection<Department?>(ReportingEmployees.Select(employee => employee.Department).Distinct().OrderBy(department => department?.Name));
         selectedDepartment = null;
 
-        Roles = new ObservableCollection<Role?>(reportingEmployees.Select(employee => employee.Role).Distinct().OrderBy(role => role?.Name));
+        Roles = new ObservableCollection<Role?>(ReportingEmployees.Select(employee => employee.Role).Distinct().OrderBy(role => role?.Name));
         selectedRole = null;
 
         EmploymentTypes = new ObservableCollection<EEmploymentType?>(Enum.GetValues(typeof(EEmploymentType)).Cast<EEmploymentType?>());
@@ -359,7 +370,7 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     public void ApplyFilters()
     {
-        IEnumerable<Employee> employeeList = reportingEmployees;
+        IEnumerable<Employee> employeeList = ReportingEmployees;
 
         if (SelectedDepartment is not null)
             employeeList = employeeList.Where(e => e.Department == SelectedDepartment);
@@ -378,7 +389,7 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     public void ApplySorting()
     {
-        ApplySorting(reportingEmployees);
+        ApplySorting(ReportingEmployees);
     }
 
     public void ApplySorting(IEnumerable<Employee> employeeList)
@@ -404,18 +415,18 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     public void CreateNewEmployee()
     {
-        if (Helios is null) return;
+        if (Helios is null || Charon is null) return;
 
-        var employeeCreationWindow = new EmployeeCreationWindow();
+        var employeeCreationWindow = new EmployeeCreationWindow(Helios, Charon);
         if (employeeCreationWindow.ShowDialog() != true) return;
 
         var newEmployee = employeeCreationWindow.VM.Employee;
 
-        if (newEmployee == null) return;
+        if (newEmployee is null) return;
 
         if (Helios.StaffReader.EmployeeExists(newEmployee.ID)) return;
 
-        reportingEmployees.Add(newEmployee);
+        ReportingEmployees.Add(newEmployee);
 
         SelectedEmployee = newEmployee;
 
@@ -425,11 +436,38 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     public void SaveEmployee()
     {
-        if (Helios is null || SelectedEmployee is null) return;
+        if (Helios is null || Charon is null || SelectedEmployee is null) return;
+
+        SelectedEmployee.SetDataFromObjects();
 
         if (Helios.StaffUpdater.Employee(SelectedEmployee) > 0)
             MessageBox.Show($"Successfully saved changes to {SelectedEmployee.FullName}.", "Success",
                 MessageBoxButton.OK, MessageBoxImage.Information);
+
+    }
+
+    public void DeleteEmployee()
+    {
+        if (SelectedEmployee is null || Helios is null || Charon is null) return;
+        Helios.StaffDeleter.Employee(SelectedEmployee);
+        SelectedEmployee.Delete();
+        employeeDataSet?.Employees.Remove(SelectedEmployee.ID);
+        ReportingEmployees.Remove(SelectedEmployee);
+        Employees.Remove(SelectedEmployee);
+        SelectedEmployee = null;
+    }
+
+    public void ActivateUser()
+    {
+        if (SelectedEmployee is null || Charon is null) return;
+
+        if (MessageBox.Show($"Are you sure you would like to activate the employee: {SelectedEmployee} as a default user?",
+                "Activate User", MessageBoxButton.YesNoCancel, MessageBoxImage.Information) !=
+            MessageBoxResult.Yes) return;
+
+        if (Charon.CreateNewUser(SelectedEmployee))
+            MessageBox.Show("Successfully Activated new user!", "Success", MessageBoxButton.OK,
+                MessageBoxImage.Asterisk);
 
     }
 
@@ -444,17 +482,44 @@ internal class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     public void AddDepartment()
     {
+        if (Helios is null || Charon is null) return;
 
+        var departmentCreator = new DepartmentCreationWindow(this);
+        if (departmentCreator.ShowDialog() != true) return;
+
+        var newDepartment = departmentCreator.VM.Department;
+
+        employeeDataSet?.AddDepartment(ref newDepartment);
+        Departments.Add(newDepartment);
+        FullDepartments.Add(newDepartment);
+
+        if (SelectedEmployee is not null) SelectedEmployee.Department = newDepartment;
     }
 
     public void AddRole()
     {
+        if (Helios is null || Charon is null) return;
 
+        var roleCreator = new RoleCreationWindow(Helios, Charon);
+        if (roleCreator.ShowDialog() != true) return;
+
+        var newRole = roleCreator.VM.Role;
+
+        employeeDataSet?.AddRole(ref newRole);
+        Roles.Add(newRole);
     }
 
     public void AddClan()
     {
+        if (Helios is null || Charon is null) return;
 
+        var clanCreator = new ClanCreationWindow(Helios, Charon);
+        if (clanCreator.ShowDialog() != true) return;
+
+        var newClan = clanCreator.VM.Clan;
+
+        employeeDataSet?.AddClan(ref newClan);
+        Clans.Add(newClan);
     }
 
     public void AddPayPoint()

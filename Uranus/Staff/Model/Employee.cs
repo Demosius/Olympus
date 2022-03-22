@@ -111,7 +111,9 @@ public class Employee : INotifyPropertyChanged
     public string Address { get; set; }
     [ForeignKey(typeof(EmployeeIcon))] public string IconName { get; set; }
     [ForeignKey(typeof(EmployeeAvatar))] public string AvatarName { get; set; }
-    [ForeignKey(typeof(Licence))] public int LicenceNumber { get; set; }
+    [ForeignKey(typeof(Licence))] public string LicenceNumber { get; set; }
+    [DefaultValue(false)] public bool IsUser { get; set; }
+
     [ManyToOne(nameof(DepartmentName), nameof(Model.Department.Employees),
         CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Department? Department
@@ -197,6 +199,7 @@ public class Employee : INotifyPropertyChanged
         ClanName = string.Empty;
         payPoint = string.Empty;
         LockerID = string.Empty;
+        LicenceNumber = string.Empty;
         PhoneNumber = string.Empty;
         Email = string.Empty;
         Address = string.Empty;
@@ -224,7 +227,7 @@ public class Employee : INotifyPropertyChanged
         string rfID, string pcID, string location, string departmentName, string roleName,
         int reportsToID, string clanName, string payPoint, EEmploymentType employmentType,
         string lockerID, string phoneNumber, string email, string address, string iconName,
-        string avatarName, int licenceNumber, Department? department, Role? role, Employee? reportsTo,
+        string avatarName, string licenceNumber, Department? department, Role? role, Employee? reportsTo,
         EmployeeAvatar? avatar, Clan? clan, EmployeeIcon? icon, Locker? locker, Licence? licence,
         List<Vehicle> vehicles, List<Shift> shifts, List<Department> departmentsCanWorkIn,
         List<Project> projects, List<EmployeeInductionReference> inductionReferences, List<ShiftRule> rules,
@@ -311,5 +314,56 @@ public class Employee : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    /// <summary>
+    /// Sets the employee object up for deletion by removing it as a reference from other related objects.
+    /// </summary>
+    public void Delete()
+    {
+        Role?.Employees.Remove(this);
+        Department?.Employees.Remove(this);
+        ReportsTo?.Reports.Remove(this);
+        Clan?.Employees.Remove(this);
+        Avatar?.Employees.Remove(this);
+        Icon?.Employees.Remove(this);
+        Locker = null;
+        Licence = null;
+        foreach (var vehicle in Vehicles)
+            vehicle.Owners.Remove(this);
+        foreach (var shift in Shifts)
+            shift.Employees.Remove(this);
+        foreach (var dept in DepartmentsCanWorkIn)
+            dept.EmployeesCanLoan.Remove(this);
+        foreach (var project in Projects)
+            project.Employees.Remove(this);
+        foreach (var employee in Reports)
+            employee.ReportsTo = null;
+        foreach (var shiftEntry in ShiftEntries)
+            shiftEntry.Employee = null;
+        foreach (var roster in Rosters)
+            roster.Employee = null;
+        foreach (var clockEvent in ClockEvents)
+            clockEvent.Employee = null;
+        foreach (var tagUse in TagUse)
+            tagUse.Employee = null;
+    }
+
+
+    /// <summary>
+    /// Sets the appropriate data keys according to the current data objects.
+    /// e.g. DepartmentName = Department.Name
+    /// </summary>
+    /// <exception cref="System.NotImplementedException"></exception>
+    public void SetDataFromObjects()
+    {
+        DepartmentName = Department?.Name ?? DepartmentName;
+        ReportsToID = ReportsTo?.ID ?? ReportsToID;
+        RoleName = Role?.Name ?? RoleName;
+        ClanName = Clan?.Name ?? ClanName;
+        LockerID = Locker?.ID ?? LockerID;
+        LicenceNumber = Licence?.Number ?? LicenceNumber;
+        IconName = Icon?.Name ?? IconName;
+        AvatarName = Avatar?.Name ?? AvatarName;
     }
 }
