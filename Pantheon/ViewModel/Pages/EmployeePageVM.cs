@@ -1,6 +1,7 @@
 ﻿using Pantheon.Properties;
 using Pantheon.View;
 using Pantheon.ViewModel.Commands;
+using Pantheon.ViewModel.Interface;
 using Styx;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,6 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using Pantheon.ViewModel.Interface;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -210,6 +210,17 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         }
     }
 
+    private ObservableCollection<string> roleNames;
+    public ObservableCollection<string> RoleNames
+    {
+        get => roleNames;
+        set
+        {
+            roleNames = value;
+            OnPropertyChanged(nameof(RoleNames));
+        }
+    }
+
     private ObservableCollection<Clan> clans;
 
     public ObservableCollection<Clan> Clans
@@ -301,6 +312,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         managers = new ObservableCollection<Employee>();
         clans = new ObservableCollection<Clan>();
         payPoints = new ObservableCollection<string>();
+        roleNames = new ObservableCollection<string>();
     }
 
     public void SetDataSources(Helios helios, Charon charon)
@@ -339,6 +351,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         PayPoints = new ObservableCollection<string>(employeeDataSet.PayPoints);
         FullDepartments = new ObservableCollection<Department>(employeeDataSet.Departments.Values.OrderBy(d => d.Name));
         AllRoles = new ObservableCollection<Role>(employeeDataSet.Roles.Values.OrderBy(r => r.DepartmentName).ThenBy(r => r.Level));
+        RoleNames = new ObservableCollection<string>(AllRoles.Select(r => r.Name));
         UseAllAsManagers = false;
 
         employeeSearchString = "";
@@ -436,7 +449,11 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
 
     public void SaveEmployee()
     {
-        if (Helios is null || Charon is null || SelectedEmployee is null) return;
+        if (Helios is null || Charon is null || SelectedEmployee is null || employeeDataSet is null) return;
+        
+        // TODO: Compare new Role to user ability to update - and if user will not be able to edit once changed, make sure to get confirmation.
+        // Might be best to add direct role checking for 'CanUpdateEmployee' - since Role is what is actually compared anyway.
+        if ((SelectedEmployee.Role is null || SelectedEmployee.Role.Name != SelectedEmployee.RoleName) && !ConfirmUnEditableChange()) return; 
 
         SelectedEmployee.SetDataFromObjects();
 
@@ -444,6 +461,21 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
             MessageBox.Show($"Successfully saved changes to {SelectedEmployee.FullName}.", "Success",
                 MessageBoxButton.OK, MessageBoxImage.Information);
 
+    }
+
+    /// <summary>
+    /// Assuming the user is about to adjust the employee in such a way that removes that employee from the user's permissions to edit further, make sure confirmation is attained.
+    /// </summary>
+    /// <returns></returns>
+    private bool ConfirmUnEditableChange()
+    {
+        if (Helios is null || Charon is null || SelectedEmployee is null || employeeDataSet is null) return false;
+
+        if (!employeeDataSet.Roles.TryGetValue(SelectedEmployee.RoleName, out var newRole)) return false;
+
+        // TODO: Here is where to add new stuff and checks and junk.
+
+        return true;
     }
 
     public void DeleteEmployee()
@@ -500,26 +532,29 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     {
         if (Helios is null || Charon is null) return;
 
-        var roleCreator = new RoleCreationWindow(Helios, Charon);
+        var roleCreator = new RoleCreationWindow(this);
         if (roleCreator.ShowDialog() != true) return;
 
         var newRole = roleCreator.VM.Role;
 
         employeeDataSet?.AddRole(ref newRole);
         Roles.Add(newRole);
+        AllRoles.Add(newRole);
     }
 
     public void AddClan()
     {
         if (Helios is null || Charon is null) return;
 
-        var clanCreator = new ClanCreationWindow(Helios, Charon);
+        var clanCreator = new ClanCreationWindow(this);
         if (clanCreator.ShowDialog() != true) return;
 
         var newClan = clanCreator.VM.Clan;
 
         employeeDataSet?.AddClan(ref newClan);
         Clans.Add(newClan);
+
+        if (SelectedEmployee is not null) SelectedEmployee.Clan = newClan;
     }
 
     public void AddPayPoint()

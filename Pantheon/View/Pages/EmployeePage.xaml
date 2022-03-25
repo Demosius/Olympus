@@ -273,9 +273,9 @@
                            Content="Role: "/>
                     <StackPanel Grid.Column="1" Grid.Row="9" 
                                 Orientation="Horizontal">
-                        <ComboBox ItemsSource="{Binding AllRoles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              SelectedValue="{Binding SelectedEmployee.Role, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                              HorizontalContentAlignment="Center"/>
+                        <ComboBox ItemsSource="{Binding RoleNames, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  SelectedValue="{Binding SelectedEmployee.RoleName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                                  HorizontalContentAlignment="Center"/>
                         <Button Content="Add"
                             Command="{Binding AddRoleCommand}"/>
                     </StackPanel>

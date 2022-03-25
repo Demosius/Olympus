@@ -74,12 +74,12 @@ public partial class Charon
             UserEmployee.Role is null) return 999;
 
         var targetRole = employee.Role;
-        int up = 0, down = 0;
-        if (UserEmployee.Role.LookDown(ref down, ref targetRole))
-        {
-            return -down;
-        }
-        return UserEmployee.Role.LookUp(ref up, ref down, UserEmployee.Role, ref targetRole) ? up : 999;
+        var level = 0;
+
+        if (UserEmployee.Role.LookDown(ref targetRole))
+            return targetRole.Level - UserEmployee.Role.Level;
+
+        return UserEmployee.Role.LookUp(ref level, UserEmployee.Role, ref targetRole) ? level - UserEmployee.Role.Level : 999;
     }
 
     public int GetLevelDifference(int employeeID)

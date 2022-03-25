@@ -4,24 +4,25 @@ using System.Windows.Input;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class ConfirmDepartmentCreationCommand : ICommand
+internal class ConfirmClanCreationCommand : ICommand
 {
-    public DepartmentCreationVM VM { get; set; }
+    public ClanCreationVM VM { get; set; }
 
-    public ConfirmDepartmentCreationCommand(DepartmentCreationVM vm)
-    {
-        VM = vm;
-    }
+    public ConfirmClanCreationCommand(ClanCreationVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Department.Name != string.Empty && !VM.DepartmentNames.Contains(VM.Department.Name);
+        return VM.Clan.Name != string.Empty &&
+               VM.Clan.Department is not null &&
+               VM.Clan.Leader is not null &&
+               !VM.ClanNames.Contains(VM.Clan.Name);
     }
 
     public void Execute(object? parameter)
     {
+
         if (parameter is not Window w) return;
-        w.DialogResult = VM.ConfirmDepartmentCreation();
+        w.DialogResult = VM.ConfirmClanCreation();
         w.Close();
     }
 

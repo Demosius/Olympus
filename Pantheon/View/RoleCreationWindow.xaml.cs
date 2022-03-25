@@ -1,4 +1,5 @@
-﻿using Styx;
+﻿using Pantheon.ViewModel.Pages;
+using Styx;
 using Uranus;
 
 namespace Pantheon.View;
@@ -8,9 +9,9 @@ namespace Pantheon.View;
 /// </summary>
 public partial class RoleCreationWindow
 {
-    public RoleCreationWindow(Helios helios, Charon charon)
+    public RoleCreationWindow(EmployeePageVM employeePageVM)
     {
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+        VM.SetDataSources(employeePageVM);
     }
 }

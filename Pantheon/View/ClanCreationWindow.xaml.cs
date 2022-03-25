@@ -1,4 +1,5 @@
-﻿using Styx;
+﻿using Pantheon.ViewModel.Pages;
+using Styx;
 using Uranus;
 
 namespace Pantheon.View;
@@ -8,9 +9,9 @@ namespace Pantheon.View;
 /// </summary>
 public partial class ClanCreationWindow
 {
-    public ClanCreationWindow(Helios helios, Charon charon)
+    public ClanCreationWindow(EmployeePageVM parentVM)
     {
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+        VM.SetDataSources(parentVM);
     }
 }

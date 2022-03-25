@@ -1,4 +1,5 @@
-﻿using Pantheon.Annotations;
+﻿using System.Collections.Generic;
+using Pantheon.Annotations;
 using Pantheon.View;
 using Pantheon.ViewModel.Commands;
 using Pantheon.ViewModel.Interface;
@@ -15,13 +16,15 @@ namespace Pantheon.ViewModel;
 
 internal class DepartmentCreationVM : INotifyPropertyChanged, IPayPoints
 {
-    #region Notifiable Properties
-
-    public Department Department { get; set; }
-
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }
     public EmployeePageVM? ParentVM { get; set; }
+
+    public Department Department { get; set; }
+
+    public List<string> DepartmentNames { get; set; }
+
+    #region Notifiable Properties
 
     private ObservableCollection<string> departments;
     public ObservableCollection<string> Departments
@@ -95,6 +98,7 @@ internal class DepartmentCreationVM : INotifyPropertyChanged, IPayPoints
         payPoints = new ObservableCollection<string>();
         AddPayPointCommand = new AddPayPointCommand(this);
         ConfirmDepartmentCreationCommand = new ConfirmDepartmentCreationCommand(this);
+        DepartmentNames = new List<string>();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -114,6 +118,7 @@ internal class DepartmentCreationVM : INotifyPropertyChanged, IPayPoints
         Departments = new ObservableCollection<string>(ParentVM.Departments.Select(d => d is null ? "" : d.Name).OrderBy(n => n));
         Employees = new ObservableCollection<Employee>(ParentVM.ReportingEmployees);
         PayPoints = new ObservableCollection<string>(ParentVM.PayPoints);
+        DepartmentNames = ParentVM.FullDepartments.Select(d => d.Name).ToList();
     }
 
     public void AddPayPoint()

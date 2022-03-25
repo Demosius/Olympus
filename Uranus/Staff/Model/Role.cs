@@ -49,33 +49,27 @@ public class Role : IComparable
         Reports = reports;
     }
 
-    public bool LookDown(ref int down, ref Role targetRole)
+    public bool LookDown(ref Role targetRole)
     {
-        if (this == targetRole)
-        {
-            ++down;
-            return true;
-        }
+        if (this == targetRole) return true;
         foreach (var role in Reports)
         {
-            if (!role.LookDown(ref down, ref targetRole)) continue;
-            ++down;
-            return true;
+            if (role.LookDown(ref targetRole)) return true;
         }
         return false;
     }
 
-    public bool LookUp(ref int up, ref int down, Role refRole, ref Role targetRole)
+    public bool LookUp(ref int level, Role refRole, ref Role targetRole)
     {
-        ++up;
+        level = Math.Max(level, Level);
+
         if (this == targetRole) return true;
-        foreach (var role in Reports.Where(role => role != refRole))
+
+        foreach (var role in Reports.Where(role => role != refRole && role != this))
         {
-            if (!role.LookDown(ref down, ref targetRole)) continue;
-            ++down;
-            return true;
+            if (role.LookDown(ref targetRole)) return true;
         }
-        return ReportsToRole is not null && ReportsToRole.LookUp(ref up, ref down, this, ref targetRole);
+        return ReportsToRole is not null && ReportsToRole.LookUp(ref level, this, ref targetRole);
     }
 
     public void AddReportingRole(Role reportingRole)

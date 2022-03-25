@@ -100,4 +100,5 @@ public class StaffCreator
     }
 
 
+    public bool Clan(Clan clan, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(clan, pushType);
 }

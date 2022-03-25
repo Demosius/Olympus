@@ -34,4 +34,9 @@ public class Clan
         Department = department;
         Leader = leader;
     }
+
+    public override string ToString()
+    {
+        return Name;
+    }
 }

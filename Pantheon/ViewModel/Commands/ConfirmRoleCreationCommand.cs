@@ -1,27 +1,25 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class ConfirmDepartmentCreationCommand : ICommand
+internal class ConfirmRoleCreationCommand : ICommand
 {
-    public DepartmentCreationVM VM { get; set; }
+    public RoleCreationVM VM { get; set; }
 
-    public ConfirmDepartmentCreationCommand(DepartmentCreationVM vm)
-    {
-        VM = vm;
-    }
+    public ConfirmRoleCreationCommand(RoleCreationVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Department.Name != string.Empty && !VM.DepartmentNames.Contains(VM.Department.Name);
+        return VM.Role.Name is not null or "" && VM.Role.Department is not null && !VM.Roles.Select(r => r.Name).Contains(VM.Role.Name);
     }
 
     public void Execute(object? parameter)
     {
         if (parameter is not Window w) return;
-        w.DialogResult = VM.ConfirmDepartmentCreation();
+        w.DialogResult = VM.ConfirmRoleCreation();
         w.Close();
     }
 
