@@ -25,6 +25,12 @@ public partial class Charon
         return CurrentUser?.Role is not null &&
             CurrentUser.Role.ReadEmployeeVerySensitive >= GetLevelDifference(employee) || UserEmployee == employee;
     }
+    
+    public bool CanUpdateEmployee(Role role)
+    {
+        return CurrentUser?.Role is not null &&
+               CurrentUser.Role.UpdateEmployee >= GetLevelDifference(role);
+    }
 
     public bool CanUpdateEmployee(Employee employee)
     {
@@ -68,5 +74,4 @@ public partial class Charon
         return CurrentUser?.Role is not null &&
             CurrentUser.Role.DeleteEmployee >= GetLevelDifference(employeeID) || UserEmployee?.ID == employeeID;
     }
-
 }

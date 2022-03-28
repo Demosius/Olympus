@@ -14,6 +14,12 @@ public class ProjectIcon : Image
         Projects = new List<Project>();
     }
 
+    public ProjectIcon(Image image) : this()
+    {
+        Name = image.Name;
+        FileName = image.FileName;
+    }
+
     // Creation of a new project icon with an already specified project.
     public ProjectIcon(Project project, string iconFileName)
     {

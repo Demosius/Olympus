@@ -1,26 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
-using Pantheon.ViewModel.Interface;
+using Pantheon.ViewModel.Pages;
 
 namespace Pantheon.ViewModel.Commands;
 
-public class AddPayPointCommand : ICommand
+public class LaunchIconiferCommand : ICommand
 {
-    public IPayPoints VM { get; set; }
+    public EmployeePageVM VM { get; set; }
 
-    public AddPayPointCommand(IPayPoints vm)
+    public LaunchIconiferCommand(EmployeePageVM vm)
     {
         VM = vm;
     }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon?.CanCreateEmployee() ?? false;
+        return VM.SelectedEmployee is not null;
     }
 
     public void Execute(object? parameter)
     {
-        VM.AddPayPoint();
+        VM.LaunchIconifer();
     }
 
     public event EventHandler? CanExecuteChanged

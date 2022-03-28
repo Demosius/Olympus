@@ -1,26 +1,23 @@
-﻿using System;
+﻿using Pantheon.ViewModel.Interface;
+using System;
 using System.Windows.Input;
-using Pantheon.ViewModel.Interface;
 
 namespace Pantheon.ViewModel.Commands;
 
-public class AddPayPointCommand : ICommand
+internal class SaveImageChangesCommand : ICommand
 {
-    public IPayPoints VM { get; set; }
+    public IImageSelector VM { get; set; }
 
-    public AddPayPointCommand(IPayPoints vm)
-    {
-        VM = vm;
-    }
+    public SaveImageChangesCommand(IImageSelector vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon?.CanCreateEmployee() ?? false;
+        return VM.CanSaveImage;
     }
 
     public void Execute(object? parameter)
     {
-        VM.AddPayPoint();
+        VM.SaveImageChanges();
     }
 
     public event EventHandler? CanExecuteChanged

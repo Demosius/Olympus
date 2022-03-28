@@ -42,7 +42,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
 
     public EmployeeAvatar Avatar => (SelectedEmployee ?? new Employee()).Avatar ?? new EmployeeAvatar();
 
-    private EmployeeDataSet? employeeDataSet;
+    public EmployeeDataSet? EmployeeDataSet;
 
     public List<Employee> ReportingEmployees { get; set; }
 
@@ -252,10 +252,10 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         {
             useAllAsManagers = value;
             OnPropertyChanged(nameof(UseAllAsManagers));
-            if (employeeDataSet is null) return;
+            if (EmployeeDataSet is null) return;
             Managers = useAllAsManagers ?
-                new ObservableCollection<Employee>(employeeDataSet.Employees.Values) :
-                new ObservableCollection<Employee>(employeeDataSet.Managers);
+                new ObservableCollection<Employee>(EmployeeDataSet.Employees.Values) :
+                new ObservableCollection<Employee>(EmployeeDataSet.Managers);
         }
     }
 
@@ -280,6 +280,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     public SaveEmployeeCommand SaveEmployeeCommand { get; set; }
     public DeleteEmployeeCommand DeleteEmployeeCommand { get; set; }
     public ActivateUserCommand ActivateUserCommand { get; set; }
+    public LaunchIconiferCommand LaunchIconiferCommand { get; set; }
     #endregion
 
     public EmployeePageVM()
@@ -298,6 +299,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         SaveEmployeeCommand = new SaveEmployeeCommand(this);
         DeleteEmployeeCommand = new DeleteEmployeeCommand(this);
         ActivateUserCommand = new ActivateUserCommand(this);
+        LaunchIconiferCommand = new LaunchIconiferCommand(this);
 
         ReportingEmployees = new List<Employee>();
         employees = new ObservableCollection<Employee>();
@@ -327,15 +329,15 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     {
         if (Charon is null || Helios is null) return;
 
-        employeeDataSet = Helios.StaffReader.EmployeeDataSet();
+        EmployeeDataSet = Helios.StaffReader.EmployeeDataSet();
 
         // Make sure that the user has an assigned role.
         if (Charon.UserEmployee is not null && Charon.UserEmployee.Role is null)
-            if (employeeDataSet.Roles.TryGetValue(Charon.UserEmployee.RoleName, out var role))
+            if (EmployeeDataSet.Roles.TryGetValue(Charon.UserEmployee.RoleName, out var role))
                 Charon.UserEmployee.Role = role;
 
         // Reporting employees (and other collections for filtering that list) is base purely on the employees that report to the current user.
-        ReportingEmployees = employeeDataSet.GetReportsByRole(Charon.UserEmployee?.ID ?? 0).ToList();
+        ReportingEmployees = EmployeeDataSet.GetReportsByRole(Charon.UserEmployee?.ID ?? 0).ToList();
 
         Departments = new ObservableCollection<Department?>(ReportingEmployees.Select(employee => employee.Department).Distinct().OrderBy(department => department?.Name));
         selectedDepartment = null;
@@ -347,10 +349,10 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         selectedEmploymentType = null;
 
         // Here we want the full potential lists of data.
-        Locations = new ObservableCollection<string>(employeeDataSet.Locations);
-        PayPoints = new ObservableCollection<string>(employeeDataSet.PayPoints);
-        FullDepartments = new ObservableCollection<Department>(employeeDataSet.Departments.Values.OrderBy(d => d.Name));
-        AllRoles = new ObservableCollection<Role>(employeeDataSet.Roles.Values.OrderBy(r => r.DepartmentName).ThenBy(r => r.Level));
+        Locations = new ObservableCollection<string>(EmployeeDataSet.Locations);
+        PayPoints = new ObservableCollection<string>(EmployeeDataSet.PayPoints);
+        FullDepartments = new ObservableCollection<Department>(EmployeeDataSet.Departments.Values.OrderBy(d => d.Name));
+        AllRoles = new ObservableCollection<Role>(EmployeeDataSet.Roles.Values.OrderBy(r => r.DepartmentName).ThenBy(r => r.Level));
         RoleNames = new ObservableCollection<string>(AllRoles.Select(r => r.Name));
         UseAllAsManagers = false;
 
@@ -430,30 +432,27 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     {
         if (Helios is null || Charon is null) return;
 
-        var employeeCreationWindow = new EmployeeCreationWindow(Helios, Charon);
+        var employeeCreationWindow = new EmployeeCreationWindow(this);
         if (employeeCreationWindow.ShowDialog() != true) return;
 
         var newEmployee = employeeCreationWindow.VM.Employee;
 
         if (newEmployee is null) return;
 
-        if (Helios.StaffReader.EmployeeExists(newEmployee.ID)) return;
-
         ReportingEmployees.Add(newEmployee);
-
-        SelectedEmployee = newEmployee;
+        EmployeeDataSet?.AddEmployee(newEmployee);
+        if (newEmployee.Reports.Any()) Managers.Add(newEmployee);
 
         ApplyFilters();
 
+        SelectedEmployee = newEmployee;
     }
 
     public void SaveEmployee()
     {
-        if (Helios is null || Charon is null || SelectedEmployee is null || employeeDataSet is null) return;
-        
-        // TODO: Compare new Role to user ability to update - and if user will not be able to edit once changed, make sure to get confirmation.
-        // Might be best to add direct role checking for 'CanUpdateEmployee' - since Role is what is actually compared anyway.
-        if ((SelectedEmployee.Role is null || SelectedEmployee.Role.Name != SelectedEmployee.RoleName) && !ConfirmUnEditableChange()) return; 
+        if (Helios is null || Charon is null || SelectedEmployee is null || EmployeeDataSet is null) return;
+
+        if ((SelectedEmployee.Role is null || SelectedEmployee.Role.Name != SelectedEmployee.RoleName) && !ConfirmUnEditableChange()) return;
 
         SelectedEmployee.SetDataFromObjects();
 
@@ -469,12 +468,18 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     /// <returns></returns>
     private bool ConfirmUnEditableChange()
     {
-        if (Helios is null || Charon is null || SelectedEmployee is null || employeeDataSet is null) return false;
+        if (Helios is null || Charon is null || SelectedEmployee is null || EmployeeDataSet is null) return false;
 
-        if (!employeeDataSet.Roles.TryGetValue(SelectedEmployee.RoleName, out var newRole)) return false;
+        if (!EmployeeDataSet.Roles.TryGetValue(SelectedEmployee.RoleName, out var newRole)) return false;
 
-        // TODO: Here is where to add new stuff and checks and junk.
+        if (Charon.CanUpdateEmployee(newRole)) return true;
 
+        if (MessageBox.Show(
+                "Changing this employee's Role will mean you will not be able to edit them in the future.\n\nDo you want to continue?",
+                "Confirm New Role", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning) !=
+            MessageBoxResult.Yes) return false;
+
+        SelectedEmployee.Role = newRole;
         return true;
     }
 
@@ -483,7 +488,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         if (SelectedEmployee is null || Helios is null || Charon is null) return;
         Helios.StaffDeleter.Employee(SelectedEmployee);
         SelectedEmployee.Delete();
-        employeeDataSet?.Employees.Remove(SelectedEmployee.ID);
+        EmployeeDataSet?.Employees.Remove(SelectedEmployee.ID);
         ReportingEmployees.Remove(SelectedEmployee);
         Employees.Remove(SelectedEmployee);
         SelectedEmployee = null;
@@ -521,7 +526,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
 
         var newDepartment = departmentCreator.VM.Department;
 
-        employeeDataSet?.AddDepartment(ref newDepartment);
+        EmployeeDataSet?.AddDepartment(ref newDepartment);
         Departments.Add(newDepartment);
         FullDepartments.Add(newDepartment);
 
@@ -537,7 +542,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
 
         var newRole = roleCreator.VM.Role;
 
-        employeeDataSet?.AddRole(ref newRole);
+        EmployeeDataSet?.AddRole(ref newRole);
         Roles.Add(newRole);
         AllRoles.Add(newRole);
     }
@@ -551,7 +556,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
 
         var newClan = clanCreator.VM.Clan;
 
-        employeeDataSet?.AddClan(ref newClan);
+        EmployeeDataSet?.AddClan(ref newClan);
         Clans.Add(newClan);
 
         if (SelectedEmployee is not null) SelectedEmployee.Clan = newClan;
@@ -564,5 +569,23 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
 
         PayPoints.Add(input.VM.Input);
         if (SelectedEmployee is not null) SelectedEmployee.PayPoint = input.VM.Input;
+    }
+
+    public void LaunchIconifer()
+    {
+        if (SelectedEmployee is null) return;
+
+        var iconifer = new IconSelectionWindow(this);
+        if (iconifer.ShowDialog() != true) return;
+        SelectedEmployee.Icon = iconifer.VM.SelectedIcon;
+    }
+
+    public void LaunchAvatarSelector()
+    {
+        if (SelectedEmployee is null) return;
+
+        var avatarSelector = new AvatarSelectionWindow(this);
+        if (avatarSelector.ShowDialog() != true) return;
+        SelectedEmployee.Avatar = avatarSelector.VM.SelectedAvatar;
     }
 }

@@ -216,9 +216,9 @@
                             <Image Source="{Binding SelectedEmployee.Icon.FullPath, FallbackValue=''}"/>
                         </Border>
                         <Button Content="Change"
-                        Width="135"
-                        Margin="5"/>
-                        <!--Command="{Binding LaunchIconiferCommand}"-->
+                                Command="{Binding LaunchIconiferCommand}"
+                                Width="135"
+                                Margin="5"/>
                     </StackPanel>
                     <!-- First Name -->
                     <Label Grid.Column="0" Grid.Row="2" 

@@ -24,15 +24,15 @@ public class StaffReader
     public string LicenceImageDirectory => Chariot.LicenceImageDirectory;
 
     /* EMPLOYEES */
-    public Employee Employee(int id, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Employee>(id, pullType);
+    public Employee? Employee(int id, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Employee>(id, pullType);
 
     public List<Employee> Employees(Expression<Func<Employee, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
-    public bool EmployeeExists(int id) => Chariot.Database?.Execute("SELECT count(*) FROM Employee WHERE ID=?;", id) > 0;
+    public bool EmployeeExists(int id) => Chariot.Database?.ExecuteScalar<int>("SELECT count(*) FROM Employee WHERE ID=?;", id) > 0;
 
-    public int EmployeeCount() => Chariot.Database?.Execute("SELECT count(*) FROM Employee;") ?? 0;
+    public int EmployeeCount() => Chariot.Database?.ExecuteScalar<int>("SELECT count(*) FROM Employee;") ?? 0;
 
-    public Role Role(string roleName, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Role>(roleName, pullType);
+    public Role? Role(string roleName, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Role>(roleName, pullType);
 
     public IEnumerable<Role> Roles(Expression<Func<Role, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
@@ -142,7 +142,9 @@ public class StaffReader
                 var departments = Chariot.PullObjectList<Department>();
                 var roles = Chariot.PullObjectList<Role>();
                 var clans = Chariot.PullObjectList<Clan>();
-                data = new EmployeeDataSet(employees, departments, clans, roles);
+                var icons = Chariot.PullObjectList<EmployeeIcon>();
+                var avatars = Chariot.PullObjectList<EmployeeAvatar>();
+                data = new EmployeeDataSet(employees, departments, clans, roles, icons, avatars);
             });
             if (data is not null) return data;
         }
@@ -151,7 +153,8 @@ public class StaffReader
             Log.Error(ex, "Failed to pull the EmployeeDataSet");
         }
         return new EmployeeDataSet(new Dictionary<int, Employee>(), new Dictionary<string, Department>(),
-            new Dictionary<string, Clan>(), new Dictionary<string, Role>());
+            new Dictionary<string, Clan>(), new Dictionary<string, Role>(), 
+            new Dictionary<string, EmployeeIcon>(), new Dictionary<string, EmployeeAvatar>());
     }
 
     /// <summary>
@@ -383,8 +386,28 @@ public class StaffReader
         return conn?.Query<Employee>($"SELECT * FROM Employee WHERE ID IN ({string.Join(", ", employeeIDs)});") ?? new List<Employee>();
     }
 
+    /// <summary>
+    /// Gets all of the shifts applicable to the current User - based on department.
+    /// </summary>
+    /// <param name="currentUser"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public IEnumerable<Shift> Shifts(Employee currentUser)
+    {
+        // Get a list of all relevant departments.
+        var departments = SubDepartments(currentUser.DepartmentName);
+
+
+
+        return departments.SelectMany(d => d.Shifts);
+    }
+
+    public IEnumerable<EmployeeIcon> Icons(Expression<Func<EmployeeIcon, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
     /* DEPARTMENTS */
-    public List<Department> Departments(Expression<Func<Department, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<Department> Departments(Expression<Func<Department, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     /// <summary>
     /// Pulls all relevant sub departments according to the given department name.
@@ -467,21 +490,5 @@ public class StaffReader
             newSet.ShiftEntries = ShiftEntries().ToDictionary(e => e.ID, e => e);
         });
         return newSet;
-    }
-
-    /// <summary>
-    /// Gets all of the shifts applicable to the current User - based on department.
-    /// </summary>
-    /// <param name="currentUser"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    public IEnumerable<Shift> Shifts(Employee currentUser)
-    {
-        // Get a list of all relevant departments.
-        var departments = SubDepartments(currentUser.DepartmentName);
-
-
-
-        return departments.SelectMany(d => d.Shifts);
     }
 }

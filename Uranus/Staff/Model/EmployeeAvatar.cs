@@ -15,4 +15,10 @@ public class EmployeeAvatar : Image
     {
         Employees = new List<Employee>();
     }
+
+    public EmployeeAvatar(Image image) : this()
+    {
+        Name = image.Name;
+        FileName = image.FileName;
+    }
 }

@@ -1,13 +1,11 @@
-﻿<Window x:Class="Pantheon.View.EmployeeCreationWindow"
-        x:Name="EmployeeWindow"
+﻿<Window x:Class="Pantheon.View.IconSelectionWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Pantheon.ViewModel"
-        xmlns:converters="clr-namespace:Pantheon.ViewModel.Converter"
         mc:Ignorable="d"
-        Title="Create Employee"
+        Title="Select Employee Icon"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
@@ -15,7 +13,7 @@
         FocusManager.FocusedElement="{Binding ElementName=IDBox}">
 
     <Window.DataContext>
-        <vm:EmployeeCreationVM x:Name="VM"/>
+        <vm:IconSelectionVM x:Name="VM"/>
     </Window.DataContext>
 
     <Window.Resources>
@@ -49,26 +47,60 @@
                 <Setter Property="MinWidth" Value="75"/>
                 <Setter Property="HorizontalAlignment" Value="Right"/>
             </Style>
-            <converters:BoolToColourConverter x:Key="BoolToColourConverter"/>
         </StackPanel.Resources>
 
-        <Label Content="* Enter Employee ID"/>
-        <TextBox x:Name="IDBox" Text="{Binding IDText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 Foreground="{Binding ValidID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToColourConverter}}"/>
-        
-        <TextBlock Text="{Binding ConfirmToolTip}"/>
+        <Label Content="Icons"/>
+        <ListView ItemsSource="{Binding Icons, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedValue="{Binding SelectedIcon, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:ItemsSource="{d:SampleData ItemCount=5}"
+                  Width="578"
+                  MaxHeight="800">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"
+                               />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Image Source="{Binding FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                           ToolTip="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                           Width="80"
+                           Height="80"
+                           Margin="2"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Button Content="Add New Icon"
+                Command="{Binding FindNewImageCommand}"/>
 
-        <Label Content="Department"/>
-        <ComboBox ItemsSource="{Binding Departments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedValue="{Binding Department, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Border BorderBrush="{StaticResource ForegroundBrush}"
+                BorderThickness="1"
+                Margin="5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="3"
+                       Source="{Binding SelectedIcon.FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                       Width="120"
+                       Height="120"/>
 
-        <Label Content="* Role"/>
-        <ComboBox ItemsSource="{Binding Roles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedValue="{Binding Role, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Column="1" Grid.Row="0"
+                         Text="{Binding IconName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                <Label Grid.Column="1" Grid.Row="1"
+                       Content="{Binding SelectedIcon.FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                <Button Grid.Column="1" Grid.Row="2"
+                        Content="Save Icon Changes"
+                        Command="{Binding SaveImageChangesCommand}"/>
 
-        <Label Content="Reports To"/>
-        <ComboBox ItemsSource="{Binding Managers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedValue="{Binding Manager, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
+        </Border>
 
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right"
@@ -76,7 +108,7 @@
             <Button Content="Cancel"
                     IsCancel="True"/>
             <Button Content="Confirm"
-                    Command="{Binding ConfirmEmployeeCreationCommand}"
+                    Command="{Binding ConfirmImageSelectionCommand}"
                     CommandParameter="{Binding ElementName=EmployeeWindow}"
                     IsDefault="True"/>
         </StackPanel>

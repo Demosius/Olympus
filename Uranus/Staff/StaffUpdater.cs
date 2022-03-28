@@ -212,4 +212,22 @@ public class StaffUpdater
         });
         return returnVal;
     }
+
+    public int EmployeeIcon(EmployeeIcon icon) => Chariot.Update(icon);
+    public int EmployeeAvatar(EmployeeAvatar avatar) => Chariot.Update(avatar);
+    public int ProjectIcon(ProjectIcon icon) => Chariot.Update(icon);
+    public int LicenceImage(LicenceImage image) => Chariot.Update(image);
+
+    /// <summary>
+    /// Renames an Employee Icon by removing it and creating a new one.
+    /// </summary>
+    /// <param name="icon"></param>
+    /// <param name="newName"></param>
+    /// <exception cref="NotImplementedException"></exception>
+    public void RenameEmployeeIcon(ref EmployeeIcon icon, string newName)
+    {
+        Chariot.Delete(icon);
+        icon.Name = newName;
+        Chariot.Create(icon);
+    }
 }

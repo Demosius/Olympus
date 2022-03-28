@@ -24,6 +24,13 @@ public class EmployeeIcon : Image
         Employees = employees;
     }
 
+    public EmployeeIcon(Image image)
+    {
+        Name = image.Name;
+        FileName = image.FileName;
+        Employees = new List<Employee>();
+    }
+
     public override string GetImageFilePath(StaffReader reader) => Path.Combine(reader.EmployeeIconDirectory, FileName);
 
 }

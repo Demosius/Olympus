@@ -6,6 +6,14 @@ using Uranus.Staff.Model;
 
 namespace Uranus.Staff;
 
+public enum EImageType
+{
+    EmployeeIcon,
+    EmployeeAvatar,
+    ProjectIcon,
+    LicenceImage
+}
+
 public class StaffCreator
 {
     private StaffChariot Chariot { get; }
@@ -65,6 +73,50 @@ public class StaffCreator
                 Chariot.Database.InsertOrReplace(project.Icon);
             }
         });
+    }
+
+    public EmployeeIcon? CreateEmployeeIconFromSourceFile(string sourceFile) => (EmployeeIcon?)CreateImageFromSourceFile(sourceFile, EImageType.EmployeeIcon);
+    public EmployeeAvatar? CreateEmployeeAvatarFromSourceFile(string sourceFile) => (EmployeeAvatar?)CreateImageFromSourceFile(sourceFile, EImageType.EmployeeAvatar);
+    public ProjectIcon? CreateProjectIconFromSourceFile(string sourceFile) => (ProjectIcon?)CreateImageFromSourceFile(sourceFile, EImageType.ProjectIcon);
+    public LicenceImage? CreateLicenceImageFromSourceFile(string sourceFile) => (LicenceImage?)CreateImageFromSourceFile(sourceFile, EImageType.LicenceImage);
+
+    public Image? CreateImageFromSourceFile(string sourceFile, EImageType type)
+    {
+        if (!File.Exists(sourceFile)) return null;
+
+        var name = Path.GetFileName(sourceFile);
+
+        var newDirectory = type switch
+        {
+            EImageType.EmployeeAvatar => Chariot.EmployeeAvatarDirectory,
+            EImageType.ProjectIcon => Chariot.ProjectIconDirectory,
+            EImageType.EmployeeIcon => Chariot.EmployeeIconDirectory,
+            EImageType.LicenceImage => Chariot.LicenceImageDirectory,
+            _ => Path.GetDirectoryName(sourceFile)
+        };
+
+        var newFilePath = Path.Combine(newDirectory ?? "", name);
+
+        var image = new Image()
+        {
+            Name = name,
+            FileName = name
+        };
+
+        File.Copy(sourceFile, newFilePath);
+
+        image = type switch
+        {
+            EImageType.EmployeeAvatar => new EmployeeAvatar(image),
+            EImageType.ProjectIcon => new ProjectIcon(image),
+            EImageType.LicenceImage => new LicenceImage(image),
+            EImageType.EmployeeIcon => new EmployeeIcon(image),
+            _ => image
+        };
+
+        Chariot.Create(image);
+
+        return image;
     }
 
     public void CopyProjectIconsFromSource(string sourceDirectory)

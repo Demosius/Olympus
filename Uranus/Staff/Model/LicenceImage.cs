@@ -22,5 +22,11 @@ public class LicenceImage : Image
         Licence = licence;
     }
 
+    public LicenceImage(Image image)
+    {
+        Name = image.Name;
+        FileName = image.FileName;
+    }
+
     public override string GetImageFilePath(StaffReader reader) => Path.Combine(reader.LicenceImageDirectory, FileName);
 }

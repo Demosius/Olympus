@@ -66,6 +66,19 @@ public partial class Charon
         staffChariot.ResetConnection(newSol);
     }
 
+    public int GetLevelDifference(StaffRole role)
+    {
+        if (CurrentUser is null ||
+            UserEmployee?.Role is null) return 999;
+
+        var level = 0;
+
+        if (UserEmployee.Role.LookDown(ref role))
+            return role.Level - UserEmployee.Role.Level;
+
+        return UserEmployee.Role.LookUp(ref level, UserEmployee.Role, ref role) ? level - UserEmployee.Role.Level : 999;
+    }
+
     public int GetLevelDifference(Employee employee)
     {
         if (CurrentUser is null ||

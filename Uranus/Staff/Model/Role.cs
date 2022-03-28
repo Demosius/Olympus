@@ -52,7 +52,7 @@ public class Role : IComparable
     public bool LookDown(ref Role targetRole)
     {
         if (this == targetRole) return true;
-        foreach (var role in Reports)
+        foreach (var role in Reports.Where(role => role != this))
         {
             if (role.LookDown(ref targetRole)) return true;
         }

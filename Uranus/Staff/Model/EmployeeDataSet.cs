@@ -13,17 +13,22 @@ public class EmployeeDataSet
     public Dictionary<string, Department> Departments { get; set; }
     public Dictionary<string, Role> Roles { get; set; }
     public Dictionary<string, Clan> Clans { get; set; }
+    public Dictionary<string, EmployeeIcon> EmployeeIcons { get; set; }
+    public Dictionary<string, EmployeeAvatar> EmployeeAvatars { get; set; }
     public IEnumerable<string> Locations { get; set; }
     public IEnumerable<string> PayPoints { get; set; }
     public IEnumerable<Employee> Managers { get; set; }
 
-    public EmployeeDataSet(IEnumerable<Employee> employees, IEnumerable<Department> departments, IEnumerable<Clan> clans, IEnumerable<Role> roles)
+    public EmployeeDataSet(IEnumerable<Employee> employees, IEnumerable<Department> departments, IEnumerable<Clan> clans,
+        IEnumerable<Role> roles, IEnumerable<EmployeeIcon> icons, IEnumerable<EmployeeAvatar> avatars)
     {
         var empList = employees.ToList();
         Employees = empList.ToDictionary(e => e.ID, e => e);
         Departments = departments.ToDictionary(d => d.Name, d => d);
         Clans = clans.ToDictionary(c => c.Name, c => c);
         Roles = roles.ToDictionary(r => r.Name, r => r);
+        EmployeeIcons = icons.ToDictionary(i => i.Name, i => i);
+        EmployeeAvatars = avatars.ToDictionary(a => a.Name, a => a);
         Locations = empList.Select(e => e.Location).Distinct();
         PayPoints = empList.Select(e => e.PayPoint).Distinct();
         Managers = empList.Where(e =>
@@ -31,12 +36,15 @@ public class EmployeeDataSet
         SetRelationships();
     }
 
-    public EmployeeDataSet(Dictionary<int, Employee> employees, Dictionary<string, Department> departments, Dictionary<string, Clan> clans, Dictionary<string, Role> roles)
+    public EmployeeDataSet(Dictionary<int, Employee> employees, Dictionary<string, Department> departments, Dictionary<string,
+        Clan> clans, Dictionary<string, Role> roles, Dictionary<string, EmployeeIcon> employeeIcons, Dictionary<string, EmployeeAvatar> employeeAvatars)
     {
         Employees = employees;
         Departments = departments;
         Clans = clans;
         Roles = roles;
+        EmployeeIcons = employeeIcons;
+        EmployeeAvatars = employeeAvatars;
         Locations = employees.Select(e => e.Value.Location).Distinct();
         PayPoints = employees.Select(e => e.Value.PayPoint).Distinct();
         Managers = Employees.Values.Where(e =>
@@ -96,6 +104,18 @@ public class EmployeeDataSet
             {
                 employee.Clan = clan;
                 clan.Employees.Add(employee);
+            }
+
+            if (EmployeeIcons.TryGetValue(employee.IconName, out var icon))
+            {
+                employee.Icon = icon;
+                icon.Employees.Add(employee);
+            }
+
+            if (EmployeeAvatars.TryGetValue(employee.AvatarName, out var avatar))
+            {
+                employee.Avatar = avatar;
+                avatar.Employees.Add(employee);
             }
         }
     }
@@ -271,5 +291,43 @@ public class EmployeeDataSet
         }
 
         Clans.Add(newClan.Name, newClan);
+    }
+
+    public void AddEmployee(Employee newEmployee)
+    {
+        if (Employees.ContainsKey(newEmployee.ID))
+            throw new Exception("Attempt to add employee to data set that already has existing employee ID.");
+
+        if (Departments.TryGetValue(newEmployee.DepartmentName, out var department))
+        {
+            newEmployee.Department = department;
+            department.Employees.Add(newEmployee);
+        }
+
+        if (Clans.TryGetValue(newEmployee.ClanName, out var clan))
+        {
+            newEmployee.Clan = clan;
+            clan.Employees.Add(newEmployee);
+        }
+
+        if (Roles.TryGetValue(newEmployee.RoleName, out var role))
+        {
+            newEmployee.Role = role;
+            role.Employees.Add(newEmployee);
+        }
+
+        if (Employees.TryGetValue(newEmployee.ReportsToID, out var manager))
+        {
+            newEmployee.ReportsTo = manager;
+            manager.Reports.Add(newEmployee);
+        }
+
+        foreach (var employee in Employees.Values.Where(employee => employee.ReportsToID == newEmployee.ID))
+        {
+            employee.ReportsTo = newEmployee;
+            newEmployee.Reports.Add(employee);
+        }
+
+        Employees.Add(newEmployee.ID, newEmployee);
     }
 }

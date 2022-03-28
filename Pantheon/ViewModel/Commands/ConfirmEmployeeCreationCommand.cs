@@ -1,26 +1,25 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Input;
-using Pantheon.ViewModel.Interface;
 
 namespace Pantheon.ViewModel.Commands;
 
-public class AddPayPointCommand : ICommand
+internal class ConfirmEmployeeCreationCommand : ICommand
 {
-    public IPayPoints VM { get; set; }
+    public EmployeeCreationVM VM { get; set; }
 
-    public AddPayPointCommand(IPayPoints vm)
-    {
-        VM = vm;
-    }
+    public ConfirmEmployeeCreationCommand(EmployeeCreationVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon?.CanCreateEmployee() ?? false;
+        return VM.ValidID && VM.Role is not null;
     }
 
     public void Execute(object? parameter)
     {
-        VM.AddPayPoint();
+        if (parameter is not Window w) return;
+        w.DialogResult = VM.ConfirmEmployeeCreation();
+        w.Close();
     }
 
     public event EventHandler? CanExecuteChanged
