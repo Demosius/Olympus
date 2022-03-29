@@ -84,7 +84,8 @@ public class StaffCreator
     {
         if (!File.Exists(sourceFile)) return null;
 
-        var name = Path.GetFileName(sourceFile);
+        var fileName = Path.GetFileName(sourceFile);
+        var name = Path.GetFileNameWithoutExtension(fileName);
 
         var newDirectory = type switch
         {
@@ -92,18 +93,26 @@ public class StaffCreator
             EImageType.ProjectIcon => Chariot.ProjectIconDirectory,
             EImageType.EmployeeIcon => Chariot.EmployeeIconDirectory,
             EImageType.LicenceImage => Chariot.LicenceImageDirectory,
-            _ => Path.GetDirectoryName(sourceFile)
+            _ => Path.GetDirectoryName(sourceFile) ?? ""
         };
 
-        var newFilePath = Path.Combine(newDirectory ?? "", name);
+        var existingIcons = Chariot.PullObjectList<EmployeeIcon>().ToDictionary(i => i.Name, i => i);
 
-        var image = new Image()
+        var newName = name;
+        var cnt = 0;
+        while (existingIcons.ContainsKey(newName))
         {
-            Name = name,
-            FileName = name
-        };
+            newName = $"{name}_{cnt}";
+            ++cnt;
+        }
+        name = newName;
+        fileName = $"{name}{Path.GetExtension(fileName)}";
 
-        File.Copy(sourceFile, newFilePath);
+        var image = new Image(newDirectory, name, fileName);
+
+        var newFilePath = Path.Combine(newDirectory, fileName);
+
+        if (!File.Exists(newFilePath)) File.Copy(sourceFile, newFilePath);
 
         image = type switch
         {
@@ -113,6 +122,8 @@ public class StaffCreator
             EImageType.EmployeeIcon => new EmployeeIcon(image),
             _ => image
         };
+
+        image.SetDirectory(newDirectory);
 
         Chariot.Create(image);
 
@@ -153,4 +164,19 @@ public class StaffCreator
 
 
     public bool Clan(Clan clan, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(clan, pushType);
+
+    public void Shift(Shift shift)
+    {
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            Chariot.Create(shift);
+            foreach (var shiftBreak in shift.Breaks)
+            {
+                Chariot.Create(shiftBreak);
+            }
+        });
+
+    }
+
+    public void Break(Break @break) => Chariot.Create(@break);
 }

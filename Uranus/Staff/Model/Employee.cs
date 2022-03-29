@@ -46,6 +46,8 @@ public class Employee : INotifyPropertyChanged
     private Department? department;
     private Role? role;
     private Clan? clan;
+    private EmployeeIcon? icon;
+    private EmployeeAvatar? avatar;
 
     #endregion
 
@@ -139,7 +141,15 @@ public class Employee : INotifyPropertyChanged
     [ManyToOne(nameof(ReportsToID), nameof(Reports), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Employee? ReportsTo { get; set; }
     [ManyToOne(nameof(AvatarName), nameof(EmployeeAvatar.Employees), CascadeOperations = CascadeOperation.CascadeRead)]
-    public EmployeeAvatar? Avatar { get; set; }
+    public EmployeeAvatar? Avatar
+    {
+        get => avatar;
+        set
+        {
+            avatar = value;
+            OnPropertyChanged(nameof(Avatar));
+        }
+    }
     [ManyToOne(nameof(ClanName), nameof(Model.Clan.Employees),
         CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Clan? Clan
@@ -151,8 +161,17 @@ public class Employee : INotifyPropertyChanged
             OnPropertyChanged(nameof(Clan));
         }
     }
-    [ManyToOne(nameof(IconName), nameof(EmployeeIcon.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public EmployeeIcon? Icon { get; set; }
+    [ManyToOne(nameof(IconName), nameof(EmployeeIcon.Employees),
+        CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public EmployeeIcon? Icon
+    {
+        get => icon;
+        set
+        {
+            icon = value;
+            OnPropertyChanged(nameof(Icon));
+        }
+    }
 
     [OneToOne(nameof(LockerID), nameof(Model.Locker.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Locker? Locker { get; set; }

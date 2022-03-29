@@ -7,6 +7,7 @@
         xmlns:vm="clr-namespace:Pantheon.ViewModel"
         mc:Ignorable="d"
         Title="Select Avatar" 
+        SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
         Foreground="{StaticResource LightForegroundBrush}"
@@ -50,8 +51,8 @@
         </StackPanel.Resources>
 
         <Label Content="Avatars"/>
-        <ListView ItemsSource="{Binding Icons, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedValue="{Binding SelectedIcon, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:ItemsSource="{d:SampleData ItemCount=5}"
+        <ListView ItemsSource="{Binding Avatars, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedValue="{Binding SelectedAvatar, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:ItemsSource="{d:SampleData ItemCount=5}"
                   Width="578"
                   MaxHeight="800">
             <ListView.ItemsPanel>
@@ -71,7 +72,7 @@
             </ListView.ItemTemplate>
         </ListView>
         <Button Content="Add New Avatar"
-                />
+                Command="{Binding FindNewImageCommand}"/>
 
         <Border BorderBrush="{StaticResource ForegroundBrush}"
                 BorderThickness="1"
@@ -87,14 +88,14 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="3"
-                       Source="{Binding SelectedIcon.FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                       Source="{Binding SelectedAvatar.FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
                        MaxWidth="120"
                        MaxHeight="240"/>
 
                 <TextBox Grid.Column="1" Grid.Row="0"
-                         Text="{Binding SelectedIcon.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                         Text="{Binding SelectedAvatar.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                 <Label Grid.Column="1" Grid.Row="1"
-                       Content="{Binding SelectedIcon.FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                       Content="{Binding SelectedAvatar.FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                 <Button Grid.Column="1" Grid.Row="2"
                         Content="Save Avatar Changes"/>
 

@@ -26,7 +26,7 @@ public partial class Charon
         {
             // Make sure user project icon paths are set.
             foreach (var p in value?.Employee?.Projects ?? new List<Project>())
-                p.Icon?.SetImageFilePath(staffReader);
+                p.Icon?.SetDirectory(staffReader.ProjectIconDirectory);
             currentUser = value;
         }
     }
@@ -98,7 +98,7 @@ public partial class Charon
     public int GetLevelDifference(int employeeID)
     {
         var employee = staffReader.Employee(employeeID, EPullType.FullRecursive);
-        return GetLevelDifference(employee);
+        return employee is null ? 999 : GetLevelDifference(employee);
     }
 
     public bool ChangePassword(string newPassword, string confirmPassword, out string message)

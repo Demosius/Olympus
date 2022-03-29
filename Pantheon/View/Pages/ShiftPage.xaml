@@ -4,14 +4,167 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:vm="clr-namespace:Pantheon.ViewModel.Pages"
+      xmlns:converter="clr-namespace:Pantheon.ViewModel.Converter"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="ShiftPage">
-    
+      d:DesignHeight="1080" d:DesignWidth="1200"
+      Title="EmployeePage">
+
     <Page.DataContext>
         <vm:ShiftPageVM x:Name="VM"/>
     </Page.DataContext>
-    <Grid>
-        
-    </Grid>
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Dark Theme -->
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <DockPanel>
+        <DockPanel.Resources>
+            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
+                <Setter Property="MinWidth" Value="100"/>
+                <Setter Property="IsEditable" Value="True"/>
+            </Style>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+            <converter:BreakButtonConverter x:Key="BreakButtonConverter"/>
+        </DockPanel.Resources>
+
+        <ToolBarTray DockPanel.Dock="Top">
+            <!-- Tray for Department selection -->
+            <ToolBar>
+                <ComboBox ItemsSource="{Binding Departments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          SelectedValue="{Binding SelectedDepartment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          Style="{StaticResource ComboBoxStyle}"
+                          MinWidth="150"/>
+            </ToolBar>
+            <!-- Buttons -->
+            <ToolBar>
+                <Button Content="New Shift" Style="{StaticResource ButtonStyle}"
+                        Command="{Binding CreateShiftCommand}"/>
+            </ToolBar>
+        </ToolBarTray>
+
+        <!--
+        ~1~ Function Buttons @1@
+        <StackPanel DockPanel.Dock="Left"
+                    Orientation="Vertical"
+                    MinWidth="100"
+                    MaxWidth="300">
+            <Button Content="Create New Shift"
+                    Command="{Binding CreateShiftCommand}"/>
+            <Button Content="Delete Shift"/>
+            <Button Content="Save Changes"/>
+        </StackPanel>
+        -->
+
+        <!-- Actual Shift Listings -->
+        <ListView ItemsSource="{Binding Shifts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="{StaticResource ForegroundBrush}"
+                            BorderThickness="1">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="{Binding Name, Mode=OneWay}"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               HorizontalContentAlignment="Center"
+                               Margin="10,0"
+                               Width="150"/>
+                            <StackPanel Orientation="Vertical"
+                                    VerticalAlignment="Center">
+                                <Label Content="Start Time" Margin="0" FontSize="10"
+                                       HorizontalContentAlignment="Center"/>
+                                <TextBox Text="{Binding StartString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         Margin="0,0,0,4" 
+                                         VerticalContentAlignment="Center" 
+                                         HorizontalContentAlignment="Center"
+                                         GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                                         LostMouseCapture="TextBox_LostMouseCapture"
+                                         LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                            </StackPanel>
+                            <Label Content="Breaks:" VerticalAlignment="Center" Margin="10,0,2,0"/>
+                            <ListView ItemsSource="{Binding Breaks, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      VerticalAlignment="Center"
+                                      SelectionMode="Single">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" MinHeight="20"
+                                                    VerticalAlignment="Center">
+                                            <Label Content="{Binding Name}" VerticalAlignment="Center"
+                                                   MinWidth="0" MinHeight="0"
+                                                   Width="60" Height="22"
+                                                   FontSize="10"
+                                                   HorizontalContentAlignment="Center"/>
+                                            <TextBox Text="{Binding StartString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalContentAlignment="Center"
+                                                     MinWidth="0" MinHeight="0"
+                                                     Width="70" Height="22"
+                                                     FontSize="10"
+                                                     GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                                                     LostMouseCapture="TextBox_LostMouseCapture"
+                                                     LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                                            <TextBox Text="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                     VerticalAlignment="Center" HorizontalContentAlignment="Center"
+                                                     MinWidth="0" MinHeight="0"
+                                                     Width="35" Height="22"
+                                                     FontSize="10"
+                                                     GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                                                     LostMouseCapture="TextBox_LostMouseCapture"
+                                                     LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                                            <TextBlock Text=" min"
+                                                       FontSize="8" 
+                                                       Height="22"/>
+                                            <Button Content="{Binding Name, Converter={StaticResource BreakButtonConverter}}" Margin="4,0,0,0"
+                                                    Command="{Binding ElementName=VM, Path=AddRemoveBreakCommand}"
+                                                    CommandParameter="{Binding}" 
+                                                    MinWidth="0" MinHeight="0"
+                                                    Height="20" Width="22"
+                                                    Padding="-1,-1,0,-1"
+                                                    VerticalContentAlignment="Center"
+                                                    FontSize="16"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0">
+                                <Label Content="End Time" Margin="0"  FontSize="10"
+                                       HorizontalContentAlignment="Center"/>
+                                <TextBox Text="{Binding EndString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         Margin="0,0,0,4" VerticalContentAlignment="Center"
+                                         HorizontalContentAlignment="Center"
+                                         GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                                         LostMouseCapture="TextBox_LostMouseCapture"
+                                         LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0">
+                                <Label Content="Default" Margin="0"  FontSize="10"
+                                       HorizontalContentAlignment="Center"/>
+                                <CheckBox IsChecked="{Binding Default}"/>
+                            </StackPanel>
+                            <Button Content="Save Changes" Height="30" Width="120"
+                                    CommandParameter="{Binding}"
+                                    Command="{Binding ElementName=VM, Path=SaveShiftCommand}"/>
+                            <Button Content="Delete" Height="30" Width="120"
+                                    CommandParameter="{Binding}"
+                                    Command="{Binding ElementName=VM, Path=DeleteShiftCommand}"/>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </DockPanel>
 </Page>

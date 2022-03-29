@@ -1,9 +1,9 @@
-﻿using Uranus.Staff.Model;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using Uranus;
-using System.Collections.ObjectModel;
+using Uranus.Staff.Model;
 
 namespace Olympus.ViewModel.Components;
 
@@ -34,7 +34,7 @@ public class ProjectLauncherVM : INotifyPropertyChanged
 
         // Set Icons for projects.
         foreach (var p in AllProjects)
-            p.Icon.SetImageFilePath(App.Helios.StaffReader);
+            p.Icon?.SetDirectory(App.Helios.StaffReader.ProjectIconDirectory);
 
         ProjectGroups = new ObservableCollection<ProjectGroupVM>();
 

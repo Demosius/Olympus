@@ -6,10 +6,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModel="clr-namespace:Pantheon.ViewModel"
         mc:Ignorable="d"
+        SizeToContent="WidthAndHeight"
         Background="{StaticResource  TooltipBackgroundBrush}"
         Foreground="{StaticResource LightForegroundBrush}"
-        Title="{Binding Title}" Height="300" Width="500"
-        FocusManager.FocusedElement="{Binding ElementName=Input}">
+        Title="{Binding Title}"
+        FocusManager.FocusedElement="{Binding ElementName=Input}"
+        WindowStartupLocation="CenterOwner">
 
     <Window.DataContext>
         <viewModel:InputWindowVM x:Name="VM"/>
@@ -24,7 +26,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Margin="20">
+    <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="Auto"/>
@@ -32,21 +34,25 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-    
+
         <!-- Prompt -->
         <Label Grid.Row="0"
                VerticalAlignment="Center"
-               Content="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}"/>
+               Content="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}"
+               Margin="5"/>
 
         <!-- Input -->
         <TextBox Grid.Row="1"
                  Text="{Binding Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 x:Name="Input"/>
+                 x:Name="Input"
+                 MinWidth="200"
+                 Margin="5"/>
 
         <!-- Buttons -->
         <StackPanel Grid.Row="3"
                     Orientation="Horizontal"
-                    HorizontalAlignment="Right">
+                    HorizontalAlignment="Right"
+                    Margin="5">
             <Button IsCancel="True"
                     Content="Cancel"/>
             <Button IsDefault="True"
@@ -57,7 +63,7 @@
 
         <Grid.Resources>
             <Style BasedOn="{StaticResource ButtonStyle}" TargetType="{x:Type Button}">
-                <Setter Property="Margin" Value="15,0,0,0"/>
+                <Setter Property="Margin" Value="10,0,0,0"/>
                 <Setter Property="MinWidth" Value="75"/>
             </Style>
         </Grid.Resources>

@@ -142,8 +142,8 @@ public class StaffReader
                 var departments = Chariot.PullObjectList<Department>();
                 var roles = Chariot.PullObjectList<Role>();
                 var clans = Chariot.PullObjectList<Clan>();
-                var icons = Chariot.PullObjectList<EmployeeIcon>();
-                var avatars = Chariot.PullObjectList<EmployeeAvatar>();
+                var icons = EmployeeIcons();
+                var avatars = EmployeeAvatars();
                 data = new EmployeeDataSet(employees, departments, clans, roles, icons, avatars);
             });
             if (data is not null) return data;
@@ -155,6 +155,24 @@ public class StaffReader
         return new EmployeeDataSet(new Dictionary<int, Employee>(), new Dictionary<string, Department>(),
             new Dictionary<string, Clan>(), new Dictionary<string, Role>(), 
             new Dictionary<string, EmployeeIcon>(), new Dictionary<string, EmployeeAvatar>());
+    }
+
+    public IEnumerable<EmployeeIcon> EmployeeIcons()
+    {
+        var icons = Chariot.PullObjectList<EmployeeIcon>();
+        foreach (var icon in icons)
+            icon.SetDirectory(EmployeeIconDirectory);
+
+        return icons;
+    }
+
+    public IEnumerable<EmployeeAvatar> EmployeeAvatars()
+    {
+        var avatars = Chariot.PullObjectList<EmployeeAvatar>();
+        foreach (var icon in avatars)
+            icon.SetDirectory(EmployeeAvatarDirectory);
+
+        return avatars;
     }
 
     /// <summary>
@@ -419,6 +437,7 @@ public class StaffReader
     {
         Dictionary<string, Department>? deptDict = null;
         Dictionary<string, List<Shift>>? shiftDict = null;
+        Dictionary<string, List<Break>>? breakDict = null;
 
         try
         {
@@ -428,6 +447,9 @@ public class StaffReader
                 shiftDict = Chariot.PullObjectList<Shift>()
                     .GroupBy(s => s.DepartmentName)
                     .ToDictionary(g => g.Key, g => g.ToList());
+                breakDict = Chariot.PullObjectList<Break>()
+                    .GroupBy(b => b.ShiftName)
+                    .ToDictionary(g => g.Key, g => g.ToList());
             });
         }
         catch (Exception ex)
@@ -435,9 +457,21 @@ public class StaffReader
             Log.Error(ex, "Failed to pull shift and/or department data from {}. Defaulted to null values.", Chariot.DatabaseName);
             deptDict = new Dictionary<string, Department>();
             shiftDict = new Dictionary<string, List<Shift>>();
+            breakDict = new Dictionary<string, List<Break>>();
         }
 
-        if (deptDict is null || shiftDict is null) return Array.Empty<Department>();
+        if (deptDict is null || shiftDict is null || breakDict is null) return Array.Empty<Department>();
+
+        foreach (var shift in shiftDict.SelectMany(d => d.Value))
+        {
+            if (!breakDict.TryGetValue(shift.Name, out var breaks)) continue;
+
+            shift.Breaks = breaks;
+            foreach (var @break in breaks)
+            {
+                @break.Shift = shift;
+            }
+        }
 
         foreach (var (deptName, shifts) in shiftDict)
         {

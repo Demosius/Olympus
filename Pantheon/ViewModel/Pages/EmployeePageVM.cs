@@ -281,6 +281,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     public DeleteEmployeeCommand DeleteEmployeeCommand { get; set; }
     public ActivateUserCommand ActivateUserCommand { get; set; }
     public LaunchIconiferCommand LaunchIconiferCommand { get; set; }
+    public LaunchAvatarSelectorCommand LaunchAvatarSelectorCommand { get; set; }
     #endregion
 
     public EmployeePageVM()
@@ -300,6 +301,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         DeleteEmployeeCommand = new DeleteEmployeeCommand(this);
         ActivateUserCommand = new ActivateUserCommand(this);
         LaunchIconiferCommand = new LaunchIconiferCommand(this);
+        LaunchAvatarSelectorCommand = new LaunchAvatarSelectorCommand(this);
 
         ReportingEmployees = new List<Employee>();
         employees = new ObservableCollection<Employee>();

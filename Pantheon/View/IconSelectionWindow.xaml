@@ -1,4 +1,5 @@
 ﻿<Window x:Class="Pantheon.View.IconSelectionWindow"
+        x:Name="IconWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -50,36 +51,40 @@
         </StackPanel.Resources>
 
         <Label Content="Icons"/>
-        <ListView ItemsSource="{Binding Icons, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedValue="{Binding SelectedIcon, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:ItemsSource="{d:SampleData ItemCount=5}"
-                  Width="578"
-                  MaxHeight="800">
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal"
-                               />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Image Source="{Binding FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+        <ScrollViewer x:Name="ScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <ListView x:Name="ListView" ItemsSource="{Binding Icons, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedValue="{Binding SelectedIcon, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:ItemsSource="{d:SampleData ItemCount=5}"
+                      Width="578"
+                      MaxHeight="800">
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"
+                                   Width="{Binding ElementName=ScrollViewer, Path=ViewportWidth}"/>
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Image Source="{Binding FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                            ToolTip="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                            Width="80"
                            Height="80"
                            Margin="2"/>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </ScrollViewer>
         <Button Content="Add New Icon"
                 Command="{Binding FindNewImageCommand}"/>
 
         <Border BorderBrush="{StaticResource ForegroundBrush}"
                 BorderThickness="1"
                 Margin="5">
-            <Grid>
+            <Grid Width="{Binding ElementName=ListView, Path=Width}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="407*"/>
+                    <ColumnDefinition Width="31*"/>
+                    <ColumnDefinition Width="20*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -92,12 +97,14 @@
                        Height="120"/>
 
                 <TextBox Grid.Column="1" Grid.Row="0"
-                         Text="{Binding IconName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                         Text="{Binding IconName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}" Grid.ColumnSpan="3" Margin="5,5,5,5"/>
                 <Label Grid.Column="1" Grid.Row="1"
-                       Content="{Binding SelectedIcon.FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                       Content="{Binding SelectedIcon.FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                       VerticalAlignment="Top"
+                       FontSize="10" Grid.ColumnSpan="3"/>
                 <Button Grid.Column="1" Grid.Row="2"
                         Content="Save Icon Changes"
-                        Command="{Binding SaveImageChangesCommand}"/>
+                        Command="{Binding SaveImageChangesCommand}" Grid.ColumnSpan="3" HorizontalAlignment="Left" Margin="312,5,0,5"/>
 
             </Grid>
         </Border>
@@ -109,7 +116,7 @@
                     IsCancel="True"/>
             <Button Content="Confirm"
                     Command="{Binding ConfirmImageSelectionCommand}"
-                    CommandParameter="{Binding ElementName=EmployeeWindow}"
+                    CommandParameter="{Binding ElementName=IconWindow}"
                     IsDefault="True"/>
         </StackPanel>
     </StackPanel>

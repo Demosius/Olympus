@@ -1,5 +1,4 @@
 ﻿using SQLite;
-using System;
 using System.IO;
 
 namespace Uranus.Staff.Model;
@@ -9,76 +8,29 @@ public class Image
     [PrimaryKey] public string Name { get; set; }
     public string FileName { get; set; }
 
-    private string fullPath;
-    [Ignore]
-    public string FullPath
-    {
-        get
-        {
-            if (fullPath is null or "")
-                fullPath = GetImageFilePath();
-            return fullPath;
-        }
-        set => fullPath = value;
-    }
+    [Ignore] public string Directory { get; set; }
+    [Ignore] public string FullPath { get; set; }
 
     public Image()
     {
-        fullPath = string.Empty;
+        Directory = string.Empty;
+        FullPath = string.Empty;
         Name = string.Empty;
         FileName = string.Empty;
     }
 
-    public Image(string fullPath, string name, string fileName)
+    public Image(string directory, string name, string fileName)
     {
-        this.fullPath = fullPath;
         Name = name;
         FileName = fileName;
+        Directory = directory;
+        FullPath = Path.Combine(directory, FileName);
     }
 
-    public virtual string GetImageFilePath()
+    public void SetDirectory(string directory)
     {
-        // Current Directory
-        var checkDir = Path.Combine(Directory.GetCurrentDirectory(), FileName);
-        if (CheckPath(checkDir)) return checkDir;
-
-        // User Image Directory.
-        checkDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), FileName);
-        if (CheckPath(checkDir)) return checkDir;
-
-        // User Directory.
-        checkDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), FileName);
-
-        return CheckPath(checkDir) ? checkDir : "";
+        Directory = directory;
+        FullPath = Path.Combine(directory, FileName);
     }
 
-    public virtual string GetImageFilePath(StaffReader reader)
-    {
-        // Check multiple locations for the image.
-
-        var checkDir = GetImageFilePath();
-        if (CheckPath(checkDir)) return checkDir;
-
-        // Database directory.
-        checkDir = Path.Combine(reader.BaseDirectory, FileName);
-        if (CheckPath(checkDir)) return checkDir;
-
-        // Staff EmployeeIcon Directory.
-        checkDir = Path.Combine(reader.EmployeeIconDirectory, FileName);
-        if (CheckPath(checkDir)) return checkDir;
-
-        // Staff ProjectIcon Directory.
-        checkDir = Path.Combine(reader.ProjectIconDirectory, FileName);
-
-        return CheckPath(checkDir) ? checkDir : FileName;
-    }
-
-    // Given a full directory path to a file, checks if file exists.
-    // If it does, set full path value to match, and return true.
-    private bool CheckPath(string path)
-    {
-        if (!File.Exists(path)) return false;
-        FullPath = path;
-        return true;
-    }
 }

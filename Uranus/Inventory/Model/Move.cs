@@ -30,7 +30,7 @@ public class Move
 
     [Ignore] public bool FullPallet => TakeBin != null && (TakeBin.IsFullQty(this) ?? false) && AccessLevel != EAccessLevel.Ground;
 
-    [Ignore] public EAccessLevel AccessLevel => (TakeBin ?? new NAVBin()).Zone.AccessLevel;
+    [Ignore] public EAccessLevel AccessLevel => (TakeBin ?? new NAVBin()).Zone?.AccessLevel ?? EAccessLevel.Ground;
 
     [Ignore] public int AssignedOperator { get; set; }
     public float TimeEstimate { get; set; }

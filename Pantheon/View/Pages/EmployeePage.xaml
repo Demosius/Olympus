@@ -117,11 +117,14 @@
             </Grid>
 
             <ListView ItemsSource="{Binding Employees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedValue="{Binding SelectedEmployee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:ItemsSource="{d:SampleData ItemCount=5}">
+                      SelectedValue="{Binding SelectedEmployee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:ItemsSource="{d:SampleData ItemCount=5}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="{Binding Icon.FullPath, FallbackValue=''}"></Image>
+                            <Image Source="{Binding Icon.FullPath, FallbackValue=''}"
+                                   MaxWidth="50"
+                                   MaxHeight="50"
+                                   Margin="0,0,5,0"/>
                             <StackPanel Orientation="Vertical">
                                 <StackPanel Orientation="Horizontal">
                                     <Label Content="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
@@ -176,6 +179,9 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -350,6 +356,28 @@
                              Text="{Binding SelectedEmployee.PayRate, FallbackValue=''}"
                              Visibility="{Binding VerySensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
 
+                    <!-- Shift Rules -->
+                    <Button Grid.Column="0" Grid.Row="18" Grid.ColumnSpan="2"
+                            Content="Manage Shift Rules"/>
+
+                    <!-- Licensing -->
+                    <Button Grid.Column="0" Grid.Row="19" Grid.ColumnSpan="2"
+                            Content="Manage Licenses"
+                            IsEnabled="False"
+                            ToolTip="Not Yet Implemented"/>
+
+                    <!-- Vehicles -->
+                    <Button Grid.Column="0" Grid.Row="20" Grid.ColumnSpan="2"
+                            Content="Manage Vehicles"
+                            IsEnabled="False"
+                            ToolTip="Not Yet Implemented"/>
+
+                    <!-- Lockers -->
+                    <Button Grid.Column="0" Grid.Row="21" Grid.ColumnSpan="2"
+                            Content="Manage Locker"
+                            IsEnabled="False"
+                            ToolTip="Not Yet Implemented"/>
+
                     <Grid.Resources>
                         <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
                             <Setter Property="FontWeight" Value="Bold"/>
@@ -376,11 +404,12 @@
         </DockPanel>
 
         <!-- Avatar -->
-        <StackPanel Orientation="Vertical">
+        <DockPanel>
+            <Button DockPanel.Dock="Bottom"
+                    Content="Change Avatar"
+                    Command="{Binding LaunchAvatarSelectorCommand}"/>
             <Image Source="{Binding SelectedEmployee.Avatar.FullPath, FallbackValue=''}"/>
-            <Button Content="Change Avatar"
-                    Margin="5"/>
-        </StackPanel>
+        </DockPanel>
 
     </DockPanel>
 </Page>

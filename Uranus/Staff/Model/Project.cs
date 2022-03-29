@@ -35,7 +35,7 @@ public class Project
         Name = eProject.ToString();
         Icon = new ProjectIcon(this, iconFileName);
         ToolTip = toolTip;
-        Icon.FullPath = Icon.GetImageFilePath(reader);
+        Icon.SetDirectory(reader.ProjectIconDirectory);
         IconName = Icon.Name;
         Departments = new List<Department>();
         Employees = new List<Employee>();

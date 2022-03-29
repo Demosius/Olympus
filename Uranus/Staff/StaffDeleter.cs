@@ -55,4 +55,16 @@ public class StaffDeleter
     }
 
     public void Employee(Employee selectedEmployee) => Chariot.Database?.Delete(selectedEmployee);
+
+    public void Shift(Shift shift)
+    {
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            foreach (var shiftBreak in shift.Breaks)
+                Chariot.Delete(shiftBreak);
+            Chariot.Delete(shift);
+        });
+    }
+
+    public void Break(Break @break) => Chariot.Delete(@break);
 }

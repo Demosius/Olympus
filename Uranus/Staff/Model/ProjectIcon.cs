@@ -38,11 +38,11 @@ public class ProjectIcon : Image
         Projects = projects;
     }
 
-    public void SetImageFilePath(StaffReader reader)
+    /*public void SetImageFilePath(StaffReader reader)
     {
         FullPath = GetImageFilePath(reader);
-    }
+    }*/
 
-    public override string GetImageFilePath(StaffReader reader) => Path.Combine(reader.ProjectIconDirectory, FileName);
+    //public override string GetImageFilePath(StaffReader reader) => Path.Combine(reader.ProjectIconDirectory, FileName);
 
 }

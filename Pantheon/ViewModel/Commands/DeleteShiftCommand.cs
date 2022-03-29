@@ -4,27 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Pantheon.ViewModel.Interface;
+using Pantheon.ViewModel.Pages;
+using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class FindNewImageCommand : ICommand
+internal class DeleteShiftCommand : ICommand
 {
-    public IImageSelector VM { get; set; }
+    public ShiftPageVM VM { get; set; }
 
-    public FindNewImageCommand(IImageSelector vm)
-    {
-        VM = vm;
-    }
+    public DeleteShiftCommand(ShiftPageVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return true;
+        return VM.SelectedDepartment is not null && (VM.Charon?.CanDeleteShift(VM.SelectedDepartment) ?? false);
     }
 
     public void Execute(object? parameter)
     {
-        VM.FindNewImage();
+        if (parameter is not Shift shift) return;
+        VM.DeleteShift(shift);
     }
 
     public event EventHandler? CanExecuteChanged

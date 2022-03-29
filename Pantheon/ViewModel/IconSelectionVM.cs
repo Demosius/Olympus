@@ -111,7 +111,8 @@ internal class IconSelectionVM : INotifyPropertyChanged, IImageSelector
 
     public void ConfirmImageSelection()
     {
-        throw new NotImplementedException();
+        if (ParentVM?.SelectedEmployee is null) return;
+        ParentVM.SelectedEmployee.Icon = SelectedIcon;
     }
 
     public void FindNewImage()
@@ -121,7 +122,7 @@ internal class IconSelectionVM : INotifyPropertyChanged, IImageSelector
         var dialog = new OpenFileDialog
         {
             InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
-            Filter = "image files (*.jpg,*.png,*.ico)|*.jpg;*.png*.ico|All files (*.*)|*.*",
+            Filter = "image files (*.jpg,*.png,*.ico)|*.jpg;*.png;*.ico|All files (*.*)|*.*",
             FilterIndex = 0,
             Multiselect = false,
             Title = "Select Image File"
@@ -131,7 +132,12 @@ internal class IconSelectionVM : INotifyPropertyChanged, IImageSelector
 
         var icon = Helios.StaffCreator.CreateEmployeeIconFromSourceFile(dialog.FileName);
 
-        if (icon is not null) Icons.Add(icon);
+        if (icon is not null)
+        {
+            Icons.Add(icon);
+            ParentVM?.EmployeeDataSet?.EmployeeIcons.Add(icon.Name, icon);
+        }
+        OnPropertyChanged(nameof(EmployeeIcon.FullPath));
 
         SelectedIcon = icon;
     }

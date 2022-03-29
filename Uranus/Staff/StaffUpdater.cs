@@ -230,4 +230,15 @@ public class StaffUpdater
         icon.Name = newName;
         Chariot.Create(icon);
     }
+
+    public int Shift(Shift shift)
+    {
+        var lines = 0;
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            lines += shift.Breaks.Sum(shiftBreak => Chariot.Update(shiftBreak));
+            lines += Chariot.Update(shift);
+        });
+        return lines;
+    }
 }

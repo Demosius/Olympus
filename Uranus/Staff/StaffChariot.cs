@@ -21,7 +21,7 @@ public class StaffChariot : MasterChariot
         typeof(Induction),                  typeof(Licence),            typeof(LicenceImage),               typeof(Locker),
         typeof(Project),                    typeof(ProjectIcon),        typeof(Role),                       typeof(Roster),
         typeof(Shift),                      typeof(ShiftEntry),         typeof(ShiftRule),                  typeof(TagUse),
-        typeof(TempTag),                    typeof(Vehicle)
+        typeof(TempTag),                    typeof(Vehicle),            typeof(Break)
     };
 
     /*************************** Constructors ****************************/

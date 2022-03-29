@@ -1,12 +1,11 @@
 ﻿using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
-using System.IO;
 
 namespace Uranus.Staff.Model;
 
 public class EmployeeIcon : Image
 {
-    [OneToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToMany(nameof(Employee.IconName), nameof(Employee.Icon), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Employee> Employees { get; set; }
 
     public EmployeeIcon()
@@ -30,7 +29,4 @@ public class EmployeeIcon : Image
         FileName = image.FileName;
         Employees = new List<Employee>();
     }
-
-    public override string GetImageFilePath(StaffReader reader) => Path.Combine(reader.EmployeeIconDirectory, FileName);
-
 }
