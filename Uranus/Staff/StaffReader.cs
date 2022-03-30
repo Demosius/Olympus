@@ -144,7 +144,9 @@ public class StaffReader
                 var clans = Chariot.PullObjectList<Clan>();
                 var icons = EmployeeIcons();
                 var avatars = EmployeeAvatars();
-                data = new EmployeeDataSet(employees, departments, clans, roles, icons, avatars);
+                var shifts = Chariot.PullObjectList<Shift>();
+                var breaks = Chariot.PullObjectList<Break>();
+                data = new EmployeeDataSet(employees, departments, clans, roles, icons, avatars, shifts, breaks);
             });
             if (data is not null) return data;
         }
@@ -153,8 +155,9 @@ public class StaffReader
             Log.Error(ex, "Failed to pull the EmployeeDataSet");
         }
         return new EmployeeDataSet(new Dictionary<int, Employee>(), new Dictionary<string, Department>(),
-            new Dictionary<string, Clan>(), new Dictionary<string, Role>(), 
-            new Dictionary<string, EmployeeIcon>(), new Dictionary<string, EmployeeAvatar>());
+            new Dictionary<string, Clan>(), new Dictionary<string, Role>(),
+            new Dictionary<string, EmployeeIcon>(), new Dictionary<string, EmployeeAvatar>(),
+            new Dictionary<string, Shift>(), new Dictionary<string, List<Break>>());
     }
 
     public IEnumerable<EmployeeIcon> EmployeeIcons()
@@ -405,20 +408,16 @@ public class StaffReader
     }
 
     /// <summary>
-    /// Gets all of the shifts applicable to the current User - based on department.
+    /// Gets all of the shifts applicable to the given employee - based on department.
     /// </summary>
-    /// <param name="currentUser"></param>
+    /// <param name="employee"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public IEnumerable<Shift> Shifts(Employee currentUser)
-    {
-        // Get a list of all relevant departments.
-        var departments = SubDepartments(currentUser.DepartmentName);
+    public IEnumerable<Shift> Shifts(Employee employee) => Chariot.PullObjectList<Shift>(s => s.DepartmentName == employee.DepartmentName);
 
+    public IEnumerable<EmployeeShift> EmployeeShifts(Employee employee) => Chariot.PullObjectList<EmployeeShift>(es => es.EmployeeID == employee.ID);
 
-
-        return departments.SelectMany(d => d.Shifts);
-    }
+    public IEnumerable<EmployeeShift> EmployeeShifts(Shift shift) => Chariot.PullObjectList<EmployeeShift>(es => es.ShiftID == shift.ID);
 
     public IEnumerable<EmployeeIcon> Icons(Expression<Func<EmployeeIcon, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
@@ -426,6 +425,8 @@ public class StaffReader
     /* DEPARTMENTS */
     public List<Department> Departments(Expression<Func<Department, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
+    public Department? Department(string departmentName, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Department>(departmentName, pullType);
 
     /// <summary>
     /// Pulls all relevant sub departments according to the given department name.
@@ -466,7 +467,7 @@ public class StaffReader
         {
             if (!breakDict.TryGetValue(shift.Name, out var breaks)) continue;
 
-            shift.Breaks = breaks;
+            shift.SetBreaks(breaks);
             foreach (var @break in breaks)
             {
                 @break.Shift = shift;

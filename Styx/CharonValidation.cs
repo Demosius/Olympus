@@ -12,7 +12,7 @@ public partial class Charon
 
     public bool CanDeleteDepartment() => CurrentUser?.Role?.DeleteDepartment ?? false;
 
-    // USER ROLES
+    // STAFF ROLES
     public bool CanCreateStaffRole() => CanCreateDepartment();
     public bool CanUpdateStaffRole() => CanUpdateDepartment();
     public bool CanDeleteStaffRole() => CanDeleteDepartment();
@@ -80,6 +80,8 @@ public partial class Charon
     public bool CanUpdateVehicle() => CurrentUser?.Role?.UpdateVehicle ?? false;
 
     public bool CanDeleteVehicle() => CurrentUser?.Role?.DeleteVehicle ?? false;
+
+    public bool CanManageLockers() => CurrentUser?.Role?.ManageLockers ?? false;
 
     public bool CanCopyDatabase() => CurrentUser?.Role?.CopyDatabase ?? false;
 

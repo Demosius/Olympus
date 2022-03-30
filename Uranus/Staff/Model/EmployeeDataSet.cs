@@ -15,12 +15,15 @@ public class EmployeeDataSet
     public Dictionary<string, Clan> Clans { get; set; }
     public Dictionary<string, EmployeeIcon> EmployeeIcons { get; set; }
     public Dictionary<string, EmployeeAvatar> EmployeeAvatars { get; set; }
+    public Dictionary<string, Shift> Shifts { get; set; }
+    public Dictionary<string, List<Break>> BreakDict { get; set; }
     public IEnumerable<string> Locations { get; set; }
     public IEnumerable<string> PayPoints { get; set; }
     public IEnumerable<Employee> Managers { get; set; }
 
     public EmployeeDataSet(IEnumerable<Employee> employees, IEnumerable<Department> departments, IEnumerable<Clan> clans,
-        IEnumerable<Role> roles, IEnumerable<EmployeeIcon> icons, IEnumerable<EmployeeAvatar> avatars)
+        IEnumerable<Role> roles, IEnumerable<EmployeeIcon> icons, IEnumerable<EmployeeAvatar> avatars,
+        IEnumerable<Shift> shifts, IEnumerable<Break> breaks)
     {
         var empList = employees.ToList();
         Employees = empList.ToDictionary(e => e.ID, e => e);
@@ -33,11 +36,17 @@ public class EmployeeDataSet
         PayPoints = empList.Select(e => e.PayPoint).Distinct();
         Managers = empList.Where(e =>
             empList.Select(emp => emp.ReportsToID).Distinct().Contains(e.ID));
+        Shifts = shifts.ToDictionary(s => s.ID, s => s);
+        BreakDict = breaks
+            .GroupBy(b => b.ShiftID)
+            .ToDictionary(g => g.Key, b => b.ToList());
         SetRelationships();
     }
 
     public EmployeeDataSet(Dictionary<int, Employee> employees, Dictionary<string, Department> departments, Dictionary<string,
-        Clan> clans, Dictionary<string, Role> roles, Dictionary<string, EmployeeIcon> employeeIcons, Dictionary<string, EmployeeAvatar> employeeAvatars)
+        Clan> clans, Dictionary<string, Role> roles,
+        Dictionary<string, EmployeeIcon> employeeIcons, Dictionary<string, EmployeeAvatar> employeeAvatars,
+        Dictionary<string, Shift> shifts, Dictionary<string, List<Break>> breakDict)
     {
         Employees = employees;
         Departments = departments;
@@ -49,6 +58,8 @@ public class EmployeeDataSet
         PayPoints = employees.Select(e => e.Value.PayPoint).Distinct();
         Managers = Employees.Values.Where(e =>
             employees.Select(emp => emp.Value.ReportsToID).Distinct().Contains(e.ID));
+        Shifts = shifts;
+        BreakDict = breakDict;
         SetRelationships();
     }
 
@@ -57,10 +68,30 @@ public class EmployeeDataSet
     /// </summary>
     public void SetRelationships()
     {
+        SetFromShifts();
         SetFromEmployees();
         SetFromRoles();
         SetFromClans();
         SetFromDepartments();
+    }
+
+    private void SetFromShifts()
+    {
+        foreach (var (_, shift) in Shifts)
+        {
+            if (BreakDict.TryGetValue(shift.ID, out var breaks))
+            {
+                shift.SetBreaks(breaks);
+                foreach (var @break in breaks)
+                    @break.Shift = shift;
+            }
+
+            if (Departments.TryGetValue(shift.DepartmentName, out var department))
+            {
+                department.Shifts.Add(shift);
+                shift.Department = department;
+            }
+        }
     }
 
     private void SetFromDepartments()
@@ -116,6 +147,12 @@ public class EmployeeDataSet
             {
                 employee.Avatar = avatar;
                 avatar.Employees.Add(employee);
+            }
+
+            if (Shifts.TryGetValue(employee.DefaultShiftID, out var shift))
+            {
+                employee.DefaultShift = shift;
+                shift.DefaultEmployees.Add(employee);
             }
         }
     }

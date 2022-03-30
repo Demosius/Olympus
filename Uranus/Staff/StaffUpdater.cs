@@ -238,6 +238,36 @@ public class StaffUpdater
         {
             lines += shift.Breaks.Sum(shiftBreak => Chariot.Update(shiftBreak));
             lines += Chariot.Update(shift);
+            Chariot.Database.Execute("UPDATE Shift SET \"Default\" = FALSE WHERE DepartmentName = ? AND Name != ?;",
+                shift.DepartmentName, shift.Name);
+        });
+        return lines;
+    }
+
+    /// <summary>
+    /// Updates EmployeeShift objects.
+    /// Checks original vs active status to know what to create or delete.
+    /// </summary>
+    /// <param name="empShifts"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public int EmployeeToShiftConnections(IEnumerable<EmployeeShift> empShifts)
+    {
+        var lines = 0;
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            foreach (var employeeShift in empShifts)
+            {
+                switch (employeeShift.Active)
+                {
+                    case true when !employeeShift.Original:
+                        lines += Chariot.Database.Insert(employeeShift);
+                        break;
+                    case false when employeeShift.Original:
+                        lines += Chariot.Database.Delete(employeeShift);
+                        break;
+                }
+            }
         });
         return lines;
     }

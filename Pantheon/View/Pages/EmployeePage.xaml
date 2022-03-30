@@ -358,7 +358,8 @@
 
                     <!-- Shift Rules -->
                     <Button Grid.Column="0" Grid.Row="18" Grid.ColumnSpan="2"
-                            Content="Manage Shift Rules"/>
+                            Content="Manage Shift Rules"
+                            Command="{Binding LaunchEmployeeShiftWindowCommand}"/>
 
                     <!-- Licensing -->
                     <Button Grid.Column="0" Grid.Row="19" Grid.ColumnSpan="2"

@@ -89,6 +89,7 @@ public class Employee : INotifyPropertyChanged
     [ForeignKey(typeof(Role))] public string RoleName { get; set; }    // Also known as Job Classification.
     [ForeignKey(typeof(Employee))] public int ReportsToID { get; set; }    // Specific Employee this employee reports to, bypassing Role and RoleReports.
     [ForeignKey(typeof(Clan))] public string ClanName { get; set; }
+    [ForeignKey(typeof(Shift))] public string DefaultShiftID { get; set; }
     public string PayPoint
     {
         get => payPoint;
@@ -172,6 +173,8 @@ public class Employee : INotifyPropertyChanged
             OnPropertyChanged(nameof(Icon));
         }
     }
+    [ManyToOne(nameof(DefaultShiftID), nameof(Shift.DefaultEmployees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public Shift? DefaultShift { get; set; }
 
     [OneToOne(nameof(LockerID), nameof(Model.Locker.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Locker? Locker { get; set; }
@@ -216,6 +219,7 @@ public class Employee : INotifyPropertyChanged
         DepartmentName = string.Empty;
         RoleName = string.Empty;
         ClanName = string.Empty;
+        DefaultShiftID = string.Empty;
         payPoint = string.Empty;
         LockerID = string.Empty;
         LicenceNumber = string.Empty;
@@ -244,7 +248,7 @@ public class Employee : INotifyPropertyChanged
 
     public Employee(int id, string firstName, string lastName, string displayName, decimal? payRate,
         string rfID, string pcID, string location, string departmentName, string roleName,
-        int reportsToID, string clanName, string payPoint, EEmploymentType employmentType,
+        int reportsToID, string clanName, string defaultShiftID, string payPoint, EEmploymentType employmentType,
         string lockerID, string phoneNumber, string email, string address, string iconName,
         string avatarName, string licenceNumber, Department? department, Role? role, Employee? reportsTo,
         EmployeeAvatar? avatar, Clan? clan, EmployeeIcon? icon, Locker? locker, Licence? licence,
@@ -265,6 +269,7 @@ public class Employee : INotifyPropertyChanged
         RoleName = roleName;
         ReportsToID = reportsToID;
         ClanName = clanName;
+        DefaultShiftID = defaultShiftID;
         this.payPoint = payPoint;
         EmploymentType = employmentType;
         LockerID = lockerID;

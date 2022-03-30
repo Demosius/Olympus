@@ -88,6 +88,7 @@ internal class ShiftPageVM : INotifyPropertyChanged, IDBInteraction
     public SaveShiftCommand SaveShiftCommand { get; set; }
     public DeleteShiftCommand DeleteShiftCommand { get; set; }
     public AddRemoveBreakCommand AddRemoveBreakCommand { get; set; }
+    public LaunchShiftEmployeeWindowCommand LaunchShiftEmployeeWindowCommand { get; set; }
 
     #endregion
 
@@ -102,6 +103,7 @@ internal class ShiftPageVM : INotifyPropertyChanged, IDBInteraction
         SaveShiftCommand = new SaveShiftCommand(this);
         DeleteShiftCommand = new DeleteShiftCommand(this);
         AddRemoveBreakCommand = new AddRemoveBreakCommand(this);
+        LaunchShiftEmployeeWindowCommand = new LaunchShiftEmployeeWindowCommand(this);
     }
 
     public void SetDataSources(Helios helios, Charon charon)
@@ -175,16 +177,26 @@ internal class ShiftPageVM : INotifyPropertyChanged, IDBInteraction
 
         var breakName = inputBox.VM.Input;
 
+        if (shift.Breaks.Any(b => b.Name == breakName)) return;
+
         var @break = new Break(shift, breakName);
 
-        shift.Breaks.Add(@break);
+        shift.AddBreak(@break);
 
         Helios.StaffCreator.Break(@break);
     }
 
     public void RemoveBreak(Break @break)
     {
-        @break.Shift?.Breaks.Remove(@break);
+        @break.Shift?.RemoveBreak(@break);
         Helios?.StaffDeleter.Break(@break);
+    }
+
+    public void LaunchShiftEmployeeWindow(Shift shift)
+    {
+        if (Helios is null || Charon is null) return;
+
+        var employeeWindow = new ShiftEmployeeWindow(Helios, Charon, shift);
+        employeeWindow.ShowDialog();
     }
 }

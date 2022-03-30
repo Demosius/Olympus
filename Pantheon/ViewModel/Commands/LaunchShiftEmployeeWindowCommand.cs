@@ -1,16 +1,15 @@
 ﻿using Pantheon.ViewModel.Pages;
 using System;
-using System.Windows;
 using System.Windows.Input;
 using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class SaveShiftCommand : ICommand
+internal class LaunchShiftEmployeeWindowCommand : ICommand
 {
     public ShiftPageVM VM { get; set; }
 
-    public SaveShiftCommand(ShiftPageVM vm) { VM = vm; }
+    public LaunchShiftEmployeeWindowCommand(ShiftPageVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -19,10 +18,8 @@ internal class SaveShiftCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        if (parameter is not Shift shift || VM.Helios is null) return;
-        shift.SortBreaks();
-        if (VM.Helios.StaffUpdater.Shift(shift) > 0)
-            MessageBox.Show("Shift saved successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        if (parameter is not Shift shift) return;
+        VM.LaunchShiftEmployeeWindow(shift);
     }
 
     public event EventHandler? CanExecuteChanged

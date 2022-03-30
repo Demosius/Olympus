@@ -282,6 +282,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     public ActivateUserCommand ActivateUserCommand { get; set; }
     public LaunchIconiferCommand LaunchIconiferCommand { get; set; }
     public LaunchAvatarSelectorCommand LaunchAvatarSelectorCommand { get; set; }
+    public LaunchEmployeeShiftWindowCommand LaunchEmployeeShiftWindowCommand { get; set; }
     #endregion
 
     public EmployeePageVM()
@@ -302,6 +303,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         ActivateUserCommand = new ActivateUserCommand(this);
         LaunchIconiferCommand = new LaunchIconiferCommand(this);
         LaunchAvatarSelectorCommand = new LaunchAvatarSelectorCommand(this);
+        LaunchEmployeeShiftWindowCommand = new LaunchEmployeeShiftWindowCommand(this);
 
         ReportingEmployees = new List<Employee>();
         employees = new ObservableCollection<Employee>();
@@ -589,5 +591,13 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         var avatarSelector = new AvatarSelectionWindow(this);
         if (avatarSelector.ShowDialog() != true) return;
         SelectedEmployee.Avatar = avatarSelector.VM.SelectedAvatar;
+    }
+
+    public void LaunchEmployeeShiftWindow()
+    {
+        if (Helios is null || Charon is null || selectedEmployee is null) return;
+        var shiftWindow = new EmployeeShiftWindow(Helios, Charon, selectedEmployee);
+
+        shiftWindow.ShowDialog();
     }
 }

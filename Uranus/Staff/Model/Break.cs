@@ -39,14 +39,7 @@ public class Break : IComparable
         ID = string.Empty;
     }
 
-    public Break(Shift shift)
-    {
-        Name = "Lunch";
-        ShiftID = shift.ID;
-        ShiftName = shift.Name;
-        Shift = shift;
-        ID = $"{ShiftID}|{Name}";
-    }
+    public Break(Shift shift) : this(shift, "Lunch") { }
 
     public Break(Shift shift, string name)
     {
@@ -55,6 +48,28 @@ public class Break : IComparable
         ShiftName = shift.Name;
         Shift = shift;
         ID = $"{ShiftID}|{Name}";
+
+        // Select initial values based on name or random values.
+        switch (Name.ToLower())
+        {
+            case "lunch":
+                StartTime = TimeSpan.FromHours(12);
+                Length = 40;
+                break;
+            case "welfare":
+                StartTime = TimeSpan.FromHours(14.5);
+                Length = 10;
+                break;
+            case "smoko":
+                StartTime = TimeSpan.FromHours(9.5);
+                Length = 20;
+                break;
+            default:
+                var rand = new Random();
+                StartTime = TimeSpan.FromHours(rand.Next(shift.StartTime.Hours + 1, shift.EndTime.Hours));
+                Length = rand.Next(1, 5) * 10;
+                break;
+        }
     }
 
     public Break(string name, DateTime startTime, int length)

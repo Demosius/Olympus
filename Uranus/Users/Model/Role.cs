@@ -48,6 +48,8 @@ public class Role
     public bool UpdateVehicle { get; set; }
     public bool DeleteVehicle { get; set; }
 
+    public bool ManageLockers { get; set; }
+
     // Whole database operations.
     public bool CopyDatabase { get; set; }  // Most
     public bool MoveDatabase { get; set; }  // Only db admin/manager.

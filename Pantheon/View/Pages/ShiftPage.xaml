@@ -66,6 +66,11 @@
         <!-- Actual Shift Listings -->
         <ListView ItemsSource="{Binding Shifts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem" BasedOn="{StaticResource ListBoxItemStyle}">
+                    <Setter Property="Focusable" Value="False"/>
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Border BorderBrush="{StaticResource ForegroundBrush}"
@@ -89,12 +94,19 @@
                                          HorizontalContentAlignment="Center"
                                          GotKeyboardFocus="TextBox_GotKeyboardFocus"
                                          LostMouseCapture="TextBox_LostMouseCapture"
-                                         LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                                         LostKeyboardFocus="TextBox_LostKeyboardFocus"
+                                         Width="70"/>
                             </StackPanel>
                             <Label Content="Breaks:" VerticalAlignment="Center" Margin="10,0,2,0"/>
-                            <ListView ItemsSource="{Binding Breaks, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            <ListView ItemsSource="{Binding BreaksObservable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                       VerticalAlignment="Center"
                                       SelectionMode="Single">
+
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem" BasedOn="{StaticResource ListBoxItemStyle}">
+                                        <Setter Property="Focusable" Value="False"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" MinHeight="20"
@@ -145,7 +157,8 @@
                                          HorizontalContentAlignment="Center"
                                          GotKeyboardFocus="TextBox_GotKeyboardFocus"
                                          LostMouseCapture="TextBox_LostMouseCapture"
-                                         LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                                         LostKeyboardFocus="TextBox_LostKeyboardFocus"
+                                         Width="70"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Vertical"
@@ -158,9 +171,13 @@
                             <Button Content="Save Changes" Height="30" Width="120"
                                     CommandParameter="{Binding}"
                                     Command="{Binding ElementName=VM, Path=SaveShiftCommand}"/>
+                            <Button Content="Employees" Height="30" Width="120"
+                                    CommandParameter="{Binding}"
+                                    Command="{Binding ElementName=VM, Path=LaunchShiftEmployeeWindowCommand}"/>
                             <Button Content="Delete" Height="30" Width="120"
                                     CommandParameter="{Binding}"
-                                    Command="{Binding ElementName=VM, Path=DeleteShiftCommand}"/>
+                                    Command="{Binding ElementName=VM, Path=DeleteShiftCommand}"
+                                    Margin="30,0,0,0"/>
                         </StackPanel>
                     </Border>
                 </DataTemplate>
