@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class CreateShiftCommand : ICommand
+public class CreateShiftCommand : ICommand
 {
     public ShiftPageVM VM { get; set; }
 

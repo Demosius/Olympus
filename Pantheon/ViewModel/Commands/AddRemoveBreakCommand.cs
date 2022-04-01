@@ -5,7 +5,7 @@ using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class AddRemoveBreakCommand : ICommand
+public class AddRemoveBreakCommand : ICommand
 {
     public ShiftPageVM VM { get; set; }
 

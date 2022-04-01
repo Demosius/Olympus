@@ -15,7 +15,7 @@ using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Pages;
 
-internal class ShiftPageVM : INotifyPropertyChanged, IDBInteraction
+public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction
 {
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }
@@ -196,7 +196,7 @@ internal class ShiftPageVM : INotifyPropertyChanged, IDBInteraction
     {
         if (Helios is null || Charon is null) return;
 
-        var employeeWindow = new ShiftEmployeeWindow(Helios, Charon, shift);
+        var employeeWindow = new ShiftEmployeeWindow(this, shift);
         employeeWindow.ShowDialog();
     }
 }

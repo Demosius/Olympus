@@ -1,5 +1,4 @@
-﻿using System.Windows.Controls;
-using Styx;
+﻿using Styx;
 using Uranus;
 
 namespace Pantheon.View.Pages;
@@ -7,7 +6,7 @@ namespace Pantheon.View.Pages;
 /// <summary>
 /// Interaction logic for RosterPage.xaml
 /// </summary>
-public partial class RosterPage : Page
+public partial class RosterPage
 {
     public RosterPage(Helios helios, Charon charon)
     {

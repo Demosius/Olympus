@@ -5,14 +5,69 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:vm="clr-namespace:Pantheon.ViewModel.Pages"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="RosterPage">
-    
+      d:DesignHeight="1080" d:DesignWidth="1200"
+      Title="EmployeePage">
+
     <Page.DataContext>
         <vm:RosterPageVM x:Name="VM"/>
     </Page.DataContext>
 
-    <Grid>
-        
-    </Grid>
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Dark Theme -->
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <DockPanel>
+        <DockPanel.Resources>
+            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="IsEditable" Value="True"/>
+                <Setter Property="MinWidth" Value="150"/>
+                <Setter Property="MaxWidth" Value="250"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="{x:Type DatePicker}">
+                <Setter Property="Margin" Value="5,0"/>
+                <Setter Property="MinHeight" Value="0"/>
+                <Setter Property="MinWidth" Value="150"/>
+                <Setter Property="MaxWidth" Value="250"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+                <Setter Property="Margin" Value="00"/>
+            </Style>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="MinWidth" Value="0"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+            </Style>
+        </DockPanel.Resources>
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+            <Label Content="Department:"/>
+            <ComboBox ItemsSource="{Binding Departments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedValue="{Binding SelectedDepartment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Label Content="Start Date:"/>
+            <DatePicker SelectedDate="{Binding MinDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Label Content="End Date:"/>
+            <DatePicker SelectedDate="{Binding MaxDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Label Content="Saturdays:"/>
+            <CheckBox IsChecked="{Binding ShowSaturdays, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Label Content="Sundays:"/>
+            <CheckBox IsChecked="{Binding ShowSundays, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Content="Get Roster" Width="140"/>
+            <Button Content="Generate Roster" Width="140"/>
+        </StackPanel>
+        <ItemsControl></ItemsControl>
+    </DockPanel>
 </Page>

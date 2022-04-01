@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Pantheon.ViewModel"
         mc:Ignorable="d"
-        Title="Shift Assignment" 
+        Title="Shift Management" 
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
@@ -51,6 +51,7 @@
             </Style>
         </StackPanel.Resources>
 
+        <!--Shift Eligibility -->      
         <Label Content="Shift Eligibility:"
                FontSize="16"
                Margin="0"/>
@@ -79,6 +80,7 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
         <Separator/>
+        <!-- Default Shift -->
         <StackPanel Orientation="Horizontal">
             <Label Content="Default Shift: "
                    VerticalAlignment="Center"
@@ -86,6 +88,11 @@
             <ComboBox ItemsSource="{Binding ShiftNames , Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       SelectedValue="{Binding SelectedShiftName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
+        <Separator/>
+        <!-- Shift Rules -->
+        
+
+        <!-- Buttons -->
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,10,0,0">

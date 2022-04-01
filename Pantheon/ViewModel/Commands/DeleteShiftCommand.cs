@@ -9,7 +9,7 @@ using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class DeleteShiftCommand : ICommand
+public class DeleteShiftCommand : ICommand
 {
     public ShiftPageVM VM { get; set; }
 

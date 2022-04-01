@@ -596,7 +596,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     public void LaunchEmployeeShiftWindow()
     {
         if (Helios is null || Charon is null || selectedEmployee is null) return;
-        var shiftWindow = new EmployeeShiftWindow(Helios, Charon, selectedEmployee);
+        var shiftWindow = new EmployeeShiftWindow(this, selectedEmployee);
 
         shiftWindow.ShowDialog();
     }

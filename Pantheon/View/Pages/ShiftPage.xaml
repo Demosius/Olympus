@@ -32,6 +32,7 @@
             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
                 <Setter Property="Margin" Value="5"/>
             </Style>
+
             <converter:BreakButtonConverter x:Key="BreakButtonConverter"/>
         </DockPanel.Resources>
 

@@ -19,7 +19,7 @@ public class Roster
     [ForeignKey(typeof(Shift))] public string ShiftName { get; set; }
     [ForeignKey(typeof(Department))] public string DepartmentName { get; set; }
     public DayOfWeek Day { get; set; }
-    public string Date { get; set; }
+    public DateTime Date { get; set; }
     public ERosterType RosterType { get; set; }
 
     [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
@@ -34,10 +34,9 @@ public class Roster
         ID = Guid.NewGuid();
         ShiftName = string.Empty;
         DepartmentName = string.Empty;
-        Date = string.Empty;
     }
 
-    public Roster(Guid id, int employeeID, string shiftName, string departmentName, DayOfWeek day, string date, ERosterType rosterType, Employee employee, Shift shift, Department department)
+    public Roster(Guid id, int employeeID, string shiftName, string departmentName, DayOfWeek day, DateTime date, ERosterType rosterType, Employee employee, Shift shift, Department department)
     {
         ID = id;
         EmployeeID = employeeID;

@@ -5,7 +5,7 @@ using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class LaunchShiftEmployeeWindowCommand : ICommand
+public class LaunchShiftEmployeeWindowCommand : ICommand
 {
     public ShiftPageVM VM { get; set; }
 

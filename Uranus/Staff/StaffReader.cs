@@ -160,6 +160,30 @@ public class StaffReader
             new Dictionary<string, Shift>(), new Dictionary<string, List<Break>>());
     }
 
+    public RosterDataSet RosterDataSet(Department department, DateTime startDate, DateTime endDate)
+    {
+        try
+        {
+            RosterDataSet? data = null;
+            Chariot.Database?.RunInTransaction(() =>
+            {
+                var employees = Chariot.PullObjectList<Employee>(e => e.DepartmentName == department.Name);
+                var rosters = Chariot.PullObjectList<Roster>(r =>
+                    r.DepartmentName == department.Name && r.Date >= startDate && r.Date <= endDate);
+                var shifts = Chariot.PullObjectList<Shift>(s => s.DepartmentName == department.Name);
+                var breaks = Chariot.PullObjectList<Break>();
+
+            });
+            if (data is not null) return data;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to pull Roster Data Set.");
+        }
+
+        return new RosterDataSet();
+    }
+
     public IEnumerable<EmployeeIcon> EmployeeIcons()
     {
         var icons = Chariot.PullObjectList<EmployeeIcon>();

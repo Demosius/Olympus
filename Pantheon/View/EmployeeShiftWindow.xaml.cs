@@ -1,4 +1,5 @@
-﻿using Styx;
+﻿using Pantheon.ViewModel.Pages;
+using Styx;
 using Uranus;
 using Uranus.Staff.Model;
 
@@ -9,9 +10,9 @@ namespace Pantheon.View;
 /// </summary>
 public partial class EmployeeShiftWindow
 {
-    public EmployeeShiftWindow(Helios helios, Charon charon, Employee employee)
+    public EmployeeShiftWindow(EmployeePageVM employeePageVM, Employee employee)
     {
         InitializeComponent();
-        VM.SetData(helios, charon, employee);
+        VM.SetData(employeePageVM, employee);
     }
 }

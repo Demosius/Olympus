@@ -6,7 +6,7 @@ using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class SaveShiftCommand : ICommand
+public class SaveShiftCommand : ICommand
 {
     public ShiftPageVM VM { get; set; }
 
