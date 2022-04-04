@@ -17,6 +17,7 @@ public class Shift : INotifyPropertyChanged
     [ForeignKey(typeof(Department))] public string DepartmentName { get; set; }
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
+    public int DailyTarget { get; set; }
 
     private bool def;
     public bool Default
@@ -39,7 +40,7 @@ public class Shift : INotifyPropertyChanged
     [ManyToMany(typeof(EmployeeShift), nameof(EmployeeShift.ShiftID), nameof(Employee.Shifts), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Employee> Employees { get; set; }
 
-    [OneToMany(nameof(Roster.ShiftName), nameof(Roster.Shift), CascadeOperations = CascadeOperation.CascadeInsert | CascadeOperation.CascadeRead)]
+    [OneToMany(nameof(Roster.ShiftID), nameof(Roster.Shift), CascadeOperations = CascadeOperation.CascadeInsert | CascadeOperation.CascadeRead)]
     public List<Roster> Rosters { get; set; }
 
     [OneToMany(nameof(Break.ShiftID), nameof(Break.Shift), CascadeOperations = CascadeOperation.CascadeInsert | CascadeOperation.CascadeRead)]

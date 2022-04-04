@@ -1,25 +1,23 @@
 ﻿using System;
 using System.Windows.Input;
 using Pantheon.ViewModel.Pages;
-using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Commands;
 
-public class DeleteShiftCommand : ICommand
+internal class GenerateRosterCommand : ICommand
 {
-    public ShiftPageVM VM { get; set; }
+    public RosterPageVM VM { get; set; }
 
-    public DeleteShiftCommand(ShiftPageVM vm) { VM = vm; }
+    public GenerateRosterCommand(RosterPageVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedDepartment is not null && (VM.Charon?.CanDeleteShift(VM.SelectedDepartment) ?? false);
+        return VM.SelectedDepartment is not null;
     }
 
     public void Execute(object? parameter)
     {
-        if (parameter is not Shift shift) return;
-        VM.DeleteShift(shift);
+        VM.GenerateRoster();
     }
 
     public event EventHandler? CanExecuteChanged

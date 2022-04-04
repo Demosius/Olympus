@@ -160,19 +160,26 @@ public class StaffReader
             new Dictionary<string, Shift>(), new Dictionary<string, List<Break>>());
     }
 
-    public RosterDataSet RosterDataSet(Department department, DateTime startDate, DateTime endDate)
+    public RosterDataSet RosterDataSet(string departmentName, DateTime startDate, DateTime endDate)
     {
         try
         {
             RosterDataSet? data = null;
             Chariot.Database?.RunInTransaction(() =>
             {
+                var department = Chariot.PullObject<Department>(departmentName);
+                if (department is null) return;
                 var employees = Chariot.PullObjectList<Employee>(e => e.DepartmentName == department.Name);
+                var earliestDate = startDate.AddDays(DayOfWeek.Sunday - startDate.DayOfWeek - 14);
+                var latestDate = endDate.AddDays(DayOfWeek.Saturday - endDate.DayOfWeek);
                 var rosters = Chariot.PullObjectList<Roster>(r =>
-                    r.DepartmentName == department.Name && r.Date >= startDate && r.Date <= endDate);
+                    r.DepartmentName == department.Name && r.Date >= earliestDate && r.Date <= latestDate);
                 var shifts = Chariot.PullObjectList<Shift>(s => s.DepartmentName == department.Name);
                 var breaks = Chariot.PullObjectList<Break>();
-
+                var employeeShiftConnections = Chariot.PullObjectList<EmployeeShift>();
+                var shiftRules = Chariot.PullObjectList<ShiftRule>();
+                data = new RosterDataSet(department, startDate, endDate, employees, rosters, shifts, breaks,
+                    employeeShiftConnections, shiftRules);
             });
             if (data is not null) return data;
         }
