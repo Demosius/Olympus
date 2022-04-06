@@ -19,6 +19,9 @@ public class Roster
     [ForeignKey(typeof(Employee))] public int EmployeeID { get; set; }
     [ForeignKey(typeof(Shift))] public string ShiftID { get; set; }
     [ForeignKey(typeof(Department))] public string DepartmentName { get; set; }
+    [ForeignKey(typeof(DailyRoster))] public Guid DailyRosterID { get; set; }
+    [ForeignKey(typeof(EmployeeRoster))] public Guid EmployeeRosterID { get; set; }
+    [ForeignKey(typeof(DepartmentRoster))] public Guid DepartmentRosterID { get; set; }
     public DayOfWeek Day { get; set; }
     public DateTime Date { get; set; }
     public TimeSpan StartTime { get; set; }
@@ -31,6 +34,13 @@ public class Roster
     public Shift? Shift { get; set; }
     [ManyToOne(nameof(DepartmentName), nameof(Model.Department.Rosters), CascadeOperations = CascadeOperation.CascadeInsert | CascadeOperation.CascadeRead)]
     public Department? Department { get; set; }
+    [ManyToOne(nameof(DailyRosterID), nameof(Model.DailyRoster.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public DailyRoster? DailyRoster { get; set; }
+    [ManyToOne(nameof(EmployeeRosterID), nameof(Model.EmployeeRoster.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public EmployeeRoster? EmployeeRoster { get; set; }
+    [ManyToOne(nameof(DepartmentRosterID), nameof(Model.DepartmentRoster.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public DepartmentRoster? DepartmentRoster { get; set; }
+
 
     public Roster()
     {
@@ -69,7 +79,7 @@ public class Roster
 
         Department = department;
         DepartmentName = department.Name;
-        
+
         Date = date;
         Day = Date.DayOfWeek;
     }

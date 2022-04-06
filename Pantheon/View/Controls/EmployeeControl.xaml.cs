@@ -1,28 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿namespace Pantheon.View.Controls;
 
-namespace Pantheon.View.Controls
+/// <summary>
+/// Interaction logic for EmployeeControl.xaml
+/// </summary>
+public partial class EmployeeControl
 {
-    /// <summary>
-    /// Interaction logic for EmployeeControl.xaml
-    /// </summary>
-    public partial class EmployeeControl : UserControl
+    public EmployeeControl()
     {
-        public EmployeeControl()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

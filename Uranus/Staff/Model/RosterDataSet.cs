@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 
 namespace Uranus.Staff.Model;
@@ -19,7 +18,8 @@ public class RosterDataSet
     public IEnumerable<EmployeeShift> EmpShiftConnections { get; set; }
     public Dictionary<int, List<ShiftRule>> ShiftRuleDict { get; set; }
 
-    public DataTable? ViewTable { get; set; }
+    public List<EmployeeRoster> EmployeeRosters { get; set; }
+    public List<DailyRoster> DailyRosters { get; set; }
 
     public RosterDataSet()
     {
@@ -29,11 +29,13 @@ public class RosterDataSet
         Rosters = new Dictionary<(int, DateTime), Roster>();
         EmpShiftConnections = new List<EmployeeShift>();
         ShiftRuleDict = new Dictionary<int, List<ShiftRule>>();
+        EmployeeRosters = new List<EmployeeRoster>();
+        DailyRosters = new List<DailyRoster>();
     }
 
     public RosterDataSet(Department department, DateTime startDate, DateTime endDate, IEnumerable<Employee> employees,
-        IEnumerable<Roster> rosters, IEnumerable<Shift> shifts, IEnumerable<Break> breaks, IEnumerable<EmployeeShift> esCons,
-        IEnumerable<ShiftRule> shiftRules)
+        IEnumerable<Roster> rosters, IEnumerable<DailyRoster> dailyRosters, IEnumerable<EmployeeRoster> employeeRosters,
+        IEnumerable<Shift> shifts, IEnumerable<Break> breaks, IEnumerable<EmployeeShift> esCons, IEnumerable<ShiftRule> shiftRules)
     {
         Department = department;
         StartDate = startDate;
@@ -45,8 +47,10 @@ public class RosterDataSet
         EmpShiftConnections = esCons;
         ShiftRuleDict = shiftRules.GroupBy(r => r.EmployeeID).ToDictionary(g => g.Key, g => g.ToList());
 
+        EmployeeRosters = employeeRosters.ToList();
+        DailyRosters = dailyRosters.ToList();
+
         SetRelationships();
-        SetDataTable();
     }
 
     /// <summary>
@@ -126,49 +130,6 @@ public class RosterDataSet
                 roster.Shift = shift;
                 shift.Rosters.Add(roster);
             }
-        }
-    }
-
-    /// <summary>
-    /// For every employee/date combination that does not exist, creates a new roster, and for each that is missing
-    /// a shift object, assigns one according to predetermined rules and logic.
-    /// </summary>
-    /// <param name="includeSaturdays"></param>
-    /// <param name="includeSundays"></param>
-    public void GenerateRosters(bool includeSaturdays, bool includeSundays)
-    {
-        // TODO: Generate rosters from withing roster data set.
-    }
-
-    public void SetDataTable()
-    {
-        ViewTable = new DataTable("Rosters");
-
-        // Set columns.
-        ViewTable.Columns.Add("Employees");
-        for (var i = 0; i <= (EndDate - StartDate).TotalDays; i++)
-        {
-            var date = StartDate.AddDays(i);
-            ViewTable.Columns.Add($"{date.DayOfWeek}\n{date:dd-MMM-yyyy}");
-        }
-
-        // Set rows and data.
-        foreach (var (_, employee) in Employees)
-        {
-            var row = ViewTable.NewRow();
-            row[0] = employee;
-            for (var i = 0; i <= (EndDate - StartDate).TotalDays; i++)
-            {
-                var date = StartDate.AddDays(i);
-                if (!Rosters.TryGetValue((employee.ID, date), out var roster))
-                {
-                    roster = Department is null ? new Roster(employee, date) : new Roster(Department, employee, date);
-                    Rosters.Add((employee.ID, date), roster);
-                }
-
-                row[i+1] = roster;
-            }
-            ViewTable.Rows.Add(row);
         }
     }
 }

@@ -200,6 +200,8 @@ public class Employee : INotifyPropertyChanged
     public List<ShiftEntry> ShiftEntries { get; set; }
     [OneToMany(nameof(Roster.EmployeeID), nameof(Roster.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Roster> Rosters { get; set; }
+    [OneToMany(nameof(EmployeeRoster.EmployeeID), nameof(EmployeeRoster.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<EmployeeRoster> EmployeeRosters { get; set; }
     [OneToMany(nameof(ClockEvent.EmployeeID), nameof(ClockEvent.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<ClockEvent> ClockEvents { get; set; }
     [OneToMany(nameof(Model.TagUse.TempTagRFID), nameof(Model.TagUse.TempTag), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
@@ -237,6 +239,7 @@ public class Employee : INotifyPropertyChanged
         Reports = new List<Employee>();
         ShiftEntries = new List<ShiftEntry>();
         Rosters = new List<Roster>();
+        EmployeeRosters = new List<EmployeeRoster>();
         ClockEvents = new List<ClockEvent>();
         TagUse = new List<TagUse>();
     }
@@ -254,7 +257,8 @@ public class Employee : INotifyPropertyChanged
         EmployeeAvatar? avatar, Clan? clan, EmployeeIcon? icon, Locker? locker, Licence? licence,
         List<Vehicle> vehicles, List<Shift> shifts, List<Department> departmentsCanWorkIn,
         List<Project> projects, List<EmployeeInductionReference> inductionReferences, List<ShiftRule> rules,
-        List<Employee> reports, List<ShiftEntry> shiftEntries, List<Roster> rosters, List<ClockEvent> clockEvents,
+        List<Employee> reports, List<ShiftEntry> shiftEntries, List<Roster> rosters, List<EmployeeRoster> employeeRosters,
+        List<ClockEvent> clockEvents,
         List<TagUse> tagUse)
     {
         ID = id;
@@ -296,6 +300,7 @@ public class Employee : INotifyPropertyChanged
         Reports = reports;
         ShiftEntries = shiftEntries;
         Rosters = rosters;
+        EmployeeRosters = employeeRosters;
         ClockEvents = clockEvents;
         TagUse = tagUse;
     }

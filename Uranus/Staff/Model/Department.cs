@@ -26,6 +26,12 @@ public class Department : IComparable
     public List<Role> Roles { get; set; }
     [OneToMany(nameof(Roster.DepartmentName), nameof(Roster.Department), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Roster> Rosters { get; set; }
+    [OneToMany(nameof(DepartmentRoster.DepartmentName), nameof(DepartmentRoster.Department), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<DepartmentRoster> DepartmentRosters { get; set; }
+    [OneToMany(nameof(DailyRoster.DepartmentName), nameof(DailyRoster.Department), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<DailyRoster> DailyRosters { get; set; }
+    [OneToMany(nameof(EmployeeRoster.DepartmentName), nameof(EmployeeRoster.Department), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<EmployeeRoster> EmployeeRosters { get; set; }
     [OneToMany(nameof(OverDepartmentName), nameof(OverDepartment), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Department> SubDepartments { get; set; }
 
@@ -47,6 +53,9 @@ public class Department : IComparable
         Clans = new List<Clan>();
         Roles = new List<Role>();
         Rosters = new List<Roster>();
+        DailyRosters = new List<DailyRoster>();
+        EmployeeRosters = new List<EmployeeRoster>();
+        DepartmentRosters = new List<DepartmentRoster>();
         SubDepartments = new List<Department>();
         EmployeesCanLoan = new List<Employee>();
         Projects = new List<Project>();
@@ -58,9 +67,9 @@ public class Department : IComparable
     }
 
     public Department(string name, string overDepartmentName, string payPoint,
-        List<Shift> shifts, List<Employee> employees, List<Clan> clans,
-        List<Role> roles, List<Roster> rosters, List<Department> subDepartments,
-        List<Employee> employeesCanLoan, List<Project> projects)
+        List<Shift> shifts, List<Employee> employees, List<Clan> clans, List<Role> roles,
+        List<Roster> rosters, List<DailyRoster> dailyRosters, List<EmployeeRoster> employeeRosters, List<DepartmentRoster> departmentRosters,
+        List<Department> subDepartments, List<Employee> employeesCanLoan, List<Project> projects)
     {
         Name = name;
         OverDepartmentName = overDepartmentName;
@@ -70,6 +79,9 @@ public class Department : IComparable
         Clans = clans;
         Roles = roles;
         Rosters = rosters;
+        DailyRosters = dailyRosters;
+        EmployeeRosters = employeeRosters;
+        DepartmentRosters = departmentRosters;
         SubDepartments = subDepartments;
         EmployeesCanLoan = employeesCanLoan;
         Projects = projects;

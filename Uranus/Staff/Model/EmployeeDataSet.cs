@@ -11,6 +11,7 @@ public class EmployeeDataSet
 {
     public Dictionary<int, Employee> Employees { get; set; }
     public Dictionary<string, Department> Departments { get; set; }
+    public Dictionary<string, List<DepartmentRoster>> DepartmentRosters { get; set; }
     public Dictionary<string, Role> Roles { get; set; }
     public Dictionary<string, Clan> Clans { get; set; }
     public Dictionary<string, EmployeeIcon> EmployeeIcons { get; set; }
@@ -21,13 +22,32 @@ public class EmployeeDataSet
     public IEnumerable<string> PayPoints { get; set; }
     public IEnumerable<Employee> Managers { get; set; }
 
-    public EmployeeDataSet(IEnumerable<Employee> employees, IEnumerable<Department> departments, IEnumerable<Clan> clans,
-        IEnumerable<Role> roles, IEnumerable<EmployeeIcon> icons, IEnumerable<EmployeeAvatar> avatars,
+    public EmployeeDataSet()
+    {
+        Employees = new Dictionary<int, Employee>();
+        Departments = new Dictionary<string, Department>();
+        Roles = new Dictionary<string, Role>();
+        DepartmentRosters = new Dictionary<string, List<DepartmentRoster>>();
+        Clans = new Dictionary<string, Clan>();
+        EmployeeIcons = new Dictionary<string, EmployeeIcon>();
+        EmployeeAvatars = new Dictionary<string, EmployeeAvatar>();
+        Shifts = new Dictionary<string, Shift>();
+        BreakDict = new Dictionary<string, List<Break>>();
+        Locations = new List<string>();
+        PayPoints = new List<string>();
+        Managers = new List<Employee>();
+    }
+
+    public EmployeeDataSet(IEnumerable<Employee> employees, IEnumerable<Department> departments, IEnumerable<DepartmentRoster> departmentRosters,
+        IEnumerable<Clan> clans, IEnumerable<Role> roles, IEnumerable<EmployeeIcon> icons, IEnumerable<EmployeeAvatar> avatars,
         IEnumerable<Shift> shifts, IEnumerable<Break> breaks)
     {
         var empList = employees.ToList();
         Employees = empList.ToDictionary(e => e.ID, e => e);
         Departments = departments.ToDictionary(d => d.Name, d => d);
+        DepartmentRosters = departmentRosters
+            .GroupBy(dr => dr.DepartmentName)
+            .ToDictionary(g => g.Key, g => g.ToList());
         Clans = clans.ToDictionary(c => c.Name, c => c);
         Roles = roles.ToDictionary(r => r.Name, r => r);
         EmployeeIcons = icons.ToDictionary(i => i.Name, i => i);
@@ -43,13 +63,14 @@ public class EmployeeDataSet
         SetRelationships();
     }
 
-    public EmployeeDataSet(Dictionary<int, Employee> employees, Dictionary<string, Department> departments, Dictionary<string,
-        Clan> clans, Dictionary<string, Role> roles,
+    public EmployeeDataSet(Dictionary<int, Employee> employees, Dictionary<string, Department> departments,
+        Dictionary<string, List<DepartmentRoster>> departmentRosters, Dictionary<string, Clan> clans, Dictionary<string, Role> roles,
         Dictionary<string, EmployeeIcon> employeeIcons, Dictionary<string, EmployeeAvatar> employeeAvatars,
         Dictionary<string, Shift> shifts, Dictionary<string, List<Break>> breakDict)
     {
         Employees = employees;
         Departments = departments;
+        DepartmentRosters = departmentRosters;
         Clans = clans;
         Roles = roles;
         EmployeeIcons = employeeIcons;
@@ -102,6 +123,15 @@ public class EmployeeDataSet
             {
                 department.OverDepartment = overDepartment;
                 overDepartment.SubDepartments.Add(department);
+            }
+
+            if (DepartmentRosters.TryGetValue(department.Name, out var rosters))
+            {
+                department.DepartmentRosters = rosters;
+                foreach (var departmentRoster in rosters)
+                {
+                    departmentRoster.Department = department;
+                }
             }
 
             if (Employees.TryGetValue(department.HeadID, out var employee))

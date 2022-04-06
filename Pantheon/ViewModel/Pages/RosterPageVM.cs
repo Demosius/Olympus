@@ -1,4 +1,5 @@
 ﻿using Pantheon.Properties;
+using Pantheon.ViewModel.Commands;
 using Styx;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,6 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Pantheon.ViewModel.Commands;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -155,18 +155,19 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 
     public void GetRoster()
     {
-        if (SelectedDepartment is null ||
+        /*if (SelectedDepartment is null ||
             Helios is null ||
             (RosterDataSet is not null && RosterDataSet.Department == SelectedDepartment &&
              RosterDataSet.StartDate == MinDate && RosterDataSet.EndDate == MaxDate)) return;
 
         RosterDataSet = Helios.StaffReader.RosterDataSet(SelectedDepartment.Name, MinDate, MaxDate);
         RosterTable = RosterDataSet.ViewTable;
+        GenerateWeeklies();*/
     }
 
     public void GenerateRoster()
     {
-        if (Helios is null || SelectedDepartment is null) return;
+        /*if (Helios is null || SelectedDepartment is null) return;
 
         if (RosterDataSet?.Department is null ||
             RosterDataSet.Department != SelectedDepartment ||
@@ -177,7 +178,19 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 
         RosterDataSet.GenerateRosters(ShowSaturdays, ShowSundays);
         RosterTable = RosterDataSet.ViewTable;
+        GenerateWeeklies();*/
     }
+
+    /*private void GenerateWeeklies()
+    {
+        if (RosterDataSet?.ViewTable is null) return;
+
+        foreach (DataRow viewTableRow in RosterDataSet.ViewTable.Rows)
+        {
+            WeeklyRosters.Add(new WeeklyRoster((Employee) viewTableRow[0], (Roster) viewTableRow[1], (Roster) viewTableRow[2],
+                (Roster) viewTableRow[3], (Roster) viewTableRow[4], (Roster) viewTableRow[5], (Roster) viewTableRow[6], (Roster) viewTableRow[7]));
+        }
+    }*/
 
     public void RepairData()
     {

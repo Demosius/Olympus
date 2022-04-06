@@ -42,10 +42,10 @@ public class Shift : INotifyPropertyChanged
 
     [OneToMany(nameof(Roster.ShiftID), nameof(Roster.Shift), CascadeOperations = CascadeOperation.CascadeInsert | CascadeOperation.CascadeRead)]
     public List<Roster> Rosters { get; set; }
-
+    [OneToMany(nameof(EmployeeRoster.ShiftID), nameof(EmployeeRoster.Shift), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<EmployeeRoster> EmployeeRosters { get; set; }
     [OneToMany(nameof(Break.ShiftID), nameof(Break.Shift), CascadeOperations = CascadeOperation.CascadeInsert | CascadeOperation.CascadeRead)]
     public List<Break> Breaks { get; set; }
-
     [OneToMany(nameof(Employee.DefaultShiftID), nameof(Employee.DefaultShift), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Employee> DefaultEmployees { get; set; }
 
@@ -87,6 +87,7 @@ public class Shift : INotifyPropertyChanged
         DepartmentName = string.Empty;
         Employees = new List<Employee>();
         Rosters = new List<Roster>();
+        EmployeeRosters = new List<EmployeeRoster>();
         Breaks = new List<Break>();
         BreaksObservable = new ObservableCollection<Break>(Breaks);
         DefaultEmployees = new List<Employee>();
@@ -101,6 +102,7 @@ public class Shift : INotifyPropertyChanged
         ID = $"{DepartmentName}|{Name}";
         Employees = new List<Employee>();
         Rosters = new List<Roster>();
+        EmployeeRosters = new List<EmployeeRoster>();
 
         // Select initial times.
         StartTime = TimeSpan.FromHours(8);
@@ -123,6 +125,7 @@ public class Shift : INotifyPropertyChanged
         Department = department;
         Employees = employees;
         Rosters = rosters;
+        EmployeeRosters = new List<EmployeeRoster>();
         Breaks = breaks;
         BreaksObservable = new ObservableCollection<Break>(Breaks);
         DefaultEmployees = new List<Employee>();

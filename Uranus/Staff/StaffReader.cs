@@ -140,13 +140,14 @@ public class StaffReader
             {
                 var employees = Chariot.PullObjectList<Employee>();
                 var departments = Chariot.PullObjectList<Department>();
+                var departmentRosters = Chariot.PullObjectList<DepartmentRoster>();
                 var roles = Chariot.PullObjectList<Role>();
                 var clans = Chariot.PullObjectList<Clan>();
                 var icons = EmployeeIcons();
                 var avatars = EmployeeAvatars();
                 var shifts = Chariot.PullObjectList<Shift>();
                 var breaks = Chariot.PullObjectList<Break>();
-                data = new EmployeeDataSet(employees, departments, clans, roles, icons, avatars, shifts, breaks);
+                data = new EmployeeDataSet(employees, departments, departmentRosters, clans, roles, icons, avatars, shifts, breaks);
             });
             if (data is not null) return data;
         }
@@ -154,10 +155,72 @@ public class StaffReader
         {
             Log.Error(ex, "Failed to pull the EmployeeDataSet");
         }
-        return new EmployeeDataSet(new Dictionary<int, Employee>(), new Dictionary<string, Department>(),
-            new Dictionary<string, Clan>(), new Dictionary<string, Role>(),
-            new Dictionary<string, EmployeeIcon>(), new Dictionary<string, EmployeeAvatar>(),
-            new Dictionary<string, Shift>(), new Dictionary<string, List<Break>>());
+        return new EmployeeDataSet();
+    }
+
+    public DepartmentRoster? DepartmentRoster(string rosterName, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<DepartmentRoster>(rosterName, pullType);
+
+    public IEnumerable<DepartmentRoster?> DepartmentRosters(string departmentName) 
+        => Chariot.Database?.Query<DepartmentRoster>("SELECT * FROM DepartmentRoster WHERE DepartmentName = ?;", departmentName) ?? new List<DepartmentRoster>();
+
+    public IEnumerable<DepartmentRoster> DepartmentRosters(Expression<Func<DepartmentRoster, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
+        => Chariot.PullObjectList(filter, pullType);
+
+    public void FillDepartmentRoster(ref DepartmentRoster departmentRoster)
+    {
+        try
+        {
+            var departmentName = departmentRoster.DepartmentName;
+
+            var startDate = departmentRoster.StartDate;
+            // startDate should be monday, but it might not be, so account for that possibility.
+            // Earliest date should cover up to 2 weeks before hand.
+            var earliestDate = startDate.AddDays(DayOfWeek.Monday - startDate.DayOfWeek - 14);
+            // Latest date should be the sunday after the earliest.
+            var latestDate = earliestDate.AddDays(DayOfWeek.Saturday - earliestDate.DayOfWeek + 1);
+
+            // Declare variables.
+            List<Employee>? employees = null;
+            List<Roster>? rosters = null;
+            List<DailyRoster>? dailyRosters = null;
+            List<EmployeeRoster>? employeeRosters = null;
+            List<Shift>? shifts = null;
+            List<Break>? breaks = null;
+            List<EmployeeShift>? employeeShiftConnections = null;
+            List<ShiftRule>? shiftRules = null;
+
+            Chariot.Database?.RunInTransaction(() =>
+            {
+                employees = Chariot.PullObjectList<Employee>(e => e.DepartmentName == departmentName);
+                
+                rosters = Chariot.PullObjectList<Roster>(r =>
+                    r.DepartmentName == departmentName && r.Date >= earliestDate && r.Date <= latestDate);
+                dailyRosters = Chariot.PullObjectList<DailyRoster>(r =>
+                        r.DepartmentName == departmentName && r.Date >= earliestDate && r.Date <= latestDate);
+                employeeRosters = Chariot.PullObjectList<EmployeeRoster>(r =>
+                    r.DepartmentName == departmentName && r.StartDate >= earliestDate && r.StartDate <= latestDate);
+                shifts = Chariot.PullObjectList<Shift>(s => s.DepartmentName == departmentName);
+                breaks = Chariot.PullObjectList<Break>();
+                employeeShiftConnections = Chariot.PullObjectList<EmployeeShift>();
+                shiftRules = Chariot.PullObjectList<ShiftRule>();
+            });
+
+            // Assign variables that may have been missed.
+            employees ??= new List<Employee>();
+            rosters ??= new List<Roster>();
+            dailyRosters ??= new List<DailyRoster>();
+            employeeRosters ??= new List<EmployeeRoster>();
+            shifts ??= new List<Shift>();
+            breaks ??= new List<Break>();
+            employeeShiftConnections ??= new List<EmployeeShift>();
+            shiftRules ??= new List<ShiftRule>();
+
+            departmentRoster.SetData(employees, rosters, dailyRosters, employeeRosters, shifts, breaks, employeeShiftConnections, shiftRules);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to pull Roster Data Set.");
+        }
     }
 
     public RosterDataSet RosterDataSet(string departmentName, DateTime startDate, DateTime endDate)
@@ -174,12 +237,16 @@ public class StaffReader
                 var latestDate = endDate.AddDays(DayOfWeek.Saturday - endDate.DayOfWeek);
                 var rosters = Chariot.PullObjectList<Roster>(r =>
                     r.DepartmentName == department.Name && r.Date >= earliestDate && r.Date <= latestDate);
+                var dailyRosters = Chariot.PullObjectList<DailyRoster>(r =>
+                    r.DepartmentName == departmentName && r.Date >= earliestDate && r.Date <= latestDate);
+                var employeeRosters = Chariot.PullObjectList<EmployeeRoster>(r =>
+                    r.DepartmentName == departmentName && r.StartDate >= earliestDate && r.StartDate <= latestDate);
                 var shifts = Chariot.PullObjectList<Shift>(s => s.DepartmentName == department.Name);
                 var breaks = Chariot.PullObjectList<Break>();
                 var employeeShiftConnections = Chariot.PullObjectList<EmployeeShift>();
                 var shiftRules = Chariot.PullObjectList<ShiftRule>();
-                data = new RosterDataSet(department, startDate, endDate, employees, rosters, shifts, breaks,
-                    employeeShiftConnections, shiftRules);
+                data = new RosterDataSet(department, startDate, endDate, employees, rosters, dailyRosters, employeeRosters,
+                    shifts, breaks, employeeShiftConnections, shiftRules);
             });
             if (data is not null) return data;
         }
