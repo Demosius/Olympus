@@ -4,20 +4,20 @@ using Pantheon.ViewModel.Pages;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class GenerateRosterCommand : ICommand
+internal class LoadRosterCommand : ICommand
 {
     public RosterPageVM VM { get; set; }
 
-    public GenerateRosterCommand(RosterPageVM vm) { VM = vm; }
+    public LoadRosterCommand(RosterPageVM vm ) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedRoster is not null;
+        return VM.SelectedDepartment is not null;
     }
 
     public void Execute(object? parameter)
     {
-        VM.GenerateRoster();
+        VM.LoadRoster();
     }
 
     public event EventHandler? CanExecuteChanged

@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Windows.Input;
-using Pantheon.ViewModel.Pages;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class GetRosterCommand : ICommand
+internal class RefreshPageCommand : ICommand
 {
-    public RosterPageVM VM { get; set; }
+    public PantheonVM VM { get; set; }
 
-    public GetRosterCommand(RosterPageVM vm ) { VM = vm; }
+    public RefreshPageCommand(PantheonVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedDepartment is not null;
+        return true;
     }
 
     public void Execute(object? parameter)
     {
-        VM.GetRoster();
+        VM.RefreshPage();
     }
 
     public event EventHandler? CanExecuteChanged

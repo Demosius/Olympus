@@ -1,6 +1,7 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
+using Microsoft.VisualBasic;
 
 namespace Uranus.Staff.Model;
 
@@ -13,7 +14,7 @@ public enum ERosterType
     PublicHoliday
 }
 
-public class Roster
+public class Roster : IEquatable<Roster>, IComparable<Roster>
 {
     [PrimaryKey] public Guid ID { get; set; }
     [ForeignKey(typeof(Employee))] public int EmployeeID { get; set; }
@@ -27,6 +28,22 @@ public class Roster
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
     public ERosterType RosterType { get; set; }
+
+    private bool atWork;
+    public bool AtWork
+    {
+        get => atWork;
+        set
+        {
+            var wasAtWork = atWork;
+            atWork = value;
+
+            if (atWork && !wasAtWork)
+                AddCount();
+            else if (!atWork && wasAtWork)
+                DropCount();
+        }
+    }
 
     [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Employee? Employee { get; set; }
@@ -84,6 +101,22 @@ public class Roster
         Day = Date.DayOfWeek;
     }
 
+    public Roster(Department department, DepartmentRoster departmentRoster, EmployeeRoster employeeRoster, Employee employee, DateTime date)
+    {
+        ID = Guid.NewGuid();
+        Department = department;
+        DepartmentName = Department.Name;
+        DepartmentRoster = departmentRoster;
+        DepartmentRosterID = DepartmentRoster.ID;
+        EmployeeRoster = employeeRoster;
+        EmployeeRosterID = EmployeeRoster.ID;
+        Employee = employee;
+        EmployeeID = Employee.ID;
+        Date = date;
+        Day = Date.DayOfWeek;
+        ShiftID = string.Empty;
+    }
+
     public Roster(Guid id, int employeeID, string shiftID, string departmentName, DayOfWeek day, DateTime date, ERosterType rosterType, Employee employee, Shift shift, Department department)
     {
         ID = id;
@@ -98,17 +131,54 @@ public class Roster
         Department = department;
     }
 
-    public void SetShift(Shift newShift)
+    public void SetShift(Shift newShift, bool working = true)
     {
+        if (AtWork) DropCount();
+
         Shift = newShift;
         ShiftID = newShift.ID;
         StartTime = newShift.StartTime;
         EndTime = newShift.EndTime;
+
+        if (AtWork) AddCount();
+
+        AtWork = working;
     }
 
     public void SetDate(DateTime date)
     {
         Date = date;
         Day = Date.DayOfWeek;
+    }
+
+
+    /// <summary>
+    /// Drop the shift-counters for Department and Daily before removing current shift.
+    /// </summary>
+    private void DropCount()
+    {
+        //DepartmentRoster?.DropCount(ShiftID);
+        DailyRoster?.DropCount(ShiftID);
+    }
+
+    /// <summary>
+    /// Increase the shift-counters for Department and Daily according to the current shift.
+    /// </summary>
+    private void AddCount()
+    {
+        //DepartmentRoster?.AddCount(ShiftID);
+        DailyRoster?.AddCount(ShiftID);
+    }
+
+    public bool Equals(Roster? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return ID == other.ID;
+    }
+
+    public int CompareTo(Roster? other)
+    {
+        return other is null ? 1 : Date.CompareTo(other.Date);
     }
 }

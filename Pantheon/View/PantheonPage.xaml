@@ -31,6 +31,13 @@
                     Command="{Binding ShowShiftPageCommand}"/>
             <Button Content="Roster Management"
                     Command="{Binding ShowRosterPageCommand}"/>
+            <Button Margin="5"
+                    Command="{Binding RefreshPageCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="../Resources/refresh.png"/>
+                    <Label Content="Refresh Data"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
         <Frame Height="Auto" 
                BorderBrush="White"

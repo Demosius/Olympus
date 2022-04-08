@@ -166,7 +166,7 @@ public class StaffReader
     public IEnumerable<DepartmentRoster> DepartmentRosters(Expression<Func<DepartmentRoster, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
         => Chariot.PullObjectList(filter, pullType);
 
-    public void FillDepartmentRoster(ref DepartmentRoster departmentRoster)
+    public void FillDepartmentRoster(DepartmentRoster departmentRoster)
     {
         try
         {

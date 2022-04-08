@@ -40,8 +40,48 @@ public class EmployeeRoster
 
     public EmployeeRoster()
     {
+        ID = Guid.NewGuid();
         DepartmentName = string.Empty;
         ShiftID = string.Empty;
         Rosters = new List<Roster>();
+    }
+
+    public EmployeeRoster(Department department, DepartmentRoster departmentRoster, Employee employee, DateTime startDate)
+    {
+        ID = Guid.NewGuid();
+        Department = department;
+        DepartmentName = Department.Name;
+        Employee = employee;
+        EmployeeID = Employee.ID;
+        StartDate = startDate;
+        ShiftID = string.Empty;
+        Rosters = new List<Roster>();
+    }
+
+    /// <summary>
+    /// Sets teh shift to the employee's default if they have one.
+    /// </summary>
+    public void SetDefault(bool saturdays = false, bool sundays = false)
+    {
+        var shift = Employee?.DefaultShift;
+        if (shift is null) return;
+
+        SetShift(shift, saturdays, sundays);
+    }
+
+    public void SetShift(Shift shift, bool saturdays = false, bool sundays = false)
+    {
+        DepartmentRoster?.DropCount(ShiftID);
+        Shift = shift;
+        ShiftID = Shift.ID;
+        DepartmentRoster?.AddCount(ShiftID);
+
+        foreach (var roster in Rosters)
+        {
+            if (roster.Day == DayOfWeek.Saturday && !saturdays || roster.Day == DayOfWeek.Sunday && !sundays)
+                roster.AtWork = false;
+            else 
+                roster.SetShift(shift);
+        }
     }
 }

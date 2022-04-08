@@ -38,7 +38,7 @@ internal class PantheonVM : INotifyPropertyChanged
     public ShowShiftPageCommand ShowShiftPageCommand { get; set; }
     public ShowEmployeePageCommand ShowEmployeePageCommand { get; set; }
     public ShowRosterPageCommand ShowRosterPageCommand { get; set; }
-
+    public RefreshPageCommand RefreshPageCommand { get; set; }
 
     #endregion
 
@@ -49,6 +49,7 @@ internal class PantheonVM : INotifyPropertyChanged
         ShowEmployeePageCommand = new ShowEmployeePageCommand(this);
         ShowShiftPageCommand = new ShowShiftPageCommand(this);
         ShowRosterPageCommand = new ShowRosterPageCommand(this);
+        RefreshPageCommand = new RefreshPageCommand(this);
     }
 
     public void SetDataSources(Charon charon, Helios helios)
@@ -70,6 +71,13 @@ internal class PantheonVM : INotifyPropertyChanged
     public void ShowRosterPage()
     {
         CurrentPage = RosterPage ??= new RosterPage(Helios!, Charon!);
+    }
+
+    public void RefreshPage()
+    {
+        if (CurrentPage is EmployeePage) EmployeePage!.VM.RefreshData();
+        if (CurrentPage is ShiftPage) ShiftPage!.VM.RefreshData();
+        if (CurrentPage is RosterPage) RosterPage!.VM.RefreshData();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

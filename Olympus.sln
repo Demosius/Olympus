@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31205.134
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Olympus", "Olympus\Olympus.csproj", "{7415656B-5EF6-4FF7-927F-F90DFDD5E694}"
 EndProject
@@ -22,6 +22,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aion", "Aion\Aion.csproj", "{2D47D9D2-546A-446F-A634-DE4D9D64A929}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AionClock", "AionClock\AionClock.csproj", "{D4ACC0F3-D31F-4372-9E32-C4EB864EABB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gigantomachy", "Gigantomachy\Gigantomachy.csproj", "{3A70FF33-4999-4974-9AB8-3A1947B4393B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,6 +92,12 @@ Global
 		{D4ACC0F3-D31F-4372-9E32-C4EB864EABB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4ACC0F3-D31F-4372-9E32-C4EB864EABB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4ACC0F3-D31F-4372-9E32-C4EB864EABB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A70FF33-4999-4974-9AB8-3A1947B4393B}.ClockDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A70FF33-4999-4974-9AB8-3A1947B4393B}.ClockDebug|Any CPU.Build.0 = Debug|Any CPU
+		{3A70FF33-4999-4974-9AB8-3A1947B4393B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A70FF33-4999-4974-9AB8-3A1947B4393B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A70FF33-4999-4974-9AB8-3A1947B4393B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A70FF33-4999-4974-9AB8-3A1947B4393B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

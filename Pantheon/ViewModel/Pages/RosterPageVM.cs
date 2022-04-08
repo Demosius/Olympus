@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Pantheon.View;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -67,6 +68,7 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         {
             selectedDepartment = value;
             OnPropertyChanged(nameof(SelectedDepartment));
+            Rosters = new ObservableCollection<DepartmentRoster>(value is not null ? value.DepartmentRosters : new List<DepartmentRoster>());
         }
     }
 
@@ -103,14 +105,38 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         }
     }
 
+    private ObservableCollection<DepartmentRoster> rosters;
+    public ObservableCollection<DepartmentRoster> Rosters
+    {
+        get => rosters;
+        set
+        {
+            rosters = value;
+            OnPropertyChanged(nameof(Rosters));
+        }
+    }
+
+    private DepartmentRoster ? selectedRoster;
+    public DepartmentRoster? SelectedRoster
+    {
+        get => selectedRoster;
+        set
+        {
+            selectedRoster = value;
+            OnPropertyChanged(nameof(SelectedRoster));
+            if (value is not null) LoadRoster();
+        }
+    }
+
     #endregion
 
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
     public RepairDataCommand RepairDataCommand { get; set; }
-    public GetRosterCommand GetRosterCommand { get; set; }
+    public LoadRosterCommand LoadRosterCommand { get; set; }
     public GenerateRosterCommand GenerateRosterCommand { get; set; }
+    public NewRosterCommand NewRosterCommand { get; set; }
 
     #endregion
 
@@ -120,11 +146,13 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         ReportingEmployees = new List<Employee>();
         minDate = DateTime.Today.AddDays(DayOfWeek.Sunday - DateTime.Today.DayOfWeek + 1);   // Default to Monday of the current week. (Sunday will get the next monday)
         maxDate = minDate.AddDays(4);   // Default to the next friday.
+        rosters = new ObservableCollection<DepartmentRoster>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
         GenerateRosterCommand = new GenerateRosterCommand(this);
-        GetRosterCommand = new GetRosterCommand(this);
+        LoadRosterCommand = new LoadRosterCommand(this);
+        NewRosterCommand = new NewRosterCommand(this);
     }
 
     public void SetDataSources(Helios helios, Charon charon)
@@ -133,6 +161,23 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         Charon = charon;
 
         RefreshData();
+    }
+
+    public void NewRoster()
+    {
+        if (SelectedDepartment is null || Helios is null || Charon is null) return;
+
+        var rosterCreator = new RosterCreationWindow(SelectedDepartment, Helios, Charon);
+        if (rosterCreator.ShowDialog() != true) return;
+
+        var newRoster = rosterCreator.VM.Roster;
+
+        if (newRoster is null) return;
+
+        SelectedDepartment.DepartmentRosters.Add(newRoster);
+        Rosters.Add(newRoster);
+        SelectedRoster = newRoster;
+
     }
 
     public void RefreshData()
@@ -153,45 +198,21 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.UserEmployee?.DepartmentName);
     }
 
-    public void GetRoster()
+    public void LoadRoster()
     {
-        /*if (SelectedDepartment is null ||
-            Helios is null ||
-            (RosterDataSet is not null && RosterDataSet.Department == SelectedDepartment &&
-             RosterDataSet.StartDate == MinDate && RosterDataSet.EndDate == MaxDate)) return;
-
-        RosterDataSet = Helios.StaffReader.RosterDataSet(SelectedDepartment.Name, MinDate, MaxDate);
-        RosterTable = RosterDataSet.ViewTable;
-        GenerateWeeklies();*/
+        if (Helios is null || SelectedRoster is null || SelectedRoster.IsLoaded) return;
+        Helios.StaffReader.FillDepartmentRoster(SelectedRoster);
     }
 
     public void GenerateRoster()
     {
-        /*if (Helios is null || SelectedDepartment is null) return;
+        if (Helios is null || SelectedRoster is null) return;
 
-        if (RosterDataSet?.Department is null ||
-            RosterDataSet.Department != SelectedDepartment ||
-            RosterDataSet.StartDate != MinDate ||
-            RosterDataSet.EndDate != MaxDate) GetRoster();
+        if (!SelectedRoster.IsLoaded) Helios.StaffReader.FillDepartmentRoster(SelectedRoster);
 
-        if (RosterDataSet is null) return;
-
-        RosterDataSet.GenerateRosters(ShowSaturdays, ShowSundays);
-        RosterTable = RosterDataSet.ViewTable;
-        GenerateWeeklies();*/
+        SelectedRoster.GenerateRosterAssignments();
     }
-
-    /*private void GenerateWeeklies()
-    {
-        if (RosterDataSet?.ViewTable is null) return;
-
-        foreach (DataRow viewTableRow in RosterDataSet.ViewTable.Rows)
-        {
-            WeeklyRosters.Add(new WeeklyRoster((Employee) viewTableRow[0], (Roster) viewTableRow[1], (Roster) viewTableRow[2],
-                (Roster) viewTableRow[3], (Roster) viewTableRow[4], (Roster) viewTableRow[5], (Roster) viewTableRow[6], (Roster) viewTableRow[7]));
-        }
-    }*/
-
+    
     public void RepairData()
     {
         throw new NotImplementedException();

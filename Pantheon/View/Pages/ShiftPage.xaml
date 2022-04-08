@@ -34,6 +34,8 @@
             </Style>
 
             <converter:BreakButtonConverter x:Key="BreakButtonConverter"/>
+            <converter:IntToStringConverter x:Key="IntToStringConverter"/>
+            <converter:CustomBoolToVisConverter x:Key="BoolToVisConverter"/>
         </DockPanel.Resources>
 
         <ToolBarTray DockPanel.Dock="Top">
@@ -50,19 +52,6 @@
                         Command="{Binding CreateShiftCommand}"/>
             </ToolBar>
         </ToolBarTray>
-
-        <!--
-        ~1~ Function Buttons @1@
-        <StackPanel DockPanel.Dock="Left"
-                    Orientation="Vertical"
-                    MinWidth="100"
-                    MaxWidth="300">
-            <Button Content="Create New Shift"
-                    Command="{Binding CreateShiftCommand}"/>
-            <Button Content="Delete Shift"/>
-            <Button Content="Save Changes"/>
-        </StackPanel>
-        -->
 
         <!-- Actual Shift Listings -->
         <ListView ItemsSource="{Binding Shifts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -162,6 +151,7 @@
                                          Width="70"/>
                             </StackPanel>
 
+                            <!-- Set Default Shift -->
                             <StackPanel Orientation="Vertical"
                                         VerticalAlignment="Center"
                                         Margin="10,0">
@@ -169,6 +159,24 @@
                                        HorizontalContentAlignment="Center"/>
                                 <CheckBox IsChecked="{Binding Default}"/>
                             </StackPanel>
+
+                            <!-- Set Target Daily Shift Count -->
+                            <StackPanel Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        Margin="10,0"
+                                        Visibility="{Binding Default, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToVisConverter}}">
+                                <Label Content="Daily Target" Margin="0"  FontSize="10"
+                                       HorizontalContentAlignment="Center"/>
+                                <TextBox Text="{Binding DailyTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntToStringConverter}}"
+                                         HorizontalContentAlignment="Center"
+                                         VerticalContentAlignment="Center"
+                                         HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"
+                                         GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                                         LostMouseCapture="TextBox_LostMouseCapture"
+                                         LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                            </StackPanel>
+
                             <Button Content="Save Changes" Height="30" Width="120"
                                     CommandParameter="{Binding}"
                                     Command="{Binding ElementName=VM, Path=SaveShiftCommand}"/>

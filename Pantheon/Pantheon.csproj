@@ -9,8 +9,32 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\calculator--plus.png" />
+    <None Remove="Resources\clock--arrow.png" />
+    <None Remove="Resources\csv.png" />
+    <None Remove="Resources\database-import.png" />
+    <None Remove="Resources\plus-circle-frame.png" />
+    <None Remove="Resources\refresh.png" />
+    <None Remove="Resources\repair.png" />
+    <None Remove="Resources\save.png" />
+    <None Remove="Resources\sort.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Styx\Styx.csproj" />
     <ProjectReference Include="..\Uranus\Uranus.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\calculator--plus.png" />
+    <Resource Include="Resources\clock--arrow.png" />
+    <Resource Include="Resources\csv.png" />
+    <Resource Include="Resources\database-import.png" />
+    <Resource Include="Resources\plus-circle-frame.png" />
+    <Resource Include="Resources\refresh.png" />
+    <Resource Include="Resources\repair.png" />
+    <Resource Include="Resources\save.png" />
+    <Resource Include="Resources\sort.png" />
   </ItemGroup>
 
   <ItemGroup>

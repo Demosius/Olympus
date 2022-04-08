@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:vm="clr-namespace:Pantheon.ViewModel.Pages"
       xmlns:controls="clr-namespace:Pantheon.View.Controls"
+      xmlns:converter="clr-namespace:Pantheon.ViewModel.Converter"
       mc:Ignorable="d" 
       d:DesignHeight="1080" d:DesignWidth="1200"
       Title="EmployeePage">
@@ -55,6 +56,8 @@
             <Style TargetType="{x:Type DataGrid}">
                 <Setter Property="Background" Value="{StaticResource AccordionBackgroundBrush}"/>
             </Style>
+            <converter:CustomBoolToVisConverter x:Key="BoolToVisConverter"/>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         </DockPanel.Resources>
 
         <!-- Top Control Panel -->
@@ -63,18 +66,14 @@
             <Label Content="Department:"/>
             <ComboBox ItemsSource="{Binding Departments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       SelectedValue="{Binding SelectedDepartment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Label Content="Start Date:"/>
-            <DatePicker SelectedDate="{Binding MinDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Label Content="End Date:"/>
-            <DatePicker SelectedDate="{Binding MaxDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Label Content="Saturdays:"/>
-            <CheckBox IsChecked="{Binding ShowSaturdays, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Label Content="Sundays:"/>
-            <CheckBox IsChecked="{Binding ShowSundays, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Button Content="Get Roster" Width="140"
-                    Command="{Binding GetRosterCommand}"/>
+            <Label Content="Rosters:"/>
+            <ComboBox ItemsSource="{Binding Rosters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedValue="{Binding SelectedRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            
             <Button Content="Generate Roster" Width="140"
                     Command="{Binding GenerateRosterCommand}"/>
+            <Button Content="New Roster" Width="140"
+                    Command="{Binding NewRosterCommand}"/>
         </StackPanel>
         
         <!-- Shift Control Panel -->
@@ -89,16 +88,25 @@
                 <DataTemplate>
                     <Border BorderBrush="{StaticResource ForegroundBrush}"
                             BorderThickness="1">
-                        <StackPanel Orientation="Horizontal" 
-                                    Width="135">
+                        <StackPanel Orientation="Horizontal" >
                             <Label Content="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
                                    HorizontalAlignment="Center"
                                    Margin="0"
                                    FontSize="16"
                                    FontWeight="Bold"/>
-                            <TextBox Text="{Binding DailyTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     HorizontalAlignment="Center"
-                                     HorizontalContentAlignment="Center"/>
+                            <Grid>
+                                <TextBox Text="{Binding DailyTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         HorizontalAlignment="Center"
+                                         HorizontalContentAlignment="Center"
+                                         Visibility="{Binding Default, Converter={StaticResource BoolToVisConverter}}"/>
+                                <TextBlock Text="D"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontWeight="Bold"
+                                           FontSize="18"
+                                           Foreground="{StaticResource CheckBoxFocusedBorderBrush}"
+                                           Visibility="{Binding Default, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            </Grid>
                         </StackPanel>
                     </Border>
                 </DataTemplate>
@@ -113,7 +121,7 @@
         </StackPanel>
 
         <!-- Roster Table -->
-        <DataGrid ItemsSource="{Binding WeeklyRosters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+        <DataGrid ItemsSource="{Binding SelectedRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   x:Name="RosterGrid"
                   FrozenColumnCount="1"
                   AutoGenerateColumns="True"

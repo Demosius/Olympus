@@ -2,7 +2,9 @@
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using Uranus.Extension;
 
 namespace Uranus.Staff.Model;
 
@@ -12,6 +14,8 @@ public class DepartmentRoster
     public string Name { get; set; }
     [ForeignKey(typeof(Department))] public string DepartmentName { get; set; }
     public DateTime StartDate { get; set; } // Monday
+    public bool UseSaturdays { get; set; }
+    public bool UseSundays { get; set; }
 
     [ManyToOne(nameof(DepartmentName), nameof(Model.Department.DepartmentRosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Department? Department { get; set; }
@@ -34,6 +38,11 @@ public class DepartmentRoster
 
     [Ignore] public Shift? DefaultShift { get; set; }
 
+    [Ignore] public Dictionary<string, int> ShiftCounter { get; set; }
+    [Ignore] public Dictionary<string, int> TargetShiftCounts { get; set; }
+
+    [Ignore] public bool IsLoaded { get; set; }
+
     public DepartmentRoster()
     {
         Name = string.Empty;
@@ -50,6 +59,35 @@ public class DepartmentRoster
         EmployeeRosterDict = new Dictionary<Guid, EmployeeRoster>();
         EmpShiftConnections = new List<EmployeeShift>();
         ShiftRuleDict = new Dictionary<int, List<ShiftRule>>();
+        ShiftCounter = new Dictionary<string, int>();
+        TargetShiftCounts = new Dictionary<string, int>();
+    }
+
+    public DepartmentRoster(string name, DateTime startDate, bool useSaturdays, bool useSundays, Department department)
+    {
+        ID = Guid.NewGuid();
+        Name = name;
+        StartDate = startDate;
+        UseSaturdays = useSaturdays;
+        UseSundays = useSundays;
+        Department = department;
+        DepartmentName = department.Name;
+
+
+        Rosters = new List<Roster>();
+        DailyRosters = new List<DailyRoster>();
+        EmployeeRosters = new List<EmployeeRoster>();
+
+        EmployeeDict = new Dictionary<int, Employee>();
+        ShiftDict = new Dictionary<string, Shift>();
+        BreakDict = new Dictionary<string, List<Break>>();
+        RosterDict = new Dictionary<(int, DateTime), Roster>();
+        DailyRosterDict = new Dictionary<Guid, DailyRoster>();
+        EmployeeRosterDict = new Dictionary<Guid, EmployeeRoster>();
+        EmpShiftConnections = new List<EmployeeShift>();
+        ShiftRuleDict = new Dictionary<int, List<ShiftRule>>();
+        ShiftCounter = new Dictionary<string, int>();
+        TargetShiftCounts = new Dictionary<string, int>();
     }
 
     public void SetData(IEnumerable<Employee> employees, IEnumerable<Roster> rosters, IEnumerable<DailyRoster> dailyRosters, IEnumerable<EmployeeRoster> employeeRosters,
@@ -65,6 +103,8 @@ public class DepartmentRoster
         DailyRosterDict = dailyRosters.ToDictionary(dr => dr.ID, dr => dr);
 
         SetRelationships();
+        GenerateMissingRosters();
+        IsLoaded = true;
     }
 
     /// <summary>
@@ -85,7 +125,52 @@ public class DepartmentRoster
     /// </summary>
     private void GenerateMissingRosters()
     {
-        // TODO: Generate missing Rosters.
+        if (Department is null) throw new DataException("Department Roster initialized without Department.");
+
+        // Make sure we have a daily roster for each day from start date.
+        var dailyRosterDict = DailyRosters.ToDictionary(dr => dr.Date, dr => dr);
+        for (var i = 0; i < 7; i++)
+        {
+            var date = StartDate.AddDays(i);
+            if (dailyRosterDict.TryGetValue(date, out _)) continue;
+
+            var newDailyRoster = new DailyRoster(Department, this, date);
+            DailyRosters.Add(newDailyRoster);
+            DailyRosterDict.Add(newDailyRoster.ID, newDailyRoster);
+            dailyRosterDict.Add(date, newDailyRoster);
+        }
+        DailyRosters.Sort();
+        if (DailyRosters.Count != 7)
+            throw new DataException(
+                "Department Roster has somehow generated a number of daily rosters not equal to 7.");
+
+        // Convert EmpRoster list to dictionary to compare to our employee list (which should be all required for the department).
+        var empRosterDict = EmployeeRosters.ToDictionary(er => er.EmployeeID, er => er);
+
+        // Create employeeRoster for each employee - only for those that do not already exist.
+        foreach (var (_, employee) in EmployeeDict)
+        {
+            if (empRosterDict.TryGetValue(employee.ID, out _)) continue;
+
+            EmployeeRoster newEmployeeRoster = new(Department, this, employee, StartDate);
+
+            // Get Roster for each day.
+            for (var i = 0; i < 7; i++)
+            {
+                var date = StartDate.AddDays(i);
+                var dailyRoster = dailyRosterDict[date];
+                var roster = new Roster(Department, this, newEmployeeRoster, employee, date);
+                newEmployeeRoster.Rosters.Add(roster);
+                dailyRoster.Rosters.Add(roster);
+                Rosters.Add(roster);
+                RosterDict.Add((roster.EmployeeID, date), roster);
+            }
+
+            newEmployeeRoster.Rosters.Sort();
+            EmployeeRosters.Add(newEmployeeRoster);
+            EmployeeRosterDict.Add(newEmployeeRoster.ID, newEmployeeRoster);
+        }
+
     }
 
     private void SetFromShifts()
@@ -99,6 +184,8 @@ public class DepartmentRoster
                     @break.Shift = shift;
             }
             Department?.Shifts.Add(shift);
+            ShiftCounter[shift.ID] = 0;
+            TargetShiftCounts[shift.ID] = shift.DailyTarget;
             shift.Department = Department;
             if (shift.Default) DefaultShift = shift;
         }
@@ -158,7 +245,7 @@ public class DepartmentRoster
             if (DailyRosterDict.TryGetValue(roster.DailyRosterID, out var daily))
             {
                 roster.DailyRoster = daily;
-                daily.Rosters.Add(roster);
+                daily.AddRoster(roster);
             }
 
             if (EmployeeRosterDict.TryGetValue(roster.EmployeeRosterID, out var employeeRoster))
@@ -171,6 +258,8 @@ public class DepartmentRoster
             {
                 Rosters.Add(roster);
                 roster.DepartmentRoster = this;
+                if (ShiftCounter.TryGetValue(roster.ShiftID, out _))
+                    ShiftCounter[roster.ShiftID]++;
             }
         }
     }
@@ -220,6 +309,104 @@ public class DepartmentRoster
                 shift.EmployeeRosters.Add(employeeRoster);
                 employeeRoster.Shift = shift;
             }
+        }
+    }
+
+    /// <summary>
+    /// Use to automate shift assignment.
+    /// </summary>
+    public void GenerateRosterAssignments()
+    {
+        AssignDefaults();
+        CountToTargets();
+        ApplyDepartmentDefault();
+    }
+
+    /// <summary>
+    /// Assigns shifts to employees based on their defined defaults - only if they do not already have assigned shifts..
+    /// </summary>
+    public void AssignDefaults()
+    {
+        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.Shift is null))
+            employeeRoster.SetDefault();
+    }
+
+    public void DropCount(string shiftID)
+    {
+        if (ShiftCounter.TryGetValue(shiftID, out _))
+            ShiftCounter[shiftID]--;
+    }
+
+    public void AddCount(string shiftID)
+    {
+        if (ShiftCounter.TryGetValue(shiftID, out _))
+            ShiftCounter[shiftID]++;
+    }
+
+    /// <summary>
+    /// Attempt to reach the targeted number for each shift.
+    /// </summary>
+    public void CountToTargets()
+    {
+        if (Department is null) throw new DataException("Department Roster has null value for department.");
+
+        // Get every non-default shift with a target above 0.
+        var shifts = Department.Shifts.Where(s => !s.Default && s.DailyTarget > 0)
+            .ToDictionary(s => s, _ => new List<EmployeeRoster>());
+
+        foreach (var (shift, _) in shifts)
+            shifts[shift] = EmployeeRosters.Where(er => er.Employee!.Shifts.Contains(shift)).ToList();
+
+        // Order by most needed (discrepancy between those available and number required to reach target.
+        shifts = shifts.OrderBy(s => s.Value.Count - (TargetShiftCounts[s.Key.ID] - ShiftCounter[s.Key.ID]))
+            .ToDictionary(e => e.Key, e => e.Value);
+
+        foreach (var (shift, empRosters) in shifts)
+        {
+            if (TargetShiftCounts[shift.ID] - ShiftCounter[shift.ID] <= 0) continue;
+            // Randomize employees #TODO: Check against history to rotate through staff (instead of randomizing).
+            empRosters.Shuffle();
+
+            foreach (var employeeRoster in empRosters.Where(employeeRoster => employeeRoster.Shift is null).TakeWhile(_ => ShiftCounter[shift.ID] < TargetShiftCounts[shift.ID]))
+            {
+                employeeRoster.SetShift(shift);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Checks all employees to see if they are assigned. If they aren't, use department defaults if they exist,
+    /// otherwise assign a shift that they are eligible for that is closest to its target count.
+    /// </summary>
+    public void ApplyDepartmentDefault()
+    {
+        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.Shift is null))
+        {
+            if (DefaultShift is not null)
+            {
+                employeeRoster.SetShift(DefaultShift);
+                continue;
+            }
+
+            if (employeeRoster.Employee is null)
+                throw new DataException("Employee roster does not have employee initialized.");
+
+            Shift? bestShift = null;
+            var bestCount = int.MinValue;
+            foreach (var shift in employeeRoster.Employee.Shifts)
+            {
+                ShiftCounter.TryGetValue(shift.ID, out var count);
+                TargetShiftCounts.TryGetValue(shift.ID, out var target);
+
+                var disc = target - count;
+
+                if (disc <= bestCount) continue;
+
+                bestCount = target - count;
+                bestShift = shift;
+            }
+
+            if (bestShift is not null) employeeRoster.SetShift(bestShift);
         }
     }
 }

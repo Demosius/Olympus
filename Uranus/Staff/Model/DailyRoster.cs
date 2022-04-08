@@ -2,10 +2,11 @@
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Uranus.Staff.Model;
 
-public class DailyRoster
+public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
 {
     [PrimaryKey] public Guid ID { get; set; }
     [ForeignKey(typeof(Department))] public string DepartmentName { get; set; }
@@ -21,11 +22,59 @@ public class DailyRoster
     [OneToMany(nameof(Roster.DailyRosterID), nameof(Roster.DailyRoster), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Roster> Rosters { get; set; }
 
-    // TODO: Add shift counting.
+    [Ignore] public Dictionary<string, int> ShiftCounter { get; set; }
 
     public DailyRoster()
     {
         DepartmentName = string.Empty;
         Rosters = new List<Roster>();
+        ShiftCounter = new Dictionary<string, int>();
+    }
+
+    public DailyRoster(Department department, DepartmentRoster departmentRoster, DateTime date)
+    {
+        ID = Guid.NewGuid();
+        Department = department;
+        DepartmentName = Department.Name;
+        DepartmentRoster = departmentRoster;
+        DepartmentRosterID = DepartmentRoster.ID;
+        Date = date;
+        Day = date.DayOfWeek;
+        Rosters = new List<Roster>();
+        ShiftCounter = department.Shifts.ToDictionary(s => s.ID, _ => 0);
+    }
+
+    public bool Equals(DailyRoster? other)
+    {
+        if (other is null) return false;
+        return ID == other.ID || DepartmentRosterID == other.DepartmentRosterID && Date == other.Date;
+    }
+
+    public int CompareTo(DailyRoster? other)
+    {
+        return other is null ? 1 : Date.CompareTo(other.Date);
+    }
+
+    /// <summary>
+    ///  Adds the given roster to the daily roster list and applies appropriate other functionality such as shift count.
+    /// </summary>
+    /// <param name="roster"></param>
+    /// <exception cref="NotImplementedException"></exception>
+    public void AddRoster(Roster roster)
+    {
+        Rosters.Add(roster);
+        AddCount(roster.ShiftID);
+    }
+
+    public void DropCount(string shiftID)
+    {
+        if (ShiftCounter.TryGetValue(shiftID, out _))
+            ShiftCounter[shiftID]--;
+    }
+
+    public void AddCount(string shiftID)
+    {
+        if (ShiftCounter.TryGetValue(shiftID, out _))
+            ShiftCounter[shiftID]++;
     }
 }

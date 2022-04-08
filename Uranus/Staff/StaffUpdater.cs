@@ -238,8 +238,12 @@ public class StaffUpdater
         {
             lines += shift.Breaks.Sum(shiftBreak => Chariot.Update(shiftBreak));
             lines += Chariot.Update(shift);
-            Chariot.Database.Execute("UPDATE Shift SET \"Default\" = FALSE WHERE DepartmentName = ? AND Name != ?;",
-                shift.DepartmentName, shift.Name);
+            
+            if (shift.Default)
+            {
+                Chariot.Database.Execute("UPDATE Shift SET \"Default\" = FALSE WHERE DepartmentName = ? AND Name != ?;",
+                    shift.DepartmentName, shift.Name);
+            }
         });
         return lines;
     }

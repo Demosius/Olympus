@@ -1,23 +1,23 @@
-﻿using System;
+﻿using Pantheon.ViewModel.Pages;
+using System;
 using System.Windows.Input;
-using Pantheon.ViewModel.Pages;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class GenerateRosterCommand : ICommand
+internal class NewRosterCommand : ICommand
 {
     public RosterPageVM VM { get; set; }
 
-    public GenerateRosterCommand(RosterPageVM vm) { VM = vm; }
+    public NewRosterCommand(RosterPageVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedRoster is not null;
+        return VM.SelectedDepartment is not null;
     }
 
     public void Execute(object? parameter)
     {
-        VM.GenerateRoster();
+        VM.NewRoster();
     }
 
     public event EventHandler? CanExecuteChanged
