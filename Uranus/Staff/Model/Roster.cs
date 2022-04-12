@@ -1,7 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
-using Microsoft.VisualBasic;
 
 namespace Uranus.Staff.Model;
 
@@ -158,7 +157,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
     private void DropCount()
     {
         //DepartmentRoster?.DropCount(ShiftID);
-        DailyRoster?.DropCount(ShiftID);
+        if (Shift is not null) DailyRoster?.DropCount(Shift);
     }
 
     /// <summary>
@@ -167,7 +166,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
     private void AddCount()
     {
         //DepartmentRoster?.AddCount(ShiftID);
-        DailyRoster?.AddCount(ShiftID);
+        if (Shift is not null) DailyRoster?.AddCount(Shift);
     }
 
     public bool Equals(Roster? other)

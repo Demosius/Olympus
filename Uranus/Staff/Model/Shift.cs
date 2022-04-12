@@ -31,7 +31,6 @@ public class Shift : INotifyPropertyChanged
             foreach (var shift in Department.Shifts.Where(shift => shift.Name != Name))
                 shift.Default = false;
         }
-
     }
 
     [ManyToOne(nameof(DepartmentName), nameof(Model.Department.Shifts), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
@@ -176,4 +175,6 @@ public class Shift : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+
+    public override string ToString() => Name;
 }

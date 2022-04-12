@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Uranus.Staff.Model;
 
-public class EmployeeRoster
+public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRoster>
 {
     [PrimaryKey] public Guid ID { get; set; }
     [ForeignKey(typeof(Department))] public string DepartmentName { get; set; }
@@ -55,6 +55,7 @@ public class EmployeeRoster
         EmployeeID = Employee.ID;
         StartDate = startDate;
         ShiftID = string.Empty;
+        DepartmentRoster = departmentRoster;
         Rosters = new List<Roster>();
     }
 
@@ -71,10 +72,10 @@ public class EmployeeRoster
 
     public void SetShift(Shift shift, bool saturdays = false, bool sundays = false)
     {
-        DepartmentRoster?.DropCount(ShiftID);
+        if (Shift is not null) DepartmentRoster?.DropCount(Shift);
         Shift = shift;
         ShiftID = Shift.ID;
-        DepartmentRoster?.AddCount(ShiftID);
+        DepartmentRoster?.AddCount(Shift);
 
         foreach (var roster in Rosters)
         {
@@ -83,5 +84,18 @@ public class EmployeeRoster
             else 
                 roster.SetShift(shift);
         }
+    }
+
+    public bool Equals(EmployeeRoster? other)
+    {
+        if (other is null) return false;
+        return ID == other.ID || DepartmentRosterID == other.DepartmentRosterID && EmployeeID == other.EmployeeID && StartDate == other.StartDate;
+    }
+
+    public int CompareTo(EmployeeRoster? other)
+    {
+        if (other is null) return 1;
+        if (Employee is null) return other.Employee is null ? 0 : -1;
+        return string.Compare(Employee.FullName, other.Employee?.FullName ?? "", StringComparison.Ordinal);
     }
 }

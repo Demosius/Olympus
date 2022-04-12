@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class ConfirmDepartmentRosterCreationCommand : ICommand 
+internal class ConfirmDepartmentRosterCreationCommand : ICommand
 {
     public RosterCreationVM VM { get; set; }
 
@@ -22,8 +22,9 @@ internal class ConfirmDepartmentRosterCreationCommand : ICommand
     {
         if (parameter is not Window w) return;
 
-        VM.ConfirmDepartmentRosterCreation();
+        if (!VM.ConfirmDepartmentRosterCreation()) return;
 
+        w.DialogResult = true;
         w.Close();
     }
 

@@ -1,19 +1,16 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Input;
-using Styx;
-using Uranus;
 
-namespace Pantheon.View.Pages;
+namespace Pantheon.View.Controls;
 
 /// <summary>
-/// Interaction logic for RosterPage.xaml
+/// Interaction logic for DepartmentRosterView.xaml
 /// </summary>
-public partial class RosterPage
+public partial class DepartmentRosterView
 {
-    public RosterPage(Helios helios, Charon charon)
+    public DepartmentRosterView()
     {
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
     }
 
     private void TextBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)

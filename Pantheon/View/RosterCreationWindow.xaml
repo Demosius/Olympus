@@ -5,14 +5,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Pantheon.ViewModel"
-        xmlns:converter="clr-namespace:Pantheon.ViewModel.Converter"
         mc:Ignorable="d"
         Title="RosterCreationWindow" 
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
-        Foreground="{StaticResource LightForegroundBrush}"
-        FocusManager.FocusedElement="{Binding ElementName=IDBox}">
+        Foreground="{StaticResource LightForegroundBrush}">
 
     <Window.DataContext>
         <vm:RosterCreationVM x:Name="VM"/>
@@ -48,14 +46,13 @@
                 <Setter Property="MinHeight" Value="0"/>
                 <Setter Property="HorizontalAlignment" Value="Right"/>
             </Style>
-            <converter:BoolToColourConverter x:Key="BoolToColourConverter"/>
         </StackPanel.Resources>
 
         <Label Content="Name" Margin="0,5,0,0"/>
         <TextBox Text="{Binding RosterName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         <Label Content="Date" Margin="0,5,0,0"/>
         <DatePicker SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Margin=""/>
+                    HorizontalAlignment="Left"/>
         <Grid Margin="0,15,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -96,7 +93,8 @@
                     IsCancel="True"/>
             <Button Content="Confirm"
                     IsDefault="True"
-                    Command="{Binding ConfirmDepartmentRosterCreationCommand}"/>
+                    Command="{Binding ConfirmDepartmentRosterCreationCommand}"
+                    CommandParameter="{Binding ElementName=RosterWindow}"/>
         </StackPanel>
     </StackPanel>
 </Window>

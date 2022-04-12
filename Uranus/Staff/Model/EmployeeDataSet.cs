@@ -397,4 +397,39 @@ public class EmployeeDataSet
 
         Employees.Add(newEmployee.ID, newEmployee);
     }
+
+    /// <summary>
+    /// Pulls all relevant sub departments according to the given department name.
+    /// Will also fill relevant department data, such as shifts.
+    /// </summary>
+    /// <param name="departmentName"></param>
+    /// <returns></returns>
+    public IEnumerable<Department> SubDepartments(string departmentName)
+    {
+        // Get the department matching the given name.
+        if (!Departments.TryGetValue(departmentName, out var department)) return new List<Department>();
+
+        var deptDict = new Dictionary<string, Department>();
+
+        GetSubDepartments(department, ref deptDict);
+
+        deptDict.Add(departmentName, department);
+
+        return deptDict.Values;
+    }
+
+    /// <summary>
+    /// Gets a dict of departments that are all  recursively under the given (potential) head department.
+    /// </summary>
+    /// <param name="department"></param>
+    /// <param name="returnDict"></param>
+    private static void GetSubDepartments(Department department, ref Dictionary<string, Department> returnDict)
+    {
+        foreach (var sub in department.SubDepartments)
+        {
+            if (returnDict.ContainsKey(sub.Name)) continue;
+            returnDict.Add(sub.Name, sub);
+            GetSubDepartments(sub, ref returnDict);
+        }
+    }
 }

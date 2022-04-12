@@ -191,8 +191,8 @@ public class StaffReader
 
             Chariot.Database?.RunInTransaction(() =>
             {
-                employees = Chariot.PullObjectList<Employee>(e => e.DepartmentName == departmentName);
-                
+                //employees = Chariot.PullObjectList<Employee>(e => e.DepartmentName == departmentName && e.EmploymentType != EEmploymentType.SA);
+                employees = EmployeeDataSet().Employees.Values.Where(e => e.EmploymentType != EEmploymentType.SA).ToList();
                 rosters = Chariot.PullObjectList<Roster>(r =>
                     r.DepartmentName == departmentName && r.Date >= earliestDate && r.Date <= latestDate);
                 dailyRosters = Chariot.PullObjectList<DailyRoster>(r =>

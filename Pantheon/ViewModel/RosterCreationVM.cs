@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using Pantheon.ViewModel.Commands;
 using Uranus;
 using Uranus.Commands;
@@ -44,7 +45,7 @@ internal class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
             value = value.AddDays(DayOfWeek.Monday - value.DayOfWeek);
             startDate = value;
             OnPropertyChanged(nameof(StartDate));
-            RosterName = value.FiscalWeek();
+            RosterName = $"{value.FiscalWeek()} ({value.Year})";
         }
     }
 
@@ -83,7 +84,7 @@ internal class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
     public RosterCreationVM()
     {
         startDate = DateTime.Today.AddDays(DayOfWeek.Monday - DateTime.Today.DayOfWeek + 7);
-        rosterName = startDate.FiscalWeek();
+        rosterName = $"{startDate.FiscalWeek()} ({startDate.Year})";
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
@@ -107,14 +108,25 @@ internal class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
             StartDate = Department.DepartmentRosters.Select(dr => dr.StartDate).Max().AddDays(7);
     }
 
-    public void ConfirmDepartmentRosterCreation()
+    public bool ConfirmDepartmentRosterCreation()
     {
-        if (Helios is null) return;
+        if (Helios is null) return false;
         if (Department is null) throw new DataException("Department not set in RosterCreation.");
 
         Roster = new DepartmentRoster(RosterName, StartDate, UseSaturdays, UseSundays, Department);
         
+        // Check name.
+        //if (Helios.StaffReader.RosterNameExists(RosterName, Department.Name))
+        if (Department.DepartmentRosters.Select(r => r.Name).Contains(RosterName))
+        {
+            if (MessageBox.Show($"The roster '{RosterName}' already exists for Department: {Department.Name}.\n\n" +
+                                "Would you like to continue and create a duplicate roster?", "Duplicate Roster?",
+                    MessageBoxButton.YesNoCancel, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+                return false;
+        }
+
         Helios.StaffCreator.DepartmentRoster(Roster);
+        return true;
     }
 
     public void RepairData()

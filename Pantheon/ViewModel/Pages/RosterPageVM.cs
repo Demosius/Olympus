@@ -9,6 +9,7 @@ using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Pantheon.View;
+using Pantheon.ViewModel.Controls;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -68,10 +69,9 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         {
             selectedDepartment = value;
             OnPropertyChanged(nameof(SelectedDepartment));
-            Rosters = new ObservableCollection<DepartmentRoster>(value is not null ? value.DepartmentRosters : new List<DepartmentRoster>());
+            SetRosters();
         }
     }
-
     private bool showSaturdays;
     public bool ShowSaturdays
     {
@@ -105,8 +105,8 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         }
     }
 
-    private ObservableCollection<DepartmentRoster> rosters;
-    public ObservableCollection<DepartmentRoster> Rosters
+    private ObservableCollection<DepartmentRosterVM> rosters;
+    public ObservableCollection<DepartmentRosterVM> Rosters
     {
         get => rosters;
         set
@@ -116,15 +116,15 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         }
     }
 
-    private DepartmentRoster ? selectedRoster;
-    public DepartmentRoster? SelectedRoster
+    private DepartmentRosterVM? selectedRoster;
+    public DepartmentRosterVM? SelectedRoster
     {
         get => selectedRoster;
         set
         {
+            value?.Initialize();
             selectedRoster = value;
             OnPropertyChanged(nameof(SelectedRoster));
-            if (value is not null) LoadRoster();
         }
     }
 
@@ -146,7 +146,7 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         ReportingEmployees = new List<Employee>();
         minDate = DateTime.Today.AddDays(DayOfWeek.Sunday - DateTime.Today.DayOfWeek + 1);   // Default to Monday of the current week. (Sunday will get the next monday)
         maxDate = minDate.AddDays(4);   // Default to the next friday.
-        rosters = new ObservableCollection<DepartmentRoster>();
+        rosters = new ObservableCollection<DepartmentRosterVM>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
@@ -163,6 +163,18 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         RefreshData();
     }
 
+    private void SetRosters()
+    {
+        Rosters.Clear();
+
+        if (Helios is null || SelectedDepartment is null) return;
+
+        foreach (var departmentRoster in SelectedDepartment.DepartmentRosters)
+        {
+            Rosters.Add(new DepartmentRosterVM(departmentRoster, Helios));
+        }
+    }
+
     public void NewRoster()
     {
         if (SelectedDepartment is null || Helios is null || Charon is null) return;
@@ -175,9 +187,9 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         if (newRoster is null) return;
 
         SelectedDepartment.DepartmentRosters.Add(newRoster);
-        Rosters.Add(newRoster);
-        SelectedRoster = newRoster;
-
+        var vm = new DepartmentRosterVM(newRoster, Helios);
+        Rosters.Add(vm);
+        SelectedRoster = vm;
     }
 
     public void RefreshData()
@@ -194,25 +206,24 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         // Reporting employees (and other collections for filtering that list) is base purely on the employees that report to the current user.
         ReportingEmployees = EmployeeDataSet.GetReportsByRole(Charon.UserEmployee?.ID ?? 0).ToList();
 
-        Departments = new ObservableCollection<Department>(Helios.StaffReader.SubDepartments(Charon.UserEmployee?.DepartmentName ?? ""));
+        Departments = new ObservableCollection<Department>(EmployeeDataSet.SubDepartments(Charon.UserEmployee?.DepartmentName ?? ""));
         SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.UserEmployee?.DepartmentName);
     }
 
-    public void LoadRoster()
+    public void LoadRoster(DepartmentRosterVM roster)
     {
-        if (Helios is null || SelectedRoster is null || SelectedRoster.IsLoaded) return;
-        Helios.StaffReader.FillDepartmentRoster(SelectedRoster);
+        roster.Initialize();
     }
 
     public void GenerateRoster()
     {
         if (Helios is null || SelectedRoster is null) return;
 
-        if (!SelectedRoster.IsLoaded) Helios.StaffReader.FillDepartmentRoster(SelectedRoster);
+        SelectedRoster.Initialize();
 
         SelectedRoster.GenerateRosterAssignments();
     }
-    
+
     public void RepairData()
     {
         throw new NotImplementedException();

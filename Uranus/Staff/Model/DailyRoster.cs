@@ -22,13 +22,13 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
     [OneToMany(nameof(Roster.DailyRosterID), nameof(Roster.DailyRoster), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Roster> Rosters { get; set; }
 
-    [Ignore] public Dictionary<string, int> ShiftCounter { get; set; }
+    [Ignore] public Dictionary<Shift, int> ShiftCounter { get; set; }
 
     public DailyRoster()
     {
         DepartmentName = string.Empty;
         Rosters = new List<Roster>();
-        ShiftCounter = new Dictionary<string, int>();
+        ShiftCounter = new Dictionary<Shift, int>();
     }
 
     public DailyRoster(Department department, DepartmentRoster departmentRoster, DateTime date)
@@ -41,7 +41,7 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
         Date = date;
         Day = date.DayOfWeek;
         Rosters = new List<Roster>();
-        ShiftCounter = department.Shifts.ToDictionary(s => s.ID, _ => 0);
+        ShiftCounter = department.Shifts.ToDictionary(s => s, _ => 0);
     }
 
     public bool Equals(DailyRoster? other)
@@ -63,18 +63,20 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
     public void AddRoster(Roster roster)
     {
         Rosters.Add(roster);
-        AddCount(roster.ShiftID);
+        if (roster.Shift is not null && roster.AtWork) AddCount(roster.Shift);
     }
 
-    public void DropCount(string shiftID)
+    public void DropCount(Shift shift)
     {
-        if (ShiftCounter.TryGetValue(shiftID, out _))
-            ShiftCounter[shiftID]--;
+        if (ShiftCounter.TryGetValue(shift, out _))
+            ShiftCounter[shift]--;
     }
 
-    public void AddCount(string shiftID)
+    public void AddCount(Shift shift)
     {
-        if (ShiftCounter.TryGetValue(shiftID, out _))
-            ShiftCounter[shiftID]++;
+        if (ShiftCounter.TryGetValue(shift, out _))
+            ShiftCounter[shift]++;
     }
+
+    public override string ToString() => $"{Day}\n{Date:dd MMM yyyy}";
 }

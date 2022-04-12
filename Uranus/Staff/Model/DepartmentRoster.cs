@@ -38,8 +38,8 @@ public class DepartmentRoster
 
     [Ignore] public Shift? DefaultShift { get; set; }
 
-    [Ignore] public Dictionary<string, int> ShiftCounter { get; set; }
-    [Ignore] public Dictionary<string, int> TargetShiftCounts { get; set; }
+    [Ignore] public Dictionary<Shift, int> ShiftCounter { get; set; }
+    [Ignore] public Dictionary<Shift, int> TargetShiftCounts { get; set; }
 
     [Ignore] public bool IsLoaded { get; set; }
 
@@ -59,8 +59,8 @@ public class DepartmentRoster
         EmployeeRosterDict = new Dictionary<Guid, EmployeeRoster>();
         EmpShiftConnections = new List<EmployeeShift>();
         ShiftRuleDict = new Dictionary<int, List<ShiftRule>>();
-        ShiftCounter = new Dictionary<string, int>();
-        TargetShiftCounts = new Dictionary<string, int>();
+        ShiftCounter = new Dictionary<Shift, int>();
+        TargetShiftCounts = new Dictionary<Shift, int>();
     }
 
     public DepartmentRoster(string name, DateTime startDate, bool useSaturdays, bool useSundays, Department department)
@@ -86,8 +86,8 @@ public class DepartmentRoster
         EmployeeRosterDict = new Dictionary<Guid, EmployeeRoster>();
         EmpShiftConnections = new List<EmployeeShift>();
         ShiftRuleDict = new Dictionary<int, List<ShiftRule>>();
-        ShiftCounter = new Dictionary<string, int>();
-        TargetShiftCounts = new Dictionary<string, int>();
+        ShiftCounter = new Dictionary<Shift, int>();
+        TargetShiftCounts = new Dictionary<Shift, int>();
     }
 
     public void SetData(IEnumerable<Employee> employees, IEnumerable<Roster> rosters, IEnumerable<DailyRoster> dailyRosters, IEnumerable<EmployeeRoster> employeeRosters,
@@ -104,6 +104,7 @@ public class DepartmentRoster
 
         SetRelationships();
         GenerateMissingRosters();
+        EmployeeRosters.Sort();
         IsLoaded = true;
     }
 
@@ -183,9 +184,10 @@ public class DepartmentRoster
                 foreach (var @break in breaks)
                     @break.Shift = shift;
             }
-            Department?.Shifts.Add(shift);
-            ShiftCounter[shift.ID] = 0;
-            TargetShiftCounts[shift.ID] = shift.DailyTarget;
+            if (Department is not null && !Department.Shifts.Select(s => s.Name).Contains(shift.Name)) 
+                Department?.Shifts.Add(shift);
+            ShiftCounter[shift] = 0;
+            TargetShiftCounts[shift] = shift.DailyTarget;
             shift.Department = Department;
             if (shift.Default) DefaultShift = shift;
         }
@@ -258,8 +260,8 @@ public class DepartmentRoster
             {
                 Rosters.Add(roster);
                 roster.DepartmentRoster = this;
-                if (ShiftCounter.TryGetValue(roster.ShiftID, out _))
-                    ShiftCounter[roster.ShiftID]++;
+                if (roster.Shift is not null && ShiftCounter.TryGetValue(roster.Shift, out _))
+                    ShiftCounter[roster.Shift]++;
             }
         }
     }
@@ -331,16 +333,16 @@ public class DepartmentRoster
             employeeRoster.SetDefault();
     }
 
-    public void DropCount(string shiftID)
+    public void DropCount(Shift shift)
     {
-        if (ShiftCounter.TryGetValue(shiftID, out _))
-            ShiftCounter[shiftID]--;
+        if (ShiftCounter.TryGetValue(shift, out _))
+            ShiftCounter[shift]--;
     }
 
-    public void AddCount(string shiftID)
+    public void AddCount(Shift shift)
     {
-        if (ShiftCounter.TryGetValue(shiftID, out _))
-            ShiftCounter[shiftID]++;
+        if (ShiftCounter.TryGetValue(shift, out _))
+            ShiftCounter[shift]++;
     }
 
     /// <summary>
@@ -358,16 +360,16 @@ public class DepartmentRoster
             shifts[shift] = EmployeeRosters.Where(er => er.Employee!.Shifts.Contains(shift)).ToList();
 
         // Order by most needed (discrepancy between those available and number required to reach target.
-        shifts = shifts.OrderBy(s => s.Value.Count - (TargetShiftCounts[s.Key.ID] - ShiftCounter[s.Key.ID]))
+        shifts = shifts.OrderBy(s => s.Value.Count - (TargetShiftCounts[s.Key] - ShiftCounter[s.Key]))
             .ToDictionary(e => e.Key, e => e.Value);
 
         foreach (var (shift, empRosters) in shifts)
         {
-            if (TargetShiftCounts[shift.ID] - ShiftCounter[shift.ID] <= 0) continue;
+            if (TargetShiftCounts[shift] - ShiftCounter[shift] <= 0) continue;
             // Randomize employees #TODO: Check against history to rotate through staff (instead of randomizing).
             empRosters.Shuffle();
 
-            foreach (var employeeRoster in empRosters.Where(employeeRoster => employeeRoster.Shift is null).TakeWhile(_ => ShiftCounter[shift.ID] < TargetShiftCounts[shift.ID]))
+            foreach (var employeeRoster in empRosters.Where(employeeRoster => employeeRoster.Shift is null).TakeWhile(_ => ShiftCounter[shift] < TargetShiftCounts[shift]))
             {
                 employeeRoster.SetShift(shift);
             }
@@ -395,8 +397,8 @@ public class DepartmentRoster
             var bestCount = int.MinValue;
             foreach (var shift in employeeRoster.Employee.Shifts)
             {
-                ShiftCounter.TryGetValue(shift.ID, out var count);
-                TargetShiftCounts.TryGetValue(shift.ID, out var target);
+                ShiftCounter.TryGetValue(shift, out var count);
+                TargetShiftCounts.TryGetValue(shift, out var target);
 
                 var disc = target - count;
 
@@ -409,4 +411,6 @@ public class DepartmentRoster
             if (bestShift is not null) employeeRoster.SetShift(bestShift);
         }
     }
+
+    public override string ToString() => Name;
 }
