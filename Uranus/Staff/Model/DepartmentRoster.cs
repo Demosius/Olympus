@@ -205,7 +205,7 @@ public class DepartmentRoster
 
             if (employee is null || shift is null) continue;
 
-            employee.Shifts.Add(shift);
+            if (shift != DefaultShift) employee.Shifts.Add(shift);
             shift.Employees.Add(employee);
         }
     }

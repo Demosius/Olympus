@@ -7,86 +7,55 @@
              xmlns:vm="clr-namespace:Pantheon.ViewModel.Controls"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:EmployeeRosterVM}, IsDesignTimeCreatable=False}"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="250" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Dark Theme -->
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
     <StackPanel Orientation="Horizontal">
 
         <!-- Employee -->
         <Border BorderBrush="GreenYellow"
-                                        BorderThickness="1">
+                BorderThickness="1"
+                Width="250">
             <StackPanel Orientation="Vertical">
 
                 <!-- Name -->
-                <StackPanel Orientation="Horizontal" Width="{Binding ElementName=EmployeeColumn, Path=ActualWidth, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                                HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal" Margin="5,5,5,0"
+                            Height="50">
                     <Image Source="{Binding Employee.Icon.FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                                               MaxWidth="50" MaxHeight="50"/>
+                           MaxWidth="40" MaxHeight="40"/>
                     <Label Content="{Binding Employee.FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                                               HorizontalAlignment="Center"
-                                               HorizontalContentAlignment="Center"/>
+                           HorizontalAlignment="Center"
+                           HorizontalContentAlignment="Center"
+                           VerticalAlignment="Center"
+                           VerticalContentAlignment="Center"/>
                 </StackPanel>
 
                 <!-- Shift Selector -->
-                <ComboBox ItemsSource="{Binding Department.Shifts, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                                                  SelectedValue="{Binding Shift}"
-                                                  MinHeight="20"
-                                                  Height="20"
-                                                  MinWidth="100"
-                                                  Width="100"/>
+                <ComboBox Style="{StaticResource MiniComboBoxStyle}"
+                          ItemsSource="{Binding Shifts, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                          SelectedValue="{Binding SelectedShift}"
+                          Width="150"
+                          Margin="0,0,0,5"/>
             </StackPanel>
         </Border>
 
         <!-- Rosters -->
-        <local:RosterView DataContext="{Binding MondayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Width="{Binding DepartmentRosterVM.MonColWidth, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:RosterView DataContext="{Binding MondayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Width="{Binding DepartmentRosterVM.TuesColWidth, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:RosterView DataContext="{Binding MondayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Width="{Binding DepartmentRosterVM.WedColWidth, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:RosterView DataContext="{Binding MondayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Width="{Binding DepartmentRosterVM.ThursColWidth, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:RosterView DataContext="{Binding MondayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Width="{Binding DepartmentRosterVM.FriColWidth, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:RosterView DataContext="{Binding MondayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Width="{Binding DepartmentRosterVM.SatColWidth, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:RosterView DataContext="{Binding MondayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Width="{Binding DepartmentRosterVM.SunColWidth, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <local:RosterView DataContext="{Binding MondayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <local:RosterView DataContext="{Binding TuesdayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <local:RosterView DataContext="{Binding WednesdayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <local:RosterView DataContext="{Binding ThursdayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <local:RosterView DataContext="{Binding FridayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <local:RosterView DataContext="{Binding SaturdayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <local:RosterView DataContext="{Binding SundayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <ItemsControl ItemsSource="{Binding Rosters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border BorderBrush="{StaticResource ForegroundBrush}"
-                                                    BorderThickness="1">
-                        <DockPanel Width="{Binding ElementName=MondayColumn, Path=ActualWidth}">
-
-                            <!-- Roster Employee-Date Confirmation Text-->
-                            <StackPanel DockPanel.Dock="Top"
-                                                                Width="{Binding ElementName=MondayColumn, Path=ActualWidth, UpdateSourceTrigger=PropertyChanged}"
-                                                                Orientation="Horizontal"
-                                                                HorizontalAlignment="Center">
-                                <StackPanel.Resources>
-                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockStyle}">
-                                        <Setter Property="FontSize" Value="8"/>
-                                        <Setter Property="Margin" Value="3,0"></Setter>
-                                    </Style>
-                                </StackPanel.Resources>
-                                <TextBlock Text="{Binding Employee.FullName, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=''}"/>
-                                <TextBlock Text="{Binding Date, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=dd-MMM-yyyy}"/>
-                            </StackPanel>
-
-                            <!-- Shift Selector -->
-
-                            <!-- Shift Type Selector (Normal/AL/RDO/etc.) -->
-                            <Button DockPanel.Dock="Left" HorizontalAlignment="Center" Width="150"></Button>
-                        </DockPanel>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
     </StackPanel>
 </UserControl>

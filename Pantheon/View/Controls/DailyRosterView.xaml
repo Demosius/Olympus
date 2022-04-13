@@ -9,31 +9,34 @@
              d:DataContext="{d:DesignInstance {x:Type vm:DailyRosterVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <Grid>
-        <ItemsControl ItemsSource="{Binding ShiftCounter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Grid Width="{Binding ElementName=MondayColumn, Path=ActualWidth, UpdateSourceTrigger=PropertyChanged}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.Resources>
-                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockStyle}">
-                                <Setter Property="Margin" Value="5,0"/>
-                                <Setter Property="FontSize" Value="10"></Setter>
-                            </Style>
-                        </Grid.Resources>
-                        <TextBlock Grid.Column="0"  Text="{Binding Value}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Key.Name}"/>
-                    </Grid>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+    <Border BorderBrush="White"
+            BorderThickness="1">
+        <StackPanel Orientation="Vertical">
+            <ItemsControl ItemsSource="{Binding ShiftCounter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.Resources>
+                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockStyle}">
+                                    <Setter Property="Margin" Value="5,0"/>
+                                    <Setter Property="FontSize" Value="10"></Setter>
+                                </Style>
+                            </Grid.Resources>
+                            <TextBlock Grid.Column="0"  Text="{Binding Value}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Key.Name}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
-        <Label Content="{Binding}"
-                                               FontSize="16"
-                                               FontWeight="Bold"/>
+            <Label Content="{Binding}"
+                   FontSize="16"
+                   FontWeight="Bold"/>
 
-    </Grid>
+        </StackPanel>
+    </Border>
 </UserControl>

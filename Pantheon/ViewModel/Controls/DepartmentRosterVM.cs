@@ -17,6 +17,9 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
     private Dictionary<DateTime, DailyRosterVM> dailyRosterVMs = new();
     private Dictionary<int, EmployeeRosterVM> employeeRosterVMs = new();
 
+    public int EmployeeColumnWidth => 250;
+    public int RosterColumnWidth => 200;
+
     #region INotifyPropertyChanged Members 
 
     public ObservableCollection<EmployeeRosterVM> EmployeeRosters { get; set; }
@@ -99,97 +102,31 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         }
     }
 
-    private int employeeColWidth = 200;
-    public int EmployeeColWidth
+    private ObservableCollection<Shift> shifts;
+    public ObservableCollection<Shift> Shifts
     {
-        get => employeeColWidth;
+        get => shifts;
         set
         {
-            employeeColWidth = value;
-            OnPropertyChanged(nameof(EmployeeColWidth));
+            shifts = value;
+            OnPropertyChanged(nameof(Shifts));
         }
     }
 
-    private int monColWidth = 150;
-    public int MonColWidth
+    private ObservableCollection<KeyValuePair<Shift, int>> shiftTargets;
+    public ObservableCollection<KeyValuePair<Shift, int>> ShiftTargets
     {
-        get => monColWidth;
+        get => shiftTargets;
         set
         {
-            monColWidth = value;
-            OnPropertyChanged(nameof(MonColWidth));
-        }
-    }
-
-    private int tuesColWidth = 150;
-    public int TuesColWidth
-    {
-        get => tuesColWidth;
-        set
-        {
-            tuesColWidth = value;
-            OnPropertyChanged(nameof(TuesColWidth));
-        }
-    }
-
-    private int wedColWidth = 150;
-    public int WedColWidth
-    {
-        get => wedColWidth;
-        set
-        {
-            wedColWidth = value;
-            OnPropertyChanged(nameof(WedColWidth));
-        }
-    }
-
-    private int thursColWidth = 150;
-    public int ThursColWidth
-    {
-        get => thursColWidth;
-        set
-        {
-            thursColWidth = value;
-            OnPropertyChanged(nameof(ThursColWidth));
-        }
-    }
-
-    private int friColWidth = 150;
-    public int FriColWidth
-    {
-        get => friColWidth;
-        set
-        {
-            friColWidth = value;
-            OnPropertyChanged(nameof(FriColWidth));
-        }
-    }
-
-    private int satColWidth = 150;
-    public int SatColWidth
-    {
-        get => satColWidth;
-        set
-        {
-            satColWidth = value;
-            OnPropertyChanged(nameof(SatColWidth));
-        }
-    }
-
-    private int sunColWidth = 150;
-    public int SunColWidth
-    {
-        get => sunColWidth;
-        set
-        {
-            sunColWidth = value;
-            OnPropertyChanged(nameof(SunColWidth));
+            shiftTargets = value;
+            OnPropertyChanged(nameof(ShiftTargets));
         }
     }
 
     #endregion
 
-    /// <summary>
+    /*/// <summary>
     /// For Testing purposes.
     /// </summary>
     public DepartmentRosterVM()
@@ -198,7 +135,9 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         Helios = new Helios(Settings.Default.SolLocation);
         EmployeeRosters = new ObservableCollection<EmployeeRosterVM>();
         IsInitialized = true;
-    }
+        shifts = new ObservableCollection<Shift>();
+        shiftTargets = new ObservableCollection<KeyValuePair<Shift, int>>();
+    }*/
 
     public DepartmentRosterVM(DepartmentRoster roster, Helios helios)
     {
@@ -206,6 +145,8 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         Helios = helios;
         EmployeeRosters = new ObservableCollection<EmployeeRosterVM>();
         IsInitialized = false;
+        shifts = new ObservableCollection<Shift>();
+        shiftTargets = new ObservableCollection<KeyValuePair<Shift, int>>();
     }
 
     /// <summary>
@@ -265,8 +206,15 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
                 }
                 erVM.AddRoster(roster, drVM);
             }
+            EmployeeRosters.Add(erVM);
         }
 
+        foreach (var (_, shift) in DepartmentRoster.ShiftDict)
+        {
+            Shifts.Add(shift);
+            ShiftTargets.Add(new KeyValuePair<Shift, int>(shift, shift.DailyTarget));
+        }
+        
         IsInitialized = true;
     }
 

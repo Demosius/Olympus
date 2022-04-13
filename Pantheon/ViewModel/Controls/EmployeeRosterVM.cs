@@ -1,7 +1,9 @@
 ﻿using Pantheon.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Runtime.CompilerServices;
 using Uranus.Staff.Model;
 
@@ -91,14 +93,61 @@ internal class EmployeeRosterVM : INotifyPropertyChanged
         }
     }
 
+    private Employee employee;
+    public Employee Employee
+    {
+        get => employee;
+        set
+        {
+            employee = value;
+            OnPropertyChanged(nameof(Employee));
+        }
+    }
+
+    private ObservableCollection<Shift> shifts;
+    public ObservableCollection<Shift> Shifts
+    {
+        get => shifts;
+        set
+        {
+            shifts = value;
+            OnPropertyChanged(nameof(Shifts));
+        }
+    }
+
+    private Shift? selectedShift;
+    public Shift? SelectedShift
+    {
+        get => selectedShift;
+        set
+        {
+            selectedShift = value;
+            OnPropertyChanged(nameof(SelectedShift));
+
+            EmployeeRoster.Shift = selectedShift;
+            foreach (var (_, rosterVM) in rosterVMs)
+                rosterVM.SelectedShift = selectedShift;
+        }
+    }
+
     #endregion
 
     public DepartmentRosterVM DepartmentRosterVM { get; set; }
 
     public EmployeeRosterVM(EmployeeRoster roster, DepartmentRosterVM departmentRosterVM)
     {
+        if (roster.Employee is null) throw new DataException("Employee Roster missing Employee Value."); 
+
         EmployeeRoster = roster;
+        employee = EmployeeRoster.Employee;
         DepartmentRosterVM = departmentRosterVM;
+        shifts = new ObservableCollection<Shift>();
+
+        foreach (var shift in Employee.Shifts)
+            shifts.Add(shift);
+
+        selectedShift = roster.Shift;
+
     }
 
     public void AddRoster(Roster roster, DailyRosterVM dailyRoster)
