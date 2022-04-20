@@ -12,13 +12,16 @@ internal class LoadRosterCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedDepartment is not null && VM.SelectedRoster is not null;
+        if (VM.LoadedRoster is not null)
+            Mouse.OverrideCursor = Cursors.Arrow;
+
+        return VM.SelectedDepartment is not null && VM.SelectedRoster is not null && VM.LoadedRoster is null;
     }
 
     public void Execute(object? parameter)
     {
-        if (VM.SelectedRoster is not null)
-            VM.LoadRoster(VM.SelectedRoster);
+        if (VM.SelectedRoster is not null && VM.LoadedRoster is null)
+            VM.LoadRoster();
     }
 
     public event EventHandler? CanExecuteChanged

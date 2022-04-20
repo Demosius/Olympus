@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Uranus.Staff.Model;
 
@@ -12,7 +13,7 @@ namespace Pantheon.ViewModel.Controls;
 internal class EmployeeRosterVM : INotifyPropertyChanged
 {
     public EmployeeRoster EmployeeRoster { get; set; }
-    private Dictionary<DateTime, RosterVM> rosterVMs = new();
+    private readonly Dictionary<DateTime, RosterVM> rosterVMs = new();
 
     #region INotifyPropertyChanged Members
 
@@ -23,7 +24,7 @@ internal class EmployeeRosterVM : INotifyPropertyChanged
         set
         {
             mondayRoster = value;
-            OnPropertyChanged(nameof(MondayRoster));
+            OnPropertyChanged();
         }
     }
 
@@ -34,7 +35,7 @@ internal class EmployeeRosterVM : INotifyPropertyChanged
         set
         {
             tuesdayRoster = value;
-            OnPropertyChanged(nameof(TuesdayRoster));
+            OnPropertyChanged();
         }
     }
 
@@ -45,7 +46,7 @@ internal class EmployeeRosterVM : INotifyPropertyChanged
         set
         {
             wednesdayRoster = value;
-            OnPropertyChanged(nameof(WednesdayRoster));
+            OnPropertyChanged();
         }
     }
 
@@ -56,7 +57,7 @@ internal class EmployeeRosterVM : INotifyPropertyChanged
         set
         {
             thursdayRoster = value;
-            OnPropertyChanged(nameof(ThursdayRoster));
+            OnPropertyChanged();
         }
     }
 
@@ -67,7 +68,7 @@ internal class EmployeeRosterVM : INotifyPropertyChanged
         set
         {
             fridayRoster = value;
-            OnPropertyChanged(nameof(FridayRoster));
+            OnPropertyChanged();
         }
     }
 
@@ -78,7 +79,7 @@ internal class EmployeeRosterVM : INotifyPropertyChanged
         set
         {
             saturdayRoster = value;
-            OnPropertyChanged(nameof(SaturdayRoster));
+            OnPropertyChanged();
         }
     }
 
@@ -89,7 +90,7 @@ internal class EmployeeRosterVM : INotifyPropertyChanged
         set
         {
             sundayRoster = value;
-            OnPropertyChanged(nameof(SundayRoster));
+            OnPropertyChanged();
         }
     }
 
@@ -100,7 +101,7 @@ internal class EmployeeRosterVM : INotifyPropertyChanged
         set
         {
             employee = value;
-            OnPropertyChanged(nameof(Employee));
+            OnPropertyChanged();
         }
     }
 
@@ -111,22 +112,38 @@ internal class EmployeeRosterVM : INotifyPropertyChanged
         set
         {
             shifts = value;
-            OnPropertyChanged(nameof(Shifts));
+            OnPropertyChanged();
         }
     }
 
-    private Shift? selectedShift;
     public Shift? SelectedShift
     {
-        get => selectedShift;
+        get => EmployeeRoster.Shift;
         set
         {
-            selectedShift = value;
-            OnPropertyChanged(nameof(SelectedShift));
+            if (SelectedShift is not null && SelectedRosterType == ERosterType.Standard) DepartmentRosterVM.SubCount(SelectedShift);
+            EmployeeRoster.Shift = value;
+            EmployeeRoster.ShiftID = value?.ID ?? "";
+            OnPropertyChanged();
+            if (SelectedShift is not null && SelectedRosterType == ERosterType.Standard) DepartmentRosterVM.AddCount(SelectedShift);
+            SetShift(value);
+        }
+    }
 
-            EmployeeRoster.Shift = selectedShift;
-            foreach (var (_, rosterVM) in rosterVMs)
-                rosterVM.SelectedShift = selectedShift;
+    public ERosterType SelectedRosterType
+    {
+        get => EmployeeRoster.RosterType;
+        set
+        {
+            var adjustCounter = value != SelectedRosterType;
+            EmployeeRoster.RosterType = value;
+            OnPropertyChanged();
+            SetRosterType(value);
+            if (!adjustCounter || SelectedShift is null) return;
+            if (SelectedRosterType == ERosterType.Standard)
+                DepartmentRosterVM.AddCount(SelectedShift);
+            else
+                DepartmentRosterVM.SubCount(SelectedShift);
         }
     }
 
@@ -136,7 +153,7 @@ internal class EmployeeRosterVM : INotifyPropertyChanged
 
     public EmployeeRosterVM(EmployeeRoster roster, DepartmentRosterVM departmentRosterVM)
     {
-        if (roster.Employee is null) throw new DataException("Employee Roster missing Employee Value."); 
+        if (roster.Employee is null) throw new DataException("Employee Roster missing Employee Value.");
 
         EmployeeRoster = roster;
         employee = EmployeeRoster.Employee;
@@ -145,9 +162,6 @@ internal class EmployeeRosterVM : INotifyPropertyChanged
 
         foreach (var shift in Employee.Shifts)
             shifts.Add(shift);
-
-        selectedShift = roster.Shift;
-
     }
 
     public void AddRoster(Roster roster, DailyRosterVM dailyRoster)
@@ -181,6 +195,29 @@ internal class EmployeeRosterVM : INotifyPropertyChanged
             default:
                 throw new ArgumentOutOfRangeException(nameof(roster.Day), roster.Day, "Unaccounted day of the week.");
         }
+    }
+
+    public void SetRosterType(ERosterType type)
+    {
+        foreach (var rosterVM in rosterVMs.Values.Where(rosterVM => rosterVM.Date.DayOfWeek is not (DayOfWeek.Saturday or DayOfWeek.Sunday)))
+            rosterVM.Type = type;
+    }
+
+    /// <summary>
+    /// Sets teh shift to the employee's default if they have one.
+    /// </summary>
+    public void SetDefault()
+    {
+        var shift = Employee.DefaultShift;
+        if (shift is null) return;
+
+        SelectedShift = shift;
+    }
+
+    public void SetShift(Shift? shift)
+    {
+        foreach (var rosterVM in rosterVMs.Values.Where(rosterVM => rosterVM.Date.DayOfWeek is not (DayOfWeek.Saturday or DayOfWeek.Sunday)))
+            rosterVM.SelectedShift = shift;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

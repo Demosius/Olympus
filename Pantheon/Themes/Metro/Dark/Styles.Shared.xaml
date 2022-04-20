@@ -259,7 +259,7 @@
 
     <!-- *****************************  ComboBoxToggleButton Style - MINI!  ***************************** -->
     <Style x:Key="MiniComboBoxToggleButtonStyle" TargetType="ToggleButton">
-        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontSize" Value="9" />
         <Setter Property="FontFamily" Value="Segoe UI" />
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource ComboBoxToggleButtonBorderBrush}" />

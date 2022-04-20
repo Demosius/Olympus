@@ -26,6 +26,17 @@ public class StaffReader
     /* EMPLOYEES */
     public Employee? Employee(int id, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Employee>(id, pullType);
 
+    /// <summary>
+    /// Gets the employee with all appropriate relationships loaded.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public Employee? EmployeeLogIn(int id)
+    {
+        EmployeeDataSet().Employees.TryGetValue(id, out var employee);
+        return employee;
+    }
+
     public List<Employee> Employees(Expression<Func<Employee, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     public bool EmployeeExists(int id) => Chariot.Database?.ExecuteScalar<int>("SELECT count(*) FROM Employee WHERE ID=?;", id) > 0;

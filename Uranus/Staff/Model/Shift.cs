@@ -10,7 +10,7 @@ using Uranus.Annotations;
 
 namespace Uranus.Staff.Model;
 
-public class Shift : INotifyPropertyChanged
+public class Shift : INotifyPropertyChanged, IEquatable<Shift>, IComparable<Shift>
 {
     [PrimaryKey] public string ID { get; set; } // {DepartmentName}|{Name}
     public string Name { get; set; }
@@ -174,6 +174,18 @@ public class Shift : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public bool Equals(Shift? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return ID == other.ID;
+    }
+
+    public int CompareTo(Shift? other)
+    {
+        return other == null ? 1 : string.CompareOrdinal(ID, other.ID);
     }
 
     public override string ToString() => Name;

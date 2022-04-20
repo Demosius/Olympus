@@ -63,6 +63,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         ID = Guid.NewGuid();
         ShiftID = string.Empty;
         DepartmentName = string.Empty;
+        AtWork = true;
     }
 
     public Roster(Employee employee, DateTime date)
@@ -84,6 +85,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
 
         Date = date;
         Day = Date.DayOfWeek;
+        AtWork = true;
     }
 
     public Roster(Department department, Employee employee, DateTime date)
@@ -98,6 +100,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
 
         Date = date;
         Day = Date.DayOfWeek;
+        AtWork = true;
     }
 
     public Roster(Department department, DepartmentRoster departmentRoster, EmployeeRoster employeeRoster, Employee employee, DateTime date)
@@ -114,6 +117,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         Date = date;
         Day = Date.DayOfWeek;
         ShiftID = string.Empty;
+        AtWork = Day != DayOfWeek.Saturday && Day != DayOfWeek.Sunday;
     }
 
     public Roster(Guid id, int employeeID, string shiftID, string departmentName, DayOfWeek day, DateTime date, ERosterType rosterType, Employee employee, Shift shift, Department department)
@@ -128,6 +132,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         Employee = employee;
         Shift = shift;
         Department = department;
+        AtWork = true;
     }
 
     public void SetShift(Shift newShift, bool working = true)

@@ -13,6 +13,7 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
     [ForeignKey(typeof(Employee))] public int EmployeeID { get; set; }
     [ForeignKey(typeof(DepartmentRoster))] public Guid DepartmentRosterID { get; set; }
     public DateTime StartDate { get; set; }
+    public ERosterType RosterType { get; set; }
 
     [ManyToOne(nameof(DepartmentName), nameof(Model.Department.EmployeeRosters),
         CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
@@ -33,10 +34,6 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
     [OneToMany(nameof(Roster.EmployeeRosterID), nameof(Roster.EmployeeRoster))]
     public List<Roster> Rosters { get; set; }
 
-    // TODO: Add ordered/day specific Roster references.
-    // Ordered would likely be easiest/lightest - but might not have required checks and balances.
-    // Checks should be done in initial creation, as opposed to when they are being pulled from the DB.
-    // Checks only if size is not accurate?
 
     public EmployeeRoster()
     {
@@ -57,33 +54,6 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
         ShiftID = string.Empty;
         DepartmentRoster = departmentRoster;
         Rosters = new List<Roster>();
-    }
-
-    /// <summary>
-    /// Sets teh shift to the employee's default if they have one.
-    /// </summary>
-    public void SetDefault(bool saturdays = false, bool sundays = false)
-    {
-        var shift = Employee?.DefaultShift;
-        if (shift is null) return;
-
-        SetShift(shift, saturdays, sundays);
-    }
-
-    public void SetShift(Shift shift, bool saturdays = false, bool sundays = false)
-    {
-        if (Shift is not null) DepartmentRoster?.DropCount(Shift);
-        Shift = shift;
-        ShiftID = Shift.ID;
-        DepartmentRoster?.AddCount(Shift);
-
-        foreach (var roster in Rosters)
-        {
-            if (roster.Day == DayOfWeek.Saturday && !saturdays || roster.Day == DayOfWeek.Sunday && !sundays)
-                roster.AtWork = false;
-            else 
-                roster.SetShift(shift);
-        }
     }
 
     public bool Equals(EmployeeRoster? other)

@@ -5,9 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Pantheon.View.Controls"
              xmlns:vm="clr-namespace:Pantheon.ViewModel.Controls"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:model="clr-namespace:Uranus.Staff.Model;assembly=Uranus"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance {x:Type vm:EmployeeRosterVM}, IsDesignTimeCreatable=False}"
-             d:DesignHeight="250" d:DesignWidth="800">
+             d:DataContext="{d:DesignInstance {x:Type vm:EmployeeRosterVM}, IsDesignTimeCreatable=False}">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -19,43 +20,72 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <StackPanel Orientation="Horizontal">
+    <Canvas Height="70">
 
         <!-- Employee -->
         <Border BorderBrush="GreenYellow"
-                BorderThickness="1"
-                Width="250">
-            <StackPanel Orientation="Vertical">
+                BorderThickness=".5"
+                Width="230"
+                Height="70">
+            <Canvas>
+                <Canvas.Resources>
+                    <ObjectDataProvider x:Key="RosterTypes"
+                                        MethodName="GetValues" 
+                                        ObjectType="{x:Type sys:Enum}">
+                        <ObjectDataProvider.MethodParameters>
+                            <x:Type TypeName="model:ERosterType"/>
+                        </ObjectDataProvider.MethodParameters>
+                    </ObjectDataProvider>
+                </Canvas.Resources> 
+
+                <Border Canvas.Top="9" Canvas.Left="10"
+                        BorderBrush="{StaticResource ForegroundBrush}" BorderThickness=".5">
+                    <Image Source="{Binding Employee.Icon.FullPath, Mode=OneTime, FallbackValue=''}"
+                           Width="50" Height="50"/>
+                </Border>
 
                 <!-- Name -->
-                <StackPanel Orientation="Horizontal" Margin="5,5,5,0"
-                            Height="50">
-                    <Image Source="{Binding Employee.Icon.FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                           MaxWidth="40" MaxHeight="40"/>
-                    <Label Content="{Binding Employee.FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                           HorizontalAlignment="Center"
-                           HorizontalContentAlignment="Center"
-                           VerticalAlignment="Center"
-                           VerticalContentAlignment="Center"/>
-                </StackPanel>
+                <Label Canvas.Top="0" Canvas.Left="60" 
+                       Width="170"
+                       Height="28"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Content="{Binding Employee.FullName, Mode=OneTime, FallbackValue=''}"
+                       HorizontalAlignment="Center"
+                       HorizontalContentAlignment="Center"
+                       VerticalAlignment="Center"
+                       VerticalContentAlignment="Center"/>
 
                 <!-- Shift Selector -->
-                <ComboBox Style="{StaticResource MiniComboBoxStyle}"
-                          ItemsSource="{Binding Shifts, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                          SelectedValue="{Binding SelectedShift}"
+                <ComboBox Canvas.Top="28" Canvas.Left="69" 
+                          Style="{StaticResource MiniComboBoxStyle}"
+                          ItemsSource="{Binding Shifts, Mode=OneTime, FallbackValue=''}"
+                          SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Width="150"
-                          Margin="0,0,0,5"/>
-            </StackPanel>
+                          Height="15"
+                          VerticalContentAlignment="Center"
+                          HorizontalContentAlignment="Center"/>
+
+                <!-- Roster Type -->
+                <ComboBox Canvas.Top="48" Canvas.Left="69" Style="{StaticResource MiniComboBoxStyle}"
+                          ItemsSource="{Binding Source={StaticResource RosterTypes}, Mode=OneTime}"
+                          SelectedValue="{Binding SelectedRosterType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          Width="150"
+                          Height="15"
+                          VerticalContentAlignment="Center"
+                          HorizontalContentAlignment="Center"/>
+
+            </Canvas>
         </Border>
 
         <!-- Rosters -->
-        <local:RosterView DataContext="{Binding MondayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:RosterView DataContext="{Binding TuesdayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:RosterView DataContext="{Binding WednesdayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:RosterView DataContext="{Binding ThursdayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:RosterView DataContext="{Binding FridayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:RosterView DataContext="{Binding SaturdayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        <local:RosterView DataContext="{Binding SundayRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <local:RosterView Canvas.Left="230" DataContext="{Binding MondayRoster, Mode=OneTime}"/>
+        <local:RosterView Canvas.Left="430" DataContext="{Binding TuesdayRoster, Mode=OneTime}"/>
+        <local:RosterView Canvas.Left="630" DataContext="{Binding WednesdayRoster, Mode=OneTime}"/>
+        <local:RosterView Canvas.Left="830" DataContext="{Binding ThursdayRoster, Mode=OneTime}"/>
+        <local:RosterView Canvas.Left="1030" DataContext="{Binding FridayRoster, Mode=OneTime}"/>
+        <local:RosterView Canvas.Left="1230" DataContext="{Binding SaturdayRoster, Mode=OneTime}"/>
+        <local:RosterView Canvas.Left="1430" DataContext="{Binding SundayRoster, Mode=OneTime}"/>
 
-    </StackPanel>
+    </Canvas>
 </UserControl>

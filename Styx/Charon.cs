@@ -143,8 +143,8 @@ public partial class Charon
 
         var user = userReader.User(userID);
         if (user is null) return false;
-
-        user.Employee = staffReader.Employee(userID, EPullType.FullRecursive);
+        
+        user.Employee = staffReader.EmployeeLogIn(userID);
         CurrentUser = user;
 
         return true;

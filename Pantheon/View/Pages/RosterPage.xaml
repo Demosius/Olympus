@@ -68,14 +68,15 @@
             <ComboBox ItemsSource="{Binding Rosters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       SelectedValue="{Binding SelectedRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-            <Button Content="Generate Roster" Width="140"
+            <Button Content="Load Roster" Width="140"
+                    Command="{Binding LoadRosterCommand}"/>
+            <Button Content="Auto-Assign" Width="140"
                     Command="{Binding GenerateRosterCommand}"/>
+            <Button Content="Clear Shifts" Width="140"
+                    Command="{Binding ClearShiftsCommand}"/>
             <Button Content="New Roster" Width="140"
                     Command="{Binding NewRosterCommand}"/>
         </StackPanel>
-
-        <!-- Shift Control Panel -->
-
 
         <!-- More Controls -->
         <StackPanel DockPanel.Dock="Bottom"
@@ -85,9 +86,7 @@
         </StackPanel>
 
         <!-- Department Roster UI -->
-        <controls:DepartmentRosterView DataContext="{Binding SelectedRoster}">
-
-        </controls:DepartmentRosterView>
+        <controls:DepartmentRosterView DataContext="{Binding LoadedRoster}"/>
         
 
     </DockPanel>

@@ -1,10 +1,14 @@
-﻿using Pantheon.Properties;
+﻿using Pantheon.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using Uranus;
+using Uranus.Extension;
 using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Controls;
@@ -13,16 +17,25 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
 {
     public DepartmentRoster DepartmentRoster { get; set; }
     public Helios Helios { get; set; }
-    public bool IsInitialized { get; set; }
-    private Dictionary<DateTime, DailyRosterVM> dailyRosterVMs = new();
-    private Dictionary<int, EmployeeRosterVM> employeeRosterVMs = new();
+    private readonly Dictionary<DateTime, DailyRosterVM> dailyRosterVMs = new();
+    public readonly Dictionary<int, EmployeeRosterVM> EmployeeRosterVMs = new();
 
-    public int EmployeeColumnWidth => 250;
-    public int RosterColumnWidth => 200;
+    public Dictionary<string, ShiftCounter> TargetAccessDict { get; set; }
 
     #region INotifyPropertyChanged Members 
 
     public ObservableCollection<EmployeeRosterVM> EmployeeRosters { get; set; }
+
+    private bool isInitialized;
+    public bool IsInitialized
+    {
+        get => isInitialized;
+        set
+        {
+            isInitialized = value;
+            OnPropertyChanged();
+        }
+    }
 
     private DailyRosterVM? mondayRoster;
     public DailyRosterVM? MondayRoster
@@ -31,7 +44,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         set
         {
             mondayRoster = value;
-            OnPropertyChanged(nameof(MondayRoster));
+            OnPropertyChanged();
         }
     }
 
@@ -42,7 +55,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         set
         {
             tuesdayRoster = value;
-            OnPropertyChanged(nameof(TuesdayRoster));
+            OnPropertyChanged();
         }
     }
 
@@ -53,7 +66,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         set
         {
             wednesdayRoster = value;
-            OnPropertyChanged(nameof(WednesdayRoster));
+            OnPropertyChanged();
 
         }
     }
@@ -65,7 +78,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         set
         {
             thursdayRoster = value;
-            OnPropertyChanged(nameof(ThursdayRoster));
+            OnPropertyChanged();
         }
     }
 
@@ -76,7 +89,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         set
         {
             fridayRoster = value;
-            OnPropertyChanged(nameof(FridayRoster));
+            OnPropertyChanged();
         }
     }
 
@@ -87,7 +100,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         set
         {
             saturdayRoster = value;
-            OnPropertyChanged(nameof(SaturdayRoster));
+            OnPropertyChanged();
         }
     }
 
@@ -98,7 +111,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         set
         {
             sundayRoster = value;
-            OnPropertyChanged(nameof(SundayRoster));
+            OnPropertyChanged();
         }
     }
 
@@ -109,18 +122,18 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         set
         {
             shifts = value;
-            OnPropertyChanged(nameof(Shifts));
+            OnPropertyChanged();
         }
     }
 
-    private ObservableCollection<KeyValuePair<Shift, int>> shiftTargets;
-    public ObservableCollection<KeyValuePair<Shift, int>> ShiftTargets
+    private ObservableCollection<ShiftCounter> shiftTargets;
+    public ObservableCollection<ShiftCounter> ShiftTargets
     {
         get => shiftTargets;
         set
         {
             shiftTargets = value;
-            OnPropertyChanged(nameof(ShiftTargets));
+            OnPropertyChanged();
         }
     }
 
@@ -146,7 +159,8 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         EmployeeRosters = new ObservableCollection<EmployeeRosterVM>();
         IsInitialized = false;
         shifts = new ObservableCollection<Shift>();
-        shiftTargets = new ObservableCollection<KeyValuePair<Shift, int>>();
+        shiftTargets = new ObservableCollection<ShiftCounter>();
+        TargetAccessDict = new Dictionary<string, ShiftCounter>();
     }
 
     /// <summary>
@@ -157,6 +171,15 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         if (IsInitialized) return;
 
         if (!DepartmentRoster.IsLoaded) Helios.StaffReader.FillDepartmentRoster(DepartmentRoster);
+
+        // Shift Targets
+        foreach (var (_, shift) in DepartmentRoster.ShiftDict)
+        {
+            Shifts.Add(shift);
+            var counter = new ShiftCounter(shift, shift.DailyTarget);
+            ShiftTargets.Add(counter);
+            TargetAccessDict.Add(shift.ID, counter);
+        }
 
         // Daily rosters.
         foreach (var dailyRoster in DepartmentRoster.DailyRosters)
@@ -195,7 +218,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         foreach (var employeeRoster in DepartmentRoster.EmployeeRosters)
         {
             var erVM = new EmployeeRosterVM(employeeRoster, this);
-            employeeRosterVMs.Add(employeeRoster.EmployeeID, erVM);
+            EmployeeRosterVMs.Add(employeeRoster.EmployeeID, erVM);
             foreach (var roster in employeeRoster.Rosters)
             {
                 dailyRosterVMs.TryGetValue(roster.Date, out var drVM);
@@ -209,18 +232,96 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
             EmployeeRosters.Add(erVM);
         }
 
-        foreach (var (_, shift) in DepartmentRoster.ShiftDict)
-        {
-            Shifts.Add(shift);
-            ShiftTargets.Add(new KeyValuePair<Shift, int>(shift, shift.DailyTarget));
-        }
-        
         IsInitialized = true;
     }
 
+    public void AddCount(Shift shift)
+    {
+        TargetAccessDict[shift.ID].Count++;
+    }
+
+    public void SubCount(Shift shift)
+    {
+        TargetAccessDict[shift.ID].Count--;
+    }
+
+    /// <summary>
+    /// Use to automate shift assignment.
+    /// </summary>
     public void GenerateRosterAssignments()
     {
-        throw new NotImplementedException();
+        AssignDefaults();
+        CountToTargets();
+        ApplyDepartmentDefault();
+    }
+
+    /// <summary>
+    /// For a fresh start, un-assign all shifts.
+    /// </summary>
+    public void UnAssignAll()
+    {
+        foreach (var employeeRosterVM in EmployeeRosters) employeeRosterVM.SelectedShift = null;
+    }
+
+    /// <summary>
+    /// Assigns shifts to employees based on their defined defaults - only if they do not already have assigned shifts..
+    /// </summary>
+    public void AssignDefaults()
+    {
+        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.SelectedShift is null))
+            employeeRoster.SetDefault();
+    }
+
+    /// <summary>
+    /// Attempt to reach the targeted number for each shift.
+    /// </summary>
+    public void CountToTargets()
+    {
+        if (DepartmentRoster.Department is null) throw new DataException("Department Roster has null value for department.");
+
+        // Get every non-default shift with a target above 0.
+        var targetShifts = DepartmentRoster.Department.Shifts.Where(s => !s.Default && s.DailyTarget > 0)
+            .ToDictionary(s => s, _ => new List<EmployeeRosterVM>());
+
+        foreach (var (shift, _) in targetShifts)
+            targetShifts[shift] = EmployeeRosters.Where(er => er.Employee.Shifts.Contains(shift)).ToList();
+
+        // Order by most needed (discrepancy between those available and number required to reach target.
+        targetShifts = targetShifts.OrderBy(s => s.Value.Count - TargetAccessDict[s.Key.ID].Discrepancy)
+            .ToDictionary(e => e.Key, e => e.Value);
+
+        foreach (var (shift, empRosters) in targetShifts)
+        {
+            if (TargetAccessDict[shift.ID].Discrepancy <= 0) continue;
+            // Randomize employees #TODO: Check against history to rotate through staff (instead of randomizing).
+            empRosters.Shuffle();
+
+            foreach (var employeeRoster in empRosters.Where(employeeRoster => employeeRoster.SelectedShift is null).TakeWhile(_ => TargetAccessDict[shift.ID].Lacking))
+                employeeRoster.SelectedShift = shift;
+        }
+    }
+
+    /// <summary>
+    /// Checks all employees to see if they are assigned. If they aren't, use department defaults if they exist,
+    /// otherwise assign a shift that they are eligible for that is closest to its target count.
+    /// </summary>
+    public void ApplyDepartmentDefault()
+    {
+        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.SelectedShift is null))
+        {
+            if (DepartmentRoster.DefaultShift is not null)
+            {
+                employeeRoster.SelectedShift = DepartmentRoster.DefaultShift;
+                continue;
+            }
+
+            if (employeeRoster.Employee is null)
+                throw new DataException("Employee roster does not have employee initialized.");
+
+            var bestShift = ShiftTargets.First(c => c.Discrepancy == ShiftTargets.Min(counter => counter.Discrepancy)).Shift;
+
+            employeeRoster.SelectedShift = bestShift;
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -232,5 +333,4 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
     }
 
     public override string ToString() => DepartmentRoster.ToString();
-
 }

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Pantheon.Annotations;
+using Pantheon.Model;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Pantheon.Annotations;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Uranus.Staff.Model;
@@ -13,10 +14,12 @@ internal class DailyRosterVM : INotifyPropertyChanged
 
     public DepartmentRosterVM DepartmentRosterVM { get; set; }
 
+    public Dictionary<string, ShiftCounter> CounterAccessDict { get; set; }
+
     #region INotifyPropertyChanged Members
 
-    private ObservableCollection<KeyValuePair<Shift, int>> shiftCounter;
-    public ObservableCollection<KeyValuePair<Shift, int>> ShiftCounter
+    private ObservableCollection<ShiftCounter> shiftCounter;
+    public ObservableCollection<ShiftCounter> ShiftCounter
     {
         get => shiftCounter;
         set
@@ -32,10 +35,25 @@ internal class DailyRosterVM : INotifyPropertyChanged
     {
         DailyRoster = roster;
         DepartmentRosterVM = departmentRosterVM;
-        shiftCounter = new ObservableCollection<KeyValuePair<Shift, int>>();
+        shiftCounter = new ObservableCollection<ShiftCounter>();
+        CounterAccessDict = new Dictionary<string, ShiftCounter>();
 
-        foreach (var (shift, _) in DepartmentRosterVM.ShiftTargets)
-            shiftCounter.Add(new KeyValuePair<Shift, int>(shift, 0));
+        foreach (var counter in DepartmentRosterVM.ShiftTargets)
+        {
+            var dailyCounter = new ShiftCounter(counter.Shift, counter.Target);
+            ShiftCounter.Add(dailyCounter);
+            CounterAccessDict.Add(dailyCounter.Shift.ID, dailyCounter);
+        }
+    }
+
+    public void AddCount(Shift shift)
+    {
+        CounterAccessDict[shift.ID].Count++;
+    }
+
+    public void SubCount(Shift shift)
+    {
+        CounterAccessDict[shift.ID].Count--;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -39,6 +39,7 @@ public class UserHandlerVM : INotifyPropertyChanged
     public UserHandlerVM(OlympusVM olympusVM) : this()
     {
         ParentVM = olympusVM;
+        LogIn();
     }
 
     public void CheckUser()
@@ -50,7 +51,7 @@ public class UserHandlerVM : INotifyPropertyChanged
         }
         else
         {
-            UserGreeting = $"Hello, {App.Charon.UserEmployee.DisplayName}.";
+            UserGreeting = $"Hello, {App.Charon.UserEmployee?.DisplayName ?? "... you?"}.";
             ButtonString = "Log Out";
         }
     }

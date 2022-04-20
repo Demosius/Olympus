@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Pantheon.Annotations;
+using System;
 using System.Collections.ObjectModel;
-using Pantheon.Annotations;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Uranus.Staff.Model;
@@ -16,7 +16,7 @@ internal class RosterVM : INotifyPropertyChanged
     public EmployeeRosterVM EmployeeRosterVM { get; set; }
 
     #region INotifyPropertyChanged Members
-    
+
     private ObservableCollection<Shift> shifts;
     public ObservableCollection<Shift> Shifts
     {
@@ -28,47 +28,90 @@ internal class RosterVM : INotifyPropertyChanged
         }
     }
 
-    private Shift? selectedShift;
     public Shift? SelectedShift
     {
-        get => selectedShift;
+        get => Roster.Shift;
         set
-        {
-            selectedShift = value;
+        {   
+            if (AtWork && Roster.Shift is not null) DailyRosterVM.SubCount(Roster.Shift);
+            Roster.Shift = value;
             OnPropertyChanged(nameof(SelectedShift));
+            if (AtWork && Roster.Shift is not null) DailyRosterVM.AddCount(Roster.Shift);
+
+            SetShift(value);
         }
     }
 
-    private Employee employee;
-    public Employee Employee
+    public Employee? Employee
     {
-        get => employee;
+        get => Roster.Employee;
         set
         {
-            employee = value;
+            Roster.Employee = value;
             OnPropertyChanged(nameof(Employee));
         }
     }
 
-    private DateTime date;
     public DateTime Date
     {
-        get => date;
+        get => Roster.Date;
         set
         {
-            date = value;
+            Roster.Date = value;
             OnPropertyChanged(nameof(Date));
         }
     }
 
-    private ERosterType type;
     public ERosterType Type
     {
-        get => type;
+        get => Roster.RosterType;
         set
         {
-            type = value;
+            Roster.RosterType = value;
             OnPropertyChanged(nameof(Type));
+            AtWork = Roster.RosterType == ERosterType.Standard;
+        }
+    }
+
+    public string StartTime
+    {
+        get => $"{Roster.StartTime.Hours:00}:{Roster.StartTime.Minutes:00}";
+        set
+        {
+            if (!TimeSpan.TryParse(value, out var t)) return;
+
+            Roster.StartTime = t;
+            OnPropertyChanged(nameof(StartTime));
+        }
+    }
+
+    public string EndTime
+    {
+        get => $"{Roster.EndTime.Hours:00}:{Roster.EndTime.Minutes:00}";
+        set
+        {
+            if (!TimeSpan.TryParse(value, out var t)) return;
+
+            Roster.EndTime = t;
+            OnPropertyChanged(nameof(EndTime));
+        }
+    }
+
+    public bool AtWork
+    {
+        get => Roster.AtWork;
+        set
+        {
+            var shiftCount = value != Roster.AtWork;
+            Roster.AtWork = value;
+            OnPropertyChanged(nameof(AtWork));
+
+            if (!shiftCount || SelectedShift is null) return;
+
+            if (AtWork) 
+                DailyRosterVM.AddCount(SelectedShift);
+            else
+                DailyRosterVM.SubCount(SelectedShift);
         }
     }
 
@@ -81,11 +124,19 @@ internal class RosterVM : INotifyPropertyChanged
         DepartmentRosterVM = departmentRosterVM;
         DailyRosterVM = dailyRosterVM;
         EmployeeRosterVM = employeeRosterVM;
-        employee = EmployeeRosterVM.Employee;
 
         shifts = new ObservableCollection<Shift>(EmployeeRosterVM.Shifts);
 
-        selectedShift = roster.Shift;
+        if (SelectedShift is not null && AtWork) dailyRosterVM.AddCount(SelectedShift);
+    }
+
+    public void SetShift(Shift? shift)
+    {
+        Roster.Shift = shift;
+        Roster.StartTime = shift?.StartTime ?? TimeSpan.Zero; 
+        Roster.EndTime = shift?.EndTime ?? TimeSpan.Zero;
+        OnPropertyChanged(nameof(StartTime));
+        OnPropertyChanged(nameof(EndTime));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

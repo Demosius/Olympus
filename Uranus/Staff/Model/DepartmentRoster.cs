@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Uranus.Extension;
 
 namespace Uranus.Staff.Model;
 
@@ -184,7 +183,7 @@ public class DepartmentRoster
                 foreach (var @break in breaks)
                     @break.Shift = shift;
             }
-            if (Department is not null && !Department.Shifts.Select(s => s.Name).Contains(shift.Name)) 
+            if (Department is not null && !Department.Shifts.Select(s => s.Name).Contains(shift.Name))
                 Department?.Shifts.Add(shift);
             ShiftCounter[shift] = 0;
             TargetShiftCounts[shift] = shift.DailyTarget;
@@ -311,104 +310,6 @@ public class DepartmentRoster
                 shift.EmployeeRosters.Add(employeeRoster);
                 employeeRoster.Shift = shift;
             }
-        }
-    }
-
-    /// <summary>
-    /// Use to automate shift assignment.
-    /// </summary>
-    public void GenerateRosterAssignments()
-    {
-        AssignDefaults();
-        CountToTargets();
-        ApplyDepartmentDefault();
-    }
-
-    /// <summary>
-    /// Assigns shifts to employees based on their defined defaults - only if they do not already have assigned shifts..
-    /// </summary>
-    public void AssignDefaults()
-    {
-        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.Shift is null))
-            employeeRoster.SetDefault();
-    }
-
-    public void DropCount(Shift shift)
-    {
-        if (ShiftCounter.TryGetValue(shift, out _))
-            ShiftCounter[shift]--;
-    }
-
-    public void AddCount(Shift shift)
-    {
-        if (ShiftCounter.TryGetValue(shift, out _))
-            ShiftCounter[shift]++;
-    }
-
-    /// <summary>
-    /// Attempt to reach the targeted number for each shift.
-    /// </summary>
-    public void CountToTargets()
-    {
-        if (Department is null) throw new DataException("Department Roster has null value for department.");
-
-        // Get every non-default shift with a target above 0.
-        var shifts = Department.Shifts.Where(s => !s.Default && s.DailyTarget > 0)
-            .ToDictionary(s => s, _ => new List<EmployeeRoster>());
-
-        foreach (var (shift, _) in shifts)
-            shifts[shift] = EmployeeRosters.Where(er => er.Employee!.Shifts.Contains(shift)).ToList();
-
-        // Order by most needed (discrepancy between those available and number required to reach target.
-        shifts = shifts.OrderBy(s => s.Value.Count - (TargetShiftCounts[s.Key] - ShiftCounter[s.Key]))
-            .ToDictionary(e => e.Key, e => e.Value);
-
-        foreach (var (shift, empRosters) in shifts)
-        {
-            if (TargetShiftCounts[shift] - ShiftCounter[shift] <= 0) continue;
-            // Randomize employees #TODO: Check against history to rotate through staff (instead of randomizing).
-            empRosters.Shuffle();
-
-            foreach (var employeeRoster in empRosters.Where(employeeRoster => employeeRoster.Shift is null).TakeWhile(_ => ShiftCounter[shift] < TargetShiftCounts[shift]))
-            {
-                employeeRoster.SetShift(shift);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Checks all employees to see if they are assigned. If they aren't, use department defaults if they exist,
-    /// otherwise assign a shift that they are eligible for that is closest to its target count.
-    /// </summary>
-    public void ApplyDepartmentDefault()
-    {
-        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.Shift is null))
-        {
-            if (DefaultShift is not null)
-            {
-                employeeRoster.SetShift(DefaultShift);
-                continue;
-            }
-
-            if (employeeRoster.Employee is null)
-                throw new DataException("Employee roster does not have employee initialized.");
-
-            Shift? bestShift = null;
-            var bestCount = int.MinValue;
-            foreach (var shift in employeeRoster.Employee.Shifts)
-            {
-                ShiftCounter.TryGetValue(shift, out var count);
-                TargetShiftCounts.TryGetValue(shift, out var target);
-
-                var disc = target - count;
-
-                if (disc <= bestCount) continue;
-
-                bestCount = target - count;
-                bestShift = shift;
-            }
-
-            if (bestShift is not null) employeeRoster.SetShift(bestShift);
         }
     }
 

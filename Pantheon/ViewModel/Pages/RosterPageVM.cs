@@ -1,5 +1,7 @@
 ﻿using Pantheon.Properties;
+using Pantheon.View;
 using Pantheon.ViewModel.Commands;
+using Pantheon.ViewModel.Controls;
 using Styx;
 using System;
 using System.Collections.Generic;
@@ -8,8 +10,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Pantheon.View;
-using Pantheon.ViewModel.Controls;
+using System.Windows.Input;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -35,7 +36,7 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         set
         {
             minDate = value;
-            OnPropertyChanged(nameof(MinDate));
+            OnPropertyChanged();
         }
     }
 
@@ -46,7 +47,7 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         set
         {
             maxDate = value;
-            OnPropertyChanged(nameof(MaxDate));
+            OnPropertyChanged();
         }
     }
 
@@ -57,7 +58,7 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         set
         {
             departments = value;
-            OnPropertyChanged(nameof(Departments));
+            OnPropertyChanged();
         }
     }
 
@@ -68,7 +69,7 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         set
         {
             selectedDepartment = value;
-            OnPropertyChanged(nameof(SelectedDepartment));
+            OnPropertyChanged();
             SetRosters();
         }
     }
@@ -79,7 +80,7 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         set
         {
             showSaturdays = value;
-            OnPropertyChanged(nameof(ShowSaturdays));
+            OnPropertyChanged();
         }
     }
 
@@ -90,7 +91,7 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         set
         {
             showSundays = value;
-            OnPropertyChanged(nameof(ShowSundays));
+            OnPropertyChanged();
         }
     }
 
@@ -101,30 +102,41 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         set
         {
             rosterTable = value;
-            OnPropertyChanged(nameof(RosterTable));
+            OnPropertyChanged();
         }
     }
 
-    private ObservableCollection<DepartmentRosterVM> rosters;
-    public ObservableCollection<DepartmentRosterVM> Rosters
+    private ObservableCollection<DepartmentRoster> rosters;
+    public ObservableCollection<DepartmentRoster> Rosters
     {
         get => rosters;
         set
         {
             rosters = value;
-            OnPropertyChanged(nameof(Rosters));
+            OnPropertyChanged();
         }
     }
 
-    private DepartmentRosterVM? selectedRoster;
-    public DepartmentRosterVM? SelectedRoster
+    private DepartmentRoster? selectedRoster;
+    public DepartmentRoster? SelectedRoster
     {
         get => selectedRoster;
         set
         {
-            value?.Initialize();
             selectedRoster = value;
-            OnPropertyChanged(nameof(SelectedRoster));
+            OnPropertyChanged();
+            LoadedRoster = null;
+        }
+    }
+
+    private DepartmentRosterVM? loadedRoster;
+    public DepartmentRosterVM? LoadedRoster
+    {
+        get => loadedRoster;
+        set
+        {
+            loadedRoster = value;
+            OnPropertyChanged();
         }
     }
 
@@ -137,6 +149,7 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
     public LoadRosterCommand LoadRosterCommand { get; set; }
     public GenerateRosterCommand GenerateRosterCommand { get; set; }
     public NewRosterCommand NewRosterCommand { get; set; }
+    public ClearShiftsCommand ClearShiftsCommand { get; set; }
 
     #endregion
 
@@ -146,13 +159,14 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         ReportingEmployees = new List<Employee>();
         minDate = DateTime.Today.AddDays(DayOfWeek.Sunday - DateTime.Today.DayOfWeek + 1);   // Default to Monday of the current week. (Sunday will get the next monday)
         maxDate = minDate.AddDays(4);   // Default to the next friday.
-        rosters = new ObservableCollection<DepartmentRosterVM>();
+        rosters = new ObservableCollection<DepartmentRoster>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
         GenerateRosterCommand = new GenerateRosterCommand(this);
         LoadRosterCommand = new LoadRosterCommand(this);
         NewRosterCommand = new NewRosterCommand(this);
+        ClearShiftsCommand = new ClearShiftsCommand(this);
     }
 
     public void SetDataSources(Helios helios, Charon charon)
@@ -169,10 +183,7 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 
         if (Helios is null || SelectedDepartment is null) return;
 
-        foreach (var departmentRoster in SelectedDepartment.DepartmentRosters)
-        {
-            Rosters.Add(new DepartmentRosterVM(departmentRoster, Helios));
-        }
+        Rosters = new ObservableCollection<DepartmentRoster>(SelectedDepartment.DepartmentRosters);
     }
 
     public void NewRoster()
@@ -187,9 +198,8 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         if (newRoster is null) return;
 
         SelectedDepartment.DepartmentRosters.Add(newRoster);
-        var vm = new DepartmentRosterVM(newRoster, Helios);
-        Rosters.Add(vm);
-        SelectedRoster = vm;
+        Rosters.Add(newRoster);
+        SelectedRoster = newRoster;
     }
 
     public void RefreshData()
@@ -210,18 +220,28 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.UserEmployee?.DepartmentName);
     }
 
-    public void LoadRoster(DepartmentRosterVM roster)
+    public void LoadRoster()
     {
-        roster.Initialize();
+        if (LoadedRoster is not null || SelectedRoster is null || Helios is null) return;
+        var vm = new DepartmentRosterVM(SelectedRoster, Helios);
+        Mouse.OverrideCursor = Cursors.Wait;
+        vm.Initialize();
+        LoadedRoster = vm;
     }
 
     public void GenerateRoster()
     {
-        if (Helios is null || SelectedRoster is null) return;
+        if (Helios is null || LoadedRoster is null) return;
 
-        SelectedRoster.Initialize();
+        LoadedRoster.GenerateRosterAssignments();
+    }
 
-        SelectedRoster.GenerateRosterAssignments();
+    /// <summary>
+    /// Clear all shifts for the loaded roster.
+    /// </summary>
+    public void ClearShifts()
+    {
+        LoadedRoster?.UnAssignAll();
     }
 
     public void RepairData()

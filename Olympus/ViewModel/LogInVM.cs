@@ -15,6 +15,7 @@ public class LogInVM : INotifyPropertyChanged
             OnPropertyChanged(nameof(UserID));
         }
     }
+
     private string password = "";
     public string Password
     {

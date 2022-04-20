@@ -12,7 +12,7 @@ internal class GenerateRosterCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedRoster is not null;
+        return VM.LoadedRoster is not null;
     }
 
     public void Execute(object? parameter)
