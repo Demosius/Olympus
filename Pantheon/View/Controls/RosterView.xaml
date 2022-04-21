@@ -17,12 +17,13 @@
                 <!-- Dark Theme -->
                 <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
                 <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
+                <ResourceDictionary Source="../../Resources/Fonts.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Border BorderBrush="{StaticResource ForegroundBrush}"
-            BorderThickness="1">
+            BorderThickness=".5">
         <Canvas>
             <Canvas.Resources>
                 <ObjectDataProvider x:Key="RosterTypes"
@@ -35,8 +36,67 @@
                 <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             </Canvas.Resources>
 
+            <!-- Attendance -->
+            <CheckBox Canvas.Top="10" Canvas.Left="0"
+                      IsChecked="{Binding AtWork, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Margin="0"
+                      Padding="0"
+                      ToolTip="At Work"
+                      x:Name="IsAtWork"/>
+
+            <!-- Times -->
+            <TextBox Canvas.Top="5" Canvas.Left="30"
+                     Text="{Binding StartTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     Height="40"
+                     MinHeight="0"
+                     FontSize="20"
+                     FontFamily="{StaticResource DIN}"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center"
+                     VerticalContentAlignment="Center"
+                     HorizontalContentAlignment="Center"
+                     Width="72"
+                     Margin="0"
+                     Padding="0"
+                     GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                     LostMouseCapture="TextBox_LostMouseCapture"
+                     LostKeyboardFocus="TextBox_LostKeyboardFocus"
+                     Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
+            <Label Canvas.Top="13" Canvas.Left="102"
+                   Content="to"
+                   FontSize="10"
+                   Margin="0"
+                   Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
+            <TextBox Canvas.Top="5" Canvas.Left="121"  
+                     Text="{Binding EndTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     Height="40"
+                     MinHeight="0"
+                     FontSize="20"
+                     FontFamily="{StaticResource DIN}"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center"
+                     VerticalContentAlignment="Center"
+                     HorizontalContentAlignment="Center"
+                     Width="72"
+                     Margin="0"
+                     Padding="0"
+                     GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                     LostMouseCapture="TextBox_LostMouseCapture"
+                     LostKeyboardFocus="TextBox_LostKeyboardFocus"
+                     Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
+
+            <!-- Away Display -->
+            <Label Canvas.Top="5" Canvas.Left="30"
+                   Height="40" Width="160"
+                   FontSize="18"
+                   Foreground="{StaticResource  GridSplitterHoverBorderBrush}"
+                   VerticalContentAlignment="Center"
+                   HorizontalContentAlignment="Center"
+                   Content="{Binding Type, Mode=OneWay}"
+                   Visibility="{Binding NotAtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
+
             <!-- Shift Selector -->
-            <ComboBox Canvas.Top="5" Canvas.Left="5"
+            <ComboBox Canvas.Top="50" Canvas.Left="5"
                       Width="92"
                       Height="15"
                       FontSize="9"
@@ -46,7 +106,7 @@
                       SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <!-- Shift Type Selector (Normal/AL/RDO/etc.) -->
-            <ComboBox Canvas.Top="5" Canvas.Left="103"
+            <ComboBox Canvas.Top="50" Canvas.Left="103"
                       Style="{StaticResource MiniComboBoxStyle}"
                       ItemsSource="{Binding Source={StaticResource RosterTypes}, Mode=OneTime}"
                       Height="15"
@@ -54,54 +114,6 @@
                       FontSize="9"
                       HorizontalContentAlignment="Center"
                       SelectedValue="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-            <!-- Attendance -->
-            <CheckBox Canvas.Top="28" Canvas.Left="0"
-                      IsChecked="{Binding AtWork, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      Margin="0"
-                      Padding="0"
-                      ToolTip="At Work"
-                      x:Name="IsAtWork"/>
-
-            <!-- Times -->
-            <TextBox Canvas.Top="25" Canvas.Left="30"
-                     Text="{Binding StartTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Height="36"
-                     MinHeight="0"
-                     FontSize="16"
-                     FontFamily="Akzidenz-Grotesk"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Center"
-                     VerticalContentAlignment="Center"
-                     HorizontalContentAlignment="Center"
-                     Width="72"
-                     Margin="0"
-                     Padding="0"
-                     GotKeyboardFocus="TextBox_GotKeyboardFocus"
-                     LostMouseCapture="TextBox_LostMouseCapture"
-                     LostKeyboardFocus="TextBox_LostKeyboardFocus"
-                     Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
-            <Label Canvas.Top="30" Canvas.Left="102"
-                   Content="to"
-                   FontSize="10"
-                   Margin="0"
-                   Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
-            <TextBox Canvas.Top="25" Canvas.Left="121"  
-                     Text="{Binding EndTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Height="36"
-                     MinHeight="0"
-                     FontSize="16"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Center"
-                     VerticalContentAlignment="Center"
-                     HorizontalContentAlignment="Center"
-                     Width="72"
-                     Margin="0"
-                     Padding="0"
-                     GotKeyboardFocus="TextBox_GotKeyboardFocus"
-                     LostMouseCapture="TextBox_LostMouseCapture"
-                     LostKeyboardFocus="TextBox_LostKeyboardFocus"
-                     Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
 
         </Canvas>
     </Border>

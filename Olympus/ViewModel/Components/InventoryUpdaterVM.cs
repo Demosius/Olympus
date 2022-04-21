@@ -1,12 +1,13 @@
 ﻿using Olympus.Properties;
-using Uranus;
-using Uranus.Inventory;
-using Uranus.Inventory.Model;
 using Olympus.ViewModel.Commands;
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
+using Uranus;
+using Uranus.Inventory;
+using Uranus.Inventory.Model;
 
 namespace Olympus.ViewModel.Components;
 
@@ -18,13 +19,15 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
     private DateTime stockUpdateTime;
     public string StockUpdateString => stockUpdateTime.ToString("dd/MM/yyyy HH:mm");
 
+    #region INotifyPropertyChanged Members
+
     public DateTime StockUpdateTime
     {
         get => stockUpdateTime;
         set
         {
             stockUpdateTime = value;
-            OnPropertyChanged(nameof(StockUpdateString));
+            OnPropertyChanged();
         }
     }
     private DateTime binsUpdateTime;
@@ -36,7 +39,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         set
         {
             binsUpdateTime = value;
-            OnPropertyChanged(nameof(BinsUpdateString));
+            OnPropertyChanged();
         }
     }
     private DateTime uomUpdateTime;
@@ -48,7 +51,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         set
         {
             uomUpdateTime = value;
-            OnPropertyChanged(nameof(UoMUpdateString));
+            OnPropertyChanged();
         }
     }
     private DateTime itemUpdateTime;
@@ -60,10 +63,37 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         set
         {
             itemUpdateTime = value;
-            OnPropertyChanged(nameof(ItemUpdateString));
+            OnPropertyChanged();
         }
     }
 
+    #endregion
+
+    public static string Info => "Click on the buttons to update the designated data.\n\n" +
+                                 "Stock (Bin Contents), Bins (Bin List), and UoM (Item Units of Measure) require data copied from NAV.\n\n" +
+                                 "Item List takes data from an external workbook (Price book Report) and requires nothing other than pressing the button.\n\n" +
+                                 "Hover over the buttons to be shown the required columns (and where to get the data) for the specific data type.";
+
+    public static string UoMInfo => "Find the Data:\n" +
+                                    "[NAV > Warehouse > Planning & Execution > Bin Contents >> Unit of Measure Code]\n\n" +
+                                    "Required Columns:\n\n" +
+                                    $"{string.Join("\n", Constants.NAV_UoMColumns.Keys)}\n\n" +
+                                    "(Un-filter All, then filter Code to \"<>EACH\".)\n" +
+                                    "(Update Daily. End of previous work day, or beginning of current.)";
+
+    public static string BCInfo => "Find the Data:\n" +
+                                   "[NAV > Warehouse > Planning & Execution > Bin Contents]\n\n" +
+                                   "Required Columns:\n\n" +
+                                   $"{string.Join("\n", Constants.NAVStockColumns.Keys)}\n\n" +
+                                   "(Filter to Zone Code as required, and Location Code = '9600')\n" +
+                                   "(Update to the minute, as required.)";
+
+    public static string BLInfo => "Find the Data:\n" +
+                                   "[NAV > Warehouse > Planning & Execution > Bin Contents >> Bin Code]\n\n" +
+                                   "Required Columns:\n\n" +
+                                   $"{string.Join("\n", Constants.NAVBinColumns.Keys)}\n\n" +
+                                   "(No filtering required.)\n" +
+                                   "(Update when changes are made to bin/zone layouts, or when Count Dates are required.)";
     // Commands
     public UpdateStockCommand UpdateStockCommand { get; set; }
     public UpdateBinsCommand UpdateBinsCommand { get; set; }
@@ -133,7 +163,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
     {
         _ = Task.Run(() =>
         {
-            if (App.Helios.InventoryCreator.NAVItems(DataConversion.NAV_CSVToItems(Settings.Default.ItemCSVLocation), 
+            if (App.Helios.InventoryCreator.NAVItems(DataConversion.NAV_CSVToItems(Settings.Default.ItemCSVLocation),
                     InventoryReader.LastItemWriteTime(Settings.Default.ItemCSVLocation)))
                 GetUpdateTimes();
         });
@@ -141,49 +171,31 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
 
     public static void ShowInfo()
     {
-        _ = MessageBox.Show("Click on the large buttons to update the designated data.\n\n" +
-                            "Stock (Bin Contents), Bins (Bin List), and UoM (Item Units of Measure) require data copied from NAV.\n\n" +
-                            "Item List takes data from an external workbook (Price book Report) and requires nothing other than pressing the button.\n\n" +
-                            "Click on the small [xx Col] buttons to be shown the required columns (and where to get the data) for the specific data type.\n\n",
+        _ = MessageBox.Show(Info,
             "Data Upload Help",
             MessageBoxButton.OK,
             MessageBoxImage.Information);
     }
 
-    public static void BcInfo()
+    public static void ShowBCInfo()
     {
-        _ = MessageBox.Show("Find the Data:\n" +
-                            "[NAV > Warehouse > Planning & Execution > Bin Contents]\n\n" +
-                            "Required Columns:\n\n" +
-                            $"{string.Join("\n", Constants.NAVStockColumns.Keys)}\n\n" +
-                            "(Filter to Zone Code as required, and Location Code = '9600')\n" +
-                            "(Update to the minute, as required.)",
+        _ = MessageBox.Show(BCInfo,
             "Stock/Bin Contents Requirements",
             MessageBoxButton.OK,
             MessageBoxImage.Information);
     }
 
-    public static void BlInfo()
+    public static void ShowBLInfo()
     {
-        _ = MessageBox.Show("Find the Data:\n" +
-                            "[NAV > Warehouse > Planning & Execution > Bin Contents >> Bin Code]\n\n" +
-                            "Required Columns:\n\n" +
-                            $"{String.Join("\n", Constants.NAVBinColumns.Keys)}\n\n" +
-                            "(No filtering required.)\n" +
-                            "(Update when changes are made to bin/zone layouts, or when Count Dates are required.)",
+        _ = MessageBox.Show(BLInfo,
             "Bin List Requirements",
             MessageBoxButton.OK,
             MessageBoxImage.Information);
     }
 
-    public static void UoMInfo()
+    public static void ShowUoMInfo()
     {
-        _ = MessageBox.Show("Find the Data:\n" +
-                            "[NAV > Warehouse > Planning & Execution > Bin Contents >> Unit of Measure Code]\n\n" +
-                            "Required Columns:\n\n" +
-                            $"{String.Join("\n", Constants.NAV_UoMColumns.Keys)}\n\n" +
-                            "(Un-filter All, then filter Code to \"<>EACH\".)\n" +
-                            "(Update Daily. End of previous work day, or beginning of current.)",
+        _ = MessageBox.Show(UoMInfo,
             "UoM Data Requirements",
             MessageBoxButton.OK,
             MessageBoxImage.Information);
@@ -191,7 +203,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

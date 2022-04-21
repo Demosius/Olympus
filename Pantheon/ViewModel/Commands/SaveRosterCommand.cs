@@ -1,24 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
-using Pantheon.ViewModel.Controls;
 using Pantheon.ViewModel.Pages;
 
 namespace Pantheon.ViewModel.Commands;
 
-internal class GenerateRosterCommand : ICommand
+internal class SaveRosterCommand : ICommand 
 {
-    public DepartmentRosterVM VM { get; set; }
+    public RosterPageVM VM { get; set; }
 
-    public GenerateRosterCommand(DepartmentRosterVM vm) { VM = vm; }
+    public SaveRosterCommand(RosterPageVM vm ) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.IsInitialized;
+        return VM.IsLoaded;
     }
 
     public void Execute(object? parameter)
     {
-        VM.GenerateRosterAssignments();
+        VM.SaveRoster();
     }
 
     public event EventHandler? CanExecuteChanged

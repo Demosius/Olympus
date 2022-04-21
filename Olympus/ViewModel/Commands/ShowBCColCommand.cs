@@ -26,6 +26,6 @@ public class ShowBcColCommand : ICommand
 
     public void Execute(object parameter)
     {
-        InventoryUpdaterVM.BcInfo();
+        InventoryUpdaterVM.ShowBCInfo();
     }
 }

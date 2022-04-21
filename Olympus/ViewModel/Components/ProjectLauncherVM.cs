@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Uranus;
 using Uranus.Staff.Model;
 
@@ -15,6 +16,8 @@ public class ProjectLauncherVM : INotifyPropertyChanged
     public List<Project> AllProjects { get; set; }
     public List<Project> UserProjects { get; set; }
 
+    #region INotifyPropertyChanged Members
+
     private ObservableCollection<ProjectGroupVM> projectGroups;
     public ObservableCollection<ProjectGroupVM> ProjectGroups
     {
@@ -26,11 +29,25 @@ public class ProjectLauncherVM : INotifyPropertyChanged
         }
     }
 
+    private ProjectGroupVM projects;
+    public ProjectGroupVM Projects
+    {
+        get => projects;
+        set
+        {
+            projects = value;
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
+
     public ProjectLauncherVM()
     {
         AllProjects = App.Helios.StaffReader.Projects(pullType: EPullType.FullRecursive).ToList();
         Departments = App.Helios.StaffReader.Departments(pullType: EPullType.IncludeChildren);
         UserProjects = App.Charon.UserEmployee is null ? new List<Project>() : App.Charon.UserEmployee.Projects;
+        Projects = new ProjectGroupVM(this, AllProjects, "All");
 
         // Set Icons for projects.
         foreach (var p in AllProjects)
@@ -57,7 +74,7 @@ public class ProjectLauncherVM : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

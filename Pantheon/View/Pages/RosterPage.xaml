@@ -64,29 +64,30 @@
             <Label Content="Department:"/>
             <ComboBox ItemsSource="{Binding Departments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       SelectedValue="{Binding SelectedDepartment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Label Content="Rosters:"/>
+            <Label Content="Roster:"/>
             <ComboBox ItemsSource="{Binding Rosters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       SelectedValue="{Binding SelectedRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Button Content="Load Roster" Width="140"
                     Command="{Binding LoadRosterCommand}"/>
-            <Button Content="Auto-Assign" Width="140"
-                    Command="{Binding GenerateRosterCommand}"/>
-            <Button Content="Clear Shifts" Width="140"
-                    Command="{Binding ClearShiftsCommand}"/>
             <Button Content="New Roster" Width="140"
                     Command="{Binding NewRosterCommand}"/>
+            <Button Content="Delete Roster" Width="140"
+                    Command="{Binding DeleteRosterCommand}"/>
         </StackPanel>
 
         <!-- More Controls -->
         <StackPanel DockPanel.Dock="Bottom"
                     Orientation="Horizontal">
-            <Button Content="Save Changes"/>
-            <Button Content="Export Roster"/>
+            <Button Content="Save Changes"
+                    Command="{Binding SaveRosterCommand}"/>
+            <Button Content="Export Roster"
+                    Command="{Binding ExportRosterCommand}"/>
         </StackPanel>
 
         <!-- Department Roster UI -->
-        <controls:DepartmentRosterView DataContext="{Binding LoadedRoster}"/>
+        <controls:DepartmentRosterView DataContext="{Binding LoadedRoster}"
+                                       Visibility="{Binding ElementName=VM, Path=IsLoaded, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         
 
     </DockPanel>

@@ -1,33 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Pantheon.ViewModel.Controls;
+using System;
 using System.Windows.Input;
-using Pantheon.ViewModel.Pages;
 
-namespace Pantheon.ViewModel.Commands
+namespace Pantheon.ViewModel.Commands;
+
+internal class ClearShiftsCommand : ICommand
 {
-    class ClearShiftsCommand : ICommand
+    public DepartmentRosterVM VM { get; set; }
+
+    public ClearShiftsCommand(DepartmentRosterVM vm) { VM = vm; }
+
+    public bool CanExecute(object? parameter)
     {
-        public RosterPageVM VM { get; set; }
+        return VM.IsInitialized;
+    }
 
-        public ClearShiftsCommand(RosterPageVM vm ) { VM = vm; }
+    public void Execute(object? parameter)
+    {
+        VM.UnAssignAll();
+    }
 
-        public bool CanExecute(object? parameter)
-        {
-            return VM.LoadedRoster is not null;
-        }
-
-        public void Execute(object? parameter)
-        {
-            VM.ClearShifts();
-        }
-
-        public event EventHandler? CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
+    public event EventHandler? CanExecuteChanged
+    {
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
     }
 }

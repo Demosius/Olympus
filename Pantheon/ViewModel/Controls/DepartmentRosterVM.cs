@@ -1,4 +1,5 @@
 ﻿using Pantheon.Model;
+using Pantheon.ViewModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,14 +7,23 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows;
+using System.Text.RegularExpressions;
 using Uranus;
+using Uranus.Commands;
 using Uranus.Extension;
+using Uranus.Interfaces;
 using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Controls;
 
-internal class DepartmentRosterVM : INotifyPropertyChanged
+public enum ERosterSortOption
+{
+    Name,
+    Shift,
+    ID
+}
+
+internal class DepartmentRosterVM : INotifyPropertyChanged, IFilters
 {
     public DepartmentRoster DepartmentRoster { get; set; }
     public Helios Helios { get; set; }
@@ -22,9 +32,18 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
 
     public Dictionary<string, ShiftCounter> TargetAccessDict { get; set; }
 
-    #region INotifyPropertyChanged Members 
+    #region INotifyPropertyChanged Members
 
-    public ObservableCollection<EmployeeRosterVM> EmployeeRosters { get; set; }
+    private ObservableCollection<EmployeeRosterVM> displayRosters;
+    public ObservableCollection<EmployeeRosterVM> DisplayRosters
+    {
+        get => displayRosters;
+        set
+        {
+            displayRosters = value;
+            OnPropertyChanged();
+        }
+    }
 
     private bool isInitialized;
     public bool IsInitialized
@@ -137,30 +156,58 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         }
     }
 
+    private string searchString;
+    public string SearchString
+    {
+        get => searchString;
+        set
+        {
+            searchString = value;
+            OnPropertyChanged();
+            ApplyFilters();
+        }
+    }
+
+    private ERosterSortOption sortOption;
+    public ERosterSortOption SortOption
+    {
+        get => sortOption;
+        set
+        {
+            sortOption = value;
+            OnPropertyChanged();
+            ApplySorting();
+        }
+    }
+
     #endregion
 
-    /*/// <summary>
-    /// For Testing purposes.
-    /// </summary>
-    public DepartmentRosterVM()
-    {
-        DepartmentRoster = new DepartmentRoster();
-        Helios = new Helios(Settings.Default.SolLocation);
-        EmployeeRosters = new ObservableCollection<EmployeeRosterVM>();
-        IsInitialized = true;
-        shifts = new ObservableCollection<Shift>();
-        shiftTargets = new ObservableCollection<KeyValuePair<Shift, int>>();
-    }*/
+    #region Commands
+
+    public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
+    public ClearFiltersCommand ClearFiltersCommand { get; set; }
+    public ApplySortingCommand ApplySortingCommand { get; set; }
+    public GenerateRosterCommand GenerateRosterCommand { get; set; }
+    public ClearShiftsCommand ClearShiftsCommand { get; set; }
+
+    #endregion
 
     public DepartmentRosterVM(DepartmentRoster roster, Helios helios)
     {
         DepartmentRoster = roster;
         Helios = helios;
-        EmployeeRosters = new ObservableCollection<EmployeeRosterVM>();
+        displayRosters = new ObservableCollection<EmployeeRosterVM>();
         IsInitialized = false;
         shifts = new ObservableCollection<Shift>();
         shiftTargets = new ObservableCollection<ShiftCounter>();
         TargetAccessDict = new Dictionary<string, ShiftCounter>();
+        searchString = string.Empty;
+
+        ApplySortingCommand = new ApplySortingCommand(this);
+        ApplyFiltersCommand = new ApplyFiltersCommand(this);
+        ClearFiltersCommand = new ClearFiltersCommand(this);
+        GenerateRosterCommand = new GenerateRosterCommand(this);
+        ClearShiftsCommand = new ClearShiftsCommand(this);
     }
 
     /// <summary>
@@ -229,10 +276,11 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
                 }
                 erVM.AddRoster(roster, drVM);
             }
-            EmployeeRosters.Add(erVM);
         }
 
         IsInitialized = true;
+
+        ApplyFilters(EmployeeRosterVMs.Values);
     }
 
     public void AddCount(Shift shift)
@@ -253,6 +301,12 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
         AssignDefaults();
         CountToTargets();
         ApplyDepartmentDefault();
+        CheckPublicHolidays();
+    }
+
+    private void CheckPublicHolidays()
+    {
+        //throw new NotImplementedException();
     }
 
     /// <summary>
@@ -260,7 +314,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
     /// </summary>
     public void UnAssignAll()
     {
-        foreach (var employeeRosterVM in EmployeeRosters) employeeRosterVM.SelectedShift = null;
+        foreach (var employeeRosterVM in DisplayRosters) employeeRosterVM.SelectedShift = null;
     }
 
     /// <summary>
@@ -268,7 +322,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
     /// </summary>
     public void AssignDefaults()
     {
-        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.SelectedShift is null))
+        foreach (var employeeRoster in DisplayRosters.Where(employeeRoster => employeeRoster.SelectedShift is null))
             employeeRoster.SetDefault();
     }
 
@@ -284,7 +338,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
             .ToDictionary(s => s, _ => new List<EmployeeRosterVM>());
 
         foreach (var (shift, _) in targetShifts)
-            targetShifts[shift] = EmployeeRosters.Where(er => er.Employee.Shifts.Contains(shift)).ToList();
+            targetShifts[shift] = DisplayRosters.Where(er => er.Employee.Shifts.Contains(shift)).ToList();
 
         // Order by most needed (discrepancy between those available and number required to reach target.
         targetShifts = targetShifts.OrderBy(s => s.Value.Count - TargetAccessDict[s.Key.ID].Discrepancy)
@@ -307,7 +361,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
     /// </summary>
     public void ApplyDepartmentDefault()
     {
-        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.SelectedShift is null))
+        foreach (var employeeRoster in DisplayRosters.Where(employeeRoster => employeeRoster.SelectedShift is null))
         {
             if (DepartmentRoster.DefaultShift is not null)
             {
@@ -322,6 +376,64 @@ internal class DepartmentRosterVM : INotifyPropertyChanged
 
             employeeRoster.SelectedShift = bestShift;
         }
+    }
+
+    public void ClearFilters()
+    {
+        ApplySorting(EmployeeRosterVMs.Values);
+    }
+
+    public void ApplyFilters()
+    {
+        List<EmployeeRosterVM> list;
+        if (SearchString != "")
+        {
+            var regex = new Regex(SearchString, RegexOptions.IgnoreCase);
+            list = EmployeeRosterVMs.Values.Where(e => regex.IsMatch(e.Employee.FullName)).ToList();
+        }
+        else
+            list = EmployeeRosterVMs.Values.ToList();
+
+        ApplySorting(list);
+    }
+
+    public void ApplySorting()
+    {
+        DisplayRosters = SortOption switch
+        {
+            ERosterSortOption.Name => new ObservableCollection<EmployeeRosterVM>(
+                DisplayRosters.OrderBy(erVM => erVM.Employee.FullName)),
+            ERosterSortOption.Shift => new ObservableCollection<EmployeeRosterVM>(
+                DisplayRosters.OrderBy(erVM => erVM.SelectedShift)),
+            ERosterSortOption.ID => new ObservableCollection<EmployeeRosterVM>(
+                DisplayRosters.OrderBy(erVM => erVM.Employee.ID)),
+            _ => DisplayRosters
+        };
+    }
+
+    public void ApplyFilters(IEnumerable<EmployeeRosterVM> list)
+    {
+        if (SearchString != "")
+        {
+            var regex = new Regex(SearchString, RegexOptions.IgnoreCase);
+            list = list.Where(e => regex.IsMatch(e.Employee.FullName)).ToList();
+        }
+
+        ApplySorting(list);
+    }
+
+    public void ApplySorting(IEnumerable<EmployeeRosterVM> list)
+    {
+        DisplayRosters = SortOption switch
+        {
+            ERosterSortOption.Name => new ObservableCollection<EmployeeRosterVM>(
+                list.OrderBy(erVM => erVM.Employee.FullName)),
+            ERosterSortOption.Shift => new ObservableCollection<EmployeeRosterVM>(
+                list.OrderBy(erVM => erVM.SelectedShift)),
+            ERosterSortOption.ID => new ObservableCollection<EmployeeRosterVM>(
+                list.OrderBy(erVM => erVM.Employee.ID)),
+            _ => DisplayRosters
+        };
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

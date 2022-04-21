@@ -275,4 +275,20 @@ public class StaffUpdater
         });
         return lines;
     }
+
+    /// <summary>
+    /// Saves relevant data from the given department roster, assuming it is appropriately filled with
+    /// DailyRosters, EmployeeRosters, and Roster objects.
+    /// </summary>
+    /// <param name="departmentRoster">Filled and initialized department roster with daily/employee/roster references.</param>
+    public void DepartmentRoster(DepartmentRoster departmentRoster)
+    {
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            //conn.UpdateAll(departmentRoster.Rosters);
+            //conn.UpdateAll(departmentRoster.DailyRosters);
+            //conn.UpdateAll(departmentRoster.EmployeeRosters);
+            Chariot.Database.Update(departmentRoster);
+        });
+    }
 }

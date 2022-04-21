@@ -1,4 +1,5 @@
-﻿using Pantheon.Annotations;
+﻿using System;
+using Pantheon.Annotations;
 using Pantheon.Model;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,6 +16,10 @@ internal class DailyRosterVM : INotifyPropertyChanged
     public DepartmentRosterVM DepartmentRosterVM { get; set; }
 
     public Dictionary<string, ShiftCounter> CounterAccessDict { get; set; }
+
+    public Dictionary<int, RosterVM> Rosters { get; set; }
+
+    public bool PublicHoliday { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -37,6 +42,7 @@ internal class DailyRosterVM : INotifyPropertyChanged
         DepartmentRosterVM = departmentRosterVM;
         shiftCounter = new ObservableCollection<ShiftCounter>();
         CounterAccessDict = new Dictionary<string, ShiftCounter>();
+        Rosters = new Dictionary<int, RosterVM>();
 
         foreach (var counter in DepartmentRosterVM.ShiftTargets)
         {
@@ -54,6 +60,28 @@ internal class DailyRosterVM : INotifyPropertyChanged
     public void SubCount(Shift shift)
     {
         CounterAccessDict[shift.ID].Count--;
+    }
+
+    /// <summary>
+    /// Sets all rosters as public holiday.
+    /// </summary>
+    public void SetPublicHoliday()
+    {
+        // Do not set roster type directly, as that will result in recursive prompting.
+        // Use SetPublicHoliday method.
+        PublicHoliday = true;
+        foreach (var (_, rosterVM) in Rosters)
+            rosterVM.SetPublicHoliday();
+    }
+
+    /// <summary>
+    /// Sets associated rosters to standard, typically used when switching from public holiday.
+    /// </summary>
+    public void SetStandard()
+    {
+        PublicHoliday = false;
+        foreach (var (_, rosterVM) in Rosters)
+            rosterVM.Type = ERosterType.Standard;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -84,28 +84,22 @@
                 <control:UserHandler DataContext="{Binding UserHandlerVM}"/>
             </StatusBarItem>
         </StatusBar>
-        
-        <Expander DockPanel.Dock="Top"
-                  ExpandDirection="Right"
-                  IsExpanded="True"
-                  Margin="0">
-            <StackPanel DockPanel.Dock="Top"
-                        Margin="0">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <control:ProjectLauncher Grid.Column="0"
-                                             DataContext="{Binding ProjectLauncherVM, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                             Margin="0"/>
-                    <control:InventoryUpdater Grid.Column="2"
-                                              DataContext="{Binding InventoryUpdaterVM, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                              Margin="0"/>
-                </Grid>
-            </StackPanel>
-        </Expander>
+
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <control:ProjectLauncher Grid.Column="0"
+                                     DataContext="{Binding ProjectLauncherVM, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0"/>
+
+            <control:InventoryUpdater Grid.Column="2"
+                                      DataContext="{Binding InventoryUpdaterVM, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Margin="0"/>
+        </Grid>
         <Frame  Content="{Binding CurrentProject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Margin="2,0,2,2" 
                     Height="Auto" 

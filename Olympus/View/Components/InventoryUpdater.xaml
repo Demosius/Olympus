@@ -4,8 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:Olympus.ViewModel.Components"
-             mc:Ignorable="d"
-             MaxHeight="155">
+             mc:Ignorable="d">
 
     <UserControl.DataContext>
         <vm:InventoryUpdaterVM/>
@@ -19,14 +18,9 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*" MaxHeight="100"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
 
             <!-- First Row, Date Labels -->
-            <Label Grid.Column="0" Grid.Row="0" 
+            <!--<Label Grid.Column="0" Grid.Row="0" 
                    Content="{Binding StockUpdateString}" 
                    Foreground="Cyan"/>
             <Label Grid.Column="1" Grid.Row="0" 
@@ -37,32 +31,56 @@
                    Foreground="DarkOrange"/>
             <Label Grid.Column="3" Grid.Row="0"
                    Content="{Binding ItemUpdateString}" 
-                   Foreground="White"/>
+                   Foreground="White"/>-->
 
             <!-- Second Row, Buttons -->
-            <Button Grid.Column="0" Grid.Row="1" 
-                    Content="Bin Contents" 
+            <Button Grid.Column="0"
                     Command="{Binding UpdateStockCommand}"
                     Background="{DynamicResource CyanGradient}" 
-                    Style="{DynamicResource InventoryButton}" />
-            <Button Grid.Column="1" Grid.Row="1" 
-                    Content="Bin List" 
+                    Style="{DynamicResource InventoryButton}"
+                    ToolTip="{Binding BCInfo}">
+                <StackPanel>
+                    <TextBlock FontSize="16">Bin Contents</TextBlock>
+                    <TextBlock Text="{Binding StockUpdateString}"
+                               FontSize="10"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="1"
                     Command="{Binding UpdateBinsCommand}"
                     Background="{DynamicResource GreenGradient}" 
-                    Style="{DynamicResource InventoryButton}" />
-            <Button Grid.Column="2" Grid.Row="1" 
-                    Content="UoM List"
+                    Style="{DynamicResource InventoryButton}"
+                    ToolTip="{Binding BLInfo}">
+                <StackPanel>
+                    <TextBlock FontSize="16">Bin List</TextBlock>
+                    <TextBlock Text="{Binding BinsUpdateString}"
+                               FontSize="10"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="2" 
                     Command="{Binding UpdateUoMCommand}"
                     Background="{DynamicResource OrangeGradient}" 
-                    Style="{DynamicResource InventoryButton}" />
-            <Button Grid.Column="3" Grid.Row="1" 
-                    Content="Item List" 
+                    Style="{DynamicResource InventoryButton}"
+                    ToolTip="{Binding UoMInfo}">
+                <StackPanel>
+                    <TextBlock FontSize="16">UoM List</TextBlock>
+                    <TextBlock Text="{Binding UoMUpdateString}"
+                               FontSize="10"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="3" 
                     Command="{Binding UpdateItemsCommand}"
                     Background="{DynamicResource Graydient}"
-                    Style="{DynamicResource InventoryButton}" />
+                    Style="{DynamicResource InventoryButton}"
+                    ToolTip="{Binding Info}">
+                <StackPanel>
+                    <TextBlock FontSize="16">Item List</TextBlock>
+                    <TextBlock Text="{Binding ItemUpdateString}"
+                               FontSize="10"/>
+                </StackPanel>
+            </Button>
 
             <!-- Third Row, Column Buttons -->
-            <Button Grid.Column="0" Grid.Row="2" 
+            <!--<Button Grid.Column="0" Grid.Row="2" 
                     Content="BC Cols" 
                     Command="{Binding ShowBcColCommand}"
                     Background="{DynamicResource CyanGradient}" 
@@ -81,7 +99,7 @@
                     Content="Info" 
                     Command="{Binding ShowInfoCommand}"
                     Background="{DynamicResource Graydient}" 
-                    Style="{DynamicResource MiniButton}" />
+                    Style="{DynamicResource MiniButton}" />-->
 
         </Grid>
     </Border>
@@ -93,7 +111,7 @@
             <Setter Property="FontFamily" Value="Courier New" />
             <Setter Property="Padding" Value="3" />
             <Setter Property="Margin" Value="0" />
-            <Setter Property="TextBlock.HorizontalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
         </Style>
 
         <!-- Inventory Buttons -->
@@ -101,15 +119,13 @@
             <Setter Property="BorderBrush" Value="Black"/>
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="MinHeight" Value="35"/>
-            <Setter Property="MaxHeight" Value="40"/>
             <Setter Property="MinWidth" Value="130"/>
             <Setter Property="VerticalAlignment" Value="Stretch" />
-            <Setter Property="FontSize" Value="14"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
         </Style>
         
         <!-- Mini Buttons -->
-        <Style x:Key="MiniButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+        <!--<Style x:Key="MiniButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="FontSize" Value="10"/>
             <Setter Property="Margin" Value="0,0,5,5"/>
             <Setter Property="Padding" Value="2,0,2,0"/>
@@ -124,7 +140,7 @@
                     <Setter Property="CornerRadius" Value="1"/>
                 </Style>
             </Style.Resources>
-        </Style>
+        </Style>-->
 
     </UserControl.Resources>
     

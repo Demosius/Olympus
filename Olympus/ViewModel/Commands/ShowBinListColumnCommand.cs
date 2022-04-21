@@ -26,6 +26,6 @@ public class ShowBinListColumnCommand : ICommand
 
     public void Execute(object parameter)
     {
-        InventoryUpdaterVM.BlInfo();
+        InventoryUpdaterVM.ShowBLInfo();
     }
 }

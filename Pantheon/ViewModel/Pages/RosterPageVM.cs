@@ -2,6 +2,7 @@
 using Pantheon.View;
 using Pantheon.ViewModel.Commands;
 using Pantheon.ViewModel.Controls;
+using Serilog;
 using Styx;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Input;
 using Uranus;
 using Uranus.Commands;
@@ -137,8 +139,11 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         {
             loadedRoster = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(IsLoaded));
         }
     }
+
+    public bool IsLoaded => LoadedRoster is not null;
 
     #endregion
 
@@ -147,9 +152,10 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
     public RefreshDataCommand RefreshDataCommand { get; set; }
     public RepairDataCommand RepairDataCommand { get; set; }
     public LoadRosterCommand LoadRosterCommand { get; set; }
-    public GenerateRosterCommand GenerateRosterCommand { get; set; }
     public NewRosterCommand NewRosterCommand { get; set; }
-    public ClearShiftsCommand ClearShiftsCommand { get; set; }
+    public SaveRosterCommand SaveRosterCommand { get; set; }
+    public DeleteRosterCommand DeleteRosterCommand { get; set; }
+    public ExportRosterCommand ExportRosterCommand { get; set; }
 
     #endregion
 
@@ -163,10 +169,11 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
-        GenerateRosterCommand = new GenerateRosterCommand(this);
         LoadRosterCommand = new LoadRosterCommand(this);
         NewRosterCommand = new NewRosterCommand(this);
-        ClearShiftsCommand = new ClearShiftsCommand(this);
+        SaveRosterCommand = new SaveRosterCommand(this);
+        DeleteRosterCommand = new DeleteRosterCommand(this);
+        ExportRosterCommand = new ExportRosterCommand(this);
     }
 
     public void SetDataSources(Helios helios, Charon charon)
@@ -229,19 +236,30 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         LoadedRoster = vm;
     }
 
-    public void GenerateRoster()
+    public void ExportRoster()
     {
-        if (Helios is null || LoadedRoster is null) return;
-
-        LoadedRoster.GenerateRosterAssignments();
+        throw new NotImplementedException();
     }
 
-    /// <summary>
-    /// Clear all shifts for the loaded roster.
-    /// </summary>
-    public void ClearShifts()
+    public void SaveRoster()
     {
-        LoadedRoster?.UnAssignAll();
+        if (Helios is null || LoadedRoster is null || !LoadedRoster.IsInitialized) return;
+
+        try
+        {
+            Helios.StaffUpdater.DepartmentRoster(LoadedRoster.DepartmentRoster);
+            MessageBox.Show("Saved Successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.None);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to save Department Roster to Database.");
+            MessageBox.Show("Failed to save roster.", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    public void DeleteRoster()
+    {
+        throw new NotImplementedException();
     }
 
     public void RepairData()

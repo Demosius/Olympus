@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Pantheon.ViewModel.Controls"
              xmlns:controls="clr-namespace:Pantheon.View.Controls"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:model="clr-namespace:Uranus.Staff.Model;assembly=Uranus"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:DepartmentRosterVM}, IsDesignTimeCreatable=False}">
 
@@ -53,10 +55,17 @@
             <Style TargetType="{x:Type DataGrid}">
                 <Setter Property="Background" Value="{StaticResource AccordionBackgroundBrush}"/>
             </Style>
+            <ObjectDataProvider x:Key="RosterSortOptions"
+                                MethodName="GetValues" 
+                                ObjectType="{x:Type sys:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="vm:ERosterSortOption"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
         </DockPanel.Resources>
 
-        <Border BorderBrush="{StaticResource ForegroundBrush}" BorderThickness="1">
-            <Grid >
+        <Border BorderBrush="{StaticResource ForegroundBrush}" BorderThickness=".5">
+            <Grid>
 
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="230" x:Name="EmployeeColumn"/>
@@ -75,56 +84,101 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Shift Count Containers -->
+
+
+                <!-- Top option Bar -->
                 <Border Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="9" BorderBrush="{StaticResource ForegroundBrush}" BorderThickness=".5">
-                    <ItemsControl ItemsSource="{Binding ShiftTargets, Mode=OneWay, FallbackValue=''}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border BorderBrush="{StaticResource ForegroundBrush}"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Function Buttons -->
+                        <Button Grid.Column="0" Content="Auto-Assign" Width="140"
+                                Command="{Binding GenerateRosterCommand}"/>
+                        <Button Grid.Column="1" Content="Clear Shifts" Width="140"
+                                Command="{Binding ClearShiftsCommand}"/>
+
+                        <!-- Filter -->
+                        <Label Grid.Column="2"
+                               Content="Filter:"/>
+                        <TextBox Grid.Column="3" 
+                                 Width="100"
+                                 Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+
+                        <!-- Sorting -->
+                        <Label Grid.Column="4"
+                               Content="Filter:"/>
+                        <ComboBox Grid.Column="5"
+                                  ItemsSource="{Binding Source={StaticResource RosterSortOptions}, Mode=OneTime}"
+                                  SelectedValue="{Binding SortOption}"/>
+
+                        <!-- Shift Count Containers -->
+                        <ItemsControl Grid.Column="6" 
+                                      VerticalContentAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      ItemsSource="{Binding ShiftTargets, Mode=OneWay, FallbackValue=''}">
+
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="{StaticResource ForegroundBrush}"
                                         BorderThickness=".5">
-                                    <Grid MinWidth="90">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Label Grid.Column="0" 
-                                               Content="{Binding Shift.Name, Mode=OneTime, FallbackValue=''}"
-                                               HorizontalAlignment="Center"
-                                               Margin="0"
-                                               FontSize="12"
-                                               FontWeight="Bold"/>
-                                        <Label Grid.Column="1"
-                                               Content="{Binding Count, Mode=OneWay}"
-                                               HorizontalAlignment="Center"
-                                               Margin="0"
-                                               FontSize="12"
-                                               FontWeight="Bold"/>
-                                        <Label Grid.Column="2"
-                                               Content="/"/>
-                                        <TextBox Grid.Column="3" Text="{Binding Target, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                 MinHeight="0"
-                                                 Height="20"
-                                                 Padding="0"
-                                                 FontSize="12"
-                                                 MinWidth="20"
-                                                 VerticalContentAlignment="Center"
-                                                 HorizontalAlignment="Center"
-                                                 HorizontalContentAlignment="Center"
-                                                 GotKeyboardFocus="TextBox_GotKeyboardFocus"
-                                                 LostMouseCapture="TextBox_LostMouseCapture"
-                                                 LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                                        <Grid MinWidth="90">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Column="0" 
+                                                   Content="{Binding Shift.Name, Mode=OneTime, FallbackValue=''}"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0"
+                                                   FontSize="12"
+                                                   FontWeight="Bold"/>
+                                            <Label Grid.Column="1"
+                                                   Content="{Binding Count, Mode=OneWay}"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0"
+                                                   FontSize="12"
+                                                   FontWeight="Bold"/>
+                                            <Label Grid.Column="2"
+                                                   Content="/"/>
+                                            <TextBox Grid.Column="3" Text="{Binding Target, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                     MinHeight="0"
+                                                     Height="20"
+                                                     Padding="0"
+                                                     FontSize="12"
+                                                     MinWidth="20"
+                                                     VerticalContentAlignment="Center"
+                                                     HorizontalAlignment="Center"
+                                                     HorizontalContentAlignment="Center"
+                                                     GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                                                     LostMouseCapture="TextBox_LostMouseCapture"
+                                                     LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Button Grid.Column="8"
+                                Content="☰"
+                                Padding="5,0"/>
+                    </Grid>
                 </Border>
 
                 <!-- Headers (Employee => Dailies) -->
@@ -145,7 +199,7 @@
                 <controls:DailyRosterView Grid.Column="7" Grid.Row="1" DataContext="{Binding SundayRoster}"/>
 
                 <!-- Employee Rosters -->
-                <ItemsControl Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="9"  ItemsSource="{Binding EmployeeRosters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                <ItemsControl Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="9"  ItemsSource="{Binding DisplayRosters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
 
                     <ItemsControl.ItemsPanel>

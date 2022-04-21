@@ -26,6 +26,6 @@ public class ShowUlColCommand : ICommand
 
     public void Execute(object parameter)
     {
-        InventoryUpdaterVM.UoMInfo();
+        InventoryUpdaterVM.ShowUoMInfo();
     }
 }

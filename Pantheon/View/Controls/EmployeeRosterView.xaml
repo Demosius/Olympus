@@ -23,7 +23,7 @@
     <Canvas Height="70">
 
         <!-- Employee -->
-        <Border BorderBrush="GreenYellow"
+        <Border BorderBrush="{StaticResource Brush01}"
                 BorderThickness=".5"
                 Width="230"
                 Height="70">
@@ -38,16 +38,16 @@
                     </ObjectDataProvider>
                 </Canvas.Resources> 
 
-                <Border Canvas.Top="9" Canvas.Left="10"
+                <Border Canvas.Top="5" Canvas.Left="5"
                         BorderBrush="{StaticResource ForegroundBrush}" BorderThickness=".5">
                     <Image Source="{Binding Employee.Icon.FullPath, Mode=OneTime, FallbackValue=''}"
-                           Width="50" Height="50"/>
+                           Width="50" Height="60"/>
                 </Border>
 
                 <!-- Name -->
-                <Label Canvas.Top="0" Canvas.Left="60" 
-                       Width="170"
-                       Height="28"
+                <Label Canvas.Top="0" Canvas.Left="50" 
+                       Width="175"
+                       Height="50"
                        FontSize="14"
                        FontWeight="Bold"
                        Content="{Binding Employee.FullName, Mode=OneTime, FallbackValue=''}"
@@ -57,23 +57,26 @@
                        VerticalContentAlignment="Center"/>
 
                 <!-- Shift Selector -->
-                <ComboBox Canvas.Top="28" Canvas.Left="69" 
+                <ComboBox Canvas.Top="50" Canvas.Left="60" 
                           Style="{StaticResource MiniComboBoxStyle}"
                           ItemsSource="{Binding Shifts, Mode=OneTime, FallbackValue=''}"
                           SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Width="150"
+                          Width="80"
                           Height="15"
+                          FontSize="9"
                           VerticalContentAlignment="Center"
                           HorizontalContentAlignment="Center"/>
 
                 <!-- Roster Type -->
-                <ComboBox Canvas.Top="48" Canvas.Left="69" Style="{StaticResource MiniComboBoxStyle}"
+                <ComboBox Canvas.Top="50" Canvas.Left="145" Style="{StaticResource MiniComboBoxStyle}"
                           ItemsSource="{Binding Source={StaticResource RosterTypes}, Mode=OneTime}"
                           SelectedValue="{Binding SelectedRosterType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Width="150"
+                          Width="80"
                           Height="15"
+                          FontSize="9"
                           VerticalContentAlignment="Center"
                           HorizontalContentAlignment="Center"/>
+
 
             </Canvas>
         </Border>

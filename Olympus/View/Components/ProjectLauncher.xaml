@@ -7,43 +7,46 @@
              mc:Ignorable="d">
 
     <UserControl.DataContext>
-        <vm:ProjectLauncherVM/>
+        <vm:ProjectLauncherVM x:Name="VM"/>
     </UserControl.DataContext>
 
-    <TabControl ItemsSource="{Binding ProjectGroups}" 
-                Padding="0"
-                Margin="2">
-        <TabControl.ItemTemplate>
-            <DataTemplate>
-                <TextBlock Text="{Binding GroupName}" />
-            </DataTemplate>
-        </TabControl.ItemTemplate>
-        <TabControl.ContentTemplate>
-            <DataTemplate>
-                <ItemsControl ItemsSource="{Binding Projects}" Margin="2">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button Style="{DynamicResource ProjectBtnStyle}" 
-                                    ToolTip="{Binding Project.ToolTip}"
-                                    Command="{Binding LaunchProjectCommand}"
-                                    CommandParameter="{Binding Project.Name}">
-                                <StackPanel>
-                                    <Image Source="{Binding Project.Icon.FullPath}" />
-                                    <Label Content="{Binding Project.Name}" />
-                                </StackPanel>
-                            </Button>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                </ItemsControl>
-            </DataTemplate>
-        </TabControl.ContentTemplate>
-    </TabControl>
+    <Grid>
+        <ItemsControl ItemsSource="{Binding Projects.Projects}" Margin="2">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.Template>
+                <ControlTemplate TargetType="ItemsControl">
+                    <Border BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            Background="{TemplateBinding Background}">
+                        <ScrollViewer CanContentScroll="True"
+                                      Padding="{TemplateBinding Padding}"
+                                      Focusable="False"
+                                      IsDeferredScrollingEnabled="True">
+                            <ItemsPresenter/>
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </ItemsControl.Template>
 
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Button Style="{DynamicResource ProjectBtnStyle}" 
+                            ToolTip="{Binding Project.ToolTip}"
+                            Command="{Binding LaunchProjectCommand}"
+                            CommandParameter="{Binding Project.Name}">
+                        <StackPanel>
+                            <Image Source="{Binding Project.Icon.FullPath, FallbackValue=''}" />
+                            <Label Content="{Binding Project.Name}" />
+                        </StackPanel>
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
     <UserControl.Resources>
 
         <Style x:Key="ProjectBtnStyle" TargetType="Button">
@@ -79,5 +82,5 @@
             </Style.Resources>
         </Style>
     </UserControl.Resources>
-    
+
 </UserControl>
