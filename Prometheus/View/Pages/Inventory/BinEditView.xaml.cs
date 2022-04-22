@@ -1,15 +1,15 @@
 ﻿using Prometheus.ViewModel.Pages;
+using Prometheus.ViewModel.Pages.Inventory;
 using Uranus.Inventory.Model;
-using System.Windows;
 
-namespace Prometheus.View.Pages;
+namespace Prometheus.View.Pages.Inventory;
 
 /// <summary>
 /// Interaction logic for BinEditView.xaml
 /// </summary>
-public partial class BinEditView : Window
+public partial class BinEditView
 {
-    public BinEditView(BinVM parentVM, NAVBin bin = null)
+    public BinEditView(BinVM parentVM, NAVBin? bin = null)
     {
         InitializeComponent();
 

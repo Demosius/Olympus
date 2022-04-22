@@ -1,24 +1,21 @@
-﻿<base:BREADBase x:Class="Prometheus.View.Pages.BinView"
+﻿<base:BREADPage x:Class="Prometheus.View.Pages.Inventory.BinView"
                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
                   xmlns:base="clr-namespace:Prometheus.View"
                   xmlns:vm="clr-namespace:Prometheus.ViewModel.Pages"
+                  xmlns:inventory="clr-namespace:Prometheus.ViewModel.Pages.Inventory"
                   mc:Ignorable="d" 
                   d:DesignHeight="450" d:DesignWidth="800"
                   Title="BinView">
 
     <Page.DataContext>
-        <vm:BinVM x:Name="VM"/>
+        <inventory:BinVM x:Name="VM"/>
     </Page.DataContext>
 
     <Page.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
+        <ResourceDictionary Source="../../../Themes/MSControls.Core.Implicit.xaml"/>
     </Page.Resources>
 
     <DockPanel>
@@ -50,7 +47,7 @@
                   IsReadOnly="True" Margin="0,-1,0,1"
                   AutoGenerateColumns="True"
                   AutoGeneratingColumn="DataGrid_AutoGeneratingColumn"/>
-        
+
 
         <DockPanel.Resources>
             <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
@@ -85,5 +82,5 @@
         </DockPanel.Resources>
     </DockPanel>
 
-    
-</base:BREADBase>
+
+</base:BREADPage>

@@ -5,10 +5,16 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>prometheus.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="ViewModel\Commands\" />
+    <Folder Include="ViewModel\Pages\Equipment\" />
+    <Folder Include="ViewModel\Pages\Users\" />
+    <Folder Include="ViewModel\Pages\Staff\" />
+    <Folder Include="View\Pages\Equipment\" />
+    <Folder Include="View\Pages\Staff\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,13 +28,13 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Update="View\Pages\BatchView.xaml.cs">
+    <Compile Update="View\Pages\Inventory\BatchView.xaml.cs">
       <DependentUpon>BatchView.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\Pages\BinEditView.xaml.cs">
+    <Compile Update="View\Pages\Inventory\BinEditView.xaml.cs">
       <DependentUpon>BinEditView.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\Pages\BinView.xaml.cs">
+    <Compile Update="View\Pages\Inventory\BinView.xaml.cs">
       <DependentUpon>BinView.xaml</DependentUpon>
     </Compile>
     <Compile Update="View\PrometheusPage.xaml.cs">
@@ -46,29 +52,31 @@
   <ItemGroup>
     <Page Update="Themes\MSControls.Core.Implicit.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Themes\MSControls.Toolkit.Implicit.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
     <Page Update="Themes\Styles.Shared.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Themes\Styles.WPF.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Themes\Theme.Colors.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="View\Pages\BatchView.xaml">
+    <Page Update="View\Pages\Inventory\BatchView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\Pages\BinEditView.xaml">
+    <Page Update="View\Pages\Inventory\BinEditView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\Pages\BinView.xaml">
+    <Page Update="View\Pages\Inventory\BinView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

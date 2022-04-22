@@ -2,56 +2,57 @@
 using Prometheus.View;
 using Prometheus.View.Pages;
 using Prometheus.ViewModel.Helpers;
+using Styx;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using Styx;
+using System.Runtime.CompilerServices;
 using Uranus;
+using Uranus.Annotations;
 using ProEnums = Prometheus.ViewModel.Helpers.EnumConverter;
 
 namespace Prometheus.ViewModel;
 
 public class PrometheusVM : INotifyPropertyChanged
 {
-    public Helios Helios { get; set; }
-    public Charon Charon { get; set; }
+    public Helios? Helios { get; set; }
+    public Charon? Charon { get; set; }
 
     public ObservableCollection<DataCategory> Categories { get; set; }
     public ObservableCollection<DataType> Types { get; set; }
-    public Dictionary<EDataType, BREADBase> DataPages { get; set; }
+    public Dictionary<EDataCategory, CatPage> Pages { get; set; }
 
-    private BREADBase currentPage;
-    public BREADBase CurrentPage 
+    private CatPage? currentPage;
+    public CatPage? CurrentPage
     {
-        get => currentPage; 
+        get => currentPage;
         set
         {
             currentPage = value;
             OnPropertyChanged(nameof(CurrentPage));
-        } 
+        }
     }
 
-    private DataCategory selectedCategory;
-    public DataCategory SelectedCategory
+    private DataCategory? selectedCategory;
+    public DataCategory? SelectedCategory
     {
         get => selectedCategory;
         set
         {
             selectedCategory = value;
             SelectedType = null;
-            SetTypes();
+            if (value is not null) SetPage(value.Category);
             OnPropertyChanged(nameof(SelectedCategory));
         }
     }
 
-    private DataType selectedType;
-    public DataType SelectedType
+    private DataType? selectedType;
+    public DataType? SelectedType
     {
         get => selectedType;
         set
         {
             selectedType = value;
-            if (value is not null) SetPage(value.Type);
             OnPropertyChanged(nameof(SelectedType));
         }
     }
@@ -60,7 +61,7 @@ public class PrometheusVM : INotifyPropertyChanged
     {
         Categories = new ObservableCollection<DataCategory>();
         Types = new ObservableCollection<DataType>();
-        DataPages = new Dictionary<EDataType, BREADBase>();
+        Pages = new Dictionary<EDataCategory, CatPage>();
         foreach (var category in ProEnums.GetDataCategories())
         {
             Categories.Add(new DataCategory(category));
@@ -83,36 +84,40 @@ public class PrometheusVM : INotifyPropertyChanged
         }
     }
 
-    public void SetPage(EDataType type)
+    public void SetPage(EDataCategory category)
     {
-        CurrentPage = GetPage(type);
+        CurrentPage = GetPage(category);
     }
 
-    public BREADBase GetPage(EDataType type)
+    public CatPage? GetPage(EDataCategory category)
     {
+        if (Helios is null || Charon is null) return null;
+
         // If it already exists in the given pages, use it.
-        if (DataPages.ContainsKey(type))
-            return DataPages[type];
-        if (type == EDataType.Batch)
-            return GeneratePage(new BatchView());
-        if (type == EDataType.NAVBin)
-            return GeneratePage(new BinView());
+        if (Pages.ContainsKey(category))
+            return Pages[category];
 
-        // If nothing else works, return null.
-        return null;
+        return category switch
+        {
+            EDataCategory.Inventory => GeneratePage(new InventoryPage()),
+            EDataCategory.Equipment => GeneratePage(new EquipmentPage()),
+            EDataCategory.Staff => GeneratePage(new StaffPage()),
+            EDataCategory.Users => GeneratePage(new UserPage(Helios, Charon)),
+            _ => null
+        };
     }
 
-    public BREADBase GeneratePage(BREADBase page)
+    public CatPage GeneratePage(CatPage page)
     {
-        DataPages.Add(page.DataType, page);
+        Pages.Add(page.DataCategory, page);
         return page;
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-
 }

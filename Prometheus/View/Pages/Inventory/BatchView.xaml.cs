@@ -1,6 +1,6 @@
 ﻿using Prometheus.ViewModel.Helpers;
 
-namespace Prometheus.View.Pages;
+namespace Prometheus.View.Pages.Inventory;
 
 /// <summary>
 /// Interaction logic for BatchView.xaml

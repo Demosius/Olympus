@@ -9,7 +9,11 @@ public class DataCategory
     public string Name { get; set; }
     public List<DataType> DataTypes { get; set; }
 
-    public DataCategory() { }
+    public DataCategory()
+    {
+        Name = string.Empty;
+        DataTypes = new List<DataType>();
+    }
 
     public DataCategory(EDataCategory category) : this()
     {

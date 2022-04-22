@@ -2,28 +2,30 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using Uranus.Annotations;
 
-namespace Prometheus.ViewModel.Pages;
+namespace Prometheus.ViewModel.Pages.Inventory;
 
-class BinEditVM : INotifyPropertyChanged
+internal class BinEditVM : INotifyPropertyChanged
 {
 
     public List<string> ExistingBinIDs { get; set; }
 
-    private BinVM parentVM;
-    public BinVM ParentVM
+    private BinVM? parentVM;
+    public BinVM? ParentVM
     {
         get => parentVM;
         set 
         {
             parentVM = value;
-            ExistingBinIDs = parentVM.Bins.Select(b => b.ID).ToList();
+            if (parentVM is not null) ExistingBinIDs = parentVM.Bins.Select(b => b.ID).ToList();
             OnPropertyChanged(nameof(ParentVM));
         }
     }
 
-    private NAVBin bin;
-    public NAVBin Bin
+    private NAVBin? bin;
+    public NAVBin? Bin
     {
         get => bin;
         set
@@ -34,7 +36,10 @@ class BinEditVM : INotifyPropertyChanged
     }
 
 
-    public BinEditVM() { }
+    public BinEditVM()
+    {
+        ExistingBinIDs = new List<string>();
+    }
 
     /// <summary>
     /// Saves the bin changes into the parent bin list, and loads it into the database.
@@ -44,9 +49,11 @@ class BinEditVM : INotifyPropertyChanged
 
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
