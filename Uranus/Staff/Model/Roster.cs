@@ -28,21 +28,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
     public TimeSpan EndTime { get; set; }
     public ERosterType RosterType { get; set; }
 
-    private bool atWork;
-    public bool AtWork
-    {
-        get => atWork;
-        set
-        {
-            var wasAtWork = atWork;
-            atWork = value;
-
-            if (atWork && !wasAtWork)
-                AddCount();
-            else if (!atWork && wasAtWork)
-                DropCount();
-        }
-    }
+    public bool AtWork { get; set; }
 
     [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Employee? Employee { get; set; }
@@ -137,15 +123,11 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
 
     public void SetShift(Shift newShift, bool working = true)
     {
-        if (AtWork) DropCount();
-
         Shift = newShift;
         ShiftID = newShift.ID;
         StartTime = newShift.StartTime;
         EndTime = newShift.EndTime;
-
-        if (AtWork) AddCount();
-
+        
         AtWork = working;
     }
 
@@ -154,26 +136,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         Date = date;
         Day = Date.DayOfWeek;
     }
-
-
-    /// <summary>
-    /// Drop the shift-counters for Department and Daily before removing current shift.
-    /// </summary>
-    private void DropCount()
-    {
-        //DepartmentRoster?.DropCount(ShiftID);
-        if (Shift is not null) DailyRoster?.DropCount(Shift);
-    }
-
-    /// <summary>
-    /// Increase the shift-counters for Department and Daily according to the current shift.
-    /// </summary>
-    private void AddCount()
-    {
-        //DepartmentRoster?.AddCount(ShiftID);
-        if (Shift is not null) DailyRoster?.AddCount(Shift);
-    }
-
+    
     public bool Equals(Roster? other)
     {
         if (other is null) return false;
@@ -184,5 +147,15 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
     public int CompareTo(Roster? other)
     {
         return other is null ? 1 : Date.CompareTo(other.Date);
+    }
+
+    public string TimeString()
+    {
+        return $"{StartTime.Hours:00}:{StartTime.Minutes:00}-{EndTime.Hours:00}:{EndTime.Minutes:00}";
+    }
+
+    public override string ToString()
+    {
+        return AtWork ? TimeString() : (RosterType == ERosterType.Standard ? ERosterType.RDO : RosterType).ToString();
     }
 }

@@ -63,20 +63,10 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
     public void AddRoster(Roster roster)
     {
         Rosters.Add(roster);
-        if (roster.Shift is not null && roster.AtWork) AddCount(roster.Shift);
+        roster.DailyRoster = this;
+        roster.DailyRosterID = ID;
     }
-
-    public void DropCount(Shift shift)
-    {
-        if (ShiftCounter.TryGetValue(shift, out _))
-            ShiftCounter[shift]--;
-    }
-
-    public void AddCount(Shift shift)
-    {
-        if (ShiftCounter.TryGetValue(shift, out _))
-            ShiftCounter[shift]++;
-    }
+    
 
     public override string ToString() => $"{Day}\n{Date:dd MMM yyyy}";
 }

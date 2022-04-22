@@ -116,7 +116,7 @@
 
                         <!-- Sorting -->
                         <Label Grid.Column="4"
-                               Content="Filter:"/>
+                               Content="Sort By:"/>
                         <ComboBox Grid.Column="5"
                                   ItemsSource="{Binding Source={StaticResource RosterSortOptions}, Mode=OneTime}"
                                   SelectedValue="{Binding SortOption}"/>

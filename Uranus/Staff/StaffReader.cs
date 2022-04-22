@@ -37,7 +37,8 @@ public class StaffReader
         return employee;
     }
 
-    public List<Employee> Employees(Expression<Func<Employee, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<Employee> Employees(Expression<Func<Employee, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
+        => Chariot.PullObjectList(filter ?? (e => e.IsActive), pullType);
 
     public bool EmployeeExists(int id) => Chariot.Database?.ExecuteScalar<int>("SELECT count(*) FROM Employee WHERE ID=?;", id) > 0;
 
@@ -105,9 +106,9 @@ public class StaffReader
         departmentList = departments;
     }
 
-    public List<int> GetManagerIDs() => Chariot.Database?.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID).ToList() ?? new List<int>();
+    public List<int> GetManagerIDs() => Chariot.Database?.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee WHERE IsActive = ?;", true).Select(e => e.ReportsToID).ToList() ?? new List<int>();
 
-    public IEnumerable<string> Locations() => Chariot.Database?.Query<Employee>("SELECT DISTINCT Location FROM Employee;").Select(e => e.Location) ?? new List<string>();
+    public IEnumerable<string> Locations() => Chariot.Database?.Query<Employee>("SELECT DISTINCT Location FROM Employee WHERE IsActive = ?;", true).Select(e => e.Location) ?? new List<string>();
 
     public IEnumerable<Employee> GetManagedEmployees(int managerID)
     {
@@ -149,7 +150,7 @@ public class StaffReader
             EmployeeDataSet? data = null;
             Chariot.Database?.RunInTransaction(() =>
             {
-                var employees = Chariot.PullObjectList<Employee>();
+                var employees = Chariot.PullObjectList<Employee>(e => e.IsActive);
                 var departments = Chariot.PullObjectList<Department>();
                 var departmentRosters = Chariot.PullObjectList<DepartmentRoster>();
                 var roles = Chariot.PullObjectList<Role>();
@@ -171,7 +172,7 @@ public class StaffReader
 
     public DepartmentRoster? DepartmentRoster(string rosterName, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<DepartmentRoster>(rosterName, pullType);
 
-    public IEnumerable<DepartmentRoster?> DepartmentRosters(string departmentName) 
+    public IEnumerable<DepartmentRoster?> DepartmentRosters(string departmentName)
         => Chariot.Database?.Query<DepartmentRoster>("SELECT * FROM DepartmentRoster WHERE DepartmentName = ?;", departmentName) ?? new List<DepartmentRoster>();
 
     public IEnumerable<DepartmentRoster> DepartmentRosters(Expression<Func<DepartmentRoster, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
@@ -187,8 +188,8 @@ public class StaffReader
             // startDate should be monday, but it might not be, so account for that possibility.
             // Earliest date should cover up to 2 weeks before hand.
             var earliestDate = startDate.AddDays(DayOfWeek.Monday - startDate.DayOfWeek - 14);
-            // Latest date should be the sunday after the earliest.
-            var latestDate = earliestDate.AddDays(DayOfWeek.Saturday - earliestDate.DayOfWeek + 1);
+            // Latest date should be the sunday after the start date.
+            var latestDate = startDate.AddDays(DayOfWeek.Saturday - startDate.DayOfWeek + 1);
 
             // Declare variables.
             List<Employee>? employees = null;
@@ -243,7 +244,7 @@ public class StaffReader
             {
                 var department = Chariot.PullObject<Department>(departmentName);
                 if (department is null) return;
-                var employees = Chariot.PullObjectList<Employee>(e => e.DepartmentName == department.Name);
+                var employees = Chariot.PullObjectList<Employee>(e => e.DepartmentName == department.Name && e.IsActive);
                 var earliestDate = startDate.AddDays(DayOfWeek.Sunday - startDate.DayOfWeek - 14);
                 var latestDate = endDate.AddDays(DayOfWeek.Saturday - endDate.DayOfWeek);
                 var rosters = Chariot.PullObjectList<Roster>(r =>
@@ -316,7 +317,7 @@ public class StaffReader
             {
                 roleDict = Chariot.PullObjectList<Role>()
                     .ToDictionary(r => r.Name, r => r);
-                employeeDict = Employees(pullType: EPullType.IncludeChildren)
+                employeeDict = Employees(e => e.IsActive, EPullType.IncludeChildren)
                     .GroupBy(e => e.RoleName)
                     .ToDictionary(g => g.Key, g => g.ToList());
             });
@@ -370,7 +371,9 @@ public class StaffReader
 
     public IEnumerable<Employee> EmployeesRecursiveReports()
     {
-        var fullEmployees = Chariot.Database?.Table<Employee>().ToDictionary(e => e.ID, e => e) ?? new Dictionary<int, Employee>();
+        var fullEmployees = Chariot.Database?.Table<Employee>()
+            .Where(e => e.IsActive)
+            .ToDictionary(e => e.ID, e => e) ?? new Dictionary<int, Employee>();
 
         foreach (var (_, employee) in fullEmployees)
         {

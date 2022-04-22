@@ -1,7 +1,9 @@
-﻿using Pantheon.Properties;
+﻿using Microsoft.Win32;
+using Pantheon.Properties;
 using Pantheon.View;
 using Pantheon.ViewModel.Commands;
 using Pantheon.ViewModel.Controls;
+using Pantheon.ViewModel.Utility;
 using Serilog;
 using Styx;
 using System;
@@ -9,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -190,7 +193,11 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 
         if (Helios is null || SelectedDepartment is null) return;
 
-        Rosters = new ObservableCollection<DepartmentRoster>(SelectedDepartment.DepartmentRosters);
+        Rosters = new ObservableCollection<DepartmentRoster>(SelectedDepartment.DepartmentRosters.OrderBy(r => r.StartDate));
+
+        SelectedRoster = Rosters.First(r =>
+            Math.Abs(DateTime.Now.Date.Subtract(r.StartDate).TotalDays -
+                     Rosters.Min(dr => DateTime.Now.Date.Subtract(dr.StartDate).TotalDays)) < .05);
     }
 
     public void NewRoster()
@@ -238,7 +245,32 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 
     public void ExportRoster()
     {
-        throw new NotImplementedException();
+        // Must have a selected roster.
+        if (SelectedRoster is null || Helios is null) return;
+
+        var vm = LoadedRoster ?? new DepartmentRosterVM(SelectedRoster, Helios);
+        vm.Initialize();
+        var depRoster = vm.DepartmentRoster;
+
+        // Prompt for file/directory.
+        SaveFileDialog sfd = new()
+        {
+            OverwritePrompt = true,
+            FileName = $"{depRoster.Name}.csv",
+            CheckFileExists = false,
+            CheckPathExists = true
+        };
+        if (sfd.ShowDialog() != true) return;
+        var fullFilePath = sfd.FileName;
+
+        // Create data table.
+        var table = depRoster.DataTable();
+
+        // Export to csv.
+        table.WriteToCsvFile(fullFilePath);
+
+        MessageBox.Show($"Successfully exported '{depRoster.Name}' to {Path.GetDirectoryName(fullFilePath)}.",
+            "Successful Export", MessageBoxButton.OK, MessageBoxImage.None);
     }
 
     public void SaveRoster()
@@ -259,7 +291,19 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 
     public void DeleteRoster()
     {
-        throw new NotImplementedException();
+        if (Helios is null || SelectedRoster is null) return;
+
+        // Confirm delete.
+        if (MessageBox.Show($"Are you sure you want to delete the roster: {SelectedRoster}?", "Confirm Deletion",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+
+        // Delete from database.
+        Helios.StaffDeleter.DepartmentRoster(SelectedRoster);
+
+        // Delete from active data.
+        SelectedDepartment?.DepartmentRosters.Remove(SelectedRoster);
+        Rosters.Remove(SelectedRoster);
+        SelectedRoster = null;
     }
 
     public void RepairData()

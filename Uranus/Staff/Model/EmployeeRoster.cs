@@ -53,6 +53,7 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
         StartDate = startDate;
         ShiftID = string.Empty;
         DepartmentRoster = departmentRoster;
+        DepartmentRosterID = DepartmentRoster.ID;
         Rosters = new List<Roster>();
     }
 

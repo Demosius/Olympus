@@ -116,6 +116,7 @@ public class Employee : INotifyPropertyChanged
     [ForeignKey(typeof(EmployeeAvatar))] public string AvatarName { get; set; }
     [ForeignKey(typeof(Licence))] public string LicenceNumber { get; set; }
     [DefaultValue(false)] public bool IsUser { get; set; }
+    [DefaultValue(true)] public bool IsActive { get; set; }     // Employees are de-activated instead of deleted.
 
     [ManyToOne(nameof(DepartmentName), nameof(Model.Department.Employees),
         CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]

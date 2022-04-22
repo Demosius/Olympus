@@ -36,6 +36,7 @@ internal class RosterVM : INotifyPropertyChanged
         {
             if (AtWork && Roster.Shift is not null) DailyRosterVM.SubCount(Roster.Shift);
             Roster.Shift = value;
+            Roster.ShiftID = Roster.Shift?.ID ?? "";
             OnPropertyChanged();
             if (AtWork && Roster.Shift is not null) DailyRosterVM.AddCount(Roster.Shift);
 

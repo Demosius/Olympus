@@ -264,8 +264,8 @@ internal class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         // EmployeeRosters
         foreach (var employeeRoster in DepartmentRoster.EmployeeRosters)
         {
-            var erVM = new EmployeeRosterVM(employeeRoster, this);
-            EmployeeRosterVMs.Add(employeeRoster.EmployeeID, erVM);
+            var erVM = AddEmployeeRoster(employeeRoster);
+
             foreach (var roster in employeeRoster.Rosters)
             {
                 dailyRosterVMs.TryGetValue(roster.Date, out var drVM);
@@ -291,6 +291,14 @@ internal class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     public void SubCount(Shift shift)
     {
         TargetAccessDict[shift.ID].Count--;
+    }
+
+    public EmployeeRosterVM AddEmployeeRoster(EmployeeRoster roster)
+    {
+        var erVM = new EmployeeRosterVM(roster, this);
+        EmployeeRosterVMs.Add(roster.EmployeeID, erVM);
+        if (roster.Shift is not null) AddCount(roster.Shift);
+        return erVM;
     }
 
     /// <summary>

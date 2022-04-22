@@ -54,7 +54,19 @@ public class StaffDeleter
         });
     }
 
-    public void Employee(Employee selectedEmployee) => Chariot.Database?.Delete(selectedEmployee);
+    /// <summary>
+    /// Sets employee IsActive status as false. Does not perform a true delete for historic reference purposes.
+    /// </summary>
+    /// <param name="employee"></param>
+    /// <returns></returns>
+    public int Employee(Employee employee) => Chariot.Database?.ExecuteScalar<int>("UPDATE Employee SET IsActive = ? WHERE ID = ?;", false, employee.ID) ?? 0;
+
+    /// <summary>
+    /// True deletion of employee from database. Use sparingly.
+    /// </summary>
+    /// <param name="employee"></param>
+    /// <returns></returns>
+    public int EmployeeObliteration(Employee employee) => Chariot.Delete(employee) ? 1 : 0;
 
     public void Shift(Shift shift)
     {
@@ -67,4 +79,22 @@ public class StaffDeleter
     }
 
     public void Break(Break @break) => Chariot.Delete(@break);
+
+    /// <summary>
+    /// Delete the given department roster, and every employee/daily/roster that references it, from the database.
+    /// </summary>
+    /// <param name="roster"></param>
+    /// <returns></returns>
+    public int DepartmentRoster(DepartmentRoster roster)
+    {
+        var lines = 0;
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            lines += Chariot.Database.ExecuteScalar<int>("DELETE FROM Roster WHERE DepartmentRosterID = ?;", roster.ID);
+            lines += Chariot.Database.ExecuteScalar<int>("DELETE FROM DailyRoster WHERE DepartmentRosterID = ?;", roster.ID);
+            lines += Chariot.Database.ExecuteScalar<int>("DELETE FROM EmployeeRoster WHERE DepartmentRosterID = ?;", roster.ID);
+            lines += Chariot.Database.Delete(roster);
+        });
+        return lines;
+    }
 }

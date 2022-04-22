@@ -281,14 +281,16 @@ public class StaffUpdater
     /// DailyRosters, EmployeeRosters, and Roster objects.
     /// </summary>
     /// <param name="departmentRoster">Filled and initialized department roster with daily/employee/roster references.</param>
-    public void DepartmentRoster(DepartmentRoster departmentRoster)
+    public int DepartmentRoster(DepartmentRoster departmentRoster)
     {
+        var lines = 0;
         Chariot.Database?.RunInTransaction(() =>
         {
-            //conn.UpdateAll(departmentRoster.Rosters);
-            //conn.UpdateAll(departmentRoster.DailyRosters);
-            //conn.UpdateAll(departmentRoster.EmployeeRosters);
-            Chariot.Database.Update(departmentRoster);
+            lines += departmentRoster.Rosters.Sum(roster => Chariot.InsertOrUpdate(roster));
+            lines += departmentRoster.DailyRosters.Sum(dailyRoster => Chariot.InsertOrUpdate(dailyRoster));
+            lines += departmentRoster.EmployeeRosters.Sum(employeeRoster => Chariot.InsertOrUpdate(employeeRoster));
+            lines += Chariot.Database.Update(departmentRoster);
         });
+        return lines;
     }
 }

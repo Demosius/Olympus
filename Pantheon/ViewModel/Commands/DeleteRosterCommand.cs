@@ -12,7 +12,7 @@ internal class DeleteRosterCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.IsLoaded;
+        return VM.SelectedRoster is not null;
     }
 
     public void Execute(object? parameter)

@@ -161,7 +161,7 @@ public class DepartmentRoster
                 var dailyRoster = dailyRosterDict[date];
                 var roster = new Roster(Department, this, newEmployeeRoster, employee, date);
                 newEmployeeRoster.Rosters.Add(roster);
-                dailyRoster.Rosters.Add(roster);
+                dailyRoster.AddRoster(roster);
                 Rosters.Add(roster);
                 RosterDict.Add((roster.EmployeeID, date), roster);
             }
@@ -227,7 +227,9 @@ public class DepartmentRoster
 
     private void SetFromRosters()
     {
-        foreach (var (_, roster) in RosterDict)
+        var nullIDs = new List<(int, DateTime)>();
+
+        foreach (var (key, roster) in RosterDict)
         {
             if (roster.DepartmentName == Department?.Name) roster.Department = Department;
 
@@ -235,6 +237,11 @@ public class DepartmentRoster
             {
                 employee.Rosters.Add(roster);
                 roster.Employee = employee;
+            }
+            else    // Make sure to remove rosters that are trying to use non-existent/inactive employees.
+            {
+                nullIDs.Add(key);
+                continue;
             }
 
             if (ShiftDict.TryGetValue(roster.ShiftID, out var shift))
@@ -263,6 +270,11 @@ public class DepartmentRoster
                     ShiftCounter[roster.Shift]++;
             }
         }
+
+        foreach (var rosterKey in nullIDs)
+        {
+            RosterDict.Remove(rosterKey);
+        }
     }
 
     private void SetFromDailyRosters()
@@ -285,8 +297,20 @@ public class DepartmentRoster
 
     private void SetFromEmployeeRosters()
     {
+        var nullIDs = new List<Guid>();
         foreach (var (_, employeeRoster) in EmployeeRosterDict)
         {
+            if (EmployeeDict.TryGetValue(employeeRoster.EmployeeID, out var employee))
+            {
+                employee.EmployeeRosters.Add(employeeRoster);
+                employeeRoster.Employee = employee;
+            }
+            else
+            {
+                nullIDs.Add(employeeRoster.ID);
+                continue;
+            }
+
             if (employeeRoster.DepartmentName == DepartmentName)
             {
                 employeeRoster.Department = Department;
@@ -299,18 +323,59 @@ public class DepartmentRoster
                 EmployeeRosters.Add(employeeRoster);
             }
 
-            if (EmployeeDict.TryGetValue(employeeRoster.EmployeeID, out var employee))
-            {
-                employee.EmployeeRosters.Add(employeeRoster);
-                employeeRoster.Employee = employee;
-            }
-
             if (ShiftDict.TryGetValue(employeeRoster.ShiftID, out var shift))
             {
                 shift.EmployeeRosters.Add(employeeRoster);
                 employeeRoster.Shift = shift;
             }
         }
+
+        foreach (var id in nullIDs)
+        {
+            EmployeeRosterDict.Remove(id);
+        }
+    }
+
+    /// <summary>
+    /// Converts the contained array of rosters into a DataTable.
+    /// </summary>
+    /// <returns></returns>
+    public DataTable DataTable()
+    {
+        var table = new DataTable();
+
+        // Establish columns.
+        table.Columns.Add("NAME");
+        foreach (var dailyRoster in DailyRosters)
+            table.Columns.Add(dailyRoster.Date.ToString("dd-MMM"));
+
+        // Day of week row.
+        var row = table.NewRow();
+        var i = 0;
+        foreach (var dailyRoster in DailyRosters)
+        {
+            i++;
+            row[i] = dailyRoster.Date.ToString("dddd").ToUpper();
+        }
+
+        table.Rows.Add(row);
+
+        // Fill in employees.
+        foreach (var employeeRoster in EmployeeRosters)
+        {
+            row = table.NewRow();
+            i = 0;
+            row[i] = employeeRoster.Employee?.FullName ?? "";
+            foreach (var roster in employeeRoster.Rosters)
+            {
+                i++;
+                row[i] = roster.ToString();
+            }
+
+            table.Rows.Add(row);
+        }
+
+        return table;
     }
 
     public override string ToString() => Name;

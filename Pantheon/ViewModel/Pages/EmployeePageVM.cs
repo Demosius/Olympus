@@ -490,7 +490,16 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     public void DeleteEmployee()
     {
         if (SelectedEmployee is null || Helios is null || Charon is null) return;
+
+        // Confirm with user.
+        if (MessageBox.Show(
+                $"Are you sure you want to delete {SelectedEmployee}?\n\n(They will be recoverable in the database, but inaccessible until they are.)",
+                "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+
+        // 'Delete' in database.
         Helios.StaffDeleter.Employee(SelectedEmployee);
+
+        // Remove current active references to the employee.
         SelectedEmployee.Delete();
         EmployeeDataSet?.Employees.Remove(SelectedEmployee.ID);
         ReportingEmployees.Remove(SelectedEmployee);
