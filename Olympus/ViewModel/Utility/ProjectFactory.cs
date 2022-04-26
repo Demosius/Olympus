@@ -35,7 +35,7 @@ public static class ProjectFactory
         
     public static bool CanLaunch(EProject project, Charon charon)
     {
-        if (charon.CurrentUser is not null)
+        if (charon.User is not null)
             return true;
         return !RequiresUser(project);
     }

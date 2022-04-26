@@ -118,8 +118,8 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction
     {
         if (Helios is null || Charon is null) return;
 
-        Departments = new ObservableCollection<Department>(Helios.StaffReader.SubDepartments(Charon.UserEmployee?.DepartmentName ?? ""));
-        SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.UserEmployee?.DepartmentName);
+        Departments = new ObservableCollection<Department>(Helios.StaffReader.SubDepartments(Charon.Employee?.DepartmentName ?? ""));
+        SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.Employee?.DepartmentName);
     }
 
     public void RepairData()

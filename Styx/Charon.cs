@@ -18,19 +18,19 @@ public class PasswordException : Exception
 
 public partial class Charon
 {
-    private User? currentUser;
-    public User? CurrentUser
+    private User? user;
+    public User? User
     {
-        get => currentUser;
+        get => user;
         set
         {
             // Make sure user project icon paths are set.
             foreach (var p in value?.Employee?.Projects ?? new List<Project>())
                 p.Icon?.SetDirectory(staffReader.ProjectIconDirectory);
-            currentUser = value;
+            user = value;
         }
     }
-    public Employee? UserEmployee => CurrentUser?.Employee;
+    public Employee? Employee => User?.Employee;
 
     // User manipulations.
     private readonly UserChariot userChariot;
@@ -43,6 +43,7 @@ public partial class Charon
     private readonly StaffChariot staffChariot;
     private readonly StaffReader staffReader;
     private readonly StaffCreator staffCreator; // For alpha user registration.
+    private readonly StaffUpdater staffUpdater;
     // private readonly StaffDeleter staffDeleter;
 
     public Charon(string solLocation)
@@ -56,6 +57,7 @@ public partial class Charon
         staffChariot = new StaffChariot(solLocation);
         staffReader = new StaffReader(ref staffChariot);
         staffCreator = new StaffCreator(ref staffChariot);
+        staffUpdater = new StaffUpdater(ref staffChariot);
         // staffDeleter = new StaffDeleter(ref staffChariot);
     }
 
@@ -68,31 +70,31 @@ public partial class Charon
 
     public int GetLevelDifference(StaffRole role)
     {
-        if (CurrentUser is null ||
-            UserEmployee?.Role is null) return 999;
+        if (User is null ||
+            Employee?.Role is null) return 999;
 
         var level = 0;
 
-        if (UserEmployee.Role.LookDown(ref role))
-            return role.Level - UserEmployee.Role.Level;
+        if (Employee.Role.LookDown(ref role))
+            return role.Level - Employee.Role.Level;
 
-        return UserEmployee.Role.LookUp(ref level, UserEmployee.Role, ref role) ? level - UserEmployee.Role.Level : 999;
+        return Employee.Role.LookUp(ref level, Employee.Role, ref role) ? level - Employee.Role.Level : 999;
     }
 
     public int GetLevelDifference(Employee employee)
     {
-        if (CurrentUser is null ||
-            UserEmployee is null ||
+        if (User is null ||
+            Employee is null ||
             employee.Role is null ||
-            UserEmployee.Role is null) return 999;
+            Employee.Role is null) return 999;
 
         var targetRole = employee.Role;
         var level = 0;
 
-        if (UserEmployee.Role.LookDown(ref targetRole))
-            return targetRole.Level - UserEmployee.Role.Level;
+        if (Employee.Role.LookDown(ref targetRole))
+            return targetRole.Level - Employee.Role.Level;
 
-        return UserEmployee.Role.LookUp(ref level, UserEmployee.Role, ref targetRole) ? level - UserEmployee.Role.Level : 999;
+        return Employee.Role.LookUp(ref level, Employee.Role, ref targetRole) ? level - Employee.Role.Level : 999;
     }
 
     public int GetLevelDifference(int employeeID)
@@ -103,7 +105,7 @@ public partial class Charon
 
     public bool ChangePassword(string newPassword, string confirmPassword, out string message)
     {
-        if (CurrentUser is null || UserEmployee is null)
+        if (User is null || Employee is null)
         {
             message = "No current user.";
             return false;
@@ -111,7 +113,7 @@ public partial class Charon
         if (!ValidatePassword(newPassword, confirmPassword, out message)) return false;
 
         // Set up new password for current user.
-        var newLogin = GetNewLogin(CurrentUser.ID, newPassword);
+        var newLogin = GetNewLogin(User.ID, newPassword);
 
         userUpdater.Login(newLogin);
         return true;
@@ -131,7 +133,7 @@ public partial class Charon
 
     public void LogOut()
     {
-        CurrentUser = null;
+        User = null;
     }
 
     public bool LogIn(int userID, string password)
@@ -141,11 +143,11 @@ public partial class Charon
         if (login is null) return false;
         if (!VerifyPassword(login, password)) return false;
 
-        var user = userReader.User(userID);
-        if (user is null) return false;
+        var newUser = userReader.User(userID);
+        if (newUser is null) return false;
         
-        user.Employee = staffReader.EmployeeLogIn(userID);
-        CurrentUser = user;
+        newUser.Employee = staffReader.EmployeeLogIn(userID);
+        User = newUser;
 
         return true;
 
@@ -185,7 +187,7 @@ public partial class Charon
             userCreator.Login(newLogin);
 
             // Set user.
-            CurrentUser = newUser;
+            User = newUser;
         }
         catch (Exception)
         {
@@ -228,7 +230,7 @@ public partial class Charon
         userCreator.Login(newLogin);
 
         // Set user.
-        CurrentUser = newUser;
+        User = newUser;
 
         return true;
     }
@@ -296,6 +298,7 @@ public partial class Charon
         if (!CreateNewUser(employee.ID, roleName)) return false;
 
         employee.IsUser = true;
+        staffUpdater.Employee(employee);
         return true;
     }
 

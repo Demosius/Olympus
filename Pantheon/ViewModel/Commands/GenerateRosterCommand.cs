@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows.Input;
 using Pantheon.ViewModel.Controls;
-using Pantheon.ViewModel.Pages;
 
 namespace Pantheon.ViewModel.Commands;
 

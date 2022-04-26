@@ -15,7 +15,7 @@ public class ChangePasswordCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return App.Charon.CurrentUser is not null;
+        return App.Charon.User is not null;
     }
 
     public void Execute(object? parameter)

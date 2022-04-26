@@ -6,72 +6,72 @@ namespace Styx;
 public partial class Charon
 {
     // Using Employee objects.
-    public bool CanCreateEmployee() => CurrentUser?.Role?.CreateEmployee ?? false;
+    public bool CanCreateEmployee() => User?.Role?.CreateEmployee ?? false;
 
     public bool CanReadEmployee(Employee employee)
     {
-        return CurrentUser?.Role is not null &&
-            CurrentUser.Role.ReadEmployee >= GetLevelDifference(employee) || UserEmployee == employee;
+        return User?.Role is not null &&
+            User.Role.ReadEmployee >= GetLevelDifference(employee) || Employee == employee;
     }
 
     public bool CanReadEmployeeSensitive(Employee employee)
     {
-        return CurrentUser?.Role is not null &&
-            CurrentUser.Role.ReadEmployeeSensitive >= GetLevelDifference(employee) || UserEmployee == employee;
+        return User?.Role is not null &&
+            User.Role.ReadEmployeeSensitive >= GetLevelDifference(employee) || Employee == employee;
     }
 
     public bool CanReadEmployeeVerySensitive(Employee employee)
     {
-        return CurrentUser?.Role is not null &&
-            CurrentUser.Role.ReadEmployeeVerySensitive >= GetLevelDifference(employee) || UserEmployee == employee;
+        return User?.Role is not null &&
+            User.Role.ReadEmployeeVerySensitive >= GetLevelDifference(employee) || Employee == employee;
     }
     
     public bool CanUpdateEmployee(Role role)
     {
-        return CurrentUser?.Role is not null &&
-               CurrentUser.Role.UpdateEmployee >= GetLevelDifference(role);
+        return User?.Role is not null &&
+               User.Role.UpdateEmployee >= GetLevelDifference(role);
     }
 
     public bool CanUpdateEmployee(Employee employee)
     {
-        return CurrentUser?.Role is not null &&
-            CurrentUser.Role.UpdateEmployee >= GetLevelDifference(employee) || UserEmployee == employee;
+        return User?.Role is not null &&
+            User.Role.UpdateEmployee >= GetLevelDifference(employee) || Employee == employee;
     }
 
     public bool CanDeleteEmployee(Employee employee)
     {
-        return CurrentUser?.Role is not null &&
-            CurrentUser.Role.DeleteEmployee >= GetLevelDifference(employee) || UserEmployee == employee;
+        return User?.Role is not null &&
+            User.Role.DeleteEmployee >= GetLevelDifference(employee) || Employee == employee;
     }
 
     // Using Employee ID as int.
     public bool CanReadEmployee(int employeeID)
     {
-        return CurrentUser?.Role is not null &&
-            CurrentUser.Role.ReadEmployee >= GetLevelDifference(employeeID) || UserEmployee?.ID == employeeID;
+        return User?.Role is not null &&
+            User.Role.ReadEmployee >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
     public bool CanReadEmployeeSensitive(int employeeID)
     {
-        return CurrentUser?.Role is not null &&
-            CurrentUser.Role.ReadEmployeeSensitive >= GetLevelDifference(employeeID) || UserEmployee?.ID == employeeID;
+        return User?.Role is not null &&
+            User.Role.ReadEmployeeSensitive >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
     public bool CanReadEmployeeVerySensitive(int employeeID)
     {
-        return CurrentUser?.Role is not null &&
-            CurrentUser.Role.ReadEmployeeVerySensitive >= GetLevelDifference(employeeID) || UserEmployee?.ID == employeeID;
+        return User?.Role is not null &&
+            User.Role.ReadEmployeeVerySensitive >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
     public bool CanUpdateEmployee(int employeeID)
     {
-        return CurrentUser?.Role is not null &&
-            CurrentUser.Role.UpdateEmployee >= GetLevelDifference(employeeID) || UserEmployee?.ID == employeeID;
+        return User?.Role is not null &&
+            User.Role.UpdateEmployee >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
     public bool CanDeleteEmployee(int employeeID)
     {
-        return CurrentUser?.Role is not null &&
-            CurrentUser.Role.DeleteEmployee >= GetLevelDifference(employeeID) || UserEmployee?.ID == employeeID;
+        return User?.Role is not null &&
+            User.Role.DeleteEmployee >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 }

@@ -44,42 +44,42 @@ public class UserHandlerVM : INotifyPropertyChanged
 
     public void CheckUser()
     {
-        if (App.Charon.CurrentUser is null)
+        if (App.Charon.User is null)
         {
             UserGreeting = "Who are you, and what are you doing here?";
             ButtonString = App.Helios.UserReader.UserCount() == 0 ? "Register" : "Log In";
         }
         else
         {
-            UserGreeting = $"Hello, {App.Charon.UserEmployee?.DisplayName ?? "... you?"}.";
+            UserGreeting = $"Hello, {App.Charon.Employee?.DisplayName ?? "... you?"}.";
             ButtonString = "Log Out";
         }
     }
 
     public void Register()
     {
-        var user = App.Charon.CurrentUser;
+        var user = App.Charon.User;
         AlphaRegistrationWindow alpha = new();
         _ = alpha.ShowDialog();
         CheckUser();
-        if (user != App.Charon.CurrentUser) ParentVM.ClearRunningProjects();
+        if (user != App.Charon.User) ParentVM.ClearRunningProjects();
     }
 
     public void LogIn()
     {
-        var user = App.Charon.CurrentUser;
+        var user = App.Charon.User;
         LoginWindow login = new();
         _ = login.ShowDialog();
         CheckUser();
-        if (user != App.Charon.CurrentUser) ParentVM.ClearRunningProjects();
+        if (user != App.Charon.User) ParentVM.ClearRunningProjects();
     }
 
     public void LogOut()
     {
-        var user = App.Charon.CurrentUser;
+        var user = App.Charon.User;
         App.Charon.LogOut();
         CheckUser();
-        if (user != App.Charon.CurrentUser) ParentVM.ClearRunningProjects();
+        if (user != App.Charon.User) ParentVM.ClearRunningProjects();
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

@@ -336,12 +336,12 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         EmployeeDataSet = Helios.StaffReader.EmployeeDataSet();
 
         // Make sure that the user has an assigned role.
-        if (Charon.UserEmployee is not null && Charon.UserEmployee.Role is null)
-            if (EmployeeDataSet.Roles.TryGetValue(Charon.UserEmployee.RoleName, out var role))
-                Charon.UserEmployee.Role = role;
+        if (Charon.Employee is not null && Charon.Employee.Role is null)
+            if (EmployeeDataSet.Roles.TryGetValue(Charon.Employee.RoleName, out var role))
+                Charon.Employee.Role = role;
 
         // Reporting employees (and other collections for filtering that list) is base purely on the employees that report to the current user.
-        ReportingEmployees = EmployeeDataSet.GetReportsByRole(Charon.UserEmployee?.ID ?? 0).ToList();
+        ReportingEmployees = EmployeeDataSet.GetReportsByRole(Charon.Employee?.ID ?? 0).ToList();
 
         Departments = new ObservableCollection<Department?>(ReportingEmployees.Select(employee => employee.Department).Distinct().OrderBy(department => department?.Name));
         selectedDepartment = null;

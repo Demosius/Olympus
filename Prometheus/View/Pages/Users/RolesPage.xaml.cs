@@ -4,11 +4,11 @@ using Uranus;
 namespace Prometheus.View.Pages.Users;
 
 /// <summary>
-/// Interaction logic for UserActivatePage.xaml
+/// Interaction logic for UserDeactivatePage.xaml
 /// </summary>
-public partial class UserActivatePage
+public partial class UserDeactivatePage
 {
-    public UserActivatePage(Helios helios, Charon charon)
+    public UserDeactivatePage(Helios helios, Charon charon)
     {
         InitializeComponent();
         VM.SetDataSources(helios, charon);

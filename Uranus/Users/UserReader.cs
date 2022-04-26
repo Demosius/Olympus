@@ -1,4 +1,7 @@
-﻿using Uranus.Users.Model;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using Uranus.Users.Model;
 
 namespace Uranus.Users;
 
@@ -21,4 +24,5 @@ public class UserReader
 
     public int UserCount() => Chariot.PullObjectList<User>(pullType: EPullType.ObjectOnly).Count; //Chariot.Database.Execute("SELECT count(*) FROM User;");
 
+    public IEnumerable<User> Users(Expression<Func<User, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList<User>(filter, pullType);
 }

@@ -11,60 +11,60 @@ public partial class Charon
 
     public bool CanChangePassword(int employeeID)
     {
-        if (CurrentUser is null) return false;
-        return employeeID == UserEmployee?.ID;
+        if (User is null) return false;
+        return employeeID == Employee?.ID;
     }
 
     // Using Employee objects.
     public bool CanCreateUser(Employee employee)
     {
-        if (CurrentUser is null) return false;
-        return CurrentUser.Role?.CreateUser >= GetLevelDifference(employee) || UserEmployee == employee;
+        if (User is null) return false;
+        return User.Role?.CreateUser >= GetLevelDifference(employee) || Employee == employee;
     }
 
 
     public bool CanReadUser(Employee employee)
     {
-        if (CurrentUser is null) return false;
-        return CurrentUser.Role?.ReadUser >= GetLevelDifference(employee) || UserEmployee == employee;
+        if (User is null) return false;
+        return User.Role?.ReadUser >= GetLevelDifference(employee) || Employee == employee;
     }
 
 
     public bool CanUpdateUser(Employee employee)
     {
-        if (CurrentUser is null) return false;
-        return CurrentUser.Role?.UpdateUser >= GetLevelDifference(employee) || UserEmployee == employee;
+        if (User is null) return false;
+        return User.Role?.UpdateUser >= GetLevelDifference(employee) || Employee == employee;
     }
 
     public bool CanDeleteUser(Employee employee)
     {
-        if (CurrentUser is null) return false;
-        return CurrentUser.Role?.DeleteUser >= GetLevelDifference(employee) || UserEmployee == employee;
+        if (User is null) return false;
+        return User.Role?.DeleteUser >= GetLevelDifference(employee) || Employee == employee;
     }
 
     // Using Employee ID as int.
     public bool CanCreateUser(int employeeID)
     {
-        if (CurrentUser is null) return false;
-        return CurrentUser.Role?.CreateUser >= GetLevelDifference(employeeID) || UserEmployee?.ID == employeeID;
+        if (User is null) return false;
+        return User.Role?.CreateUser >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
     public bool CanReadUser(int employeeID)
     {
-        if (CurrentUser is null) return false;
-        return CurrentUser.Role?.ReadUser >= GetLevelDifference(employeeID) || UserEmployee?.ID == employeeID;
+        if (User is null) return false;
+        return User.Role?.ReadUser >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
     public bool CanUpdateUser(int employeeID)
     {
-        if (CurrentUser is null) return false;
-        return CurrentUser.Role?.UpdateUser >= GetLevelDifference(employeeID) || UserEmployee?.ID == employeeID;
+        if (User is null) return false;
+        return User.Role?.UpdateUser >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
     public bool CanDeleteUser(int employeeID)
     {
-        if (CurrentUser is null) return false;
-        return CurrentUser.Role?.DeleteUser >= GetLevelDifference(employeeID) || UserEmployee?.ID == employeeID;
+        if (User is null) return false;
+        return User.Role?.DeleteUser >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
 

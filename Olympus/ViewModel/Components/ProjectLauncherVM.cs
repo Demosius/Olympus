@@ -46,7 +46,7 @@ public class ProjectLauncherVM : INotifyPropertyChanged
     {
         AllProjects = App.Helios.StaffReader.Projects(pullType: EPullType.FullRecursive).ToList();
         Departments = App.Helios.StaffReader.Departments(pullType: EPullType.IncludeChildren);
-        UserProjects = App.Charon.UserEmployee is null ? new List<Project>() : App.Charon.UserEmployee.Projects;
+        UserProjects = App.Charon.Employee is null ? new List<Project>() : App.Charon.Employee.Projects;
         Projects = new ProjectGroupVM(this, AllProjects, "All");
 
         // Set Icons for projects.

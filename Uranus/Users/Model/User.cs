@@ -20,12 +20,18 @@ public class User
         RoleName = string.Empty;
     }
 
-    public User(int id, string roleName, Role? role, Employee? employee)
+    public User(int id, string roleName)
     {
         ID = id;
         RoleName = roleName;
-        Role = role;
+    }
+
+    public User(Employee employee, Role role)
+    {
         Employee = employee;
+        Role = role;
+        ID = employee.ID;
+        RoleName = role.Name;
     }
 
     public void SetRole(Role role)

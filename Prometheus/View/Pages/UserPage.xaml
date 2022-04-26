@@ -22,7 +22,7 @@
         <ListView DockPanel.Dock="Left"
                   Width="Auto"
                   MinWidth="100"
-                  ItemsSource="{Binding PageNames}"
+                  ItemsSource="{Binding Pages}"
                   SelectedValue="{Binding SelectedPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ListView.ItemTemplate>
                 <DataTemplate>

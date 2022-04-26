@@ -63,7 +63,7 @@ public class Role : IComparable
     {
         level = Math.Max(level, Level);
 
-        if (this == targetRole) return true;
+        if (this == targetRole || this == refRole) return true;
 
         foreach (var role in Reports.Where(role => role != refRole && role != this))
         {

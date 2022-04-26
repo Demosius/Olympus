@@ -109,7 +109,7 @@ public class Role
     {
         Name = "Default";
 
-        CreateUser = -3;
+        CreateUser = -1;
         ReadUser = -3;
         UpdateUser = -3;
         DeleteUser = -3;

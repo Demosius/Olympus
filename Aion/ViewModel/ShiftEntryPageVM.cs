@@ -332,7 +332,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
     {
         Helios = helios;
         Charon = charon;
-        Manager = charon.UserEmployee;
+        Manager = charon.Employee;
         Employees = Helios.StaffReader.GetManagedEmployees(Manager.ID).ToList();
 
         Task.Run(SetEntries);

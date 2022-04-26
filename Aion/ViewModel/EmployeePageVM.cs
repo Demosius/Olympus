@@ -151,7 +151,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
     {
         Helios = helios;
         Charon = charon;
-        allEmployees ??= new List<Employee>(Helios.StaffReader.GetManagedEmployees(Charon.UserEmployee.ID));
+        allEmployees ??= new List<Employee>(Helios.StaffReader.GetManagedEmployees(Charon.Employee.ID));
         Task.Run(RefreshData);
     }
 
@@ -160,7 +160,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
     /// </summary>
     public void ApplyFilters()
     {
-        if (Charon.CurrentUser is null) return;
+        if (Charon.User is null) return;
 
         IEnumerable<Employee> employeeBase = allEmployees;
 
@@ -303,7 +303,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
 
     public void RefreshData()
     {
-        allEmployees = new List<Employee>(Helios.StaffReader.GetManagedEmployees(Charon.UserEmployee.ID));
+        allEmployees = new List<Employee>(Helios.StaffReader.GetManagedEmployees(Charon.Employee.ID));
         ClearFilters();
     }
 

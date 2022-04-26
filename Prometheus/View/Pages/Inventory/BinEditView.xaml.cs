@@ -1,5 +1,4 @@
-﻿using Prometheus.ViewModel.Pages;
-using Prometheus.ViewModel.Pages.Inventory;
+﻿using Prometheus.ViewModel.Pages.Inventory;
 using Uranus.Inventory.Model;
 
 namespace Prometheus.View.Pages.Inventory;

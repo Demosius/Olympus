@@ -1,23 +1,23 @@
-﻿using System;
+﻿using Prometheus.ViewModel.Pages.Users;
+using System;
 using System.Windows.Input;
-using Pantheon.ViewModel.Pages;
 
-namespace Pantheon.ViewModel.Commands;
+namespace Prometheus.ViewModel.Commands;
 
-internal class SaveRosterCommand : ICommand 
+internal class ActivateUserCommand : ICommand
 {
-    public RosterPageVM VM { get; set; }
+    public UserActivateVM VM { get; set; }
 
-    public SaveRosterCommand(RosterPageVM vm ) { VM = vm; }
+    public ActivateUserCommand(UserActivateVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.IsLoaded;
+        return VM.SelectedEmployee is not null;
     }
 
     public void Execute(object? parameter)
     {
-        VM.SaveRoster();
+        VM.ActivateUser();
     }
 
     public event EventHandler? CanExecuteChanged

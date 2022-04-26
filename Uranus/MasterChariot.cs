@@ -134,7 +134,15 @@ public abstract class MasterChariot
         }
 
         var recursive = pullType == EPullType.FullRecursive;
-        return Database.GetWithChildren<T>(primaryKey, recursive);
+
+        try
+        {
+            return Database.GetWithChildren<T>(primaryKey, recursive);
+        }
+        catch (InvalidOperationException)
+        {
+            return default;
+        }
     }
 
     protected List<string> GetTableNames()
