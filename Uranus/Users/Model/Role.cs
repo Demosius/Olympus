@@ -58,6 +58,8 @@ public class Role : IEquatable<Role>
     [OneToMany(nameof(User.RoleName), nameof(User.Role), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<User> Users { get; set; }
 
+    [Ignore] public int UserPermissionsTotal => CreateUser + ReadUser + UpdateUser + DeleteUser;
+
     public Role()
     {
         Name = string.Empty;

@@ -1,4 +1,5 @@
-﻿using Prometheus.ViewModel.Commands.Users;
+﻿using Prometheus.View.PopUp.Users;
+using Prometheus.ViewModel.Commands.Users;
 using Styx;
 using Styx.Interfaces;
 using System.Collections.Generic;
@@ -8,7 +9,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
-using Prometheus.View.PopUp.Users;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -58,6 +58,7 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
         {
             filterString = value;
             OnPropertyChanged();
+            ApplyFilters();
         }
     }
 
@@ -69,6 +70,7 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
         {
             selectedSortMethod = value;
             OnPropertyChanged();
+            ApplyFilters();
         }
     }
 
@@ -165,19 +167,20 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
     {
         userList = SelectedSortMethod switch
         {
-            ESortMethod.Name => userList.OrderBy(e => e.Employee?.FullName ?? ""),
-            ESortMethod.RoleName => userList.OrderBy(e => e.Role).ThenBy(e => e.Employee?.FullName ?? ""),
-            ESortMethod.DepartmentRoleName => userList.OrderBy(e => e.Employee?.Department ?? new Department())
-                .ThenBy(e => e.Role)
-                .ThenBy(e => e.Employee),
-            ESortMethod.EmploymentTypeRoleName => userList.OrderBy(e => e.Employee?.EmploymentType)
-                .ThenBy(e => e.Role)
-                .ThenBy(e => e.Employee),
-            ESortMethod.RoleEmploymentTypeName => userList.OrderBy(e => e.Role)
-                .ThenBy(e => e.Employee?.EmploymentType)
-                .ThenBy(e => e.Employee?.FullName ?? ""),
-            ESortMethod.ID => userList.OrderBy(e => e.ID),
-            _ => userList.OrderBy(e => e.Employee?.EmploymentType).ThenBy(e => e.Employee)
+            ESortMethod.Name => userList.OrderBy(user => user.Employee?.FullName ?? ""),
+            ESortMethod.RoleName => userList.OrderBy(user => user.RoleName).ThenBy(user => user.Employee?.FullName ?? ""),
+            ESortMethod.DepartmentRoleName => userList.OrderBy(user => user.Employee?.DepartmentName ?? "")
+                .ThenBy(user => user.RoleName)
+                .ThenBy(user => user.Employee?.FullName ?? ""),
+            ESortMethod.EmploymentTypeRoleName => userList.OrderBy(user => user.Employee?.EmploymentType)
+                .ThenBy(user => user.RoleName)
+                .ThenBy(user => user.Employee?.FullName ?? ""),
+            ESortMethod.RoleEmploymentTypeName => userList.OrderBy(user => user.RoleName)
+                .ThenBy(user => user.Employee?.EmploymentType)
+                .ThenBy(user => user.Employee?.FullName ?? ""),
+            ESortMethod.ID => userList.OrderBy(user => user.ID),
+            _ => userList.OrderBy(user => user.Employee?.EmploymentType)
+                .ThenBy(user => user.Employee?.FullName ?? "")
         };
         Users = new ObservableCollection<User>(userList);
     }
@@ -185,7 +188,7 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
     public void ChangeUserRole()
     {
         if (Helios is null || Charon is null || SelectedUser is null) return;
-        
+
         var roleWindow = new SetUserRoleView(Helios, Charon, SelectedUser);
 
         roleWindow.ShowDialog();

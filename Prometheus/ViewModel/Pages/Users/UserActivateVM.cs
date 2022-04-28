@@ -84,7 +84,7 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
         {
             selectedSortMethod = value;
             OnPropertyChanged();
-            ApplySorting();
+            ApplyFilters();
         }
     }
 
