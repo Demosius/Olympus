@@ -17,6 +17,7 @@ public class UserDeleter
     {
         return Chariot.Delete(user) && Chariot.DeleteByKey<Login>(user.ID);
     }
+
     public bool User(int id)
     {
         return Chariot.DeleteByKey<User>(id) && Chariot.DeleteByKey<Login>(id);

@@ -40,10 +40,10 @@
             </StackPanel.Resources>
             <Button Content="De-activate"
                     ToolTip="Activates as a user any employee with direct reports, or that is in a role with reporting roles."
-                    Command="{Binding}"/>
-            <Button Content="Activate Selected"
-                    ToolTip="Activate the selected employee as a user."
-                    Command="{Binding }"/>
+                    Command="{Binding DeactivateUserCommand}"/>
+            <Button Content="Change Role"
+                    ToolTip="Change the user's role."
+                    Command="{Binding ChangeUserRoleCommand}"/>
         </StackPanel>
 
         <!-- Sorting and Filtering -->
@@ -59,41 +59,26 @@
                       Margin="2"/>
         </StackPanel>
 
-        <!-- Employee Selection -->
-        <ListView ItemsSource="{Binding Employees, Mode=OneWay}"
-                  SelectedValue="{Binding SelectedEmployee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+        <!-- User Selection -->
+        <ListView ItemsSource="{Binding Users, Mode=OneWay}"
+                  SelectedValue="{Binding SelectedUser, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <Image Source="{Binding Icon.FullPath, FallbackValue=''}"
+                        <Image Source="{Binding Employee.Icon.FullPath, FallbackValue=''}"
                                    MaxWidth="50"
                                    MaxHeight="50"
                                    Margin="0,0,5,0"/>
                         <StackPanel Orientation="Vertical">
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                       FontSize="14"
-                                       FontWeight="Bold"
-                                       Foreground="{StaticResource LightForegroundBrush}"/>
-                                <Label Content=" - "
-                                       FontSize="14"
-                                       FontWeight="Bold"
-                                       Foreground="{StaticResource LightForegroundBrush}"/>
-                                <Label Content="{Binding ID, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                       FontSize="14"
-                                       FontStyle="Italic"
-                                       Foreground="{StaticResource LightForegroundBrush}"/>
-                            </StackPanel>
-                            <WrapPanel Orientation="Horizontal">
-                                <TextBlock Text="Employment: "/>
-                                <Separator/>
+                            <Label Content="{Binding Employee, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                   FontSize="14"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource LightForegroundBrush}"/>
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="5,0">
                                 <TextBlock Text="Role: "/>
-                                <TextBlock Text="{Binding Role, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                <Separator/>
-                                <TextBlock Text="Department: "/>
-                                <TextBlock Text="{Binding Department, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                            </WrapPanel>
+                                <TextBlock Text="{Binding RoleName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
                 </DataTemplate>

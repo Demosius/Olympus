@@ -1,4 +1,5 @@
 ﻿using Uranus.Staff.Model;
+using UserRole = Uranus.Users.Model.Role;
 
 namespace Styx;
 
@@ -95,4 +96,6 @@ public partial class Charon
 
     public bool CanAssignUserRole() => User?.Role?.AssignRole ?? false;
 
+    public bool CanAssignUserRole(UserRole fromRole, UserRole toRole) =>
+        CanAssignUserRole() && User!.Role!.IsMasterTo(fromRole) && User.Role.IsMasterTo(toRole);
 }

@@ -178,6 +178,12 @@ public abstract class MasterChariot
         return true;
     }
 
+    /// <summary>
+    /// Updates the given type value in the appropriate database.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="item"></param>
+    /// <returns>The number of database rows affected.</returns>
     public int Update<T>(T item) => Database?.Update(item) ?? 0;
 
     public int InsertOrUpdate<T>(T item) => Database?.InsertOrReplace(item) ?? 0;

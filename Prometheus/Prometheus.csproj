@@ -9,10 +9,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="ViewModel\Commands\Equipment\" />
+    <Folder Include="ViewModel\Commands\Inventory\" />
+    <Folder Include="ViewModel\Commands\Staff\" />
     <Folder Include="ViewModel\Pages\Equipment\" />
     <Folder Include="ViewModel\Pages\Staff\" />
+    <Folder Include="ViewModel\PopUp\Equipment\" />
+    <Folder Include="ViewModel\PopUp\Inventory\" />
+    <Folder Include="ViewModel\PopUp\Staff\" />
     <Folder Include="View\Pages\Equipment\" />
     <Folder Include="View\Pages\Staff\" />
+    <Folder Include="View\PopUp\Equipment\" />
+    <Folder Include="View\PopUp\Inventory\" />
+    <Folder Include="View\PopUp\Staff\" />
   </ItemGroup>
 
   <ItemGroup>

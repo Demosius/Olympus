@@ -1,10 +1,11 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
+using System;
 using System.Collections.Generic;
 
 namespace Uranus.Users.Model;
 
-public class Role
+public class Role : IEquatable<Role>
 {
     [PrimaryKey] public string Name { get; set; }
 
@@ -194,4 +195,117 @@ public class Role
         CopyDatabase = true;
         MoveDatabase = true;
     }
+
+    public override string ToString() => Name;
+
+    /// <summary>
+    /// Determines if this role is master to - has a higher or equal value in every field - the given other role.
+    /// Must have at least one higher, and none lower.
+    /// </summary>
+    /// <param name="otherRole"></param>
+    /// <returns></returns>
+    public bool IsMasterTo(Role? otherRole)
+    {
+        if (otherRole is null || ReferenceEquals(this, otherRole)) return false;
+        if (Name == "DatabaseManager") return true;
+
+        var higher = false;
+        // Users
+        if (CreateUser < otherRole.CreateUser) return false;
+        higher |= CreateUser > otherRole.CreateUser;
+        if (ReadUser < otherRole.ReadUser) return false;
+        higher |= ReadUser > otherRole.ReadUser;
+        if (UpdateUser < otherRole.UpdateUser) return false;
+        higher |= UpdateUser > otherRole.UpdateUser;
+        if (DeleteUser < otherRole.DeleteUser) return false;
+        higher |= DeleteUser > otherRole.DeleteUser;
+        // Employees
+        if (!CreateEmployee && otherRole.CreateEmployee) return false;
+        higher |= CreateEmployee && !otherRole.CreateEmployee;
+        if (ReadEmployee < otherRole.ReadEmployee) return false;
+        higher |= ReadEmployee > otherRole.ReadEmployee;
+        if (ReadEmployeeSensitive < otherRole.ReadEmployeeSensitive) return false;
+        higher |= ReadEmployeeSensitive > otherRole.ReadEmployeeSensitive;
+        if (ReadEmployeeVerySensitive < otherRole.ReadEmployeeVerySensitive) return false;
+        higher |= ReadEmployeeVerySensitive > otherRole.ReadEmployeeVerySensitive;
+        if (UpdateEmployee < otherRole.UpdateEmployee) return false;
+        higher |= UpdateEmployee > otherRole.UpdateEmployee;
+        if (DeleteEmployee < otherRole.DeleteEmployee) return false;
+        higher |= DeleteEmployee > otherRole.DeleteEmployee;
+        // Departments
+        if (!CreateDepartment && otherRole.CreateDepartment) return false;
+        higher |= CreateDepartment && !otherRole.CreateDepartment;
+        if (!UpdateDepartment && otherRole.UpdateDepartment) return false;
+        higher |= UpdateDepartment && !otherRole.UpdateDepartment;
+        if (!DeleteDepartment && otherRole.DeleteDepartment) return false;
+        higher |= DeleteDepartment && !otherRole.DeleteDepartment;
+        // User Roles
+        if (!AssignRole && otherRole.AssignRole) return false;
+        higher |= AssignRole && !otherRole.AssignRole;
+        if (!EditRoles && otherRole.EditRoles) return false;
+        higher |= EditRoles && !otherRole.EditRoles;
+        // Clans
+        if (!CreateClan && otherRole.CreateClan) return false;
+        higher |= CreateClan && !otherRole.CreateClan;
+        if (!UpdateClan && otherRole.UpdateClan) return false;
+        higher |= UpdateClan && !otherRole.UpdateClan;
+        if (!DeleteClan && otherRole.DeleteClan) return false;
+        higher |= DeleteClan && !otherRole.DeleteClan;
+        // Shifts
+        if (CreateShift < otherRole.CreateShift) return false;
+        higher |= CreateShift > otherRole.CreateShift;
+        if (UpdateShift < otherRole.UpdateShift) return false;
+        higher |= UpdateShift > otherRole.UpdateShift;
+        if (DeleteShift < otherRole.DeleteShift) return false;
+        higher |= DeleteShift > otherRole.DeleteShift;
+        // Licences
+        if (!CreateLicence && otherRole.CreateLicence) return false;
+        higher |= CreateLicence && !otherRole.CreateLicence;
+        if (!ReadLicence && otherRole.ReadLicence) return false;
+        higher |= ReadLicence && !otherRole.ReadLicence;
+        if (!UpdateLicence && otherRole.UpdateLicence) return false;
+        higher |= UpdateLicence && !otherRole.UpdateLicence;
+        if (!DeleteLicence && otherRole.DeleteLicence) return false;
+        higher |= DeleteLicence && !otherRole.DeleteLicence;
+        // Vehicles
+        if (!CreateVehicle && otherRole.CreateVehicle) return false;
+        higher |= CreateVehicle && !otherRole.CreateVehicle;
+        if (!ReadVehicle && otherRole.ReadVehicle) return false;
+        higher |= ReadVehicle && !otherRole.ReadVehicle;
+        if (!UpdateVehicle && otherRole.UpdateVehicle) return false;
+        higher |= UpdateVehicle && !otherRole.UpdateVehicle;
+        if (!DeleteVehicle && otherRole.DeleteVehicle) return false;
+        higher |= DeleteVehicle && !otherRole.DeleteVehicle;
+        // Other
+        if (!ManageLockers && otherRole.ManageLockers) return false;
+        higher |= ManageLockers && !otherRole.ManageLockers;
+        if (!CopyDatabase && otherRole.CopyDatabase) return false;
+        higher |= CopyDatabase && !otherRole.CopyDatabase;
+        if (!MoveDatabase && otherRole.MoveDatabase) return false;
+        higher |= MoveDatabase && !otherRole.MoveDatabase;
+
+        return higher;
+    }
+
+    public bool Equals(Role? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+
+        return Name == other.Name;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Role otherRole && Equals(otherRole);
+    }
+
+    public override int GetHashCode()
+    {
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        return Name.GetHashCode();
+    }
+
+    public static bool operator ==(Role lh, Role rh) => lh.Equals(rh);
+    public static bool operator !=(Role lh, Role rh) => !(lh == rh);
 }

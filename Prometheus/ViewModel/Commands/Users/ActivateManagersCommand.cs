@@ -1,8 +1,8 @@
-﻿using Prometheus.ViewModel.Pages.Users;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Prometheus.ViewModel.Pages.Users;
 
-namespace Prometheus.ViewModel.Commands;
+namespace Prometheus.ViewModel.Commands.Users;
 
 internal class ActivateManagersCommand : ICommand
 {

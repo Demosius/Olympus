@@ -7,7 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
-using Prometheus.ViewModel.Commands;
+using Prometheus.ViewModel.Commands.Users;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -174,15 +174,6 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
             .Where(employee => employee.IsActive && !employee.IsUser && Charon.CanCreateUser(employee));
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-
     public void ClearFilters()
     {
         FilterString = "";
@@ -320,5 +311,13 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
         SelectedEmployee = null;
 
         ApplyFilters();
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

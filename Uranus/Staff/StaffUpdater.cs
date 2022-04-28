@@ -293,4 +293,11 @@ public class StaffUpdater
         });
         return lines;
     }
+
+    /// <summary>
+    /// Takes the given employee ID and sets the employee's IsUser value to false.
+    /// </summary>
+    /// <param name="employeeID"></param>
+    /// <returns>True if successful.</returns>
+    public bool DeactivateUser(int employeeID) => Chariot.Database?.Execute("UPDATE Employee SET IsUser = false WHERE ID = ?;", employeeID) > 1;
 }

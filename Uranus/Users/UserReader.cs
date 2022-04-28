@@ -24,5 +24,10 @@ public class UserReader
 
     public int UserCount() => Chariot.PullObjectList<User>(pullType: EPullType.ObjectOnly).Count; //Chariot.Database.Execute("SELECT count(*) FROM User;");
 
-    public IEnumerable<User> Users(Expression<Func<User, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList<User>(filter, pullType);
+    public IEnumerable<User> Users(Expression<Func<User, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
+    public IEnumerable<Role> Roles(Expression<Func<Role, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
 }

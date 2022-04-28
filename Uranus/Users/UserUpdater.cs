@@ -11,9 +11,7 @@ public class UserUpdater
         Chariot = chariot;
     }
 
-    public int Login(Login login)
-    {
-        return Chariot.Update(login);
-    }
+    public int Login(Login login) => Chariot.Update(login);
 
+    public int User(User user) => Chariot.Update(user);
 }

@@ -1,4 +1,5 @@
 ﻿using Uranus.Staff.Model;
+using Uranus.Users.Model;
 
 namespace Styx;
 
@@ -66,7 +67,4 @@ public partial class Charon
         if (User is null) return false;
         return User.Role?.DeleteUser >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
-
-
-
 }

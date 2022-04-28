@@ -7,6 +7,7 @@ using Uranus.Staff;
 using Uranus.Staff.Model;
 using Uranus.Users;
 using Uranus.Users.Model;
+using Role = Uranus.Users.Model.Role;
 using StaffRole = Uranus.Staff.Model.Role;
 
 namespace Styx;
@@ -37,7 +38,7 @@ public partial class Charon
     private readonly UserCreator userCreator;
     private readonly UserReader userReader;
     private readonly UserUpdater userUpdater;
-    // private readonly UserDeleter userDeleter;
+    private readonly UserDeleter userDeleter;
 
     // Reading employees.
     private readonly StaffChariot staffChariot;
@@ -303,6 +304,31 @@ public partial class Charon
     }
 
     /// <summary>
+    /// Deactivates the given user. Deletes the user and login from the appropriate database, and changes the associated data to reflect that they are no longer a user.
+    /// </summary>
+    /// <param name="targetUser"></param>
+    public bool DeactivateUser(User targetUser)
+    {
+        var isSuccess = DeactivateUser(targetUser.ID);
+        if (isSuccess && targetUser.Employee is not null) targetUser.Employee.IsUser = false;
+        return isSuccess;
+    }
+
+    /// <summary>
+    /// Deactivates the given user. Deletes the user and login from the appropriate database, and changes the associated data to reflect that they are no longer a user.
+    /// </summary>
+    /// <param name="userID"></param>
+    public bool DeactivateUser(int userID)
+    {
+        // Make sure the current user can (has permission to) deactivate the given user.
+        if (!CanDeleteUser(userID)) return false;
+
+        // Remove from user database.
+        // Edit employee in staff database only if user is deleted.
+        return userDeleter.User(userID) && staffUpdater.DeactivateUser(userID);
+    }
+
+    /// <summary>
     /// Check that password is correct for the user-login.
     /// </summary>
     private static bool VerifyPassword(Login login, string password)
@@ -389,5 +415,28 @@ public partial class Charon
 
         using var rfc2898DeriveBytes = new Rfc2898DeriveBytes(password, saltBytes, nIterations);
         return Convert.ToBase64String(rfc2898DeriveBytes.GetBytes(nHash));
+    }
+
+    /// <summary>
+    /// Assigns the given role to the given user, changing it in the database, and on the given object.
+    /// </summary>
+    /// <param name="targetUser"></param>
+    /// <param name="role"></param>
+    /// <returns></returns>
+    public bool SetRole(User targetUser, Role role)
+    {
+        if (targetUser.Role is null || !CanAssignUserRole(targetUser.Role, role)) return false;
+
+        var oldRole = targetUser.Role;
+
+        targetUser.Role = role;
+        targetUser.RoleName = role.Name;
+
+        if (userUpdater.User(targetUser) > 0)
+            return true;
+
+        targetUser.Role = oldRole;
+        targetUser.RoleName = oldRole.Name;
+        return false;
     }
 }
