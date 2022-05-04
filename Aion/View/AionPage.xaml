@@ -35,7 +35,6 @@
                           Command="{Binding ShowEntriesCommand}"/>
             <ToggleButton Grid.Column="2" Content="Employees"
                           Command="{Binding ShowEmployeesCommand}"/>
-
             <Button Grid.Column="4"
                     Command="{Binding ImportOldDataCommand}"
                     ToolTip="Import and convert old Aion Data."
@@ -49,15 +48,15 @@
                 </Style>
             </Grid.Resources>
         </Grid>
-        <Frame  Content="{Binding CurrentPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                Margin="0" 
-                x:Name="OView"
-                Height="Auto" 
-                HorizontalAlignment="Stretch" 
-                VerticalAlignment="Stretch"
-                BorderThickness="1" 
-                BorderBrush="SlateGray"
-                NavigationUIVisibility="Hidden"/>
+        <Frame Content="{Binding CurrentPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+               Margin="0" 
+               x:Name="OView"
+               Height="Auto" 
+               HorizontalAlignment="Stretch" 
+               VerticalAlignment="Stretch"
+               BorderThickness="1" 
+               BorderBrush="SlateGray"
+               NavigationUIVisibility="Hidden"/>
 
     </DockPanel>
 </Page>

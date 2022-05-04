@@ -27,7 +27,8 @@
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
         </DockPanel.Resources>
-        <!-- Function Buttons -->
+
+        <!-- Function Buttons --> 
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal" 
                     Background="{StaticResource ComboBoxReadOnlyBorderBrush}">
@@ -52,27 +53,35 @@
                 </StackPanel>
             </Button>
         </StackPanel>
+
         <!-- Sorting and Filtering -->
         <StackPanel DockPanel.Dock="Top"
-                        Orientation="Horizontal"
-                        Background="{StaticResource ProgressBarBackgroundBrush}">
+                    Orientation="Horizontal"
+                    Background="{StaticResource ProgressBarBackgroundBrush}">
+            <Label Content="Filter: "
+                   VerticalAlignment="Center"/>
             <TextBox Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      MinWidth="100"
                      Margin="2"/>
-            <ComboBox ItemsSource="{Binding Source ={StaticResource SortMethods}}"
-                      SelectedValue="{Binding SelectedSortMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      MinWidth="100"
-                      Margin="2"/>
+            <!-- No sorting as dataGrid handles that for us. -->
         </StackPanel>
-    
-        <DataGrid ItemsSource="{Binding Roles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+
+        <DataGrid x:Name="RoleGrid"
+                  d:ItemsSource="{d:SampleData ItemCount=7}"
+                  ItemsSource="{Binding Roles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   SelectedValue="{Binding SelectedRole}"
                   SelectionMode="Single"
-                  CanUserAddRows="True"
                   CanUserDeleteRows="False"
                   CanUserReorderColumns="True"
                   CanUserResizeColumns="True"
                   CanUserResizeRows="True"
-                  CanUserSortColumns="True"/>
+                  CanUserSortColumns="True"
+                  IsReadOnly="False"
+                  SelectionUnit="CellOrRowHeader"
+                  FrozenColumnCount="1"
+                  RowHeaderWidth="15"
+                  RowHeight="30"
+                  FontSize="14"
+                  AutoGeneratingColumn="RoleGrid_OnAutoGeneratingColumn"/>
     </DockPanel>
 </Page>

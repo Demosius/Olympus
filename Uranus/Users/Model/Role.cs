@@ -55,15 +55,22 @@ public class Role : IEquatable<Role>
     public bool CopyDatabase { get; set; }  // Most
     public bool MoveDatabase { get; set; }  // Only db admin/manager.
 
+    public string Description { get; set; }
+
     [OneToMany(nameof(User.RoleName), nameof(User.Role), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<User> Users { get; set; }
 
     [Ignore] public int UserPermissionsTotal => CreateUser + ReadUser + UpdateUser + DeleteUser;
+    [Ignore] public int UserCount => Users.Count;
+
+    public const string Default = "Default";
+    public const string Master = "DatabaseManager";
 
     public Role()
     {
         Name = string.Empty;
         Users = new List<User>();
+        Description = string.Empty;
     }
 
     public Role(string name, int createUser, int readUser, int updateUser, int deleteUser, bool createEmployee, int readEmployee,
@@ -71,7 +78,7 @@ public class Role : IEquatable<Role>
         bool updateDepartment, bool deleteDepartment, bool assignRole, bool editRoles, bool createClan, bool updateClan,
         bool deleteClan, int createShift, int updateShift, int deleteShift, bool createLicence, bool readLicence, bool updateLicence,
         bool deleteLicence, bool createVehicle, bool readVehicle, bool updateVehicle, bool deleteVehicle, bool copyDatabase,
-        bool moveDatabase, List<User> users)
+        bool moveDatabase, List<User> users, string description)
     {
         Name = name;
         CreateUser = createUser;
@@ -106,11 +113,12 @@ public class Role : IEquatable<Role>
         CopyDatabase = copyDatabase;
         MoveDatabase = moveDatabase;
         Users = users;
+        Description = description;
     }
 
     public void SetDefault()
     {
-        Name = "Default";
+        Name = Default;
 
         CreateUser = -1;
         ReadUser = -3;
@@ -155,7 +163,7 @@ public class Role : IEquatable<Role>
 
     public void SetMaster()
     {
-        Name = "DatabaseManager";
+        Name = Master;
 
         CreateUser = 1000;
         ReadUser = 1000;
@@ -196,6 +204,25 @@ public class Role : IEquatable<Role>
 
         CopyDatabase = true;
         MoveDatabase = true;
+    }
+
+    /// <summary>
+    /// Checks if the Role is a standard (default/DatabaseManager) and sets the Properties accordingly.
+    /// </summary>
+    /// <returns>The name of the Role.</returns>
+    public string CheckStandards()
+    {
+        switch (Name)
+        {
+            case Default:
+                SetDefault();
+                break;
+            case Master:
+                SetMaster();
+                break;
+        }
+
+        return Name;
     }
 
     public override string ToString() => Name;

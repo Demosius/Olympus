@@ -100,13 +100,14 @@
                                       DataContext="{Binding InventoryUpdaterVM, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                       Margin="0"/>
         </Grid>
-        <Frame  Content="{Binding CurrentProject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                    Margin="2,0,2,2" 
-                    Height="Auto" 
-                    HorizontalAlignment="Stretch" 
-                    VerticalAlignment="Stretch"
-                    BorderThickness="1" 
-                    BorderBrush="SlateGray"
-                    NavigationUIVisibility="Hidden"/>
+        <Frame Content="{Binding CurrentProject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+               Margin="2,0,2,2" 
+               Height="Auto" 
+               HorizontalAlignment="Stretch" 
+               VerticalAlignment="Stretch"
+               BorderThickness="1" 
+               BorderBrush="SlateGray"
+               NavigationUIVisibility="Hidden"
+               Navigating="Frame_OnNavigating"/>
     </DockPanel>
 </Window>

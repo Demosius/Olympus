@@ -1,11 +1,14 @@
-﻿using Styx;
+﻿using Prometheus.ViewModel.Commands.Users;
+using Styx;
 using Styx.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Windows;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -85,6 +88,8 @@ internal class RolesVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IF
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public ApplySortingCommand ApplySortingCommand { get; set; }
+    public DeleteRoleCommand DeleteRoleCommand { get; set; }
+    public SaveRolesCommand SaveRolesCommand { get; set; }
 
     #endregion
 
@@ -99,6 +104,8 @@ internal class RolesVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IF
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
+        DeleteRoleCommand = new DeleteRoleCommand(this);
+        SaveRolesCommand = new SaveRolesCommand(this);
     }
 
     public void SetDataSources(Helios helios, Charon charon)
@@ -130,7 +137,7 @@ internal class RolesVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IF
 
     public void RepairData()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
 
@@ -177,5 +184,40 @@ internal class RolesVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IF
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void SaveRoles()
+    {
+        if (Charon?.User?.Role is null || Helios is null || !Charon.CanEditUserRole()) return;
+
+        // Check each role to see if the current user has permission to edit them - or that they have no assigned users.
+        var savable = Roles.Where(role => role.Users.Count == 0 || Charon.User.Role.IsMasterTo(role)).ToList();
+
+        Helios.UserUpdater.Roles(savable);
+
+        RefreshData();
+
+        MessageBox.Show("Save Successful.\n\n(Some data may revert based on your permissions and current users.)", "Data Saved", MessageBoxButton.OK);
+    }
+
+    public void DeleteRole()
+    {
+        if (Helios is null || SelectedRole is null || SelectedRole.Users.Count > 0 || !(Charon?.CanDeleteUserRole() ?? false)) return;
+
+        // Remove from database.
+        if (!Helios.UserDeleter.Role(SelectedRole))
+        {
+            MessageBox.Show(
+                "Failed to delete user role.\n" +
+                "Likely due to current active users having the role assigned.\n" +
+                "Make sure that no users are assigned to the role before trying to delete it again.",
+                "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
+        // Remove from active page data.
+        allRoles.Remove(SelectedRole);
+        Roles.Remove(SelectedRole);
+        SelectedRole = null;
+        MessageBox.Show("Role Deleted", "Success", MessageBoxButton.OK);
     }
 }

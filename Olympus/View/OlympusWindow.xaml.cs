@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Threading;
+using System.Windows.Navigation;
 using Olympus.Properties;
 
 namespace Olympus.View;
@@ -19,5 +20,10 @@ public partial class MainWindow
     {
         // Saves the settings when closing the App.
         Settings.Default.Save();
+    }
+
+    private void Frame_OnNavigating(object sender, NavigatingCancelEventArgs e)
+    {
+        if (e.NavigationMode is NavigationMode.Forward or NavigationMode.Back) e.Cancel = true;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Uranus.Staff;
 using System;
+using System.Windows.Navigation;
 using Styx;
 using Uranus;
 using Uranus.Interfaces;
@@ -25,5 +26,10 @@ public partial class PantheonPage : IProject
     public void RefreshData()
     {
         throw new NotImplementedException();
+    }
+
+    private void Frame_OnNavigating(object sender, NavigatingCancelEventArgs e)
+    {
+        if (e.NavigationMode is NavigationMode.Back or NavigationMode.Forward) e.Cancel = true;
     }
 }

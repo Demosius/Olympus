@@ -45,7 +45,8 @@
                HorizontalAlignment="Stretch" 
                VerticalAlignment="Stretch"
                BorderThickness="1" 
-               NavigationUIVisibility="Hidden"/>
+               NavigationUIVisibility="Hidden"
+               Navigating="Frame_OnNavigating"/>
     </DockPanel>
 
 </Page>

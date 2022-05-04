@@ -35,6 +35,7 @@
                VerticalAlignment="Stretch"
                BorderThickness="1" 
                BorderBrush="{StaticResource Brush05}"
-               NavigationUIVisibility="Hidden"/>
+               NavigationUIVisibility="Hidden"
+               Navigating="Frame_OnNavigating"/>
     </DockPanel>
 </Page>

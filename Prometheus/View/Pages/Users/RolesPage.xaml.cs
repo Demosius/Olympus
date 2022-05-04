@@ -1,4 +1,10 @@
-﻿using Styx;
+﻿using System;
+using System.Collections.Generic;
+using Styx;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using Uranus;
 
 namespace Prometheus.View.Pages.Users;
@@ -12,5 +18,22 @@ public partial class UserDeactivatePage
     {
         InitializeComponent();
         VM.SetDataSources(helios, charon);
+    }
+
+    private void RoleGrid_OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
+    {
+        var headerName = e.Column.Header.ToString();
+
+        switch (headerName)
+        {
+            case "Users":
+            case "UserPermissionsTotal":
+            case "Description":
+                e.Cancel = true;
+                break;
+            case "Name":
+                e.Column.IsReadOnly = true;
+                break;
+        }
     }
 }
