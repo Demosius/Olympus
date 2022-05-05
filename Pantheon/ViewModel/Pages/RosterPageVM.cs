@@ -16,6 +16,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
+using Pantheon.View.PopUp.Rosters;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -195,7 +196,7 @@ internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 
         Rosters = new ObservableCollection<DepartmentRoster>(SelectedDepartment.DepartmentRosters.OrderBy(r => r.StartDate));
 
-        SelectedRoster = Rosters.First(r =>
+        SelectedRoster = Rosters.FirstOrDefault(r =>
             Math.Abs(DateTime.Now.Date.Subtract(r.StartDate).TotalDays -
                      Rosters.Min(dr => DateTime.Now.Date.Subtract(dr.StartDate).TotalDays)) < .05);
     }

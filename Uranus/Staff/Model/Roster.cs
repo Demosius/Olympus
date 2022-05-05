@@ -151,7 +151,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
 
     public string TimeString()
     {
-        return $"{StartTime.Hours:00}:{StartTime.Minutes:00}-{EndTime.Hours:00}:{EndTime.Minutes:00}";
+        return $"{StartTime.Hours:00}:{StartTime.Minutes:00} - {EndTime.Hours:00}:{EndTime.Minutes:00}";
     }
 
     public override string ToString()

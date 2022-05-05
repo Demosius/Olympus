@@ -9,7 +9,7 @@
              xmlns:model="clr-namespace:Uranus.Staff.Model;assembly=Uranus"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:RosterVM}, IsDesignTimeCreatable=False}"
-             Height="70" Width="200">
+             Height="40" Width="200">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -24,97 +24,11 @@
 
     <Border BorderBrush="{StaticResource ForegroundBrush}"
             BorderThickness=".5">
-        <Canvas>
-            <Canvas.Resources>
-                <ObjectDataProvider x:Key="RosterTypes"
-                                    MethodName="GetValues" 
-                                    ObjectType="{x:Type sys:Enum}">
-                    <ObjectDataProvider.MethodParameters>
-                        <x:Type TypeName="model:ERosterType"/>
-                    </ObjectDataProvider.MethodParameters>
-                </ObjectDataProvider>
-                <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-            </Canvas.Resources>
+        <TextBlock Text="{Binding DisplayString, Mode=OneWay}"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   FontSize="20">
 
-            <!-- Attendance -->
-            <CheckBox Canvas.Top="10" Canvas.Left="0"
-                      IsChecked="{Binding AtWork, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      Margin="0"
-                      Padding="0"
-                      ToolTip="At Work"
-                      x:Name="IsAtWork"/>
-
-            <!-- Times -->
-            <TextBox Canvas.Top="5" Canvas.Left="30"
-                     Text="{Binding StartTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Height="40"
-                     MinHeight="0"
-                     FontSize="20"
-                     FontFamily="{StaticResource DIN}"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Center"
-                     VerticalContentAlignment="Center"
-                     HorizontalContentAlignment="Center"
-                     Width="72"
-                     Margin="0"
-                     Padding="0"
-                     GotKeyboardFocus="TextBox_GotKeyboardFocus"
-                     LostMouseCapture="TextBox_LostMouseCapture"
-                     LostKeyboardFocus="TextBox_LostKeyboardFocus"
-                     Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
-            <Label Canvas.Top="13" Canvas.Left="102"
-                   Content="to"
-                   FontSize="10"
-                   Margin="0"
-                   Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
-            <TextBox Canvas.Top="5" Canvas.Left="121"  
-                     Text="{Binding EndTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Height="40"
-                     MinHeight="0"
-                     FontSize="20"
-                     FontFamily="{StaticResource DIN}"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Center"
-                     VerticalContentAlignment="Center"
-                     HorizontalContentAlignment="Center"
-                     Width="72"
-                     Margin="0"
-                     Padding="0"
-                     GotKeyboardFocus="TextBox_GotKeyboardFocus"
-                     LostMouseCapture="TextBox_LostMouseCapture"
-                     LostKeyboardFocus="TextBox_LostKeyboardFocus"
-                     Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
-
-            <!-- Away Display -->
-            <Label Canvas.Top="5" Canvas.Left="30"
-                   Height="40" Width="160"
-                   FontSize="18"
-                   Foreground="{StaticResource  GridSplitterHoverBorderBrush}"
-                   VerticalContentAlignment="Center"
-                   HorizontalContentAlignment="Center"
-                   Content="{Binding Type, Mode=OneWay}"
-                   Visibility="{Binding NotAtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
-
-            <!-- Shift Selector -->
-            <ComboBox Canvas.Top="50" Canvas.Left="5"
-                      Width="92"
-                      Height="15"
-                      FontSize="9"
-                      HorizontalContentAlignment="Center"
-                      Style="{StaticResource MiniComboBoxStyle}"
-                      ItemsSource="{Binding DepartmentRosterVM.Shifts, Mode=OneTime}"
-                      SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-            <!-- Shift Type Selector (Normal/AL/RDO/etc.) -->
-            <ComboBox Canvas.Top="50" Canvas.Left="103"
-                      Style="{StaticResource MiniComboBoxStyle}"
-                      ItemsSource="{Binding Source={StaticResource RosterTypes}, Mode=OneTime}"
-                      Height="15"
-                      Width="90"
-                      FontSize="9"
-                      HorizontalContentAlignment="Center"
-                      SelectedValue="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-        </Canvas>
+        </TextBlock>
     </Border>
 </UserControl>

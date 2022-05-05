@@ -1,4 +1,4 @@
-﻿<Window x:Class="Pantheon.View.RoleCreationWindow"
+﻿<Window x:Class="Pantheon.View.PopUp.Employees.RoleCreationWindow"
         x:Name="RoleWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

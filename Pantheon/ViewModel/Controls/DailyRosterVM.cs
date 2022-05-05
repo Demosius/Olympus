@@ -1,9 +1,9 @@
-﻿using Pantheon.Annotations;
-using Pantheon.Model;
+﻿using Pantheon.Model;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Pantheon.Annotations;
 using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Controls;

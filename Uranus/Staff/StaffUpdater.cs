@@ -299,5 +299,5 @@ public class StaffUpdater
     /// </summary>
     /// <param name="employeeID"></param>
     /// <returns>True if successful.</returns>
-    public bool DeactivateUser(int employeeID) => Chariot.Database?.Execute("UPDATE Employee SET IsUser = false WHERE ID = ?;", employeeID) > 1;
+    public bool DeactivateUser(int employeeID) => Chariot.Database?.Execute("UPDATE Employee SET IsUser = false WHERE ID = ?;", employeeID) > 0;
 }

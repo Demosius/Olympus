@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-using Pantheon.Annotations;
 using Pantheon.ViewModel.Commands;
 using Pantheon.ViewModel.Interface;
 using Pantheon.ViewModel.Pages;
@@ -8,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Pantheon.Annotations;
 using Uranus;
 using Uranus.Staff.Model;
 

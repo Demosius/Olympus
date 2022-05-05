@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Input;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -205,13 +206,17 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
                 "Confirm User Deactivation", MessageBoxButton.YesNo, MessageBoxImage.Warning) !=
             MessageBoxResult.Yes) return;
 
+
+        Mouse.OverrideCursor = Cursors.Wait;
         if (!Charon.DeactivateUser(SelectedUser))
         {
+            Mouse.OverrideCursor = Cursors.Arrow;
             MessageBox.Show(
                 $"Unable to remove {SelectedUser.Employee?.FullName ?? SelectedUser.ID.ToString()} as a user.",
                 "Failure", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
+        Mouse.OverrideCursor = Cursors.Arrow;
 
         MessageBox.Show(
                 $"Successfully removed {SelectedUser.Employee?.FullName ?? SelectedUser.ID.ToString()} as a user.",

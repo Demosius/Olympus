@@ -48,6 +48,7 @@ public class Employee : INotifyPropertyChanged
     private Clan? clan;
     private EmployeeIcon? icon;
     private EmployeeAvatar? avatar;
+    private bool isUser;
 
     #endregion
 
@@ -115,7 +116,15 @@ public class Employee : INotifyPropertyChanged
     [ForeignKey(typeof(EmployeeIcon))] public string IconName { get; set; }
     [ForeignKey(typeof(EmployeeAvatar))] public string AvatarName { get; set; }
     [ForeignKey(typeof(Licence))] public string LicenceNumber { get; set; }
-    [DefaultValue(false)] public bool IsUser { get; set; }
+    [DefaultValue(false)]public bool IsUser
+    {
+        get => isUser;
+        set
+        {
+            isUser = value;
+            OnPropertyChanged();
+        }
+    }
     [DefaultValue(true)] public bool IsActive { get; set; }     // Employees are de-activated instead of deleted.
 
     [ManyToOne(nameof(DepartmentName), nameof(Model.Department.Employees),

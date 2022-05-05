@@ -43,6 +43,8 @@
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
             <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
+            <converter:BoolToIntConverter x:Key="BoolToIntConverter"/>
+            <converter:UserToColourConverter x:Key="UserToColourConverter"/>
         </DockPanel.Resources>
         <ToolBarTray DockPanel.Dock="Top">
             <!-- Search / Filter -->
@@ -128,17 +130,22 @@
                             <StackPanel Orientation="Vertical">
                                 <StackPanel Orientation="Horizontal">
                                     <Label Content="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                       FontSize="14"
-                                       FontWeight="Bold"
-                                       Foreground="{StaticResource LightForegroundBrush}"/>
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource LightForegroundBrush}"/>
                                     <Label Content=" - "
-                                       FontSize="14"
-                                       FontWeight="Bold"
-                                       Foreground="{StaticResource LightForegroundBrush}"/>
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource LightForegroundBrush}"/>
                                     <Label Content="{Binding ID, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                       FontSize="14"
-                                       FontStyle="Italic"
-                                       Foreground="{StaticResource LightForegroundBrush}"/>
+                                           FontSize="14"
+                                           FontStyle="Italic"
+                                           Foreground="{StaticResource LightForegroundBrush}"/>
+                                    <Label Content=" U" 
+                                           Foreground="DarkOrange"
+                                           FontSize="14"
+                                           FontWeight="Black"
+                                           Visibility="{Binding IsUser, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"/>
                                 </StackPanel>
                                 <WrapPanel Orientation="Horizontal">
                                     <TextBlock Text="Employment: "/>
@@ -212,13 +219,13 @@
                     </StackPanel>
                     <!-- Icon -->
                     <Label Grid.Column="0" Grid.Row="1" 
-                   Content="Icon: "
-                   VerticalAlignment="Top"/>
+                           Content="Icon: "
+                           VerticalAlignment="Top"/>
                     <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Vertical">
                         <Border Height="135"
-                        Width="135"
-                        BorderBrush="{StaticResource AccordionBorderBrush}"
-                        BorderThickness="1">
+                                Width="135"
+                                BorderBrush="{Binding SelectedEmployee.IsUser, Converter={StaticResource UserToColourConverter}, Mode=OneWay, FallbackValue=''}"
+                                BorderThickness="1">
                             <Image Source="{Binding SelectedEmployee.Icon.FullPath, FallbackValue=''}"/>
                         </Border>
                         <Button Content="Change"

@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using Pantheon.View.PopUp.Employees;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -518,7 +519,6 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         if (Charon.CreateNewUser(SelectedEmployee))
             MessageBox.Show("Successfully Activated new user!", "Success", MessageBoxButton.OK,
                 MessageBoxImage.Asterisk);
-
     }
 
     public void AddLocation()

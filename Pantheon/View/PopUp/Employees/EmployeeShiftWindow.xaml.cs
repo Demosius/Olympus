@@ -1,7 +1,7 @@
 ﻿using Pantheon.ViewModel.Pages;
 using Uranus.Staff.Model;
 
-namespace Pantheon.View;
+namespace Pantheon.View.PopUp.Employees;
 
 /// <summary>
 /// Interaction logic for EmployeeShiftWindow.xaml

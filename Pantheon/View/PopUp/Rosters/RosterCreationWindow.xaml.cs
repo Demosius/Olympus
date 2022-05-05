@@ -2,7 +2,7 @@
 using Uranus;
 using Uranus.Staff.Model;
 
-namespace Pantheon.View;
+namespace Pantheon.View.PopUp.Rosters;
 
 /// <summary>
 /// Interaction logic for RosterCreationWindow.xaml

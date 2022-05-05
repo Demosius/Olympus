@@ -1,12 +1,12 @@
-﻿<Window x:Class="Pantheon.View.AvatarSelectionWindow"
-        x:Name="AvatarWindow"
+﻿<Window x:Class="Pantheon.View.PopUp.Employees.EmployeeShiftWindow"
+        x:Name="ShiftWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Pantheon.ViewModel"
         mc:Ignorable="d"
-        Title="Select Avatar" 
+        Title="Shift Management" 
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
@@ -14,7 +14,7 @@
         FocusManager.FocusedElement="{Binding ElementName=IDBox}">
 
     <Window.DataContext>
-        <vm:AvatarSelectionVM x:Name="VM"/>
+        <vm:EmployeeShiftVM x:Name="VM"/>
     </Window.DataContext>
 
     <Window.Resources>
@@ -35,7 +35,8 @@
             <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
                 <Setter Property="Margin" Value="5"/>
                 <Setter Property="IsEditable" Value="True"/>
-                <Setter Property="MinWidth" Value="250"/>
+                <Setter Property="MinWidth" Value="150"/>
+                <Setter Property="MaxWidth" Value="250"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
             <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
@@ -50,66 +51,56 @@
             </Style>
         </StackPanel.Resources>
 
-        <Label Content="Avatars"/>
-        <ListView ItemsSource="{Binding Avatars, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedValue="{Binding SelectedAvatar, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:ItemsSource="{d:SampleData ItemCount=5}"
-                  Width="578"
-                  MaxHeight="800">
-            <ListView.ItemsPanel>
+        <!--Shift Eligibility -->      
+        <Label Content="Shift Eligibility:"
+               FontSize="16"
+               Margin="0"/>
+        <ItemsControl ItemsSource="{Binding EmpShifts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal"
-                               />
+                    <StackPanel Orientation="Horizontal"/>
                 </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <ListView.ItemTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Image Source="{Binding FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                           ToolTip="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                           MaxWidth="80"
-                           MaxHeight="160"
-                           Margin="2"/>
+                    <Border BorderBrush="{StaticResource ForegroundBrush}"
+                            BorderThickness="1">
+                        <StackPanel Orientation="Vertical" 
+                                    Width="135">
+                            <Label Content="{Binding Shift.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0"
+                                   FontSize="16"
+                                   FontWeight="Bold"/>
+                            <CheckBox IsChecked="{Binding Active, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
                 </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        <Button Content="Add New Avatar"
-                Command="{Binding FindNewImageCommand}"/>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Separator/>
+        <!-- Default Shift -->
+        <StackPanel Orientation="Horizontal">
+            <Label Content="Default Shift: "
+                   VerticalAlignment="Center"
+                   Margin="0"/>
+            <ComboBox ItemsSource="{Binding ShiftNames , Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedValue="{Binding SelectedShiftName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
+        <Separator/>
+        <!-- Shift Rules -->
+        
 
-        <Border BorderBrush="{StaticResource ForegroundBrush}"
-                BorderThickness="1"
-                Margin="5">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="3"
-                       Source="{Binding SelectedAvatar.FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                       MaxWidth="120"
-                       MaxHeight="240"/>
-
-                <TextBox Grid.Column="1" Grid.Row="0"
-                         Text="{Binding SelectedAvatar.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
-                <Label Grid.Column="1" Grid.Row="1"
-                       Content="{Binding SelectedAvatar.FullPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
-                <Button Grid.Column="1" Grid.Row="2"
-                        Content="Save Avatar Changes"/>
-
-            </Grid>
-        </Border>
-
+        <!-- Buttons -->
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,10,0,0">
             <Button Content="Cancel"
                     IsCancel="True"/>
             <Button Content="Confirm"
-                    Command="{Binding ConfirmImageSelectionCommand}"
-                    CommandParameter="{Binding ElementName=AvatarWindow}"
+                    Command="{Binding ConfirmShiftAdjustmentsCommand}"
+                    CommandParameter="{Binding ElementName=ShiftWindow}"
                     IsDefault="True"/>
         </StackPanel>
     </StackPanel>

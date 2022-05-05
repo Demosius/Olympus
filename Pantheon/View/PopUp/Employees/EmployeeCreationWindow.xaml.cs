@@ -1,6 +1,6 @@
 ﻿using Pantheon.ViewModel.Pages;
 
-namespace Pantheon.View;
+namespace Pantheon.View.PopUp.Employees;
 
 /// <summary>
 /// Interaction logic for EmployeeCreationWindow.xaml

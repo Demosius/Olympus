@@ -1,9 +1,9 @@
-﻿using Pantheon.Annotations;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using Pantheon.Annotations;
 using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Controls;
@@ -25,9 +25,11 @@ internal class RosterVM : INotifyPropertyChanged
         set
         {
             shifts = value;
-            OnPropertyChanged(nameof(Shifts));
+            OnPropertyChanged();
         }
     }
+
+    public string DisplayString => ToString();
 
     public Shift? SelectedShift
     {
@@ -85,6 +87,7 @@ internal class RosterVM : INotifyPropertyChanged
 
             Roster.StartTime = t;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(DisplayString));
         }
     }
 
@@ -97,6 +100,7 @@ internal class RosterVM : INotifyPropertyChanged
 
             Roster.EndTime = t;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(DisplayString));
         }
     }
 
@@ -109,6 +113,7 @@ internal class RosterVM : INotifyPropertyChanged
             Roster.AtWork = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(NotAtWork));
+            OnPropertyChanged(nameof(DisplayString));
 
             if (!shiftCount || SelectedShift is null) return;
 
@@ -144,6 +149,7 @@ internal class RosterVM : INotifyPropertyChanged
         Roster.EndTime = shift?.EndTime ?? TimeSpan.Zero;
         OnPropertyChanged(nameof(StartTime));
         OnPropertyChanged(nameof(EndTime));
+        OnPropertyChanged(nameof(DisplayString));
     }
 
     /// <summary>
@@ -173,5 +179,10 @@ internal class RosterVM : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public override string ToString()
+    {
+        return Roster.ToString();
     }
 }

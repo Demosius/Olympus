@@ -53,7 +53,7 @@ public partial class Charon
         userCreator = new UserCreator(ref userChariot);
         userReader = new UserReader(ref userChariot);
         userUpdater = new UserUpdater(ref userChariot);
-        // userDeleter = new UserDeleter(ref userChariot);
+        userDeleter = new UserDeleter(ref userChariot);
 
         staffChariot = new StaffChariot(solLocation);
         staffReader = new StaffReader(ref staffChariot);
@@ -146,7 +146,7 @@ public partial class Charon
 
         var newUser = userReader.User(userID);
         if (newUser is null) return false;
-        
+
         newUser.Employee = staffReader.EmployeeLogIn(userID);
         User = newUser;
 
@@ -273,6 +273,8 @@ public partial class Charon
         if (!CreateNewUser(employee.ID, "Default")) return false;
 
         employee.IsUser = true;
+        staffChariot.Update(employee);
+
         return true;
 
     }

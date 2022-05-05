@@ -1,4 +1,4 @@
-﻿<Window x:Class="Pantheon.View.DepartmentCreationWindow"
+﻿<Window x:Class="Pantheon.View.PopUp.Employees.DepartmentCreationWindow"
         x:Name="DeptWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

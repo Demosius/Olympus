@@ -1,11 +1,11 @@
-﻿using Pantheon.Annotations;
-using Pantheon.ViewModel.Commands;
+﻿using Pantheon.ViewModel.Commands;
 using Pantheon.ViewModel.Pages;
 using Styx;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Pantheon.Annotations;
 using Uranus;
 using Uranus.Staff.Model;
 

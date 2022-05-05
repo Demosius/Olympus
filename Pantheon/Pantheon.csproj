@@ -70,12 +70,26 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Update="View\Controls\ActiveEmployeeRosterView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="View\Controls\ActiveRosterView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="View\PantheonPage.xaml.cs">
       <DependentUpon>PantheonPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="View\Controls\ActiveEmployeeRosterView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="View\Controls\ActiveRosterView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="View\InputWindow.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
@@ -90,6 +104,12 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="View\Pages\Employees\" />
+    <Folder Include="View\Pages\Rosters\" />
+    <Folder Include="View\Pages\Shifts\" />
   </ItemGroup>
 
 </Project>
