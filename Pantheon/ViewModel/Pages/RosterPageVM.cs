@@ -1,6 +1,6 @@
 ﻿using Microsoft.Win32;
 using Pantheon.Properties;
-using Pantheon.View;
+using Pantheon.View.PopUp.Rosters;
 using Pantheon.ViewModel.Commands;
 using Pantheon.ViewModel.Controls;
 using Pantheon.ViewModel.Utility;
@@ -16,7 +16,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using Pantheon.View.PopUp.Rosters;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -24,7 +23,7 @@ using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Pages;
 
-internal class RosterPageVM : INotifyPropertyChanged, IDBInteraction
+public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 {
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }

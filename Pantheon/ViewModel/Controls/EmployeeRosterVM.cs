@@ -10,7 +10,7 @@ using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Controls;
 
-internal class EmployeeRosterVM : INotifyPropertyChanged
+public class EmployeeRosterVM : INotifyPropertyChanged
 {
     public EmployeeRoster EmployeeRoster { get; set; }
     private readonly Dictionary<DateTime, RosterVM> rosterVMs = new();

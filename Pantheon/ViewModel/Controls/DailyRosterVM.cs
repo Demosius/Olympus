@@ -8,7 +8,7 @@ using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Controls;
 
-internal class DailyRosterVM : INotifyPropertyChanged
+public class DailyRosterVM : INotifyPropertyChanged
 {
     public DailyRoster DailyRoster { get; set; }
 
@@ -64,13 +64,13 @@ internal class DailyRosterVM : INotifyPropertyChanged
     /// <summary>
     /// Sets all rosters as public holiday.
     /// </summary>
-    public void SetPublicHoliday()
+    public void SetPublicHoliday(bool isPublicHoliday = true)
     {
         // Do not set roster type directly, as that will result in recursive prompting.
         // Use SetPublicHoliday method.
-        PublicHoliday = true;
+        PublicHoliday = isPublicHoliday;
         foreach (var (_, rosterVM) in Rosters)
-            rosterVM.SetPublicHoliday();
+            rosterVM.SetPublicHoliday(isPublicHoliday);
     }
 
     /// <summary>

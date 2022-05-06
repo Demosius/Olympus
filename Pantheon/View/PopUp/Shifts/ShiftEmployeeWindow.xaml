@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Pantheon.ViewModel"
+        xmlns:shifts="clr-namespace:Pantheon.ViewModel.PopUp.Shifts"
         mc:Ignorable="d"
         Title="Employee Assignment" 
         SizeToContent="WidthAndHeight"
@@ -14,7 +15,7 @@
         FocusManager.FocusedElement="{Binding ElementName=IDBox}">
 
     <Window.DataContext>
-        <vm:ShiftEmployeeVM x:Name="VM"/>
+        <shifts:ShiftEmployeeVM x:Name="VM"/>
     </Window.DataContext>
 
     <Window.Resources>

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Pantheon.View.PopUp.Shifts;
+using Pantheon.ViewModel.Commands.Shifts;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;

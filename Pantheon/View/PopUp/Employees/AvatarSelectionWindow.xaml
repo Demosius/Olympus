@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Pantheon.ViewModel"
+        xmlns:employees="clr-namespace:Pantheon.ViewModel.PopUp.Employees"
         mc:Ignorable="d"
         Title="Select Avatar" 
         SizeToContent="WidthAndHeight"
@@ -14,41 +15,40 @@
         FocusManager.FocusedElement="{Binding ElementName=IDBox}">
 
     <Window.DataContext>
-        <vm:AvatarSelectionVM x:Name="VM"/>
+        <employees:AvatarSelectionVM x:Name="VM"/>
     </Window.DataContext>
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml" />
-                <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml" />
+                <ResourceDictionary Source="../../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary>
+                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                        <Setter Property="Margin" Value="5"/>
+                    </Style>
+                    <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
+                        <Setter Property="Margin" Value="5"/>
+                        <Setter Property="IsEditable" Value="True"/>
+                        <Setter Property="MinWidth" Value="250"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                    </Style>
+                    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                        <Setter Property="VerticalAlignment" Value="Bottom"/>
+                        <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+                        <Setter Property="Margin" Value="0,10,0,0"/>
+                    </Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                        <Setter Property="Margin" Value="5,5,5,5"/>
+                        <Setter Property="MinWidth" Value="75"/>
+                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                    </Style>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
 
     <StackPanel Orientation="Vertical"
                 Margin="15">
-        <StackPanel.Resources>
-            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
-                <Setter Property="Margin" Value="5"/>
-            </Style>
-            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
-                <Setter Property="Margin" Value="5"/>
-                <Setter Property="IsEditable" Value="True"/>
-                <Setter Property="MinWidth" Value="250"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-            </Style>
-            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
-                <Setter Property="VerticalAlignment" Value="Bottom"/>
-                <Setter Property="VerticalContentAlignment" Value="Bottom"/>
-                <Setter Property="Margin" Value="0,10,0,0"/>
-            </Style>
-            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
-                <Setter Property="Margin" Value="5,5,5,5"/>
-                <Setter Property="MinWidth" Value="75"/>
-                <Setter Property="HorizontalAlignment" Value="Right"/>
-            </Style>
-        </StackPanel.Resources>
 
         <Label Content="Avatars"/>
         <ListView ItemsSource="{Binding Avatars, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

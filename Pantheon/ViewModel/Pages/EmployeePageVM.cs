@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using Pantheon.View.PopUp.Employees;
+using Pantheon.ViewModel.Commands.Employees;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;

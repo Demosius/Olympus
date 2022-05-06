@@ -1,5 +1,7 @@
 ﻿using Pantheon.Model;
+using Pantheon.View.PopUp.Rosters;
 using Pantheon.ViewModel.Commands;
+using Pantheon.ViewModel.Commands.Rosters;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,6 +10,7 @@ using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using Pantheon.ViewModel.Commands.Shifts;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Extension;
@@ -23,7 +26,7 @@ public enum ERosterSortOption
     ID
 }
 
-internal class DepartmentRosterVM : INotifyPropertyChanged, IFilters
+public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
 {
     public DepartmentRoster DepartmentRoster { get; set; }
     public Helios Helios { get; set; }
@@ -189,6 +192,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     public ApplySortingCommand ApplySortingCommand { get; set; }
     public GenerateRosterCommand GenerateRosterCommand { get; set; }
     public ClearShiftsCommand ClearShiftsCommand { get; set; }
+    public LaunchPublicHolidayManagerCommand LaunchPublicHolidayManagerCommand { get; set; }
 
     #endregion
 
@@ -208,6 +212,7 @@ internal class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         ClearFiltersCommand = new ClearFiltersCommand(this);
         GenerateRosterCommand = new GenerateRosterCommand(this);
         ClearShiftsCommand = new ClearShiftsCommand(this);
+        LaunchPublicHolidayManagerCommand = new LaunchPublicHolidayManagerCommand(this);
     }
 
     /// <summary>
@@ -442,6 +447,13 @@ internal class DepartmentRosterVM : INotifyPropertyChanged, IFilters
                 list.OrderBy(erVM => erVM.Employee.ID)),
             _ => DisplayRosters
         };
+    }
+
+    public void LaunchPublicHolidayManager()
+    {
+        var phMan = new PublicHolidayWindow(this);
+
+        phMan.ShowDialog();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

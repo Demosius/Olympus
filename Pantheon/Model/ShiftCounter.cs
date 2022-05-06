@@ -5,7 +5,7 @@ using Uranus.Staff.Model;
 
 namespace Pantheon.Model;
 
-internal class ShiftCounter : INotifyPropertyChanged
+public class ShiftCounter : INotifyPropertyChanged
 {
     public Shift Shift { get; set; }
 

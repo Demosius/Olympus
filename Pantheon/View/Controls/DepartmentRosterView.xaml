@@ -193,9 +193,18 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <Button Grid.Column="8"
-                                Content="☰"
-                                Padding="5,0"/>
+                        <ToggleButton Grid.Column="8" x:Name="TogglePopupButton" HorizontalAlignment="Left"
+                                      Padding="5,0" Margin="5,5" Content="☰"/>
+
+                        <Popup Grid.Column="8" IsOpen="{Binding IsChecked, ElementName=TogglePopupButton}">
+                            <Border BorderThickness="1" BorderBrush="{StaticResource CheckBoxBorderBrush}">
+                                <StackPanel Orientation="Vertical">
+                                    <Button Content="Public Holidays"
+                                            Command="{Binding LaunchPublicHolidayManagerCommand}"/>
+                                </StackPanel>
+                            </Border>
+                        </Popup>
+
                     </Grid>
                 </Border>
 

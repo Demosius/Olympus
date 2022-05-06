@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Pantheon.ViewModel"
+        xmlns:employees="clr-namespace:Pantheon.ViewModel.PopUp.Employees"
         mc:Ignorable="d"
         Title="Create Department" 
         SizeToContent="WidthAndHeight"
@@ -13,8 +14,17 @@
         Foreground="{StaticResource LightForegroundBrush}">
 
     <Window.DataContext>
-        <vm:DepartmentCreationVM x:Name="VM"/>
+        <employees:DepartmentCreationVM x:Name="VM"/>
     </Window.DataContext>
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary Source="../../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
 
     <StackPanel Orientation="Vertical"
                 Margin="15">

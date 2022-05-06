@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Pantheon.ViewModel"
         xmlns:converters="clr-namespace:Pantheon.ViewModel.Converter"
+        xmlns:employees="clr-namespace:Pantheon.ViewModel.PopUp.Employees"
         mc:Ignorable="d"
         Title="Create Employee"
         SizeToContent="WidthAndHeight"
@@ -15,14 +16,14 @@
         FocusManager.FocusedElement="{Binding ElementName=IDBox}">
 
     <Window.DataContext>
-        <vm:EmployeeCreationVM x:Name="VM"/>
+        <employees:EmployeeCreationVM x:Name="VM"/>
     </Window.DataContext>
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml" />
-                <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml" />
+                <ResourceDictionary Source="../../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary Source="../../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>

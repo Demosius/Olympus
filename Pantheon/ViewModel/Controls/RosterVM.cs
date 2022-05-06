@@ -8,7 +8,7 @@ using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Controls;
 
-internal class RosterVM : INotifyPropertyChanged
+public class RosterVM : INotifyPropertyChanged
 {
     public Roster Roster { get; set; }
 
@@ -165,11 +165,11 @@ internal class RosterVM : INotifyPropertyChanged
     /// <summary>
     /// Sets the roster type as public holiday without using the Type Setter - which would result in recursive prompting.
     /// </summary>
-    public void SetPublicHoliday()
+    public void SetPublicHoliday(bool isPublicHoliday = true)
     {
-        Roster.RosterType = ERosterType.PublicHoliday;
+        Roster.RosterType = isPublicHoliday ? ERosterType.PublicHoliday : ERosterType.Standard;
         OnPropertyChanged(nameof(Type));
-        AtWork = false;
+        AtWork = !isPublicHoliday;
     }
 
 
