@@ -139,8 +139,13 @@
                                   ItemsSource="{Binding Source={StaticResource RosterSortOptions}, Mode=OneTime}"
                                   SelectedValue="{Binding SortOption}"/>
 
+                        <!-- Shift Target Bypass option -->
+                        <CheckBox Grid.Column="6"
+                                  IsChecked="{Binding ExceedTargets, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip="Exceed shift target counts."/>
+
                         <!-- Shift Count Containers -->
-                        <ItemsControl Grid.Column="6" 
+                        <ItemsControl Grid.Column="7" 
                                       VerticalContentAlignment="Center"
                                       VerticalAlignment="Center"
                                       ItemsSource="{Binding ShiftTargets, Mode=OneWay, FallbackValue=''}">

@@ -1,7 +1,7 @@
-﻿using Pantheon.Model;
-using Pantheon.View.PopUp.Rosters;
+﻿using Pantheon.View.PopUp.Rosters;
 using Pantheon.ViewModel.Commands;
 using Pantheon.ViewModel.Commands.Rosters;
+using Pantheon.ViewModel.Commands.Shifts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,7 +10,6 @@ using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using Pantheon.ViewModel.Commands.Shifts;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Extension;
@@ -33,7 +32,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     private readonly Dictionary<DateTime, DailyRosterVM> dailyRosterVMs = new();
     public readonly Dictionary<int, EmployeeRosterVM> EmployeeRosterVMs = new();
 
-    public Dictionary<string, ShiftCounter> TargetAccessDict { get; set; }
+    public Dictionary<string, WeeklyShiftCounter> TargetAccessDict { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -183,6 +182,16 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         }
     }
 
+    public bool ExceedTargets
+    {
+        get => DepartmentRoster.ExceedTargets;
+        set
+        {
+            DepartmentRoster.ExceedTargets = value;
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region Commands
@@ -204,7 +213,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         IsInitialized = false;
         shifts = new ObservableCollection<Shift>();
         shiftTargets = new ObservableCollection<ShiftCounter>();
-        TargetAccessDict = new Dictionary<string, ShiftCounter>();
+        TargetAccessDict = new Dictionary<string, WeeklyShiftCounter>();
         searchString = string.Empty;
 
         ApplySortingCommand = new ApplySortingCommand(this);
@@ -228,7 +237,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         foreach (var (_, shift) in DepartmentRoster.ShiftDict)
         {
             Shifts.Add(shift);
-            var counter = new ShiftCounter(shift, shift.DailyTarget);
+            var counter = new WeeklyShiftCounter(DepartmentRoster, shift, shift.DailyTarget);
             ShiftTargets.Add(counter);
             TargetAccessDict.Add(shift.ID, counter);
         }

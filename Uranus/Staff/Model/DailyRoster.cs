@@ -21,6 +21,8 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
 
     [OneToMany(nameof(Roster.DailyRosterID), nameof(Roster.DailyRoster), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Roster> Rosters { get; set; }
+    [OneToMany(nameof(DailyShiftCounter.RosterID), nameof(DailyShiftCounter.Roster), CascadeOperations = CascadeOperation.None)]
+    public List<DailyShiftCounter> ShiftCounters { get; set; }
 
     [Ignore] public Dictionary<Shift, int> ShiftCounter { get; set; }
 
@@ -29,6 +31,7 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
         DepartmentName = string.Empty;
         Rosters = new List<Roster>();
         ShiftCounter = new Dictionary<Shift, int>();
+        ShiftCounters = new List<DailyShiftCounter>();
     }
 
     public DailyRoster(Department department, DepartmentRoster departmentRoster, DateTime date)
@@ -42,6 +45,7 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
         Day = date.DayOfWeek;
         Rosters = new List<Roster>();
         ShiftCounter = department.Shifts.ToDictionary(s => s, _ => 0);
+        ShiftCounters = new List<DailyShiftCounter>();
     }
 
     public bool Equals(DailyRoster? other)

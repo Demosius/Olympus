@@ -17,6 +17,8 @@ public class RosterDataSet
     public Dictionary<(int, DateTime), Roster> Rosters { get; set; }
     public IEnumerable<EmployeeShift> EmpShiftConnections { get; set; }
     public Dictionary<int, List<ShiftRule>> ShiftRuleDict { get; set; }
+    public Dictionary<Guid, List<DailyShiftCounter>> DailyShiftCounters { get; set; }
+    public Dictionary<Guid, List<WeeklyShiftCounter>> WeeklyShiftCounters { get; set; }
 
     public List<EmployeeRoster> EmployeeRosters { get; set; }
     public List<DailyRoster> DailyRosters { get; set; }
@@ -31,11 +33,14 @@ public class RosterDataSet
         ShiftRuleDict = new Dictionary<int, List<ShiftRule>>();
         EmployeeRosters = new List<EmployeeRoster>();
         DailyRosters = new List<DailyRoster>();
+        DailyShiftCounters = new Dictionary<Guid, List<DailyShiftCounter>>();
+        WeeklyShiftCounters = new Dictionary<Guid, List<WeeklyShiftCounter>>();
     }
 
     public RosterDataSet(Department department, DateTime startDate, DateTime endDate, IEnumerable<Employee> employees,
         IEnumerable<Roster> rosters, IEnumerable<DailyRoster> dailyRosters, IEnumerable<EmployeeRoster> employeeRosters,
-        IEnumerable<Shift> shifts, IEnumerable<Break> breaks, IEnumerable<EmployeeShift> esCons, IEnumerable<ShiftRule> shiftRules)
+        IEnumerable<Shift> shifts, IEnumerable<Break> breaks, IEnumerable<EmployeeShift> esCons, IEnumerable<ShiftRule> shiftRules,
+        IEnumerable<DailyShiftCounter> dailyShiftCounters, IEnumerable<WeeklyShiftCounter> weeklyShiftCounters)
     {
         Department = department;
         StartDate = startDate;
@@ -49,6 +54,12 @@ public class RosterDataSet
 
         EmployeeRosters = employeeRosters.ToList();
         DailyRosters = dailyRosters.ToList();
+
+        DailyShiftCounters = dailyShiftCounters.GroupBy(counter => counter.RosterID)
+            .ToDictionary(group => group.Key, group => group.ToList());
+
+        WeeklyShiftCounters = weeklyShiftCounters.GroupBy(counter => counter.RosterID)
+            .ToDictionary(group => group.Key, group => group.ToList());
 
         SetRelationships();
     }

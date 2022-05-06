@@ -1,9 +1,8 @@
-﻿using Pantheon.Model;
+﻿using Pantheon.Annotations;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Pantheon.Annotations;
 using Uranus.Staff.Model;
 
 namespace Pantheon.ViewModel.Controls;
@@ -14,7 +13,7 @@ public class DailyRosterVM : INotifyPropertyChanged
 
     public DepartmentRosterVM DepartmentRosterVM { get; set; }
 
-    public Dictionary<string, ShiftCounter> CounterAccessDict { get; set; }
+    public Dictionary<string, DailyShiftCounter> CounterAccessDict { get; set; }
 
     public Dictionary<int, RosterVM> Rosters { get; set; }
 
@@ -40,14 +39,15 @@ public class DailyRosterVM : INotifyPropertyChanged
         DailyRoster = roster;
         DepartmentRosterVM = departmentRosterVM;
         shiftCounter = new ObservableCollection<ShiftCounter>();
-        CounterAccessDict = new Dictionary<string, ShiftCounter>();
+        CounterAccessDict = new Dictionary<string, DailyShiftCounter>();
         Rosters = new Dictionary<int, RosterVM>();
 
         foreach (var counter in DepartmentRosterVM.ShiftTargets)
         {
-            var dailyCounter = new ShiftCounter(counter.Shift, counter.Target);
+            if (counter.Shift is null) continue;
+            var dailyCounter = new DailyShiftCounter(DailyRoster, counter.Shift, counter.Target);
             ShiftCounter.Add(dailyCounter);
-            CounterAccessDict.Add(dailyCounter.Shift.ID, dailyCounter);
+            CounterAccessDict.Add(dailyCounter.ShiftID, dailyCounter);
         }
     }
 

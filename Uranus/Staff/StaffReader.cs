@@ -200,6 +200,8 @@ public class StaffReader
             List<Break>? breaks = null;
             List<EmployeeShift>? employeeShiftConnections = null;
             List<ShiftRule>? shiftRules = null;
+            List<WeeklyShiftCounter>? weeklyShiftCounters = null;
+            List<DailyShiftCounter>? dailyShiftCounters = null;
 
             Chariot.Database?.RunInTransaction(() =>
             {
@@ -215,6 +217,8 @@ public class StaffReader
                 breaks = Chariot.PullObjectList<Break>();
                 employeeShiftConnections = Chariot.PullObjectList<EmployeeShift>();
                 shiftRules = Chariot.PullObjectList<ShiftRule>();
+                weeklyShiftCounters = Chariot.PullObjectList<WeeklyShiftCounter>(wc => wc.RosterID == departmentRoster.ID);
+                dailyShiftCounters = Chariot.PullObjectList<DailyShiftCounter>(dc => dc.Date >= earliestDate && dc.Date <= latestDate);
             });
 
             // Assign variables that may have been missed.
@@ -226,8 +230,12 @@ public class StaffReader
             breaks ??= new List<Break>();
             employeeShiftConnections ??= new List<EmployeeShift>();
             shiftRules ??= new List<ShiftRule>();
+            weeklyShiftCounters ??= new List<WeeklyShiftCounter>();
+            dailyShiftCounters ??= new List<DailyShiftCounter>();
 
-            departmentRoster.SetData(employees, rosters, dailyRosters, employeeRosters, shifts, breaks, employeeShiftConnections, shiftRules);
+            departmentRoster.SetData(
+                employees, rosters, dailyRosters, employeeRosters, shifts, breaks,
+                employeeShiftConnections, shiftRules, weeklyShiftCounters, dailyShiftCounters);
         }
         catch (Exception ex)
         {
@@ -257,8 +265,10 @@ public class StaffReader
                 var breaks = Chariot.PullObjectList<Break>();
                 var employeeShiftConnections = Chariot.PullObjectList<EmployeeShift>();
                 var shiftRules = Chariot.PullObjectList<ShiftRule>();
+                var dailyShiftCounters = Chariot.PullObjectList<DailyShiftCounter>();
+                var weeklyShiftCounters = Chariot.PullObjectList<WeeklyShiftCounter>();
                 data = new RosterDataSet(department, startDate, endDate, employees, rosters, dailyRosters, employeeRosters,
-                    shifts, breaks, employeeShiftConnections, shiftRules);
+                    shifts, breaks, employeeShiftConnections, shiftRules, dailyShiftCounters, weeklyShiftCounters);
             });
             if (data is not null) return data;
         }

@@ -92,7 +92,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
                                    "[NAV > Warehouse > Planning & Execution > Bin Contents >> Bin Code]\n\n" +
                                    "Required Columns:\n\n" +
                                    $"{string.Join("\n", Constants.NAVBinColumns.Keys)}\n\n" +
-                                   "(No filtering required.)\n" +
+                                   "(Make sure data is not filtered.)\n" +
                                    "(Update when changes are made to bin/zone layouts, or when Count Dates are required.)";
     // Commands
     public UpdateStockCommand UpdateStockCommand { get; set; }
