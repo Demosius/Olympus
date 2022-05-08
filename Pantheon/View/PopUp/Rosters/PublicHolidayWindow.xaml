@@ -7,23 +7,27 @@
         xmlns:vm="clr-namespace:Pantheon.ViewModel.PopUp.Rosters"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance {x:Type vm:PublicHolidayVM}, IsDesignTimeCreatable=False}"
-        Title="PublicHolidayWindow" Height="350" Width="650">
+        Title="PublicHolidayWindow" Height="350" Width="750">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
                 <ResourceDictionary>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
-                        <Setter Property="Width" Value="90"/>
-                        <Setter Property="Margin" Value="20,0,0,0"/>
-                    </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid Background="{DynamicResource TooltipBackgroundBrush}">
+
+        <Grid.Resources>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                <Setter Property="Width" Value="90"/>
+                <Setter Property="Margin" Value="20,0,0,0"/>
+            </Style>
+        </Grid.Resources>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -61,7 +65,8 @@
                FontSize="16"/>
         <Label Grid.Column="1" Grid.Row="4"
                HorizontalAlignment="Center"
-               Content="{Binding ParentVM.SundayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue='00/00/0000'}"/>
+               Content="{Binding ParentVM.MondayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue=' - error - '}"
+               ContentStringFormat="dd MMM yy"/>
         <CheckBox Grid.Column="1" Grid.Row="5"
                   IsChecked="{Binding Monday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   HorizontalAlignment="Center"/>
@@ -72,7 +77,8 @@
                FontSize="16"/>
         <Label Grid.Column="2" Grid.Row="4"
                HorizontalAlignment="Center"
-               Content="{Binding ParentVM.SundayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue='00/00/0000'}"/>
+               Content="{Binding ParentVM.TuesdayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue=' - error - '}"
+               ContentStringFormat="dd MMM yy"/>
         <CheckBox Grid.Column="2" Grid.Row="5"
                   IsChecked="{Binding Tuesday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   HorizontalAlignment="Center"/>
@@ -83,7 +89,8 @@
                FontSize="16"/>
         <Label Grid.Column="3" Grid.Row="4"
                HorizontalAlignment="Center"
-               Content="{Binding ParentVM.SundayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue='00/00/0000'}"/>
+               Content="{Binding ParentVM.WednesdayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue=' - error - '}"
+               ContentStringFormat="dd MMM yy"/>
         <CheckBox Grid.Column="3" Grid.Row="5"
                   IsChecked="{Binding Wednesday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   HorizontalAlignment="Center"/>
@@ -94,7 +101,8 @@
                FontSize="16"/>
         <Label Grid.Column="4" Grid.Row="4"
                HorizontalAlignment="Center"
-               Content="{Binding ParentVM.SundayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue='00/00/0000'}"/>
+               Content="{Binding ParentVM.ThursdayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue=' - error - '}"
+               ContentStringFormat="dd MMM yy"/>
         <CheckBox Grid.Column="4" Grid.Row="5"
                   IsChecked="{Binding Thursday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   HorizontalAlignment="Center"/>
@@ -105,7 +113,8 @@
                FontSize="16"/>
         <Label Grid.Column="5" Grid.Row="4"
                HorizontalAlignment="Center"
-               Content="{Binding ParentVM.SundayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue='00/00/0000'}"/>
+               Content="{Binding ParentVM.FridayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue=' - error - '}"
+               ContentStringFormat="dd MMM yy"/>
         <CheckBox Grid.Column="5" Grid.Row="5"
                   IsChecked="{Binding Friday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   HorizontalAlignment="Center"/>
@@ -116,7 +125,8 @@
                FontSize="16"/>
         <Label Grid.Column="6" Grid.Row="4"
                HorizontalAlignment="Center"
-               Content="{Binding ParentVM.SundayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue='00/00/0000'}"/>
+               Content="{Binding ParentVM.SaturdayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue=' - error - '}"
+               ContentStringFormat="dd MMM yy"/>
         <CheckBox Grid.Column="6" Grid.Row="5"
                   IsChecked="{Binding Saturday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   HorizontalAlignment="Center"/>
@@ -127,7 +137,8 @@
                FontSize="16"/>
         <Label Grid.Column="7" Grid.Row="4"
                HorizontalAlignment="Center"
-               Content="{Binding ParentVM.SundayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue='00/00/0000'}"/>
+               Content="{Binding ParentVM.SundayRoster.DailyRoster.Date, Mode=OneWay, FallbackValue=' - error - '}"
+               ContentStringFormat="dd MMM yy"/>
         <CheckBox Grid.Column="7" Grid.Row="5"
                   IsChecked="{Binding Sunday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   HorizontalAlignment="Center"/>

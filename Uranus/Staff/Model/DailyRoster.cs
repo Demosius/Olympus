@@ -13,6 +13,7 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
     [ForeignKey(typeof(DepartmentRoster))] public Guid DepartmentRosterID { get; set; }
     public DateTime Date { get; set; }
     public DayOfWeek Day { get; set; }
+    public bool IsPublicHoliday { get; set; }
 
     [ManyToOne(nameof(DepartmentName), nameof(Model.Department.DailyRosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Department? Department { get; set; }

@@ -17,7 +17,11 @@ public class DailyRosterVM : INotifyPropertyChanged
 
     public Dictionary<int, RosterVM> Rosters { get; set; }
 
-    public bool PublicHoliday { get; set; }
+    public bool PublicHoliday
+    {
+        get => DailyRoster.IsPublicHoliday;
+        set => DailyRoster.IsPublicHoliday = value;
+    }
 
     #region INotifyPropertyChanged Members
 
