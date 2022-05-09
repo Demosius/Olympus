@@ -36,9 +36,11 @@ public class DepartmentRoster
     [Ignore] public Dictionary<Guid, DailyRoster> DailyRosterDict { get; set; }
     [Ignore] public Dictionary<Guid, EmployeeRoster> EmployeeRosterDict { get; set; }
     [Ignore] public IEnumerable<EmployeeShift> EmpShiftConnections { get; set; }
-    [Ignore] public Dictionary<int, List<ShiftRule>> ShiftRuleDict { get; set; }
+    [Ignore] public Dictionary<int, List<ShiftRuleSingle>> SingleRuleDict { get; set; }
+    [Ignore] public Dictionary<int, List<ShiftRuleRecurring>> RecurringRuleDict { get; set; }
+    [Ignore] public Dictionary<int, List<ShiftRuleRoster>> RosterRuleDict { get; set; }
     [Ignore] public Dictionary<string, WeeklyShiftCounter> ShiftCounterDict { get; set; }
-    [Ignore] public Dictionary<Guid, List<DailyShiftCounter>> DailyCounterDict { get; set; }
+    [Ignore] public Dictionary<Guid, Dictionary<string, DailyShiftCounter>> DailyCounterDict { get; set; }
 
     [Ignore] public Shift? DefaultShift { get; set; }
 
@@ -63,11 +65,13 @@ public class DepartmentRoster
         DailyRosterDict = new Dictionary<Guid, DailyRoster>();
         EmployeeRosterDict = new Dictionary<Guid, EmployeeRoster>();
         EmpShiftConnections = new List<EmployeeShift>();
-        ShiftRuleDict = new Dictionary<int, List<ShiftRule>>();
+        SingleRuleDict = new Dictionary<int, List<ShiftRuleSingle>>();
+        RecurringRuleDict = new Dictionary<int, List<ShiftRuleRecurring>>();
+        RosterRuleDict = new Dictionary<int, List<ShiftRuleRoster>>();
         ShiftCounter = new Dictionary<Shift, int>();
         TargetShiftCounts = new Dictionary<Shift, int>();
         ShiftCounterDict = new Dictionary<string, WeeklyShiftCounter>();
-        DailyCounterDict = new Dictionary<Guid, List<DailyShiftCounter>>();
+        DailyCounterDict = new Dictionary<Guid, Dictionary<string, DailyShiftCounter>>();
     }
 
     public DepartmentRoster(string name, DateTime startDate, bool useSaturdays, bool useSundays, Department department)
@@ -92,28 +96,36 @@ public class DepartmentRoster
         DailyRosterDict = new Dictionary<Guid, DailyRoster>();
         EmployeeRosterDict = new Dictionary<Guid, EmployeeRoster>();
         EmpShiftConnections = new List<EmployeeShift>();
-        ShiftRuleDict = new Dictionary<int, List<ShiftRule>>();
+        SingleRuleDict = new Dictionary<int, List<ShiftRuleSingle>>();
+        RecurringRuleDict = new Dictionary<int, List<ShiftRuleRecurring>>();
+        RosterRuleDict = new Dictionary<int, List<ShiftRuleRoster>>();
         ShiftCounter = new Dictionary<Shift, int>();
         TargetShiftCounts = new Dictionary<Shift, int>();
         ShiftCounterDict = new Dictionary<string, WeeklyShiftCounter>();
-        DailyCounterDict = new Dictionary<Guid, List<DailyShiftCounter>>();
+        DailyCounterDict = new Dictionary<Guid, Dictionary<string, DailyShiftCounter>>();
     }
 
     public void SetData(IEnumerable<Employee> employees, IEnumerable<Roster> rosters, IEnumerable<DailyRoster> dailyRosters, IEnumerable<EmployeeRoster> employeeRosters,
-        IEnumerable<Shift> shifts, IEnumerable<Break> breaks, IEnumerable<EmployeeShift> empShiftCons, IEnumerable<ShiftRule> shiftRules,
+        IEnumerable<Shift> shifts, IEnumerable<Break> breaks, IEnumerable<EmployeeShift> empShiftCons,
+        IEnumerable<ShiftRuleSingle> singleRules, IEnumerable<ShiftRuleRecurring> recurringRules, IEnumerable<ShiftRuleRoster> rosterRules,
         IEnumerable<WeeklyShiftCounter> weeklyShiftCounters, IEnumerable<DailyShiftCounter> dailyShiftCounters)
     {
         EmployeeDict = employees.ToDictionary(e => e.ID, e => e);
         ShiftDict = shifts.ToDictionary(s => s.ID, s => s);
         BreakDict = breaks.GroupBy(b => b.ShiftID).ToDictionary(g => g.Key, g => g.ToList());
         EmpShiftConnections = empShiftCons;
-        ShiftRuleDict = shiftRules.GroupBy(r => r.EmployeeID).ToDictionary(g => g.Key, g => g.ToList());
+        SingleRuleDict = singleRules.GroupBy(rule => rule.EmployeeID)
+            .ToDictionary(group => group.Key, group => group.ToList());
+        RecurringRuleDict = recurringRules.GroupBy(rule => rule.EmployeeID)
+            .ToDictionary(group => group.Key, group => group.ToList());
+        RosterRuleDict = rosterRules.GroupBy(rule => rule.EmployeeID)
+            .ToDictionary(group => group.Key, group => group.ToList());
         RosterDict = rosters.ToDictionary(r => (r.EmployeeID, r.Date), r => r);
         EmployeeRosterDict = employeeRosters.ToDictionary(er => er.ID, er => er);
         DailyRosterDict = dailyRosters.ToDictionary(dr => dr.ID, dr => dr);
 
-        DailyCounterDict = dailyShiftCounters.GroupBy(counter => counter.RosterID)
-            .ToDictionary(group => group.Key, group => group.ToList());
+        DailyCounterDict = dailyShiftCounters.GroupBy(counter => counter.RosterID).ToDictionary(group => group.Key,
+            group => group.ToDictionary(counter => counter.ShiftID, counter => counter));
 
         ShiftCounterDict = weeklyShiftCounters.Where(c => c.RosterID == ID).ToDictionary(c => c.ShiftID, c => c);
         ShiftCounters = ShiftCounterDict.Values.ToList();
@@ -204,6 +216,7 @@ public class DepartmentRoster
             if (ShiftCounterDict.TryGetValue(shift.ID, out var counter))
             {
                 counter.Shift = shift;
+                if (counter.RosterID == ID) counter.Roster = this;
             }
             else
             {
@@ -246,12 +259,32 @@ public class DepartmentRoster
             if (employee.DepartmentName == Department?.Name) employee.Department = Department;
 
             if (DefaultShift is not null) employee.Shifts.Add(DefaultShift);
+            
+            if (SingleRuleDict.TryGetValue(employee.ID, out var shiftRules))
+            {
+                employee.SingleRules = shiftRules;
+                foreach (var shiftRule in shiftRules)
+                    shiftRule.Employee = employee;
+            }
 
-            if (!ShiftRuleDict.TryGetValue(employee.ID, out var shiftRules)) continue;
+            if (RecurringRuleDict.TryGetValue(employee.ID, out var recurringRules))
+            {
+                employee.RecurringRules = recurringRules;
+                foreach (var shiftRule in recurringRules)
+                    shiftRule.Employee = employee;
+            }
 
-            employee.Rules = shiftRules;
-            foreach (var shiftRule in shiftRules)
+            if (!RosterRuleDict.TryGetValue(employee.ID, out var rosterRules)) continue;
+
+            employee.RosterRules = rosterRules;
+            foreach (var shiftRule in rosterRules)
+            {
                 shiftRule.Employee = employee;
+                if (!ShiftDict.TryGetValue(shiftRule.ShiftID ?? "", out var shift)) continue;
+
+                shiftRule.Shift = shift;
+                shift.RosterRules.Add(shiftRule);
+            }
         }
     }
 
@@ -323,16 +356,18 @@ public class DepartmentRoster
                 Department?.DailyRosters.Add(dailyRoster);
             }
 
-            if (!DailyCounterDict.TryGetValue(dailyRoster.ID, out var counters)) continue;
+            DailyCounterDict.TryGetValue(dailyRoster.ID, out var counters);
+            counters ??= new Dictionary<string, DailyShiftCounter>();
 
-            foreach (var dailyShiftCounter in counters)
+            foreach (var (id, shift) in ShiftDict)
             {
-                if (ShiftDict.TryGetValue(dailyShiftCounter.ShiftID, out var shift))
-                {
-                    dailyShiftCounter.Shift = shift;
-                }
+                counters.TryGetValue(id, out var counter);
+                counter ??= new DailyShiftCounter(dailyRoster, shift, ShiftCounterDict[id].Target);
+
+                counter.Shift = shift;
+                counter.Roster = dailyRoster;
+                dailyRoster.ShiftCounters.Add(counter);
             }
-            dailyRoster.ShiftCounters = counters;
         }
     }
 

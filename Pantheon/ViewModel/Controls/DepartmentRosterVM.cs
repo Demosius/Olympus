@@ -147,8 +147,8 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         }
     }
 
-    private ObservableCollection<ShiftCounter> shiftTargets;
-    public ObservableCollection<ShiftCounter> ShiftTargets
+    private ObservableCollection<WeeklyShiftCounter> shiftTargets;
+    public ObservableCollection<WeeklyShiftCounter> ShiftTargets
     {
         get => shiftTargets;
         set
@@ -192,6 +192,17 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         }
     }
 
+    private bool showTargets;
+    public bool ShowTargets
+    {
+        get => showTargets;
+        set
+        {
+            showTargets = value;
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region Commands
@@ -212,9 +223,10 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         displayRosters = new ObservableCollection<EmployeeRosterVM>();
         IsInitialized = false;
         shifts = new ObservableCollection<Shift>();
-        shiftTargets = new ObservableCollection<ShiftCounter>();
+        shiftTargets = new ObservableCollection<WeeklyShiftCounter>();
         TargetAccessDict = new Dictionary<string, WeeklyShiftCounter>();
         searchString = string.Empty;
+        ShowTargets = true;
 
         ApplySortingCommand = new ApplySortingCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
@@ -234,12 +246,13 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         if (!DepartmentRoster.IsLoaded) Helios.StaffReader.FillDepartmentRoster(DepartmentRoster);
 
         // Shift Targets
-        foreach (var (_, shift) in DepartmentRoster.ShiftDict)
+        foreach (var shiftCounter in DepartmentRoster.ShiftCounters)
         {
+            var shift = shiftCounter.Shift;
+            if (shift is null) throw new DataException("Shift should not be null.");
             Shifts.Add(shift);
-            var counter = new WeeklyShiftCounter(DepartmentRoster, shift, shift.DailyTarget);
-            ShiftTargets.Add(counter);
-            TargetAccessDict.Add(shift.ID, counter);
+            ShiftTargets.Add(shiftCounter);
+            TargetAccessDict.Add(shift.ID, shiftCounter);
         }
 
         // Daily rosters.
@@ -460,9 +473,9 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
 
     public void LaunchPublicHolidayManager()
     {
-        var phMan = new PublicHolidayWindow(this);
+        var publicHolidayWindow = new PublicHolidayWindow(this);
 
-        phMan.ShowDialog();
+        publicHolidayWindow.ShowDialog();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

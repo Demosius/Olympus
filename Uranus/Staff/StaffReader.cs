@@ -199,7 +199,9 @@ public class StaffReader
             List<Shift>? shifts = null;
             List<Break>? breaks = null;
             List<EmployeeShift>? employeeShiftConnections = null;
-            List<ShiftRule>? shiftRules = null;
+            List<ShiftRuleSingle>? singleRules = null;
+            List<ShiftRuleRecurring>? recurringRules = null;
+            List<ShiftRuleRoster>? rosterRules = null;
             List<WeeklyShiftCounter>? weeklyShiftCounters = null;
             List<DailyShiftCounter>? dailyShiftCounters = null;
 
@@ -216,7 +218,9 @@ public class StaffReader
                 shifts = Chariot.PullObjectList<Shift>(s => s.DepartmentName == departmentName);
                 breaks = Chariot.PullObjectList<Break>();
                 employeeShiftConnections = Chariot.PullObjectList<EmployeeShift>();
-                shiftRules = Chariot.PullObjectList<ShiftRule>();
+                singleRules = Chariot.PullObjectList<ShiftRuleSingle>();
+                recurringRules = Chariot.PullObjectList<ShiftRuleRecurring>();
+                rosterRules = Chariot.PullObjectList<ShiftRuleRoster>();
                 weeklyShiftCounters = Chariot.PullObjectList<WeeklyShiftCounter>(wc => wc.RosterID == departmentRoster.ID);
                 dailyShiftCounters = Chariot.PullObjectList<DailyShiftCounter>(dc => dc.Date >= earliestDate && dc.Date <= latestDate);
             });
@@ -229,13 +233,16 @@ public class StaffReader
             shifts ??= new List<Shift>();
             breaks ??= new List<Break>();
             employeeShiftConnections ??= new List<EmployeeShift>();
-            shiftRules ??= new List<ShiftRule>();
+            singleRules ??= new List<ShiftRuleSingle>();
+            recurringRules ??= new List<ShiftRuleRecurring>();
+            rosterRules ??= new List<ShiftRuleRoster>();
             weeklyShiftCounters ??= new List<WeeklyShiftCounter>();
             dailyShiftCounters ??= new List<DailyShiftCounter>();
 
             departmentRoster.SetData(
                 employees, rosters, dailyRosters, employeeRosters, shifts, breaks,
-                employeeShiftConnections, shiftRules, weeklyShiftCounters, dailyShiftCounters);
+                employeeShiftConnections, singleRules, recurringRules, rosterRules,
+                weeklyShiftCounters, dailyShiftCounters);
         }
         catch (Exception ex)
         {
@@ -264,11 +271,14 @@ public class StaffReader
                 var shifts = Chariot.PullObjectList<Shift>(s => s.DepartmentName == department.Name);
                 var breaks = Chariot.PullObjectList<Break>();
                 var employeeShiftConnections = Chariot.PullObjectList<EmployeeShift>();
-                var shiftRules = Chariot.PullObjectList<ShiftRule>();
+                var singleRules = Chariot.PullObjectList<ShiftRuleSingle>();
+                var recurringRules = Chariot.PullObjectList<ShiftRuleRecurring>();
+                var rosterRules = Chariot.PullObjectList<ShiftRuleRoster>();
                 var dailyShiftCounters = Chariot.PullObjectList<DailyShiftCounter>();
                 var weeklyShiftCounters = Chariot.PullObjectList<WeeklyShiftCounter>();
-                data = new RosterDataSet(department, startDate, endDate, employees, rosters, dailyRosters, employeeRosters,
-                    shifts, breaks, employeeShiftConnections, shiftRules, dailyShiftCounters, weeklyShiftCounters);
+                data = new RosterDataSet(department, startDate, endDate, employees, rosters, dailyRosters,
+                    employeeRosters, shifts, breaks, employeeShiftConnections, singleRules, recurringRules, 
+                    rosterRules, dailyShiftCounters, weeklyShiftCounters);
             });
             if (data is not null) return data;
         }

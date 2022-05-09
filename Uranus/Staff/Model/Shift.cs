@@ -47,6 +47,8 @@ public class Shift : INotifyPropertyChanged, IEquatable<Shift>, IComparable<Shif
     public List<Break> Breaks { get; set; }
     [OneToMany(nameof(Employee.DefaultShiftID), nameof(Employee.DefaultShift), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Employee> DefaultEmployees { get; set; }
+    [OneToMany(nameof(ShiftRuleRoster.ShiftID), nameof(ShiftRuleRoster.Shift), CascadeOperations = CascadeOperation.None)]
+    public List<ShiftRuleRoster> RosterRules { get; set; }
 
     #region Notifiable Properties
 
@@ -90,6 +92,7 @@ public class Shift : INotifyPropertyChanged, IEquatable<Shift>, IComparable<Shif
         Breaks = new List<Break>();
         BreaksObservable = new ObservableCollection<Break>(Breaks);
         DefaultEmployees = new List<Employee>();
+        RosterRules = new List<ShiftRuleRoster>();
         ID = string.Empty;
     }
 
@@ -102,6 +105,7 @@ public class Shift : INotifyPropertyChanged, IEquatable<Shift>, IComparable<Shif
         Employees = new List<Employee>();
         Rosters = new List<Roster>();
         EmployeeRosters = new List<EmployeeRoster>();
+        RosterRules = new List<ShiftRuleRoster>();
 
         // Select initial times.
         StartTime = TimeSpan.FromHours(8);
@@ -128,6 +132,7 @@ public class Shift : INotifyPropertyChanged, IEquatable<Shift>, IComparable<Shif
         Breaks = breaks;
         BreaksObservable = new ObservableCollection<Break>(Breaks);
         DefaultEmployees = new List<Employee>();
+        RosterRules = new List<ShiftRuleRoster>();
         ID = $"{DepartmentName}|{Name}";
     }
 

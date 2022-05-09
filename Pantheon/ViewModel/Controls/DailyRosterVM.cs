@@ -46,12 +46,10 @@ public class DailyRosterVM : INotifyPropertyChanged
         CounterAccessDict = new Dictionary<string, DailyShiftCounter>();
         Rosters = new Dictionary<int, RosterVM>();
 
-        foreach (var counter in DepartmentRosterVM.ShiftTargets)
+        foreach (var counter in DailyRoster.ShiftCounters)
         {
-            if (counter.Shift is null) continue;
-            var dailyCounter = new DailyShiftCounter(DailyRoster, counter.Shift, counter.Target);
-            ShiftCounter.Add(dailyCounter);
-            CounterAccessDict.Add(dailyCounter.ShiftID, dailyCounter);
+            ShiftCounter.Add(counter);
+            CounterAccessDict.Add(counter.ShiftID, counter);
         }
     }
 

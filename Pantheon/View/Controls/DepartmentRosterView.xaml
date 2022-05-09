@@ -87,7 +87,7 @@
             <Grid>
 
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="230" x:Name="EmployeeColumn"/>
+                    <ColumnDefinition Width="231" x:Name="EmployeeColumn"/>
                     <ColumnDefinition Width="200" x:Name="MondayColumn"/>
                     <ColumnDefinition Width="200" x:Name="TuesdayColumn"/>
                     <ColumnDefinition Width="200" x:Name="WednesdayColumn"/>
@@ -180,7 +180,8 @@
                                                    FontWeight="Bold"/>
                                             <Label Grid.Column="2"
                                                    Content="/"/>
-                                            <TextBox Grid.Column="3" Text="{Binding Target, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Grid.Column="3" Text="{Binding MasterTarget, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                                     PreviewTextInput="ShiftTarget_OnPreviewTextInput"
                                                      MinHeight="0"
                                                      Height="20"
                                                      Padding="0"
@@ -191,7 +192,9 @@
                                                      HorizontalContentAlignment="Center"
                                                      GotKeyboardFocus="TextBox_GotKeyboardFocus"
                                                      LostMouseCapture="TextBox_LostMouseCapture"
-                                                     LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                                                     LostKeyboardFocus="TextBox_LostKeyboardFocus"
+                                                     LostFocus="ShiftTarget_LostFocus"
+                                                     TextChanged="ShiftTarget_Changed"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -215,11 +218,17 @@
 
                 <!-- Headers (Employee => Dailies) -->
                 <Border Grid.Column="0" Grid.Row="1"  BorderBrush="{StaticResource ForegroundBrush}" BorderThickness=".5">
-                    <Label Content="Employee"
-                           FontSize="24"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           FontWeight="Bold"/>
+                    <Grid>
+                        <Label Content="Employee"
+                               FontSize="24"
+                               HorizontalAlignment="Center"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"/>
+                        <CheckBox VerticalAlignment="Top" 
+                                  HorizontalAlignment="Right"
+                                  IsChecked="{Binding ShowTargets, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  ToolTip="Show Daily Shift Targets"/>
+                    </Grid>
                 </Border>
 
                 <controls:DailyRosterView Grid.Column="1" Grid.Row="1" DataContext="{Binding MondayRoster}"/>

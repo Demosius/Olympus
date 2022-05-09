@@ -1,5 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
+using System;
 
 namespace Uranus.Staff.Model;
 
@@ -7,23 +8,20 @@ namespace Uranus.Staff.Model;
 // Each entry is another rule, and multiple rules can apply to a single employee.
 public class ShiftRule
 {
-    [PrimaryKey, AutoIncrement] public int ID { get; set; }
+    [PrimaryKey] public Guid ID { get; set; }
     [ForeignKey(typeof(Employee))] public int EmployeeID { get; set; }
-    public string Rule { get; set; }
-
-    [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.Rules), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Employee? Employee { get; set; }
+    public string Description { get; set; }
 
     public ShiftRule()
     {
-        Rule = string.Empty;
+        ID = Guid.NewGuid();
+        Description = string.Empty;
     }
 
-    public ShiftRule(int id, int employeeID, string rule, Employee employee)
+    public ShiftRule(int employeeID, string description)
     {
-        ID = id;
+        ID = Guid.NewGuid();
         EmployeeID = employeeID;
-        Rule = rule;
-        Employee = employee;
+        Description = description;
     }
 }

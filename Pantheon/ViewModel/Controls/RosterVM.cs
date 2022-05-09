@@ -169,7 +169,10 @@ public class RosterVM : INotifyPropertyChanged
     {
         Roster.RosterType = isPublicHoliday ? ERosterType.PublicHoliday : ERosterType.Standard;
         OnPropertyChanged(nameof(Type));
-        AtWork = !isPublicHoliday;
+        if (isPublicHoliday)
+            AtWork = false;
+        else
+            AtWork = DailyRosterVM.DailyRoster.Day is not (DayOfWeek.Saturday or DayOfWeek.Sunday) || Roster.Shift is not null;
     }
 
 

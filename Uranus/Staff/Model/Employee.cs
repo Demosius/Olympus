@@ -116,7 +116,8 @@ public class Employee : INotifyPropertyChanged
     [ForeignKey(typeof(EmployeeIcon))] public string IconName { get; set; }
     [ForeignKey(typeof(EmployeeAvatar))] public string AvatarName { get; set; }
     [ForeignKey(typeof(Licence))] public string LicenceNumber { get; set; }
-    [DefaultValue(false)]public bool IsUser
+    [DefaultValue(false)]
+    public bool IsUser
     {
         get => isUser;
         set
@@ -200,10 +201,15 @@ public class Employee : INotifyPropertyChanged
     [ManyToMany(typeof(EmployeeProject), nameof(EmployeeProject.EmployeeID), nameof(Project.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Project> Projects { get; set; }
 
+    [OneToMany(nameof(ShiftRule.EmployeeID), nameof(ShiftRuleSingle.Employee), CascadeOperations = CascadeOperation.All)]
+    public List<ShiftRuleSingle> SingleRules { get; set; }
+    [OneToMany(nameof(ShiftRule.EmployeeID), nameof(ShiftRuleRecurring.Employee), CascadeOperations = CascadeOperation.All)]
+    public List<ShiftRuleRecurring> RecurringRules { get; set; }
+    [OneToMany(nameof(ShiftRule.EmployeeID), nameof(ShiftRuleRoster.Employee), CascadeOperations = CascadeOperation.All)]
+    public List<ShiftRuleRoster> RosterRules { get; set; }
+
     [OneToMany(nameof(EmployeeInductionReference.EmployeeID), nameof(EmployeeInductionReference.Employee), CascadeOperations = CascadeOperation.All)]
     public List<EmployeeInductionReference> InductionReferences { get; set; }
-    [OneToMany(nameof(ShiftRule.EmployeeID), nameof(ShiftRule.Employee), CascadeOperations = CascadeOperation.All)]
-    public List<ShiftRule> Rules { get; set; }
     [OneToMany(nameof(ReportsToID), nameof(ReportsTo), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Employee> Reports { get; set; }
     [OneToMany(nameof(ShiftEntry.EmployeeID), nameof(ShiftEntry.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
@@ -245,7 +251,9 @@ public class Employee : INotifyPropertyChanged
         DepartmentsCanWorkIn = new List<Department>();
         Projects = new List<Project>();
         InductionReferences = new List<EmployeeInductionReference>();
-        Rules = new List<ShiftRule>();
+        SingleRules = new List<ShiftRuleSingle>();
+        RecurringRules = new List<ShiftRuleRecurring>();
+        RosterRules = new List<ShiftRuleRoster>();
         Reports = new List<Employee>();
         ShiftEntries = new List<ShiftEntry>();
         Rosters = new List<Roster>();
@@ -257,62 +265,6 @@ public class Employee : INotifyPropertyChanged
     public Employee(int id) : this()
     {
         ID = id;
-    }
-
-    public Employee(int id, string firstName, string lastName, string displayName, decimal? payRate,
-        string rfID, string pcID, string location, string departmentName, string roleName,
-        int reportsToID, string clanName, string defaultShiftID, string payPoint, EEmploymentType employmentType,
-        string lockerID, string phoneNumber, string email, string address, string iconName,
-        string avatarName, string licenceNumber, Department? department, Role? role, Employee? reportsTo,
-        EmployeeAvatar? avatar, Clan? clan, EmployeeIcon? icon, Locker? locker, Licence? licence,
-        List<Vehicle> vehicles, List<Shift> shifts, List<Department> departmentsCanWorkIn,
-        List<Project> projects, List<EmployeeInductionReference> inductionReferences, List<ShiftRule> rules,
-        List<Employee> reports, List<ShiftEntry> shiftEntries, List<Roster> rosters, List<EmployeeRoster> employeeRosters,
-        List<ClockEvent> clockEvents,
-        List<TagUse> tagUse)
-    {
-        ID = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        DisplayName = displayName;
-        PayRate = payRate;
-        RF_ID = rfID;
-        PC_ID = pcID;
-        this.location = location;
-        DepartmentName = departmentName;
-        RoleName = roleName;
-        ReportsToID = reportsToID;
-        ClanName = clanName;
-        DefaultShiftID = defaultShiftID;
-        this.payPoint = payPoint;
-        EmploymentType = employmentType;
-        LockerID = lockerID;
-        PhoneNumber = phoneNumber;
-        Email = email;
-        Address = address;
-        IconName = iconName;
-        AvatarName = avatarName;
-        LicenceNumber = licenceNumber;
-        Department = department;
-        Role = role;
-        ReportsTo = reportsTo;
-        Avatar = avatar;
-        Clan = clan;
-        Icon = icon;
-        Locker = locker;
-        Licence = licence;
-        Vehicles = vehicles;
-        Shifts = shifts;
-        DepartmentsCanWorkIn = departmentsCanWorkIn;
-        Projects = projects;
-        InductionReferences = inductionReferences;
-        Rules = rules;
-        Reports = reports;
-        ShiftEntries = shiftEntries;
-        Rosters = rosters;
-        EmployeeRosters = employeeRosters;
-        ClockEvents = clockEvents;
-        TagUse = tagUse;
     }
 
     public void AssignRole(Role newRole)

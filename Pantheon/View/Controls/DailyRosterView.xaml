@@ -15,6 +15,9 @@
                 <!-- Dark Theme -->
                 <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
                 <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
+                <ResourceDictionary>
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -22,23 +25,51 @@
     <Border BorderBrush="{StaticResource  Brush01}"
             BorderThickness=".5">
         <StackPanel Orientation="Vertical">
-            <ItemsControl ItemsSource="{Binding ShiftCounter, Mode=OneTime}">
+            <ItemsControl ItemsSource="{Binding ShiftCounter, Mode=OneTime}"
+                          Visibility="{Binding DepartmentRosterVM.ShowTargets, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.Resources>
-                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockStyle}">
-                                    <Setter Property="Margin" Value="5,0"/>
-                                    <Setter Property="FontSize" Value="10"></Setter>
-                                </Style>
-                            </Grid.Resources>
-                            <TextBlock Grid.Column="0"  Text="{Binding Count, Mode=OneWay}"/>
-                            <TextBlock Grid.Column="1" Text="{Binding Shift.Name, Mode=OneTime}"/>
-                        </Grid>
+                        <Border BorderBrush="{StaticResource ForegroundBrush}"
+                                        BorderThickness=".5">
+                            <Grid MinWidth="90">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" 
+                                       Content="{Binding Shift.Name, Mode=OneTime, FallbackValue=''}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0"
+                                       FontSize="12"
+                                       FontWeight="Bold"/>
+                                <Label Grid.Column="1"
+                                       Content="{Binding Count, Mode=OneWay}"
+                                       HorizontalAlignment="Center"
+                                       Margin="0"
+                                       FontSize="12"
+                                       FontWeight="Bold"/>
+                                <Label Grid.Column="2"
+                                       Content="/"/>
+                                <TextBox Grid.Column="3" Text="{Binding Target, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                         PreviewTextInput="ShiftTarget_OnPreviewTextInput"
+                                         MinHeight="0"
+                                         Height="20"
+                                         Padding="0"
+                                         FontSize="12"
+                                         MinWidth="20"
+                                         VerticalContentAlignment="Center"
+                                         HorizontalAlignment="Center"
+                                         HorizontalContentAlignment="Center"
+                                         GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                                         LostMouseCapture="TextBox_LostMouseCapture"
+                                         LostKeyboardFocus="TextBox_LostKeyboardFocus"
+                                         LostFocus="ShiftTarget_LostFocus"
+                                         TextChanged="ShiftTarget_Changed"/>
+                            </Grid>
+                        </Border>
+
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

@@ -16,7 +16,9 @@ public class RosterDataSet
     public Dictionary<string, List<Break>> BreakDict { get; set; }
     public Dictionary<(int, DateTime), Roster> Rosters { get; set; }
     public IEnumerable<EmployeeShift> EmpShiftConnections { get; set; }
-    public Dictionary<int, List<ShiftRule>> ShiftRuleDict { get; set; }
+    public Dictionary<int, List<ShiftRuleSingle>> SingleRuleDict { get; set; }
+    public Dictionary<int, List<ShiftRuleRecurring>> RecurringRuleDict { get; set; }
+    public Dictionary<int, List<ShiftRuleRoster>> RosterRuleDict { get; set; }
     public Dictionary<Guid, List<DailyShiftCounter>> DailyShiftCounters { get; set; }
     public Dictionary<Guid, List<WeeklyShiftCounter>> WeeklyShiftCounters { get; set; }
 
@@ -30,7 +32,9 @@ public class RosterDataSet
         BreakDict = new Dictionary<string, List<Break>>();
         Rosters = new Dictionary<(int, DateTime), Roster>();
         EmpShiftConnections = new List<EmployeeShift>();
-        ShiftRuleDict = new Dictionary<int, List<ShiftRule>>();
+        SingleRuleDict = new Dictionary<int, List<ShiftRuleSingle>>();
+        RecurringRuleDict = new Dictionary<int, List<ShiftRuleRecurring>>();
+        RosterRuleDict = new Dictionary<int, List<ShiftRuleRoster>>();
         EmployeeRosters = new List<EmployeeRoster>();
         DailyRosters = new List<DailyRoster>();
         DailyShiftCounters = new Dictionary<Guid, List<DailyShiftCounter>>();
@@ -39,7 +43,8 @@ public class RosterDataSet
 
     public RosterDataSet(Department department, DateTime startDate, DateTime endDate, IEnumerable<Employee> employees,
         IEnumerable<Roster> rosters, IEnumerable<DailyRoster> dailyRosters, IEnumerable<EmployeeRoster> employeeRosters,
-        IEnumerable<Shift> shifts, IEnumerable<Break> breaks, IEnumerable<EmployeeShift> esCons, IEnumerable<ShiftRule> shiftRules,
+        IEnumerable<Shift> shifts, IEnumerable<Break> breaks, IEnumerable<EmployeeShift> esCons,
+        IEnumerable<ShiftRuleSingle> singleRules, IEnumerable<ShiftRuleRecurring> recurringRules, IEnumerable<ShiftRuleRoster> rosterRules,
         IEnumerable<DailyShiftCounter> dailyShiftCounters, IEnumerable<WeeklyShiftCounter> weeklyShiftCounters)
     {
         Department = department;
@@ -50,7 +55,12 @@ public class RosterDataSet
         BreakDict = breaks.GroupBy(b => b.ShiftID).ToDictionary(g => g.Key, g => g.ToList());
         Rosters = rosters.ToDictionary(r => (r.EmployeeID, r.Date), r => r);
         EmpShiftConnections = esCons;
-        ShiftRuleDict = shiftRules.GroupBy(r => r.EmployeeID).ToDictionary(g => g.Key, g => g.ToList());
+        SingleRuleDict = singleRules.GroupBy(rule => rule.EmployeeID)
+            .ToDictionary(group => group.Key, group => group.ToList());
+        RecurringRuleDict = recurringRules.GroupBy(rule => rule.EmployeeID)
+            .ToDictionary(group => group.Key, group => group.ToList());
+        RosterRuleDict = rosterRules.GroupBy(rule => rule.EmployeeID)
+            .ToDictionary(group => group.Key, group => group.ToList());
 
         EmployeeRosters = employeeRosters.ToList();
         DailyRosters = dailyRosters.ToList();
@@ -116,11 +126,31 @@ public class RosterDataSet
 
             if (DefaultShift is not null) employee.Shifts.Add(DefaultShift);
 
-            if (!ShiftRuleDict.TryGetValue(employee.ID, out var shiftRules)) continue;
+            if (SingleRuleDict.TryGetValue(employee.ID, out var shiftRules))
+            { 
+                employee.SingleRules = shiftRules;
+                foreach (var shiftRule in shiftRules)
+                    shiftRule.Employee = employee;
+            }
 
-            employee.Rules = shiftRules;
-            foreach (var shiftRule in shiftRules)
+            if (RecurringRuleDict.TryGetValue(employee.ID, out var recurringRules))
+            {
+                employee.RecurringRules = recurringRules;
+                foreach (var shiftRule in recurringRules)
+                    shiftRule.Employee = employee;
+            }
+
+            if (!RosterRuleDict.TryGetValue(employee.ID, out var rosterRules)) continue;
+            
+            employee.RosterRules = rosterRules;
+            foreach (var shiftRule in rosterRules)
+            {
                 shiftRule.Employee = employee;
+                if (!Shifts.TryGetValue(shiftRule.ShiftID ?? "", out var shift)) continue;
+                
+                shiftRule.Shift = shift;
+                shift.RosterRules.Add(shiftRule);
+            }
         }
     }
 
