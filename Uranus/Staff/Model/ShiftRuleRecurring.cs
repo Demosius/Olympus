@@ -15,9 +15,9 @@ public class ShiftRuleRecurring : ShiftRule
 
     public DayOfWeek DayOfWeek { get; set; }
     public int WeekRotation { get; set; }
+    public int WeekNumber { get; set; }
     public DateTime FromDate { get; set; }
     public DateTime TimeOfDay { get; set; }
-    public int WeekNumber { get; set; }
     public RecurringRuleType RuleType { get; set; }
 
     [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.RecurringRules), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]

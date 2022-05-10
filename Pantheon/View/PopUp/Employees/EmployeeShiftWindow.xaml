@@ -52,7 +52,7 @@
             </Style>
         </StackPanel.Resources>
 
-        <!--Shift Eligibility -->      
+        <!--Shift Eligibility -->
         <Label Content="Shift Eligibility:"
                FontSize="16"
                Margin="0"/>
@@ -90,8 +90,35 @@
                       SelectedValue="{Binding SelectedShiftName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
         </StackPanel>
         <Separator/>
+
         <!-- Shift Rules -->
-        
+        <StackPanel Orientation="Vertical">
+            <!-- New rule options. -->
+            <StackPanel Orientation="Horizontal">
+                <ToggleButton Content="Single Use"
+                              IsChecked="{Binding SingleCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <ToggleButton Content="Recurring"
+                              IsChecked="{Binding RecurringCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <ToggleButton Content="Set Roster"
+                              IsChecked="{Binding RosterCheck, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+
+            <!-- Single Rule Creation -->
+            <StackPanel Orientation="Vertical"
+                        ></StackPanel>
+
+            <!-- Recurring Rule Creation -->
+
+            <!-- Roster Rule Creation -->
+
+            <!-- Current rules -->
+            <!-- Use item view of some sort. -->
+            <Expander>
+                <WrapPanel Orientation="Horizontal">
+
+                </WrapPanel>
+            </Expander>
+        </StackPanel>
 
         <!-- Buttons -->
         <StackPanel Orientation="Horizontal"

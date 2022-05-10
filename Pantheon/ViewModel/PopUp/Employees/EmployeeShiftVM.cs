@@ -55,6 +55,90 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
         }
     }
 
+    private bool singleCheck;
+    public bool SingleCheck
+    {
+        get => singleCheck;
+        set
+        {
+            singleCheck = value;
+            if (singleCheck)
+            {
+                SingleRule ??= new ShiftRuleSingle();
+                RecurringCheck = false;
+                RosterCheck = false;
+            }
+            OnPropertyChanged();
+        }
+    }
+
+    private bool recurringCheck;
+    public bool RecurringCheck
+    {
+        get => recurringCheck;
+        set
+        {
+            recurringCheck = value;
+            if (recurringCheck)
+            {
+                RecurringRule ??= new ShiftRuleRecurring();
+                SingleCheck = false;
+                RosterCheck = false;
+            }
+            OnPropertyChanged();
+        }
+    }
+
+    private bool rosterCheck;
+    public bool RosterCheck
+    {
+        get => rosterCheck;
+        set
+        {
+            rosterCheck = value;
+            if (rosterCheck)
+            {
+                RosterRule ??= new ShiftRuleRoster();
+                SingleCheck = false;
+                RecurringCheck = false;
+            }
+            OnPropertyChanged();
+        }
+    }
+
+    private ShiftRuleSingle? singleRule;
+    public ShiftRuleSingle? SingleRule
+    {
+        get => singleRule;
+        set
+        {
+            singleRule = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private ShiftRuleRecurring? recurringRule;
+    public ShiftRuleRecurring? RecurringRule
+    {
+        get => recurringRule;
+        set
+        {
+            recurringRule = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private ShiftRuleRoster? rosterRule;
+    public ShiftRuleRoster? RosterRule
+    {
+        get => rosterRule;
+        set
+        {
+            rosterRule = value;
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     public Dictionary<string, Shift?> Shifts { get; set; }
