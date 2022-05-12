@@ -1,4 +1,4 @@
-﻿using Pantheon.ViewModel.Controls;
+﻿using Pantheon.ViewModel.Controls.Rosters;
 using Pantheon.ViewModel.PopUp.Rosters;
 
 namespace Pantheon.View.PopUp.Rosters

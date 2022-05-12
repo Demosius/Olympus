@@ -1,8 +1,4 @@
-﻿using Pantheon.View.PopUp.Rosters;
-using Pantheon.ViewModel.Commands;
-using Pantheon.ViewModel.Commands.Rosters;
-using Pantheon.ViewModel.Commands.Shifts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,13 +6,17 @@ using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using Pantheon.View.PopUp.Rosters;
+using Pantheon.ViewModel.Commands;
+using Pantheon.ViewModel.Commands.Rosters;
+using Pantheon.ViewModel.Commands.Shifts;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Extension;
 using Uranus.Interfaces;
 using Uranus.Staff.Model;
 
-namespace Pantheon.ViewModel.Controls;
+namespace Pantheon.ViewModel.Controls.Rosters;
 
 public enum ERosterSortOption
 {

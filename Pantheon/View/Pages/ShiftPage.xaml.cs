@@ -1,6 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using Styx;
+using System.Windows.Controls;
 using System.Windows.Input;
-using Styx;
 using Uranus;
 
 namespace Pantheon.View.Pages;

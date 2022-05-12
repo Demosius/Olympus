@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Pantheon.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Pantheon.Annotations;
 using Uranus.Staff.Model;
 
-namespace Pantheon.ViewModel.Controls;
+namespace Pantheon.ViewModel.Controls.Rosters;
 
 public class EmployeeRosterVM : INotifyPropertyChanged
 {

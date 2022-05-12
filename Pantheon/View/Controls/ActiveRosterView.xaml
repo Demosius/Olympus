@@ -4,9 +4,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:vm="clr-namespace:Pantheon.ViewModel.Controls"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:model="clr-namespace:Uranus.Staff.Model;assembly=Uranus"
+             xmlns:vm="clr-namespace:Pantheon.ViewModel.Controls.Rosters"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:RosterVM}, IsDesignTimeCreatable=False}"
              Height="90" Width="200">

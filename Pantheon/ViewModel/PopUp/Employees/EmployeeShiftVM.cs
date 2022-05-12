@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using Pantheon.Annotations;
+using Pantheon.ViewModel.Commands.Employees;
+using Pantheon.ViewModel.Controls.Shifts;
+using Pantheon.ViewModel.Pages;
+using Styx;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Pantheon.Annotations;
-using Pantheon.ViewModel.Commands;
-using Pantheon.ViewModel.Commands.Employees;
-using Pantheon.ViewModel.Pages;
-using Styx;
 using Uranus;
 using Uranus.Staff.Model;
 
@@ -30,6 +30,17 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
         {
             shiftNames = value;
             OnPropertyChanged(nameof(ShiftNames));
+        }
+    }
+
+    private ObservableCollection<Shift> shifts;
+    public ObservableCollection<Shift> Shifts
+    {
+        get => shifts;
+        set
+        {
+            shifts = value;
+            OnPropertyChanged();
         }
     }
 
@@ -64,7 +75,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
             singleCheck = value;
             if (singleCheck)
             {
-                SingleRule ??= new ShiftRuleSingle();
+                SingleRule ??= Employee is null ? new SingleRuleVM() : new SingleRuleVM(Employee);
                 RecurringCheck = false;
                 RosterCheck = false;
             }
@@ -81,7 +92,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
             recurringCheck = value;
             if (recurringCheck)
             {
-                RecurringRule ??= new ShiftRuleRecurring();
+                RecurringRule ??= Employee is null ? new RecurringRuleVM() : new RecurringRuleVM(Employee);
                 SingleCheck = false;
                 RosterCheck = false;
             }
@@ -98,7 +109,15 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
             rosterCheck = value;
             if (rosterCheck)
             {
-                RosterRule ??= new ShiftRuleRoster();
+                if (RosterRule is null)
+                {
+                    if (Employee is null)
+                        RosterRule = new RosterRuleVM();
+                    else if (RosterRules.Count == 0)
+                        RosterRule = new RosterRuleVM(Employee);
+                    else
+                        RosterRule = new RosterRuleVM(Employee, RosterRules.First());
+                }
                 SingleCheck = false;
                 RecurringCheck = false;
             }
@@ -106,8 +125,8 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
         }
     }
 
-    private ShiftRuleSingle? singleRule;
-    public ShiftRuleSingle? SingleRule
+    private SingleRuleVM? singleRule;
+    public SingleRuleVM? SingleRule
     {
         get => singleRule;
         set
@@ -117,8 +136,8 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
         }
     }
 
-    private ShiftRuleRecurring? recurringRule;
-    public ShiftRuleRecurring? RecurringRule
+    private RecurringRuleVM? recurringRule;
+    public RecurringRuleVM? RecurringRule
     {
         get => recurringRule;
         set
@@ -128,8 +147,8 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
         }
     }
 
-    private ShiftRuleRoster? rosterRule;
-    public ShiftRuleRoster? RosterRule
+    private RosterRuleVM? rosterRule;
+    public RosterRuleVM? RosterRule
     {
         get => rosterRule;
         set
@@ -139,20 +158,50 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
         }
     }
 
+    public ObservableCollection<ShiftRuleSingle> SingleRules { get; set; }
+    public ObservableCollection<ShiftRuleRecurring> RecurringRules { get; set; }
+    public ObservableCollection<ShiftRuleRoster> RosterRules { get; set; }
+
+    private ShiftRule? selectedRule;
+    public ShiftRule? SelectedRule
+    {
+        get => selectedRule;
+        set
+        {
+            selectedRule = value;
+            OnPropertyChanged();
+        }
+    }
+    
+
     #endregion
 
-    public Dictionary<string, Shift?> Shifts { get; set; }
+    public Dictionary<string, Shift?> ShiftDict { get; set; }
+
+    #region Commands
 
     public ConfirmShiftAdjustmentsCommand ConfirmShiftAdjustmentsCommand { get; set; }
+    public AddSingleRuleCommand AddSingleRuleCommand { get; set; }
+    public AddRecurringRuleCommand AddRecurringRuleCommand { get; set; }
+    public AddRosterRuleCommand AddRosterRuleCommand { get; set; }
+
+    #endregion
 
     public EmployeeShiftVM()
     {
         shiftNames = new ObservableCollection<string>();
         empShifts = new ObservableCollection<EmployeeShift>();
-        Shifts = new Dictionary<string, Shift?>();
+        shifts = new ObservableCollection<Shift>();
+        ShiftDict = new Dictionary<string, Shift?>();
         selectedShiftName = string.Empty;
+        SingleRules = new ObservableCollection<ShiftRuleSingle>();
+        RecurringRules = new ObservableCollection<ShiftRuleRecurring>();
+        RosterRules = new ObservableCollection<ShiftRuleRoster>();
 
         ConfirmShiftAdjustmentsCommand = new ConfirmShiftAdjustmentsCommand(this);
+        AddSingleRuleCommand = new AddSingleRuleCommand(this);
+        AddRecurringRuleCommand = new AddRecurringRuleCommand(this);
+        AddRosterRuleCommand = new AddRosterRuleCommand(this);
     }
 
     public void SetData(EmployeePageVM employeePageVM, Employee employee)
@@ -166,20 +215,30 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
 
         Employee.DepartmentName = Employee.Department?.Name ?? Employee.DepartmentName;
 
+        SingleRules.Clear();
+        RecurringRules.Clear();
+        RosterRules.Clear();
+
+        foreach (var ruleSingle in Employee.SingleRules) SingleRules.Add(ruleSingle);
+        foreach (var ruleRecurring in Employee.RecurringRules) RecurringRules.Add(ruleRecurring);
+        foreach (var ruleRoster in Employee.RosterRules) RosterRules.Add(ruleRoster);
+
         // We will require a basic list of shifts, and a dictionary where the Key by ID is preserved.
         var shiftList = ParentVM.EmployeeDataSet.Shifts.Values.Where(s => s.DepartmentName == Employee.DepartmentName).ToList();
-        var shiftDict = shiftList.ToDictionary(s => s.ID, s => s); 
+        var shiftDict = shiftList.ToDictionary(s => s.ID, s => s);
 
-        Shifts = shiftList.ToDictionary(s => s.Name, s => s)!;
-        Shifts.Add("<-- No Default -->", null);
+        Shifts = new ObservableCollection<Shift>(shiftList);
 
-        ShiftNames = new ObservableCollection<string>(Shifts.Keys);
+        ShiftDict = shiftList.ToDictionary(s => s.Name, s => s)!;
+        ShiftDict.Add("<-- No Default -->", null);
+
+        ShiftNames = new ObservableCollection<string>(ShiftDict.Keys);
 
         if (Employee.DefaultShift is null)
             if (shiftDict.TryGetValue(Employee.DefaultShiftID, out var shift))
                 Employee.DefaultShift = shift;
 
-        SelectedShiftName = Shifts.TryGetValue(Employee.DefaultShift?.Name ?? "", out _)
+        SelectedShiftName = ShiftDict.TryGetValue(Employee.DefaultShift?.Name ?? "", out _)
             ? Employee.DefaultShift?.Name ?? ""
             : "<-- No Default -->";
 
@@ -197,7 +256,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
 
         // Create remaining potential shift connections.
         var currentConnections = empShifts.Select(es => es.ShiftID);
-        foreach (var shift in Shifts.Values.Where(s => s is not null && !currentConnections.Contains(s.ID)))
+        foreach (var shift in ShiftDict.Values.Where(s => s is not null && !currentConnections.Contains(s.ID)))
         {
             var newConn = new EmployeeShift(Employee, shift!);
             EmpShifts.Add(newConn);
@@ -210,13 +269,40 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
 
         Helios.StaffUpdater.EmployeeToShiftConnections(EmpShifts);
 
-        if (Employee.DefaultShift != Shifts[SelectedShiftName])
+        if (Employee.DefaultShift != ShiftDict[SelectedShiftName])
         {
-            var shift = Shifts[SelectedShiftName];
+            var shift = ShiftDict[SelectedShiftName];
             Employee.DefaultShift = shift;
             Employee.DefaultShiftID = shift?.ID ?? "";
             Helios.StaffUpdater.Employee(Employee);
         }
+    }
+
+    public void AddSingleRule()
+    {
+        if (Helios is null || Charon is null || Employee is null || SingleRule is null || !SingleRule.IsValid()) return;
+        SingleRules.Add(SingleRule.ShiftRule);
+        Employee.SingleRules.Add(SingleRule.ShiftRule);
+        SingleRule = new SingleRuleVM(Employee);
+        Helios.StaffCreator.ShiftRuleSingle(SingleRule.ShiftRule);
+    }
+
+    public void AddRecurringRule()
+    {
+        if (Helios is null || Charon is null || Employee is null || RecurringRule is null || !RecurringRule.IsValid()) return;
+        RecurringRules.Add(RecurringRule.ShiftRule);
+        Employee.RecurringRules.Add(RecurringRule.ShiftRule);
+        RecurringRule = new RecurringRuleVM(Employee);
+        Helios.StaffCreator.ShiftRuleRecurring(RecurringRule.ShiftRule);
+    }
+
+    public void AddRosterRule()
+    {
+        if (Helios is null || Charon is null || Employee is null || RosterRule is null || !RosterRule.IsValid()) return;
+        RosterRules.Add(RosterRule.ShiftRule);
+        Employee.RosterRules.Add(RosterRule.ShiftRule);
+        RosterRule = new RosterRuleVM(Employee, RosterRules.First());
+        Helios.StaffCreator.ShiftRuleRoster(RosterRule.ShiftRule);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

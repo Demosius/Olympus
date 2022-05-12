@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Pantheon.ViewModel.PopUp.Rosters;
+using System;
 using System.Windows;
 using System.Windows.Input;
-using Pantheon.ViewModel.PopUp.Rosters;
 
-namespace Pantheon.ViewModel.Commands;
+namespace Pantheon.ViewModel.Commands.Rosters;
 
 internal class ConfirmDepartmentRosterCreationCommand : ICommand
 {

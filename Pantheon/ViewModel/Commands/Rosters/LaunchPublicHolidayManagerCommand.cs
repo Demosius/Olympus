@@ -1,4 +1,4 @@
-﻿using Pantheon.ViewModel.Controls;
+﻿using Pantheon.ViewModel.Controls.Rosters;
 using System;
 using System.Windows.Input;
 

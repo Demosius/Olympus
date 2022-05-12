@@ -24,4 +24,9 @@ public class ShiftRule
         EmployeeID = employeeID;
         Description = description;
     }
+
+    public override string ToString()
+    {
+        return Description;
+    }
 }

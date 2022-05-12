@@ -2,7 +2,7 @@
 using System;
 using System.Windows.Input;
 
-namespace Pantheon.ViewModel.Commands;
+namespace Pantheon.ViewModel.Commands.Rosters;
 
 public class NewRosterCommand : ICommand
 {

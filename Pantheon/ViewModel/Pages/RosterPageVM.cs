@@ -1,8 +1,8 @@
 ﻿using Microsoft.Win32;
 using Pantheon.Properties;
 using Pantheon.View.PopUp.Rosters;
-using Pantheon.ViewModel.Commands;
-using Pantheon.ViewModel.Controls;
+using Pantheon.ViewModel.Commands.Rosters;
+using Pantheon.ViewModel.Controls.Rosters;
 using Pantheon.ViewModel.Utility;
 using Serilog;
 using Styx;

@@ -21,6 +21,9 @@ public class EmployeeDataSet
     public IEnumerable<string> Locations { get; set; }
     public IEnumerable<string> PayPoints { get; set; }
     public IEnumerable<Employee> Managers { get; set; }
+    public Dictionary<int, List<ShiftRuleSingle>> SingleRuleDict { get; set; }
+    public Dictionary<int, List<ShiftRuleRecurring>> RecurringRuleDict { get; set; }
+    public Dictionary<int, List<ShiftRuleRoster>> RosterRuleDict { get; set; }
 
     public EmployeeDataSet()
     {
@@ -36,11 +39,15 @@ public class EmployeeDataSet
         Locations = new List<string>();
         PayPoints = new List<string>();
         Managers = new List<Employee>();
+        SingleRuleDict = new Dictionary<int, List<ShiftRuleSingle>>();
+        RecurringRuleDict = new Dictionary<int, List<ShiftRuleRecurring>>();
+        RosterRuleDict = new Dictionary<int, List<ShiftRuleRoster>>();
     }
 
     public EmployeeDataSet(IEnumerable<Employee> employees, IEnumerable<Department> departments, IEnumerable<DepartmentRoster> departmentRosters,
         IEnumerable<Clan> clans, IEnumerable<Role> roles, IEnumerable<EmployeeIcon> icons, IEnumerable<EmployeeAvatar> avatars,
-        IEnumerable<Shift> shifts, IEnumerable<Break> breaks)
+        IEnumerable<Shift> shifts, IEnumerable<Break> breaks,
+        IEnumerable<ShiftRuleSingle> singleRules, IEnumerable<ShiftRuleRecurring> recurringRules, IEnumerable<ShiftRuleRoster> rosterRules)
     {
         var empList = employees.ToList();
         Employees = empList.ToDictionary(e => e.ID, e => e);
@@ -60,27 +67,14 @@ public class EmployeeDataSet
         BreakDict = breaks
             .GroupBy(b => b.ShiftID)
             .ToDictionary(g => g.Key, b => b.ToList());
-        SetRelationships();
-    }
 
-    public EmployeeDataSet(Dictionary<int, Employee> employees, Dictionary<string, Department> departments,
-        Dictionary<string, List<DepartmentRoster>> departmentRosters, Dictionary<string, Clan> clans, Dictionary<string, Role> roles,
-        Dictionary<string, EmployeeIcon> employeeIcons, Dictionary<string, EmployeeAvatar> employeeAvatars,
-        Dictionary<string, Shift> shifts, Dictionary<string, List<Break>> breakDict)
-    {
-        Employees = employees;
-        Departments = departments;
-        DepartmentRosters = departmentRosters;
-        Clans = clans;
-        Roles = roles;
-        EmployeeIcons = employeeIcons;
-        EmployeeAvatars = employeeAvatars;
-        Locations = employees.Select(e => e.Value.Location).Distinct();
-        PayPoints = employees.Select(e => e.Value.PayPoint).Distinct();
-        Managers = Employees.Values.Where(e =>
-            employees.Select(emp => emp.Value.ReportsToID).Distinct().Contains(e.ID));
-        Shifts = shifts;
-        BreakDict = breakDict;
+        SingleRuleDict = singleRules.GroupBy(r => r.EmployeeID)
+            .ToDictionary(g => g.Key, g => g.ToList());
+        RecurringRuleDict = recurringRules.GroupBy(r => r.EmployeeID)
+            .ToDictionary(g => g.Key, g => g.ToList());
+        RosterRuleDict = rosterRules.GroupBy(r => r.EmployeeID)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
         SetRelationships();
     }
 
@@ -183,6 +177,24 @@ public class EmployeeDataSet
             {
                 employee.DefaultShift = shift;
                 shift.DefaultEmployees.Add(employee);
+            }
+
+            if (SingleRuleDict.TryGetValue(employee.ID, out var singleRules))
+            {
+                employee.SingleRules = singleRules;
+                foreach (var rule in singleRules) rule.Employee = employee;
+            }
+
+            if (RecurringRuleDict.TryGetValue(employee.ID, out var recurringRules))
+            {
+                employee.RecurringRules = recurringRules;
+                foreach (var rule in recurringRules) rule.Employee = employee;
+            }
+
+            if (RosterRuleDict.TryGetValue(employee.ID, out var rosterRules))
+            {
+                employee.RosterRules = rosterRules;
+                foreach (var rule in rosterRules) rule.Employee = employee;
             }
         }
     }

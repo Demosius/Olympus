@@ -4,11 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Pantheon.View.Controls"
-             xmlns:vm="clr-namespace:Pantheon.ViewModel.Controls"
-             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-             xmlns:model="clr-namespace:Uranus.Staff.Model;assembly=Uranus"
+             xmlns:rosters="clr-namespace:Pantheon.ViewModel.Controls.Rosters"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance {x:Type vm:EmployeeRosterVM}, IsDesignTimeCreatable=False}">
+             d:DataContext="{d:DesignInstance {x:Type rosters:EmployeeRosterVM}, IsDesignTimeCreatable=False}">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -28,15 +26,6 @@
                 Width="230"
                 Height="40">
             <Canvas>
-                <Canvas.Resources>
-                    <ObjectDataProvider x:Key="RosterTypes"
-                                        MethodName="GetValues" 
-                                        ObjectType="{x:Type sys:Enum}">
-                        <ObjectDataProvider.MethodParameters>
-                            <x:Type TypeName="model:ERosterType"/>
-                        </ObjectDataProvider.MethodParameters>
-                    </ObjectDataProvider>
-                </Canvas.Resources> 
 
                 <Border Canvas.Top="5" Canvas.Left="5"
                         BorderBrush="{StaticResource ForegroundBrush}" BorderThickness=".5">

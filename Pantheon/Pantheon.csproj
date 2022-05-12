@@ -107,6 +107,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="ViewModel\Controls\Employees\" />
     <Folder Include="ViewModel\Pages\Employees\" />
     <Folder Include="ViewModel\Pages\Rosters\" />
     <Folder Include="ViewModel\Pages\Shifts\" />

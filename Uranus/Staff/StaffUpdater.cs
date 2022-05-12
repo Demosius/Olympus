@@ -303,4 +303,6 @@ public class StaffUpdater
     /// <param name="employeeID"></param>
     /// <returns>True if successful.</returns>
     public bool DeactivateUser(int employeeID) => Chariot.Database?.Execute("UPDATE Employee SET IsUser = false WHERE ID = ?;", employeeID) > 0;
+
+    public int ShiftRuleSingle(ShiftRuleSingle singleRuleShiftRule) => Chariot.Update(singleRuleShiftRule);
 }

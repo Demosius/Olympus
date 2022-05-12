@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Pantheon.ViewModel.Pages;
+using System;
 using System.Windows.Input;
-using Pantheon.ViewModel.Pages;
 
-namespace Pantheon.ViewModel.Commands;
+namespace Pantheon.ViewModel.Commands.Rosters;
 
 public class LoadRosterCommand : ICommand
 {
     public RosterPageVM VM { get; set; }
 
-    public LoadRosterCommand(RosterPageVM vm ) { VM = vm; }
+    public LoadRosterCommand(RosterPageVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {

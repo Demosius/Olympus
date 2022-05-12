@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Pantheon.Annotations;
+using Pantheon.ViewModel.Commands.Rosters;
+using Styx;
+using System;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using Pantheon.Annotations;
-using Pantheon.ViewModel.Commands;
-using Styx;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Extension;
@@ -103,7 +103,7 @@ internal class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
     public void RefreshData()
     {
         if (Department is null) throw new DataException("Department not set in RosterCreation.");
-        
+
         if (Department.DepartmentRosters.Any())
             StartDate = Department.DepartmentRosters.Select(dr => dr.StartDate).Max().AddDays(7);
     }
@@ -114,7 +114,7 @@ internal class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
         if (Department is null) throw new DataException("Department not set in RosterCreation.");
 
         Roster = new DepartmentRoster(RosterName, StartDate, UseSaturdays, UseSundays, Department);
-        
+
         // Check name.
         //if (Helios.StaffReader.RosterNameExists(RosterName, Department.Name))
         if (Department.DepartmentRosters.Select(r => r.Name).Contains(RosterName))

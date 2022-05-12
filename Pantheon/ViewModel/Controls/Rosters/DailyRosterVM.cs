@@ -1,11 +1,11 @@
-﻿using Pantheon.Annotations;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Pantheon.Annotations;
 using Uranus.Staff.Model;
 
-namespace Pantheon.ViewModel.Controls;
+namespace Pantheon.ViewModel.Controls.Rosters;
 
 public class DailyRosterVM : INotifyPropertyChanged
 {

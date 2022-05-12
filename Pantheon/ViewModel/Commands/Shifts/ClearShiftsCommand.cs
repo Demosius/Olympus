@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Pantheon.ViewModel.Controls.Rosters;
+using System;
 using System.Windows.Input;
-using Pantheon.ViewModel.Controls;
 
 namespace Pantheon.ViewModel.Commands.Shifts;
 

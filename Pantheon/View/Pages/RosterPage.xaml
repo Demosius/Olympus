@@ -37,7 +37,7 @@
             </Style>
             <Style TargetType="{x:Type DatePicker}">
                 <Setter Property="Margin" Value="5,0"/>
-                <Setter Property="FontSize" Value="14"></Setter>
+                <Setter Property="FontSize" Value="14" />
                 <Setter Property="MinHeight" Value="0"/>
                 <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
@@ -88,7 +88,7 @@
         <!-- Department Roster UI -->
         <controls:DepartmentRosterView DataContext="{Binding LoadedRoster}"
                                        Visibility="{Binding ElementName=VM, Path=IsLoaded, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-        
+
 
     </DockPanel>
 </Page>

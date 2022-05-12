@@ -1,9 +1,8 @@
 ﻿using Pantheon.Annotations;
-using Pantheon.ViewModel.Pages;
+using Pantheon.ViewModel.Commands.Rosters;
+using Pantheon.ViewModel.Controls.Rosters;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Pantheon.ViewModel.Commands.Rosters;
-using Pantheon.ViewModel.Controls;
 
 namespace Pantheon.ViewModel.PopUp.Rosters;
 

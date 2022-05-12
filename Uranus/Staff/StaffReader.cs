@@ -159,7 +159,11 @@ public class StaffReader
                 var avatars = EmployeeAvatars();
                 var shifts = Chariot.PullObjectList<Shift>();
                 var breaks = Chariot.PullObjectList<Break>();
-                data = new EmployeeDataSet(employees, departments, departmentRosters, clans, roles, icons, avatars, shifts, breaks);
+                var singleRules = Chariot.PullObjectList<ShiftRuleSingle>();
+                var recurringRules = Chariot.PullObjectList<ShiftRuleRecurring>();
+                var rosterRules = Chariot.PullObjectList<ShiftRuleRoster>();
+                data = new EmployeeDataSet(employees, departments, departmentRosters, clans, roles, icons, avatars,
+                    shifts, breaks, singleRules, recurringRules, rosterRules);
             });
             if (data is not null) return data;
         }

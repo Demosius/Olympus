@@ -4,8 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:Pantheon.ViewModel"
-        xmlns:employees="clr-namespace:Pantheon.ViewModel.PopUp.Employees"
+        xmlns:vm="clr-namespace:Pantheon.ViewModel.PopUp.Employees"
         mc:Ignorable="d"
         Title="Create Clan" 
         SizeToContent="WidthAndHeight"
@@ -14,7 +13,7 @@
         Foreground="{StaticResource LightForegroundBrush}">
 
     <Window.DataContext>
-        <employees:ClanCreationVM x:Name="VM"/>
+        <vm:ClanCreationVM x:Name="VM"/>
     </Window.DataContext>
 
     <Window.Resources>
@@ -36,7 +35,7 @@
                 <Setter Property="Margin" Value="5"/>
                 <Setter Property="IsEditable" Value="True"/>
                 <Setter Property="MinWidth" Value="200"/>
-                <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                <Setter Property="VerticalAlignment" Value="Center" />
             </Style>
             <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
                 <Setter Property="VerticalAlignment" Value="Bottom"/>

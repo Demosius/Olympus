@@ -181,4 +181,13 @@ public class StaffCreator
     public void Break(Break @break) => Chariot.Create(@break);
 
     public void DepartmentRoster(DepartmentRoster roster) => Chariot.Create(roster);
+
+    public void ShiftRuleSingle(ShiftRuleSingle shiftRule, EPushType pushType = EPushType.ObjectOnly) =>
+        Chariot.Create(shiftRule, pushType);
+
+    public void ShiftRuleRecurring(ShiftRuleRecurring shiftRule, EPushType pushType = EPushType.ObjectOnly) =>
+        Chariot.Create(shiftRule, pushType);
+
+    public void ShiftRuleRoster(ShiftRuleRoster shiftRule, EPushType pushType = EPushType.ObjectOnly) =>
+        Chariot.Create(shiftRule, pushType);
 }
