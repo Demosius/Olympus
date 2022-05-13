@@ -10,6 +10,11 @@ public class SingleRuleVM : INotifyPropertyChanged
 {
     public ShiftRuleSingle ShiftRule { get; set; }
 
+    public bool InEdit { get; set; }
+    public bool IsNew => !InEdit;
+
+    public ShiftRuleSingle? Original { get; set; }
+
     #region INotifyPropertyChanged Memebers
 
     public string Description
@@ -113,6 +118,13 @@ public class SingleRuleVM : INotifyPropertyChanged
     public SingleRuleVM(Employee employee)
     {
         ShiftRule = new ShiftRuleSingle(employee);
+    }
+
+    public SingleRuleVM(ShiftRuleSingle singleRule)
+    {
+        InEdit = true;
+        Original = singleRule;
+        ShiftRule = singleRule.Copy();
     }
 
     public bool IsValid()

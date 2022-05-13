@@ -1,8 +1,8 @@
-﻿using SQLiteNetExtensions.Attributes;
+﻿using SQLite;
+using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SQLite;
 
 namespace Uranus.Staff.Model;
 
@@ -24,21 +24,41 @@ public class ShiftRuleRoster : ShiftRule
     // If using rotation.
     public DateTime? FromDate { get; set; }
     public int? WeekRotation { get; set; }
-    [TextBlob(nameof(WeekNumbersBlob))]
-    public List<int>? WeekNumbers { get; set; }
-    public string? WeekNumbersBlob { get; set; }
+    public string WeekNumbers { get; set; }
 
     [ManyToOne(nameof(ShiftID), nameof(Model.Shift.RosterRules), CascadeOperations = CascadeOperation.None)]
     public Shift? Shift { get; set; }
     [ManyToOne(nameof(EmployeeID), nameof(Model.Employee.RosterRules), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Employee? Employee { get; set; }
 
-    [Ignore] public string Summary => $"{MinDays} - {MaxDays} every {WeekNumbersBlob ?? "1"} of {WeekRotation ?? 1} week(s).";
+    [Ignore]
+    public List<int> WeekNumberList
+    {
+        get => WeekNumbers == "" ? new List<int>() : WeekNumbers.Split(",").Select(int.Parse).ToList();
+        set
+        {
+            value.Sort();
+            WeekNumbers = string.Join(",", value);
+        }
+    }
+
+    [Ignore]
+    public string Summary => $"{(Rotation ? RotationString : "Roster: " )}{DayString}";
+
+    private string RotationString =>
+        $"Roster for week{(WeekNumberList.Count > 1 ? "s" : "")}: {WeekNumbers} on {WeekRotation} week rotation.\n";
+
+    private string DayString =>
+        $"(({MinDays}-{MaxDays} Days: M:{AtStr(Monday)} T:{AtStr(Tuesday)} W:{AtStr(Wednesday)} Th:{AtStr(Thursday)} F:{AtStr(Friday)} Sa:{AtStr(Saturday)} Su{AtStr(Sunday)}))";
+
+    private static string AtStr(bool? b) => b is null ? "-" : (bool)b ? "✔" : "❌";
+    
 
     public ShiftRuleRoster()
     {
         Sunday = false;
         Saturday = false;
+        WeekNumbers = string.Empty;
     }
 
     public ShiftRuleRoster(Employee employee) : this()
@@ -68,6 +88,32 @@ public class ShiftRuleRoster : ShiftRule
            Rotation && other.Rotation &&
            WeekRotation == other.WeekRotation && WeekRotation > 1 &&
            FromDate == other.FromDate &&
-           WeekNumbers is not null && other.WeekNumbers is not null &&
+           /*WeekNumbers is not null && other.WeekNumbers is not null &&*/
            !WeekNumbers.Intersect(other.WeekNumbers).Any();
+
+    public ShiftRuleRoster Copy()
+    {
+        return new ShiftRuleRoster
+        {
+            Employee = Employee,
+            Rotation = Rotation,
+            FromDate = FromDate,
+            WeekRotation = WeekRotation,
+            WeekNumbers = WeekNumbers,
+            ShiftID = ShiftID,
+            Shift = Shift,
+            Monday = Monday,
+            Tuesday = Tuesday,
+            Wednesday = Wednesday,
+            Thursday = Thursday,
+            Friday = Friday,
+            Saturday = Saturday,
+            Sunday = Sunday,
+            MinDays = MinDays,
+            MaxDays = MaxDays,
+            ID = ID,
+            EmployeeID = EmployeeID,
+            Description = Description
+        };
+    }
 }

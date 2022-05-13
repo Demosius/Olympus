@@ -13,6 +13,11 @@ public class RecurringRuleVM : INotifyPropertyChanged
 {
     public ShiftRuleRecurring ShiftRule { get; set; }
 
+    public bool InEdit { get; set; }
+    public bool IsNew => !InEdit;
+
+    public ShiftRuleRecurring? Original { get; set; }
+
     private readonly Regex clearRex = new("[^0-9,]+");
 
     #region INotifyPropertyChange Members
@@ -49,13 +54,13 @@ public class RecurringRuleVM : INotifyPropertyChanged
             ShiftRule.WeekRotation = (int)value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(UseDate));
-            WeekNumbersText = string.Join(", ", ShiftRule.WeekNumbers ?? new List<int>());
+            WeekNumbersText = string.Join(", ", ShiftRule.WeekNumberList ?? new List<int>());
         }
     }
 
     public string WeekNumbersText
     {
-        get => string.Join(", ", ShiftRule.WeekNumbers ?? new List<int>());
+        get => string.Join(", ", ShiftRule.WeekNumberList ?? new List<int>());
         set
         {
             var clean = clearRex.Replace(value, "");
@@ -64,7 +69,7 @@ public class RecurringRuleVM : INotifyPropertyChanged
             var days = stringArray.Select(int.Parse).Where(x => x <= ShiftRule.WeekRotation).ToList();
             days.Sort();
             if (days.Count == 0) days.Add(1);
-            ShiftRule.WeekNumbers = days;
+            ShiftRule.WeekNumberList = days;
             OnPropertyChanged();
         }
     }
@@ -143,6 +148,13 @@ public class RecurringRuleVM : INotifyPropertyChanged
     public RecurringRuleVM(Employee employee)
     {
         ShiftRule = new ShiftRuleRecurring(employee);
+    }
+
+    public RecurringRuleVM(ShiftRuleRecurring recurringRule)
+    {
+        InEdit = true;
+        Original = recurringRule;
+        ShiftRule = recurringRule.Copy();
     }
 
     public bool IsValid()

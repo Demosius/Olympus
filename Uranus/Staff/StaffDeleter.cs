@@ -97,4 +97,10 @@ public class StaffDeleter
         });
         return lines;
     }
+
+    public bool SingleRule(ShiftRuleSingle single) => Chariot.Delete(single);
+
+    public bool RecurringRule(ShiftRuleRecurring recurring) => Chariot.Delete(recurring);
+
+    public bool RosterRule(ShiftRuleRoster roster) => Chariot.Delete(roster);
 }

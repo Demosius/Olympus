@@ -5,15 +5,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Pantheon.ViewModel.PopUp.Employees"
+        xmlns:converter="clr-namespace:Pantheon.ViewModel.Converter"
         xmlns:model="clr-namespace:Uranus.Staff.Model;assembly=Uranus"
         xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d"
         Title="Shift Management" 
-        SizeToContent="WidthAndHeight"
+        SizeToContent="Height"
+        Width="415"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
         Foreground="{StaticResource LightForegroundBrush}"
-        FocusManager.FocusedElement="{Binding ElementName=IDBox}">
+        FocusManager.FocusedElement="{Binding ElementName=IDBox}"
+        ResizeMode="NoResize">
 
     <Window.DataContext>
         <vm:EmployeeShiftVM x:Name="VM"/>
@@ -89,6 +92,8 @@
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converter:EditBoolToLabelConverter x:Key="EditBoolConverter"/>
+            <converter:NBoolToAttendanceStringConverter x:Key="AttendanceStringConverter"/>
         </StackPanel.Resources>
 
         <!--Shift Eligibility -->
@@ -98,23 +103,28 @@
         <ItemsControl ItemsSource="{Binding EmpShifts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal"/>
+                    <WrapPanel Orientation="Horizontal"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Border BorderBrush="{StaticResource ForegroundBrush}"
                             BorderThickness="1">
-                        <StackPanel Orientation="Vertical" 
-                                    Width="135">
-                            <Label Content="{Binding Shift.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                                   HorizontalAlignment="Center"
-                                   Margin="0"
+                        <Grid >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0"
+                                      IsChecked="{Binding Active, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      HorizontalAlignment="Center"/>
+                            <Label Grid.Column="1"
+                                   Content="{Binding Shift.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                                   HorizontalAlignment="Left"
+                                   Margin="0,0,15,0"
                                    FontSize="16"
                                    FontWeight="Bold"/>
-                            <CheckBox IsChecked="{Binding Active, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      HorizontalAlignment="Center"/>
-                        </StackPanel>
+                        </Grid>
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
@@ -142,7 +152,7 @@
                     <Setter Property="HorizontalAlignment" Value="Left"/>
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                     <Setter Property="Margin" Value="5,2"/>
-                    <Setter Property="MinWidth" Value="130"/>
+                    <Setter Property="Width" Value="130"/>
                 </Style>
                 <Style TargetType="{x:Type DatePicker}">
                     <Setter Property="Margin" Value="5,2"/>
@@ -185,7 +195,7 @@
                   Visibility="{Binding ElementName=VM, Path=SingleCheck, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
@@ -226,8 +236,15 @@
                          Text="{Binding TimeString, Mode=TwoWay, UpdateSourceTrigger=LostFocus, FallbackValue=''}"
                          Visibility="{Binding UseTime, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                <Button Grid.Row="4" Grid.Column="1" Content="Add"
-                        Command="{Binding ElementName=VM, Path=AddSingleRuleCommand}"/>
+                <StackPanel Grid.Row="4" Grid.Column="1" 
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <Button Content="Cancel"
+                            Command="{Binding ElementName=VM, Path=CancelSingleRuleEditCommand}"
+                            Visibility="{Binding InEdit, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <Button Content="{Binding InEdit, Mode=OneWay, Converter={StaticResource EditBoolConverter}}"
+                            Command="{Binding ElementName=VM, Path=AddSingleRuleCommand}"/>
+                </StackPanel>
             </Grid>
 
             <!-- Recurring Rule Creation -->
@@ -235,7 +252,7 @@
                   Visibility="{Binding ElementName=VM, Path=RecurringCheck, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
@@ -276,6 +293,7 @@
                        Content="Start Date: "
                        Visibility="{Binding ElementName=DateStartPicker, Path=Visibility}"/>
                 <DatePicker Grid.Row="4" Grid.Column="1" x:Name="DateStartPicker"
+                            HorizontalAlignment="Left"
                             SelectedDate="{Binding FromDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             Visibility="{Binding UseDate, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
@@ -299,8 +317,15 @@
                           SelectedValue="{Binding Shift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Visibility="{Binding UseShift, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-                <Button Grid.Row="8" Grid.Column="1" Content="Add"
-                        Command="{Binding ElementName=VM, Path=AddRecurringRuleCommand}"/>
+                <StackPanel Grid.Row="8" Grid.Column="1" 
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <Button Content="Cancel"
+                            Command="{Binding ElementName=VM, Path=CancelRecurringRuleEditCommand}"
+                            Visibility="{Binding InEdit, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <Button Content="{Binding InEdit, Mode=OneWay, Converter={StaticResource EditBoolConverter}}"
+                            Command="{Binding ElementName=VM, Path=AddRecurringRuleCommand}"/>
+                </StackPanel>
             </Grid>
 
             <!-- Roster Rule Creation -->
@@ -308,7 +333,7 @@
                         Visibility="{Binding ElementName=VM, Path=RosterCheck, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <Grid.RowDefinitions>
@@ -333,47 +358,95 @@
                        Content="Description: "/>
                 <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
 
-                <Label Grid.Row="1" Grid.Column="0" 
-                       Content="Monday: "/>
-                <CheckBox Grid.Row="1" Grid.Column="1"
-                          IsThreeState="True"
-                          IsChecked="{Binding Monday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                <Label Grid.Row="2" Grid.Column="0" 
-                       Content="Tuesday: "/>
-                <CheckBox Grid.Row="2" Grid.Column="1"
-                          IsThreeState="True"
-                          IsChecked="{Binding Tuesday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Grid.Resources>
+                        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                        </Style>
+                    </Grid.Resources>
 
-                <Label Grid.Row="3" Grid.Column="0" 
-                       Content="Wednesday: "/>
-                <CheckBox Grid.Row="3" Grid.Column="1"
-                          IsThreeState="True"
-                          IsChecked="{Binding Wednesday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Label Grid.Row="0" Grid.Column="0"  
+                           Content="Monday: "/>
+                    <CheckBox Grid.Row="0" Grid.Column="1"  
+                              IsThreeState="True"
+                              IsChecked="{Binding Monday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="0" Grid.Column="2"  
+                               Text="{Binding Monday, Mode=OneWay, Converter={StaticResource AttendanceStringConverter}}"
+                               VerticalAlignment="Center"/>
 
-                <Label Grid.Row="4" Grid.Column="0" 
-                       Content="Thursday: "/>
-                <CheckBox Grid.Row="4" Grid.Column="1"
-                          IsThreeState="True"
-                          IsChecked="{Binding Thursday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Label Grid.Row="0" Grid.Column="3"  
+                           Content="Tuesday: "/>
+                    <CheckBox Grid.Row="0" Grid.Column="4" 
+                              IsThreeState="True"
+                              IsChecked="{Binding Tuesday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="0" Grid.Column="5"  
+                               Text="{Binding Tuesday, Mode=OneWay, Converter={StaticResource AttendanceStringConverter}}"
+                               VerticalAlignment="Center"/>
 
-                <Label Grid.Row="5" Grid.Column="0" 
-                       Content="Friday: "/>
-                <CheckBox Grid.Row="5" Grid.Column="1"
-                          IsThreeState="True"
-                          IsChecked="{Binding Friday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Label Grid.Row="1" Grid.Column="0"  
+                           Content="Wednesday: "/>
+                    <CheckBox Grid.Row="1" Grid.Column="1"  
+                              IsThreeState="True"
+                              IsChecked="{Binding Wednesday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="2"  
+                               Text="{Binding Wednesday, Mode=OneWay, Converter={StaticResource AttendanceStringConverter}}"
+                               VerticalAlignment="Center"/>
 
-                <Label Grid.Row="6" Grid.Column="0" 
-                       Content="Saturday: "/>
-                <CheckBox Grid.Row="6" Grid.Column="1"
-                          IsThreeState="True"
-                          IsChecked="{Binding Saturday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Label Grid.Row="1" Grid.Column="3"  
+                           Content="Thursday: "/>
+                    <CheckBox Grid.Row="1" Grid.Column="4"  
+                              IsThreeState="True"
+                              IsChecked="{Binding Thursday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="5"  
+                               Text="{Binding Thursday, Mode=OneWay, Converter={StaticResource AttendanceStringConverter}}"
+                               VerticalAlignment="Center"/>
 
-                <Label Grid.Row="7" Grid.Column="0" 
-                       Content="Sunday: "/>
-                <CheckBox Grid.Row="7" Grid.Column="1"
-                          IsThreeState="True"
-                          IsChecked="{Binding Sunday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Label  Grid.Row="2" Grid.Column="0"  
+                            Content="Friday: "/>
+                    <CheckBox Grid.Row="2" Grid.Column="1"  
+                              IsThreeState="True"
+                              IsChecked="{Binding Friday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="2"  
+                               Text="{Binding Friday, Mode=OneWay, Converter={StaticResource AttendanceStringConverter}}"
+                               VerticalAlignment="Center"/>
+
+                    <Label Grid.Row="3" Grid.Column="0"  
+                           Content="Saturday: "/>
+                    <CheckBox Grid.Row="3" Grid.Column="1"  
+                              IsThreeState="True"
+                              IsChecked="{Binding Saturday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Grid.Row="3" Grid.Column="2"  
+                               Text="{Binding Saturday, Mode=OneWay, Converter={StaticResource AttendanceStringConverter}}"
+                               VerticalAlignment="Center"/>
+
+                    <Label Grid.Row="3" Grid.Column="3" 
+                           Content="Sunday: "/>
+                    <CheckBox Grid.Row="3" Grid.Column="4"  
+                              IsThreeState="True"
+                              IsChecked="{Binding Sunday, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock  Grid.Row="3" Grid.Column="5" 
+                                Text="{Binding Sunday, Mode=OneWay, Converter={StaticResource AttendanceStringConverter}}"
+                                VerticalAlignment="Center"/>
+
+                </Grid>
+
+
 
 
                 <Label Grid.Row="8" Grid.Column="0" 
@@ -382,10 +455,10 @@
                             Orientation="Horizontal">
                     <ComboBox ItemsSource="{Binding DayRange}"
                               SelectedValue="{Binding MinDays, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              MinWidth="80"/>
+                              MaxWidth="80"/>
                     <ComboBox ItemsSource="{Binding DayRange}"
                               SelectedValue="{Binding MaxDays, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              MinWidth="80"/>
+                              MaxWidth="80"/>
                 </StackPanel>
 
                 <Label Grid.Row="9" Grid.Column="0" 
@@ -427,15 +500,24 @@
 
                 </StackPanel>
 
-                <Button Grid.Row="14" Grid.Column="1" Content="Add"
-                        Command="{Binding ElementName=VM, Path=AddRosterRuleCommand}"/>
-
+                <StackPanel Grid.Row="14" Grid.Column="1" 
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <Button Content="Cancel"
+                            Command="{Binding ElementName=VM, Path=CancelRosterRuleEditCommand}"
+                            Visibility="{Binding InEdit, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <Button Content="{Binding InEdit, Mode=OneWay, Converter={StaticResource EditBoolConverter}}"
+                            Command="{Binding ElementName=VM, Path=AddRosterRuleCommand}"/>
+                </StackPanel>
             </Grid>
 
             <!-- Current rules -->
             <!-- Use item view of some sort. -->
-            <Expander IsExpanded="False">
-                <StackPanel Orientation="Vertical">
+            <Expander IsExpanded="False" 
+                      BorderThickness=".5" 
+                      BorderBrush="{StaticResource Brush01}">
+                <StackPanel Orientation="Vertical"
+                            CanHorizontallyScroll="False">
                     <ListView ItemsSource="{Binding SingleRules, Mode=OneWay}"
                               SelectedValue="{Binding SelectedRule, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <ListView.ItemsPanel>
@@ -445,8 +527,15 @@
                         </ListView.ItemsPanel>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding}"
-                                           ToolTip="{Binding Summary}"/>
+                                <Border BorderBrush="Magenta"
+                                        Background="#303"
+                                        BorderThickness="1"
+                                        Margin="2"
+                                        Padding="5,2"
+                                        CornerRadius="10">
+                                    <TextBlock Text="{Binding}"
+                                               ToolTip="{Binding Summary}"/>
+                                </Border>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
@@ -459,8 +548,15 @@
                         </ListView.ItemsPanel>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding}"
-                                           ToolTip="{Binding Summary}"/>
+                                <Border BorderBrush="Yellow"
+                                        Background="#330"
+                                        BorderThickness="1"
+                                        Margin="2"
+                                        Padding="5,2"
+                                        CornerRadius="10">
+                                    <TextBlock Text="{Binding}"
+                                               ToolTip="{Binding Summary}"/>
+                                </Border>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
@@ -474,11 +570,27 @@
                         </ListView.ItemsPanel>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding}"
-                                           ToolTip="{Binding Summary}"/>
+                                <Border BorderBrush="Cyan"
+                                        Background="#033"
+                                        BorderThickness="1"
+                                        Margin="2"
+                                        Padding="5,2"
+                                        CornerRadius="10">
+                                    <TextBlock Text="{Binding}"
+                                               ToolTip="{Binding Summary}"/>
+                                </Border>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+                        <Button Content="Edit"
+                                Width="80"
+                                Command="{Binding EditShiftRuleCommand}"/>
+                        <Button Content="Delete"
+                                Width="80"
+                                Command="{Binding DeleteShiftRuleCommand}"/>
+                    </StackPanel>
                 </StackPanel>
             </Expander>
         </StackPanel>

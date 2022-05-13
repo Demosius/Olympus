@@ -1,6 +1,7 @@
 ﻿using Pantheon.Properties;
 using Pantheon.View;
-using Pantheon.ViewModel.Commands;
+using Pantheon.View.PopUp.Employees;
+using Pantheon.ViewModel.Commands.Employees;
 using Pantheon.ViewModel.Interface;
 using Styx;
 using System;
@@ -12,8 +13,6 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using Pantheon.View.PopUp.Employees;
-using Pantheon.ViewModel.Commands.Employees;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -285,6 +284,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     public LaunchIconiferCommand LaunchIconiferCommand { get; set; }
     public LaunchAvatarSelectorCommand LaunchAvatarSelectorCommand { get; set; }
     public LaunchEmployeeShiftWindowCommand LaunchEmployeeShiftWindowCommand { get; set; }
+    public FillFullTimeRostersCommand FillFullTimeRostersCommand { get; set; }
     #endregion
 
     public EmployeePageVM()
@@ -306,6 +306,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         LaunchIconiferCommand = new LaunchIconiferCommand(this);
         LaunchAvatarSelectorCommand = new LaunchAvatarSelectorCommand(this);
         LaunchEmployeeShiftWindowCommand = new LaunchEmployeeShiftWindowCommand(this);
+        FillFullTimeRostersCommand = new FillFullTimeRostersCommand(this);
 
         ReportingEmployees = new List<Employee>();
         employees = new ObservableCollection<Employee>();
@@ -609,5 +610,40 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         var shiftWindow = new EmployeeShiftWindow(this, selectedEmployee);
 
         shiftWindow.ShowDialog();
+    }
+
+    /// <summary>
+    /// Creates a roster shift rule for every full time (non-salary) employee that doesn't already have one.
+    /// Standard M-F roster, unspecified shift.
+    /// </summary>
+    public void FillFullTimeRosters()
+    {
+        if (Helios is null) return;
+
+        // Get list of employees.
+        var targets =
+            ReportingEmployees.Where(e => e.EmploymentType is EEmploymentType.FP && e.RosterRules.Count == 0).ToList();
+
+        foreach (var employee in targets)
+        {
+            var rosterRule = new ShiftRuleRoster(employee)
+            {
+                Description = "Standard Roster",
+                Monday = true,
+                Tuesday = true,
+                Wednesday = true,
+                Thursday = true,
+                Friday = true,
+                MinDays = 5,
+                MaxDays = 5
+            };
+            employee.RosterRules.Add(rosterRule);
+        }
+
+        // Update database with full group of new rules.
+        var lines = Helios.StaffCreator.ShiftRuleRosters(targets.SelectMany(e => e.RosterRules));
+
+        MessageBox.Show($"Created {lines} new roster rules for current Full-Time Permanent employees.", "Success",
+            MessageBoxButton.OK);
     }
 }

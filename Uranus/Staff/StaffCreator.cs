@@ -190,4 +190,6 @@ public class StaffCreator
 
     public void ShiftRuleRoster(ShiftRuleRoster shiftRule, EPushType pushType = EPushType.ObjectOnly) =>
         Chariot.Create(shiftRule, pushType);
+
+    public int ShiftRuleRosters(IEnumerable<ShiftRuleRoster> rosterRules) => Chariot.InsertIntoTable(rosterRules);
 }

@@ -281,7 +281,7 @@ public class StaffReader
                 var dailyShiftCounters = Chariot.PullObjectList<DailyShiftCounter>();
                 var weeklyShiftCounters = Chariot.PullObjectList<WeeklyShiftCounter>();
                 data = new RosterDataSet(department, startDate, endDate, employees, rosters, dailyRosters,
-                    employeeRosters, shifts, breaks, employeeShiftConnections, singleRules, recurringRules, 
+                    employeeRosters, shifts, breaks, employeeShiftConnections, singleRules, recurringRules,
                     rosterRules, dailyShiftCounters, weeklyShiftCounters);
             });
             if (data is not null) return data;

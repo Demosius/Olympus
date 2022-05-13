@@ -238,7 +238,7 @@ public class StaffUpdater
         {
             lines += shift.Breaks.Sum(shiftBreak => Chariot.Update(shiftBreak));
             lines += Chariot.Update(shift);
-            
+
             if (shift.Default)
             {
                 Chariot.Database.Execute("UPDATE Shift SET \"Default\" = FALSE WHERE DepartmentName = ? AND Name != ?;",
@@ -304,5 +304,9 @@ public class StaffUpdater
     /// <returns>True if successful.</returns>
     public bool DeactivateUser(int employeeID) => Chariot.Database?.Execute("UPDATE Employee SET IsUser = false WHERE ID = ?;", employeeID) > 0;
 
-    public int ShiftRuleSingle(ShiftRuleSingle singleRuleShiftRule) => Chariot.Update(singleRuleShiftRule);
+    public int ShiftRuleSingle(ShiftRuleSingle shiftRule) => Chariot.Update(shiftRule);
+
+    public int ShiftRuleRecurring(ShiftRuleRecurring shiftRule) => Chariot.Update(shiftRule);
+
+    public int ShiftRuleRoster(ShiftRuleRoster shiftRule) => Chariot.Update(shiftRule);
 }

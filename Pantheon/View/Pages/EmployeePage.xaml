@@ -45,6 +45,7 @@
             <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
             <converter:UserToColourConverter x:Key="UserToColourConverter"/>
         </DockPanel.Resources>
+
         <ToolBarTray DockPanel.Dock="Top">
             <!-- Search / Filter -->
             <ToolBar>
@@ -95,6 +96,25 @@
                           MinWidth="100"
                           Margin="2,0"
                           Style="{StaticResource ComboBoxStyle}" />
+            </ToolBar>
+            <!-- Action Buttons -->
+            <ToolBar>
+
+                <ToggleButton x:Name="TogglePopupButton"
+                              Style="{StaticResource ToggleButtonStyle}"
+                              HorizontalAlignment="Left"
+                              Padding="5,0" Margin="5,5"
+                              Content="☰"/>
+                <Popup IsOpen="{Binding IsChecked, ElementName=TogglePopupButton}">
+                    <Border BorderThickness="1" BorderBrush="{StaticResource CheckBoxBorderBrush}">
+                        <StackPanel Orientation="Vertical">
+                            <Button Content="Fill FT Rosters"
+                                    ToolTip="Set any full time employees without existing roster rules to use a standard M-F roster."
+                                    Command="{Binding FillFullTimeRostersCommand}"/>
+                        </StackPanel>
+                    </Border>
+                </Popup>
+
             </ToolBar>
         </ToolBarTray>
 

@@ -15,6 +15,11 @@ public class RosterRuleVM : INotifyPropertyChanged
 {
     public ShiftRuleRoster? SampleRosterRule { get; set; }
 
+    public bool InEdit { get; set; }
+    public bool IsNew => !InEdit;
+
+    public ShiftRuleRoster? Original { get; set; }
+
     public ShiftRuleRoster ShiftRule { get; set; }
 
     private readonly Regex clearRex = new("[^0-9,]+");
@@ -174,7 +179,7 @@ public class RosterRuleVM : INotifyPropertyChanged
 
     public string WeekNumbersText
     {
-        get => string.Join(", ", ShiftRule.WeekNumbers ?? new List<int>());
+        get => string.Join(", ", ShiftRule.WeekNumberList);
         set
         {
             var clean = clearRex.Replace(value, "");
@@ -183,7 +188,7 @@ public class RosterRuleVM : INotifyPropertyChanged
             var days = stringArray.Select(int.Parse).Where(x => x <= ShiftRule.WeekRotation).ToList();
             days.Sort();
             if (days.Count == 0) days.Add(1);
-            ShiftRule.WeekNumbers = days;
+            ShiftRule.WeekNumberList = days;
             OnPropertyChanged();
         }
     }
@@ -227,6 +232,13 @@ public class RosterRuleVM : INotifyPropertyChanged
     {
         ShiftRule = new ShiftRuleRoster(employee, sampleRosterRule);
         SampleRosterRule = sampleRosterRule;
+    }
+
+    public RosterRuleVM(ShiftRuleRoster rosterRule)
+    {
+        InEdit = true;
+        Original = rosterRule;
+        ShiftRule = rosterRule.Copy();
     }
 
     public void CheckMinMax()
