@@ -165,17 +165,15 @@ public abstract class MasterChariot
     /// <typeparam name="T"></typeparam>
     /// <param name="objList"></param>
     /// <returns></returns>
-    public bool UpdateTable<T>(List<T> objList)
+    public int UpdateTable<T>(IEnumerable<T> objList)
     {
-        if (objList.Count == 0) return false;
-        Database?.RunInTransaction(() =>
-        {
-            foreach (var obj in objList)
-            {
-                _ = Database.InsertOrReplace(obj);
-            }
-        });
-        return true;
+        var count = 0;
+        var list = objList as T[] ?? objList.ToArray();
+        if (!list.Any()) return count;
+
+        Database?.RunInTransaction(() => { count += list.Sum(obj => Database.InsertOrReplace(obj)); });
+
+        return count;
     }
 
     /// <summary>

@@ -1,6 +1,7 @@
 ﻿using SQLiteNetExtensions.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -50,6 +51,42 @@ public class InventoryReader
             return Chariot.Database?.Query<NAVZone>("SELECT FROM ? WHERE [Code] = ?;", Chariot.GetTableName(typeof(NAVZone)), zoneCode) ?? new List<NAVZone>();
         var recursive = pullType == EPullType.FullRecursive;
         return Chariot.Database.GetAllWithChildren<NAVZone>(zone => zone.Code == zoneCode, recursive);
+    }
+
+    /// <summary>
+    /// Zones with matched zone-extension objects.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<NAVZone> Zones()
+    {
+        IEnumerable<NAVZone>? returnZones = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var zones = Chariot.PullObjectList<NAVZone>().ToDictionary(z => z.ID, z => z);
+            var extensions = Chariot.PullObjectList<ZoneExtension>().ToDictionary(e => e.ZoneID, e => e);
+            var newExtensions = new List<ZoneExtension>();
+
+            foreach (var (id, zone) in zones)
+            {
+                if (extensions.TryGetValue(id, out var extension))
+                {
+                    zone.Extension = extension;
+                    extension.Zone = zone;
+                }
+                else
+                {
+                    extension = new ZoneExtension(zone);
+                    newExtensions.Add(extension);
+                }
+            }
+
+            Chariot.InsertIntoTable(newExtensions);
+            returnZones = zones.Values;
+        });
+        returnZones ??= new List<NAVZone>();
+
+        return returnZones;
     }
 
     /* STOCK */

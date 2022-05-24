@@ -1,5 +1,6 @@
 ﻿using System;
 using Aion.View;
+using Hydra.View;
 using Khaos.View;
 using Pantheon.View;
 using Phoenix.View;
@@ -26,6 +27,7 @@ public static class ProjectFactory
             EProject.Phoenix => new PhoenixPage(),
             EProject.Khaos => new KhaosPage(),
             EProject.Aion => new AionPage(App.Helios, App.Charon),
+            EProject.Hydra => new HydraPage(App.Helios, App.Charon),
             EProject.None => null,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
         };
@@ -50,6 +52,7 @@ public static class ProjectFactory
             EProject.Phoenix => PhoenixPage.RequiresUser,
             EProject.Pantheon => PantheonPage.RequiresUser,
             EProject.Khaos => KhaosPage.RequiresUser,
+            EProject.Hydra => HydraPage.RequiresUser,
             EProject.None => false,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
         };

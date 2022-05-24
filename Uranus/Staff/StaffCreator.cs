@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Serilog;
 using Uranus.Staff.Model;
 
 namespace Uranus.Staff;
@@ -140,7 +141,11 @@ public class StaffCreator
                 if (Path.GetExtension(filePath) == ".ico")
                     File.Copy(filePath, Path.Combine(Chariot.ProjectIconDirectory, fileName), true);
             }
-            catch (IOException) { } // If the file can't be copied across, continue anyway.
+            catch (IOException ex)
+            {
+                // If the file can't be copied across, continue anyway.
+                Log.Error(ex, "Failed to transfer icon file. ({File Name}).", fileName);
+            }
         }
     }
 

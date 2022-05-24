@@ -8,7 +8,8 @@ public enum EProject
     Phoenix,
     Pantheon,
     Khaos,
-    Aion
+    Aion,
+    Hydra
 }
 
 public enum ELicence
@@ -33,6 +34,7 @@ public static class EnumConverter
             "KHAOS" => EProject.Khaos,
             "PROMETHEUS" => EProject.Prometheus,
             "AION" => EProject.Aion,
+            "HYDRA" => EProject.Hydra,
             _ => EProject.None
         };
     }

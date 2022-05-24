@@ -78,29 +78,27 @@ public static class EnumConverter
 {
     public static string DataCategoryToString(EDataCategory category)
     {
-        if (category == EDataCategory.Equipment)
-            return "Equipment";
-        if (category == EDataCategory.Inventory)
-            return "Inventory";
-        if (category == EDataCategory.Staff)
-            return "Staff";
-        if (category == EDataCategory.Users)
-            return "Users";
-        return "None";
+        return category switch
+        {
+            EDataCategory.Equipment => "Equipment",
+            EDataCategory.Inventory => "Inventory",
+            EDataCategory.Staff => "Staff",
+            EDataCategory.Users => "Users",
+            _ => "None"
+        };
     }
 
     public static EDataCategory StringToDataCategory(string category)
     {
-        category = (category ?? "inventory").ToUpper();
-        if (category == "INVENTORY")
-            return EDataCategory.Inventory;
-        if (category == "EQUIPMENT")
-            return EDataCategory.Equipment;
-        if (category == "STAFF")
-            return EDataCategory.Staff;
-        if (category == "USERS")
-            return EDataCategory.Users;
-        return EDataCategory.Inventory;
+        category = category.ToUpper();
+        return category switch
+        {
+            "INVENTORY" => EDataCategory.Inventory,
+            "EQUIPMENT" => EDataCategory.Equipment,
+            "STAFF" => EDataCategory.Staff,
+            "USERS" => EDataCategory.Users,
+            _ => EDataCategory.Inventory
+        };
     }
 
     public static List<EDataCategory> GetDataCategories()
@@ -116,8 +114,9 @@ public static class EnumConverter
 
     public static List<EDataType> GetTypeList(EDataCategory category)
     {
-        if (category == EDataCategory.Inventory)
-            return new List<EDataType>
+        return category switch
+        {
+            EDataCategory.Inventory => new List<EDataType>
             {
                 EDataType.Batch,
                 EDataType.Bay,
@@ -141,17 +140,12 @@ public static class EnumConverter
                 EDataType.SubStock,
                 EDataType.TableUpdate,
                 EDataType.ZoneAccessLevel
-            };
-        if (category == EDataCategory.Equipment)
-            return new List<EDataType>
+            },
+            EDataCategory.Equipment => new List<EDataType>
             {
-                EDataType.Checklist,
-                EDataType.CompletedChecklist,
-                EDataType.Machine,
-                EDataType.MachineType
-            };
-        if (category == EDataCategory.Staff)
-            return new List<EDataType>
+                EDataType.Checklist, EDataType.CompletedChecklist, EDataType.Machine, EDataType.MachineType
+            },
+            EDataCategory.Staff => new List<EDataType>
             {
                 EDataType.Clan,
                 EDataType.Department,
@@ -177,15 +171,10 @@ public static class EnumConverter
                 EDataType.TagUse,
                 EDataType.TempTag,
                 EDataType.Vehicle
-            };
-        if (category == EDataCategory.Users)
-            return new List<EDataType>
-            {
-                EDataType.User,
-                EDataType.UserRole,
-                EDataType.Login
-            };
-        return new List<EDataType>();
+            },
+            EDataCategory.Users => new List<EDataType> { EDataType.User, EDataType.UserRole, EDataType.Login },
+            _ => new List<EDataType>()
+        };
     }
 
     public static EDataCategory DataTypeToCategory(EDataType type)

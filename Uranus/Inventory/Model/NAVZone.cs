@@ -36,6 +36,17 @@ public class NAVZone
         set => (Extension ??= new ZoneExtension(this)).AccessLevel = value;
     }
 
+    [Ignore]
+    public Site? Site
+    {
+        get => (Extension ??= new ZoneExtension(this)).Site;
+        set
+        {
+            (Extension ??= new ZoneExtension(this)).Site = value;
+            Extension.SiteName = value?.Name ?? "";
+        }
+    }
+
     public NAVZone()
     {
         ID = string.Empty;
@@ -48,7 +59,8 @@ public class NAVZone
         Bays = new List<Bay>();
     }
 
-    public NAVZone(string id, string code, string locationCode, string description, int ranking, NAVLocation location, List<NAVBin> bins, List<NAVMoveLine> moveLines, List<NAVStock> stock, List<Bay> bays, ZoneExtension? extension)
+    public NAVZone(string id, string code, string locationCode, string description, int ranking, NAVLocation location,
+        List<NAVBin> bins, List<NAVMoveLine> moveLines, List<NAVStock> stock, List<Bay> bays, ZoneExtension? extension)
     {
         ID = id;
         Code = code;
@@ -61,5 +73,18 @@ public class NAVZone
         Stock = stock;
         Bays = bays;
         Extension = extension;
+    }
+
+    public NAVZone(string zoneID)
+    {
+        ID = zoneID;
+        var lc = zoneID.Split(':');
+        LocationCode = lc[0];
+        Code = lc[1];
+        Description = string.Empty;
+        Bins = new List<NAVBin>();
+        MoveLines = new List<NAVMoveLine>();
+        Stock = new List<NAVStock>();
+        Bays = new List<Bay>();
     }
 }

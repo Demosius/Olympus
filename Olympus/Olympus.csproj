@@ -22,6 +22,7 @@
     <None Remove="Resources\Images\Icons\dredd.ico" />
     <None Remove="Resources\Images\Icons\forge.ico" />
     <None Remove="Resources\Images\Icons\hellsing.ico" />
+    <None Remove="Resources\Images\Icons\hydra.ico" />
     <None Remove="Resources\Images\Icons\newlym.ico" />
     <None Remove="Resources\Images\Icons\o-bolt.ico" />
     <None Remove="Resources\Images\Icons\o-sport.ico" />
@@ -121,6 +122,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Aion\Aion.csproj" />
+    <ProjectReference Include="..\Hydra\Hydra.csproj" />
     <ProjectReference Include="..\Khaos\Khaos.csproj" />
     <ProjectReference Include="..\Pantheon\Pantheon.csproj" />
     <ProjectReference Include="..\Phoenix\Phoenix.csproj" />
@@ -137,6 +139,9 @@
     <Resource Include="Resources\Images\Icons\chaos-white.ico" />
     <Resource Include="Resources\Images\Icons\dredd.ico" />
 	<Resource Include="Resources\Images\Icons\hellsing.ico" />
+	<Content Include="Resources\Images\Icons\hydra.ico">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</Content>
     <Resource Include="Resources\Images\Icons\newlym.ico" />
     <Resource Include="Resources\Images\Icons\o-bolt.ico" />
     <Resource Include="Resources\Images\Icons\o-sport.ico" />

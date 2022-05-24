@@ -1,7 +1,7 @@
-﻿using Uranus.Inventory.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Uranus.Inventory.Model;
 
 namespace Uranus.Inventory;
 
@@ -14,24 +14,26 @@ public class InventoryUpdater
         Chariot = chariot;
     }
 
-    public bool NAVBins(List<NAVBin> bins)
+    public int NAVBins(List<NAVBin> bins)
     {
-        if (Chariot.UpdateTable(bins))
+        var count = 0;
+        Chariot.Database?.RunInTransaction(() =>
         {
-            _ = Chariot.SetTableUpdateTime(typeof(NAVBin));
-            return true;
-        }
-        return false;
+            count = Chariot.UpdateTable(bins);
+            if (count > 0) Chariot.SetTableUpdateTime(typeof(NAVBin));
+        });
+        return count;
     }
 
-    public bool NAVItems(List<NAVItem> items, DateTime dateTime)
+    public int NAVItems(List<NAVItem> items, DateTime dateTime)
     {
-        if (Chariot.UpdateTable(items))
+        var count = 0;
+        Chariot.Database?.RunInTransaction(() =>
         {
-            _ = Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime);
-            return true;
-        }
-        return false;
+            count = Chariot.UpdateTable(items);
+            if (count > 0) Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime);
+        });
+        return count;
     }
 
     public bool NAVUoMs(List<NAVUoM> uomList)
@@ -40,9 +42,9 @@ public class InventoryUpdater
         // Remove previous data with relevant UoMCode 
         // (Expect for ease/speed updates will happen one UoMCode at a time)
         Chariot.UoMCodeDelete(uomList.Select(s => s.Code).Distinct().ToList());
-            
+
         if (Chariot.InsertIntoTable(uomList) == 0) return false;
-            
+
         _ = Chariot.SetTableUpdateTime(typeof(NAVUoM));
         return true;
     }
@@ -59,16 +61,28 @@ public class InventoryUpdater
         return true;
     }
 
-    public bool NAVZones(List<NAVZone> zones) => Chariot.UpdateTable(zones);
+    public int NAVZones(List<NAVZone> zones) => Chariot.UpdateTable(zones);
 
-    public bool NAVLocation(List<NAVLocation> locations) => Chariot.UpdateTable(locations);
+    public int Zones(IEnumerable<NAVZone> zones)
+    {
+        var count = 0;
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var list = zones as NAVZone[] ?? zones.ToArray();
+            count += Chariot.UpdateTable(list);
+            count += Chariot.UpdateTable(list.Select(z => z.Extension));
+        });
+        return count;
+    }
 
-    public bool NAVDivision(List<NAVDivision> divs) => Chariot.UpdateTable(divs);
+    public int NAVLocation(List<NAVLocation> locations) => Chariot.UpdateTable(locations);
 
-    public bool NAVCategory(List<NAVCategory> cats) => Chariot.UpdateTable(cats);
+    public int NAVDivision(List<NAVDivision> divs) => Chariot.UpdateTable(divs);
 
-    public bool NAVPlatform(List<NAVPlatform> pfs)  => Chariot.UpdateTable(pfs);
+    public int NAVCategory(List<NAVCategory> cats) => Chariot.UpdateTable(cats);
 
-    public bool NAVGenre(List<NAVGenre> gens) => Chariot.UpdateTable(gens);
+    public int NAVPlatform(List<NAVPlatform> pfs) => Chariot.UpdateTable(pfs);
+
+    public int NAVGenre(List<NAVGenre> gens) => Chariot.UpdateTable(gens);
 
 }

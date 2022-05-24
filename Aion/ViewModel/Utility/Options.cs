@@ -6,13 +6,13 @@ namespace Aion.ViewModel.Utility;
 
 public class Options
 {
-    private static readonly string JsonFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "options.json");
+    private static readonly string jsonFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "options.json");
 
     public string DBLocation { get; set; }
 
     public Options()
     {
-        var data = File.ReadAllText(JsonFile);
+        var data = File.ReadAllText(jsonFile);
         var o = JsonSerializer.Deserialize<Opt>(data);
 
         // Set properties.
@@ -21,7 +21,7 @@ public class Options
 
     public static string GetDBLocation()
     {
-        var data = File.ReadAllText(JsonFile);
+        var data = File.ReadAllText(jsonFile);
         return JsonSerializer.Deserialize<Options>(data)?.DBLocation;
     }
 
@@ -33,7 +33,7 @@ public class Options
     public void SaveOptions()
     {
         var data = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText(JsonFile, data);
+        File.WriteAllText(jsonFile, data);
     }
 
     public void SetFromOther(Options options)
