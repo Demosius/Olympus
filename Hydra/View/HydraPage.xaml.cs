@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using Hydra.ViewModel;
 using Styx;
 using Uranus;
 using Uranus.Interfaces;
@@ -15,7 +16,7 @@ public partial class HydraPage : IProject
     public HydraPage(Helios helios, Charon charon)
     {
         InitializeComponent();
-        
+        DataContext = new HydraVM(helios, charon);
     }
 
     public EProject Project => EProject.Hydra;

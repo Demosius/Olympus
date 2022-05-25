@@ -145,7 +145,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
     {
         _ = Task.Run(() =>
         {
-            if (App.Helios.InventoryUpdater.NAVBins(DataConversion.NAVRawStringToBins(General.ClipboardToString())))
+            if (App.Helios.InventoryUpdater.NAVBins(DataConversion.NAVRawStringToBins(General.ClipboardToString())) > 0)
                 GetUpdateTimes();
         });
     }

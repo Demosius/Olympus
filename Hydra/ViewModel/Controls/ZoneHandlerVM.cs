@@ -1,10 +1,15 @@
-﻿using System.Collections.ObjectModel;
+﻿using Hydra.ViewModel.Commands;
+using Serilog;
 using Styx;
 using Styx.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -29,6 +34,8 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
     public RepairDataCommand RepairDataCommand { get; set; }
+    public UpdateZonesCommand UpdateZonesCommand { get; set; }
+    public SaveZonesCommand SaveZonesCommand { get; set; }
 
     #endregion
 
@@ -36,9 +43,11 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
     {
         HydraVM = hydraVM;
         Zones = new ObservableCollection<NAVZone>();
-        
+
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
+        UpdateZonesCommand = new UpdateZonesCommand(this);
+        SaveZonesCommand = new SaveZonesCommand(this);
         Task.Run(() => SetDataSources(HydraVM.Helios!, HydraVM.Charon!));
     }
 
@@ -53,7 +62,7 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
     public void RepairData()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public void SetDataSources(Helios helios, Charon charon)
@@ -75,6 +84,49 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
     {
         if (Helios is null) return;
 
-        Helios.InventoryUpdater.Zones(Zones);
+        // Get data sets and check data validity.
+        List<NAVZone>? newZones;
+        try
+        {
+            newZones = DataConversion.NAVRawStringToZones(General.ClipboardToString());
+        }
+        catch (InvalidDataException ex)
+        {
+            Log.Error(ex, "Invalid data for NAV zone update.");
+            MessageBox.Show("Invalid data fond on the clipboard.", "Invalid Data Exception Thrown", MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return;
+        }
+
+        if (!newZones.Any()) return;
+
+        // Check data difference. Count: Match, To-be-deleted(only current), & To-be-added(only new).
+        var matchCount = newZones.Count(z => Zones.Contains(z));
+        var delCount = Zones.Count(z => !newZones.Contains(z));
+        var newCount = newZones.Count(z => !Zones.Contains(z));
+
+        // Confirm replacement.
+        var result = MessageBox.Show($"{delCount} lines deleted.\n" +
+                                     $"{matchCount} lines updated.\n" +
+                                     $"{newCount} lines added.\n" +
+                                     "Would you like to continue with the update?", "Confirm Update",
+            MessageBoxButton.YesNo, MessageBoxImage.Question);
+        if (result != MessageBoxResult.Yes) return;
+
+        // Apply update/replacement.
+        Helios.InventoryUpdater.ReplaceZones(newZones);
+
+        RefreshData();
+    }
+
+    public void SaveZones()
+    {
+        // Confirm with user.
+        if (Helios is null || MessageBox.Show("Are you sure you want to save the changes made to the zones?",
+                "Confirm Changes", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+
+        // Update/Replace table.
+        Helios.InventoryUpdater.ReplaceZones(Zones);
+
     }
 }

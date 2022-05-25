@@ -77,7 +77,7 @@ public abstract class MasterChariot
     /// <typeparam name="T"></typeparam>
     /// <param name="objList"></param>
     /// <returns>Difference between objects deleted and objects inserted.</returns>
-    public int ReplaceFullTable<T>(List<T> objList)
+    public int ReplaceFullTable<T>(IEnumerable<T> objList)
     {
         var line = 0;
         Database?.RunInTransaction(() =>

@@ -3,6 +3,7 @@ using Styx.Interfaces;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Hydra.ViewModel.Commands;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -26,6 +27,7 @@ public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
     public RepairDataCommand RepairDataCommand { get; set; }
+    public AddNewSiteCommand AddNewSiteCommand { get; set; }
 
     #endregion
 
@@ -35,12 +37,13 @@ public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
+        AddNewSiteCommand = new AddNewSiteCommand(this);
         Task.Run(() => SetDataSources(HydraVM.Helios!, HydraVM.Charon!));
     }
 
     public void RefreshData()
     {
-        throw new System.NotImplementedException();
+        // TODO: Implement.
     }
 
     public void RepairData()
@@ -61,5 +64,10 @@ public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void AddNewSite()
+    {
+        // TODO: MORPHEUS
     }
 }

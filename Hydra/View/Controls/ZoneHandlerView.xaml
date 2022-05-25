@@ -15,6 +15,9 @@
                 <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
                 <ResourceDictionary>
                     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                        <Setter Property="Margin" Value="2"></Setter>
+                    </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -25,9 +28,35 @@
                     Orientation="Horizontal"
                     Background="{StaticResource CheckBoxBackgroundBrush}">
             <Button Content="Update Zones"
-                    ToolTip="Update From NAV"/>
+                    ToolTip="Update From NAV"
+                    Command="{Binding UpdateZonesCommand}"/>
         </StackPanel>
-        <DataGrid ItemsSource="{Binding Zones}"/>
+        <Grid DockPanel.Dock="Bottom"
+              Background="{StaticResource CheckBoxBackgroundBrush}">
+            <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+                <Button Command="{Binding RefreshDataCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../../Resources/refresh.png"
+                               MaxHeight="20"
+                               MaxWidth="20"
+                               Margin="0,0,5,0"/>
+                        <TextBlock Text="Refresh"/>
+                    </StackPanel>
+                </Button>
+                <Button Content="Save Changes"
+                        Command="{Binding SaveZonesCommand}"/>
+            </StackPanel>
+        </Grid>
+        <DataGrid ItemsSource="{Binding Zones}"
+                  AutoGenerateColumns="True"
+                  AutoGeneratingColumn="DataGrid_OnAutoGeneratingColumn"
+                  CanUserAddRows="True"
+                  CanUserDeleteRows="True"
+                  CanUserSortColumns="True"
+                  CanUserReorderColumns="True"
+                  CanUserResizeColumns="True"
+                  CanUserResizeRows="True"/>
     </DockPanel>
 
 </UserControl>

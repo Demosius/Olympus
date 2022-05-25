@@ -7,12 +7,10 @@
       xmlns:vm="clr-namespace:Hydra.ViewModel"
       xmlns:controls="clr-namespace:Hydra.View.Controls"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type vm:HydraVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="HydraPage">
 
-    <Page.DataContext>
-        <vm:HydraVM x:Name="VM"/>
-    </Page.DataContext>
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

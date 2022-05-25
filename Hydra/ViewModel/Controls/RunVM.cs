@@ -40,7 +40,7 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
     public void RefreshData()
     {
-        throw new System.NotImplementedException();
+        // TODO: Implement.
     }
 
     public void RepairData()

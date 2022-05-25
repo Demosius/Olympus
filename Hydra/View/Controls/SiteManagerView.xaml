@@ -15,13 +15,31 @@
                 <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
                 <ResourceDictionary>
                     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                        <Setter Property="Margin" Value="2"/>
+                    </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="Orchid">
-            
-    </Grid>
+    <DockPanel Background="Orchid">
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal"
+                    Background="{StaticResource Brush05}">
+            <Button Command="{Binding RefreshDataCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="../../Resources/refresh.png"
+                           MaxHeight="20"
+                           MinHeight="20"
+                           Margin="0,0,2,0"/>
+                    <TextBlock Text="Refresh Data"></TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Content=" Add New Site"
+                    Command="{Binding AddNewSiteCommand}"/>
+        </StackPanel>
+        <DataGrid></DataGrid>
+    </DockPanel>
 
 </UserControl>

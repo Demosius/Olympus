@@ -33,8 +33,9 @@ public class HydraVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
     #endregion
 
-    public HydraVM()
+    public HydraVM(Helios helios, Charon charon)
     {
+        SetDataSources(helios, charon);
         RunVM = new RunVM(this);
         SiteManagerVM = new SiteManagerVM(this);
         ZoneHandlerVM = new ZoneHandlerVM(this);
@@ -45,7 +46,9 @@ public class HydraVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
     public void RefreshData()
     {
-        throw new NotImplementedException();
+        RunVM.RefreshData();
+        SiteManagerVM.RefreshData();
+        ZoneHandlerVM.RefreshData();
     }
 
     public void RepairData()
@@ -55,7 +58,8 @@ public class HydraVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
     public void SetDataSources(Helios helios, Charon charon)
     {
-        throw new NotImplementedException();
+        Helios = helios;
+        Charon = charon;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

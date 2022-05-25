@@ -8,7 +8,7 @@ namespace Uranus.Inventory.Model;
 [Table("ItemList")]
 public class NAVItem
 {
-    [PrimaryKey] public int Number { get; set; }
+    [PrimaryKey, ForeignKey(typeof(ItemExtension))] public int Number { get; set; }
     public string Description { get; set; }
     public string Barcode { get; set; }
     [ForeignKey(typeof(NAVCategory))] public int CategoryCode { get; set; }
@@ -22,6 +22,9 @@ public class NAVItem
     public double Weight { get; set; }
     public bool PreOwned { get; set; }
 
+    [OneToOne(nameof(Number), nameof(ItemExtension.Item), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public ItemExtension? Extension { get; set; }
+
     [OneToMany(nameof(NAVUoM.ItemNumber), nameof(NAVUoM.Item), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVUoM> UoMs { get; set; }
     [OneToMany(nameof(Model.NAVStock.ItemNumber), nameof(Model.NAVStock.Item), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
@@ -34,6 +37,8 @@ public class NAVItem
     public List<Move> Moves { get; set; }
     [OneToMany(nameof(NAVMoveLine.ItemNumber), nameof(NAVMoveLine.Item), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVMoveLine> MoveLines { get; set; }
+    [OneToMany(nameof(SiteItemLevel.ItemNumber), nameof(SiteItemLevel.Item), CascadeOperations = CascadeOperation.CascadeRead )]
+    public List<SiteItemLevel> SiteLevels { get; set; }
 
     [ManyToOne(nameof(CategoryCode), nameof(NAVCategory.Items), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVCategory? Category { get; set; }
@@ -43,6 +48,13 @@ public class NAVItem
     public NAVPlatform? Platform { get; set; }
     [ManyToOne(nameof(GenreCode), nameof(NAVGenre.Items), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVGenre? Genre { get; set; }
+
+    [Ignore]
+    public bool SiteLevelTarget
+    {
+        get => (Extension ??= new ItemExtension(this)).SiteLevelTarget;
+        set => (Extension ??= new ItemExtension(this)).SiteLevelTarget = value;
+    }
 
     // Specific UoMs
     [Ignore] public NAVUoM? Case { get; set; }

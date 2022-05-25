@@ -85,4 +85,20 @@ public class InventoryUpdater
 
     public int NAVGenre(List<NAVGenre> gens) => Chariot.UpdateTable(gens);
 
+    /// <summary>
+    /// Replaces the current data with all new data, and updates connected zoneExtensions as applicable.
+    /// </summary>
+    /// <param name="newZones"></param>
+    /// <returns></returns>
+    public int ReplaceZones(IEnumerable<NAVZone> newZones)
+    {
+        var lines = 0;
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var list = newZones as NAVZone[] ?? newZones.ToArray();
+            lines += Chariot.UpdateTable(list.Select(z => z.Extension));
+            lines += Chariot.ReplaceFullTable(list);
+        });
+        return lines;
+    }
 }

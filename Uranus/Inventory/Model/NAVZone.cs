@@ -1,11 +1,12 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
+using System;
 using System.Collections.Generic;
 
 namespace Uranus.Inventory.Model;
 
 [Table("ZoneList")]
-public class NAVZone
+public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
 {
     [PrimaryKey, ForeignKey(typeof(ZoneExtension))] public string ID { get; set; } // Combination of LocationCode and Code (e.g. 9600:PK)
     public string Code { get; set; }
@@ -86,5 +87,31 @@ public class NAVZone
         MoveLines = new List<NAVMoveLine>();
         Stock = new List<NAVStock>();
         Bays = new List<Bay>();
+    }
+
+    public int CompareTo(NAVZone? other)
+    {
+        if (ReferenceEquals(this, other)) return 0;
+        return other is null ? 1 : string.Compare(ID, other.ID, StringComparison.Ordinal);
+    }
+
+    public bool Equals(NAVZone? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return ID == other.ID;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        return obj.GetType() == GetType() && Equals((NAVZone)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        return ID.GetHashCode();
     }
 }
