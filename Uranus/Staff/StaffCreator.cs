@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Serilog;
-using Uranus.Staff.Model;
+using Uranus.Staff.Models;
 
 namespace Uranus.Staff;
 

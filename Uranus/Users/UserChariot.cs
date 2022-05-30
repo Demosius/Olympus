@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Uranus.Users.Model;
+using Uranus.Users.Models;
 
 namespace Uranus.Users;
 

@@ -18,7 +18,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Update="View\VulcanPage.xaml.cs">
+    <Compile Update="Views\VulcanPage.xaml.cs">
       <DependentUpon>VulcanPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="View\VulcanPage.xaml">
+    <Page Update="Views\VulcanPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

@@ -1,0 +1,100 @@
+﻿<Window x:Class="Pantheon.Views.PopUp.Rosters.RosterCreationWindow"
+        x:Name="RosterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:rosters="clr-namespace:Pantheon.ViewModels.PopUp.Rosters"
+        mc:Ignorable="d"
+        Title="RosterCreationWindow" 
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource TooltipBackgroundBrush}"
+        Foreground="{StaticResource LightForegroundBrush}">
+
+    <Window.DataContext>
+        <rosters:RosterCreationVM x:Name="VM"/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary Source="../../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <StackPanel Orientation="Vertical"
+                Margin="15">
+        <StackPanel.Resources>
+            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="IsEditable" Value="True"/>
+                <Setter Property="MinWidth" Value="250"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                <Setter Property="Margin" Value="0"/>
+            </Style>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="MinWidth" Value="0"/>
+                <Setter Property="MinHeight" Value="0"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+            </Style>
+        </StackPanel.Resources>
+
+        <Label Content="Name" Margin="0,5,0,0"/>
+        <TextBox Text="{Binding RosterName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Content="Date" Margin="0,5,0,0"/>
+        <DatePicker SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    HorizontalAlignment="Left"/>
+        <Grid Margin="0,15,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Content="Saturdays"
+                   VerticalAlignment="Center"
+                   VerticalContentAlignment="Center"/>
+            <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding UseSaturdays}"
+                      VerticalAlignment="Bottom"
+                      VerticalContentAlignment="Bottom"
+                      HorizontalAlignment="Right"
+                      HorizontalContentAlignment="Right"/>
+            <Label Grid.Row="1" Grid.Column="0" Content="Sundays"/>
+            <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding UseSundays}"
+                      VerticalAlignment="Bottom"
+                      VerticalContentAlignment="Bottom"
+                      HorizontalAlignment="Right"
+                      HorizontalContentAlignment="Right"/>
+        </Grid>
+        <Separator/>
+        <StackPanel Orientation="Horizontal"
+                    Margin="0,15,0,0">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                    <Setter Property="Margin" Value="5,5,5,5"/>
+                    <Setter Property="MinWidth" Value="75"/>
+                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                </Style>
+            </StackPanel.Resources>
+
+            <Button Content="Cancel"
+                    IsCancel="True"/>
+            <Button Content="Confirm"
+                    IsDefault="True"
+                    Command="{Binding ConfirmDepartmentRosterCreationCommand}"
+                    CommandParameter="{Binding ElementName=RosterWindow}"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

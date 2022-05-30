@@ -1,0 +1,31 @@
+﻿<Window x:Class="AionClock.Views.ClockRejectionView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:AionClock.ViewModels"
+        mc:Ignorable="d"
+        Title="ClockRejectionView" Height="400" Width="900"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.DataContext>
+        <viewModels:ClockRejectionVM x:Name="VM"/>
+    </Window.DataContext>
+    <Grid>
+        <Border BorderThickness="4" BorderBrush="DarkRed">
+            <StackPanel VerticalAlignment="Center">
+                <Label Content="Clock"
+                       HorizontalAlignment="Center"
+                       FontSize="48" FontWeight="Bold"/>
+                <Label Content="REJECTED" Foreground="DarkRed" FontWeight="Black" FontSize="54"
+                       HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding Reason}" 
+                           FontWeight="Bold" FontSize="36" FontFamily="Courier New"
+                           Padding="50,0"
+                           TextWrapping="Wrap"                           
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

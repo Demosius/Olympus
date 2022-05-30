@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Uranus.Users.Model;
+using Uranus.Users.Models;
 
 namespace Uranus.Users;
 

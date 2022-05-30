@@ -1,11 +1,10 @@
 ﻿using SQLiteNetExtensions.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using Uranus.Inventory.Model;
+using Uranus.Inventory.Models;
 
 namespace Uranus.Inventory;
 

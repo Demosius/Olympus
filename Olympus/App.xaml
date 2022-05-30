@@ -2,13 +2,15 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              DispatcherUnhandledException="Application_DispatcherUnhandledException"
-             StartupUri="View/OlympusWindow.xaml">
+             StartupUri="Views/OlympusWindow.xaml">
 
-        <!--<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>-->
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/Olympus/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary>
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
 

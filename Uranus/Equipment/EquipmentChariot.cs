@@ -1,6 +1,6 @@
-﻿using Uranus.Equipment.Model;
-using System;
+﻿using System;
 using System.IO;
+using Uranus.Equipment.Models;
 
 namespace Uranus.Equipment;
 

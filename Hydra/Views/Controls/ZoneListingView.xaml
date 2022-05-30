@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="Hydra.Views.Controls.ZoneListingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Hydra.Views.Controls"
+             xmlns:vm="clr-namespace:Hydra.ViewModels.Controls"
+             d:DataContext="{d:DesignData {x:Type vm:ZoneListingVM}, d:IsDesignTimeCreatable=False}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <ListView x:Name="zoneListView"
+                  AllowDrop="True"
+                  DragLeave="ZoneItemList_DragLeave"
+                  DragOver="ZoneItemList_DragOver"
+                  ItemsSource="{Binding }">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <EventSetter Event="MouseMove" Handler="ZoneItem_MouseMove" />
+                    <EventSetter Event="DragOver" Handler="ZoneItem_DragOver" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Description}" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</UserControl>

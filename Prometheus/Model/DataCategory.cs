@@ -1,4 +1,4 @@
-﻿using Prometheus.ViewModel.Helpers;
+﻿using Prometheus.ViewModels.Helpers;
 using System.Collections.Generic;
 
 namespace Prometheus.Model;

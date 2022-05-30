@@ -1,4 +1,4 @@
-﻿using Uranus.Staff.Model;
+﻿using Uranus.Staff.Models;
 
 namespace Styx;
 
@@ -25,7 +25,7 @@ public partial class Charon
         return User?.Role is not null &&
             User.Role.ReadEmployeeVerySensitive >= GetLevelDifference(employee) || Employee == employee;
     }
-    
+
     public bool CanUpdateEmployee(Role role)
     {
         return User?.Role is not null &&

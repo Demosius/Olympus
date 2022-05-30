@@ -1,6 +1,6 @@
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Uranus.Extension;
+using System;
+using Uranus.Extensions;
 
 namespace Gigantomachy;
 
@@ -20,7 +20,7 @@ public class UranusTests
 
         // Act
         var date = new DateTime(2020, 1, 1);
-        while (date < new DateTime(2022,2,1))
+        while (date < new DateTime(2022, 2, 1))
         {
             Console.WriteLine($"{date:d} = {date.FiscalWeek()}");
             date = date.AddDays(1);

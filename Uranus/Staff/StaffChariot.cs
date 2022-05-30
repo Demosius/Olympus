@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Uranus.Staff.Model;
+using Uranus.Staff.Models;
 
 namespace Uranus.Staff;
 
@@ -19,10 +19,10 @@ public class StaffChariot : MasterChariot
         typeof(Employee),                   typeof(EmployeeAvatar),     typeof(EmployeeDepartmentLoaning),  typeof(EmployeeIcon),
         typeof(EmployeeInductionReference), typeof(EmployeeProject),    typeof(EmployeeShift),              typeof(EmployeeVehicle),
         typeof(Induction),                  typeof(Licence),            typeof(LicenceImage),               typeof(Locker),
-        typeof(Shift),                      typeof(ShiftEntry),         typeof(TagUse),                     
+        typeof(Shift),                      typeof(ShiftEntry),         typeof(TagUse),
         typeof(ShiftRuleSingle),            typeof(ShiftRuleRecurring), typeof(ShiftRuleRoster),
-        typeof(TempTag),                    typeof(Vehicle),            typeof(Break),                      typeof(Project),    
-        typeof(ProjectIcon),                typeof(Role),               
+        typeof(TempTag),                    typeof(Vehicle),            typeof(Break),                      typeof(Project),
+        typeof(ProjectIcon),                typeof(Role),
         typeof(Roster),                     typeof(DepartmentRoster),   typeof(EmployeeRoster),             typeof(DailyRoster),
         typeof(DailyShiftCounter),          typeof(WeeklyShiftCounter)
     };

@@ -3,15 +3,15 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:vm="clr-namespace:Aion.ViewModel"
       xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
       xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+      xmlns:viewModels="clr-namespace:Aion.ViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="1080" d:DesignWidth="1920"
       Title="EntryEditPage">
 
     <Page.DataContext>
-        <vm:ShiftEntryPageVM x:Name="VM"/>
+        <viewModels:ShiftEntryPageVM x:Name="VM"/>
     </Page.DataContext>
 
     <Page.InputBindings>
@@ -55,7 +55,7 @@
                                 MethodName="GetValues" 
                                 ObjectType="{x:Type sys:Enum}">
                 <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="vm:EEntrySortOption"/>
+                    <x:Type TypeName="viewModels:EEntrySortOption"/>
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
         </DockPanel.Resources>
@@ -244,7 +244,7 @@
                 </Button>
             </ToolBar>
         </ToolBarTray>
-        
+
         <Border BorderThickness="1" BorderBrush="Gray">
             <StackPanel Orientation="Vertical"
                         DockPanel.Dock="Left">

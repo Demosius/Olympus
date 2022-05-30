@@ -1,0 +1,113 @@
+﻿<Page x:Class="Prometheus.Views.Pages.Users.UserActivatePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+      xmlns:users="clr-namespace:Prometheus.ViewModels.Pages.Users"
+      xmlns:converters="clr-namespace:Prometheus.ViewModels.Converters"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="UserActivatePage">
+
+    <Page.DataContext>
+        <users:UserActivateVM x:Name="VM"/>
+    </Page.DataContext>
+
+    <Page.Resources>
+        <ResourceDictionary Source="../../../Themes/MSControls.Core.Implicit.xaml"/>
+    </Page.Resources>
+
+    <DockPanel>
+        <DockPanel.Resources>
+            <converters:EmploymentToStringConverter x:Key="EmploymentTypeConverter"/>
+            <ObjectDataProvider x:Key="SortMethods"
+                                MethodName="GetValues" 
+                                ObjectType="{x:Type sys:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="users:ESortMethod"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+            <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
+        </DockPanel.Resources>
+        <!-- Function Buttons -->
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal" 
+                    Background="{StaticResource ComboBoxReadOnlyBorderBrush}">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="MinWidth" Value="150"/>
+                </Style>
+            </StackPanel.Resources>
+            <Button Content="Activate Managers"
+                    ToolTip="Activates as a user any employee with direct reports, or that is in a role with reporting roles."
+                    Command="{Binding ActivateManagersCommand}"
+                    Visibility="{Binding CanMassCreate, Converter={StaticResource VisibilityConverter}, Mode=OneWay}"/>
+            <Button Content="Activate Selected"
+                    ToolTip="Activate the selected employee as a user."
+                    Command="{Binding ActivateUserCommand}"/>
+        </StackPanel>
+
+        <!-- Sorting and Filtering -->
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal"
+                    Background="{StaticResource ProgressBarBackgroundBrush}">
+            <TextBox Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     MinWidth="100"
+                     Margin="2"/>
+            <ComboBox ItemsSource="{Binding Source ={StaticResource SortMethods}}"
+                      SelectedValue="{Binding SelectedSortMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      MinWidth="100"
+                      Margin="2"/>
+        </StackPanel>
+
+        <!-- Employee Selection -->
+        <ListView ItemsSource="{Binding Employees, Mode=OneWay}"
+                  SelectedValue="{Binding SelectedEmployee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding Icon.FullPath, FallbackValue=''}"
+                                   MaxWidth="50"
+                                   MaxHeight="50"
+                                   Margin="0,0,5,0"/>
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                       FontSize="14"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource LightForegroundBrush}"/>
+                                <Label Content=" - "
+                                       FontSize="14"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource LightForegroundBrush}"/>
+                                <Label Content="{Binding ID, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                       FontSize="14"
+                                       FontStyle="Italic"
+                                       Foreground="{StaticResource LightForegroundBrush}"/>
+                            </StackPanel>
+                            <WrapPanel Orientation="Horizontal">
+                                <TextBlock Text="Employment: "/>
+                                <TextBlock Text="{Binding EmploymentType, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmploymentTypeConverter}}"/>
+                                <Separator/>
+                                <TextBlock Text="Role: "/>
+                                <TextBlock Text="{Binding Role, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Separator/>
+                                <TextBlock Text="Department: "/>
+                                <TextBlock Text="{Binding Department, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                            </WrapPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.Resources>
+                <Style TargetType="Separator" BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}">
+                    <Setter Property="Margin" Value="5,0"/>
+                </Style>
+            </ListView.Resources>
+        </ListView>
+
+    </DockPanel>
+</Page>

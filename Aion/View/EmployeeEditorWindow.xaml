@@ -4,14 +4,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:Aion.ViewModel"
         xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-        xmlns:model="clr-namespace:Uranus.Staff.Model;assembly=Uranus"
+        xmlns:model="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
+        xmlns:viewModels="clr-namespace:Aion.ViewModels"
         mc:Ignorable="d"
         Title="Edit Employee" Height="500" Width="475">
 
     <Window.DataContext>
-        <vm:EmployeeEditorVM x:Name="VM"/>
+        <viewModels:EmployeeEditorVM x:Name="VM"/>
     </Window.DataContext>
 
     <Window.Resources>
@@ -66,14 +66,14 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+
         <!-- CODE -->
         <Label Content="{Binding Code}"
                Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                HorizontalAlignment="Center"
                FontSize="24"
                FontWeight="Black"/>
-        
+
         <!-- First Name -->
         <Label Content="First Name: "
                Grid.Row="1" Grid.Column="0"
@@ -168,7 +168,7 @@
         <ComboBox Grid.Row="8" Grid.Column="1"
                   ItemsSource="{Binding JobClassifications, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   SelectedValue="{Binding JobClassification, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-        
+
         <!-- Okay/Cancel -->
         <StackPanel Orientation="Horizontal"
                     Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2"

@@ -169,35 +169,35 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Update="View\AlphaRegistrationWindow.xaml.cs">
+    <Compile Update="Views\AlphaRegistrationWindow.xaml.cs">
       <DependentUpon>AlphaRegistrationWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\Components\DatabaseSelection.xaml.cs">
+    <Compile Update="Views\Components\DatabaseSelection.xaml.cs">
       <DependentUpon>DatabaseSelection.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\Components\InventoryUpdater.xaml.cs">
+    <Compile Update="Views\Components\InventoryUpdater.xaml.cs">
       <DependentUpon>InventoryUpdater.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\Components\ProjectButton.xaml.cs">
+    <Compile Update="Views\Components\ProjectButton.xaml.cs">
       <DependentUpon>ProjectButton.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\Components\ProjectGroup.xaml.cs">
+    <Compile Update="Views\Components\ProjectGroup.xaml.cs">
       <DependentUpon>ProjectGroup.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\Components\ProjectLauncher.xaml.cs">
+    <Compile Update="Views\Components\ProjectLauncher.xaml.cs">
       <DependentUpon>ProjectLauncher.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\Components\UserHandler.xaml.cs">
+    <Compile Update="Views\Components\UserHandler.xaml.cs">
       <DependentUpon>UserHandler.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\LoginWindow.xaml.cs">
+    <Compile Update="Views\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\OlympusWindow.xaml.cs">
+    <Compile Update="Views\OlympusWindow.xaml.cs">
       <SubType>Code</SubType>
       <DependentUpon>OlympusWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\RegisterWindow.xaml.cs">
+    <Compile Update="Views\RegisterWindow.xaml.cs">
       <DependentUpon>RegisterWindow.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -268,36 +268,36 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\AlphaRegistrationWindow.xaml">
+    <Page Update="Views\AlphaRegistrationWindow.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\Components\DatabaseSelection.xaml">
+    <Page Update="Views\Components\DatabaseSelection.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\Components\InventoryUpdater.xaml">
+    <Page Update="Views\Components\InventoryUpdater.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\Components\ProjectButton.xaml">
+    <Page Update="Views\Components\ProjectButton.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\Components\ProjectGroup.xaml">
+    <Page Update="Views\Components\ProjectGroup.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\Components\ProjectLauncher.xaml">
+    <Page Update="Views\Components\ProjectLauncher.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\Components\UserHandler.xaml">
+    <Page Update="Views\Components\UserHandler.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\LoginWindow.xaml">
+    <Page Update="Views\LoginWindow.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\OlympusWindow.xaml">
+    <Page Update="Views\OlympusWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\RegisterWindow.xaml">
+    <Page Update="Views\RegisterWindow.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

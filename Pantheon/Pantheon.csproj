@@ -70,30 +70,30 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Update="View\Controls\ActiveEmployeeRosterView.xaml.cs">
+    <Compile Update="Views\Controls\ActiveEmployeeRosterView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="View\Controls\ActiveRosterView.xaml.cs">
+    <Compile Update="Views\Controls\ActiveRosterView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="View\PantheonPage.xaml.cs">
+    <Compile Update="Views\PantheonPage.xaml.cs">
       <DependentUpon>PantheonPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="View\Controls\ActiveEmployeeRosterView.xaml">
+    <Page Update="Views\Controls\ActiveEmployeeRosterView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\Controls\ActiveRosterView.xaml">
+    <Page Update="Views\Controls\ActiveRosterView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\InputWindow.xaml">
+    <Page Update="Views\InputWindow.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
-    <Page Update="View\PantheonPage.xaml">
+    <Page Update="Views\PantheonPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
@@ -107,13 +107,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModel\Controls\Employees\" />
-    <Folder Include="ViewModel\Pages\Employees\" />
-    <Folder Include="ViewModel\Pages\Rosters\" />
-    <Folder Include="ViewModel\Pages\Shifts\" />
-    <Folder Include="View\Pages\Employees\" />
-    <Folder Include="View\Pages\Rosters\" />
-    <Folder Include="View\Pages\Shifts\" />
+    <Folder Include="ViewModels\Controls\Employees\" />
+    <Folder Include="ViewModels\Pages\Employees\" />
+    <Folder Include="ViewModels\Pages\Rosters\" />
+    <Folder Include="ViewModels\Pages\Shifts\" />
+    <Folder Include="Views\Pages\Employees\" />
+    <Folder Include="Views\Pages\Rosters\" />
+    <Folder Include="Views\Pages\Shifts\" />
   </ItemGroup>
 
 </Project>

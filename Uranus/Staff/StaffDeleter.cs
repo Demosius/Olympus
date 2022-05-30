@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Uranus.Staff.Model;
+using Uranus.Staff.Models;
 
 namespace Uranus.Staff;
 

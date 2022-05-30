@@ -1,0 +1,67 @@
+﻿<Window x:Class="AionClock.Views.ClockConfirmationView"
+        x:Name="ConfirmationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:AionClock.ViewModels"
+        xmlns:converters="clr-namespace:AionClock.ViewModels.Converters"
+        mc:Ignorable="d"
+        Title="Confirm" Height="300" Width="500"
+        WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <viewModels:ClockConfirmationVM x:Name="VM"/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <converters:InOutColourConverter x:Key="InOutColourConverter"/>
+        <Style TargetType="Button">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Width" Value="100"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"
+                    Orientation="Vertical"
+                    HorizontalAlignment="Center">
+            <TextBlock Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                       FontSize="30"
+                       FontWeight="Bold"/>
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <TextBlock Text="Clocking "
+                           VerticalAlignment="Center"
+                           FontSize="30"/>
+                <TextBlock Text="{Binding Status, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                           FontWeight="Bold"
+                           FontSize="35"
+                           Foreground="{Binding Status, Converter={StaticResource InOutColourConverter}}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <Button Grid.Row="3" Grid.Column="1" 
+                Content="Cancel"
+                IsCancel="True"/>
+        <Button Grid.Row="3" Grid.Column="3"
+                Content="Accept"
+                IsDefault="True"
+                Command="{Binding ClockCommand}"
+                CommandParameter="{Binding ElementName=ConfirmationWindow}"/>
+    </Grid>
+</Window>

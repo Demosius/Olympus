@@ -4,11 +4,11 @@ using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using Uranus;
 using Uranus.Staff;
-using Uranus.Staff.Model;
+using Uranus.Staff.Models;
 using Uranus.Users;
-using Uranus.Users.Model;
-using Role = Uranus.Users.Model.Role;
-using StaffRole = Uranus.Staff.Model.Role;
+using Uranus.Users.Models;
+using Role = Uranus.Users.Models.Role;
+using StaffRole = Uranus.Staff.Models.Role;
 
 namespace Styx;
 

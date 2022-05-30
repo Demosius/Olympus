@@ -10,6 +10,7 @@
     <SolidColorBrush x:Key="Brush03" Color="#FFB5C6C6"/>
     <SolidColorBrush x:Key="Brush04" Color="#FF455656"/>
     <SolidColorBrush x:Key="Brush05" Color="#FF562222"/>
+    <SolidColorBrush x:Key="Brush06" Color="#FF223333"/>
 
     <!-- ********************************** THEME COLORS **********************************-->
     <!--Base Colors-->

@@ -1,5 +1,5 @@
-﻿using Uranus.Staff.Model;
-using UserRole = Uranus.Users.Model.Role;
+﻿using Uranus.Staff.Models;
+using UserRole = Uranus.Users.Models.Role;
 
 namespace Styx;
 

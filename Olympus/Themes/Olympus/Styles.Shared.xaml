@@ -11,7 +11,7 @@
 
     <!-- *********************************  BRUSHES  ********************************* -->
 
-    <!-- Olympus graydient brushes -->
+    <!-- Olympus gradient brushes -->
     <LinearGradientBrush x:Key="BackGroundBrush" EndPoint="0,1" StartPoint="0,0">
         <GradientStop Color="#044" Offset="0"/>
         <GradientStop Color="#022" Offset="1"/>

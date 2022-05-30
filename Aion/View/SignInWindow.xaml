@@ -4,12 +4,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:Aion.ViewModel"
+        xmlns:viewModels="clr-namespace:Aion.ViewModels"
         mc:Ignorable="d"
         Title="Sign In" Height="300" Width="500">
 
     <Window.DataContext>
-        <vm:SignInVM x:Name="VM"/>
+        <viewModels:SignInVM x:Name="VM"/>
     </Window.DataContext>
 
     <Window.Resources>
@@ -31,7 +31,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+
         <ComboBox Grid.Row="1" IsEditable="True"
                   x:Name="ManagerCombo"
                   ItemsSource="{Binding Managers}"

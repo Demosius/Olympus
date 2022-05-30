@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Uranus.Inventory.Model;
+using Uranus.Inventory.Models;
 
 namespace Uranus.Inventory;
 

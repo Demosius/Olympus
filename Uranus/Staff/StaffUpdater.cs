@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Uranus.Staff.Model;
+using Uranus.Staff.Models;
 
 namespace Uranus.Staff;
 

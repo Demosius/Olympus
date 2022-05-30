@@ -12,13 +12,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="View\KhaosPage.xaml.cs">
+    <Compile Update="Views\KhaosPage.xaml.cs">
       <DependentUpon>KhaosPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="View\KhaosPage.xaml">
+    <Page Update="Views\KhaosPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

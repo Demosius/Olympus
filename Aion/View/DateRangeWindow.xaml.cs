@@ -1,4 +1,4 @@
-﻿using Aion.ViewModel;
+﻿using Aion.ViewModels;
 
 namespace Aion.View;
 

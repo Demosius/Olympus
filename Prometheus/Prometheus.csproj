@@ -26,19 +26,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ViewModel\Commands\Equipment\" />
-    <Folder Include="ViewModel\Commands\Inventory\" />
-    <Folder Include="ViewModel\Commands\Staff\" />
-    <Folder Include="ViewModel\Pages\Equipment\" />
-    <Folder Include="ViewModel\Pages\Staff\" />
-    <Folder Include="ViewModel\PopUp\Equipment\" />
-    <Folder Include="ViewModel\PopUp\Inventory\" />
-    <Folder Include="ViewModel\PopUp\Staff\" />
-    <Folder Include="View\Pages\Equipment\" />
-    <Folder Include="View\Pages\Staff\" />
-    <Folder Include="View\PopUp\Equipment\" />
-    <Folder Include="View\PopUp\Inventory\" />
-    <Folder Include="View\PopUp\Staff\" />
+    <Folder Include="ViewModels\Commands\Equipment\" />
+    <Folder Include="ViewModels\Commands\Inventory\" />
+    <Folder Include="ViewModels\Commands\Staff\" />
+    <Folder Include="ViewModels\Pages\Equipment\" />
+    <Folder Include="ViewModels\Pages\Staff\" />
+    <Folder Include="ViewModels\PopUp\Equipment\" />
+    <Folder Include="ViewModels\PopUp\Inventory\" />
+    <Folder Include="ViewModels\PopUp\Staff\" />
+    <Folder Include="Views\Pages\Equipment\" />
+    <Folder Include="Views\Pages\Staff\" />
+    <Folder Include="Views\PopUp\Equipment\" />
+    <Folder Include="Views\PopUp\Inventory\" />
+    <Folder Include="Views\PopUp\Staff\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -79,16 +79,16 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Update="View\Pages\Inventory\BatchView.xaml.cs">
+    <Compile Update="Views\Pages\Inventory\BatchView.xaml.cs">
       <DependentUpon>BatchView.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\Pages\Inventory\BinEditView.xaml.cs">
+    <Compile Update="Views\Pages\Inventory\BinEditView.xaml.cs">
       <DependentUpon>BinEditView.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\Pages\Inventory\BinView.xaml.cs">
+    <Compile Update="Views\Pages\Inventory\BinView.xaml.cs">
       <DependentUpon>BinView.xaml</DependentUpon>
     </Compile>
-    <Compile Update="View\PrometheusPage.xaml.cs">
+    <Compile Update="Views\PrometheusPage.xaml.cs">
       <DependentUpon>PrometheusPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -123,19 +123,19 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="View\Pages\Inventory\BatchView.xaml">
+    <Page Update="Views\Pages\Inventory\BatchView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\Pages\Inventory\BinEditView.xaml">
+    <Page Update="Views\Pages\Inventory\BinEditView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\Pages\Inventory\BinView.xaml">
+    <Page Update="Views\Pages\Inventory\BinView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="View\PrometheusPage.xaml">
+    <Page Update="Views\PrometheusPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

@@ -1,5 +1,5 @@
 ﻿using Uranus;
-using Uranus.Staff.Model;
+using Uranus.Staff.Models;
 
 namespace Aion.View;
 

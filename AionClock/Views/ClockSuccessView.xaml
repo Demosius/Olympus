@@ -1,0 +1,35 @@
+﻿<Window x:Class="AionClock.Views.ClockSuccessView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:AionClock.ViewModels"
+        xmlns:converters="clr-namespace:AionClock.ViewModels.Converters"
+        mc:Ignorable="d"
+        Title="ClockSuccessView" Height="400" Width="900"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.DataContext>
+        <viewModels:ClockSuccessVM x:Name="VM"/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <converters:InOutColourConverter x:Key="InOutColourConverter"/>
+    </Window.Resources>
+
+    <Grid>
+        <Border BorderThickness="4" BorderBrush="{Binding Action, Converter={StaticResource InOutColourConverter}}">
+            <StackPanel VerticalAlignment="Center">
+                <Label Content="{Binding EmployeeName}"
+                       HorizontalAlignment="Center"
+                       FontSize="48" FontWeight="Bold"/>
+                <Label Content="{Binding Action}" Foreground="{Binding Action, Converter={StaticResource InOutColourConverter}}" FontWeight="Black" FontSize="54"
+                       HorizontalAlignment="Center"/>
+                <Label Content="{Binding TimeStamp}" 
+                       FontWeight="Bold" FontSize="48" FontFamily="Courier New"
+                       HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

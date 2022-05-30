@@ -1,20 +1,20 @@
-﻿using Uranus;
-using Vulcan.Model;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows;
+using Uranus;
+using Vulcan.Models;
 using Vulcan.Properties;
 
 namespace Vulcan;
 
 /// <summary>
-///  The chariot for Vulcan specific data transactions and persitence.
+///  The chariot for Vulcan specific data transactions and persistence.
 /// </summary>
-class VulcanChariot : MasterChariot
+internal sealed class VulcanChariot : MasterChariot
 {
-    public override string DatabaseName { get; } = "Vulcan.sqlite";
+    public override string DatabaseName => "Vulcan.sqlite";
 
-    public override Type[] Tables { get; } = new Type[] {typeof(Operator)};
+    public override Type[] Tables { get; } = { typeof(Operator) };
 
     /*************************** Constructors ****************************/
 
@@ -81,5 +81,5 @@ class VulcanChariot : MasterChariot
     /***************************** UPDATE Data ****************************/
 
     /***************************** DELETE Data ****************************/
-        
+
 }

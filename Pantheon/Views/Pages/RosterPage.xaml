@@ -1,0 +1,94 @@
+﻿<Page x:Class="Pantheon.Views.Pages.RosterPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:controls="clr-namespace:Pantheon.Views.Controls"
+      xmlns:pages="clr-namespace:Pantheon.ViewModels.Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="1080" d:DesignWidth="1200"
+      Title="EmployeePage">
+
+    <Page.DataContext>
+        <pages:RosterPageVM x:Name="VM"/>
+    </Page.DataContext>
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Dark Theme -->
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <DockPanel>
+        <DockPanel.Resources>
+            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="IsEditable" Value="True"/>
+                <Setter Property="MinWidth" Value="150"/>
+                <Setter Property="MaxWidth" Value="250"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="{x:Type DatePicker}">
+                <Setter Property="Margin" Value="5,0"/>
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="MinHeight" Value="0"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+                <Setter Property="Margin" Value="00"/>
+            </Style>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="MinWidth" Value="0"/>
+                <Setter Property="MinHeight" Value="0"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+            </Style>
+            <Style TargetType="{x:Type DataGrid}">
+                <Setter Property="Background" Value="{StaticResource AccordionBackgroundBrush}"/>
+            </Style>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        </DockPanel.Resources>
+
+        <!-- Top Control Panel -->
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+            <Label Content="Department:"/>
+            <ComboBox ItemsSource="{Binding Departments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedValue="{Binding SelectedDepartment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Label Content="Roster:"/>
+            <ComboBox ItemsSource="{Binding Rosters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedValue="{Binding SelectedRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Button Content="Load Roster" Width="140"
+                    Command="{Binding LoadRosterCommand}"/>
+            <Button Content="New Roster" Width="140"
+                    Command="{Binding NewRosterCommand}"/>
+            <Button Content="Delete Roster" Width="140"
+                    Command="{Binding DeleteRosterCommand}"/>
+        </StackPanel>
+
+        <!-- More Controls -->
+        <StackPanel DockPanel.Dock="Bottom"
+                    Orientation="Horizontal">
+            <Button Content="Save Changes"
+                    Command="{Binding SaveRosterCommand}"/>
+            <Button Content="Export Roster"
+                    Command="{Binding ExportRosterCommand}"/>
+        </StackPanel>
+
+        <!-- Department Roster UI -->
+        <controls:DepartmentRosterView DataContext="{Binding LoadedRoster}"
+                                       Visibility="{Binding ElementName=VM, Path=IsLoaded, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+
+    </DockPanel>
+</Page>

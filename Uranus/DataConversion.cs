@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Uranus.Inventory;
-using Uranus.Inventory.Model;
+using Uranus.Inventory.Models;
 
 namespace Uranus;
 

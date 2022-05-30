@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Uranus.Users.Model;
+using Uranus.Users.Models;
 
 namespace Uranus.Users;
 

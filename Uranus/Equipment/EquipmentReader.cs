@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Uranus.Equipment.Model;
+using Uranus.Equipment.Models;
 
 namespace Uranus.Equipment;
 

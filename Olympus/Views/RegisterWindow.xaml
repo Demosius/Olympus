@@ -1,0 +1,31 @@
+﻿<Window x:Class="Olympus.Views.RegisterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="{DynamicResource BackGroundBrush}"
+        Title="Register" SizeToContent="Height" Width="300">
+
+    <StackPanel Margin="10">
+        <WrapPanel>
+            <Label Content="_User" Target="{Binding ElementName=TxtUser}"/>
+            <Label>
+                <TextBlock FontSize="12" FontWeight="Light" FontStyle="Italic">(employee number)</TextBlock>
+            </Label>
+        </WrapPanel>
+        <TextBox x:Name="TxtUser"/>
+        <Label>_Password</Label>
+        <PasswordBox x:Name="PwdFirst"/>
+        <!-- ReSharper disable once MarkupTextTypo -->
+        <Label>R_epeat Password</Label>
+        <PasswordBox x:Name="PwdSecond"/>
+        <TextBlock Margin="10" Foreground="WhiteSmoke" TextWrapping="Wrap">Password must be at least 6 characters long. Mixing upper and lower case letters with numbers and special characters is also recommended.</TextBlock>
+        <StackPanel Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Right">
+            <Button IsCancel="True">_Cancel</Button>
+            <Button IsDefault="True" Name="BtnRegister" >_Register</Button>
+        </StackPanel>
+    </StackPanel>
+</Window>

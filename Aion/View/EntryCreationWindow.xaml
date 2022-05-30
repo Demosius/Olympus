@@ -4,14 +4,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:Aion.ViewModel"
+        xmlns:viewModels="clr-namespace:Aion.ViewModels"
         mc:Ignorable="d"
         Title="Simple Shift Creator" Height="800" Width="560" 
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
-        <vm:EntryCreationVM x:Name="VM"/>
+        <viewModels:EntryCreationVM x:Name="VM"/>
     </Window.DataContext>
 
     <Window.Resources>
@@ -34,7 +34,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+
         <!-- Date range -->
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
@@ -71,7 +71,7 @@
         <!-- Date -->
         <StackPanel Grid.Row="1" Orientation="Horizontal"
                     HorizontalAlignment="Center">
-        <DatePicker SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            <DatePicker SelectedDate="{Binding SelectedDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     HorizontalAlignment="Center"
                     FontSize="18"
                     TextBlock.TextAlignment="Center"/>
@@ -88,7 +88,7 @@
                   IsEditable="True"
                   HorizontalContentAlignment="Center"
                   FontSize="16"/>
-        
+
         <!-- Template Row -->
         <Grid Grid.Row="3"
               Margin="5">
@@ -138,7 +138,7 @@
                    FontSize="8"/>
             <TextBox Grid.Row="1" Grid.Column="4"
                      Text="{Binding Comment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            
+
             <!-- Create Shift Entry Button -->
             <Button Grid.Row="0" Grid.Column="5" Grid.RowSpan="2"
                     Margin="10,0"
@@ -155,7 +155,7 @@
             </Grid.Resources>
 
         </Grid>
-        
+
         <!-- Entry Display -->
         <ListView Grid.Row="4"
                   ItemsSource="{Binding Entries, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -203,7 +203,7 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        
+
         <!-- Delete Shift Button-->
         <StackPanel Grid.Row="5" Orientation="Horizontal"
                     Margin="5,5,5,15"

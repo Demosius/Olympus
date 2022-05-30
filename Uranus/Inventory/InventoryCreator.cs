@@ -1,6 +1,6 @@
-﻿using Uranus.Inventory.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Uranus.Inventory.Models;
 
 namespace Uranus.Inventory;
 

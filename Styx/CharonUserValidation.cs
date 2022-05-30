@@ -1,5 +1,4 @@
-﻿using Uranus.Staff.Model;
-using Uranus.Users.Model;
+﻿using Uranus.Staff.Models;
 
 namespace Styx;
 

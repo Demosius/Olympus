@@ -4,13 +4,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="clr-namespace:Aion.ViewModel"
-        xmlns:converters="clr-namespace:Aion.ViewModel.Converters"
+        xmlns:viewModels="clr-namespace:Aion.ViewModels"
+        xmlns:converters="clr-namespace:Aion.ViewModels.Converters"
         mc:Ignorable="d"
         Title="Create New Employee" Height="350" Width="500">
 
     <Window.DataContext>
-        <vm:EmployeeCreationVM x:Name="VM"/>
+        <viewModels:EmployeeCreationVM x:Name="VM"/>
     </Window.DataContext>
 
     <Window.Resources>
@@ -23,7 +23,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    
+
     <Grid Margin="20"
           FocusManager.FocusedElement="{Binding ElementName=EntryBox}">
         <Grid.Resources>
@@ -42,12 +42,12 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        
+
         <!-- Label Direction -->
         <Label Content="Enter New Employee Number"
                Grid.Row="1"
                Margin="20,5"/>
-        
+
         <!-- Employee Code Input Box -->
         <TextBox Grid.Row="2" 
                  x:Name="EntryBox"
@@ -84,5 +84,5 @@
                     CommandParameter="{Binding ElementName=EmployeeCreator}"/>
         </StackPanel>
     </Grid>
-    
+
 </Window>

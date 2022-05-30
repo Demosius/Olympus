@@ -1,0 +1,122 @@
+﻿<UserControl x:Class="Pantheon.Views.Controls.ActiveRosterView"
+             x:Name="ActiveRosterControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:model="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
+             xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Rosters"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:RosterVM}, IsDesignTimeCreatable=False}"
+             Height="90" Width="200">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Dark Theme -->
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
+                <ResourceDictionary Source="../../Resources/Fonts.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Border BorderBrush="{StaticResource ForegroundBrush}"
+            BorderThickness=".5">
+        <Canvas>
+            <Canvas.Resources>
+                <ObjectDataProvider x:Key="RosterTypes"
+                                    MethodName="GetValues" 
+                                    ObjectType="{x:Type sys:Enum}">
+                    <ObjectDataProvider.MethodParameters>
+                        <x:Type TypeName="model:ERosterType"/>
+                    </ObjectDataProvider.MethodParameters>
+                </ObjectDataProvider>
+                <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            </Canvas.Resources>
+
+            <!-- Attendance -->
+            <CheckBox Canvas.Top="15" Canvas.Left="0"
+                      IsChecked="{Binding AtWork, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Margin="0"
+                      Padding="0"
+                      ToolTip="At Work"
+                      x:Name="IsAtWork"/>
+
+            <!-- Times -->
+            <TextBox Canvas.Top="5" Canvas.Left="28"
+                     Text="{Binding StartTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     Height="50"
+                     MinHeight="0"
+                     FontSize="24"
+                     FontFamily="{StaticResource DIN}"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center"
+                     VerticalContentAlignment="Center"
+                     HorizontalContentAlignment="Center"
+                     Width="77"
+                     Margin="0"
+                     Padding="0"
+                     GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                     LostMouseCapture="TextBox_LostMouseCapture"
+                     LostKeyboardFocus="TextBox_LostKeyboardFocus"
+                     Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
+            <Label Canvas.Top="18" Canvas.Left="102"
+                   Content="to"
+                   FontSize="10"
+                   Margin="0"
+                   Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
+            <TextBox Canvas.Top="5" Canvas.Left="119"  
+                     Text="{Binding EndTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                     Height="50"
+                     MinHeight="0"
+                     FontSize="24"
+                     FontFamily="{StaticResource DIN}"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center"
+                     VerticalContentAlignment="Center"
+                     HorizontalContentAlignment="Center"
+                     Width="77"
+                     Margin="0"
+                     Padding="0"
+                     GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                     LostMouseCapture="TextBox_LostMouseCapture"
+                     LostKeyboardFocus="TextBox_LostKeyboardFocus"
+                     Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
+
+            <!-- Away Display -->
+            <Label Canvas.Top="5" Canvas.Left="30"
+                   Height="50" Width="160"
+                   FontSize="22"
+                   Foreground="{StaticResource  GridSplitterHoverBorderBrush}"
+                   VerticalContentAlignment="Center"
+                   HorizontalContentAlignment="Center"
+                   Content="{Binding Type, Mode=OneWay}"
+                   Visibility="{Binding NotAtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
+
+            <!-- Shift Selector -->
+            <ComboBox Canvas.Top="57" Canvas.Left="5"
+                      Width="92"
+                      Height="27"
+                      FontSize="12"
+                      HorizontalContentAlignment="Center"
+                      VerticalContentAlignment="Center"
+                      Style="{StaticResource MiniComboBoxStyle}"
+                      ItemsSource="{Binding DepartmentRosterVM.Shifts, Mode=OneTime}"
+                      SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <!-- Shift Type Selector (Normal/AL/RDO/etc.) -->
+            <ComboBox Canvas.Top="57" Canvas.Left="103"
+                      Style="{StaticResource MiniComboBoxStyle}"
+                      ItemsSource="{Binding Source={StaticResource RosterTypes}, Mode=OneTime}"
+                      Height="27"
+                      Width="90"
+                      FontSize="12"
+                      HorizontalContentAlignment="Center"
+                      VerticalContentAlignment="Center"
+                      SelectedValue="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+        </Canvas>
+    </Border>
+</UserControl>
