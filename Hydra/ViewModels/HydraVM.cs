@@ -19,6 +19,7 @@ public class HydraVM : INotifyPropertyChanged, IDBInteraction, IDataSource
     public RunVM RunVM { get; set; }
     public SiteManagerVM SiteManagerVM { get; set; }
     public ZoneHandlerVM ZoneHandlerVM { get; set; }
+    public ItemLevelsVM ItemLevelsVM { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -39,6 +40,7 @@ public class HydraVM : INotifyPropertyChanged, IDBInteraction, IDataSource
         RunVM = new RunVM(this);
         SiteManagerVM = new SiteManagerVM(this);
         ZoneHandlerVM = new ZoneHandlerVM(this);
+        ItemLevelsVM = new ItemLevelsVM(this);
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);

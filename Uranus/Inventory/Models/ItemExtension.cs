@@ -11,6 +11,11 @@ public class ItemExtension
     [OneToOne(nameof(ItemNumber), nameof(NAVItem.Extension), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVItem? Item { get; set; }
 
+    public ItemExtension()
+    {
+
+    }
+
     public ItemExtension(NAVItem item)
     {
         Item = item;

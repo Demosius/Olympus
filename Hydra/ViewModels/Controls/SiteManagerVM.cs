@@ -133,7 +133,7 @@ public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
         var siteName = inputBox.InputText;
 
         if (siteName.Length == 0) return;
-        if (Sites.Select(s => s.Site.Name).Contains(siteName))
+        if (siteName == "NoSite" || Sites.Select(s => s.Site.Name).Contains(siteName))
         {
             MessageBox.Show("Site with this name already exists.", "No New Site Created", MessageBoxButton.OK,
                 MessageBoxImage.Warning);

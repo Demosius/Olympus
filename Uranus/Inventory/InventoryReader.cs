@@ -88,6 +88,42 @@ public class InventoryReader
         return returnZones;
     }
 
+    /// <summary>
+    /// Items with matched item-extension objects.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<NAVItem> Items()
+    {
+        IEnumerable<NAVItem>? returnItems = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var items = Chariot.PullObjectList<NAVItem>().ToDictionary(i => i.Number, i => i);
+            var extensions = Chariot.PullObjectList<ItemExtension>().ToDictionary(e => e.ItemNumber, e => e);
+            var newExtensions = new List<ItemExtension>();
+
+            foreach (var (no, item) in items)
+            {
+                if (extensions.TryGetValue(no, out var extension))
+                {
+                    item.Extension = extension;
+                    extension.Item = item;
+                }
+                else
+                {
+                    extension = new ItemExtension(item);
+                    newExtensions.Add(extension);
+                }
+            }
+
+            Chariot.InsertIntoTable(newExtensions);
+            returnItems = items.Values;
+        });
+        returnItems ??= new List<NAVItem>();
+
+        return returnItems;
+    }
+
     /* STOCK */
     // Stock.ID = <locationCode>:<zoneCode>:<binCode>:<itemNumber>:<uomCode>
     public NAVStock? NAVStock(string stockID, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVStock>(stockID, pullType);
@@ -268,5 +304,68 @@ public class InventoryReader
         }
 
         return siteDict.Values;
+    }
+
+    /// <summary>
+    /// Get the full set of data required for standard Hydra functionality.
+    /// </summary>
+    /// <returns></returns>
+    public HydraDataSet HydraDataSet(bool includeStock = true)
+    {
+        HydraDataSet? dataSet = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var items = Items().ToList();
+            var sites = Sites(out var zones).ToList();
+            var levels = Chariot.PullObjectList<SiteItemLevel>().ToDictionary(l => (l.ItemNumber, l.SiteName), l => l);
+            var stock = includeStock
+                ? Chariot.PullObjectList<NAVStock>()
+                : new List<NAVStock>();
+            var bins = includeStock
+                ? Chariot.PullObjectList<NAVBin>()
+                : new List<NAVBin>();
+            var uomList = includeStock
+                ? Chariot.PullObjectList<NAVUoM>()
+                : new List<NAVUoM>();
+            var newLevels = new List<SiteItemLevel>();
+
+            foreach (var item in items)
+            {
+                foreach (var site in sites)
+                {
+                    if (levels.TryGetValue((item.Number, site.Name), out var level))
+                    {
+                        item.SiteLevels.Add(level);
+                        site.ItemLevels.Add(level);
+                        level.Site = site;
+                        level.Item = item;
+                    }
+                    else
+                    {
+                        level = new SiteItemLevel(item, site);
+                        newLevels.Add(level);
+                    }
+                }
+            }
+
+            IEnumerable<SiteItemLevel> allLevels;
+            if (newLevels.Any())
+            {
+                Chariot.InsertIntoTable(newLevels);
+                allLevels = newLevels.Concat(levels.Values);
+            }
+            else
+            {
+                allLevels = levels.Values;
+            }
+
+            dataSet = new HydraDataSet(items, sites, zones, allLevels, bins, stock, uomList);
+        });
+
+        dataSet ??= new HydraDataSet(new List<NAVItem>(), new List<Site>(), new List<NAVZone>(),
+            new List<SiteItemLevel>(), new List<NAVBin>(), new List<NAVStock>(), new List<NAVUoM>());
+
+        return dataSet;
     }
 }

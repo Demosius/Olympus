@@ -43,6 +43,8 @@
                                       Visibility="{Binding ElementName=SiteToggle, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             <controls:RunView DataContext="{Binding RunVM}" 
                               Visibility="{Binding ElementName=ActionToggle, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <controls:ItemLevelsView DataContext="{Binding ItemLevelsVM}"
+                                     Visibility="{Binding ElementName=LevelsToggle, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </Grid>
     </DockPanel>
 </Page>

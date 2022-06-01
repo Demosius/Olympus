@@ -1,11 +1,10 @@
-﻿<UserControl x:Class="Hydra.Views.Controls.ZoneHandlerView"
+﻿<UserControl x:Class="Hydra.Views.Controls.ItemLevelsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:vm="clr-namespace:Hydra.ViewModels.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Hydra.Views.Controls"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance {x:Type vm:ZoneHandlerVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
@@ -14,27 +13,27 @@
                 <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
                 <ResourceDictionary>
                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
-                        <Setter Property="Margin" Value="2"></Setter>
+                        <Setter Property="Margin" Value="2"/>
                     </Style>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <DockPanel Background="Aquamarine">
+    <DockPanel Background="Honeydew">
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal"
-                    Background="{StaticResource CheckBoxBackgroundBrush}">
+                    Background="{StaticResource Brush05}">
             <Button Command="{Binding RefreshDataCommand}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="../../Resources/refresh.png"
                            MaxHeight="20"
-                           MaxWidth="20"
-                           Margin="0,0,5,0"/>
-                    <TextBlock Text="Refresh"/>
+                           MinHeight="20"
+                           Margin="0,0,2,0"/>
+                    <TextBlock Text="Refresh Data"/>
                 </StackPanel>
             </Button>
-            <Button Command="{Binding SaveZonesCommand}">
+            <Button Command="{Binding SaveSitesCommand}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="../../Resources/save.png"
                            MaxHeight="20"
@@ -43,26 +42,16 @@
                     <TextBlock Text="Save Changes"/>
                 </StackPanel>
             </Button>
-            <Button ToolTip="Update From NAV"
-                    Command="{Binding UpdateZonesCommand}">
+            <!--<Button Command="{Binding AddNewSiteCommand}">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="../../Resources/arrow-transition-090.png"
+                    <Image Source="../../Resources/plus-circle-frame.png"
                            MaxHeight="20"
                            MinHeight="20"
                            Margin="0,0,2,0"/>
-                    <TextBlock Text="Update Zones"/>
+                    <TextBlock Text="Add New Site"/>
                 </StackPanel>
-            </Button>
+            </Button>-->
         </StackPanel>
-        <DataGrid ItemsSource="{Binding Zones}"
-                  AutoGenerateColumns="True"
-                  AutoGeneratingColumn="DataGrid_OnAutoGeneratingColumn"
-                  CanUserAddRows="True"
-                  CanUserDeleteRows="True"
-                  CanUserSortColumns="True"
-                  CanUserReorderColumns="True"
-                  CanUserResizeColumns="True"
-                  CanUserResizeRows="True"/>
+        <Grid></Grid>
     </DockPanel>
-
 </UserControl>

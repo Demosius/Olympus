@@ -67,10 +67,16 @@ public class Stock
         Bin = navStock.Bin;
         Item = navStock.Item;
 
+        Bin?.Stock.Add(this);
+        Item?.Stock.Add(this);
+
+
         // Handle IDs : Item should stay constant, so isn't included in the re-used SetIDs method.
         ItemNumber = Item?.Number ?? navStock.ItemNumber;
         SetIDs();
     }
+
+    public NAVZone? Zone => Bin?.Zone;
 
     private void SetIDs()
     {

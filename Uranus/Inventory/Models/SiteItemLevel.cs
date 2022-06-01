@@ -25,5 +25,14 @@ public class SiteItemLevel
         SiteName = string.Empty;
     }
 
+    public SiteItemLevel(NAVItem item, Site site)
+    {
+        Site = site;
+        Item = item;
+        ItemNumber = item.Number;
+        SiteName = site.Name;
 
+        site.ItemLevels.Add(this);
+        item.SiteLevels.Add(this);
+    }
 }

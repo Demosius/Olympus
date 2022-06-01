@@ -85,59 +85,62 @@
                 <!--<Expander Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">-->
                 <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
                       Visibility="{Binding ElementName=DetailToggle, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <Grid.Resources>
-                            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
-                                <Setter Property="Margin" Value="2"/>
-                                <Setter Property="MinWidth" Value="40"/>
-                                <Setter Property="MinHeight" Value="0"/>
-                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                                <Setter Property="FontSize" Value="10"/>
-                            </Style>
-                            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
-                                <Setter Property="HorizontalAlignment" Value="Center"/>
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                <Setter Property="FontSize" Value="10"/>
-                            </Style>
-                        </Grid.Resources>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                    <Grid.Resources>
+                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                            <Setter Property="Margin" Value="2"/>
+                            <Setter Property="MinWidth" Value="40"/>
+                            <Setter Property="MinHeight" Value="0"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="FontSize" Value="10"/>
+                            <EventSetter Event="GotKeyboardFocus" Handler="TextBox_GotKeyboardFocus"/>
+                            <EventSetter Event="LostMouseCapture" Handler="TextBox_LostMouseCapture"/>
+                            <EventSetter Event="LostKeyboardFocus" Handler="TextBox_LostKeyboardFocus"/>
+                        </Style>
+                        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                            <Setter Property="HorizontalAlignment" Value="Center"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="FontSize" Value="10"/>
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                        <Label Grid.Row="0" Grid.Column="1" Content="Min"/>
-                        <Label Grid.Row="0" Grid.Column="2" Content="Max"/>
-                        <Label Grid.Row="1" Grid.Column="0" Content="Units"/>
-                        <Label Grid.Row="2" Grid.Column="0" Content="Cases"/>
-                        <Label Grid.Row="3" Grid.Column="0" Content="Pct (%)" ToolTip="Between 1% and 100% - Decimals will be converted."/>
+                    <Label Grid.Row="0" Grid.Column="1" Content="Min"/>
+                    <Label Grid.Row="0" Grid.Column="2" Content="Max"/>
+                    <Label Grid.Row="1" Grid.Column="0" Content="Units"/>
+                    <Label Grid.Row="2" Grid.Column="0" Content="Cases"/>
+                    <Label Grid.Row="3" Grid.Column="0" Content="Pct (%)" ToolTip="Between 1% and 100% - Decimals will be converted."/>
 
-                        <TextBox Grid.Row="1" Grid.Column="1" 
+                    <TextBox Grid.Row="1" Grid.Column="1" 
                                  ToolTip="Minimum Units"
                                  Text="{Binding MinUnits}"/>
-                        <TextBox Grid.Row="1" Grid.Column="2" 
+                    <TextBox Grid.Row="1" Grid.Column="2" 
                                  ToolTip="Maximum Units"
                                  Text="{Binding MaxUnits}"/>
-                        <TextBox Grid.Row="2" Grid.Column="1" 
+                    <TextBox Grid.Row="2" Grid.Column="1" 
                                  ToolTip="Minimum Cases"
                                  Text="{Binding MinCases}"/>
-                        <TextBox Grid.Row="2" Grid.Column="2" 
+                    <TextBox Grid.Row="2" Grid.Column="2" 
                                  ToolTip="Maximum Cases"
                                  Text="{Binding MaxCases}"/>
-                        <TextBox Grid.Row="3" Grid.Column="1" 
+                    <TextBox Grid.Row="3" Grid.Column="1" 
                                  ToolTip="Minimum Percentage"
                                  Text="{Binding MinPct}"/>
-                        <TextBox Grid.Row="3" Grid.Column="2" 
+                    <TextBox Grid.Row="3" Grid.Column="2" 
                                  ToolTip="Maximum Percentage"
                                  Text="{Binding MaxPct}"/>
-                    </Grid>
+                </Grid>
                 <!--</Expander>-->
             </Grid>
         </Border>
