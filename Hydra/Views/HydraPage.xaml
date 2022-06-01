@@ -32,6 +32,9 @@
             <ToggleButton x:Name="SiteToggle"
                           Content="Site Manager"
                           Checked="SiteToggle_OnChecked"/>
+            <ToggleButton x:Name="LevelsToggle"
+                          Content="Item Level Targets"
+                          Checked="LevelsToggle_OnChecked"/>
         </StackPanel>
         <Grid Background="DarkGreen">
             <controls:ZoneHandlerView DataContext="{Binding ZoneHandlerVM}" 

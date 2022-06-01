@@ -895,7 +895,8 @@
                         <ContentControl x:Name="contentControl" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}" Foreground="{TemplateBinding Foreground}">
                             <ContentPresenter x:Name="contentPresenter" />
                         </ContentControl>
-                        <ContentControl x:Name="contentControl1" Visibility="Collapsed" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}" Foreground="{StaticResource ForegroundBrush}">
+                        <!-- Changed Visibility (Collapsed => Visible) to assist with image content control for toggle button. -->
+                        <ContentControl x:Name="contentControl1" Visibility="Visible" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}" Foreground="{StaticResource ForegroundBrush}">
                             <ContentPresenter x:Name="contentPresenter1" />
                         </ContentControl>
                         <Rectangle x:Name="FocusedVisualElement" Stroke="{StaticResource ButtonPressedBorderBrush}" Visibility="Collapsed" StrokeThickness="2" />

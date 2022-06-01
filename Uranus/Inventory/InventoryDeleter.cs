@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Uranus.Inventory.Models;
 
 namespace Uranus.Inventory;
 
@@ -13,5 +14,6 @@ public class InventoryDeleter
 
     // Deletes stock where zones are in the given list.
     public void StockZoneDeletes(List<string> zoneIDs) => Chariot.StockZoneDeletes(zoneIDs);
-       
+
+    public bool Site(Site site) => Chariot.Delete(site);
 }

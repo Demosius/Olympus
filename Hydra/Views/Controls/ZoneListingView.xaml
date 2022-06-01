@@ -5,15 +5,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Hydra.Views.Controls"
              xmlns:vm="clr-namespace:Hydra.ViewModels.Controls"
-             d:DataContext="{d:DesignData {x:Type vm:ZoneListingVM}, d:IsDesignTimeCreatable=False}"
+             d:DataContext="{d:DesignInstance {x:Type vm:ZoneListingVM}, d:IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <Grid>
-        <ListView x:Name="zoneListView"
+        <ListView x:Name="ZoneListView"
                   AllowDrop="True"
                   DragLeave="ZoneItemList_DragLeave"
                   DragOver="ZoneItemList_DragOver"
-                  ItemsSource="{Binding }">
+                  ItemsSource="{Binding ZoneVMs}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <EventSetter Event="MouseMove" Handler="ZoneItem_MouseMove" />
@@ -22,7 +31,8 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Description}" />
+                    <TextBlock Text="{Binding}" 
+                               ToolTip="{Binding Zone.Site.Name, FallbackValue=''}" HorizontalAlignment="Center"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

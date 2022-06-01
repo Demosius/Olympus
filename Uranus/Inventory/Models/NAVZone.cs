@@ -48,6 +48,13 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
         }
     }
 
+    [Ignore]
+    public string SiteName
+    {
+        get => (Extension ??= new ZoneExtension(this)).SiteName;
+        set => (Extension ??= new ZoneExtension(this)).SiteName = value;
+    }
+
     public NAVZone()
     {
         ID = string.Empty;

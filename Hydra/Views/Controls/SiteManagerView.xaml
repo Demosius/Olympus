@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:Hydra.ViewModels.Controls"
+             xmlns:controls="clr-namespace:Hydra.Views.Controls"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:SiteManagerVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -31,13 +32,68 @@
                            MaxHeight="20"
                            MinHeight="20"
                            Margin="0,0,2,0"/>
-                    <TextBlock Text="Refresh Data"></TextBlock>
+                    <TextBlock Text="Refresh Data"/>
                 </StackPanel>
             </Button>
-            <Button Content=" Add New Site"
-                    Command="{Binding AddNewSiteCommand}"/>
+            <Button Command="{Binding SaveSitesCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="../../Resources/save.png"
+                           MaxHeight="20"
+                           MinHeight="20"
+                           Margin="0,0,2,0"/>
+                    <TextBlock Text="Save Changes"/>
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding AddNewSiteCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="../../Resources/plus-circle-frame.png"
+                           MaxHeight="20"
+                           MinHeight="20"
+                           Margin="0,0,2,0"/>
+                    <TextBlock Text="Add New Site"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
-        <DataGrid></DataGrid>
+        <Grid DockPanel.Dock="Left"
+              Background="{StaticResource Brush03}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0"
+                    BorderBrush="Black"
+                    BorderThickness="1">
+                <TextBlock Text="No Site Zones."
+                           FontSize="14"
+                           FontWeight="Bold"
+                           Margin="5"/>
+            </Border>
+            <controls:ZoneListingView Grid.Row="1"
+                                      DataContext="{Binding NoSiteZoneListing}"
+                                      IncomingZoneItem="{Binding IncomingZoneVM}"
+                                      InsertedZoneItem="{Binding InsertedZoneVM}"
+                                      RemovedZoneItem="{Binding RemovedZoneVM}"
+                                      TargetZoneItem="{Binding TargetZoneVM}"
+                                      ZoneItemDropCommand="{Binding ZoneReceivedCommand}"
+                                      ZoneItemInsertedCommand="{Binding ZoneInsertedCommand}"
+                                      ZoneItemRemovedCommand="{Binding ZoneRemovedCommand}"/>
+        </Grid>
+        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Disabled">
+            <ItemsControl Background="{StaticResource Brush04}"
+                          ItemsSource="{Binding Sites}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <ItemContainerTemplate>
+                        <controls:SiteView/>
+                    </ItemContainerTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </DockPanel>
 
 </UserControl>

@@ -4,24 +4,153 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:Hydra.ViewModels.Controls"
+             xmlns:controls="clr-namespace:Hydra.Views.Controls"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:SiteVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="1200" d:DesignWidth="600">
 
-    <Grid>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary>
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid MinWidth="100" Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            
+        <Border Grid.Row="0" BorderBrush="{StaticResource Brush01}"
+                    BorderThickness="1"
+                    Background="{StaticResource Brush05}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-        </Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-        <ListView Grid.Row="1">
+                <TextBlock Grid.Row="0" Grid.Column="1"
+                           Text="{Binding Site.Name}"
+                           Foreground="{StaticResource Brush01}"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+                <Button Grid.Row="0" Grid.Column="2"
+                        Command="{Binding DeleteSiteCommand}"
+                        CommandParameter="{Binding}"
+                        Padding="2"
+                        MinHeight="0"
+                        MinWidth="0"
+                        Margin="2"
+                        ToolTip="Delete Site">
+                    <Image Source="../../Resources/cross.png" 
+                           Margin="0"/>
+                </Button>
 
-        </ListView>
-            
+                <ToggleButton Grid.Row="0" Grid.Column="0"
+                              x:Name="DetailToggle"
+                              Padding="2"
+                              MinHeight="0"
+                              MinWidth="0"
+                              Margin="2"
+                              ToolTip="Show/Hide stock-level numbers.">
+                    <Image>
+                        <Image.Style>
+                            <Style TargetType="{x:Type Image}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=DetailToggle, Path=IsChecked}" Value="true">
+                                        <Setter Property="Source" Value="../../Resources/arrow-transition-090.png"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=DetailToggle, Path=IsChecked}" Value="false">
+                                        <Setter Property="Source" Value="../../Resources/arrow-transition-270.png"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Image.Style>
+                    </Image>
+                </ToggleButton>
+
+                <!--<Expander Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">-->
+                <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                      Visibility="{Binding ElementName=DetailToggle, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Grid.Resources>
+                            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                                <Setter Property="Margin" Value="2"/>
+                                <Setter Property="MinWidth" Value="40"/>
+                                <Setter Property="MinHeight" Value="0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                <Setter Property="FontSize" Value="10"/>
+                            </Style>
+                            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="FontSize" Value="10"/>
+                            </Style>
+                        </Grid.Resources>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="1" Content="Min"/>
+                        <Label Grid.Row="0" Grid.Column="2" Content="Max"/>
+                        <Label Grid.Row="1" Grid.Column="0" Content="Units"/>
+                        <Label Grid.Row="2" Grid.Column="0" Content="Cases"/>
+                        <Label Grid.Row="3" Grid.Column="0" Content="Pct (%)" ToolTip="Between 1% and 100% - Decimals will be converted."/>
+
+                        <TextBox Grid.Row="1" Grid.Column="1" 
+                                 ToolTip="Minimum Units"
+                                 Text="{Binding MinUnits}"/>
+                        <TextBox Grid.Row="1" Grid.Column="2" 
+                                 ToolTip="Maximum Units"
+                                 Text="{Binding MaxUnits}"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" 
+                                 ToolTip="Minimum Cases"
+                                 Text="{Binding MinCases}"/>
+                        <TextBox Grid.Row="2" Grid.Column="2" 
+                                 ToolTip="Maximum Cases"
+                                 Text="{Binding MaxCases}"/>
+                        <TextBox Grid.Row="3" Grid.Column="1" 
+                                 ToolTip="Minimum Percentage"
+                                 Text="{Binding MinPct}"/>
+                        <TextBox Grid.Row="3" Grid.Column="2" 
+                                 ToolTip="Maximum Percentage"
+                                 Text="{Binding MaxPct}"/>
+                    </Grid>
+                <!--</Expander>-->
+            </Grid>
+        </Border>
+
+        <controls:ZoneListingView Grid.Row="1"
+                                  DataContext="{Binding ZoneListingVM}" 
+                                  IncomingZoneItem="{Binding IncomingZoneVM}"
+                                  InsertedZoneItem="{Binding InsertedZoneVM}"
+                                  RemovedZoneItem="{Binding RemovedZoneVM}"
+                                  TargetZoneItem="{Binding TargetZoneVM}"
+                                  ZoneItemDropCommand="{Binding ZoneReceivedCommand}"
+                                  ZoneItemInsertedCommand="{Binding ZoneInsertedCommand}"
+                                  ZoneItemRemovedCommand="{Binding ZoneRemovedCommand}"/>
+
     </Grid>
 </UserControl>

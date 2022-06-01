@@ -48,12 +48,14 @@ public class Site
     {
         (zones ??= new List<NAVZone>()).Add(newZone);
         ZoneExtensions.Add(newZone.Extension ??= new ZoneExtension(newZone));
+        newZone.Site = this;
     }
 
     public void RemoveZone(NAVZone oldZone)
     {
         zones?.Remove(oldZone);
         ZoneExtensions.Remove(oldZone.Extension ??= new ZoneExtension(oldZone));
+        oldZone.Site = null;
     }
 
     public override string ToString()

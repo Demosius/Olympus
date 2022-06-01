@@ -9,74 +9,74 @@ namespace Hydra.Views.Controls;
 /// </summary>
 public partial class ZoneListingView
 {
-    public static readonly DependencyProperty IncomingTodoItemProperty =
-        DependencyProperty.Register("IncomingTodoItem", typeof(object), typeof(ZoneListingView),
+    public static readonly DependencyProperty IncomingZoneItemProperty =
+        DependencyProperty.Register("IncomingZoneItem", typeof(object), typeof(ZoneListingView),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-    public object IncomingTodoItem
+    public object IncomingZoneItem
     {
-        get => GetValue(IncomingTodoItemProperty);
-        set => SetValue(IncomingTodoItemProperty, value);
+        get => GetValue(IncomingZoneItemProperty);
+        set => SetValue(IncomingZoneItemProperty, value);
     }
 
-    public static readonly DependencyProperty RemovedTodoItemProperty =
-        DependencyProperty.Register("RemovedTodoItem", typeof(object), typeof(ZoneListingView),
+    public static readonly DependencyProperty RemovedZoneItemProperty =
+        DependencyProperty.Register("RemovedZoneItem", typeof(object), typeof(ZoneListingView),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-    public object RemovedTodoItem
+    public object RemovedZoneItem
     {
-        get => GetValue(RemovedTodoItemProperty);
-        set => SetValue(RemovedTodoItemProperty, value);
+        get => GetValue(RemovedZoneItemProperty);
+        set => SetValue(RemovedZoneItemProperty, value);
     }
 
-    public static readonly DependencyProperty TodoItemDropCommandProperty =
-        DependencyProperty.Register("TodoItemDropCommand", typeof(ICommand), typeof(ZoneListingView),
+    public static readonly DependencyProperty ZoneItemDropCommandProperty =
+        DependencyProperty.Register("ZoneItemDropCommand", typeof(ICommand), typeof(ZoneListingView),
             new PropertyMetadata(null));
 
-    public ICommand TodoItemDropCommand
+    public ICommand ZoneItemDropCommand
     {
-        get => (ICommand)GetValue(TodoItemDropCommandProperty);
-        set => SetValue(TodoItemDropCommandProperty, value);
+        get => (ICommand)GetValue(ZoneItemDropCommandProperty);
+        set => SetValue(ZoneItemDropCommandProperty, value);
     }
 
-    public static readonly DependencyProperty TodoItemRemovedCommandProperty =
-        DependencyProperty.Register("TodoItemRemovedCommand", typeof(ICommand), typeof(ZoneListingView),
+    public static readonly DependencyProperty ZoneItemRemovedCommandProperty =
+        DependencyProperty.Register("ZoneItemRemovedCommand", typeof(ICommand), typeof(ZoneListingView),
             new PropertyMetadata(null));
 
-    public ICommand TodoItemRemovedCommand
+    public ICommand ZoneItemRemovedCommand
     {
-        get => (ICommand)GetValue(TodoItemRemovedCommandProperty);
-        set => SetValue(TodoItemRemovedCommandProperty, value);
+        get => (ICommand)GetValue(ZoneItemRemovedCommandProperty);
+        set => SetValue(ZoneItemRemovedCommandProperty, value);
     }
 
-    public static readonly DependencyProperty TodoItemInsertedCommandProperty =
-        DependencyProperty.Register("TodoItemInsertedCommand", typeof(ICommand), typeof(ZoneListingView),
+    public static readonly DependencyProperty ZoneItemInsertedCommandProperty =
+        DependencyProperty.Register("ZoneItemInsertedCommand", typeof(ICommand), typeof(ZoneListingView),
             new PropertyMetadata(null));
 
-    public ICommand TodoItemInsertedCommand
+    public ICommand ZoneItemInsertedCommand
     {
-        get => (ICommand)GetValue(TodoItemInsertedCommandProperty);
-        set => SetValue(TodoItemInsertedCommandProperty, value);
+        get => (ICommand)GetValue(ZoneItemInsertedCommandProperty);
+        set => SetValue(ZoneItemInsertedCommandProperty, value);
     }
 
-    public static readonly DependencyProperty InsertedTodoItemProperty =
-        DependencyProperty.Register("InsertedTodoItem", typeof(object), typeof(ZoneListingView),
+    public static readonly DependencyProperty InsertedZoneItemProperty =
+        DependencyProperty.Register("InsertedZoneItem", typeof(object), typeof(ZoneListingView),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-    public object InsertedTodoItem
+    public object InsertedZoneItem
     {
-        get => GetValue(InsertedTodoItemProperty);
-        set => SetValue(InsertedTodoItemProperty, value);
+        get => GetValue(InsertedZoneItemProperty);
+        set => SetValue(InsertedZoneItemProperty, value);
     }
 
-    public static readonly DependencyProperty TargetTodoItemProperty =
-        DependencyProperty.Register("TargetTodoItem", typeof(object), typeof(ZoneListingView),
+    public static readonly DependencyProperty TargetZoneItemProperty =
+        DependencyProperty.Register("TargetZoneItem", typeof(object), typeof(ZoneListingView),
             new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-    public object TargetTodoItem
+    public object TargetZoneItem
     {
-        get => GetValue(TargetTodoItemProperty);
-        set => SetValue(TargetTodoItemProperty, value);
+        get => GetValue(TargetZoneItemProperty);
+        set => SetValue(TargetZoneItemProperty, value);
     }
 
     public ZoneListingView()
@@ -86,55 +86,53 @@ public partial class ZoneListingView
 
     private void ZoneItem_MouseMove(object sender, MouseEventArgs e)
     {
-        if (e.LeftButton == MouseButtonState.Pressed &&
-            sender is FrameworkElement frameworkElement)
+        if (e.LeftButton != MouseButtonState.Pressed || sender is not FrameworkElement frameworkElement) return;
+
+        var zoneItem = frameworkElement.DataContext;
+
+        var dragDropResult = DragDrop.DoDragDrop(frameworkElement,
+            new DataObject(DataFormats.Serializable, zoneItem),
+            DragDropEffects.Move);
+
+        if (dragDropResult == DragDropEffects.None)
         {
-            var todoItem = frameworkElement.DataContext;
-
-            var dragDropResult = DragDrop.DoDragDrop(frameworkElement,
-                new DataObject(DataFormats.Serializable, todoItem),
-                DragDropEffects.Move);
-
-            if (dragDropResult == DragDropEffects.None)
-            {
-                AddTodoItem(todoItem);
-            }
+            AddZoneItem(zoneItem);
         }
     }
 
     private void ZoneItem_DragOver(object sender, DragEventArgs e)
     {
-        if (!TodoItemInsertedCommand.CanExecute(null)) return;
+        if (!ZoneItemInsertedCommand.CanExecute(null)) return;
         if (sender is not FrameworkElement element) return;
 
-        TargetTodoItem = element.DataContext;
-        InsertedTodoItem = e.Data.GetData(DataFormats.Serializable) ?? new object();
+        TargetZoneItem = element.DataContext;
+        InsertedZoneItem = e.Data.GetData(DataFormats.Serializable) ?? new object();
 
-        TodoItemInsertedCommand.Execute(null);
+        ZoneItemInsertedCommand.Execute(null);
     }
 
     private void ZoneItemList_DragOver(object sender, DragEventArgs e)
     {
-        var todoItem = e.Data.GetData(DataFormats.Serializable) ?? new object();
-        AddTodoItem(todoItem);
+        var zoneItem = e.Data.GetData(DataFormats.Serializable) ?? new object();
+        AddZoneItem(zoneItem);
     }
 
-    private void AddTodoItem(object todoItem)
+    private void AddZoneItem(object zoneItem)
     {
-        if (!TodoItemDropCommand.CanExecute(null)) return;
+        if (!ZoneItemDropCommand.CanExecute(null)) return;
 
-        IncomingTodoItem = todoItem;
-        TodoItemDropCommand.Execute(null);
+        IncomingZoneItem = zoneItem;
+        ZoneItemDropCommand.Execute(null);
     }
 
     private void ZoneItemList_DragLeave(object sender, DragEventArgs e)
     {
-        var result = VisualTreeHelper.HitTest(zoneListView, e.GetPosition(zoneListView));
+        var result = VisualTreeHelper.HitTest(ZoneListView, e.GetPosition(ZoneListView));
 
         if (result != null) return;
-        if (!TodoItemRemovedCommand.CanExecute(null)) return;
+        if (!ZoneItemRemovedCommand.CanExecute(null)) return;
 
-        RemovedTodoItem = e.Data.GetData(DataFormats.Serializable) ?? new object();
-        TodoItemRemovedCommand.Execute(null);
+        RemovedZoneItem = e.Data.GetData(DataFormats.Serializable) ?? new object();
+        ZoneItemRemovedCommand.Execute(null);
     }
 }

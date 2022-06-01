@@ -101,4 +101,17 @@ public class InventoryUpdater
         });
         return lines;
     }
+
+    public int Sites(IEnumerable<Site> sites)
+    {
+        var lines = 0;
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var list = sites as Site[] ?? sites.ToArray();
+            lines += Chariot.UpdateTable(list);
+            lines += Chariot.UpdateTable(list.SelectMany(s => s.Zones));
+            lines += Chariot.UpdateTable(list.SelectMany(s => s.Zones.Select(z => z.Extension)));
+        });
+        return lines;
+    }
 }

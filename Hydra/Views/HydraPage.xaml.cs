@@ -32,17 +32,27 @@ public partial class HydraPage : IProject
     {
         ZoneToggle.IsChecked = false;
         SiteToggle.IsChecked = false;
+        LevelsToggle.IsChecked = false;
     }
 
     private void ZoneToggle_OnChecked(object sender, RoutedEventArgs e)
     {
         ActionToggle.IsChecked = false;
         SiteToggle.IsChecked = false;
+        LevelsToggle.IsChecked = false;
     }
 
     private void SiteToggle_OnChecked(object sender, RoutedEventArgs e)
     {
         ZoneToggle.IsChecked = false;
         ActionToggle.IsChecked = false;
+        LevelsToggle.IsChecked = false;
+    }
+
+    private void LevelsToggle_OnChecked(object sender, RoutedEventArgs e)
+    {
+        ActionToggle.IsChecked = false;
+        SiteToggle.IsChecked = false;
+        ZoneToggle.IsChecked = false;
     }
 }

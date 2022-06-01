@@ -55,4 +55,5 @@ public class InventoryCreator
 
     public int NAVGenre(List<NAVGenre> gens) => Chariot.ReplaceFullTable(gens);
 
+    public int Site(Site site) => Chariot.InsertOrUpdate(site);
 }

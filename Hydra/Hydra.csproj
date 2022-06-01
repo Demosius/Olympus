@@ -8,8 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\arrow-transition-090.png" />
+    <None Remove="Resources\arrow-transition-270.png" />
     <None Remove="Resources\calculator--plus.png" />
     <None Remove="Resources\clock--arrow.png" />
+    <None Remove="Resources\cross.png" />
     <None Remove="Resources\csv.png" />
     <None Remove="Resources\database-import.png" />
     <None Remove="Resources\Fonts\code128.ttf" />
@@ -31,8 +34,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\arrow-transition-090.png" />
+    <Resource Include="Resources\arrow-transition-270.png" />
     <Resource Include="Resources\calculator--plus.png" />
     <Resource Include="Resources\clock--arrow.png" />
+    <Resource Include="Resources\cross.png" />
     <Resource Include="Resources\csv.png" />
     <Resource Include="Resources\database-import.png" />
     <Resource Include="Resources\Fonts\code128.ttf">

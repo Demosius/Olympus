@@ -235,4 +235,38 @@ public class InventoryReader
     {
         return NAVItems(pullType: EPullType.IncludeChildren).Select(i => new SkuMaster(i));
     }
+
+    /// <summary>
+    /// Gets all sites with the appropriately attached zones (with their zone extensions).
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<Site> Sites(out List<NAVZone> zones)
+    {
+        List<NAVZone>? zoneList = null;
+        Dictionary<string, Site>? siteDict = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            zoneList = Zones().ToList();
+            siteDict = Chariot.PullObjectList<Site>().ToDictionary(s => s.Name, s => s);
+        });
+        zoneList ??= new List<NAVZone>();
+        siteDict ??= new Dictionary<string, Site>();
+        zones = zoneList;
+
+        foreach (var zone in zones.Where(zone => zone.SiteName != ""))
+        {
+            if (!siteDict.TryGetValue(zone.SiteName, out var site))
+            {
+                zone.SiteName = "";
+            }
+            else
+            {
+                site.Zones.Add(zone);
+                zone.Site = site;
+            }
+        }
+
+        return siteDict.Values;
+    }
 }
