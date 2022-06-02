@@ -207,7 +207,6 @@ public class Employee : INotifyPropertyChanged
     public List<ShiftRuleRecurring> RecurringRules { get; set; }
     [OneToMany(nameof(ShiftRule.EmployeeID), nameof(ShiftRuleRoster.Employee), CascadeOperations = CascadeOperation.All)]
     public List<ShiftRuleRoster> RosterRules { get; set; }
-
     [OneToMany(nameof(EmployeeInductionReference.EmployeeID), nameof(EmployeeInductionReference.Employee), CascadeOperations = CascadeOperation.All)]
     public List<EmployeeInductionReference> InductionReferences { get; set; }
     [OneToMany(nameof(ReportsToID), nameof(ReportsTo), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
