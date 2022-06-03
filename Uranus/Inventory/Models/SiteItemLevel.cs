@@ -35,4 +35,13 @@ public class SiteItemLevel
         site.ItemLevels.Add(this);
         item.SiteLevels.Add(this);
     }
+
+    public override string ToString()
+    {
+        return Active 
+            ? OverrideDefaults 
+                ? "Custom" 
+                : "✓"
+            : "❌";
+    }
 }

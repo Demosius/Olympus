@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Hydra.ViewModels.Controls;
 
 namespace Hydra.Views.Controls
 {
@@ -23,6 +25,13 @@ namespace Hydra.Views.Controls
         public ItemLevelsView()
         {
             InitializeComponent();
+        }
+        
+        private void DataGrid_OnSelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
+        {
+            var addedItems = e.AddedCells;
+            var c = addedItems[0].Column;
+            ((ItemLevelsVM)DataContext).SelectedObject = ((DataRowView)addedItems[0].Item).Row.ItemArray[c.DisplayIndex];
         }
     }
 }

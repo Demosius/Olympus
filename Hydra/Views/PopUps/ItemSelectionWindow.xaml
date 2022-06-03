@@ -1,12 +1,12 @@
-﻿<Window x:Class="Hydra.Views.ItemSelectionWindow"
+﻿<Window x:Class="Hydra.Views.PopUps.ItemSelectionWindow"
         x:Name="ItemsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewModels="clr-namespace:Hydra.ViewModels"
+        xmlns:vm="clr-namespace:Hydra.ViewModels.PopUps"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance {x:Type viewModels:ItemSelectionVM}, d:IsDesignTimeCreatable=False}"
+        d:DataContext="{d:DesignInstance {x:Type vm:ItemSelectionVM}, d:IsDesignTimeCreatable=False}"
         Title="ItemSelectionWindow" d:Height="450"
         ResizeMode="NoResize"
         SizeToContent="Width">
@@ -14,7 +14,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Themes/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
                 <ResourceDictionary>
                     <!--<Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}" x:Key="NewBtnStyle">
                         <Setter Property="Margin" Value="2"/>
@@ -43,7 +43,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            
+
             <Label Grid.Row="0" Grid.Column="0"
                    Content="Filters: "
                    MinWidth="0"
@@ -53,14 +53,14 @@
                     Padding="0"
                     ToolTip="Filter using items on Clipboard"
                     Command="{Binding FilterItemsFromClipboardCommand}">
-                <Image Source="../Resources/arrow-transition-090.png"/>
+                <Image Source="../../Resources/arrow-transition-090.png"/>
             </Button>
             <Button Grid.Row="0" Grid.Column="2"
                     MinHeight="20"
                     Padding="0"
                     ToolTip="Clear Filters"
                     Command="{Binding ClearFiltersCommand}">
-                <Image Source="../Resources/cross.png"/>
+                <Image Source="../../Resources/cross.png"/>
             </Button>
             <TextBox Grid.Row="0" Grid.Column="3"
                      Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -94,7 +94,7 @@
                         IsCancel="True"/>
                 <Button Content="Confirm"
                         Command="{Binding ConfirmItemSelectionCommand}"
-                        CommandParameter=""
+                        CommandParameter="{Binding ElementName=ItemsWindow}"
                         IsDefault="True"/>
             </StackPanel>
         </Grid>

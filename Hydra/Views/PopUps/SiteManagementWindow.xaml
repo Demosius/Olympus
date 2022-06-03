@@ -1,0 +1,187 @@
+﻿<Window x:Class="Hydra.Views.PopUps.SiteManagementWindow"
+        x:Name="SiteWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Hydra.Views.PopUps"
+        xmlns:vm="clr-namespace:Hydra.ViewModels.PopUps"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type vm:SiteManagementVM}, d:IsDesignTimeCreatable=False}"
+        Title="SiteManagementWindow" Height="800"
+        SizeToContent="Width"
+        ResizeMode="NoResize">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary>
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <DockPanel>
+        <DockPanel.Resources>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                <Setter Property="Margin" Value="2"/>
+            </Style>
+        </DockPanel.Resources>
+
+        <Grid DockPanel.Dock="Top"
+              Background="{StaticResource Brush05}">
+            <Grid.Resources>
+                <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="MinWidth" Value="40"/>
+                    <Setter Property="MinHeight" Value="0"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    <Setter Property="FontSize" Value="10"/>
+                    <EventSetter Event="GotKeyboardFocus" Handler="TextBox_GotKeyboardFocus"/>
+                    <EventSetter Event="LostMouseCapture" Handler="TextBox_LostMouseCapture"/>
+                    <EventSetter Event="LostKeyboardFocus" Handler="TextBox_LostKeyboardFocus"/>
+                </Style>
+                <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="FontSize" Value="10"/>
+                </Style>
+            </Grid.Resources>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="1" Content="Min"/>
+            <Label Grid.Row="0" Grid.Column="2" Content="Max"/>
+            <Label Grid.Row="1" Grid.Column="0" Content="Units"/>
+            <Label Grid.Row="2" Grid.Column="0" Content="Cases"/>
+            <Label Grid.Row="3" Grid.Column="0" Content="Pct (%)" ToolTip="Between 1% and 100% - Decimals will be converted."/>
+
+            <TextBox Grid.Row="1" Grid.Column="1" 
+                     ToolTip="Minimum Units"
+                     IsEnabled="{Binding OverrideDefaults}"
+                     Text="{Binding MinUnits}"/>
+            <TextBox Grid.Row="1" Grid.Column="2" 
+                     ToolTip="Maximum Units"
+                     IsEnabled="{Binding OverrideDefaults}"
+                     Text="{Binding MaxUnits}"/>
+            <TextBox Grid.Row="2" Grid.Column="1" 
+                     ToolTip="Minimum Cases"
+                     IsEnabled="{Binding OverrideDefaults}"
+                     Text="{Binding MinCases}"/>
+            <TextBox Grid.Row="2" Grid.Column="2" 
+                     ToolTip="Maximum Cases"
+                     IsEnabled="{Binding OverrideDefaults}"
+                     Text="{Binding MaxCases}"/>
+            <TextBox Grid.Row="3" Grid.Column="1" 
+                     ToolTip="Minimum Percentage"
+                     IsEnabled="{Binding OverrideDefaults}"
+                     Text="{Binding MinPct}"/>
+            <TextBox Grid.Row="3" Grid.Column="2" 
+                     ToolTip="Maximum Percentage"
+                     IsEnabled="{Binding OverrideDefaults}"
+                     Text="{Binding MaxPct}"/>
+        </Grid>
+
+        <Grid DockPanel.Dock="Top"
+              Background="{StaticResource Brush05}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0"
+                   Content="Filters: "
+                   MinWidth="0"
+                   VerticalAlignment="Center"/>
+            <Button Grid.Row="0" Grid.Column="1"
+                    MinHeight="20"
+                    Padding="0"
+                    ToolTip="Filter using items on Clipboard"
+                    Command="{Binding FilterItemsFromClipboardCommand}">
+                <Image Source="../../Resources/arrow-transition-090.png"/>
+            </Button>
+            <Button Grid.Row="0" Grid.Column="2"
+                    MinHeight="20"
+                    Padding="0"
+                    ToolTip="Clear Filters"
+                    Command="{Binding ClearFiltersCommand}">
+                <Image Source="../../Resources/cross.png"/>
+            </Button>
+            <TextBox Grid.Row="0" Grid.Column="3"
+                     Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     MinWidth="80"
+                     MinHeight="0"
+                     MaxWidth="400"
+                     Margin="2"
+                     ToolTip="Filter Text"
+                     HorizontalAlignment="Left"/>
+
+
+        </Grid>
+
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal"
+                    Background="{StaticResource Brush05}">
+            <Button Content="Activate All"
+                    ToolTip="Impacts only currently displayed items."
+                    Command="{Binding ActivateAllItemsCommand}"/>
+            <Button Content="De-Activate All"
+                    ToolTip="Impacts only currently displayed items."
+                    Command="{Binding DeActivateAllItemsCommand}"/>
+            <Button Content="Activate All - Exclusive"
+                    ToolTip="(Also de-activates non displayed items.)"
+                    Command="{Binding ExclusiveItemActivationCommand}"/>
+
+        </StackPanel>
+
+        <Grid DockPanel.Dock="Bottom"
+              Background="{StaticResource Brush05}">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <Button Content="Cancel"
+                        IsCancel="True"/>
+                <Button Content="Confirm"
+                        Command="{Binding ConfirmItemSelectionCommand}"
+                        CommandParameter="{Binding ElementName=ItemsWindow}"
+                        IsDefault="True"/>
+            </StackPanel>
+        </Grid>
+
+        <DataGrid AutoGenerateColumns="False"
+                  ItemsSource="{Binding CurrentItems}">
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn Header="Active" 
+                                        Binding="{Binding Active}"
+                                        CanUserSort="True"
+                                        IsReadOnly="False"/>
+                <DataGridTextColumn Header="Item Number" 
+                                    Binding="{Binding ItemNumber}"
+                                    CanUserSort="True"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Description"
+                                    Binding="{Binding Item.Description, FallbackValue=''}"
+                                    CanUserSort="True"
+                                    IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>

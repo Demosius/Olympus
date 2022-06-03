@@ -1,24 +1,25 @@
 ﻿using Hydra.ViewModels.Controls;
 using System;
 using System.Windows.Input;
+using Uranus.Inventory.Models;
 
 namespace Hydra.ViewModels.Commands;
 
 
-public class SaveLevelsCommand : ICommand
+public class ManageSiteCommand : ICommand
 {
     public ItemLevelsVM VM { get; set; }
 
-    public SaveLevelsCommand(ItemLevelsVM vm) { VM = vm; }
+    public ManageSiteCommand(ItemLevelsVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return true;
+        return VM.SelectedObject is SiteItemLevel;
     }
 
     public void Execute(object? parameter)
     {
-        VM.SaveLevels();
+        VM.ManageSite();
     }
 
     public event EventHandler? CanExecuteChanged

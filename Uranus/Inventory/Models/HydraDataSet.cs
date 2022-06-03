@@ -10,7 +10,7 @@ public class HydraDataSet
     public Dictionary<string, Site> Sites { get; set; }
     public Dictionary<string, NAVZone> Zones { get; set; }
     public Dictionary<string, NAVBin> Bins { get; set; }
-    public List<SiteItemLevel> SiteItemLevels { get; set; }
+    public Dictionary<(string, int), SiteItemLevel> SiteItemLevels { get; set; }
     public List<NAVStock> NAVStock { get; set; }
     public List<NAVUoM> UoMs { get; set; }
     public List<Stock> Stock { get; set; }
@@ -21,7 +21,7 @@ public class HydraDataSet
         Sites = new Dictionary<string, Site>();
         Zones = new Dictionary<string, NAVZone>();
         Bins = new Dictionary<string, NAVBin>();
-        SiteItemLevels = new List<SiteItemLevel>();
+        SiteItemLevels = new Dictionary<(string, int), SiteItemLevel>();
         NAVStock = new List<NAVStock>();
         UoMs = new List<NAVUoM>();
         Stock = new List<Stock>();
@@ -34,7 +34,7 @@ public class HydraDataSet
         Items = items.ToDictionary(i => i.Number, i => i);
         Sites = sites.ToDictionary(s => s.Name, s => s);
         Zones = zones.ToDictionary(z => z.ID, z => z);
-        SiteItemLevels = siteItemLevels.ToList();
+        SiteItemLevels = siteItemLevels.ToDictionary(l => (l.SiteName, l.ItemNumber), l => l);
         NAVStock = stock.ToList();
         Bins = bins.ToDictionary(b => b.Code, b => b);
         UoMs = uomList.ToList();

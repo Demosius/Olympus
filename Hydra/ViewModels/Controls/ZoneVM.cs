@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Xml.Serialization;
 using Uranus.Annotations;
 using Uranus.Inventory.Models;
 

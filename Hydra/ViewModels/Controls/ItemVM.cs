@@ -8,7 +8,7 @@ namespace Hydra.ViewModels.Controls;
 public class ItemVM : INotifyPropertyChanged
 {
     public NAVItem Item { get; set; }
-    public int Number => Item.Number;
+    public string Number => Item.Number.ToString(format: "000000");
     public string VolumeString => $"{Item.Length} X {Item.Width} X {Item.Height} = {Item.Cube}cm³ : {Item.Weight}kg";
      
     #region INotifyPropertyChanged Members
@@ -22,7 +22,7 @@ public class ItemVM : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-
+    
     public string Description
     {
         get => Item.Description;
@@ -47,5 +47,10 @@ public class ItemVM : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public override string ToString()
+    {
+        return $"{Item.Number} : {Item.Description}";
     }
 }

@@ -26,7 +26,8 @@
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal"
                     Background="{StaticResource Brush05}">
-            <Button Command="{Binding RefreshDataCommand}">
+            <Button Command="{Binding RefreshDataCommand}"
+                    ToolTip="(F5)">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="../../Resources/refresh.png"
                            MaxHeight="20"
@@ -54,19 +55,51 @@
                 </StackPanel>
             </Button>-->
         </StackPanel>
+
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal"
                     Background="{StaticResource Brush04}">
-            <Button Command="{Binding SelectItemsCommand}">
+            <Button Command="{Binding SelectItemsCommand}"
+                    ToolTip="(ctrl+i)">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="../../Resources/plus-circle-frame.png"
+                    <Image Source="../../Resources/plus.png"
                            MaxHeight="20"
                            MaxWidth="20"
                            Margin="0,0,2,0"/>
-                    <TextBlock Text="Select Items"></TextBlock>
+                    <TextBlock Text="Select Items"/>
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding ManageSiteCommand}"
+                    ToolTip="(ctrl+s)">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="../../Resources/wrench-screwdriver.png"
+                           MaxHeight="20"
+                           MaxWidth="20"
+                           Margin="0,0,2,0"/>
+                    <TextBlock Text="Manage Site"/>
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding CustomizeLevelsCommand}"
+                    ToolTip="(F6)">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="../../Resources/balance--plus.png"
+                           MaxHeight="20"
+                           MaxWidth="20"
+                           Margin="0,0,2,0"/>
+                    <TextBlock Text="Customize Levels"/>
                 </StackPanel>
             </Button>
         </StackPanel>
-        <Grid></Grid>
+
+        <DataGrid ItemsSource="{Binding DisplayData}"
+                  SelectedCellsChanged="DataGrid_OnSelectedCellsChanged"
+                  AutoGenerateColumns="True"
+                  SelectionMode="Single"
+                  MinColumnWidth="50"
+                  SelectionUnit="Cell"
+                  IsReadOnly="True"
+                  RowHeaderWidth="10">
+
+        </DataGrid>
     </DockPanel>
 </UserControl>

@@ -31,6 +31,7 @@ public class InventoryUpdater
         Chariot.Database?.RunInTransaction(() =>
         {
             count = Chariot.UpdateTable(items);
+            count += Chariot.UpdateTable(items.Select(i => i.Extension));
             if (count > 0) Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime);
         });
         return count;

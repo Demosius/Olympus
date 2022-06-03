@@ -10,6 +10,7 @@
   <ItemGroup>
     <None Remove="Resources\arrow-transition-090.png" />
     <None Remove="Resources\arrow-transition-270.png" />
+    <None Remove="Resources\balance--plus.png" />
     <None Remove="Resources\calculator--plus.png" />
     <None Remove="Resources\clock--arrow.png" />
     <None Remove="Resources\cross.png" />
@@ -21,10 +22,14 @@
     <None Remove="Resources\Fonts\DIN Medium.ttf" />
     <None Remove="Resources\Fonts\DIN.ttf" />
     <None Remove="Resources\plus-circle-frame.png" />
+    <None Remove="Resources\plus-small.png" />
+    <None Remove="Resources\plus.png" />
     <None Remove="Resources\refresh.png" />
     <None Remove="Resources\repair.png" />
     <None Remove="Resources\save.png" />
     <None Remove="Resources\sort.png" />
+    <None Remove="Resources\wrench-screwdriver.png" />
+    <None Remove="Resources\wrench.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +41,7 @@
   <ItemGroup>
     <Resource Include="Resources\arrow-transition-090.png" />
     <Resource Include="Resources\arrow-transition-270.png" />
+    <Resource Include="Resources\balance--plus.png" />
     <Resource Include="Resources\calculator--plus.png" />
     <Resource Include="Resources\clock--arrow.png" />
     <Resource Include="Resources\cross.png" />
@@ -57,10 +63,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\plus-circle-frame.png" />
+    <Resource Include="Resources\plus-small.png" />
+    <Resource Include="Resources\plus.png" />
     <Resource Include="Resources\refresh.png" />
     <Resource Include="Resources\repair.png" />
     <Resource Include="Resources\save.png" />
     <Resource Include="Resources\sort.png" />
+    <Resource Include="Resources\wrench-screwdriver.png" />
+    <Resource Include="Resources\wrench.png" />
   </ItemGroup>
 
   <ItemGroup>

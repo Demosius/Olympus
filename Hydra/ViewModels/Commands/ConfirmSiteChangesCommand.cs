@@ -1,16 +1,16 @@
 ﻿using Hydra.ViewModels.PopUps;
 using System;
+using System.Data;
 using System.Windows;
 using System.Windows.Input;
 
 namespace Hydra.ViewModels.Commands;
 
-
-public class ConfirmItemSelectionCommand : ICommand
+public class ConfirmSiteChangesCommand : ICommand
 {
-    public ItemSelectionVM VM { get; set; }
+    public SiteManagementVM VM { get; set; }
 
-    public ConfirmItemSelectionCommand(ItemSelectionVM vm) { VM = vm; }
+    public ConfirmSiteChangesCommand(SiteManagementVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -19,10 +19,8 @@ public class ConfirmItemSelectionCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        if (parameter is not Window window) return;
-        Mouse.OverrideCursor = Cursors.Wait;
-        VM.ConfirmItemSelection();
-        Mouse.OverrideCursor = Cursors.Arrow;
+        if (parameter is not Window window) throw new DataException("No appropriate parameter passed to site management command.");
+        VM.ConfirmSiteChanges();
         window.DialogResult = true;
         window.Close();
     }
