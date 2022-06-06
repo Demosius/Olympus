@@ -10,7 +10,9 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Uranus;
 using Uranus.Annotations;
@@ -20,6 +22,16 @@ using Uranus.Inventory.Models;
 
 namespace Hydra.ViewModels.Controls;
 
+public enum EItemLevelFilter
+{
+    None,
+    AllActive,
+    AnyActive,
+    AnyInactive,
+    AllInactive,
+    Custom
+}
+
 public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IFilters
 {
     public HydraVM HydraVM { get; set; }
@@ -28,13 +40,16 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
 
     public HydraDataSet DataSet { get; set; }
 
-    public List<NAVItem> AllItems { get; set; }
+    public List<ItemVM> AllItems { get; set; }
     public DataTable DataTable { get; set; }
+
+    public Dictionary<(string, int), SiteItemLevelVM> SiteItemLevelVMs { get; set; }
+    public List<SiteVM> Sites { get; set; }
 
     #region INotifyPropertyChanged Members
 
-    private ObservableCollection<NAVItem> items;
-    public ObservableCollection<NAVItem> Items
+    private ObservableCollection<ItemVM> items;
+    public ObservableCollection<ItemVM> Items
     {
         get => items;
         set
@@ -68,6 +83,30 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
         }
     }
 
+    private string filterString;
+    public string FilterString
+    {
+        get => filterString;
+        set
+        {
+            filterString = value;
+            OnPropertyChanged();
+            ApplyFilters();
+        }
+    }
+
+
+    private EItemLevelFilter selectedFilter;
+    public EItemLevelFilter SelectedFilter
+    {
+        get => selectedFilter;
+        set
+        {
+            selectedFilter = value;
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region Commands
@@ -88,10 +127,13 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
     {
         HydraVM = hydraVM;
         DataSet = new HydraDataSet();
-        AllItems = new List<NAVItem>();
-        items = new ObservableCollection<NAVItem>();
+        AllItems = new List<ItemVM>();
+        items = new ObservableCollection<ItemVM>();
         DataTable = new DataTable();
         displayData = new DataView();
+        SiteItemLevelVMs = new Dictionary<(string, int), SiteItemLevelVM>();
+        Sites = new List<SiteVM>();
+        filterString = string.Empty;
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
@@ -111,12 +153,35 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
         if (Helios is null) return;
         Mouse.OverrideCursor = Cursors.Wait;
         DataSet = Helios.InventoryReader.HydraDataSet(false);
-        AllItems = DataSet.Items.Values.ToList();
-        Items = new ObservableCollection<NAVItem>(AllItems.Where(i => i.SiteLevelTarget));
+
+        SetVMs();
+
+        Items = new ObservableCollection<ItemVM>(AllItems.Where(i => i.UseLevelTargets));
         SetTables();
 
         ApplyFilters();
         Mouse.OverrideCursor = Cursors.Arrow;
+    }
+
+    private void SetVMs()
+    {
+        SiteItemLevelVMs = DataSet.SiteItemLevels.Values.Select(sil => new SiteItemLevelVM(sil))
+            .ToDictionary(sil => (sil.SiteName, sil.ItemNumber), sil => sil);
+        Sites = DataSet.Sites.Values.Select(s => new SiteVM(s)).ToList();
+        AllItems = DataSet.Items.Values.Select(s => new ItemVM(s)).ToList();
+        foreach (var itemVM in AllItems)
+        {
+            foreach (var siteVM in Sites)
+            {
+                if (!SiteItemLevelVMs.TryGetValue((siteVM.Name, itemVM.Item.Number), out var sil))
+                    sil = new SiteItemLevelVM(new SiteItemLevel(itemVM.Item, siteVM.Site));
+
+                sil.SiteVM = siteVM;
+                sil.ItemVM = itemVM;
+                siteVM.ItemLevelVMs.Add(sil);
+                itemVM.SiteLevelVMs.Add(sil);
+            }
+        }
     }
 
     public void SetTables()
@@ -139,7 +204,7 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
             {
                 AutoIncrement = false,
                 ColumnName = site.Name,
-                DataType = typeof(SiteItemLevel),
+                DataType = typeof(SiteItemLevelVM),
             };
 
             DataTable.Columns.Add(column);
@@ -149,12 +214,15 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
         foreach (var item in Items)
         {
             var row = DataTable.NewRow();
-            row["Item"] = new ItemVM(item);
+            row["Item"] = item;
 
             foreach (var (_, site) in DataSet.Sites)
             {
-                if (!DataSet.SiteItemLevels.TryGetValue((site.Name, item.Number), out var levels))
-                    levels = new SiteItemLevel(item, site);
+                if (!SiteItemLevelVMs.TryGetValue((site.Name, item.Item.Number), out var levels))
+                {
+                    levels = new SiteItemLevelVM(new SiteItemLevel(item.Item, site));
+                    SiteItemLevelVMs.Add((levels.SiteName, levels.ItemNumber), levels);
+                }
                 row[site.Name] = levels;
             }
             DataTable.Rows.Add(row);
@@ -177,12 +245,41 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
 
     public void ClearFilters()
     {
-        throw new NotImplementedException();
+        FilterString = string.Empty;
+        DisplayData = DataTable.DefaultView;
     }
 
     public void ApplyFilters()
     {
-        //DisplayData.RowFilter = "Item.Number = 155555";
+        var regex = new Regex(FilterString);
+
+        var rows = DataTable
+            .AsEnumerable()
+            .Where(dataRow => regex.IsMatch(dataRow.Field<ItemVM>("Item")?.Number.ToString() ?? "");
+
+        switch (SelectedFilter)
+        {
+            case EItemLevelFilter.None:
+                break;
+            case EItemLevelFilter.AllActive:
+                rows = rows.Where(r => r.Field<ItemVM>("Item")?.SiteLevelVMs.All(siteLevels => siteLevels.Active) ?? false);
+                break;
+            case EItemLevelFilter.AnyActive:
+                break;
+            case EItemLevelFilter.AnyInactive:
+                break;
+            case EItemLevelFilter.AllInactive:
+                break;
+            case EItemLevelFilter.Custom:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        DisplayData = DataTable
+            .AsEnumerable()
+            .Where(dataRow => regex.IsMatch(dataRow.Field<ItemVM>("Item")?.Number.ToString() ?? ""))
+            .AsDataView();
     }
 
     public void ApplySorting()
@@ -200,7 +297,10 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
 
     public void SaveLevels()
     {
-        throw new NotImplementedException();
+        if (Helios is null) return;
+
+        Helios.InventoryUpdater.SiteItemLevels(DataSet.SiteItemLevels.Values.Where(sil => sil.Item?.SiteLevelTarget ?? false));
+        MessageBox.Show("Successfully saved Site Item Levels data.");
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -214,7 +314,7 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
     public void ManageSite()
     {
         if (Helios is null || Charon is null || SelectedObject is null) return;
-        var site = ((SiteItemLevel)SelectedObject).Site;
+        var site = ((SiteItemLevelVM)SelectedObject).Site;
         if (site == null) return;
 
         var vm = new SiteManagementVM(this, site);
@@ -226,11 +326,12 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
     public void CustomizeLevels()
     {
         if (Helios is null || Charon is null || SelectedObject is null) return;
-        var siteItemLevel = (SiteItemLevel)SelectedObject;
+        var siteItemLevel = (SiteItemLevelVM)SelectedObject;
 
         var vm = new LevelManagementVM(this, siteItemLevel);
         var window = new LevelManagementWindow { DataContext = vm };
         window.ShowDialog();
-        OnPropertyChanged(nameof(siteItemLevel));
+        ApplyFilters();
+        SelectedObject = siteItemLevel;
     }
 }

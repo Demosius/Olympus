@@ -4,7 +4,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Hydra.Views.PopUps"
         xmlns:vm="clr-namespace:Hydra.ViewModels.PopUps"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance {x:Type vm:SiteManagementVM}, d:IsDesignTimeCreatable=False}"
@@ -17,7 +16,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
                 <ResourceDictionary>
-                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -31,7 +29,8 @@
         </DockPanel.Resources>
 
         <Grid DockPanel.Dock="Top"
-              Background="{StaticResource Brush05}">
+              Background="{StaticResource Brush05}"
+              DataContext="{Binding Site}">
             <Grid.Resources>
                 <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
                     <Setter Property="Margin" Value="2"/>
@@ -71,27 +70,21 @@
 
             <TextBox Grid.Row="1" Grid.Column="1" 
                      ToolTip="Minimum Units"
-                     IsEnabled="{Binding OverrideDefaults}"
                      Text="{Binding MinUnits}"/>
             <TextBox Grid.Row="1" Grid.Column="2" 
                      ToolTip="Maximum Units"
-                     IsEnabled="{Binding OverrideDefaults}"
                      Text="{Binding MaxUnits}"/>
             <TextBox Grid.Row="2" Grid.Column="1" 
                      ToolTip="Minimum Cases"
-                     IsEnabled="{Binding OverrideDefaults}"
                      Text="{Binding MinCases}"/>
             <TextBox Grid.Row="2" Grid.Column="2" 
                      ToolTip="Maximum Cases"
-                     IsEnabled="{Binding OverrideDefaults}"
                      Text="{Binding MaxCases}"/>
             <TextBox Grid.Row="3" Grid.Column="1" 
                      ToolTip="Minimum Percentage"
-                     IsEnabled="{Binding OverrideDefaults}"
                      Text="{Binding MinPct}"/>
             <TextBox Grid.Row="3" Grid.Column="2" 
                      ToolTip="Maximum Percentage"
-                     IsEnabled="{Binding OverrideDefaults}"
                      Text="{Binding MaxPct}"/>
         </Grid>
 
@@ -160,8 +153,8 @@
                 <Button Content="Cancel"
                         IsCancel="True"/>
                 <Button Content="Confirm"
-                        Command="{Binding ConfirmItemSelectionCommand}"
-                        CommandParameter="{Binding ElementName=ItemsWindow}"
+                        Command="{Binding ConfirmSiteChangesCommand}"
+                        CommandParameter="{Binding ElementName=SiteWindow}"
                         IsDefault="True"/>
             </StackPanel>
         </Grid>

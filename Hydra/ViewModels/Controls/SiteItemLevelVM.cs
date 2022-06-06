@@ -16,6 +16,9 @@ public class SiteItemLevelVM : INotifyPropertyChanged
     public Site? Site => SiteItemLevel.Site;
     public NAVItem? Item => SiteItemLevel.Item;
 
+    public SiteVM? SiteVM { get; set; }
+    public ItemVM? ItemVM { get; set; }
+
     #region INotifyPropertyChanged Members
 
     public bool Active
@@ -24,8 +27,9 @@ public class SiteItemLevelVM : INotifyPropertyChanged
         set
         {
             SiteItemLevel.Active = value;
-            if (!value) OverrideDefaults = false;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(SetMinMax));
+            OnPropertyChanged(nameof(ToString));
         }
     }
 
@@ -36,8 +40,12 @@ public class SiteItemLevelVM : INotifyPropertyChanged
         {
             SiteItemLevel.OverrideDefaults = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(SetMinMax));
+            OnPropertyChanged(nameof(ToString));
         }
     }
+
+    public bool SetMinMax => Active && OverrideDefaults;
 
     public string MinUnits
     {
@@ -143,5 +151,10 @@ public class SiteItemLevelVM : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public override string ToString()
+    {
+        return SiteItemLevel.ToString();
     }
 }

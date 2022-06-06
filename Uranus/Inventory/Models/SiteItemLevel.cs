@@ -1,9 +1,11 @@
-﻿using SQLiteNetExtensions.Attributes;
+﻿using SQLite;
+using SQLiteNetExtensions.Attributes;
 
 namespace Uranus.Inventory.Models;
 
 public class SiteItemLevel
 {
+    [PrimaryKey] public string ID { get; set; } // ItemNumber:SiteName - e.g. "145556:DC"
     [ForeignKey(typeof(ItemExtension))] public int ItemNumber { get; set; }
     [ForeignKey(typeof(Site))] public string SiteName { get; set; }
     public bool Active { get; set; }
@@ -23,6 +25,7 @@ public class SiteItemLevel
     public SiteItemLevel()
     {
         SiteName = string.Empty;
+        ID = ":";
     }
 
     public SiteItemLevel(NAVItem item, Site site)
@@ -31,6 +34,7 @@ public class SiteItemLevel
         Item = item;
         ItemNumber = item.Number;
         SiteName = site.Name;
+        ID = $"{ItemNumber}:{SiteName}";
 
         site.ItemLevels.Add(this);
         item.SiteLevels.Add(this);
@@ -38,10 +42,10 @@ public class SiteItemLevel
 
     public override string ToString()
     {
-        return Active 
-            ? OverrideDefaults 
-                ? "Custom" 
-                : "✓"
-            : "❌";
+        return Active
+            ? OverrideDefaults
+                ? "Custom"
+                : "✔"
+            : "✘";
     }
 }

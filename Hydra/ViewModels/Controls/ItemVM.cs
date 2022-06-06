@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Uranus.Annotations;
 using Uranus.Inventory.Models;
@@ -10,7 +11,9 @@ public class ItemVM : INotifyPropertyChanged
     public NAVItem Item { get; set; }
     public string Number => Item.Number.ToString(format: "000000");
     public string VolumeString => $"{Item.Length} X {Item.Width} X {Item.Height} = {Item.Cube}cm³ : {Item.Weight}kg";
-     
+
+    public List<SiteItemLevelVM> SiteLevelVMs { get; set; }
+
     #region INotifyPropertyChanged Members
 
     public bool UseLevelTargets
@@ -22,7 +25,7 @@ public class ItemVM : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-    
+
     public string Description
     {
         get => Item.Description;
@@ -39,6 +42,7 @@ public class ItemVM : INotifyPropertyChanged
     {
         Item = item;
         item.Extension ??= new ItemExtension(item);
+        SiteLevelVMs = new List<SiteItemLevelVM>();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Uranus;
 using Uranus.Annotations;
-using Uranus.Inventory.Models;
 
 namespace Hydra.ViewModels.PopUps;
 
@@ -23,10 +22,10 @@ public class LevelManagementVM : INotifyPropertyChanged
 
     #endregion
 
-    public LevelManagementVM(ItemLevelsVM parentVM, SiteItemLevel siteItemLevel)
+    public LevelManagementVM(ItemLevelsVM parentVM, SiteItemLevelVM siteItemLevelVM)
     {
         ItemLevelsVM = parentVM;
-        SiteItemLevelVM = new SiteItemLevelVM(siteItemLevel);
+        SiteItemLevelVM = siteItemLevelVM;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

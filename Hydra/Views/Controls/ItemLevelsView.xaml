@@ -2,12 +2,18 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Hydra.Views.Controls"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:Hydra.ViewModels.Controls"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:model="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:ItemLevelsVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.InputBindings>
+        <KeyBinding Gesture="F6"
+                    Command="{Binding CustomizeLevelsCommand}" />
+    </UserControl.InputBindings>
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -17,6 +23,16 @@
                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
                         <Setter Property="Margin" Value="2"/>
                     </Style>
+                    <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
+                        <Setter Property="Margin" Value="2"/>
+                    </Style>
+                    <ObjectDataProvider x:Key="ItemLevelFilters"
+                                        MethodName="GetValues" 
+                                        ObjectType="{x:Type sys:Enum}">
+                        <ObjectDataProvider.MethodParameters>
+                            <x:Type TypeName="vm:EItemLevelFilter"/>
+                        </ObjectDataProvider.MethodParameters>
+                    </ObjectDataProvider>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -45,38 +61,27 @@
                     <TextBlock Text="Save Changes"/>
                 </StackPanel>
             </Button>
-            <!--<Button Command="{Binding AddNewSiteCommand}">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="../../Resources/plus-circle-frame.png"
-                           MaxHeight="20"
-                           MinHeight="20"
-                           Margin="0,0,2,0"/>
-                    <TextBlock Text="Add New Site"/>
-                </StackPanel>
-            </Button>-->
         </StackPanel>
 
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal"
                     Background="{StaticResource Brush04}">
-            <Button Command="{Binding SelectItemsCommand}"
-                    ToolTip="(ctrl+i)">
+            <Button Command="{Binding SelectItemsCommand}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="../../Resources/plus.png"
                            MaxHeight="20"
                            MaxWidth="20"
                            Margin="0,0,2,0"/>
-                    <TextBlock Text="Select Items"/>
+                    <AccessText Text="Select _Items"/>
                 </StackPanel>
             </Button>
-            <Button Command="{Binding ManageSiteCommand}"
-                    ToolTip="(ctrl+s)">
+            <Button Command="{Binding ManageSiteCommand}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="../../Resources/wrench-screwdriver.png"
                            MaxHeight="20"
                            MaxWidth="20"
                            Margin="0,0,2,0"/>
-                    <TextBlock Text="Manage Site"/>
+                    <AccessText Text="Manage _Site"/>
                 </StackPanel>
             </Button>
             <Button Command="{Binding CustomizeLevelsCommand}"
@@ -89,17 +94,38 @@
                     <TextBlock Text="Customize Levels"/>
                 </StackPanel>
             </Button>
+            <Label Content="Filters: "
+                   MinWidth="0"
+                   VerticalAlignment="Center"/>
+            <TextBox Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     MinWidth="80"
+                     MinHeight="0"
+                     MaxWidth="400"
+                     Margin="2"
+                     ToolTip="Filter Text"/>
+            <ComboBox ItemsSource="{Binding Source={StaticResource ItemLevelFilters}}" 
+                      SelectedValue="{Binding SelectedFilter}"
+                      MinWidth="100"/>
+            <Button MinHeight="20"
+                    Padding="0"
+                    ToolTip="Clear Filters"
+                    Command="{Binding ClearFiltersCommand}">
+                <Image Source="../../Resources/cross.png"
+                       MaxHeight="20"
+                       MaxWidth="20"/>
+            </Button>
         </StackPanel>
 
         <DataGrid ItemsSource="{Binding DisplayData}"
+                  AutoGeneratingColumn="DataGrid_OnAutoGeneratingColumn"
                   SelectedCellsChanged="DataGrid_OnSelectedCellsChanged"
                   AutoGenerateColumns="True"
                   SelectionMode="Single"
                   MinColumnWidth="50"
                   SelectionUnit="Cell"
                   IsReadOnly="True"
-                  RowHeaderWidth="10">
+                  RowHeaderWidth="10"
+                  HorizontalContentAlignment="Center"/>
 
-        </DataGrid>
     </DockPanel>
 </UserControl>

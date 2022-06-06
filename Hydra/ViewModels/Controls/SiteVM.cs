@@ -1,4 +1,5 @@
 ﻿using Hydra.ViewModels.Commands;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -10,8 +11,10 @@ namespace Hydra.ViewModels.Controls;
 public class SiteVM : INotifyPropertyChanged
 {
     public Site Site { get; set; }
+    public string Name => Site.Name;
 
     public ZoneListingVM ZoneListingVM { get; set; }
+    public List<SiteItemLevelVM> ItemLevelVMs { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -69,7 +72,7 @@ public class SiteVM : INotifyPropertyChanged
 
     public string MinPct
     {
-        get => Site.MinPct is null 
+        get => Site.MinPct is null
             ? ""
             : ((Site.MinPct ?? 0) * 100).ToString(CultureInfo.CurrentCulture);
         set
@@ -89,8 +92,8 @@ public class SiteVM : INotifyPropertyChanged
 
     public string MaxPct
     {
-        get => Site.MaxPct is null      
-            ? "" 
+        get => Site.MaxPct is null
+            ? ""
             : ((Site.MaxPct ?? 0) * 100).ToString(CultureInfo.CurrentCulture);
         set
         {
@@ -109,12 +112,13 @@ public class SiteVM : INotifyPropertyChanged
 
     #endregion
 
-    public DeleteSiteCommand DeleteSiteCommand { get; set; }
+    public DeleteSiteCommand? DeleteSiteCommand { get; set; }
 
-    public SiteVM(Site site, DeleteSiteCommand deleteSiteCommand)
+    public SiteVM(Site site, DeleteSiteCommand? deleteSiteCommand = null)
     {
         Site = site;
         ZoneListingVM = new ZoneListingVM(site.Zones, this);
+        ItemLevelVMs = new List<SiteItemLevelVM>();
         DeleteSiteCommand = deleteSiteCommand;
     }
 

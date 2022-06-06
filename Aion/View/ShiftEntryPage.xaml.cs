@@ -140,4 +140,8 @@ public partial class ShiftEntryPage
             
     }
 
+    private void EntryGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+
+    }
 }

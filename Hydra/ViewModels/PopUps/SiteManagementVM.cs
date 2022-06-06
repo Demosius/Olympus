@@ -6,7 +6,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+using System.Windows.Input;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -17,7 +20,7 @@ namespace Hydra.ViewModels.PopUps;
 public class SiteManagementVM : IItemDataVM
 {
     public ItemLevelsVM ItemLevelsVM { get; set; }
-    public Site Site { get; set; }
+    public SiteVM Site { get; set; }
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }
 
@@ -63,13 +66,15 @@ public class SiteManagementVM : IItemDataVM
     public ActivateAllItemsCommand ActivateAllItemsCommand { get; set; }
     public DeActivateAllItemsCommand DeActivateAllItemsCommand { get; set; }
     public ExclusiveItemActivationCommand ExclusiveItemActivationCommand { get; set; }
+    public ConfirmSiteChangesCommand ConfirmSiteChangesCommand { get; set; }
 
     #endregion
 
     public SiteManagementVM(ItemLevelsVM parentVM, Site site)
     {
         ItemLevelsVM = parentVM;
-        Site = site;
+        Site = new SiteVM(site);
+
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
@@ -79,6 +84,7 @@ public class SiteManagementVM : IItemDataVM
         ActivateAllItemsCommand = new ActivateAllItemsCommand(this);
         DeActivateAllItemsCommand = new DeActivateAllItemsCommand(this);
         ExclusiveItemActivationCommand = new ExclusiveItemActivationCommand(this);
+        ConfirmSiteChangesCommand = new ConfirmSiteChangesCommand(this);
 
         AllItems = new List<SiteItemLevelVM>();
         filterString = string.Empty;
@@ -90,8 +96,12 @@ public class SiteManagementVM : IItemDataVM
 
     public void RefreshData()
     {
-        // TODO: Implement this thing!
-        // Get hydra-active item's SiteItemLevels 
+        AllItems = ItemLevelsVM.SiteItemLevelVMs.Values
+            .Where(sil => sil.SiteName == Site.Site.Name && (sil.Item?.SiteLevelTarget ?? false))
+            .OrderBy(sil => sil.ItemNumber)
+            .ToList();
+        ApplyFilters();
+
     }
 
     public void RepairData()
@@ -108,12 +118,15 @@ public class SiteManagementVM : IItemDataVM
 
     public void ClearFilters()
     {
-        throw new NotImplementedException();
+        FilterString = string.Empty;
+        ApplyFilters();
     }
 
     public void ApplyFilters()
     {
-        throw new NotImplementedException();
+        var regex = new Regex(FilterString);
+        CurrentItems =
+            new ObservableCollection<SiteItemLevelVM>(AllItems.Where(sil => regex.IsMatch(sil.ItemNumber.ToString())));
     }
 
     public void ApplySorting()
@@ -128,22 +141,28 @@ public class SiteManagementVM : IItemDataVM
 
     public void ActivateAllItems()
     {
-        throw new NotImplementedException();
+        foreach (var siteItemLevelVM in CurrentItems) siteItemLevelVM.Active = true;
     }
 
     public void DeActivateAllItems()
     {
-        throw new NotImplementedException();
+        foreach (var siteItemLevelVM in CurrentItems) siteItemLevelVM.Active = false;
     }
 
     public void ExclusiveItemActivation()
     {
-        throw new NotImplementedException();
+        foreach (var siteItemLevelVM in AllItems) siteItemLevelVM.Active = false;
+        foreach (var siteItemLevelVM in CurrentItems) siteItemLevelVM.Active = true;
     }
 
     public void ConfirmSiteChanges()
     {
-        throw new NotImplementedException();
+        if (Helios is null) return;
+
+        Mouse.OverrideCursor = Cursors.Wait;
+        Helios.InventoryUpdater.SiteItemLevels(AllItems.Select(vm => vm.SiteItemLevel));
+        Helios.InventoryUpdater.Site(Site.Site);
+        Mouse.OverrideCursor = Cursors.Arrow;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

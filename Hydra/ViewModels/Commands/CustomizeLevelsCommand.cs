@@ -14,7 +14,7 @@ public class CustomizeLevelsCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedObject is SiteItemLevel;
+        return VM.SelectedObject is SiteItemLevelVM;
     }
 
     public void Execute(object? parameter)

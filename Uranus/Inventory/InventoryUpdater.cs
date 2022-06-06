@@ -115,4 +115,8 @@ public class InventoryUpdater
         });
         return lines;
     }
+
+    public int SiteItemLevels(IEnumerable<SiteItemLevel> siteItemLevels) => Chariot.UpdateTable(siteItemLevels);
+
+    public int Site(Site site) => Chariot.Update(site);
 }
