@@ -138,7 +138,7 @@ public class StaffCreator
             var fileName = Path.GetFileName(filePath);
             try
             {
-                if (Path.GetExtension(filePath) == ".ico")
+                if (Path.GetExtension(filePath) is ".ico" or ".svg" )
                     File.Copy(filePath, Path.Combine(Chariot.ProjectIconDirectory, fileName), true);
             }
             catch (IOException ex)

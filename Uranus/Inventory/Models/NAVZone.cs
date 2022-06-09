@@ -67,6 +67,20 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
         Bays = new List<Bay>();
     }
 
+    public NAVZone(string zoneCode, NAVLocation location)
+    {
+        Code = zoneCode;
+        LocationCode = location.Code;
+        Location = location;
+        Location.Zones.Add(this);
+        ID = $"{LocationCode}:{Code}";
+        Description = "";
+        Bins = new List<NAVBin>();
+        Bays = new List<Bay>();
+        MoveLines = new List<NAVMoveLine>();
+        Stock = new List<NAVStock>();
+    }
+
     public NAVZone(string id, string code, string locationCode, string description, int ranking, NAVLocation location,
         List<NAVBin> bins, List<NAVMoveLine> moveLines, List<NAVStock> stock, List<Bay> bays, ZoneExtension? extension)
     {

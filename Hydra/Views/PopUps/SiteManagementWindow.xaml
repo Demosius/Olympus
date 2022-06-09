@@ -160,7 +160,7 @@
         </Grid>
 
         <DataGrid AutoGenerateColumns="False"
-                  ItemsSource="{Binding CurrentItems}">
+                  ItemsSource="{Binding CurrentItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <DataGrid.Columns>
                 <DataGridCheckBoxColumn Header="Active" 
                                         Binding="{Binding Active}"

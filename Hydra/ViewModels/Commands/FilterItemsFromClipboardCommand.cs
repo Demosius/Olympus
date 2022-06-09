@@ -7,9 +7,9 @@ namespace Hydra.ViewModels.Commands;
 
 public class FilterItemsFromClipboardCommand : ICommand
 {
-    public IItemDataVM VM { get; set; }
+    public IItemFilters VM { get; set; }
 
-    public FilterItemsFromClipboardCommand(IItemDataVM vm) { VM = vm; }
+    public FilterItemsFromClipboardCommand(IItemFilters vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {

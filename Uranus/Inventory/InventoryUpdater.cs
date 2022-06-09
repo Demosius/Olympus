@@ -25,13 +25,14 @@ public class InventoryUpdater
         return count;
     }
 
-    public int NAVItems(List<NAVItem> items, DateTime dateTime)
+    public int NAVItems(IEnumerable<NAVItem> items, DateTime dateTime)
     {
         var count = 0;
         Chariot.Database?.RunInTransaction(() =>
         {
-            count = Chariot.UpdateTable(items);
-            count += Chariot.UpdateTable(items.Select(i => i.Extension));
+            var navItems = items as NAVItem[] ?? items.ToArray();
+            count = Chariot.UpdateTable(navItems);
+            count += Chariot.UpdateTable(navItems.Select(i => i.Extension));
             if (count > 0) Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime);
         });
         return count;

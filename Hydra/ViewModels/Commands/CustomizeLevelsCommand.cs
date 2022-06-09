@@ -1,7 +1,6 @@
 ﻿using Hydra.ViewModels.Controls;
 using System;
 using System.Windows.Input;
-using Uranus.Inventory.Models;
 
 namespace Hydra.ViewModels.Commands;
 

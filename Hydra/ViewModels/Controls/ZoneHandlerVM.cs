@@ -58,6 +58,7 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
         var zones = Helios.InventoryReader.Zones().OrderBy(z => z.Code);
         foreach (var zone in zones) Zones.Add(zone);
+        OnPropertyChanged(nameof(zones));
     }
 
     public void RepairData()

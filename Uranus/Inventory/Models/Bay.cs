@@ -26,6 +26,13 @@ public class Bay
         Zones = new List<NAVZone>();
     }
 
+    public Bay(string id)
+    {
+        ID = id;
+        BayBins = new List<BinExtension>();
+        Zones = new List<NAVZone>();
+    }
+
     public Bay(string id, List<BinExtension> bayBins, List<NAVZone> zones)
     {
         ID = id;

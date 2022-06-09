@@ -110,6 +110,29 @@ public class SiteVM : INotifyPropertyChanged
         }
     }
 
+    private bool takeFrom;
+    public bool TakeFrom
+    {
+        get => takeFrom;
+        set
+        {
+            takeFrom = value;
+            OnPropertyChanged();
+        }
+    }
+
+
+    private bool placeTo;
+    public bool  PlaceTo
+    {
+        get => placeTo;
+        set
+        {
+            placeTo = value;
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     public DeleteSiteCommand? DeleteSiteCommand { get; set; }

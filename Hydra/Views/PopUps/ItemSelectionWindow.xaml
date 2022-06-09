@@ -99,10 +99,6 @@
             </StackPanel>
         </Grid>
 
-
-        <DataGrid ItemsSource="{Binding TempTable}"
-                  AutoGenerateColumns="True"/>
-
         <DataGrid AutoGenerateColumns="False"
                   ItemsSource="{Binding CurrentItems}">
             <DataGrid.Columns>

@@ -19,8 +19,195 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <Grid Background="Red">
-            
-    </Grid>
+    <UserControl.InputBindings>
+        <KeyBinding Gesture="F5"
+                    Command="Refresh"></KeyBinding>
+    </UserControl.InputBindings>
+
+    <DockPanel Background="Red">
+
+        <!-- Standard Functions -->
+        <!--<StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal"
+                    Background="{StaticResource Brush05}">
+            <Button Command="{Binding RefreshDataCommand}"
+                    ToolTip="(F5)">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="../../Resources/refresh.png"
+                           MaxHeight="20"
+                           MinHeight="20"
+                           Margin="0,0,2,0"/>
+                    <TextBlock Text="Refresh Data"/>
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding SaveLevelsCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="../../Resources/save.png"
+                           MaxHeight="20"
+                           MinHeight="20"
+                           Margin="0,0,2,0"/>
+                    <TextBlock Text="Save Changes"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>-->
+
+        <!-- Setup manager -->
+        <Grid DockPanel.Dock="Top"
+              Background="{StaticResource Brush05}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Refresh Button -->
+            <Button Grid.Column="0" 
+                    Command="{Binding RefreshDataCommand}"
+                    ToolTip="(F5)"
+                    Padding="0"
+                    Margin="2"
+                    VerticalAlignment="Top">
+                <Image Source="../../Resources/refresh.png" MaxHeight="20" MaxWidth="20"></Image>
+            </Button>
+
+            <!-- Site List -->
+            <DataGrid Grid.Column="1"
+                      ItemsSource="{Binding Sites}"
+                      MaxHeight="500"
+                      AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Site Name"
+                                        Binding="{Binding Name}"
+                                        IsReadOnly="True"/>
+                    <DataGridCheckBoxColumn Header="Take"
+                                            Binding="{Binding TakeFrom}"/>
+                    <DataGridCheckBoxColumn Header="Place"
+                                            Binding="{Binding PlaceTo}"/>
+                    <DataGridTextColumn Header="Min Units"
+                                        Binding="{Binding MinUnits}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Max Units"
+                                        Binding="{Binding MaxUnits}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Min Cases"
+                                        Binding="{Binding MinCases}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Max Cases"
+                                        Binding="{Binding MaxCases}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Min Pct"
+                                        Binding="{Binding MinPct}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Max Pct"
+                                        Binding="{Binding MaxPct}"
+                                        IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Go Button -->
+            <Button Grid.Column="2"
+                    Command="{Binding RefreshDataCommand}"
+                    ToolTip="(F5)"
+                    Margin="2"
+                    VerticalAlignment="Bottom">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="../../Resources/wand--arrow.png"
+                           MaxHeight="20"
+                           MinHeight="20"
+                           Margin="0,0,5,0"/>
+                    <TextBlock Text="Run"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- Filters -->
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal"
+              Background="{StaticResource Brush05}">
+
+            <Label Content="FILTERS: "
+                   MinWidth="0"
+                   VerticalAlignment="Center"
+                   FontFamily="Arial"
+                   FontWeight="Black"/>
+            <StackPanel>
+                <Label Content="ITEMS"
+                       FontFamily="Arial"
+                       FontWeight="Black"
+                       FontSize="10"
+                       HorizontalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button MinHeight="20"
+                            Padding="0"
+                            ToolTip="Filter using items on Clipboard"
+                            Command="{Binding FilterItemsFromClipboardCommand}"
+                            Margin="2">
+                        <Image Source="../../Resources/arrow-transition-090.png"
+                                                                       MaxHeight="20"
+                                                                       MaxWidth="20"/>
+                    </Button>
+                    <Button MinHeight="20"
+                            Padding="0"
+                            ToolTip="Clear Filters"
+                            Command="{Binding ClearFiltersCommand}"
+                            Margin="2">
+                        <Image Source="../../Resources/cross.png"
+                               MaxHeight="20"
+                               MaxWidth="20"/>
+                    </Button>
+                    <TextBox Text="{Binding ItemFilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             MinWidth="80"
+                             MinHeight="0"
+                             MaxWidth="400"
+                             Margin="2"
+                             ToolTip="Filter Text"
+                             HorizontalAlignment="Left"/>
+                </StackPanel>
+            </StackPanel>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+            <StackPanel>
+                <Label Content="FROM SITE"
+                       FontFamily="Arial"
+                       FontWeight="Black"
+                       FontSize="10"
+                       HorizontalAlignment="Center"/>
+                <TextBox Text="{Binding FromSiteFilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         MinWidth="80"
+                         MinHeight="0"
+                         MaxWidth="400"
+                         Margin="2"
+                         ToolTip="Filter Text"
+                         HorizontalAlignment="Left"/>
+            </StackPanel>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+            <StackPanel>
+                <Label Content="TO SITE"
+                       FontFamily="Arial"
+                       FontWeight="Black"
+                       FontSize="10"
+                       HorizontalAlignment="Center"/>
+                <TextBox Text="{Binding ToSiteFilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         MinWidth="80"
+                         MinHeight="0"
+                         MaxWidth="400"
+                         Margin="2"
+                         ToolTip="Filter Text"
+                         HorizontalAlignment="Left"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Data View -->
+        <DataGrid ItemsSource="{Binding CurrentMoves}"
+                  AutoGenerateColumns="False"
+                  CanUserDeleteRows="True"
+                  CanUserAddRows="False"
+                  CanUserReorderColumns="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="From Site"
+                                    Binding="{Binding TakeSiteName}"
+                                    IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
 
 </UserControl>

@@ -37,6 +37,17 @@ public class NAVLocation
         Stores = new List<Store>();
     }
 
+    public NAVLocation(string code, string name)
+    {
+        Code = code;
+        Name = name;
+        CompanyCode = string.Empty;
+        Zones = new List<NAVZone>();
+        MoveLines = new List<NAVMoveLine>();
+        Stock = new List<NAVStock>();
+        Stores = new List<Store>();
+    }
+
     public NAVLocation(string code, string name, string companyCode, bool isWarehouse, bool isStore, bool activeForReplenishment, List<NAVZone> zones, List<NAVMoveLine> moveLines, List<NAVStock> stock, List<Store> stores)
     {
         Code = code;

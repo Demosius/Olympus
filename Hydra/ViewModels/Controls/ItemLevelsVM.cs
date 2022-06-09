@@ -104,6 +104,7 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
         {
             selectedFilter = value;
             OnPropertyChanged();
+            ApplyFilters();
         }
     }
 
@@ -161,6 +162,7 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
 
         ApplyFilters();
         Mouse.OverrideCursor = Cursors.Arrow;
+        OnPropertyChanged(nameof(DisplayData));
     }
 
     private void SetVMs()
@@ -245,7 +247,10 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
 
     public void ClearFilters()
     {
-        FilterString = string.Empty;
+        filterString = string.Empty;
+        selectedFilter = EItemLevelFilter.None;
+        OnPropertyChanged(nameof(FilterString));
+        OnPropertyChanged(nameof(SelectedFilter));
         DisplayData = DataTable.DefaultView;
     }
 
@@ -253,33 +258,40 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
     {
         var regex = new Regex(FilterString);
 
-        var rows = DataTable
+        var dataRows = DataTable
             .AsEnumerable()
-            .Where(dataRow => regex.IsMatch(dataRow.Field<ItemVM>("Item")?.Number.ToString() ?? "");
+            .Where(dataRow => regex.IsMatch(dataRow.Field<ItemVM>("Item")?.Number.ToString() ?? ""));
 
         switch (SelectedFilter)
         {
             case EItemLevelFilter.None:
                 break;
             case EItemLevelFilter.AllActive:
-                rows = rows.Where(r => r.Field<ItemVM>("Item")?.SiteLevelVMs.All(siteLevels => siteLevels.Active) ?? false);
+                dataRows = dataRows.Where(r =>
+                    r.Field<ItemVM>("Item")?.SiteLevelVMs.All(siteLevels => siteLevels.Active) ?? false);
                 break;
             case EItemLevelFilter.AnyActive:
+                dataRows = dataRows.Where(r =>
+                    r.Field<ItemVM>("Item")?.SiteLevelVMs.Any(siteLevels => siteLevels.Active) ?? false);
                 break;
             case EItemLevelFilter.AnyInactive:
+                dataRows = dataRows.Where(r =>
+                    r.Field<ItemVM>("Item")?.SiteLevelVMs.Any(siteLevels => !siteLevels.Active) ?? false);
                 break;
             case EItemLevelFilter.AllInactive:
+                dataRows = dataRows.Where(r =>
+                    r.Field<ItemVM>("Item")?.SiteLevelVMs.All(siteLevels => !siteLevels.Active) ?? false);
                 break;
             case EItemLevelFilter.Custom:
+                dataRows = dataRows.Where(r =>
+                    r.Field<ItemVM>("Item")?.SiteLevelVMs
+                        .Any(siteLevels => siteLevels.Active && siteLevels.OverrideDefaults) ?? false);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
 
-        DisplayData = DataTable
-            .AsEnumerable()
-            .Where(dataRow => regex.IsMatch(dataRow.Field<ItemVM>("Item")?.Number.ToString() ?? ""))
-            .AsDataView();
+        DisplayData = dataRows.AsDataView();
     }
 
     public void ApplySorting()

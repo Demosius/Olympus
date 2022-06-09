@@ -6,11 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Input;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -47,18 +49,6 @@ public class ItemSelectionVM : INotifyPropertyChanged, IItemDataVM
         set
         {
             currentItems = value;
-            OnPropertyChanged();
-        }
-    }
-
-
-    private DataTable tempTable;
-    public DataTable TempTable
-    {
-        get => tempTable;
-        set
-        {
-            tempTable = value;
             OnPropertyChanged();
         }
     }
@@ -100,8 +90,6 @@ public class ItemSelectionVM : INotifyPropertyChanged, IItemDataVM
         currentItems = new ObservableCollection<ItemVM>();
 
         SetDataSources(vm.Helios!, vm.Charon!);
-
-        tempTable = new DataTable();
     }
 
     public void SetDataSources(Helios helios, Charon charon)
@@ -113,7 +101,7 @@ public class ItemSelectionVM : INotifyPropertyChanged, IItemDataVM
 
     public void RefreshData()
     {
-        AllItems = ItemLevelsVM.AllItems.Select(i => new ItemVM(i)).ToList();
+        AllItems = ItemLevelsVM.AllItems;
         ApplyFilters();
     }
 
@@ -142,28 +130,57 @@ public class ItemSelectionVM : INotifyPropertyChanged, IItemDataVM
     public void ConfirmItemSelection()
     {
         if (Helios is null) return;
-        ItemLevelsVM.AllItems = AllItems.Select(i => i.Item).ToList();
-        Helios.InventoryUpdater.NAVItems(ItemLevelsVM.AllItems, DateTime.Now);
+        ItemLevelsVM.AllItems = AllItems;
+        Helios.InventoryUpdater.NAVItems(ItemLevelsVM.AllItems.Select(vm => vm.Item), DateTime.Now);
     }
 
     public void FilterItemsFromClipboard()
     {
-        // TODO: THIS
-        var table = DataConversion.RawStringToTable(General.ClipboardToString());
+        Mouse.OverrideCursor = Cursors.Wait;
         var numbers = new List<int>();
-        foreach (DataColumn column in table.Columns)
+
+        // Set data.
+        var rawData = General.ClipboardToString();
+        var byteArray = Encoding.UTF8.GetBytes(rawData);
+        var stream = new MemoryStream(byteArray);
+        using var reader = new StreamReader(stream);
+
+        // Get the item number column, if there is one.
+        var line = reader.ReadLine();
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
+
+        var itemIndex = Array.IndexOf(headArr, "Item No.");
+        if (itemIndex == -1) itemIndex = Array.IndexOf(headArr, "Item Number");
+        if (itemIndex == -1) itemIndex = Array.IndexOf(headArr, "Item");
+
+        if (itemIndex == -1)
         {
-            if (column.ColumnName == "Item No.")
-            {
-                foreach (DataRow row in table.Rows)
-                {
-                    //numbers.Add((int)row[column]);
-                }
-            }
+            Mouse.OverrideCursor = Cursors.Arrow;
+            MessageBox.Show("Could not detect item number values within clipboard data.");
+            return;
         }
 
-        MessageBox.Show($"Found {numbers.Count} potential item numbers.");
-        TempTable = table;
+        line = reader.ReadLine();
+
+        while (line is not null)
+        {
+            var row = line.Split('\t');
+
+            if (int.TryParse(row[itemIndex], out var itemNumber)) numbers.Add(itemNumber);
+
+            line = reader.ReadLine();
+        }
+
+        numbers.Sort();
+
+        const int x = 3000;
+
+        MessageBox.Show(numbers.Count <= x
+            ? $"Found {numbers.Count:#,###} potential item numbers."
+            : $"Found {numbers.Count:#,###} potential item numbers. Will only use the first {x:#,###}.");
+
+        FilterString = string.Join("|", numbers.Select(n => n.ToString("000000")).Take(x));
+        Mouse.OverrideCursor = Cursors.Arrow;
     }
 
     public void ActivateAllItems()

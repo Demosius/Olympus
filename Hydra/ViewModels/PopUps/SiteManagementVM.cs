@@ -6,9 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Input;
 using Uranus;
 using Uranus.Annotations;
@@ -17,7 +20,7 @@ using Uranus.Inventory.Models;
 
 namespace Hydra.ViewModels.PopUps;
 
-public class SiteManagementVM : IItemDataVM
+public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
 {
     public ItemLevelsVM ItemLevelsVM { get; set; }
     public SiteVM Site { get; set; }
@@ -136,7 +139,51 @@ public class SiteManagementVM : IItemDataVM
 
     public void FilterItemsFromClipboard()
     {
-        throw new NotImplementedException();
+        Mouse.OverrideCursor = Cursors.Wait;
+        var numbers = new List<int>();
+
+        // Set data.
+        var rawData = General.ClipboardToString();
+        var byteArray = Encoding.UTF8.GetBytes(rawData);
+        var stream = new MemoryStream(byteArray);
+        using var reader = new StreamReader(stream);
+
+        // Get the item number column, if there is one.
+        var line = reader.ReadLine();
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
+
+        var itemIndex = Array.IndexOf(headArr, "Item No.");
+        if (itemIndex == -1) itemIndex = Array.IndexOf(headArr, "Item Number");
+        if (itemIndex == -1) itemIndex = Array.IndexOf(headArr, "Item");
+
+        if (itemIndex == -1)
+        {
+            Mouse.OverrideCursor = Cursors.Arrow;
+            MessageBox.Show("Could not detect item number values within clipboard data.");
+            return;
+        }
+
+        line = reader.ReadLine();
+
+        while (line is not null)
+        {
+            var row = line.Split('\t');
+
+            if (int.TryParse(row[itemIndex], out var itemNumber)) numbers.Add(itemNumber);
+
+            line = reader.ReadLine();
+        }
+
+        numbers.Sort();
+
+        const int x = 3000;
+
+        MessageBox.Show(numbers.Count <= x
+            ? $"Found {numbers.Count:#,###} potential item numbers."
+            : $"Found {numbers.Count:#,###} potential item numbers. Will only use the first {x:#,###}.");
+
+        FilterString = string.Join("|", numbers.Select(n => n.ToString("000000")).Take(x));
+        Mouse.OverrideCursor = Cursors.Arrow;
     }
 
     public void ActivateAllItems()
