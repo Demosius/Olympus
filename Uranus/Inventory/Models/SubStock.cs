@@ -16,6 +16,9 @@ public class SubStock
     public int NegAdjQty { get; set; }
     public int PosAdjQty { get; set; }
 
+    [Ignore] public int AvailableQty => Qty - PickQty - NegAdjQty;
+    [Ignore] public int BalanceQty => Qty - PickQty + PutAwayQty - NegAdjQty + PosAdjQty;
+
     public EUoM UoM { get; set; }
 
     [ManyToOne(nameof(StockID), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
@@ -64,5 +67,33 @@ public class SubStock
     {
         return !(PickQty == 0 && PutAwayQty == 0 &&
                  NegAdjQty == 0 && PosAdjQty == 0);
+    }
+
+    public SubStock Copy()
+    {
+        var sub = new SubStock
+        {
+            ID = ID,
+            NegAdjQty = NegAdjQty,
+            PosAdjQty = PosAdjQty,
+            Qty = Qty,
+            PickQty = PickQty,
+            PutAwayQty = PutAwayQty,
+            StockID = StockID,
+            UoM = UoM
+        };
+        return sub;
+    }
+
+    /// <summary>
+    /// Determine if the subStock as it stands in Item, Bin and UoM, has pending operations: i.e. values to pick, put, or count.
+    /// </summary>
+    /// <returns></returns>
+    public bool Pending()
+    {
+        return NegAdjQty != 0 ||
+               PosAdjQty != 0 ||
+               PickQty != 0 ||
+               PutAwayQty != 0;
     }
 }

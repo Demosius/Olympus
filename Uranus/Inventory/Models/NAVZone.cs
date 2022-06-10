@@ -21,8 +21,8 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
     public List<NAVBin> Bins { get; set; }
     [OneToMany(nameof(NAVMoveLine.ZoneID), nameof(NAVMoveLine.Zone), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVMoveLine> MoveLines { get; set; }
-    [OneToMany(nameof(NAVStock.ZoneID), nameof(NAVStock.Zone), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public List<NAVStock> Stock { get; set; }
+    [OneToMany(nameof(Models.NAVStock.ZoneID), nameof(Models.NAVStock.Zone), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public List<NAVStock> NAVStock { get; set; }
 
     [ManyToMany(typeof(BayZone), nameof(BayZone.ZoneID), nameof(Bay.Zones), CascadeOperations = CascadeOperation.All)]
     public List<Bay> Bays { get; set; }
@@ -55,6 +55,8 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
         set => (Extension ??= new ZoneExtension(this)).SiteName = value;
     }
 
+    [Ignore] public Dictionary<int, Stock> Stock { get; set; }
+
     public NAVZone()
     {
         ID = string.Empty;
@@ -63,8 +65,9 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
         Description = string.Empty;
         Bins = new List<NAVBin>();
         MoveLines = new List<NAVMoveLine>();
-        Stock = new List<NAVStock>();
+        NAVStock = new List<NAVStock>();
         Bays = new List<Bay>();
+        Stock = new Dictionary<int, Stock>();
     }
 
     public NAVZone(string zoneCode, NAVLocation location)
@@ -78,11 +81,12 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
         Bins = new List<NAVBin>();
         Bays = new List<Bay>();
         MoveLines = new List<NAVMoveLine>();
-        Stock = new List<NAVStock>();
+        NAVStock = new List<NAVStock>();
+        Stock = new Dictionary<int, Stock>();
     }
 
     public NAVZone(string id, string code, string locationCode, string description, int ranking, NAVLocation location,
-        List<NAVBin> bins, List<NAVMoveLine> moveLines, List<NAVStock> stock, List<Bay> bays, ZoneExtension? extension)
+        List<NAVBin> bins, List<NAVMoveLine> moveLines, List<NAVStock> navStock, List<Bay> bays, ZoneExtension? extension)
     {
         ID = id;
         Code = code;
@@ -92,9 +96,10 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
         Location = location;
         Bins = bins;
         MoveLines = moveLines;
-        Stock = stock;
+        NAVStock = navStock;
         Bays = bays;
         Extension = extension;
+        Stock = new Dictionary<int, Stock>();
     }
 
     public NAVZone(string zoneID)
@@ -106,8 +111,9 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
         Description = string.Empty;
         Bins = new List<NAVBin>();
         MoveLines = new List<NAVMoveLine>();
-        Stock = new List<NAVStock>();
+        NAVStock = new List<NAVStock>();
         Bays = new List<Bay>();
+        Stock = new Dictionary<int, Stock>();
     }
 
     public int CompareTo(NAVZone? other)
@@ -134,5 +140,21 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
     {
         // ReSharper disable once NonReadonlyMemberInGetHashCode
         return ID.GetHashCode();
+    }
+
+    public void AddStock(Stock newStock)
+    {
+        if (Stock.TryGetValue(newStock.ItemNumber, out var oldStock))
+            oldStock.Add(newStock);
+        else
+            Stock.Add(newStock.ItemNumber, newStock.Copy());
+    }
+
+    public void RemoveStock(Stock stock)
+    {
+        if (!Stock.TryGetValue(stock.ItemNumber, out var currentStock)) return;
+
+        currentStock.Sub(stock);
+        if (currentStock.IsEmpty()) Stock.Remove(stock.ItemNumber);
     }
 }

@@ -22,7 +22,6 @@ public class Site
     public List<SiteItemLevel> ItemLevels { get; set; }
 
     private List<NAVZone>? zones;
-
     [Ignore]
     public List<NAVZone> Zones
     {
@@ -30,11 +29,14 @@ public class Site
         set => zones = value;
     }
 
+    [Ignore] public Dictionary<int, Stock> Stock { get; set; }
+
     public Site()
     {
         Name = string.Empty;
         ZoneExtensions = new List<ZoneExtension>();
         ItemLevels = new List<SiteItemLevel>();
+        Stock = new Dictionary<int, Stock>();
     }
 
     public Site(string name)
@@ -42,6 +44,7 @@ public class Site
         Name = name;
         ZoneExtensions = new List<ZoneExtension>();
         ItemLevels = new List<SiteItemLevel>();
+        Stock = new Dictionary<int, Stock>();
     }
 
     public void AddZone(NAVZone newZone)
@@ -61,5 +64,21 @@ public class Site
     public override string ToString()
     {
         return Name;
+    }
+
+    public void AddStock(Stock newStock)
+    {
+        if (Stock.TryGetValue(newStock.ItemNumber, out var oldStock))
+            oldStock.Add(newStock);
+        else
+            Stock.Add(newStock.ItemNumber, newStock.Copy());
+    }
+
+    public void RemoveStock(Stock stock)
+    {
+        if (!Stock.TryGetValue(stock.ItemNumber, out var currentStock)) return;
+
+        currentStock.Sub(stock);
+        if (currentStock.IsEmpty()) Stock.Remove(stock.ItemNumber);
     }
 }

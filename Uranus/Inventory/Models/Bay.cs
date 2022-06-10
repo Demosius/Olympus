@@ -17,13 +17,24 @@ public class Bay
 
     // Does not hold bins directly.
     // Instead uses the bin extension references to get bins.
-    [Ignore] public List<NAVBin> Bins => BayBins.Select(bb => bb.Bin).ToList();
+    // [Ignore] public List<NAVBin> Bins => BayBins.Select(bb => bb.Bin).ToList();
+
+    private List<NAVBin>? bins;
+    [Ignore]
+    public List<NAVBin> Bins
+    {
+        get => bins ??= BayBins.Select(e => e.Bin!).ToList();
+        set => bins = value;
+    }
+
+    [Ignore] public Dictionary<int, Stock> Stock { get; set; }
 
     public Bay()
     {
         ID = string.Empty;
         BayBins = new List<BinExtension>();
         Zones = new List<NAVZone>();
+        Stock = new Dictionary<int, Stock>();
     }
 
     public Bay(string id)
@@ -31,6 +42,7 @@ public class Bay
         ID = id;
         BayBins = new List<BinExtension>();
         Zones = new List<NAVZone>();
+        Stock = new Dictionary<int, Stock>();
     }
 
     public Bay(string id, List<BinExtension> bayBins, List<NAVZone> zones)
@@ -38,6 +50,22 @@ public class Bay
         ID = id;
         BayBins = bayBins;
         Zones = zones;
+        Stock = new Dictionary<int, Stock>();
     }
 
+    public void AddStock(Stock newStock)
+    {
+        if (Stock.TryGetValue(newStock.ItemNumber, out var oldStock))
+            oldStock.Add(newStock);
+        else
+            Stock.Add(newStock.ItemNumber, newStock.Copy());
+    }
+
+    public void RemoveStock(Stock stock)
+    {
+        if (!Stock.TryGetValue(stock.ItemNumber, out var currentStock)) return;
+
+        currentStock.Sub(stock);
+        if (currentStock.IsEmpty()) Stock.Remove(stock.ItemNumber);
+    }
 }

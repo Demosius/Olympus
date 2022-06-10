@@ -8,6 +8,7 @@ public class HydraDataSet
 {
     public Dictionary<int, NAVItem> Items { get; set; }
     public Dictionary<string, Site> Sites { get; set; }
+    public Dictionary<string, NAVLocation> Locations { get; set; }
     public Dictionary<string, NAVZone> Zones { get; set; }
     public Dictionary<string, NAVBin> Bins { get; set; }
     public Dictionary<(string, int), SiteItemLevel> SiteItemLevels { get; set; }
@@ -19,6 +20,7 @@ public class HydraDataSet
     {
         Items = new Dictionary<int, NAVItem>();
         Sites = new Dictionary<string, Site>();
+        Locations = new Dictionary<string, NAVLocation>();
         Zones = new Dictionary<string, NAVZone>();
         Bins = new Dictionary<string, NAVBin>();
         SiteItemLevels = new Dictionary<(string, int), SiteItemLevel>();
@@ -29,28 +31,67 @@ public class HydraDataSet
 
     public HydraDataSet(IEnumerable<NAVItem> items, IEnumerable<Site> sites, IEnumerable<NAVZone> zones,
         IEnumerable<SiteItemLevel> siteItemLevels, IEnumerable<NAVBin> bins, IEnumerable<NAVStock> stock,
-        IEnumerable<NAVUoM> uomList)
+        IEnumerable<NAVUoM> uomList, IEnumerable<NAVLocation> locations)
     {
         Items = items.ToDictionary(i => i.Number, i => i);
         Sites = sites.ToDictionary(s => s.Name, s => s);
+        Locations = locations.ToDictionary(l => l.Code, l => l);
         Zones = zones.ToDictionary(z => z.ID, z => z);
         SiteItemLevels = siteItemLevels.ToDictionary(l => (l.SiteName, l.ItemNumber), l => l);
         NAVStock = stock.ToList();
-        Bins = bins.ToDictionary(b => b.Code, b => b);
+        Bins = bins.ToDictionary(b => b.ID, b => b);
         UoMs = uomList.ToList();
         Stock = new List<Stock>();
+
+        FillSites();
 
         SetRelationships();
     }
 
     public void SetRelationships()
     {
+        SetFromZones();
         SetFromUoMs();
         SetFromBins();
         SetFromStock();
     }
 
-    public void SetFromUoMs()
+    private void FillSites()
+    {
+        // Generate Site Specific Zones/Bays/Bins
+        foreach (var (name, site) in Sites)
+        {
+            var locationCode = $"{name}SiteLocation";
+            var zoneCode = $"{name}SiteZone";
+            var binCode = $"{name}SiteBin";
+
+            var location = new NAVLocation(locationCode, locationCode);
+            var zone = new NAVZone(zoneCode, location);
+            var bin = new NAVBin(binCode, zone);
+
+            site.Zones.Add(zone);
+            zone.Site = site;
+            zone.SiteName = name;
+
+            Zones.Add(zone.ID, zone);
+            Locations.Add(location.Code, location);
+            Bins.Add(bin.ID, bin);
+        }
+    }
+
+    private void SetFromZones()
+    {
+        foreach (var (_, zone) in Zones)
+        {
+            if (Locations.TryGetValue(zone.LocationCode, out var location))
+            {
+                location.Zones.Add(zone);
+                zone.Location = location;
+            }
+        }
+    }
+
+    private void SetFromUoMs()
     {
         foreach (var navUoM in UoMs)
         {
@@ -75,7 +116,7 @@ public class HydraDataSet
         }
     }
 
-    public void SetFromBins()
+    private void SetFromBins()
     {
         foreach (var (_, bin) in Bins)
         {
@@ -84,32 +125,43 @@ public class HydraDataSet
                 zone.Bins.Add(bin);
                 bin.Zone = zone;
             }
+
+
         }
     }
 
-    public void SetFromStock()
+    private void SetFromStock()
     {
-        foreach (var stock in NAVStock)
+        var count = 0;
+        foreach (var navStock in NAVStock)
         {
-            if (Items.TryGetValue(stock.ItemNumber, out var item))
+            count++;
+            if (count == 21106)
+                Console.WriteLine($"!!!!!!!!!!!!!!!!_-------------------------__{count}__-----------------------_!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+            if (Items.TryGetValue(navStock.ItemNumber, out var item))
             {
-                item.NAVStock.Add(stock);
-                stock.Item = item;
+                item.NAVStock.Add(navStock);
+                navStock.Item = item;
             }
 
-            if (Zones.TryGetValue(stock.ZoneID, out var zone))
+            if (Zones.TryGetValue(navStock.ZoneID, out var zone))
             {
-                zone.Stock.Add(stock);
-                stock.Zone = zone;
+                zone.NAVStock.Add(navStock);
+                navStock.Zone = zone;
             }
 
-            if (Bins.TryGetValue(stock.BinCode, out var bin))
+            if (Bins.TryGetValue(navStock.BinCode, out var bin))
             {
-                bin.NAVStock.Add(stock);
-                stock.Bin = bin;
+                bin.NAVStock.Add(navStock);
+                navStock.Bin = bin;
             }
 
-            Stock.Add(new Stock(stock));
+            var stock = new Stock(navStock);
+            Stock.Add(stock);
+
+            stock.AddStock();
+
         }
     }
 }

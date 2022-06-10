@@ -13,24 +13,35 @@ public class BinExtension
     public double Length { get; set; }
 
     [OneToOne(nameof(BinID), nameof(NAVBin.Extension), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public NAVBin Bin { get; set; }
+    public NAVBin? Bin { get; set; }
 
     [ManyToOne(nameof(BayID), nameof(Models.Bay.BayBins), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Bay Bay { get; set; }
+    public Bay? Bay { get; set; }
 
     public BinExtension()
     {
         BinID = string.Empty;
         BayID = string.Empty;
-        Bin = new NAVBin();
-        Bay = new Bay();
     }
 
-    public BinExtension(string binID, string bayID, NAVBin bin, Bay bay)
+    public BinExtension(NAVBin bin, Bay bay)
     {
-        BinID = binID;
-        BayID = bayID;
+        BinID = bin.ID;
+        BayID = bay.ID;
         Bin = bin;
         Bay = bay;
+    }
+
+    public BinExtension(NAVBin bin)
+    {
+        Bin = bin;
+        BinID = bin.ID;
+        BayID = string.Empty;
+    }
+
+    public void SetBay(Bay? bay)
+    {
+        Bay = bay;
+        BayID = bay?.ID ?? string.Empty;
     }
 }

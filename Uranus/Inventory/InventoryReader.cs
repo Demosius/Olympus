@@ -124,6 +124,51 @@ public class InventoryReader
         return returnItems;
     }
 
+    /// <summary>
+    /// Items with matched item-extension objects.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<NAVBin> Bins()
+    {
+        IEnumerable<NAVBin>? returnBins = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var bins = Chariot.PullObjectList<NAVBin>().ToDictionary(i => i.ID, i => i);
+            var bays = Chariot.PullObjectList<Bay>().ToDictionary(b => b.ID, b => b);
+            var extensions = Chariot.PullObjectList<BinExtension>().ToDictionary(e => e.BinID, e => e);
+            var newExtensions = new List<BinExtension>();
+
+            foreach (var (no, bin) in bins)
+            {
+                if (extensions.TryGetValue(no, out var extension))
+                {
+                    bin.Extension = extension;
+                    extension.Bin = bin;
+                }
+                else
+                {
+                    extension = new BinExtension(bin);
+                    newExtensions.Add(extension);
+                }
+
+                if (bays.TryGetValue(extension.BayID, out var bay))
+                {
+                    bay.BayBins.Add(extension);
+                    bay.Bins.Add(bin);
+                    extension.Bay = bay;
+                    bin.Bay = bay;
+                }
+            }
+
+            Chariot.InsertIntoTable(newExtensions);
+            returnBins = bins.Values;
+        });
+        returnBins ??= new List<NAVBin>();
+
+        return returnBins;
+    }
+
     /* STOCK */
     // Stock.ID = <locationCode>:<zoneCode>:<binCode>:<itemNumber>:<uomCode>
     public NAVStock? NAVStock(string stockID, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVStock>(stockID, pullType);
@@ -323,12 +368,13 @@ public class InventoryReader
                 ? Chariot.PullObjectList<NAVStock>()
                 : new List<NAVStock>();
             var bins = includeStock
-                ? Chariot.PullObjectList<NAVBin>()
+                ? Bins()
                 : new List<NAVBin>();
             var uomList = includeStock
                 ? Chariot.PullObjectList<NAVUoM>()
                 : new List<NAVUoM>();
             var newLevels = new List<SiteItemLevel>();
+            var locations = Chariot.PullObjectList<NAVLocation>();
 
             foreach (var item in items)
             {
@@ -360,11 +406,12 @@ public class InventoryReader
                 allLevels = levels.Values;
             }
 
-            dataSet = new HydraDataSet(items, sites, zones, allLevels, bins, stock, uomList);
+            dataSet = new HydraDataSet(items, sites, zones, allLevels, bins, stock, uomList, locations);
         });
 
         dataSet ??= new HydraDataSet(new List<NAVItem>(), new List<Site>(), new List<NAVZone>(),
-            new List<SiteItemLevel>(), new List<NAVBin>(), new List<NAVStock>(), new List<NAVUoM>());
+            new List<SiteItemLevel>(), new List<NAVBin>(), new List<NAVStock>(), new List<NAVUoM>(),
+            new List<NAVLocation>());
 
         return dataSet;
     }

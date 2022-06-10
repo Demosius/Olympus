@@ -30,8 +30,6 @@ public class NAVBin
 
     [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVStock> NAVStock { get; set; }
-    [OneToMany(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public List<Stock> Stock { get; set; }
     [OneToMany(nameof(Move.TakeBinID), nameof(Move.TakeBin), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Move> FromMoves { get; set; }
     [OneToMany(nameof(Move.PlaceBinID), nameof(Move.PlaceBin), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
@@ -48,15 +46,12 @@ public class NAVBin
     public Bay? Bay
     {
         get => Extension?.Bay;
-        set
-        {
-            if (value is not null)
-                (Extension ??= new BinExtension(ID, value.ID, this, value)).Bay = value;
-        }
+        set => (Extension ??= new BinExtension(this)).SetBay(value);
     }
 
-    [Ignore] public EAccessLevel? AccessLevel => Zone?.AccessLevel;
+    [Ignore] public Dictionary<int, Stock> Stock { get; set; }
 
+    [Ignore] public EAccessLevel? AccessLevel => Zone?.AccessLevel;
 
     public NAVBin()
     {
@@ -71,13 +66,34 @@ public class NAVBin
         LastCCDate = DateTime.MinValue;
         LastPIDate = DateTime.MinValue;
         NAVStock = new List<NAVStock>();
-        Stock = new List<Stock>();
+        Stock = new Dictionary<int, Stock>();
         FromMoves = new List<Move>();
         ToMoves = new List<Move>();
         MoveLines = new List<NAVMoveLine>();
     }
 
-    public NAVBin(string id, string zoneID, string locationCode, string zoneCode, string code, string description, bool empty, bool assigned, int ranking, double usedCube, double maxCube, DateTime lastCcDate, DateTime lastPiDate, NAVZone zone, List<NAVStock> navStock, List<Stock> stock, List<Move> fromMoves, List<Move> toMoves, List<NAVMoveLine> moveLines, BinExtension extension)
+    public NAVBin(string code, NAVZone zone)
+    {
+        Code = code;
+        LocationCode = zone.LocationCode;
+        Zone = zone;
+        ZoneCode = zone.Code;
+        ZoneID = zone.ID;
+        ID = $"{LocationCode}:{ZoneCode}:{Code}";
+        Zone.Bins.Add(this);
+
+        Description = string.Empty;
+        NAVStock = new List<NAVStock>();
+        Stock = new Dictionary<int, Stock>();
+        FromMoves = new List<Move>();
+        ToMoves = new List<Move>();
+        MoveLines = new List<NAVMoveLine>();
+    }
+
+    public NAVBin(string id, string zoneID, string locationCode, string zoneCode, string code, string description,
+        bool empty, bool assigned, int ranking, double usedCube, double maxCube, DateTime lastCcDate,
+        DateTime lastPiDate, NAVZone zone, List<NAVStock> navStock, Dictionary<int, Stock> stock, List<Move> fromMoves,
+        List<Move> toMoves, List<NAVMoveLine> moveLines, BinExtension extension)
     {
         ID = id;
         ZoneID = zoneID;
@@ -110,7 +126,7 @@ public class NAVBin
     }
 
     // Merges matching items in Stock (NOT NAVStock)
-    public void MergeStock()
+    /*public void MergeStock()
     {
         // Try to merge every stock item with every other.
         // If merge is successful, remove the merged stock from the list.
@@ -125,14 +141,14 @@ public class NAVBin
                 break;
             }
         }
-    }
+    }*/
 
     // Takes examples of NAVStock and creates Stock versions.
     public void ConvertStock()
     {
         foreach (var stock in NAVStock.Select(ns => new Stock(ns)))
         {
-            Stock.Add(stock);
+            Stock.Add(stock.ItemNumber, stock);
         }
     }
 
@@ -140,23 +156,41 @@ public class NAVBin
     // Returns null if the move requires more than is available.
     public bool? IsFullQty(Move move)
     {
-        var itemStock = Stock.Where(stock => stock.Item == move.Item).ToList();
-        if (itemStock.Count != 1)
-            return null; // Item is not at this bin location OR there is multiple instances of item stock - which should not occur.
-        var theStock = itemStock[0];
-        if (theStock.Cases?.Qty < move.TakeCases ||
-            theStock.Packs?.Qty < move.TakePacks ||
-            theStock.Eaches?.Qty < move.TakeEaches)
+        // Make sure the item exists at this bin location.
+        if (!Stock.TryGetValue(move.ItemNumber, out var stock)) return null;
+
+        if (stock.Cases?.Qty < move.TakeCases ||
+            stock.Packs?.Qty < move.TakePacks ||
+            stock.Eaches?.Qty < move.TakeEaches)
             return null; // Too much stock trying to move.
-        if (itemStock.Count != Stock.Count)
+
+        if (Stock.Count > 1)
             return false; // There is other stock at this location.
-        return theStock.Cases?.Qty == move.TakeCases &&
-               theStock.Packs?.Qty == move.TakePacks &&
-               theStock.Eaches?.Qty == move.TakeEaches;
+
+        // True if numbers now match exactly.
+        return stock.Cases?.Qty == move.TakeCases &&
+               stock.Packs?.Qty == move.TakePacks &&
+               stock.Eaches?.Qty == move.TakeEaches;
     }
 
     public override string ToString()
     {
         return $"{Code} - {ZoneCode} - {UsedCube}m³/{MaxCube}m³";
+    }
+
+    public void AddStock(Stock newStock)
+    {
+        if (Stock.TryGetValue(newStock.ItemNumber, out var oldStock))
+            oldStock.Merge(newStock);
+        else
+            Stock.Add(newStock.ItemNumber, newStock);
+    }
+    
+    public void RemoveStock(Stock stock)
+    {
+        if (!Stock.TryGetValue(stock.ItemNumber, out var currentStock)) return;
+
+        if (currentStock.MatchQty(stock) && !currentStock.Pending()) Stock.Remove(stock.ItemNumber);
+        else currentStock.Sub(stock);
     }
 }

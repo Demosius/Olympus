@@ -29,8 +29,6 @@ public class NAVItem
     public List<NAVUoM> UoMs { get; set; }
     [OneToMany(nameof(Models.NAVStock.ItemNumber), nameof(Models.NAVStock.Item), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVStock> NAVStock { get; set; }
-    [OneToMany(nameof(Models.Stock.ItemNumber), nameof(Models.Stock.Item), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public List<Stock> Stock { get; set; }
     [OneToMany(nameof(NAVTransferOrder.ItemNumber), nameof(NAVTransferOrder.Item), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVTransferOrder> TransferOrders { get; set; }
     [OneToMany(nameof(Move.ItemNumber), nameof(Move.Item), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
@@ -61,6 +59,10 @@ public class NAVItem
     [Ignore] public NAVUoM? Pack { get; set; }
     [Ignore] public NAVUoM? Each { get; set; }
 
+    // Stock Management
+    [Ignore] public Stock? Stock { get; set; }
+    [Ignore] public Dictionary<string, Stock> StockDict { get; set; }
+
     public NAVItem()
     {
         Description = string.Empty;
@@ -68,7 +70,7 @@ public class NAVItem
         PreOwned = false;
         UoMs = new List<NAVUoM>();
         NAVStock = new List<NAVStock>();
-        Stock = new List<Stock>();
+        StockDict = new Dictionary<string, Stock>();
         TransferOrders = new List<NAVTransferOrder>();
         Moves = new List<Move>();
         MoveLines = new List<NAVMoveLine>();
@@ -160,5 +162,21 @@ public class NAVItem
     public override string ToString()
     {
         return $"{Number}|{Description}|{Barcode}: (DIV:{DivisionCode}, CAT:{CategoryCode}, PF:{PlatformCode}, GEN:{GenreCode}) - L:{Length}cm x W:{Width}cm x H:{Height}cm = Cube:{Cube}cm³, Weight:{Weight} - {(PreOwned ? "Used" : "New")} ";
+    }
+
+    public void AddStock(Stock newStock)
+    {
+        if (Stock is null)
+            Stock = newStock.Copy();
+        else
+            Stock.Add(newStock);
+
+        if (!StockDict.TryGetValue(newStock.BinID, out var oldStock))
+            StockDict.Add(newStock.BinID, newStock);
+    }
+
+    public void RemoveStock(Stock stock)
+    {
+        Stock?.Sub(stock);
     }
 }

@@ -8,6 +8,7 @@ namespace Uranus.Inventory.Models;
 public class Stock
 {
     [PrimaryKey] public string ID { get; set; } // Combination of BinID and ItemNumber (e.g. 9600:PR:PR18 058:271284)
+    [ForeignKey(typeof(NAVZone))] public string ZoneID { get; set; }    // Combination of LocationCode and ZoneCode (e.g. 9600:PR)
     [ForeignKey(typeof(NAVBin))] public string BinID { get; set; } // Combination of LocationCode, ZoneCode, and BinCode (e.g. 9600:PR:PR18 058)
     [ForeignKey(typeof(NAVItem))] public int ItemNumber { get; set; }
 
@@ -27,22 +28,31 @@ public class Stock
     [ManyToOne(nameof(ItemNumber), nameof(NAVItem.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVItem? Item { get; set; }
 
+    [Ignore] public NAVZone? Zone => Bin?.Zone;
+    [Ignore] public NAVLocation? Location => Zone?.Location;
+    [Ignore] public Bay? Bay => Bin?.Bay;
+    [Ignore] public Site? Site => Zone?.Site;
+
+    [Ignore] public int BaseQty => Eaches?.Qty ?? 0 + (Packs?.Qty ?? 0 * Item?.Pack?.QtyPerUoM ?? 0) + (Cases?.Qty ?? 0 * Item?.Case?.QtyPerUoM ?? 0);
+
     public Stock()
     {
         ID = string.Empty;
         BinID = string.Empty;
+        ZoneID = string.Empty;
         CaseID = string.Empty;
         PackID = string.Empty;
         EachID = string.Empty;
     }
 
-    public Stock(string id, string binID, string caseID, string packID, string eachID)
+    public Stock(string id, string binID, string caseID, string packID, string eachID, string zoneID)
     {
         ID = id;
         BinID = binID;
         CaseID = caseID;
         PackID = packID;
         EachID = eachID;
+        ZoneID = zoneID;
     }
 
     public Stock(NAVStock navStock) : this()
@@ -67,16 +77,39 @@ public class Stock
         Bin = navStock.Bin;
         Item = navStock.Item;
 
-        Bin?.Stock.Add(this);
-        Item?.Stock.Add(this);
-
-
         // Handle IDs : Item should stay constant, so isn't included in the re-used SetIDs method.
         ItemNumber = Item?.Number ?? navStock.ItemNumber;
         SetIDs();
     }
 
-    public NAVZone? Zone => Bin?.Zone;
+    /// <summary>
+    /// Stock adds itself to all attached objects where appropriate.
+    /// </summary>
+    public void AddStock()
+    {
+        Location?.AddStock(this);
+        Site?.AddStock(this);
+        Zone?.AddStock(this);
+        Bay?.AddStock(this);
+
+        Item?.AddStock(this);
+        // Bin last, as it may merge.
+        Bin?.AddStock(this);
+    }
+
+    /// <summary>
+    /// Stock removes itself from all attached objects, where appropriate.
+    /// </summary>
+    public void RemoveStock()
+    {
+        Location?.RemoveStock(this);
+        Site?.RemoveStock(this);
+        Zone?.RemoveStock(this);
+        Bay?.RemoveStock(this);
+
+        Item?.RemoveStock(this);
+        Bin?.RemoveStock(this);
+    }
 
     private void SetIDs()
     {
@@ -93,14 +126,15 @@ public class Stock
     // Move full stock to specified bin.
     public void FullMove(NAVBin toBin)
     {
-        // Handle object moving.
+        // TODO: 
+        /*// Handle object moving.
         if (Bin != null) _ = Bin.Stock.Remove(this);
         Bin = toBin;
         Bin.Stock.Add(this);
         // Handle ID changing.
         SetIDs();
         // Merge with potential matching stock in new bin location.
-        toBin.MergeStock();
+        toBin.MergeStock();*/
     }
 
     // Partial move.
@@ -123,7 +157,9 @@ public class Stock
         };
 
         newStock.SetIDs();
-        Bin.Stock.Add(newStock);
+        // TODO: Fix
+        // Bin.Stock.Add(newStock); 
+
         // Make sure to not take more than available.
         if (eaches > (Eaches?.Qty ?? 0)) eaches = Eaches?.Qty ?? 0;
         if (packs > (Packs?.Qty ?? 0)) packs = Packs?.Qty ?? 0;
@@ -140,7 +176,41 @@ public class Stock
         return newStock;
     }
 
+    /// <summary>
+    /// Merges new stock into this one, and clears to other stock out in the process to keep the overall balance.
+    /// </summary>
+    /// <param name="newStock"></param>
+    /// <returns></returns>
     public bool Merge(Stock newStock)
+    {
+        var returnVal = Add(newStock);
+
+        if (!returnVal) return false;
+
+        newStock.Clear();
+
+        return true;
+    }
+
+    // Checks if there is anything stopping the stock from being able to be moved.
+    // e.g. Pick Qty/Put Away Qty, etc.
+    public bool CanMove()
+    {
+        return !((Cases?.PreventsMove() ?? false) || (Packs?.PreventsMove() ?? false) || (Eaches?.PreventsMove() ?? false));
+    }
+
+    public bool MatchQty(Stock other)
+    {
+        return Cases?.Qty == other.Cases?.Qty &&
+               Packs?.Qty == other.Packs?.Qty &&
+               Eaches?.Qty == other.Eaches?.Qty;
+    }
+
+    /// <summary>
+    /// Adds values from new stock to this one without removing them.
+    /// </summary>
+    /// <param name="newStock"></param>
+    public bool Add(Stock newStock)
     {
         // Stock ID must match (same bin and item, etc.) but must not be the same object.
         if (ReferenceEquals(this, newStock) || ID != newStock.ID)
@@ -151,14 +221,12 @@ public class Stock
         {
             Eaches ??= new SubStock(this, EUoM.EACH);
             Eaches.Qty += newStock.Eaches.Qty;
-            newStock.Eaches.Qty = 0;
         }
 
         if (newStock.Packs is not null)
         {
             Packs ??= new SubStock(this, EUoM.PACK);
             Packs.Qty += newStock.Packs.Qty;
-            newStock.Packs.Qty = 0;
         }
 
         // ReSharper disable once InvertIf
@@ -166,16 +234,85 @@ public class Stock
         {
             Cases ??= new SubStock(this, EUoM.CASE);
             Cases.Qty += newStock.Cases.Qty;
-            newStock.Cases.Qty = 0;
         }
 
         return true;
     }
 
-    // Checks if there is anything stopping the stock from being able to be moved.
-    // e.g. Pick Qty/Put Away Qty, etc.
-    public bool CanMove()
+    public bool Sub(Stock stock)
     {
-        return !((Cases?.PreventsMove() ?? false) || (Packs?.PreventsMove() ?? false) || (Eaches?.PreventsMove() ?? false));
+        // Stock ID must match (same bin and item, etc.) but must not be the same object.
+        if (ReferenceEquals(this, stock) || ID != stock.ID)
+            return false;
+
+        // Decrease Stock quantities.
+        // Allow negative values. Checks should be done before move creation/attempt.
+        if (stock.Eaches is not null)
+        {
+            Eaches ??= new SubStock(this, EUoM.EACH);
+            Eaches.Qty -= stock.Eaches.Qty;
+        }
+
+        if (stock.Packs is not null)
+        {
+            Packs ??= new SubStock(this, EUoM.PACK);
+            Packs.Qty -= stock.Packs.Qty;
+        }
+
+        // ReSharper disable once InvertIf
+        if (stock.Cases is not null)
+        {
+            Cases ??= new SubStock(this, EUoM.CASE);
+            Cases.Qty -= stock.Cases.Qty;
+        }
+
+        return true;
+    }
+
+    public void Clear()
+    {
+        if (Eaches != null) Eaches.Qty = 0;
+        if (Packs != null) Packs.Qty = 0;
+        if (Cases != null) Cases.Qty = 0;
+    }
+
+    public Stock Copy()
+    {
+        var stock = new Stock
+        {
+            ID = ID,
+            Eaches = Eaches?.Copy(),
+            Packs = Packs?.Copy(),
+            Cases = Cases?.Copy(),
+            Bin = null,
+            BinID = string.Empty,
+            CaseID = CaseID,
+            EachID = EachID,
+            Item = Item,
+            ItemNumber = ItemNumber,
+            ZoneID = ZoneID
+        };
+
+        if (stock.Eaches != null) stock.Eaches.Stock = stock;
+        if (stock.Packs != null) stock.Packs.Stock = stock;
+        if (stock.Cases != null) stock.Cases.Stock = stock;
+
+        return stock;
+    }
+
+    public bool IsEmpty()
+    {
+        return Cases?.Qty == 0 && Packs?.Qty == 0 && Eaches?.Qty == 0;
+    }
+
+    /// <summary>
+    /// Determine if the stock as it stands in Item and Bin, has pending operations: i.e. values to pick, put, or count.
+    /// </summary>
+    /// <returns></returns>
+    public bool Pending()
+    {
+        return (Cases?.Pending() ?? false) || 
+               (Packs?.Pending() ?? false) || 
+               (Eaches?.Pending() ?? false);
     }
 }

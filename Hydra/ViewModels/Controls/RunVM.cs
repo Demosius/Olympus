@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Hydra.Helpers;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -93,6 +94,7 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public ApplySortingCommand ApplySortingCommand { get; set; }
     public FilterItemsFromClipboardCommand FilterItemsFromClipboardCommand { get; set; }
+    public GenerateMovesCommand GenerateMovesCommand { get; set; }
 
     #endregion
 
@@ -113,6 +115,8 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         ClearFiltersCommand = new ClearFiltersCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
         FilterItemsFromClipboardCommand = new FilterItemsFromClipboardCommand(this);
+        GenerateMovesCommand = new GenerateMovesCommand(this);
+
         Task.Run(() => SetDataSources(HydraVM.Helios!, HydraVM.Charon!));
     }
 
@@ -226,6 +230,18 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
     public void ExclusiveItemActivation()
     {
         throw new NotImplementedException();
+    }
+
+    public void GenerateMoves()
+    {
+        if (Helios is null) return;
+        var hds = Helios.InventoryReader.HydraDataSet();
+        var siteMoves =
+            MoveGenerator.GenerateSiteMoves(hds, Sites.Where(s => s.TakeFrom).Select(s => s.Name),
+                Sites.Where(s => s.PlaceTo).Select(s => s.Name));
+
+        AllMoves = siteMoves.Select(m => new MoveVM(m)).ToList();
+        ApplyFilters();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

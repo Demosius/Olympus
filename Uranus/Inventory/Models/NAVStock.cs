@@ -37,9 +37,9 @@ public class NAVStock
     public NAVUoM? UoM { get; set; }
     [ManyToOne(nameof(ItemNumber), nameof(NAVItem.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVItem? Item { get; set; }
-    [ManyToOne(nameof(ZoneID), nameof(NAVZone.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(ZoneID), nameof(NAVZone.NAVStock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVZone? Zone { get; set; }
-    [ManyToOne(nameof(LocationCode), nameof(NAVLocation.Stock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(LocationCode), nameof(NAVLocation.NAVStock), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVLocation? Location { get; set; }
 
     public NAVStock()

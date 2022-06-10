@@ -75,6 +75,25 @@ public class Move
         }
     }
 
+    public Move(NAVBin takeBin, NAVBin placeBin, NAVItem item, int caseQty, int packQty, int eachQty)
+    {
+        Item = item;
+        ItemNumber = item.Number;
+        TakeBin = takeBin;
+        TakeBinID = takeBin.ID;
+        PlaceBin = placeBin;
+        PlaceBinID = placeBin.ID;
+        TakeCases = caseQty;
+        TakePacks = packQty;
+        TakeEaches = eachQty;
+        PlaceCases = caseQty;
+        PlacePacks = packQty;
+        PlaceEaches = eachQty;
+
+        Batch = null;
+        BatchID = string.Empty;
+    }
+
     public bool LineMatch(NAVMoveLine moveLine)
     {
         //TODO: PartialMove line matching.
