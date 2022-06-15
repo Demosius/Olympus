@@ -37,8 +37,8 @@ public class Stock
     [Ignore] public int PackQty => Packs?.Qty ?? 0;
     [Ignore] public int CaseQty => Cases?.Qty ?? 0;
 
-    [Ignore] public int UnitsInPacks => Packs?.Qty ?? 0 * Item?.Pack?.QtyPerUoM ?? 0;
-    [Ignore] public int UnitsInCases => Cases?.Qty ?? 0 * Item?.Case?.QtyPerUoM ?? 0;
+    [Ignore] public int UnitsInPacks => ((Packs?.Qty ?? 0) * (Item?.QtyPerPack ?? 0));
+    [Ignore] public int UnitsInCases => ((Cases?.Qty ?? 0) * (Item?.QtyPerCase ?? 0));
 
     [Ignore] public int BaseQty => EachQty + UnitsInPacks + UnitsInCases;
 
@@ -86,6 +86,14 @@ public class Stock
 
         // Handle IDs : Item should stay constant, so isn't included in the re-used SetIDs method.
         ItemNumber = Item?.Number ?? navStock.ItemNumber;
+        SetIDs();
+    }
+
+    public Stock(NAVItem item, NAVBin bin) : this()
+    {
+        Bin = bin;
+        Item = item;
+        ItemNumber = item.Number;
         SetIDs();
     }
 
@@ -201,9 +209,8 @@ public class Stock
     /// <param name="newStock"></param>
     public bool Add(Stock newStock)
     {
-        // Stock ID must match (same bin and item, etc.) but must not be the same object.
-        if (ReferenceEquals(this, newStock) || ID != newStock.ID)
-            return false;
+        // Stock  must not be the same object.
+        if (ReferenceEquals(this, newStock)) return false;
 
         // Increase Stock quantities.
         if (newStock.Eaches is not null)

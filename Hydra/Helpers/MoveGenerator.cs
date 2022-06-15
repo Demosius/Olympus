@@ -42,63 +42,18 @@ public static class MoveGenerator
         var takeSites = new List<Site>();
         var placeSites = new List<Site>();
 
-        var allSILList = new List<SIL>();
-        var takeSILList = new List<SIL>();
-        var placeSILList = new List<SIL>();
-
         foreach (var siteName in fromSites)
             if (dataSet.Sites.TryGetValue(siteName, out var site)) takeSites.Add(site);
         foreach (var siteName in toSites)
             if (dataSet.Sites.TryGetValue(siteName, out var site)) placeSites.Add(site);
 
-        // TODO: Break down into a function.
-
         // Go through and set levels for each relevant item.
-        foreach (var site in takeSites.Concat(placeSites).Distinct())
-        {
-            foreach (var (itemNumber, stock) in site.Stock)
-            {
-                // Only stop to check if item is set up for hydra.
-                if (!(stock.Item?.SiteLevelTarget ?? false)) continue;
-
-                // Get siteItemLevels. Skip if not available.
-                if (!dataSet.SiteItemLevels.TryGetValue((site.Name, itemNumber), out var siteItemLevel)) continue;
-
-                // Skip if item is not set up for site.
-                if (!siteItemLevel.Active) continue;
-
-                // Set levels.
-                var levels = GetLevels(siteItemLevel, site);
-                SetPctLevels(levels, stock);
-
-                // Check if movements are potentially required.
-                var take = takeSites.Contains(site);
-                var place = placeSites.Contains(site);
-
-                var baseQty = stock.BaseQty;
-                var cases = stock.Cases?.Qty ?? 0;
-                var eaches = stock.Eaches?.Qty ?? 0;
-
-                var sil = new SIL
-                {
-                    Site = site,
-                    Item = stock.Item,
-                    Levels = levels
-                };
-
-                allSILList.Add(sil);
-
-                if (take && (baseQty > levels.MaxUnits || cases > levels.MaxCases || eaches > levels.MaxEaches))
-                    takeSILList.Add(sil);
-
-                if (place && (baseQty < levels.MinUnits || cases < levels.MinCases || eaches < levels.MinEaches))
-                    placeSILList.Add(sil);
-            }
-        }
+        GetSILLists(dataSet, takeSites, placeSites, out var takeableSIL, out var placeableSIL,
+            out var targetTakeSIL, out var targetPlaceSIL);
 
         // TODO: Break down into a function.
         // Go through site/item combinations that are over targets and can be moved out.
-        foreach (var takeSIL in takeSILList)
+        foreach (var takeSIL in targetTakeSIL)
         {
             var takeSite = takeSIL.Site;
             var takeItem = takeSIL.Item;
@@ -112,7 +67,7 @@ public static class MoveGenerator
                 takeStock.BaseQty <= takeLevels.MaxUnits) continue;
 
             // Set and order Site-Item-Levels list.
-            var silList = allSILList.Where(sil => sil.Item == takeItem && sil.Site != takeSite && placeSites.Contains(sil.Site)).ToList();
+            var silList = placeableSIL.Where(sil => sil.Item == takeItem && sil.Site != takeSite).ToList();
 
             // Ordered by which site could potentially benefit most from more of the item,
             // as determined by levels.
@@ -127,7 +82,7 @@ public static class MoveGenerator
 
         // TODO: Break down into a function.
         // Go through site/item combinations that are under targets and require more moved in.
-        foreach (var placeSil in placeSILList)
+        foreach (var placeSil in targetPlaceSIL)
         {
             var placeSite = placeSil.Site;
             var placeItem = placeSil.Item;
@@ -141,7 +96,7 @@ public static class MoveGenerator
                 placeStock.BaseQty >= placeLevels.MinUnits) continue;
 
             // Set and order Site-Item-Levels list.
-            var silList = allSILList.Where(sil => sil.Item == placeItem && sil.Site != placeSite && takeSites.Contains(sil.Site)).ToList();
+            var silList = takeableSIL.Where(sil => sil.Item == placeItem && sil.Site != placeSite).ToList();
 
             // Ordered by which site could potentially benefit most from more of the item,
             // as determined by levels.
@@ -157,6 +112,67 @@ public static class MoveGenerator
         return returnList;
     }
 
+    private static void GetSILLists(HydraDataSet dataSet, ICollection<Site> takeSites, ICollection<Site> placeSites, out List<SIL> takeableSIL, out List<SIL> placeableSIL,
+        out List<SIL> targetTakeSIL, out List<SIL> targetPlaceSIL)
+    {
+        takeableSIL = new List<SIL>();
+        placeableSIL = new List<SIL>();
+        targetTakeSIL = new List<SIL>();
+        targetPlaceSIL = new List<SIL>();
+
+        var items = dataSet.Items.Values.Where(i => i.SiteLevelTarget).ToList();
+
+        foreach (var site in takeSites.Concat(placeSites).Distinct())
+        {
+            foreach (var item in items)
+            {
+                if (!site.Stock.TryGetValue(item.Number, out var stock))
+                {
+                    stock = new Stock(item, site.Bin!);
+                    site.AddStock(stock);
+                }
+
+                // Get siteItemLevels. Skip if not available.
+                if (!dataSet.SiteItemLevels.TryGetValue((site.Name, item.Number), out var siteItemLevel)) continue;
+
+                // Skip if item is not set up for site.
+                if (!siteItemLevel.Active) continue;
+
+                // Set levels.
+                var levels = GetLevels(siteItemLevel, site);
+                SetPctLevels(ref levels, stock);
+
+                // Check if movements are potentially required.
+                var take = takeSites.Contains(site);
+                var place = placeSites.Contains(site);
+
+                var baseQty = stock.BaseQty;
+                var cases = stock.Cases?.Qty ?? 0;
+                var eaches = stock.Eaches?.Qty ?? 0;
+
+                var sil = new SIL
+                {
+                    Site = site,
+                    Item = item,
+                    Levels = levels
+                };
+
+                if (take)
+                {
+                    takeableSIL.Add(sil);
+                    if (baseQty > levels.MaxUnits || cases > levels.MaxCases || eaches > levels.MaxEaches)
+                        targetTakeSIL.Add(sil);
+                }
+
+                if (!place) continue;
+
+                placeableSIL.Add(sil);
+                if (baseQty < levels.MinUnits || cases < levels.MinCases || eaches < levels.MinEaches)
+                    targetPlaceSIL.Add(sil);
+            }
+        }
+    }
+
     private static IEnumerable<Move> ConvertToActualMoves(IEnumerable<PotentialMove> potentialMoves)
     {
         var returnList = new List<Move>();
@@ -169,9 +185,11 @@ public static class MoveGenerator
         {
             ++count;
             var maxPotential = pmList.Max(pm => pm.Potential);
-            var move = pmList.First(pm => pm.Potential == maxPotential).Move;
+            var pMove = pmList.First(pm => pm.Potential == maxPotential);
+            var move = pMove.Move;
 
             returnList.Add(move);
+            pmList.Remove(pMove);
 
             move.Execute();
 
@@ -198,10 +216,10 @@ public static class MoveGenerator
             if (!placeSite.Stock.TryGetValue(takeItem.Number, out var placeStock)) placeStock = new Stock();
 
             potentialMoves.AddRange(from moveStock in takeItem.StockDict.Values.Where(s => s.Site == takeSite)
-                select GetPotentialMove(takeSIL, takeStock, placeSIL, placeStock, moveStock)
+                                    select GetPotentialMove(takeSIL, takeStock, placeSIL, placeStock, moveStock)
                 into newMove
-                where newMove is not null
-                select (PotentialMove) newMove);
+                                    where newMove is not null
+                                    select (PotentialMove)newMove);
         }
         return potentialMoves;
     }
@@ -219,10 +237,10 @@ public static class MoveGenerator
             if (!takeSite.Stock.TryGetValue(takeItem.Number, out var takeStock)) takeStock = new Stock();
 
             potentialMoves.AddRange(from moveStock in takeItem.StockDict.Values.Where(s => s.Site == takeSite)
-                select GetPotentialMove(takeSIL, takeStock, placeSIL, placeStock, moveStock)
+                                    select GetPotentialMove(takeSIL, takeStock, placeSIL, placeStock, moveStock)
                 into newMove
-                where newMove is not null
-                select (PotentialMove) newMove);
+                                    where newMove is not null
+                                    select (PotentialMove)newMove);
         }
         return potentialMoves;
     }
@@ -231,14 +249,14 @@ public static class MoveGenerator
     {
         var takeLevels = takeSIL.Levels;
         var placeLevels = placeSIL.Levels;
-        var takeSite = takeSIL.Site;
+        var placeSite = placeSIL.Site;
         var item = placeSIL.Item;
 
         var val = MoveCheck(takeStock, takeLevels, placeStock, placeLevels, moveStock);
 
-        if (val <= 0 || moveStock.Bin is null) return null;
+        if (val <= 0 || moveStock.Bin is null || placeSite.Bin is null) return null;
 
-        var newMove = GenerateMove(moveStock.Bin, takeSite.Bin, item);
+        var newMove = GenerateMove(moveStock.Bin, placeSite.Bin, item);
 
         if (newMove is null) return null;
 
@@ -280,19 +298,22 @@ public static class MoveGenerator
     public static Levels GetLevels(SiteItemLevel sil, Site site)
     {
         var useSil = sil.OverrideDefaults;
-        var item = sil.Item;
+        var item = sil.Item!;
+        var baseQty = item.Stock?.BaseQty ?? 0;
+        var caseQty = item.Case is null ? 0 : baseQty / item.QtyPerCase;
+
         var levels = new Levels
         {
             MinEaches = useSil ? sil.MinEaches ?? 0 : site.MinEaches ?? 0,
             MaxEaches = useSil
-                ? sil.MaxEaches ?? (item?.Stock?.BaseQty ?? 0)
-                : site.MaxEaches ?? (item?.Stock?.BaseQty ?? 0),
+                ? sil.MaxEaches ?? baseQty
+                : site.MaxEaches ?? baseQty,
             MinCases = useSil ? sil.MinCases ?? 0 : site.MinCases ?? 0,
             MaxCases = useSil
-                ? sil.MaxCases ?? (item?.Stock?.Cases?.Qty ?? 0)
-                : site.MaxCases ?? (item?.Stock?.Cases?.Qty ?? 0),
+                ? sil.MaxCases ?? caseQty
+                : site.MaxCases ?? caseQty,
             MinPct = useSil ? sil.MinPct ?? 0 : site.MinPct ?? 0,
-            MaxPct = useSil ? sil.MaxPct ?? 1 : site.MaxPct ?? 1,
+            MaxPct = useSil ? sil.MaxPct ?? 1 : site.MaxPct ?? 1
         };
 
         return levels;
@@ -303,7 +324,7 @@ public static class MoveGenerator
     /// </summary>
     /// <param name="levels"></param>
     /// <param name="stock"></param>
-    public static void SetPctLevels(Levels levels, Stock stock)
+    public static void SetPctLevels(ref Levels levels, Stock stock)
     {
         var minUnits = levels.MinEaches + levels.MinCases * stock.Item?.QtyPerCase ?? 0;
         var maxUnits = levels.MaxEaches + levels.MaxCases * stock.Item?.QtyPerCase ?? 0;
@@ -378,7 +399,7 @@ public static class MoveGenerator
             return int.MinValue;
 
         var eachLevel = CheckLevel(eachesBefore, eachesAfter, levels.MinEaches, levels.MaxEaches);
-        var caseLevel = CheckLevel(casesBefore, casesAfter, levels.MinCases, levels.MaxCases) * fromStock.Item?.QtyPerCase ?? 1;
+        var caseLevel = CheckLevel(casesBefore, casesAfter, levels.MinCases, levels.MaxCases) * (fromStock.Item?.QtyPerCase ?? 1);
         var unitLevel = CheckLevel(unitsBefore, unitsAfter, levels.MinUnits, levels.MaxUnits);
 
         return eachLevel + caseLevel + unitLevel;
@@ -412,7 +433,7 @@ public static class MoveGenerator
             return int.MinValue;
 
         var eachLevel = CheckLevel(eachesBefore, eachesAfter, levels.MinEaches, levels.MaxEaches);
-        var caseLevel = CheckLevel(casesBefore, casesAfter, levels.MinCases, levels.MaxCases) * toStock.Item?.QtyPerCase ?? 1;
+        var caseLevel = CheckLevel(casesBefore, casesAfter, levels.MinCases, levels.MaxCases) * (toStock.Item?.QtyPerCase ?? 1);
         var unitLevel = CheckLevel(unitsBefore, unitsAfter, levels.MinUnits, levels.MaxUnits);
 
         return eachLevel + caseLevel + unitLevel;
@@ -430,9 +451,9 @@ public static class MoveGenerator
             beforeLevel = max - before;
 
         if (after < min)
-            afterLevel = before - min;
+            afterLevel = after - min;
         else if (after > max)
-            afterLevel = max - before;
+            afterLevel = max - after;
 
         return afterLevel - beforeLevel;
     }

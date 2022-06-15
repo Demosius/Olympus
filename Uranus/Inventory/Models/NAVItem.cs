@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Uranus.Inventory.Models;
 
 [Table("ItemList")]
-public class NAVItem
+public class NAVItem : IEquatable<NAVItem>
 {
     [PrimaryKey, ForeignKey(typeof(ItemExtension))] public int Number { get; set; }
     public string Description { get; set; }
@@ -172,6 +172,11 @@ public class NAVItem
 
     public void AddStock(Stock newStock)
     {
+        if (Number is 267773 or 263033)
+        {
+            var i = Stock?.BaseQty ?? 0;
+        }
+
         if (Stock is null)
             Stock = newStock.Copy();
         else

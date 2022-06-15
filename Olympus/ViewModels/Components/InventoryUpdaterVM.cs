@@ -28,6 +28,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         {
             stockUpdateTime = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(StockUpdateString));
         }
     }
     private DateTime binsUpdateTime;
@@ -40,6 +41,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         {
             binsUpdateTime = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(BinsUpdateString));
         }
     }
     private DateTime uomUpdateTime;
@@ -52,6 +54,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         {
             uomUpdateTime = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(UoMUpdateString));
         }
     }
     private DateTime itemUpdateTime;
@@ -64,6 +67,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         {
             itemUpdateTime = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(ItemUpdateString));
         }
     }
 

@@ -15,6 +15,7 @@ public class MoveVM : INotifyPropertyChanged
     public Move Move { get; }
 
     public int ItemNumber => Move.ItemNumber;
+    public string ItemDescription => Move.Item?.Description ?? "";
 
     public string TakeSiteName => Move.TakeBin?.Zone?.SiteName ?? "";
     public string TakeZoneCode => Move.TakeBin?.Zone?.Code ?? "";

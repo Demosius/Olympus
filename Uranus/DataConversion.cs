@@ -658,6 +658,10 @@ public static class DataConversion
                 var zone = row[headDict["Zone Code"]];
                 var bin = row[headDict["Bin Code"]];
                 var uom = row[headDict["Unit of Measure Code"]];
+                if (!Enum.TryParse(uom, out EUoM _))
+                {
+                    uom = "EACH";
+                }
                 var zoneID = string.Join(":", location, zone);
                 var binID = string.Join(":", zoneID, bin);
                 if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer, provider, out var itemNo)) itemNo = 0;

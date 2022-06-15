@@ -205,6 +205,24 @@
                 <DataGridTextColumn Header="From Site"
                                     Binding="{Binding TakeSiteName}"
                                     IsReadOnly="True"/>
+                <DataGridTextColumn Header="Item Number"
+                                    Binding="{Binding ItemNumber}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Item Description"
+                                    Binding="{Binding ItemDescription}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="From Zone"
+                                    Binding="{Binding TakeZoneCode}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="From Bin"
+                                    Binding="{Binding TakeBinCode}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Quantity"
+                                    Binding="{Binding TakeQtyString}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="To Site"
+                                    Binding="{Binding PlaceSiteName}"
+                                    IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>
