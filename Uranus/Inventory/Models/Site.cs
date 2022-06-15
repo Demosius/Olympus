@@ -8,8 +8,8 @@ namespace Uranus.Inventory.Models;
 public class Site
 {
     [PrimaryKey] public string Name { get; set; }
-    public int? MinUnits { get; set; }
-    public int? MaxUnits { get; set; }
+    public int? MinEaches { get; set; }
+    public int? MaxEaches { get; set; }
     public int? MinCases { get; set; }
     public int? MaxCases { get; set; }
     public float? MinPct { get; set; }
@@ -30,6 +30,11 @@ public class Site
     }
 
     [Ignore] public Dictionary<int, Stock> Stock { get; set; }
+
+    // For site specific loc/zone/bin.
+    [Ignore] public NAVLocation Location { get; set; }
+    [Ignore] public NAVZone Zone { get; set; }
+    [Ignore] public NAVBin Bin { get; set; }
 
     public Site()
     {

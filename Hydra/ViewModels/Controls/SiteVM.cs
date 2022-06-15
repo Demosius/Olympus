@@ -18,28 +18,28 @@ public class SiteVM : INotifyPropertyChanged
 
     #region INotifyPropertyChanged Members
 
-    public string MinUnits
+    public string MinEaches
     {
-        get => Site.MinUnits?.ToString() ?? "";
+        get => Site.MinEaches?.ToString() ?? "";
         set
         {
             if (value != "" && int.TryParse(value, out var minUnits) && minUnits >= 0)
-                Site.MinUnits = minUnits;
+                Site.MinEaches = minUnits;
             else
-                Site.MinUnits = null;
+                Site.MinEaches = null;
             OnPropertyChanged();
         }
     }
 
-    public string MaxUnits
+    public string MaxEaches
     {
-        get => Site.MaxUnits?.ToString() ?? "";
+        get => Site.MaxEaches?.ToString() ?? "";
         set
         {
             if (value != "" && int.TryParse(value, out var maxUnits) && maxUnits >= 0)
-                Site.MaxUnits = maxUnits;
+                Site.MaxEaches = maxUnits;
             else
-                Site.MaxUnits = null;
+                Site.MaxEaches = null;
             OnPropertyChanged();
         }
     }

@@ -33,7 +33,14 @@ public class Stock
     [Ignore] public Bay? Bay => Bin?.Bay;
     [Ignore] public Site? Site => Zone?.Site;
 
-    [Ignore] public int BaseQty => Eaches?.Qty ?? 0 + (Packs?.Qty ?? 0 * Item?.Pack?.QtyPerUoM ?? 0) + (Cases?.Qty ?? 0 * Item?.Case?.QtyPerUoM ?? 0);
+    [Ignore] public int EachQty => Eaches?.Qty ?? 0;
+    [Ignore] public int PackQty => Packs?.Qty ?? 0;
+    [Ignore] public int CaseQty => Cases?.Qty ?? 0;
+
+    [Ignore] public int UnitsInPacks => Packs?.Qty ?? 0 * Item?.Pack?.QtyPerUoM ?? 0;
+    [Ignore] public int UnitsInCases => Cases?.Qty ?? 0 * Item?.Case?.QtyPerUoM ?? 0;
+
+    [Ignore] public int BaseQty => EachQty + UnitsInPacks + UnitsInCases;
 
     public Stock()
     {
@@ -58,7 +65,7 @@ public class Stock
     public Stock(NAVStock navStock) : this()
     {
         // Handle the UoMs
-        var uom = (EUoM)Enum.Parse(typeof(EUoM), navStock.UoMCode);
+        if (!Enum.TryParse(navStock.UoMCode, out EUoM uom)) uom = EUoM.EACH;
         switch (uom)
         {
             case EUoM.CASE:
@@ -79,6 +86,17 @@ public class Stock
 
         // Handle IDs : Item should stay constant, so isn't included in the re-used SetIDs method.
         ItemNumber = Item?.Number ?? navStock.ItemNumber;
+        SetIDs();
+    }
+
+    /// <summary>
+    /// Changes the bin associated with the stock. Typically used for stock movements.
+    /// Changes associated IDs for sub-stock and this stock itself.
+    /// </summary>
+    /// <param name="newBin"></param>
+    public void ChangeBin(NAVBin newBin)
+    {
+        Bin = newBin;
         SetIDs();
     }
 
@@ -126,56 +144,27 @@ public class Stock
     // Move full stock to specified bin.
     public void FullMove(NAVBin toBin)
     {
-        // TODO: 
-        /*// Handle object moving.
-        if (Bin != null) _ = Bin.Stock.Remove(this);
-        Bin = toBin;
-        Bin.Stock.Add(this);
-        // Handle ID changing.
-        SetIDs();
-        // Merge with potential matching stock in new bin location.
-        toBin.MergeStock();*/
+        RemoveStock();
+        ChangeBin(toBin);
+        AddStock();
     }
 
     // Partial move.
     public void Move(NAVBin toBin, int eaches = 0, int packs = 0, int cases = 0)
     {
-        var splitStock = Split(eaches, packs, cases);
-        splitStock?.Move(toBin);
-    }
-
-    // Pulls out the specified QTYs and return a separate stock object.
-    private Stock? Split(int eaches = 0, int packs = 0, int cases = 0)
-    {
-        if (Bin is null || Item is null) return null;
-
-        Stock newStock = new()
+        if (IsFull(eaches, packs, cases))
         {
-            Item = Item,
-            ItemNumber = Item.Number,
-            Bin = Bin
-        };
-
-        newStock.SetIDs();
-        // TODO: Fix
-        // Bin.Stock.Add(newStock); 
-
-        // Make sure to not take more than available.
-        if (eaches > (Eaches?.Qty ?? 0)) eaches = Eaches?.Qty ?? 0;
-        if (packs > (Packs?.Qty ?? 0)) packs = Packs?.Qty ?? 0;
-        if (cases > (Cases?.Qty ?? 0)) cases = Cases?.Qty ?? 0;
-        // Move qty.
-        if (Eaches != null) Eaches.Qty -= eaches;
-        if (Packs != null) Packs.Qty -= packs;
-        if (Cases != null) Cases.Qty -= cases;
-
-        if (newStock.Eaches != null) newStock.Eaches.Qty = eaches;
-        if (newStock.Packs != null) newStock.Packs.Qty = packs;
-        if (newStock.Cases != null) newStock.Cases.Qty = cases;
-
-        return newStock;
+            FullMove(toBin);
+        }
+        else
+        {
+            var stock = Copy();
+            stock.RemoveStock();
+            stock.ChangeBin(toBin);
+            stock.AddStock();
+        }
     }
-
+    
     /// <summary>
     /// Merges new stock into this one, and clears to other stock out in the process to keep the overall balance.
     /// </summary>
@@ -276,6 +265,12 @@ public class Stock
         if (Cases != null) Cases.Qty = 0;
     }
 
+    /// <summary>
+    /// Creates a copy of the stock, including the sub stock and relevant qty values.
+    /// This copy is not to be associated with the existing bin - and will typically
+    /// be used as an abstract stock level balance.
+    /// </summary>
+    /// <returns></returns>
     public Stock Copy()
     {
         var stock = new Stock
@@ -287,12 +282,47 @@ public class Stock
             Bin = null,
             BinID = string.Empty,
             CaseID = CaseID,
+            PackID = PackID,
             EachID = EachID,
             Item = Item,
             ItemNumber = ItemNumber,
             ZoneID = ZoneID
         };
 
+        // Make sure the new sub-stock references the new stock instead of this parent stock.
+        if (stock.Eaches != null) stock.Eaches.Stock = stock;
+        if (stock.Packs != null) stock.Packs.Stock = stock;
+        if (stock.Cases != null) stock.Cases.Stock = stock;
+
+        return stock;
+    }
+
+    /// <summary>
+    /// Creates a copy of the stock, but only applies the quantity values given
+    /// and does not take with it the applied sub-stock values such as pending moves and adjustments.
+    ///
+    /// We do not remove from this parent stock as we split it, as that should be handled by any applicable movement functions.
+    /// </summary>
+    /// <returns></returns>
+    public Stock Split(int eachQty, int packQty, int caseQty)
+    {
+        var stock = new Stock
+        {
+            ID = ID,
+            Eaches = Eaches?.Split(eachQty),
+            Packs = Packs?.Split(packQty),
+            Cases = Cases?.Split(caseQty),
+            Bin = Bin,
+            BinID = BinID,
+            CaseID = CaseID,
+            PackID = PackID,
+            EachID = EachID,
+            Item = Item,
+            ItemNumber = ItemNumber,
+            ZoneID = ZoneID
+        };
+
+        // Make sure the new sub-stock references the new stock instead of this parent stock.
         if (stock.Eaches != null) stock.Eaches.Stock = stock;
         if (stock.Packs != null) stock.Packs.Stock = stock;
         if (stock.Cases != null) stock.Cases.Stock = stock;
@@ -311,8 +341,83 @@ public class Stock
     /// <returns></returns>
     public bool Pending()
     {
-        return (Cases?.Pending() ?? false) || 
-               (Packs?.Pending() ?? false) || 
+        return (Cases?.Pending() ?? false) ||
+               (Packs?.Pending() ?? false) ||
                (Eaches?.Pending() ?? false);
+    }
+
+    /// <summary>
+    /// Determine if the given values represents the full quantity of stock.
+    /// </summary>
+    /// <param name="eaches"></param>
+    /// <param name="packs"></param>
+    /// <param name="cases"></param>
+    /// <returns></returns>
+    public bool IsFull(int eaches, int packs, int cases)
+    {
+        return eaches == EachQty && packs == PackQty && cases == CaseQty;
+    }
+
+    /// <summary>
+    /// Converts the internal quantities to the given values per UoM.
+    /// If it cannot be done perfectly, will do what is possible and leave leftovers as eaches.
+    /// </summary>
+    /// <param name="eaches"></param>
+    /// <param name="packs"></param>
+    /// <param name="cases"></param>
+    public void Convert(int eaches, int packs, int cases)
+    {
+        // Take out what units can be taken.
+        var eachAv = Eaches?.AvailableQty ?? 0;
+        if (eachAv < 0) eachAv = 0;
+        var packAv = Packs?.AvailableQty ?? 0;
+        if (packAv < 0) packAv = 0;
+        var caseAv = Cases?.AvailableQty ?? 0;
+        if (caseAv < 0) caseAv = 0;
+
+        var qtyPerPack = Item?.QtyPerPack ?? 1;
+        var qtyPerCase = Item?.QtyPerCase ?? 1;
+
+        var units = 0;
+
+        if (Eaches is not null)
+        {
+            Eaches.Qty -= eachAv;
+            units += eachAv;
+        }
+
+        if (Packs is not null)
+        {
+            Packs.Qty -= packAv;
+            units += packAv * qtyPerPack;
+        }
+
+        if (Cases is not null)
+        {
+            Cases.Qty -= caseAv;
+            units += caseAv * qtyPerCase;
+        }
+
+        var unitsForCases = cases * qtyPerCase;
+
+        if (unitsForCases > 0 && Cases is not null)
+        {
+            if (unitsForCases > units) unitsForCases = (units / qtyPerCase) * qtyPerCase;
+            units -= unitsForCases;
+            Cases.Qty += unitsForCases / qtyPerCase;
+        }
+
+        var unitsForPacks = packs * qtyPerPack;
+        if (unitsForPacks > 0 && Packs is not null)
+        {
+            if (unitsForPacks > units) unitsForPacks = (units / qtyPerPack) * qtyPerPack;
+            units -= unitsForPacks;
+            Packs.Qty += unitsForPacks / qtyPerPack;
+        }
+
+        if (Eaches is not null)
+        {
+            Eaches.Qty += units;
+        }
     }
 }

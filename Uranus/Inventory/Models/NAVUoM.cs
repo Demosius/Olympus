@@ -27,7 +27,15 @@ public class NAVUoM
     {
         get
         {
-            uom ??= (EUoM)Enum.Parse(typeof(EUoM), Code);
+            if (uom is not null) return (EUoM)uom;
+
+            if (!Enum.TryParse(Code, out EUoM u))
+            {
+                u = EUoM.EACH;
+                Code = "EACH";
+            }
+            uom = u;
+
             return (EUoM)uom;
         }
     }

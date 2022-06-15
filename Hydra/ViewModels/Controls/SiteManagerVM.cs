@@ -186,7 +186,7 @@ public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
     {
         try
         {
-            Helios?.InventoryUpdater.Sites(Sites.Select(vm => vm.Site));
+            Helios?.InventoryUpdater.Sites(Sites.Select(vm => vm.Site), AllZones);
         }
         catch (Exception ex)
         {

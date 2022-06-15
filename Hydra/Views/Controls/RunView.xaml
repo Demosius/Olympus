@@ -82,11 +82,11 @@
                                             Binding="{Binding TakeFrom}"/>
                     <DataGridCheckBoxColumn Header="Place"
                                             Binding="{Binding PlaceTo}"/>
-                    <DataGridTextColumn Header="Min Units"
-                                        Binding="{Binding MinUnits}"
+                    <DataGridTextColumn Header="Min Eaches"
+                                        Binding="{Binding MinEaches}"
                                         IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Max Units"
-                                        Binding="{Binding MaxUnits}"
+                    <DataGridTextColumn Header="Max Eaches"
+                                        Binding="{Binding MaxEaches}"
                                         IsReadOnly="True"/>
                     <DataGridTextColumn Header="Min Cases"
                                         Binding="{Binding MinCases}"

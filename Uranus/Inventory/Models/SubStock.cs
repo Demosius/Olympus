@@ -46,7 +46,9 @@ public class SubStock
     {
         ID = navStock.ID;
         StockID = navStock.BinID + navStock.ItemNumber;
-        UoM = (EUoM)Enum.Parse(typeof(EUoM), navStock.UoMCode);
+
+        if (!Enum.TryParse(navStock.UoMCode, out EUoM uom)) uom = EUoM.EACH;
+        UoM = uom;
 
         Qty = navStock.Qty;
         PickQty = navStock.PickQty;
@@ -68,7 +70,11 @@ public class SubStock
         return !(PickQty == 0 && PutAwayQty == 0 &&
                  NegAdjQty == 0 && PosAdjQty == 0);
     }
-
+    
+    /// <summary>
+    /// Creates a full copy of the sub-stock.
+    /// </summary>
+    /// <returns></returns>
     public SubStock Copy()
     {
         var sub = new SubStock
@@ -79,6 +85,25 @@ public class SubStock
             Qty = Qty,
             PickQty = PickQty,
             PutAwayQty = PutAwayQty,
+            StockID = StockID,
+            UoM = UoM
+        };
+        return sub;
+    }
+
+    /// <summary>
+    /// Creates a similar copy of the sub-stock with (at most - determined by available stock) the qty given
+    /// and does not copy across other pending values (pick/put/adj.).
+    /// </summary>
+    /// <param name="qty"></param>
+    /// <returns></returns>
+    public SubStock Split(int qty)
+    {
+        if (qty > AvailableQty) qty = AvailableQty;
+        var sub = new SubStock
+        {
+            ID = ID,
+            Qty = qty,
             StockID = StockID,
             UoM = UoM
         };

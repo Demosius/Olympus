@@ -70,10 +70,10 @@
 
             <TextBox Grid.Row="1" Grid.Column="1" 
                      ToolTip="Minimum Units"
-                     Text="{Binding MinUnits}"/>
+                     Text="{Binding MinEaches}"/>
             <TextBox Grid.Row="1" Grid.Column="2" 
                      ToolTip="Maximum Units"
-                     Text="{Binding MaxUnits}"/>
+                     Text="{Binding MaxEaches}"/>
             <TextBox Grid.Row="2" Grid.Column="1" 
                      ToolTip="Minimum Cases"
                      Text="{Binding MinCases}"/>

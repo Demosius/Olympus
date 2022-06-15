@@ -23,14 +23,14 @@ public class LaunchProjectCommand : ICommand
 
     public bool CanExecute(object parameter)
     {
-        var eProject = (EProject)Enum.Parse(typeof(EProject), (string)parameter ?? "None");
+        if (!Enum.TryParse((string)parameter ?? "None", out EProject eProject)) eProject = EProject.None;
         if (VM.ProjectGroup is null) return false;
         return VM.ProjectGroup.ProjectLauncher.OlympusVM.CurrentProject?.Project != eProject && ProjectFactory.CanLaunch(eProject, App.Charon);
     }
 
     public void Execute(object parameter)
     {
-        var eProject = EnumConverter.StringToProject(parameter as string);
+        if (!Enum.TryParse((string)parameter ?? "None", out EProject eProject)) eProject = EProject.None;
         VM.ProjectGroup.ProjectLauncher.OlympusVM.LoadProject(eProject);
     }
 }

@@ -117,6 +117,19 @@ public class InventoryUpdater
         return lines;
     }
 
+    public int Sites(IEnumerable<Site> sites, IEnumerable<NAVZone> zones)
+    {
+        var lines = 0;
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var zoneArray = zones as NAVZone[] ?? zones.ToArray();
+            lines += Chariot.UpdateTable(sites);
+            lines += Chariot.UpdateTable(zoneArray);
+            lines += Chariot.UpdateTable(zoneArray.Select(z => z.Extension));
+        });
+        return lines;
+    }
+
     public int SiteItemLevels(IEnumerable<SiteItemLevel> siteItemLevels) => Chariot.UpdateTable(siteItemLevels);
 
     public int Site(Site site) => Chariot.Update(site);

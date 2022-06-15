@@ -28,6 +28,8 @@ public class Move
     public int PlacePacks { get; set; }
     public int PlaceEaches { get; set; }
 
+    public bool HasExecuted { get; set; }
+
     [Ignore] public bool FullPallet => TakeBin != null && (TakeBin.IsFullQty(this) ?? false) && AccessLevel != EAccessLevel.Ground;
 
     [Ignore] public EAccessLevel AccessLevel => (TakeBin ?? new NAVBin()).Zone?.AccessLevel ?? EAccessLevel.Ground;
@@ -104,5 +106,51 @@ public class Move
     {
         //TODO: PartialMove line merging.
         throw new NotImplementedException();
+    }
+
+    public void Execute()
+    { 
+        // TODO: Add appropriate error generation here.
+        if (TakeBin is null || PlaceBin is null || Item is null || HasExecuted) return;
+        if (!TakeBin.Stock.TryGetValue(Item.Number, out var stock)) return;
+        
+        var moveStock = stock.Split(TakeEaches, TakePacks, TakeCases);
+
+        moveStock.RemoveStock();
+        moveStock.Convert(PlaceEaches, PlacePacks, PlaceCases);
+        moveStock.ChangeBin(PlaceBin);
+        moveStock.AddStock();
+        
+        HasExecuted = true;
+    }
+
+    public void Undo()
+    {
+        // TODO: Add appropriate error generation here.
+        if (TakeBin is null || PlaceBin is null || Item is null || !HasExecuted) return;
+        if (!PlaceBin.Stock.TryGetValue(Item.Number, out var stock)) return;
+        
+        var moveStock = stock.Split(PlaceEaches, PlacePacks, PlaceCases);
+
+        moveStock.RemoveStock();
+        moveStock.Convert(TakeEaches, TakePacks, TakeCases);
+        moveStock.ChangeBin(TakeBin);
+        moveStock.AddStock();
+
+        HasExecuted = false;
+    }
+
+    public bool IsTakeFull()
+    {
+        if (TakeBin is null || PlaceBin is null || Item is null) return false;
+        return TakeBin.Stock.TryGetValue(Item.Number, out var stock) && 
+               stock.IsFull(TakeEaches, TakePacks, TakeCases);
+    }
+
+    public bool IsPlaceFull()
+    {
+        if (TakeBin is null || PlaceBin is null || Item is null) return false;
+        return PlaceBin.Stock.TryGetValue(Item.Number, out var stock) &&
+               stock.IsFull(PlaceEaches, PlacePacks, PlaceCases);
     }
 }

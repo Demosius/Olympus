@@ -1,4 +1,5 @@
-﻿using Hydra.Interfaces;
+﻿using Hydra.Helpers;
+using Hydra.Interfaces;
 using Hydra.ViewModels.Commands;
 using Styx;
 using Styx.Interfaces;
@@ -14,7 +15,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Hydra.Helpers;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -33,7 +33,6 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
     public List<MoveVM> AllMoves { get; set; }
 
     #region InotifyPropertyChanged Members
-
 
     private ObservableCollection<MoveVM> currentMoves;
     public ObservableCollection<MoveVM> CurrentMoves
@@ -235,6 +234,8 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
     public void GenerateMoves()
     {
         if (Helios is null) return;
+
+        Mouse.OverrideCursor = Cursors.Wait;
         var hds = Helios.InventoryReader.HydraDataSet();
         var siteMoves =
             MoveGenerator.GenerateSiteMoves(hds, Sites.Where(s => s.TakeFrom).Select(s => s.Name),
@@ -242,6 +243,7 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
 
         AllMoves = siteMoves.Select(m => new MoveVM(m)).ToList();
         ApplyFilters();
+        Mouse.OverrideCursor = Cursors.Arrow;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

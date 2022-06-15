@@ -10,8 +10,8 @@ public class SiteItemLevel
     [ForeignKey(typeof(Site))] public string SiteName { get; set; }
     public bool Active { get; set; }
     public bool OverrideDefaults { get; set; }
-    public int? MinUnits { get; set; }
-    public int? MaxUnits { get; set; }
+    public int? MinEaches { get; set; }
+    public int? MaxEaches { get; set; }
     public int? MinCases { get; set; }
     public int? MaxCases { get; set; }
     public float? MinPct { get; set; }

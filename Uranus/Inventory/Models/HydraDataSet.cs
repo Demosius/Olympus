@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 
 namespace Uranus.Inventory.Models;
 
@@ -76,6 +77,10 @@ public class HydraDataSet
             Zones.Add(zone.ID, zone);
             Locations.Add(location.Code, location);
             Bins.Add(bin.ID, bin);
+
+            site.Location = location;
+            site.Zone = zone;
+            site.Bin = bin;
         }
     }
 
@@ -120,7 +125,7 @@ public class HydraDataSet
     {
         foreach (var (_, bin) in Bins)
         {
-            if (Zones.TryGetValue(bin.ZoneCode, out var zone))
+            if (Zones.TryGetValue(bin.ZoneID, out var zone))
             {
                 zone.Bins.Add(bin);
                 bin.Zone = zone;
@@ -132,13 +137,8 @@ public class HydraDataSet
 
     private void SetFromStock()
     {
-        var count = 0;
         foreach (var navStock in NAVStock)
         {
-            count++;
-            if (count == 21106)
-                Console.WriteLine($"!!!!!!!!!!!!!!!!_-------------------------__{count}__-----------------------_!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
             if (Items.TryGetValue(navStock.ItemNumber, out var item))
             {
                 item.NAVStock.Add(navStock);
@@ -151,7 +151,7 @@ public class HydraDataSet
                 navStock.Zone = zone;
             }
 
-            if (Bins.TryGetValue(navStock.BinCode, out var bin))
+            if (Bins.TryGetValue(navStock.BinID, out var bin))
             {
                 bin.NAVStock.Add(navStock);
                 navStock.Bin = bin;

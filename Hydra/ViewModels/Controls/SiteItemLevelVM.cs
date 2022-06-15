@@ -49,26 +49,26 @@ public class SiteItemLevelVM : INotifyPropertyChanged
 
     public string MinUnits
     {
-        get => SiteItemLevel.MinUnits?.ToString() ?? "";
+        get => SiteItemLevel.MinEaches?.ToString() ?? "";
         set
         {
             if (value != "" && int.TryParse(value, out var minUnits) && minUnits >= 0)
-                SiteItemLevel.MinUnits = minUnits;
+                SiteItemLevel.MinEaches = minUnits;
             else
-                SiteItemLevel.MinUnits = null;
+                SiteItemLevel.MinEaches = null;
             OnPropertyChanged();
         }
     }
 
     public string MaxUnits
     {
-        get => SiteItemLevel.MaxUnits?.ToString() ?? "";
+        get => SiteItemLevel.MaxEaches?.ToString() ?? "";
         set
         {
             if (value != "" && int.TryParse(value, out var maxUnits) && maxUnits >= 0)
-                SiteItemLevel.MaxUnits = maxUnits;
+                SiteItemLevel.MaxEaches = maxUnits;
             else
-                SiteItemLevel.MaxUnits = null;
+                SiteItemLevel.MaxEaches = null;
             OnPropertyChanged();
         }
     }

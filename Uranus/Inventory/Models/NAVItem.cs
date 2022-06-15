@@ -59,9 +59,14 @@ public class NAVItem
     [Ignore] public NAVUoM? Pack { get; set; }
     [Ignore] public NAVUoM? Each { get; set; }
 
+    // Qty Per UoMs
+    [Ignore] public int QtyPerCase => Case?.QtyPerUoM ?? 0;
+    [Ignore] public int QtyPerPack => Pack?.QtyPerUoM ?? 0;
+
     // Stock Management
     [Ignore] public Stock? Stock { get; set; }
     [Ignore] public Dictionary<string, Stock> StockDict { get; set; }
+    [Ignore] public Dictionary<string, Stock> SiteStockDict { get; set; }
 
     public NAVItem()
     {
@@ -71,6 +76,7 @@ public class NAVItem
         UoMs = new List<NAVUoM>();
         NAVStock = new List<NAVStock>();
         StockDict = new Dictionary<string, Stock>();
+        SiteStockDict = new Dictionary<string, Stock>();
         TransferOrders = new List<NAVTransferOrder>();
         Moves = new List<Move>();
         MoveLines = new List<NAVMoveLine>();
@@ -171,8 +177,15 @@ public class NAVItem
         else
             Stock.Add(newStock);
 
-        if (!StockDict.TryGetValue(newStock.BinID, out var oldStock))
+        if (!StockDict.TryGetValue(newStock.BinID, out _))
             StockDict.Add(newStock.BinID, newStock);
+
+        if (newStock.Site is null) return;
+
+        if (SiteStockDict.TryGetValue(newStock.Site.Name, out var oldStock))
+            oldStock.Add(newStock);
+        else
+            SiteStockDict.Add(newStock.Site.Name, newStock.Copy());
     }
 
     public void RemoveStock(Stock stock)

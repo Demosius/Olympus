@@ -1,7 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
-using System.Linq;
 
 namespace Uranus.Inventory.Models;
 
@@ -93,7 +92,8 @@ public class NAVStock
 
     public EUoM GetEUoM()
     {
-        return (EUoM)Enum.Parse(typeof(EUoM), !Enum.GetNames(typeof(EUoM)).Contains(UoMCode) ? "EACH" : UoMCode); // EnumConverter.StringToUoM(UoMCode);
+        if (!Enum.TryParse(UoMCode, out EUoM uom)) uom = EUoM.EACH;
+        return uom;
     }
 
     public double GetWeight()
