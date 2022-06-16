@@ -1,36 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Hydra.Models;
+using System.Collections.Generic;
 using System.Linq;
 using Uranus.Inventory.Models;
 
 namespace Hydra.Helpers;
-
-public struct Levels
-{
-    public int MinEaches { get; set; }
-    public int MaxEaches { get; set; }
-    public int MinCases { get; set; }
-    public int MaxCases { get; set; }
-    public float MinPct { get; set; }
-    public float MaxPct { get; set; }
-    public int MinUnits { get; set; }
-    public int MaxUnits { get; set; }
-}
-
-public struct SIL
-{
-    public int Value { get; set; }  // Context determines value for the user: e.g. value as a place site.
-    public Site Site { get; set; }
-    public NAVItem Item { get; set; }
-    public Levels Levels { get; set; }
-}
-
-public struct PotentialMove
-{
-    public int Potential { get; set; }
-    public Move Move { get; set; }
-    public SIL TakeSIL { get; set; }
-    public SIL PlaceSIL { get; set; }
-}
 
 public static class MoveGenerator
 {
@@ -39,86 +12,32 @@ public static class MoveGenerator
         var returnList = new List<Move>();
 
         // Set Site Objects
-        var takeSites = new List<Site>();
-        var placeSites = new List<Site>();
-
-        foreach (var siteName in fromSites)
-            if (dataSet.Sites.TryGetValue(siteName, out var site)) takeSites.Add(site);
-        foreach (var siteName in toSites)
-            if (dataSet.Sites.TryGetValue(siteName, out var site)) placeSites.Add(site);
+        var takeSites = dataSet.Sites.Values.Where(s => fromSites.Contains(s.Name)).ToList();
+        var placeSites = dataSet.Sites.Values.Where(s => toSites.Contains(s.Name)).ToList();
 
         // Go through and set levels for each relevant item.
         GetSILLists(dataSet, takeSites, placeSites, out var takeableSIL, out var placeableSIL,
             out var targetTakeSIL, out var targetPlaceSIL);
-
-        // TODO: Break down into a function.
+        
         // Go through site/item combinations that are over targets and can be moved out.
-        foreach (var takeSIL in targetTakeSIL)
-        {
-            var takeSite = takeSIL.Site;
-            var takeItem = takeSIL.Item;
-            var takeLevels = takeSIL.Levels;
-
-            var takeStock = takeSite.Stock[takeItem.Number];
-
-            // Make sure that the quantity is over by at least one value.
-            if (takeStock.EachQty <= takeLevels.MaxEaches &&
-                takeStock.CaseQty <= takeLevels.MaxCases &&
-                takeStock.BaseQty <= takeLevels.MaxUnits) continue;
-
-            // Set and order Site-Item-Levels list.
-            var silList = placeableSIL.Where(sil => sil.Item == takeItem && sil.Site != takeSite).ToList();
-
-            // Ordered by which site could potentially benefit most from more of the item,
-            // as determined by levels.
-            OrderSILList(ref silList);
-
-            var potentialMoves = GetPotentialMovesToPlace(takeSIL, takeStock, silList);
-
-            var newMoves = ConvertToActualMoves(potentialMoves);
-            var moves = newMoves.ToList();
-            if (moves.Any()) returnList.AddRange(moves);
-        }
-
-        // TODO: Break down into a function.
+        var takeMoves = GetMoves(targetTakeSIL, placeableSIL, true).ToList();
         // Go through site/item combinations that are under targets and require more moved in.
-        foreach (var placeSil in targetPlaceSIL)
-        {
-            var placeSite = placeSil.Site;
-            var placeItem = placeSil.Item;
-            var placeLevels = placeSil.Levels;
+        var placeMoves = GetMoves(targetPlaceSIL, takeableSIL, false).ToList();
 
-            var placeStock = placeSite.Stock[placeItem.Number];
-
-            // Make sure that the quantity is under by at least one value.
-            if (placeStock.EachQty >= placeLevels.MinEaches &&
-                placeStock.CaseQty >= placeLevels.MinCases &&
-                placeStock.BaseQty >= placeLevels.MinUnits) continue;
-
-            // Set and order Site-Item-Levels list.
-            var silList = takeableSIL.Where(sil => sil.Item == placeItem && sil.Site != placeSite).ToList();
-
-            // Ordered by which site could potentially benefit most from more of the item,
-            // as determined by levels.
-            OrderSILList(ref silList);
-
-            var potentialMoves = GetPotentialMovesToTake(placeSil, placeStock, silList);
-
-            var newMoves = ConvertToActualMoves(potentialMoves);
-            var moves = newMoves.ToList();
-            if (moves.Any()) returnList.AddRange(moves);
-        }
+        if (takeMoves.Any()) returnList.AddRange(takeMoves);
+        if (placeMoves.Any()) returnList.AddRange(placeMoves);
 
         return returnList;
     }
 
-    private static void GetSILLists(HydraDataSet dataSet, ICollection<Site> takeSites, ICollection<Site> placeSites, out List<SIL> takeableSIL, out List<SIL> placeableSIL,
-        out List<SIL> targetTakeSIL, out List<SIL> targetPlaceSIL)
+    private static void GetSILLists(HydraDataSet dataSet, ICollection<Site> takeSites, ICollection<Site> placeSites,
+        out List<SiteItemLevel> takeableSIL, out List<SiteItemLevel> placeableSIL,
+        out List<SiteItemLevel> targetTakeSIL, out List<SiteItemLevel> targetPlaceSIL)
     {
-        takeableSIL = new List<SIL>();
-        placeableSIL = new List<SIL>();
-        targetTakeSIL = new List<SIL>();
-        targetPlaceSIL = new List<SIL>();
+        takeableSIL = new List<SiteItemLevel>();
+        placeableSIL = new List<SiteItemLevel>();
+        targetTakeSIL = new List<SiteItemLevel>();
+        targetPlaceSIL = new List<SiteItemLevel>();
 
         var items = dataSet.Items.Values.Where(i => i.SiteLevelTarget).ToList();
 
@@ -133,44 +52,60 @@ public static class MoveGenerator
                 }
 
                 // Get siteItemLevels. Skip if not available.
-                if (!dataSet.SiteItemLevels.TryGetValue((site.Name, item.Number), out var siteItemLevel)) continue;
+                if (!dataSet.SiteItemLevels.TryGetValue((site.Name, item.Number), out var sil)) continue;
 
                 // Skip if item is not set up for site.
-                if (!siteItemLevel.Active) continue;
-
-                // Set levels.
-                var levels = GetLevels(siteItemLevel, site);
-                SetPctLevels(ref levels, stock);
+                if (!sil.Active) continue;
 
                 // Check if movements are potentially required.
                 var take = takeSites.Contains(site);
                 var place = placeSites.Contains(site);
 
-                var baseQty = stock.BaseQty;
-                var cases = stock.Cases?.Qty ?? 0;
-                var eaches = stock.Eaches?.Qty ?? 0;
-
-                var sil = new SIL
-                {
-                    Site = site,
-                    Item = item,
-                    Levels = levels
-                };
-
                 if (take)
                 {
                     takeableSIL.Add(sil);
-                    if (baseQty > levels.MaxUnits || cases > levels.MaxCases || eaches > levels.MaxEaches)
+                    if (sil.TargetToTake)
                         targetTakeSIL.Add(sil);
                 }
 
                 if (!place) continue;
 
                 placeableSIL.Add(sil);
-                if (baseQty < levels.MinUnits || cases < levels.MinCases || eaches < levels.MinEaches)
+                if (sil.TargetToPlace)
                     targetPlaceSIL.Add(sil);
             }
         }
+    }
+
+    private static IEnumerable<Move> GetMoves(List<SiteItemLevel> targetSIL, IReadOnlyCollection<SiteItemLevel> otherSIL, bool take)
+    {
+        var returnList = new List<Move>();
+
+        // Go through site/item combinations that are over targets and can be moved out.
+        foreach (var sil in targetSIL)
+        {
+            if (sil.Site is null || sil.Item is null) continue;
+
+            var site = sil.Site;
+            var item = sil.Item;
+
+            // Make sure that the quantity is over by at least one value.
+            if ((take && !sil.Takeable) || (!take && !sil.Placeable)) continue;
+
+            // Set and order Site-Item-Levels list.
+            var silList = otherSIL.Where(s => s.Item == item && s.Site != site).ToList();
+
+            // Ordered by which site has the greatest move potential.
+            silList = silList.OrderBy(s => take ? s.TakePotential : s.PlacePotential).ToList();
+
+            var potentialMoves = GetPotentialMoves(sil, silList, take);
+
+            var newMoves = ConvertToActualMoves(potentialMoves).ToList();
+
+            if (newMoves.Any()) returnList.AddRange(newMoves);
+        }
+
+        return returnList;
     }
 
     private static IEnumerable<Move> ConvertToActualMoves(IEnumerable<PotentialMove> potentialMoves)
@@ -184,89 +119,72 @@ public static class MoveGenerator
         while (pmList.Any() && count <= maxCount)
         {
             ++count;
-            var maxPotential = pmList.Max(pm => pm.Potential);
-            var pMove = pmList.First(pm => pm.Potential == maxPotential);
-            var move = pMove.Move;
+            var maxPotential = 0;
+            PotentialMove? potentialMove = null;
 
-            returnList.Add(move);
-            pmList.Remove(pMove);
+            foreach (var move in pmList)
+            {
+                if (move.Potential <= maxPotential) continue;
+                maxPotential = move.Potential;
+                potentialMove = move;
+            }
 
-            move.Execute();
+            if (potentialMove is null) break;
 
-            foreach (var potentialMove in pmList) SetMoveValue(potentialMove);
+            returnList.Add(potentialMove.Move);
+            pmList.Remove(potentialMove);
+
+            potentialMove.Execute();
 
             pmList = pmList.Where(pm => pm.Potential >= 0).ToList();
         }
 
         return returnList;
     }
-
-    private static IEnumerable<PotentialMove> GetPotentialMovesToPlace(SIL takeSIL, Stock takeStock, IEnumerable<SIL> placeSILList)
+    
+    private static IEnumerable<PotentialMove> GetPotentialMoves(SiteItemLevel sil, IEnumerable<SiteItemLevel> otherSIL, bool take)
     {
-        var takeSite = takeSIL.Site;
-        var takeItem = takeSIL.Item;
+        if (sil.Site is null || sil.Item is null) return new List<PotentialMove>();
 
         var potentialMoves = new List<PotentialMove>();
 
-        // Go through each site (with levels) to gather potential moves.
-        foreach (var placeSIL in placeSILList)
+        Site? takeSite = null;
+        var item = sil.Item;
+
+        if (take) takeSite = sil.Site;
+
+        foreach (var siteItemLevel in otherSIL)
         {
-            var placeSite = placeSIL.Site;
+            if (siteItemLevel.Site is null) continue;
 
-            if (!placeSite.Stock.TryGetValue(takeItem.Number, out var placeStock)) placeStock = new Stock();
+            if (!take) takeSite = siteItemLevel.Site;
+            var site = takeSite;
 
-            potentialMoves.AddRange(from moveStock in takeItem.StockDict.Values.Where(s => s.Site == takeSite)
-                                    select GetPotentialMove(takeSIL, takeStock, placeSIL, placeStock, moveStock)
+            potentialMoves.AddRange(from moveStock in item.StockDict.Values.Where(s => s.Site == site)
+                select GetPotentialMove(take ? sil : siteItemLevel , take ? siteItemLevel : sil, moveStock)
                 into newMove
-                                    where newMove is not null
-                                    select (PotentialMove)newMove);
+                where newMove is not null
+                select (PotentialMove)newMove);
         }
+
         return potentialMoves;
     }
 
-    private static IEnumerable<PotentialMove> GetPotentialMovesToTake(SIL placeSIL, Stock placeStock, IEnumerable<SIL> takeSILList)
+    private static PotentialMove? GetPotentialMove(SiteItemLevel takeSIL, SiteItemLevel placeSIL, Stock moveStock)
     {
-        var potentialMoves = new List<PotentialMove>();
+        if (placeSIL.Item is null) return null;
 
-        // Go through each site (with levels) to gather potential moves.
-        foreach (var takeSIL in takeSILList)
-        {
-            var takeSite = takeSIL.Site;
-            var takeItem = takeSIL.Item;
-
-            if (!takeSite.Stock.TryGetValue(takeItem.Number, out var takeStock)) takeStock = new Stock();
-
-            potentialMoves.AddRange(from moveStock in takeItem.StockDict.Values.Where(s => s.Site == takeSite)
-                                    select GetPotentialMove(takeSIL, takeStock, placeSIL, placeStock, moveStock)
-                into newMove
-                                    where newMove is not null
-                                    select (PotentialMove)newMove);
-        }
-        return potentialMoves;
-    }
-
-    private static PotentialMove? GetPotentialMove(SIL takeSIL, Stock takeStock, SIL placeSIL, Stock placeStock, Stock moveStock)
-    {
-        var takeLevels = takeSIL.Levels;
-        var placeLevels = placeSIL.Levels;
         var placeSite = placeSIL.Site;
         var item = placeSIL.Item;
 
-        var val = MoveCheck(takeStock, takeLevels, placeStock, placeLevels, moveStock);
-
-        if (val <= 0 || moveStock.Bin is null || placeSite.Bin is null) return null;
+        if (moveStock.Bin is null || placeSite?.Bin is null) return null;
 
         var newMove = GenerateMove(moveStock.Bin, placeSite.Bin, item);
 
         if (newMove is null) return null;
+        var pm = new PotentialMove(newMove, takeSIL, placeSIL);
 
-        return new PotentialMove
-        {
-            Move = newMove,
-            Potential = val,
-            TakeSIL = placeSIL,
-            PlaceSIL = takeSIL
-        };
+        return pm.Potential > 0 ? pm : null;
     }
 
     /// <summary>
@@ -293,191 +211,5 @@ public static class MoveGenerator
         if (eachQty is null || eachQty > stock.Eaches?.AvailableQty) eachQty = stock.Eaches?.AvailableQty ?? 0;
 
         return new Move(fromBin, toBin, item, (int)caseQty, (int)packQty, (int)eachQty);
-    }
-
-    public static Levels GetLevels(SiteItemLevel sil, Site site)
-    {
-        var useSil = sil.OverrideDefaults;
-        var item = sil.Item!;
-        var baseQty = item.Stock?.BaseQty ?? 0;
-        var caseQty = item.Case is null ? 0 : baseQty / item.QtyPerCase;
-
-        var levels = new Levels
-        {
-            MinEaches = useSil ? sil.MinEaches ?? 0 : site.MinEaches ?? 0,
-            MaxEaches = useSil
-                ? sil.MaxEaches ?? baseQty
-                : site.MaxEaches ?? baseQty,
-            MinCases = useSil ? sil.MinCases ?? 0 : site.MinCases ?? 0,
-            MaxCases = useSil
-                ? sil.MaxCases ?? caseQty
-                : site.MaxCases ?? caseQty,
-            MinPct = useSil ? sil.MinPct ?? 0 : site.MinPct ?? 0,
-            MaxPct = useSil ? sil.MaxPct ?? 1 : site.MaxPct ?? 1
-        };
-
-        return levels;
-    }
-
-    /// <summary>
-    /// Based on stock levels, convert the percentage to unit targets, and override the min/max units where appropriate.
-    /// </summary>
-    /// <param name="levels"></param>
-    /// <param name="stock"></param>
-    public static void SetPctLevels(ref Levels levels, Stock stock)
-    {
-        var minUnits = levels.MinEaches + levels.MinCases * stock.Item?.QtyPerCase ?? 0;
-        var maxUnits = levels.MaxEaches + levels.MaxCases * stock.Item?.QtyPerCase ?? 0;
-
-        var baseQty = stock.Item?.Stock?.BaseQty ?? 0;
-
-        var minPct = (int)(levels.MinPct * baseQty);
-        var maxPct = (int)(levels.MaxPct * baseQty);
-
-        if (minPct > minUnits) minUnits = minPct;
-        if (maxPct < maxUnits) maxUnits = maxPct;
-
-        levels.MinUnits = minUnits;
-        levels.MaxUnits = maxUnits;
-    }
-
-    /// <summary>
-    /// Checks a potential move between two sites and quantifies the move based on given target levels.
-    /// </summary>
-    /// <returns>int - Higher value means greater positive overall move. Negative values given for bad moves. int.Min for untenable moves.</returns>
-    private static int MoveCheck(Stock fromStock, Levels fromLevels, Stock toStock, Levels toLevels, Stock moveStock)
-    {
-        var toVal = ToCheck(toStock, toLevels, moveStock);
-        var fromVal = FromCheck(fromStock, fromLevels, moveStock);
-
-        if (toVal == int.MinValue || fromVal == int.MinValue) return int.MinValue;
-        return toVal + fromVal;
-    }
-
-    private static void SetMoveValue(PotentialMove potentialMove)
-    {
-        var item = potentialMove.TakeSIL.Item;
-        var move = potentialMove.Move;
-
-        if (!potentialMove.TakeSIL.Site.Stock.TryGetValue(item.Number, out var fromStock) ||
-            !potentialMove.PlaceSIL.Site.Stock.TryGetValue(item.Number, out var toStock) ||
-            move.TakeBin is null ||
-            !move.TakeBin.Stock.TryGetValue(item.Number, out var moveStock))
-        {
-            potentialMove.Potential = int.MinValue;
-            return;
-        }
-
-        potentialMove.Potential = MoveCheck(fromStock, potentialMove.TakeSIL.Levels,
-            toStock, potentialMove.PlaceSIL.Levels, moveStock);
-    }
-
-    /// <summary>
-    /// Checks a potential movement of stock from a greater stock, and compares it to target levels to quantify the quality of the move.
-    /// </summary>
-    /// <param name="fromStock"></param>
-    /// <param name="levels"></param>
-    /// <param name="moveStock"></param>
-    /// <returns>int - Higher = better move, negative is worse but acceptable, min means that the move is untenable.</returns>
-    private static int FromCheck(Stock fromStock, Levels levels, Stock moveStock)
-    {
-        var eachesBefore = fromStock.EachQty;
-        var eachesAfter = eachesBefore - moveStock.EachQty;
-        var casesBefore = fromStock.CaseQty;
-        var casesAfter = casesBefore - moveStock.CaseQty;
-        var unitsBefore = fromStock.BaseQty;
-        var unitsAfter = unitsBefore - moveStock.BaseQty;
-
-        // Check for changes from with limits to outside limits.
-        // These automatically disqualify the move.
-        if ((eachesBefore <= levels.MaxEaches && eachesBefore >= levels.MinEaches &&
-             (eachesAfter > levels.MaxEaches || eachesAfter < levels.MinEaches)) ||
-            (casesBefore <= levels.MaxCases && casesBefore >= levels.MinCases &&
-             (casesAfter > levels.MaxCases || casesAfter < levels.MinCases)) ||
-            (unitsBefore <= levels.MaxUnits && unitsBefore >= levels.MinUnits &&
-             (unitsAfter > levels.MaxUnits || unitsAfter < levels.MinUnits)))
-            return int.MinValue;
-
-        var eachLevel = CheckLevel(eachesBefore, eachesAfter, levels.MinEaches, levels.MaxEaches);
-        var caseLevel = CheckLevel(casesBefore, casesAfter, levels.MinCases, levels.MaxCases) * (fromStock.Item?.QtyPerCase ?? 1);
-        var unitLevel = CheckLevel(unitsBefore, unitsAfter, levels.MinUnits, levels.MaxUnits);
-
-        return eachLevel + caseLevel + unitLevel;
-    }
-
-
-    /// <summary>
-    /// Checks a potential movement of stock to a greater stock, and compares it to target levels to quantify the quality of the move.
-    /// </summary>
-    /// <param name="toStock"></param>
-    /// <param name="levels"></param>
-    /// <param name="moveStock"></param>
-    /// <returns>int - Higher = better move, negative is worse but acceptable, min means that the move is untenable.</returns>
-    private static int ToCheck(Stock toStock, Levels levels, Stock moveStock)
-    {
-        var eachesBefore = toStock.EachQty;
-        var eachesAfter = eachesBefore + moveStock.EachQty;
-        var casesBefore = toStock.CaseQty;
-        var casesAfter = casesBefore + moveStock.CaseQty;
-        var unitsBefore = toStock.BaseQty;
-        var unitsAfter = unitsBefore + moveStock.BaseQty;
-
-        // Check for changes from with limits to outside limits.
-        // These automatically disqualify the move.
-        if ((eachesBefore <= levels.MaxEaches && eachesBefore >= levels.MinEaches &&
-             (eachesAfter > levels.MaxEaches || eachesAfter < levels.MinEaches)) ||
-            (casesBefore <= levels.MaxCases && casesBefore >= levels.MinCases &&
-             (casesAfter > levels.MaxCases || casesAfter < levels.MinCases)) ||
-            (unitsBefore <= levels.MaxUnits && unitsBefore >= levels.MinUnits &&
-             (unitsAfter > levels.MaxUnits || unitsAfter < levels.MinUnits)))
-            return int.MinValue;
-
-        var eachLevel = CheckLevel(eachesBefore, eachesAfter, levels.MinEaches, levels.MaxEaches);
-        var caseLevel = CheckLevel(casesBefore, casesAfter, levels.MinCases, levels.MaxCases) * (toStock.Item?.QtyPerCase ?? 1);
-        var unitLevel = CheckLevel(unitsBefore, unitsAfter, levels.MinUnits, levels.MaxUnits);
-
-        return eachLevel + caseLevel + unitLevel;
-
-    }
-
-    private static int CheckLevel(int before, int after, int min, int max)
-    {
-        var beforeLevel = 0;
-        var afterLevel = 0;
-
-        if (before < min)
-            beforeLevel = before - min;
-        else if (before > max)
-            beforeLevel = max - before;
-
-        if (after < min)
-            afterLevel = after - min;
-        else if (after > max)
-            afterLevel = max - after;
-
-        return afterLevel - beforeLevel;
-    }
-
-    private static void OrderSILList(ref List<SIL> silList)
-    {
-        foreach (var sil in silList) SetPlacePotential(sil);
-
-        silList = silList.OrderBy(sil => sil.Value).ToList();
-    }
-
-    /// <summary>
-    /// Compare stock values to minimum levels to quantify a numeric value according to whether stock should go TO the given site.
-    /// </summary>
-    /// <param name="sil"></param>
-    /// <returns>int value representing the potential of the site to receive the item. Higher = better.</returns>
-    private static void SetPlacePotential(SIL sil)
-    {
-        if (!sil.Site.Stock.TryGetValue(sil.Item.Number, out var stock)) stock = new Stock();
-
-        var eaches = sil.Levels.MinEaches - stock.EachQty;
-        var cases = (sil.Levels.MinCases - stock.CaseQty) * sil.Item.QtyPerCase;
-        var units = sil.Levels.MinUnits - stock.BaseQty;
-
-        sil.Value = eaches + units + cases;
     }
 }

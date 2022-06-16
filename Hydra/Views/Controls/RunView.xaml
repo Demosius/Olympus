@@ -6,7 +6,7 @@
              xmlns:vm="clr-namespace:Hydra.ViewModels.Controls"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:RunVM}, IsDesignTimeCreatable=False}"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="500" d:DesignWidth="900">
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -53,7 +53,21 @@
         <!-- Setup manager -->
         <Grid DockPanel.Dock="Top"
               Background="{StaticResource Brush05}">
+
+            <Grid.Resources>
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                    <Setter Property="Margin" Value="2"/>
+                    <Setter Property="VerticalAlignment" Value="Bottom"/>
+                </Style>
+            </Grid.Resources>
+
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -64,7 +78,6 @@
                     Command="{Binding RefreshDataCommand}"
                     ToolTip="(F5)"
                     Padding="0"
-                    Margin="2"
                     VerticalAlignment="Top">
                 <Image Source="../../Resources/refresh.png" MaxHeight="20" MaxWidth="20"></Image>
             </Button>
@@ -106,9 +119,7 @@
             <!-- Go Button -->
             <Button Grid.Column="2"
                     Command="{Binding GenerateMovesCommand}"
-                    ToolTip="(F5)"
-                    Margin="2"
-                    VerticalAlignment="Bottom">
+                    ToolTip="(F5)">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="../../Resources/wand--arrow.png"
                            MaxHeight="20"
@@ -117,6 +128,44 @@
                     <TextBlock Text="Run"/>
                 </StackPanel>
             </Button>
+
+            <!-- Export/Output Options -->
+            <Button Grid.Column="4"
+                    Command="{Binding}"
+                    ToolTip="Export To CSV">
+                <Image Source="../../Resources/csv.png"
+                       MaxHeight="20"
+                       MaxWidth="20"/>
+            </Button>
+            <Button Grid.Column="5"
+                    Command="{Binding}"
+                    ToolTip="Export To PDF">
+                <Image Source="../../Resources/document-pdf.png"
+                       MaxHeight="20"
+                       MaxWidth="20"/>
+            </Button>
+            <Button Grid.Column="6"
+                    Command="{Binding}"
+                    ToolTip="Export To Excel">
+                <Image Source="../../Resources/document-excel-table.png"
+                       MaxHeight="20"
+                       MaxWidth="20"/>
+            </Button>
+            <Button Grid.Column="7"
+                    Command="{Binding}"
+                    ToolTip="Export To Labels">
+                <Image Source="../../Resources/document-break.png"
+                       MaxHeight="20"
+                       MaxWidth="20"/>
+            </Button>
+            <Button Grid.Column="8"
+                    Command="{Binding}"
+                    ToolTip="Save Moves">
+                <Image Source="../../Resources/disk--arrow.png"
+                       MaxHeight="20"
+                       MaxWidth="20"/>
+            </Button>
+
         </Grid>
 
         <!-- Filters -->

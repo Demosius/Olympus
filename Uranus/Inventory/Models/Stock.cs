@@ -209,7 +209,7 @@ public class Stock
     /// <param name="newStock"></param>
     public bool Add(Stock newStock)
     {
-        // Stock  must not be the same object.
+        // Stock must not be the same object.
         if (ReferenceEquals(this, newStock)) return false;
 
         // Increase Stock quantities.
@@ -237,8 +237,8 @@ public class Stock
 
     public bool Sub(Stock stock)
     {
-        // Stock ID must match (same bin and item, etc.) but must not be the same object.
-        if (ReferenceEquals(this, stock) || ID != stock.ID)
+        // Stock must not be the same object.
+        if (ReferenceEquals(this, stock))
             return false;
 
         // Decrease Stock quantities.
