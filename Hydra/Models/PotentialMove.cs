@@ -12,10 +12,11 @@ internal class PotentialMove
     public Site? PlaceSite => PlaceSIL.Site;
 
     public Levels TakeLevels => TakeSIL.Levels;
-    public Levels PlaceLevels => TakeSIL.Levels;
+    public Levels PlaceLevels => PlaceSIL.Levels;
 
     public Stock? TakeStock => !(TakeSite?.Stock.TryGetValue(Item?.Number ?? 0, out var fromStock) ?? false) ? null : fromStock;
     public Stock? PlaceStock => !(PlaceSite?.Stock.TryGetValue(Item?.Number ?? 0, out var placeStock) ?? false) ? null : placeStock;
+
     public Stock? MoveStock => !(TakeBin?.Stock.TryGetValue(Item?.Number ?? 0, out var moveStock) ?? false) ? null : moveStock;
 
     public NAVBin? TakeBin => Move.TakeBin;
@@ -40,8 +41,8 @@ internal class PotentialMove
     {
         if (PlaceStock is null || TakeStock is null || MoveStock is null) return int.MinValue;
 
-        var toVal = MoveCheck(PlaceStock, MoveStock.EachQty, MoveStock.CaseQty, MoveStock.BaseQty);
-        var fromVal = MoveCheck(TakeStock, -MoveStock.EachQty, -MoveStock.CaseQty, -MoveStock.BaseQty);
+        var toVal = MoveCheck(PlaceStock, MoveStock.EachQty, MoveStock.CaseQty, MoveStock.BaseQty, false);
+        var fromVal = MoveCheck(TakeStock, -MoveStock.EachQty, -MoveStock.CaseQty, -MoveStock.BaseQty, true);
 
         if (toVal == int.MinValue || fromVal == int.MinValue) return int.MinValue;
         return toVal + fromVal;
@@ -51,14 +52,16 @@ internal class PotentialMove
     /// Checks a potential movement of stock to or from a greater stock, and compares it to target levels to quantify the quality of the move.
     /// </summary>
     /// <returns>int - Higher = better move, negative is worse but acceptable, min means that the move is untenable.</returns>
-    private int MoveCheck(Stock stock, int moveEaches, int moveCases, int moveUnits)
+    private int MoveCheck(Stock stock, int moveEaches, int moveCases, int moveUnits, bool take)
     {
-        if (TakeSIL.BrokenByMove(moveEaches, moveCases, moveUnits))
+        if ((take ? TakeSIL : PlaceSIL).BrokenByMove(moveEaches, moveCases, moveUnits))
             return int.MinValue;
 
-        var eachLevel = CheckLevel(stock.EachQty, moveEaches, TakeLevels.MinEaches, TakeLevels.MaxEaches);
-        var caseLevel = CheckLevel(stock.CaseQty, moveCases, TakeLevels.MinCases, TakeLevels.MaxCases) * (stock.Item?.QtyPerCase ?? 1);
-        var unitLevel = CheckLevel(stock.BaseQty, moveUnits, TakeLevels.MinUnits, TakeLevels.MaxUnits);
+        var levels = take ? TakeLevels : PlaceLevels;
+
+        var eachLevel = CheckLevel(stock.EachQty, moveEaches, levels.MinEaches, levels.MaxEaches);
+        var caseLevel = CheckLevel(stock.CaseQty, moveCases, levels.MinCases, levels.MaxCases) * (stock.Item?.QtyPerCase ?? 1);
+        var unitLevel = CheckLevel(stock.BaseQty, moveUnits, levels.MinUnits, levels.MaxUnits);
 
         return eachLevel + caseLevel + unitLevel;
     }

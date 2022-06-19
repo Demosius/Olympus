@@ -133,7 +133,7 @@ public static class MoveGenerator
 
             returnList.Add(potentialMove.Move);
             pmList.Remove(potentialMove);
-
+            
             potentialMove.Execute();
 
             pmList = pmList.Where(pm => pm.Potential >= 0).ToList();

@@ -148,6 +148,9 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         fromSiteFilterString = string.Empty;
         toSiteFilterString = string.Empty;
         CurrentMoves = new ObservableCollection<MoveVM>(AllMoves);
+        OnPropertyChanged(nameof(ItemFilterString));
+        OnPropertyChanged(nameof(FromSiteFilterString));
+        OnPropertyChanged(nameof(ToSiteFilterString));
     }
 
     public void ApplyFilters()
