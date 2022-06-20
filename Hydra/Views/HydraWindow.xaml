@@ -20,7 +20,7 @@
     </Window.Resources>
 
     <Frame Source="{Binding HydraPage}"
-           Margin="2"
+           Margin="0"
            Height="Auto" 
            HorizontalAlignment="Stretch" 
            VerticalAlignment="Stretch"

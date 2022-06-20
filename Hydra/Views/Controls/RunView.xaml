@@ -131,35 +131,35 @@
 
             <!-- Export/Output Options -->
             <Button Grid.Column="4"
-                    Command="{Binding}"
+                    Command="{Binding ExportToCSVCommand}"
                     ToolTip="Export To CSV">
                 <Image Source="../../Resources/csv.png"
                        MaxHeight="20"
                        MaxWidth="20"/>
             </Button>
             <Button Grid.Column="5"
-                    Command="{Binding}"
+                    Command="{Binding ExportToPDFCommand}"
                     ToolTip="Export To PDF">
                 <Image Source="../../Resources/document-pdf.png"
                        MaxHeight="20"
                        MaxWidth="20"/>
             </Button>
             <Button Grid.Column="6"
-                    Command="{Binding}"
+                    Command="{Binding ExportToExcelCommand}"
                     ToolTip="Export To Excel">
                 <Image Source="../../Resources/document-excel-table.png"
                        MaxHeight="20"
                        MaxWidth="20"/>
             </Button>
             <Button Grid.Column="7"
-                    Command="{Binding}"
+                    Command="{Binding ExportToLabelsCommand}"
                     ToolTip="Export To Labels">
                 <Image Source="../../Resources/document-break.png"
                        MaxHeight="20"
                        MaxWidth="20"/>
             </Button>
             <Button Grid.Column="8"
-                    Command="{Binding}"
+                    Command="{Binding SaveGenerationCommand}"
                     ToolTip="Save Moves">
                 <Image Source="../../Resources/disk--arrow.png"
                        MaxHeight="20"

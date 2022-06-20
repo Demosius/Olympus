@@ -1,12 +1,14 @@
 ﻿using Hydra.Helpers;
 using Hydra.Interfaces;
 using Hydra.ViewModels.Commands;
+using Morpheus.Helpers;
 using Styx;
 using Styx.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -94,6 +96,11 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
     public ApplySortingCommand ApplySortingCommand { get; set; }
     public FilterItemsFromClipboardCommand FilterItemsFromClipboardCommand { get; set; }
     public GenerateMovesCommand GenerateMovesCommand { get; set; }
+    public ExportToCSVCommand ExportToCSVCommand { get; set; }
+    public ExportToPDFCommand ExportToPDFCommand { get; set; }
+    public ExportToExcelCommand ExportToExcelCommand { get; set; }
+    public ExportToLabelsCommand ExportToLabelsCommand { get; set; }
+    public SaveGenerationCommand SaveGenerationCommand { get; set; }
 
     #endregion
 
@@ -115,6 +122,11 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         ApplySortingCommand = new ApplySortingCommand(this);
         FilterItemsFromClipboardCommand = new FilterItemsFromClipboardCommand(this);
         GenerateMovesCommand = new GenerateMovesCommand(this);
+        ExportToCSVCommand = new ExportToCSVCommand(this);
+        ExportToPDFCommand = new ExportToPDFCommand(this);
+        ExportToExcelCommand = new ExportToExcelCommand(this);
+        ExportToLabelsCommand = new ExportToLabelsCommand(this);
+        SaveGenerationCommand = new SaveGenerationCommand(this);
 
         Task.Run(() => SetDataSources(HydraVM.Helios!, HydraVM.Charon!));
     }
@@ -247,6 +259,85 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         AllMoves = siteMoves.Select(m => new MoveVM(m)).ToList();
         ApplyFilters();
         Mouse.OverrideCursor = Cursors.Arrow;
+    }
+
+    public void SaveGeneration()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void ExportToLabels()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void ExportToExcel()
+    {
+        Output.DataTableToExcel(CurrentMoveDataTable(), DefaultExportString);
+    }
+
+    public void ExportToPDF()
+    {
+        Output.MovesToPDF(CurrentMoves.Select(vm => vm.Move), DefaultExportString);
+    }
+
+    public void ExportToCSV()
+    {
+        Output.DataTableToCSV(CurrentMoveDataTable(), DefaultExportString);
+    }
+
+    private string DefaultExportString => $"hydra_export_{DateTime.Now:yyyyMMdd_HHmmss}";
+
+    private DataTable CurrentMoveDataTable()
+    {
+
+        var dt = new DataTable();
+
+        dt.Columns.Add(new DataColumn("Item Number"));
+        dt.Columns.Add(new DataColumn("Item Description"));
+        dt.Columns.Add(new DataColumn("From Site"));
+        dt.Columns.Add(new DataColumn("From Location"));
+        dt.Columns.Add(new DataColumn("From Zone"));
+        dt.Columns.Add(new DataColumn("From Bay"));
+        dt.Columns.Add(new DataColumn("From Bin"));
+        dt.Columns.Add(new DataColumn("To Site"));
+        dt.Columns.Add(new DataColumn("To Location"));
+        dt.Columns.Add(new DataColumn("To Zone"));
+        dt.Columns.Add(new DataColumn("To Bay"));
+        dt.Columns.Add(new DataColumn("To Bin"));
+        dt.Columns.Add(new DataColumn("Take Cases"));
+        dt.Columns.Add(new DataColumn("Take Packs"));
+        dt.Columns.Add(new DataColumn("Take Eaches"));
+        dt.Columns.Add(new DataColumn("Place Cases"));
+        dt.Columns.Add(new DataColumn("Place Packs"));
+        dt.Columns.Add(new DataColumn("Place Eaches"));
+
+        foreach (var move in CurrentMoves.Select(vm => vm.Move))
+        {
+            var row = dt.NewRow();
+            row["Item Number"] = move.ItemNumber;
+            row["Item Description"] = move.Item?.Description;
+            row["From Site"] = move.TakeSite?.Name;
+            row["From Location"] = move.TakeLocation;
+            row["From Zone"] = move.TakeZone?.Code;
+            row["From Bay"] = move.TakeBay?.ID;
+            row["From Bin"] = move.TakeBin?.Code;
+            row["To Site"] = move.PlaceSite?.Name;
+            row["To Location"] = move.PlaceLocation;
+            row["To Zone"] = move.PlaceZone?.Code;
+            row["To Bay"] = move.PlaceBay?.ID;
+            row["To Bin"] = move.PlaceBin?.Code;
+            row["Take Cases"] = move.TakeCases;
+            row["Take Packs"] = move.TakePacks;
+            row["Take Eaches"] = move.TakeEaches;
+            row["Place Cases"] = move.PlaceCases;
+            row["Place Packs"] = move.PlacePacks;
+            row["Place Eaches"] = move.PlaceEaches;
+
+            dt.Rows.Add(row);
+        }
+
+        return dt;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

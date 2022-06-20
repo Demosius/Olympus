@@ -30,12 +30,22 @@ public class Move
 
     public bool HasExecuted { get; set; }
 
+    public int AssignedOperator { get; set; }
+    public float TimeEstimate { get; set; }
+
     [Ignore] public bool FullPallet => TakeBin != null && (TakeBin.IsFullQty(this) ?? false) && AccessLevel != EAccessLevel.Ground;
 
     [Ignore] public EAccessLevel AccessLevel => (TakeBin ?? new NAVBin()).Zone?.AccessLevel ?? EAccessLevel.Ground;
 
-    [Ignore] public int AssignedOperator { get; set; }
-    public float TimeEstimate { get; set; }
+    [Ignore] public NAVZone? TakeZone => TakeBin?.Zone;
+    [Ignore] public Site? TakeSite => TakeZone?.Site;
+    [Ignore] public Bay? TakeBay => TakeBin?.Bay;
+    [Ignore] public string? TakeLocation => TakeBin?.LocationCode;
+
+    [Ignore] public NAVZone? PlaceZone => PlaceBin?.Zone;
+    [Ignore] public Site? PlaceSite => PlaceZone?.Site;
+    [Ignore] public Bay? PlaceBay => PlaceBin?.Bay;
+    [Ignore] public string? PlaceLocation => PlaceBin?.LocationCode;
 
     public Move()
     {
@@ -109,18 +119,18 @@ public class Move
     }
 
     public void Execute()
-    { 
+    {
         // TODO: Add appropriate error generation here.
         if (TakeBin is null || PlaceBin is null || Item is null || HasExecuted) return;
         if (!TakeBin.Stock.TryGetValue(Item.Number, out var stock)) return;
-        
+
         var moveStock = stock.Split(TakeEaches, TakePacks, TakeCases);
 
         moveStock.RemoveStock();
         moveStock.Convert(PlaceEaches, PlacePacks, PlaceCases);
         moveStock.ChangeBin(PlaceBin);
         moveStock.AddStock();
-        
+
         HasExecuted = true;
     }
 
@@ -129,7 +139,7 @@ public class Move
         // TODO: Add appropriate error generation here.
         if (TakeBin is null || PlaceBin is null || Item is null || !HasExecuted) return;
         if (!PlaceBin.Stock.TryGetValue(Item.Number, out var stock)) return;
-        
+
         var moveStock = stock.Split(PlaceEaches, PlacePacks, PlaceCases);
 
         moveStock.RemoveStock();
@@ -143,7 +153,7 @@ public class Move
     public bool IsTakeFull()
     {
         if (TakeBin is null || PlaceBin is null || Item is null) return false;
-        return TakeBin.Stock.TryGetValue(Item.Number, out var stock) && 
+        return TakeBin.Stock.TryGetValue(Item.Number, out var stock) &&
                stock.IsFull(TakeEaches, TakePacks, TakeCases);
     }
 
