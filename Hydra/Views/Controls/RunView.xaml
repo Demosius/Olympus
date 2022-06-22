@@ -20,7 +20,7 @@
 
     <UserControl.InputBindings>
         <KeyBinding Gesture="F5"
-                    Command="Refresh"></KeyBinding>
+                    Command="Refresh"/>
     </UserControl.InputBindings>
 
     <DockPanel Background="#bb8">

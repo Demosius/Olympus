@@ -8,10 +8,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\img\dog.jpg" />
+    <None Remove="Resources\img\fox.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\img\dog.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\img\fox.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="itext7" Version="7.2.2" />
     <PackageReference Include="Microsoft.Office.Interop.Excel" Version="15.0.4795.1001" />
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
     <PackageReference Include="Open-XML-SDK" Version="2.9.1" />
     <PackageReference Include="PdfSharp" Version="1.50.5147" />
+    <PackageReference Include="PDFsharp-MigraDoc" Version="1.50.5147" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
   </ItemGroup>
 
