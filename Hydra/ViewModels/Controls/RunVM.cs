@@ -278,7 +278,9 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
 
     public void ExportToPDF()
     {
-        Output.MovesToPDF(CurrentMoves.Select(vm => vm.Move), DefaultExportString);
+        Output.MovesToPDF(
+            CurrentMoves.Select(vm => vm.Move).GroupBy(m => m.TakeSite?.Name ?? "")
+                .ToDictionary(g => g.Key, g => g.ToList()), DefaultExportString);
     }
 
     public void ExportToCSV()
@@ -286,7 +288,7 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         Output.DataTableToCSV(CurrentMoveDataTable(), DefaultExportString);
     }
 
-    private string DefaultExportString => $"hydra_export_{DateTime.Now:yyyyMMdd_HHmmss}";
+    private static string DefaultExportString => $"hydra_export_{DateTime.Now:yyyyMMddTHHmmss}";
 
     private DataTable CurrentMoveDataTable()
     {

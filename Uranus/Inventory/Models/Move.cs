@@ -28,6 +28,9 @@ public class Move
     public int PlacePacks { get; set; }
     public int PlaceEaches { get; set; }
 
+    public int? GroupPriority { get; set; }
+    public int? IndividualPriority { get; set; }
+
     public bool HasExecuted { get; set; }
 
     public int AssignedOperator { get; set; }
@@ -46,6 +49,16 @@ public class Move
     [Ignore] public Site? PlaceSite => PlaceZone?.Site;
     [Ignore] public Bay? PlaceBay => PlaceBin?.Bay;
     [Ignore] public string? PlaceLocation => PlaceBin?.LocationCode;
+
+    [Ignore] public int? BatchPriority => Batch?.Priority;
+
+
+    [Ignore]
+    public int Priority
+    {
+        get => IndividualPriority ?? GroupPriority ?? BatchPriority ?? 1;
+        set => IndividualPriority = value;
+    }
 
     public Move()
     {
