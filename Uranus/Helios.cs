@@ -1,5 +1,5 @@
-﻿using Uranus.Inventory;
-using Uranus.Equipment;
+﻿using Uranus.Equipment;
+using Uranus.Inventory;
 using Uranus.Staff;
 using Uranus.Users;
 
@@ -31,8 +31,12 @@ public class Helios
     public UserUpdater UserUpdater { get; set; }
     public UserDeleter UserDeleter { get; set; }
 
+    public string SolLocation { get; }
+
     public Helios(string solLocation)
     {
+        SolLocation = solLocation;
+
         inventoryChariot = new InventoryChariot(solLocation);
         InventoryCreator = new InventoryCreator(ref inventoryChariot);
         InventoryReader = new InventoryReader(ref inventoryChariot);

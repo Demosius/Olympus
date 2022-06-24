@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Microsoft.Win32;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -33,6 +34,10 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
     public ObservableCollection<SiteVM> Sites { get; set; }
 
     public List<MoveVM> AllMoves { get; set; }
+
+    // Track whether the current data is old data that has been loaded which likely
+    // includes different core data (bin contents) than the current database holds.
+    public bool OldLoaded { get; set; }
 
     #region InotifyPropertyChanged Members
 
@@ -263,7 +268,25 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
 
     public void SaveGeneration()
     {
-        throw new NotImplementedException();
+        if (Helios is null) return;
+
+        var dir = Path.Combine(Helios.SolLocation, "Inventory", "Hydra");
+        if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+        var dialog = new SaveFileDialog
+        {
+            Filter = "SQLite Files (*.sqlite)|*.sqlite",
+            Title = "Save Generated Moves",
+            InitialDirectory = dir,
+            FileName = $"{DefaultExportString}.sqlite"
+        };
+
+        if (dialog.ShowDialog() != true) return;
+
+        var filePath = dialog.FileName;
+        
+
+
     }
 
     public void ExportToLabels()
