@@ -102,6 +102,7 @@ public class Move
 
     public Move(NAVBin takeBin, NAVBin placeBin, NAVItem item, int caseQty, int packQty, int eachQty)
     {
+        ID = Guid.NewGuid();
         Item = item;
         ItemNumber = item.Number;
         TakeBin = takeBin;

@@ -355,7 +355,7 @@ public class InventoryReader
     /// Get the full set of data required for standard Hydra functionality.
     /// </summary>
     /// <returns></returns>
-    public HydraDataSet HydraDataSet(bool includeStock = true)
+    public HydraDataSet? HydraDataSet(bool includeStock = true)
     {
         HydraDataSet? dataSet = null;
 

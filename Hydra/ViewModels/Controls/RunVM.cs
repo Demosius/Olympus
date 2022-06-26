@@ -1,6 +1,8 @@
-﻿using Hydra.Helpers;
+﻿using Hydra.Data;
+using Hydra.Helpers;
 using Hydra.Interfaces;
 using Hydra.ViewModels.Commands;
+using Microsoft.Win32;
 using Morpheus.Helpers;
 using Styx;
 using Styx.Interfaces;
@@ -17,11 +19,11 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Microsoft.Win32;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
+using Uranus.Inventory.Models;
 
 namespace Hydra.ViewModels.Controls;
 
@@ -30,6 +32,8 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
     public HydraVM HydraVM { get; set; }
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }
+
+    private HydraDataSet? dataSet;
 
     public ObservableCollection<SiteVM> Sites { get; set; }
 
@@ -256,9 +260,10 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         if (Helios is null) return;
 
         Mouse.OverrideCursor = Cursors.Wait;
-        var hds = Helios.InventoryReader.HydraDataSet();
+        dataSet = Helios.InventoryReader.HydraDataSet();
+
         var siteMoves =
-            MoveGenerator.GenerateSiteMoves(hds, Sites.Where(s => s.TakeFrom).Select(s => s.Name),
+            MoveGenerator.GenerateSiteMoves(dataSet, Sites.Where(s => s.TakeFrom).Select(s => s.Name),
                 Sites.Where(s => s.PlaceTo).Select(s => s.Name));
 
         AllMoves = siteMoves.Select(m => new MoveVM(m)).ToList();
@@ -284,9 +289,10 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         if (dialog.ShowDialog() != true) return;
 
         var filePath = dialog.FileName;
-        
 
+        var chariot = new HydraChariot(filePath);
 
+        chariot.SendData(dataSet, AllMoves.Select(vm => vm.Move));
     }
 
     public void ExportToLabels()
@@ -301,9 +307,10 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
 
     public void ExportToPDF()
     {
-        Output.MovesToPDF(
-            CurrentMoves.Select(vm => vm.Move).GroupBy(m => m.TakeSite?.Name ?? "")
-                .ToDictionary(g => g.Key, g => g.ToList()), DefaultExportString);
+        Output.MovesToPDF(CurrentMoves
+            .Select(vm => vm.Move)
+            .GroupBy(m => m.TakeSite?.Name ?? "")
+            .ToDictionary(g => g.Key, g => g.OrderBy(move => move.TakeBin?.Code ?? "").ToList()), DefaultExportString);
     }
 
     public void ExportToCSV()
