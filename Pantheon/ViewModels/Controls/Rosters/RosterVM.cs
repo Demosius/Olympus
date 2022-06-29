@@ -1,7 +1,9 @@
 ﻿using Pantheon.Annotations;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Uranus.Staff.Models;
@@ -15,6 +17,8 @@ public class RosterVM : INotifyPropertyChanged
     public DepartmentRosterVM DepartmentRosterVM { get; set; }
     public DailyRosterVM DailyRosterVM { get; set; }
     public EmployeeRosterVM EmployeeRosterVM { get; set; }
+
+    public List<ShiftRule> ShiftRules { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -137,6 +141,7 @@ public class RosterVM : INotifyPropertyChanged
         EmployeeRosterVM = employeeRosterVM;
         DailyRosterVM.Rosters.Add(Roster.EmployeeID, this);
 
+        ShiftRules = new List<ShiftRule>();
         shifts = new ObservableCollection<Shift>(EmployeeRosterVM.Shifts);
 
         if (SelectedShift is not null && AtWork) dailyRosterVM.AddCount(SelectedShift);
@@ -175,6 +180,11 @@ public class RosterVM : INotifyPropertyChanged
             AtWork = DailyRosterVM.DailyRoster.Day is not (DayOfWeek.Saturday or DayOfWeek.Sunday) || Roster.Shift is not null;
     }
 
+    public void ApplyShiftRules(List<ShiftRule> rules)
+    {
+        ShiftRules.AddRange(rules.Where(rule => rule.AppliesToDay(Date)));
+        ShiftRules = ShiftRules.Distinct().ToList();
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

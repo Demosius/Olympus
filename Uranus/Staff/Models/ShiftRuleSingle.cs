@@ -79,4 +79,14 @@ public class ShiftRuleSingle : ShiftRule
             Description = Description
         };
     }
+
+    public override bool AppliesToWeek(DateTime weeksStartDate)
+    {
+        // Make sure we're starting from monday.
+        weeksStartDate = weeksStartDate.AddDays(weeksStartDate.DayOfWeek - DayOfWeek.Monday);
+        // Applies if there is overlap at either tail regarding range.
+        return StartDate <= weeksStartDate.AddDays(7) && EndDate >= weeksStartDate;
+    }
+
+    public override bool AppliesToDay(DateTime date) => date >= StartDate && date <= EndDate;
 }

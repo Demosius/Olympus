@@ -113,4 +113,16 @@ public class ShiftRuleRecurring : ShiftRule
             Description = Description
         };
     }
+
+    public override bool AppliesToWeek(DateTime weeksStartDate)
+    {
+        if (WeekRotation is 1 or 0) return true;
+        if (FromDate > weeksStartDate) return false;
+        var weeksFromStart = (weeksStartDate - FromDate).Days / 7;
+        var weekInRotation = weeksFromStart % WeekRotation;
+        return WeekNumbers.Split(",").ToList().Contains(weekInRotation.ToString());
+    }
+
+    public override bool AppliesToDay(DateTime date) => DayOfWeek == date.DayOfWeek &&
+                                                        AppliesToWeek(date.AddDays(-(date.DayOfWeek - DayOfWeek.Monday)));
 }

@@ -53,6 +53,17 @@ public class DailyRosterVM : INotifyPropertyChanged
         }
     }
 
+    public void AddShifts(IEnumerable<Shift> shifts)
+    {
+        foreach (var shift in shifts)
+        {
+            if (CounterAccessDict.ContainsKey(shift.ID)) continue;
+            var dailyShiftCounter = new DailyShiftCounter(DailyRoster, shift, shift.DailyTarget);
+            CounterAccessDict.Add(shift.ID, dailyShiftCounter);
+            ShiftCounter.Add(dailyShiftCounter);
+        }
+    } 
+
     public void AddCount(Shift shift)
     {
         CounterAccessDict[shift.ID].Count++;

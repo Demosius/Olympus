@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Uranus.Extensions;
 
 namespace Uranus.Staff.Models;
 
@@ -455,4 +456,165 @@ public class DepartmentRoster
     }
 
     public override string ToString() => Name;
+
+    public void GenerateRosterAssignments()
+    {
+        ApplyShiftRules();
+        AssignDefaults();
+        CountToTargets();
+        ApplyDepartmentDefault();
+        CheckPublicHolidays();
+    }
+
+    private void CheckPublicHolidays()
+    {
+        //throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Applies shift rules to employees and their weekly/daily shifts as appropriate.
+    /// </summary>
+    private void ApplyShiftRules()
+    {
+        foreach (var employeeRoster in EmployeeRosters)
+        {
+            // TODO: 
+            employeeRoster.ApplyShiftRules();
+        }
+    }
+
+    /// <summary>
+    /// Assigns shifts to employees based on their defined defaults - only if they do not already have assigned shifts..
+    /// </summary>
+    public void AssignDefaults()
+    {
+        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.Shift is null))
+            employeeRoster.SetDefault();
+    }
+
+    /// <summary>
+    /// Attempt to reach the targeted number for each shift.
+    /// </summary>
+    public void CountToTargets()
+    {
+        if (Department is null) throw new DataException("Department Roster has null value for department.");
+
+        // Get every non-default shift with a target above 0.
+        var targetShifts = Department.Shifts.Where(s => !s.Default && s.DailyTarget > 0)
+            .ToDictionary(s => s, _ => new List<EmployeeRoster>());
+
+        foreach (var (shift, _) in targetShifts)
+            targetShifts[shift] = EmployeeRosters
+                .Where(er => er.Employee is not null && er.Employee.Shifts.Contains(shift)).ToList();
+
+        // Order by most needed (discrepancy between those available and number required to reach target.
+        targetShifts = targetShifts.OrderBy(s => s.Value.Count - ShiftCounterDict[s.Key.ID].Discrepancy)
+            .ToDictionary(e => e.Key, e => e.Value);
+
+        foreach (var (shift, empRosters) in targetShifts)
+        {
+            if (ShiftCounterDict[shift.ID].Discrepancy <= 0) continue;
+            // Randomize employees #TODO: Check against history to rotate through staff (instead of randomizing).
+            empRosters.Shuffle();
+
+            foreach (var employeeRoster in empRosters.Where(employeeRoster => employeeRoster.Shift is null).TakeWhile(_ => ShiftCounterDict[shift.ID].Lacking))
+                employeeRoster.Shift = shift;
+        }
+    }
+
+    /// <summary>
+    /// Checks all employees to see if they are assigned. If they aren't, use department defaults if they exist,
+    /// otherwise assign a shift that they are eligible for that is closest to its target count.
+    /// </summary>
+    public void ApplyDepartmentDefault()
+    {
+        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.Shift is null))
+        {
+            if (DefaultShift is not null)
+            {
+                employeeRoster.Shift = DefaultShift;
+                continue;
+            }
+
+            if (employeeRoster.Employee is null)
+                throw new DataException("Employee roster does not have employee initialized.");
+
+            var bestShift = ShiftCounters.First(c => c.Discrepancy == ShiftCounters.Min(counter => counter.Discrepancy)).Shift;
+
+            employeeRoster.Shift = bestShift;
+        }
+    }
+
+    public void Initialize()
+    {
+        if (IsInitialized) return;
+
+        if (!DepartmentRoster.IsLoaded) Helios.StaffReader.FillDepartmentRoster(DepartmentRoster);
+
+        // Shift Targets
+        foreach (var shiftCounter in DepartmentRoster.ShiftCounters)
+        {
+            var shift = shiftCounter.Shift;
+            if (shift is null) throw new DataException("Shift should not be null.");
+            Shifts.Add(shift);
+            ShiftTargets.Add(shiftCounter);
+            TargetAccessDict.Add(shift.ID, shiftCounter);
+        }
+
+        // Daily rosters.
+        foreach (var dailyRoster in DepartmentRoster.DailyRosters)
+        {
+            var drVM = new DailyRosterVM(dailyRoster, this);
+            dailyRosterVMs.Add(dailyRoster.Date, drVM);
+            switch (dailyRoster.Day)
+            {
+                case DayOfWeek.Monday:
+                    MondayRoster = drVM;
+                    break;
+                case DayOfWeek.Tuesday:
+                    TuesdayRoster = drVM;
+                    break;
+                case DayOfWeek.Wednesday:
+                    WednesdayRoster = drVM;
+                    break;
+                case DayOfWeek.Thursday:
+                    ThursdayRoster = drVM;
+                    break;
+                case DayOfWeek.Friday:
+                    FridayRoster = drVM;
+                    break;
+                case DayOfWeek.Saturday:
+                    SaturdayRoster = drVM;
+                    break;
+                case DayOfWeek.Sunday:
+                    SundayRoster = drVM;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(dailyRoster.Day), dailyRoster.Day, "Unaccounted day of the week.");
+            }
+            // Ensure that each daily roster accounts for shifts.
+            drVM.AddShifts(Shifts);
+        }
+
+        // EmployeeRosters
+        foreach (var employeeRoster in DepartmentRoster.EmployeeRosters)
+        {
+            var erVM = AddEmployeeRoster(employeeRoster);
+
+            foreach (var roster in employeeRoster.Rosters)
+            {
+                dailyRosterVMs.TryGetValue(roster.Date, out var drVM);
+                if (drVM is null)
+                {
+                    drVM = new DailyRosterVM(new DailyRoster(DepartmentRoster.Department!, DepartmentRoster, roster.Date), this);
+                    dailyRosterVMs.Add(roster.Date, drVM);
+                }
+                erVM.AddRoster(roster, drVM);
+            }
+        }
+
+        IsInitialized = true;
+
+        ApplyFilters(EmployeeRosterVMs.Values);
+    }
 }

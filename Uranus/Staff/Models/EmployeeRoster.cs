@@ -2,6 +2,7 @@
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Uranus.Staff.Models;
 
@@ -69,4 +70,26 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
         if (Employee is null) return other.Employee is null ? 0 : -1;
         return string.Compare(Employee.FullName, other.Employee?.FullName ?? "", StringComparison.Ordinal);
     }
+
+    public void ApplyShiftRules()
+    {
+        if (Employee is null) return;
+
+        // Gather rules that apply to this weekly roster, from the employee.
+        var rules = Employee.ShiftRules.Where(rule => rule.AppliesToWeek(StartDate)).ToList();
+
+        foreach (var  roster in Rosters) roster.ApplyShiftRules(rules);
+    }
+
+    /// <summary>
+    /// Sets teh shift to the employee's default if they have one.
+    /// </summary>
+    public void SetDefault()
+    {
+        var shift = Employee?.DefaultShift;
+        if (shift is null) return;
+
+        Shift = shift;
+    }
+
 }

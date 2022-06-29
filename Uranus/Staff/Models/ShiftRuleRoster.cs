@@ -116,4 +116,16 @@ public class ShiftRuleRoster : ShiftRule
             Description = Description
         };
     }
+
+    public override bool AppliesToWeek(DateTime weeksStartDate)
+    {
+        if (WeekRotation == 1) return true;
+        if (FromDate > weeksStartDate) return false;
+        if (!Rotation || FromDate is null) return true;
+        var weeksFromStart = (weeksStartDate - (DateTime)FromDate).Days / 7;
+        var weekInRotation = weeksFromStart % (WeekRotation ?? 1);
+        return WeekNumbers.Split(",").ToList().Contains(weekInRotation.ToString());
+    }
+
+    public override bool AppliesToDay(DateTime date) => AppliesToWeek(date.AddDays(date.DayOfWeek - DayOfWeek.Monday));
 }

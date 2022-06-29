@@ -1,6 +1,8 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Uranus.Staff.Models;
 
@@ -157,5 +159,11 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
     public override string ToString()
     {
         return AtWork ? TimeString() : (RosterType == ERosterType.Standard ? ERosterType.RDO : RosterType).ToString();
+    }
+
+    public void ApplyShiftRules(List<ShiftRule> rules)
+    {
+        /*ShiftRules.AddRange(rules.Where(rule => rule.AppliesToDay(Date)));
+        ShiftRules = ShiftRules.Distinct().ToList(); TODO*/
     }
 }

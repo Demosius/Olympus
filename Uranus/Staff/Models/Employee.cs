@@ -2,6 +2,7 @@
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Uranus.Annotations;
 
@@ -224,6 +225,10 @@ public class Employee : INotifyPropertyChanged
 
     [Ignore] public string FullName => $"{FirstName} {LastName}";
     [Ignore] public string ReportsToName => ReportsTo?.FullName ?? "";
+
+    [Ignore]
+    public List<ShiftRule> ShiftRules =>
+        new List<ShiftRule>().Concat(SingleRules).Concat(RecurringRules).Concat(RosterRules).ToList();
 
     public Employee()
     {

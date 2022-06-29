@@ -203,21 +203,21 @@ public class EmployeeRosterVM : INotifyPropertyChanged
             rosterVM.Type = type;
     }
 
-    /// <summary>
-    /// Sets teh shift to the employee's default if they have one.
-    /// </summary>
-    public void SetDefault()
-    {
-        var shift = Employee.DefaultShift;
-        if (shift is null) return;
-
-        SelectedShift = shift;
-    }
-
     public void SetShift(Shift? shift)
     {
         foreach (var rosterVM in rosterVMs.Values.Where(rosterVM => rosterVM.Date.DayOfWeek is not (DayOfWeek.Saturday or DayOfWeek.Sunday)))
             rosterVM.SelectedShift = shift;
+    }
+
+    /// <summary>
+    /// Apply shift rules from the employee to the employee (weekly) roster, and the individual rosters therein.
+    /// </summary>
+    public void ApplyShiftRules()
+    {
+        // Gather rules that apply to this weekly roster, from the employee.
+        var rules = Employee.ShiftRules.Where(rule => rule.AppliesToWeek(EmployeeRoster.StartDate)).ToList();
+        
+        foreach (var (_, rosterVM) in rosterVMs) rosterVM.ApplyShiftRules(rules);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

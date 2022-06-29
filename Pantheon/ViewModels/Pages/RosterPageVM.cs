@@ -32,6 +32,8 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 
     public List<Employee> ReportingEmployees { get; set; }
 
+    public Dictionary<Guid, DepartmentRosterVM> LoadedRosters { get; set; }
+
     #region NotifiableProperties
 
     private DateTime minDate;
@@ -169,6 +171,7 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         minDate = DateTime.Today.AddDays(DayOfWeek.Sunday - DateTime.Today.DayOfWeek + 1);   // Default to Monday of the current week. (Sunday will get the next monday)
         maxDate = minDate.AddDays(4);   // Default to the next friday.
         rosters = new ObservableCollection<DepartmentRoster>();
+        LoadedRosters = new Dictionary<Guid, DepartmentRosterVM>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
@@ -237,9 +240,15 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
     public void LoadRoster()
     {
         if (LoadedRoster is not null || SelectedRoster is null || Helios is null) return;
-        var vm = new DepartmentRosterVM(SelectedRoster, Helios);
+
+        if (!LoadedRosters.TryGetValue(SelectedRoster.ID, out var vm))
+            vm = new DepartmentRosterVM(SelectedRoster, Helios);
+
         Mouse.OverrideCursor = Cursors.Wait;
         vm.Initialize();
+
+        if (!LoadedRosters.ContainsKey(SelectedRoster.ID)) LoadedRosters.Add(SelectedRoster.ID, vm);
+
         LoadedRoster = vm;
     }
 

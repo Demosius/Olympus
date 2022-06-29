@@ -25,6 +25,9 @@ public class ShiftRule
         Description = description;
     }
 
+    public virtual bool AppliesToWeek(DateTime weeksStartDate) => true;
+    public virtual bool AppliesToDay(DateTime date) => true;
+
     public override string ToString()
     {
         return Description;
