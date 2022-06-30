@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
 
@@ -25,14 +26,15 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
     [OneToMany(nameof(DailyShiftCounter.RosterID), nameof(DailyShiftCounter.Roster), CascadeOperations = CascadeOperation.None)]
     public List<DailyShiftCounter> ShiftCounters { get; set; }
 
-    [Ignore] public Dictionary<Shift, int> ShiftCounter { get; set; }
+    [Ignore] public Dictionary<string, DailyShiftCounter> CounterAccessDict { get; set; }
+    [Ignore] public List<Shift> Shifts => Department?.Shifts ?? new List<Shift>();
 
     public DailyRoster()
     {
         DepartmentName = string.Empty;
         Rosters = new List<Roster>();
-        ShiftCounter = new Dictionary<Shift, int>();
         ShiftCounters = new List<DailyShiftCounter>();
+        CounterAccessDict = new Dictionary<string, DailyShiftCounter>();
     }
 
     public DailyRoster(Department department, DepartmentRoster departmentRoster, DateTime date)
@@ -45,8 +47,18 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
         Date = date;
         Day = date.DayOfWeek;
         Rosters = new List<Roster>();
-        ShiftCounter = department.Shifts.ToDictionary(s => s, _ => 0);
         ShiftCounters = new List<DailyShiftCounter>();
+        CounterAccessDict = new Dictionary<string, DailyShiftCounter>();
+    }
+
+    public void AddCount(Shift shift)
+    {
+        CounterAccessDict[shift.ID].Count++;
+    }
+
+    public void SubCount(Shift shift)
+    {
+        CounterAccessDict[shift.ID].Count--;
     }
 
     public bool Equals(DailyRoster? other)

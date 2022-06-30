@@ -35,6 +35,7 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
     [OneToMany(nameof(Roster.EmployeeRosterID), nameof(Roster.EmployeeRoster))]
     public List<Roster> Rosters { get; set; }
 
+    [Ignore] public List<Shift>? Shifts => Employee?.Shifts;
 
     public EmployeeRoster()
     {
@@ -92,4 +93,7 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
         Shift = shift;
     }
 
+    public void SubCount(Shift shift) => DepartmentRoster?.SubCount(shift);
+
+    public void AddCount(Shift shift) => DepartmentRoster?.AddCount(shift);
 }

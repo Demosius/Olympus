@@ -132,17 +132,17 @@ public class RosterVM : INotifyPropertyChanged
 
     #endregion
 
-    public RosterVM(Roster roster, DepartmentRosterVM departmentRosterVM, DailyRosterVM dailyRosterVM, EmployeeRosterVM employeeRosterVM)
+    public RosterVM(Roster roster)//, DepartmentRosterVM departmentRosterVM, DailyRosterVM dailyRosterVM, EmployeeRosterVM employeeRosterVM)
     {
         Roster = roster;
         Date = roster.Date;
-        DepartmentRosterVM = departmentRosterVM;
-        DailyRosterVM = dailyRosterVM;
-        EmployeeRosterVM = employeeRosterVM;
-        DailyRosterVM.Rosters.Add(Roster.EmployeeID, this);
+        //DepartmentRosterVM = departmentRosterVM;
+        //DailyRosterVM = dailyRosterVM;
+        //EmployeeRosterVM = employeeRosterVM;
+        //DailyRosterVM.Rosters.Add(Roster.EmployeeID, this);
 
-        ShiftRules = new List<ShiftRule>();
-        shifts = new ObservableCollection<Shift>(EmployeeRosterVM.Shifts);
+        //ShiftRules = new List<ShiftRule>();
+        shifts = new ObservableCollection<Shift>(Roster.EmployeeRoster.Shifts);
 
         if (SelectedShift is not null && AtWork) dailyRosterVM.AddCount(SelectedShift);
     }

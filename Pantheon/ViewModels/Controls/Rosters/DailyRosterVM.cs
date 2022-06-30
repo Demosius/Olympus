@@ -10,9 +10,7 @@ namespace Pantheon.ViewModels.Controls.Rosters;
 public class DailyRosterVM : INotifyPropertyChanged
 {
     public DailyRoster DailyRoster { get; set; }
-
-    public DepartmentRosterVM DepartmentRosterVM { get; set; }
-
+    
     public Dictionary<string, DailyShiftCounter> CounterAccessDict { get; set; }
 
     public Dictionary<int, RosterVM> Rosters { get; set; }
@@ -38,10 +36,9 @@ public class DailyRosterVM : INotifyPropertyChanged
 
     #endregion
 
-    public DailyRosterVM(DailyRoster roster, DepartmentRosterVM departmentRosterVM)
+    public DailyRosterVM(DailyRoster roster)
     {
         DailyRoster = roster;
-        DepartmentRosterVM = departmentRosterVM;
         shiftCounter = new ObservableCollection<ShiftCounter>();
         CounterAccessDict = new Dictionary<string, DailyShiftCounter>();
         Rosters = new Dictionary<int, RosterVM>();
@@ -64,6 +61,7 @@ public class DailyRosterVM : INotifyPropertyChanged
         }
     } 
 
+    /*
     public void AddCount(Shift shift)
     {
         CounterAccessDict[shift.ID].Count++;
@@ -73,6 +71,7 @@ public class DailyRosterVM : INotifyPropertyChanged
     {
         CounterAccessDict[shift.ID].Count--;
     }
+    */
 
     /// <summary>
     /// Sets all rosters as public holiday.

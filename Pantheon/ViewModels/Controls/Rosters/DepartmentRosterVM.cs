@@ -239,13 +239,12 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     }
 
     /// <summary>
+    /// Initialise and set appropriate ViewModels from the core Models.
+    /// 
     /// Full initialization can take some time, so only call to initialize when the specific Department Roster is to be used/viewed.
     /// </summary>
     public void Initialize()
     {
-        DepartmentRoster.Initialize();
-    }
-    /*{
         if (IsInitialized) return;
 
         if (!DepartmentRoster.IsLoaded) Helios.StaffReader.FillDepartmentRoster(DepartmentRoster);
@@ -263,7 +262,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         // Daily rosters.
         foreach (var dailyRoster in DepartmentRoster.DailyRosters)
         {
-            var drVM = new DailyRosterVM(dailyRoster, this);
+            var drVM = new DailyRosterVM(dailyRoster);
             dailyRosterVMs.Add(dailyRoster.Date, drVM);
             switch (dailyRoster.Day)
             {
@@ -296,27 +295,14 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         }
 
         // EmployeeRosters
-        foreach (var employeeRoster in DepartmentRoster.EmployeeRosters)
-        {
-            var erVM = AddEmployeeRoster(employeeRoster);
-
-            foreach (var roster in employeeRoster.Rosters)
-            {
-                dailyRosterVMs.TryGetValue(roster.Date, out var drVM);
-                if (drVM is null)
-                {
-                    drVM = new DailyRosterVM(new DailyRoster(DepartmentRoster.Department!, DepartmentRoster, roster.Date), this);
-                    dailyRosterVMs.Add(roster.Date, drVM);
-                }
-                erVM.AddRoster(roster, drVM);
-            }
-        }
+        foreach (var employeeRoster in DepartmentRoster.EmployeeRosters) AddEmployeeRoster(employeeRoster);
 
         IsInitialized = true;
 
         ApplyFilters(EmployeeRosterVMs.Values);
-    }*/
+    }
 
+    /*
     public void AddCount(Shift shift)
     {
         TargetAccessDict[shift.ID].Count++;
@@ -326,6 +312,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     {
         TargetAccessDict[shift.ID].Count--;
     }
+    */
 
     /// <summary>
     /// Check if roster is archived, and give the option to un-archive it.
@@ -345,9 +332,9 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
 
     public EmployeeRosterVM AddEmployeeRoster(EmployeeRoster roster)
     {
-        var erVM = new EmployeeRosterVM(roster, this);
+        var erVM = new EmployeeRosterVM(roster);//, this);
         EmployeeRosterVMs.Add(roster.EmployeeID, erVM);
-        if (roster.Shift is not null) AddCount(roster.Shift);
+        if (roster.Shift is not null) DepartmentRoster.AddCount(roster.Shift);
         return erVM;
     }
 

@@ -121,11 +121,11 @@ public class EmployeeRosterVM : INotifyPropertyChanged
         get => EmployeeRoster.Shift;
         set
         {
-            if (SelectedShift is not null && SelectedRosterType == ERosterType.Standard) DepartmentRosterVM.SubCount(SelectedShift);
+            if (SelectedShift is not null && SelectedRosterType == ERosterType.Standard) EmployeeRoster.SubCount(SelectedShift);
             EmployeeRoster.Shift = value;
             EmployeeRoster.ShiftID = value?.ID ?? "";
             OnPropertyChanged();
-            if (SelectedShift is not null && SelectedRosterType == ERosterType.Standard) DepartmentRosterVM.AddCount(SelectedShift);
+            if (SelectedShift is not null && SelectedRosterType == ERosterType.Standard) EmployeeRoster.AddCount(SelectedShift);
             SetShift(value);
         }
     }
@@ -141,23 +141,23 @@ public class EmployeeRosterVM : INotifyPropertyChanged
             SetRosterType(value);
             if (!adjustCounter || SelectedShift is null) return;
             if (SelectedRosterType == ERosterType.Standard)
-                DepartmentRosterVM.AddCount(SelectedShift);
+                EmployeeRoster.AddCount(SelectedShift);
             else
-                DepartmentRosterVM.SubCount(SelectedShift);
+                EmployeeRoster.SubCount(SelectedShift);
         }
     }
 
     #endregion
 
-    public DepartmentRosterVM DepartmentRosterVM { get; set; }
+    //public DepartmentRosterVM DepartmentRosterVM { get; set; }
 
-    public EmployeeRosterVM(EmployeeRoster roster, DepartmentRosterVM departmentRosterVM)
+    public EmployeeRosterVM(EmployeeRoster roster)//, DepartmentRosterVM departmentRosterVM)
     {
         if (roster.Employee is null) throw new DataException("Employee Roster missing Employee Value.");
 
         EmployeeRoster = roster;
         employee = EmployeeRoster.Employee;
-        DepartmentRosterVM = departmentRosterVM;
+        //DepartmentRosterVM = departmentRosterVM;
         shifts = new ObservableCollection<Shift>();
 
         foreach (var shift in Employee.Shifts)
@@ -166,7 +166,7 @@ public class EmployeeRosterVM : INotifyPropertyChanged
 
     public void AddRoster(Roster roster, DailyRosterVM dailyRoster)
     {
-        var rvm = new RosterVM(roster, DepartmentRosterVM, dailyRoster, this);
+        var rvm = new RosterVM(roster);//, DepartmentRosterVM, dailyRoster, this);
         rosterVMs.Add(roster.Date, rvm);
 
         switch (roster.Day)
