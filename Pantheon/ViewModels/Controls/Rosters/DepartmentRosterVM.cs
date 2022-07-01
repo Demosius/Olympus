@@ -28,7 +28,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
 {
     public DepartmentRoster DepartmentRoster { get; set; }
     public Helios Helios { get; set; }
-    private readonly Dictionary<DateTime, DailyRosterVM> dailyRosterVMs = new();
+
     public readonly Dictionary<int, EmployeeRosterVM> EmployeeRosterVMs = new();
 
     public Dictionary<string, WeeklyShiftCounter> TargetAccessDict { get; set; }
@@ -260,39 +260,13 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         }
 
         // Daily rosters.
-        foreach (var dailyRoster in DepartmentRoster.DailyRosters)
-        {
-            var drVM = new DailyRosterVM(dailyRoster);
-            dailyRosterVMs.Add(dailyRoster.Date, drVM);
-            switch (dailyRoster.Day)
-            {
-                case DayOfWeek.Monday:
-                    MondayRoster = drVM;
-                    break;
-                case DayOfWeek.Tuesday:
-                    TuesdayRoster = drVM;
-                    break;
-                case DayOfWeek.Wednesday:
-                    WednesdayRoster = drVM;
-                    break;
-                case DayOfWeek.Thursday:
-                    ThursdayRoster = drVM;
-                    break;
-                case DayOfWeek.Friday:
-                    FridayRoster = drVM;
-                    break;
-                case DayOfWeek.Saturday:
-                    SaturdayRoster = drVM;
-                    break;
-                case DayOfWeek.Sunday:
-                    SundayRoster = drVM;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(dailyRoster.Day), dailyRoster.Day, "Unaccounted day of the week.");
-            }
-            // Ensure that each daily roster accounts for shifts.
-            drVM.AddShifts(Shifts);
-        }
+        MondayRoster = new DailyRosterVM(DepartmentRoster.MondayRoster!);
+        TuesdayRoster = new DailyRosterVM(DepartmentRoster.TuesdayRoster!);
+        WednesdayRoster = new DailyRosterVM(DepartmentRoster.WednesdayRoster!);
+        ThursdayRoster = new DailyRosterVM(DepartmentRoster.ThursdayRoster!);
+        FridayRoster = new DailyRosterVM(DepartmentRoster.FridayRoster!);
+        SaturdayRoster = new DailyRosterVM(DepartmentRoster.SaturdayRoster!);
+        SundayRoster = new DailyRosterVM(DepartmentRoster.SundayRoster!);
 
         // EmployeeRosters
         foreach (var employeeRoster in DepartmentRoster.EmployeeRosters) AddEmployeeRoster(employeeRoster);

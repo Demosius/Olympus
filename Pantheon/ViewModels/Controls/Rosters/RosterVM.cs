@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Uranus.Staff.Models;
@@ -13,12 +12,6 @@ namespace Pantheon.ViewModels.Controls.Rosters;
 public class RosterVM : INotifyPropertyChanged
 {
     public Roster Roster { get; set; }
-
-    public DepartmentRosterVM DepartmentRosterVM { get; set; }
-    public DailyRosterVM DailyRosterVM { get; set; }
-    public EmployeeRosterVM EmployeeRosterVM { get; set; }
-
-    public List<ShiftRule> ShiftRules { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -40,11 +33,11 @@ public class RosterVM : INotifyPropertyChanged
         get => Roster.Shift;
         set
         {
-            if (AtWork && Roster.Shift is not null) DailyRosterVM.SubCount(Roster.Shift);
+            if (AtWork && Roster.Shift is not null) Roster.SubCount(Roster.Shift);
             Roster.Shift = value;
             Roster.ShiftID = Roster.Shift?.ID ?? "";
             OnPropertyChanged();
-            if (AtWork && Roster.Shift is not null) DailyRosterVM.AddCount(Roster.Shift);
+            if (AtWork && Roster.Shift is not null) Roster.AddCount(Roster.Shift);
 
             SetShift(value);
         }
@@ -78,7 +71,7 @@ public class RosterVM : INotifyPropertyChanged
             Roster.RosterType = value;
             OnPropertyChanged();
             AtWork = Roster.RosterType == ERosterType.Standard;
-            if (Roster.RosterType != ERosterType.PublicHoliday || DailyRosterVM.PublicHoliday) return;
+            if (Roster.RosterType != ERosterType.PublicHoliday || (Roster.DailyRoster?.IsPublicHoliday ?? false)) return;
             PromptPublicHoliday();
         }
     }
@@ -122,9 +115,9 @@ public class RosterVM : INotifyPropertyChanged
             if (!shiftCount || SelectedShift is null) return;
 
             if (AtWork)
-                DailyRosterVM.AddCount(SelectedShift);
+                Roster.AddCount(SelectedShift);
             else
-                DailyRosterVM.SubCount(SelectedShift);
+                Roster.SubCount(SelectedShift);
         }
     }
 
@@ -132,19 +125,12 @@ public class RosterVM : INotifyPropertyChanged
 
     #endregion
 
-    public RosterVM(Roster roster)//, DepartmentRosterVM departmentRosterVM, DailyRosterVM dailyRosterVM, EmployeeRosterVM employeeRosterVM)
+    public RosterVM(Roster roster)
     {
         Roster = roster;
-        Date = roster.Date;
-        //DepartmentRosterVM = departmentRosterVM;
-        //DailyRosterVM = dailyRosterVM;
-        //EmployeeRosterVM = employeeRosterVM;
-        //DailyRosterVM.Rosters.Add(Roster.EmployeeID, this);
+        shifts = new ObservableCollection<Shift>(Roster.Shifts);
 
-        //ShiftRules = new List<ShiftRule>();
-        shifts = new ObservableCollection<Shift>(Roster.EmployeeRoster.Shifts);
-
-        if (SelectedShift is not null && AtWork) dailyRosterVM.AddCount(SelectedShift);
+        if (SelectedShift is not null && AtWork) Roster.AddCount(SelectedShift);
     }
 
     public void SetShift(Shift? shift)
@@ -159,12 +145,12 @@ public class RosterVM : INotifyPropertyChanged
 
     /// <summary>
     /// Checks with the user if this date is to be set as a public holiday for all.
-    /// </summary>\
+    /// </summary>
     private void PromptPublicHoliday()
     {
         if (MessageBox.Show($"Do you want to set {Date:dddd, dd/MM/yyyy} as a public holiday?", "Public Holiday",
                 MessageBoxButton.YesNo, MessageBoxImage.Asterisk) == MessageBoxResult.Yes)
-            DailyRosterVM.SetPublicHoliday();
+            Roster.DailyRoster?.SetPublicHoliday();
     }
 
     /// <summary>
@@ -177,14 +163,14 @@ public class RosterVM : INotifyPropertyChanged
         if (isPublicHoliday)
             AtWork = false;
         else
-            AtWork = DailyRosterVM.DailyRoster.Day is not (DayOfWeek.Saturday or DayOfWeek.Sunday) || Roster.Shift is not null;
+            AtWork = Roster.DailyRoster?.Day is not (DayOfWeek.Saturday or DayOfWeek.Sunday) || Roster.Shift is not null;
     }
 
-    public void ApplyShiftRules(List<ShiftRule> rules)
-    {
+    /*public void ApplyShiftRules(List<ShiftRule> rules) => Roster.ApplyShiftRules(rules);*/
+    /*{
         ShiftRules.AddRange(rules.Where(rule => rule.AppliesToDay(Date)));
         ShiftRules = ShiftRules.Distinct().ToList();
-    }
+    }*/
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

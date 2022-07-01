@@ -45,6 +45,8 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
     [ManyToOne(nameof(DepartmentRosterID), nameof(Models.DepartmentRoster.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public DepartmentRoster? DepartmentRoster { get; set; }
 
+    [Ignore] public List<Shift> Shifts => EmployeeRoster?.Shifts ?? new List<Shift>();
+    [Ignore] public List<ShiftRule> ShiftRules { get; set; }
 
     public Roster()
     {
@@ -52,6 +54,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         ShiftID = string.Empty;
         DepartmentName = string.Empty;
         AtWork = true;
+        ShiftRules = new List<ShiftRule>();
     }
 
     public Roster(Employee employee, DateTime date)
@@ -74,6 +77,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         Date = date;
         Day = Date.DayOfWeek;
         AtWork = true;
+        ShiftRules = new List<ShiftRule>();
     }
 
     public Roster(Department department, Employee employee, DateTime date)
@@ -89,6 +93,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         Date = date;
         Day = Date.DayOfWeek;
         AtWork = true;
+        ShiftRules = new List<ShiftRule>();
     }
 
     public Roster(Department department, DepartmentRoster departmentRoster, EmployeeRoster employeeRoster, Employee employee, DateTime date)
@@ -106,6 +111,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         Day = Date.DayOfWeek;
         ShiftID = string.Empty;
         AtWork = Day != DayOfWeek.Saturday && Day != DayOfWeek.Sunday;
+        ShiftRules = new List<ShiftRule>();
     }
 
     public Roster(Guid id, int employeeID, string shiftID, string departmentName, DayOfWeek day, DateTime date, ERosterType rosterType, Employee employee, Shift shift, Department department)
@@ -121,6 +127,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         Shift = shift;
         Department = department;
         AtWork = true;
+        ShiftRules = new List<ShiftRule>();
     }
 
     public void SetShift(Shift newShift, bool working = true)
@@ -163,7 +170,24 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
 
     public void ApplyShiftRules(List<ShiftRule> rules)
     {
-        /*ShiftRules.AddRange(rules.Where(rule => rule.AppliesToDay(Date)));
-        ShiftRules = ShiftRules.Distinct().ToList(); TODO*/
+        ShiftRules.AddRange(rules.Where(rule => rule.AppliesToDay(Date)));
+        ShiftRules = ShiftRules.Distinct().ToList();
+    }
+
+    public void SubCount(Shift shift) => DailyRoster?.SubCount(shift);
+
+    public void AddCount(Shift shift) => DailyRoster?.AddCount(shift);
+
+    /// <summary>
+    /// Sets the roster type as public holiday without using the Type Setter - which would result in recursive prompting.
+    /// </summary>
+    public void SetPublicHoliday(bool isPublicHoliday = true)
+    {
+        RosterType = isPublicHoliday ? ERosterType.PublicHoliday : ERosterType.Standard;
+        //OnPropertyChanged(nameof(Type));
+        if (isPublicHoliday)
+            AtWork = false;
+        else
+            AtWork = DailyRoster?.Day is not (DayOfWeek.Saturday or DayOfWeek.Sunday) || Shift is not null;
     }
 }

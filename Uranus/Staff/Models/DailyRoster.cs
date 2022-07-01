@@ -83,7 +83,18 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
         roster.DailyRoster = this;
         roster.DailyRosterID = ID;
     }
-    
+
+    /// <summary>
+    /// Sets all rosters as public holiday.
+    /// </summary>
+    public void SetPublicHoliday(bool isPublicHoliday = true)
+    {
+        // Do not set roster type directly, as that will result in recursive prompting.
+        // Use SetPublicHoliday method.
+        IsPublicHoliday = isPublicHoliday;
+        foreach (var roster in Rosters)
+            roster.SetPublicHoliday(isPublicHoliday);
+    }
 
     public override string ToString() => $"{Day}\n{Date:dd MMM yyyy}";
 }

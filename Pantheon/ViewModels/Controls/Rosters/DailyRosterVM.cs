@@ -10,7 +10,7 @@ namespace Pantheon.ViewModels.Controls.Rosters;
 public class DailyRosterVM : INotifyPropertyChanged
 {
     public DailyRoster DailyRoster { get; set; }
-    
+
     public Dictionary<string, DailyShiftCounter> CounterAccessDict { get; set; }
 
     public Dictionary<int, RosterVM> Rosters { get; set; }
@@ -59,7 +59,7 @@ public class DailyRosterVM : INotifyPropertyChanged
             CounterAccessDict.Add(shift.ID, dailyShiftCounter);
             ShiftCounter.Add(dailyShiftCounter);
         }
-    } 
+    }
 
     /*
     public void AddCount(Shift shift)
@@ -76,14 +76,14 @@ public class DailyRosterVM : INotifyPropertyChanged
     /// <summary>
     /// Sets all rosters as public holiday.
     /// </summary>
-    public void SetPublicHoliday(bool isPublicHoliday = true)
-    {
+    public void SetPublicHoliday(bool isPublicHoliday = true) => DailyRoster.SetPublicHoliday(isPublicHoliday);
+    /*{
         // Do not set roster type directly, as that will result in recursive prompting.
         // Use SetPublicHoliday method.
         PublicHoliday = isPublicHoliday;
         foreach (var (_, rosterVM) in Rosters)
             rosterVM.SetPublicHoliday(isPublicHoliday);
-    }
+    }*/
 
     /// <summary>
     /// Sets associated rosters to standard, typically used when switching from public holiday.

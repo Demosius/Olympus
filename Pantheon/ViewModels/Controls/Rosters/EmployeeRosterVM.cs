@@ -157,14 +157,20 @@ public class EmployeeRosterVM : INotifyPropertyChanged
 
         EmployeeRoster = roster;
         employee = EmployeeRoster.Employee;
-        //DepartmentRosterVM = departmentRosterVM;
-        shifts = new ObservableCollection<Shift>();
 
-        foreach (var shift in Employee.Shifts)
-            shifts.Add(shift);
+        MondayRoster = new RosterVM(roster.MondayRoster!);
+        TuesdayRoster = new RosterVM(roster.TuesdayRoster!);
+        WednesdayRoster = new RosterVM(roster.WednesdayRoster!);
+        ThursdayRoster = new RosterVM(roster.ThursdayRoster!);
+        FridayRoster = new RosterVM(roster.FridayRoster!);
+        SaturdayRoster = new RosterVM(roster.SaturdayRoster!);
+        SundayRoster = new RosterVM(roster.SundayRoster!);
+        
+        shifts = new ObservableCollection<Shift>(roster.Shifts);
     }
 
-    public void AddRoster(Roster roster, DailyRosterVM dailyRoster)
+    /*
+    public void AddRoster(Roster roster)//, DailyRosterVM dailyRoster)
     {
         var rvm = new RosterVM(roster);//, DepartmentRosterVM, dailyRoster, this);
         rosterVMs.Add(roster.Date, rvm);
@@ -195,7 +201,7 @@ public class EmployeeRosterVM : INotifyPropertyChanged
             default:
                 throw new ArgumentOutOfRangeException(nameof(roster.Day), roster.Day, "Unaccounted day of the week.");
         }
-    }
+    }*/
 
     public void SetRosterType(ERosterType type)
     {
@@ -209,7 +215,7 @@ public class EmployeeRosterVM : INotifyPropertyChanged
             rosterVM.SelectedShift = shift;
     }
 
-    /// <summary>
+    /*/// <summary>
     /// Apply shift rules from the employee to the employee (weekly) roster, and the individual rosters therein.
     /// </summary>
     public void ApplyShiftRules()
@@ -218,7 +224,7 @@ public class EmployeeRosterVM : INotifyPropertyChanged
         var rules = Employee.ShiftRules.Where(rule => rule.AppliesToWeek(EmployeeRoster.StartDate)).ToList();
         
         foreach (var (_, rosterVM) in rosterVMs) rosterVM.ApplyShiftRules(rules);
-    }
+    }*/
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

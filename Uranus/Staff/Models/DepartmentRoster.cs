@@ -18,6 +18,14 @@ public class DepartmentRoster
     public bool UseSundays { get; set; }
     public bool ExceedTargets { get; set; }
 
+    [ForeignKey(typeof(DailyRoster))] public Guid MondayRosterID { get; set; }
+    [ForeignKey(typeof(DailyRoster))] public Guid TuesdayRosterID { get; set; }
+    [ForeignKey(typeof(DailyRoster))] public Guid WednesdayRosterID { get; set; }
+    [ForeignKey(typeof(DailyRoster))] public Guid ThursdayRosterID { get; set; }
+    [ForeignKey(typeof(DailyRoster))] public Guid FridayRosterID { get; set; }
+    [ForeignKey(typeof(DailyRoster))] public Guid SaturdayRosterID { get; set; }
+    [ForeignKey(typeof(DailyRoster))] public Guid SundayRosterID { get; set; }
+
     [ManyToOne(nameof(DepartmentName), nameof(Models.Department.DepartmentRosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Department? Department { get; set; }
 
@@ -30,13 +38,20 @@ public class DepartmentRoster
     [OneToMany(nameof(WeeklyShiftCounter.RosterID), nameof(WeeklyShiftCounter.Roster), CascadeOperations = CascadeOperation.None)]
     public List<WeeklyShiftCounter> ShiftCounters { get; set; }
 
-    [Ignore] public DailyRoster? MondayRoster { get; set; }
-    [Ignore] public DailyRoster? TuesdayRoster { get; set; }
-    [Ignore] public DailyRoster? WednesdayRoster { get; set; }
-    [Ignore] public DailyRoster? ThursdayRoster { get; set; }
-    [Ignore] public DailyRoster? FridayRoster { get; set; }
-    [Ignore] public DailyRoster? SaturdayRoster { get; set; }
-    [Ignore] public DailyRoster? SundayRoster { get; set; }
+    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public DailyRoster? MondayRoster { get; set; }
+    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public DailyRoster? TuesdayRoster { get; set; }
+    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public DailyRoster? WednesdayRoster { get; set; }
+    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public DailyRoster? ThursdayRoster { get; set; }
+    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public DailyRoster? FridayRoster { get; set; }
+    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public DailyRoster? SaturdayRoster { get; set; }
+    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public DailyRoster? SundayRoster { get; set; }
 
     [Ignore] public Dictionary<int, Employee> EmployeeDict { get; set; }
     [Ignore] public Dictionary<string, Shift> ShiftDict { get; set; }
@@ -484,6 +499,8 @@ public class DepartmentRoster
                 shift.EmployeeRosters.Add(employeeRoster);
                 employeeRoster.Shift = shift;
             }
+
+
         }
 
         foreach (var id in nullIDs)

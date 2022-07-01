@@ -16,6 +16,14 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
     public DateTime StartDate { get; set; }
     public ERosterType RosterType { get; set; }
 
+    [ForeignKey(typeof(Roster))] public Guid MondayRosterID { get; set; }
+    [ForeignKey(typeof(Roster))] public Guid TuesdayRosterID { get; set; }
+    [ForeignKey(typeof(Roster))] public Guid WednesdayRosterID { get; set; }
+    [ForeignKey(typeof(Roster))] public Guid ThursdayRosterID { get; set; }
+    [ForeignKey(typeof(Roster))] public Guid FridayRosterID { get; set; }
+    [ForeignKey(typeof(Roster))] public Guid SaturdayRosterID { get; set; }
+    [ForeignKey(typeof(Roster))] public Guid SundayRosterID { get; set; }
+
     [ManyToOne(nameof(DepartmentName), nameof(Models.Department.EmployeeRosters),
         CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Department? Department { get; set; }
@@ -35,7 +43,22 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
     [OneToMany(nameof(Roster.EmployeeRosterID), nameof(Roster.EmployeeRoster))]
     public List<Roster> Rosters { get; set; }
 
-    [Ignore] public List<Shift>? Shifts => Employee?.Shifts;
+    [OneToOne(nameof(Roster.DailyRosterID), nameof(Roster.DailyRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public Roster? MondayRoster { get; set; }
+    [OneToOne(nameof(Roster.DailyRosterID), nameof(Roster.DailyRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public Roster? TuesdayRoster { get; set; }
+    [OneToOne(nameof(Roster.DailyRosterID), nameof(Roster.DailyRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public Roster? WednesdayRoster { get; set; }
+    [OneToOne(nameof(Roster.DailyRosterID), nameof(Roster.DailyRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public Roster? ThursdayRoster { get; set; }
+    [OneToOne(nameof(Roster.DailyRosterID), nameof(Roster.DailyRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public Roster? FridayRoster { get; set; }
+    [OneToOne(nameof(Roster.DailyRosterID), nameof(Roster.DailyRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public Roster? SaturdayRoster { get; set; }
+    [OneToOne(nameof(Roster.DailyRosterID), nameof(Roster.DailyRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    public Roster? SundayRoster { get; set; }
+
+    [Ignore] public List<Shift> Shifts => Employee?.Shifts ?? new List<Shift>();
 
     public EmployeeRoster()
     {
@@ -79,7 +102,7 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
         // Gather rules that apply to this weekly roster, from the employee.
         var rules = Employee.ShiftRules.Where(rule => rule.AppliesToWeek(StartDate)).ToList();
 
-        foreach (var  roster in Rosters) roster.ApplyShiftRules(rules);
+        foreach (var roster in Rosters) roster.ApplyShiftRules(rules);
     }
 
     /// <summary>
