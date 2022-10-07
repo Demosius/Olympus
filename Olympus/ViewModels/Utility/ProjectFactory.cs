@@ -6,6 +6,7 @@ using Phoenix.Views;
 using Prometheus.Views;
 using Styx;
 using System;
+using FixedBinChecker.Views;
 using Uranus.Interfaces;
 using Uranus.Staff;
 using Uranus.Staff.Models;
@@ -28,6 +29,7 @@ public static class ProjectFactory
             EProject.Khaos => new KhaosPage(),
             EProject.Aion => new AionPage(App.Helios, App.Charon),
             EProject.Hydra => new HydraPage(App.Helios, App.Charon),
+            EProject.FixedBinChecker => new FixedBinCheckerPage(App.Helios),
             EProject.None => null,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
         };
@@ -53,6 +55,7 @@ public static class ProjectFactory
             EProject.Pantheon => PantheonPage.RequiresUser,
             EProject.Khaos => KhaosPage.RequiresUser,
             EProject.Hydra => HydraPage.RequiresUser,
+            EProject.FixedBinChecker => FixedBinCheckerPage.RequiresUser,
             EProject.None => false,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
         };

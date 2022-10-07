@@ -9,7 +9,8 @@ public enum EProject
     Pantheon,
     Khaos,
     Aion,
-    Hydra
+    Hydra,
+    FixedBinChecker
 }
 
 public enum ELicence

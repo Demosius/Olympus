@@ -11,7 +11,6 @@ namespace Pantheon.Views;
 /// Interaction logic for PantheonPage.xaml
 /// </summary>
 public partial class PantheonPage : IProject
-
 {
     public PantheonPage(Charon charon, Helios helios)
     {

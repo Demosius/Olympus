@@ -20,6 +20,7 @@
     <None Remove="Resources\Images\Icons\chaos-white.ico" />
     <None Remove="Resources\Images\Icons\chaos.ico" />
     <None Remove="Resources\Images\Icons\dredd.ico" />
+    <None Remove="Resources\Images\Icons\fixedBin.ico" />
     <None Remove="Resources\Images\Icons\forge.ico" />
     <None Remove="Resources\Images\Icons\hellsing.ico" />
     <None Remove="Resources\Images\Icons\hydra.ico" />
@@ -64,6 +65,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\Aion.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\fixedBin.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\omega.ico">
@@ -122,6 +126,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Aion\Aion.csproj" />
+    <ProjectReference Include="..\FixedBinChecker\FixedBinChecker.csproj" />
     <ProjectReference Include="..\Hydra\Hydra.csproj" />
     <ProjectReference Include="..\Khaos\Khaos.csproj" />
     <ProjectReference Include="..\Pantheon\Pantheon.csproj" />
