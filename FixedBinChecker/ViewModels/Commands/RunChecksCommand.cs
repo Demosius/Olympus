@@ -11,7 +11,8 @@ public class RunChecksCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return true;
+        return VM.FixedZoneString != string.Empty && VM.FromZoneString != string.Empty &&
+               (VM.CheckCase || VM.CheckPack || VM.CheckEach || VM.CheckExclusiveEach);
     }
 
     public void Execute(object? parameter)

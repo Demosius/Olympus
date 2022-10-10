@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Uranus.Interfaces;
 
 namespace Uranus.Inventory.Models;
 
-public class HydraDataSet
+public class HydraDataSet : IDataSet
 {
     public Dictionary<int, NAVItem> Items { get; set; }
     public Dictionary<string, Site> Sites { get; set; }

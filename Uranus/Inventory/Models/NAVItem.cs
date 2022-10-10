@@ -63,6 +63,10 @@ public class NAVItem : IEquatable<NAVItem>
     [Ignore] public int QtyPerCase => Case?.QtyPerUoM ?? 0;
     [Ignore] public int QtyPerPack => Pack?.QtyPerUoM ?? 0;
 
+    // UoM Checks
+    [Ignore] public bool HasCases => QtyPerCase > 0;
+    [Ignore] public bool HasPacks => QtyPerPack > 0;
+
     // Stock Management
     [Ignore] public Stock? Stock { get; set; }
     [Ignore] public Dictionary<string, Stock> StockDict { get; set; }
@@ -172,11 +176,6 @@ public class NAVItem : IEquatable<NAVItem>
 
     public void AddStock(Stock newStock)
     {
-        if (Number is 267773 or 263033)
-        {
-            var i = Stock?.BaseQty ?? 0;
-        }
-
         if (Stock is null)
             Stock = newStock.Copy();
         else

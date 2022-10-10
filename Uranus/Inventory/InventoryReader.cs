@@ -56,13 +56,13 @@ public class InventoryReader
     /// Zones with matched zone-extension objects.
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<NAVZone> Zones()
+    public IEnumerable<NAVZone> Zones(Expression<Func<NAVZone, bool>>? filter = null)
     {
         IEnumerable<NAVZone>? returnZones = null;
 
         Chariot.Database?.RunInTransaction(() =>
         {
-            var zones = Chariot.PullObjectList<NAVZone>().ToDictionary(z => z.ID, z => z);
+            var zones = Chariot.PullObjectList(filter).ToDictionary(z => z.ID, z => z);
             var extensions = Chariot.PullObjectList<ZoneExtension>().ToDictionary(e => e.ZoneID, e => e);
             var newExtensions = new List<ZoneExtension>();
 
@@ -92,13 +92,13 @@ public class InventoryReader
     /// Items with matched item-extension objects.
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<NAVItem> Items()
+    public IEnumerable<NAVItem> Items(Expression<Func<NAVItem, bool>>? filter = null)
     {
         IEnumerable<NAVItem>? returnItems = null;
 
         Chariot.Database?.RunInTransaction(() =>
         {
-            var items = Chariot.PullObjectList<NAVItem>().ToDictionary(i => i.Number, i => i);
+            var items = Chariot.PullObjectList(filter).ToDictionary(i => i.Number, i => i);
             var extensions = Chariot.PullObjectList<ItemExtension>().ToDictionary(e => e.ItemNumber, e => e);
             var newExtensions = new List<ItemExtension>();
 
@@ -128,13 +128,13 @@ public class InventoryReader
     /// Items with matched item-extension objects.
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<NAVBin> Bins()
+    public IEnumerable<NAVBin> Bins(Expression<Func<NAVBin, bool>>? filter = null)
     {
         IEnumerable<NAVBin>? returnBins = null;
 
         Chariot.Database?.RunInTransaction(() =>
         {
-            var bins = Chariot.PullObjectList<NAVBin>().ToDictionary(i => i.ID, i => i);
+            var bins = Chariot.PullObjectList(filter).ToDictionary(i => i.ID, i => i);
             var bays = Chariot.PullObjectList<Bay>().ToDictionary(b => b.ID, b => b);
             var extensions = Chariot.PullObjectList<BinExtension>().ToDictionary(e => e.BinID, e => e);
             var newExtensions = new List<BinExtension>();
@@ -349,6 +349,33 @@ public class InventoryReader
         }
 
         return siteDict.Values;
+    }
+
+    /// <summary>
+    /// Get the full set of data required for standard FixedBinChecker functionality.
+    /// </summary>
+    /// <returns></returns>
+    public FixedBinCheckDataSet? FixedBinCheckDataSet(List<string> fromZones, List<string> fixedZones)
+    {
+        FixedBinCheckDataSet? dataSet = null;
+
+        var allZones = fromZones.Concat(fixedZones);
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var items = Items().ToList();
+            var zones = Zones(zone => allZones.Contains(zone.Code));
+            var stock = Chariot.PullObjectList<NAVStock>(stock => allZones.Contains(stock.ZoneCode));
+            var bins = Bins(bin => allZones.Contains(bin.ZoneCode));
+            var uomList = NAVUoMs();
+
+            dataSet = new FixedBinCheckDataSet(items, zones, bins, stock, uomList);
+        });
+
+        dataSet ??= new FixedBinCheckDataSet(new List<NAVItem>(), new List<NAVZone>(), new List<NAVBin>(),
+            new List<NAVStock>(), new List<NAVUoM>());
+
+        return dataSet;
     }
 
     /// <summary>

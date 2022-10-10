@@ -1,15 +1,26 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows;
+﻿using System.Collections;
+using FixedBinChecker.Models;
 using FixedBinChecker.ViewModels.Commands;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+using System.Windows;
+using System.Windows.Input;
 using Uranus;
 using Uranus.Annotations;
+using Uranus.Commands;
+using Uranus.Interfaces;
+using Uranus.Inventory.Models;
 
 namespace FixedBinChecker.ViewModels;
 
-public class FixedBinCheckerVM : INotifyPropertyChanged
+public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
 {
     public Helios Helios { get; set; }
+    public List<ItemCheckResult> CheckResults { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -68,6 +79,7 @@ public class FixedBinCheckerVM : INotifyPropertyChanged
         {
             checkEach = value;
             OnPropertyChanged();
+            if (checkExclusiveEach && checkEach) CheckExclusiveEach = false;
         }
     }
 
@@ -79,6 +91,43 @@ public class FixedBinCheckerVM : INotifyPropertyChanged
         {
             checkExclusiveEach = value;
             OnPropertyChanged();
+            if (checkExclusiveEach && checkEach) CheckEach = false;
+        }
+    }
+
+    private ObservableCollection<ItemCheckResult> filteredCheckResults;
+    public ObservableCollection<ItemCheckResult> FilteredCheckResults
+    {
+        get => filteredCheckResults;
+        set
+        {
+            filteredCheckResults = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private bool? passFilter;
+    public bool? PassFilter
+    {
+        get => passFilter;
+        set
+        {
+            passFilter = value;
+            OnPropertyChanged();
+            ApplyFilters();
+        }
+    }
+
+
+    private string binFilter;
+    public string BinFilter
+    {
+        get => binFilter;
+        set
+        {
+            binFilter = value;
+            OnPropertyChanged();
+            ApplyFilters();
         }
     }
 
@@ -88,6 +137,10 @@ public class FixedBinCheckerVM : INotifyPropertyChanged
 
     public RunChecksCommand RunChecksCommand { get; set; }
 
+    public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
+    public ClearFiltersCommand ClearFiltersCommand { get; set; }
+    public ApplySortingCommand ApplySortingCommand { get; set; }
+
     #endregion
 
     public FixedBinCheckerVM(Helios helios)
@@ -95,13 +148,54 @@ public class FixedBinCheckerVM : INotifyPropertyChanged
         Helios = helios;
         fromZoneString = string.Empty;
         fixedZoneString = string.Empty;
+        CheckResults = new List<ItemCheckResult>();
+        filteredCheckResults = new ObservableCollection<ItemCheckResult>();
+        binFilter = string.Empty;
 
         RunChecksCommand = new RunChecksCommand(this);
+        ApplyFiltersCommand = new ApplyFiltersCommand(this);
+        ClearFiltersCommand = new ClearFiltersCommand(this);
+        ApplySortingCommand = new ApplySortingCommand(this);
     }
 
     public void RunChecks()
     {
-        MessageBox.Show("Test");
+        Mouse.OverrideCursor = Cursors.Wait;
+
+        CheckResults.Clear();
+
+        var fromZones = fromZoneString.ToUpper().Split(',', '|').ToList();
+        var fixedZones = fixedZoneString.ToUpper().Split(',', '|').ToList();
+
+        // Pull dataSet.
+        var dataSet = Helios.InventoryReader.FixedBinCheckDataSet(fromZones, fixedZones);
+        if (dataSet is null)
+        {
+            MessageBox.Show("Failed to pull relevant data.");
+            return;
+        }
+
+        // Get items only that exist in from zones.
+        var items = new List<NAVItem>();
+        foreach (var (_, item) in dataSet.Items)
+        {
+            if (item.StockDict.Values.Any(stock => fromZones.Contains(stock.Bin?.ZoneCode ?? "")))
+                items.Add(item);
+        }
+
+        // Convert items in dataSet to result collection.
+        foreach (var item in items) CheckResults.Add(new ItemCheckResult(item, fixedZones));
+
+        // Run checks against results.
+        foreach (var result in CheckResults)
+        {
+            result.RunChecks(checkCase, checkPack, checkEach, checkExclusiveEach);
+        }
+
+        // Show results.
+        ApplyFilters();
+
+        Mouse.OverrideCursor = Cursors.Arrow;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -110,5 +204,33 @@ public class FixedBinCheckerVM : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void ClearFilters()
+    {
+        PassFilter = null;
+        BinFilter = string.Empty;
+        ApplyFilters();
+    }
+
+    public void ApplyFilters()
+    {
+        IEnumerable<ItemCheckResult> results = CheckResults;
+
+        if (PassFilter is not null)
+            results = results.Where(res => PassFilter == res.PassCheck);
+
+        if (BinFilter != string.Empty)
+        {
+            var regex = new Regex(BinFilter, RegexOptions.IgnoreCase);
+            results = results.Where(res => regex.IsMatch(res.FixedBins));
+        }
+
+        FilteredCheckResults = new ObservableCollection<ItemCheckResult>(results);
+    }
+
+    public void ApplySorting()
+    {
+        throw new System.NotImplementedException();
     }
 }

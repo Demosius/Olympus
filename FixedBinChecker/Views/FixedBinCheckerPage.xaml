@@ -3,7 +3,6 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:FixedBinChecker.Views"
       xmlns:vm="clr-namespace:FixedBinChecker.ViewModels"
       mc:Ignorable="d" 
       d:DataContext="{d:DesignInstance {x:Type vm:FixedBinCheckerVM}, IsDesignTimeCreatable=False}"
@@ -36,29 +35,37 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            
+
             <Label Grid.Row="0" Grid.Column="0" Content="Check From Zone(s):"/>
-            <TextBox Grid.Row="1" Grid.Column="0"/>
+            <TextBox Grid.Row="1" Grid.Column="0"
+                     Margin="5,0"
+                     Text="{Binding FromZoneString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Label Grid.Row="0" Grid.Column="1" Content="Is fixed in Zone(s):"/>
-            <TextBox Grid.Row="1" Grid.Column="1"/>
+            <TextBox Grid.Row="1" Grid.Column="1"
+                     Margin="5,0"
+                     Text="{Binding FixedZoneString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Label Grid.Row="0" Grid.Column="2" Content="Cases"/>
             <CheckBox Grid.Row="1" Grid.Column="2"
-                      HorizontalAlignment="Center"/>
+                      HorizontalAlignment="Center"
+                      IsChecked="{Binding CheckCase, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Label Grid.Row="0" Grid.Column="3" Content="Packs"/>
             <CheckBox Grid.Row="1" Grid.Column="3"
-                      HorizontalAlignment="Center"/>
+                      HorizontalAlignment="Center"
+                      IsChecked="{Binding CheckPack, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Label Grid.Row="0" Grid.Column="4" Content="Eaches"/>
             <CheckBox Grid.Row="1" Grid.Column="4"
-                      HorizontalAlignment="Center"/>
+                      HorizontalAlignment="Center"
+                      IsChecked="{Binding CheckEach, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Label Grid.Row="0" Grid.Column="5" Content="Eaches - Exclusive"
                    ToolTip="If item has ONLY an each UoM associated."/>
             <CheckBox Grid.Row="1" Grid.Column="5"
-                      HorizontalAlignment="Center"/>
+                      HorizontalAlignment="Center"
+                      IsChecked="{Binding CheckExclusiveEach, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Button Grid.Row="0" Grid.Column="6" Grid.RowSpan="2"
                     Width="140" Height="35"
@@ -67,33 +74,57 @@
                     Command="{Binding RunChecksCommand}"/>
 
         </Grid>
+
+        <!-- Filter Row -->
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+            <StackPanel Orientation="Vertical">
+                <Label Content="Pass Filter" 
+                       Margin="0" Padding="10,5,10,0"
+                       FontSize="10"/>
+                <CheckBox IsThreeState="True" 
+                          HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                          Margin="0" Padding="0"
+                          IsChecked="{Binding PassFilter, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Label Content="Bin Filter" 
+                       Margin="0" Padding="10,5,10,0"
+                       FontSize="10"
+                       HorizontalAlignment="Center"/>
+                <TextBox HorizontalAlignment="Center"
+                         MinWidth="100"
+                         Margin="5"
+                         Text="{Binding BinFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip="'^$' - To filter specifically to empty bin values."/>
+            </StackPanel>
+        </StackPanel>
+
         <!-- Data View -->
-        <DataGrid ItemsSource="{Binding CurrentMoves}"
+        <DataGrid ItemsSource="{Binding FilteredCheckResults}"
                   AutoGenerateColumns="False"
                   CanUserDeleteRows="True"
                   CanUserAddRows="False"
-                  CanUserReorderColumns="True">
+                  CanUserReorderColumns="True"
+                  RowHeaderWidth="15">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="From Site"
-                                    Binding="{Binding TakeSiteName}"
-                                    IsReadOnly="True"/>
+                <DataGridCheckBoxColumn Header="Pass"
+                                        Binding="{Binding PassCheck}"
+                                        IsReadOnly="True"/>
                 <DataGridTextColumn Header="Item Number"
-                                    Binding="{Binding ItemNumber}"
+                                    Binding="{Binding Number}"
                                     IsReadOnly="True"/>
                 <DataGridTextColumn Header="Item Description"
-                                    Binding="{Binding ItemDescription}"
+                                    Binding="{Binding Description}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="From Zone"
-                                    Binding="{Binding TakeZoneCode}"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn Header="From Bin"
-                                    Binding="{Binding TakeBinCode}"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn Header="Quantity"
-                                    Binding="{Binding TakeQtyString}"
-                                    IsReadOnly="True"/>
-                <DataGridTextColumn Header="To Site"
-                                    Binding="{Binding PlaceSiteName}"
+                <DataGridCheckBoxColumn Header="Has Cases"
+                                        Binding="{Binding HasCases, Mode=OneWay}"
+                                        IsReadOnly="True"/>
+                <DataGridCheckBoxColumn Header="Has Packs"
+                                        Binding="{Binding HasPacks, Mode=OneWay}"
+                                        IsReadOnly="True"/>
+                <DataGridTextColumn Header="Fixed Bins"
+                                    Binding="{Binding FixedBins}"
                                     IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>

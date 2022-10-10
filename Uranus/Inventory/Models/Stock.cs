@@ -1,11 +1,12 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
+using System.Collections;
 
 namespace Uranus.Inventory.Models;
 
 [Table("RealStock")]
-public class Stock
+public class Stock : IEnumerable
 {
     [PrimaryKey] public string ID { get; set; } // Combination of BinID and ItemNumber (e.g. 9600:PR:PR18 058:271284)
     [ForeignKey(typeof(NAVZone))] public string ZoneID { get; set; }    // Combination of LocationCode and ZoneCode (e.g. 9600:PR)
@@ -426,5 +427,10 @@ public class Stock
         {
             Eaches.Qty += units;
         }
+    }
+
+    public IEnumerator GetEnumerator()
+    {
+        throw new NotImplementedException();
     }
 }

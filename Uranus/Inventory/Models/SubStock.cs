@@ -15,6 +15,7 @@ public class SubStock
     public int PutAwayQty { get; set; }
     public int NegAdjQty { get; set; }
     public int PosAdjQty { get; set; }
+    public bool Fixed { get; set; }
 
     [Ignore] public int AvailableQty => Qty - PickQty - NegAdjQty;
     [Ignore] public int BalanceQty => Qty - PickQty + PutAwayQty - NegAdjQty + PosAdjQty;
@@ -55,6 +56,7 @@ public class SubStock
         PutAwayQty = navStock.PutAwayQty;
         NegAdjQty = navStock.NegAdjQty;
         PosAdjQty = navStock.PosAdjQty;
+        Fixed = navStock.Fixed;
     }
 
     public void SetStockID()
@@ -70,7 +72,7 @@ public class SubStock
         return !(PickQty == 0 && PutAwayQty == 0 &&
                  NegAdjQty == 0 && PosAdjQty == 0);
     }
-    
+
     /// <summary>
     /// Creates a full copy of the sub-stock.
     /// </summary>
@@ -120,5 +122,10 @@ public class SubStock
                PosAdjQty != 0 ||
                PickQty != 0 ||
                PutAwayQty != 0;
+    }
+
+    public override string ToString()
+    {
+        return string.Join("-", Stock?.Bin?.Code ?? "", UoM, Qty);
     }
 }
