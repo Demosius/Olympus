@@ -8,44 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\application--arrow.png" />
-    <None Remove="Resources\arrow-transition-090.png" />
-    <None Remove="Resources\arrow-transition-270.png" />
-    <None Remove="Resources\arrow-transition.png" />
-    <None Remove="Resources\balance--plus.png" />
-    <None Remove="Resources\calculator--plus.png" />
-    <None Remove="Resources\clock--arrow.png" />
-    <None Remove="Resources\cross.png" />
-    <None Remove="Resources\csv.png" />
-    <None Remove="Resources\database-import.png" />
-    <None Remove="Resources\disk--arrow.png" />
-    <None Remove="Resources\document-break.png" />
-    <None Remove="Resources\document-excel-table.png" />
-    <None Remove="Resources\document-horizontal-text.png" />
-    <None Remove="Resources\document-pdf.png" />
     <None Remove="Resources\Fonts\code128.ttf" />
     <None Remove="Resources\Fonts\DIN Black.ttf" />
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
     <None Remove="Resources\Fonts\DIN Medium.ttf" />
     <None Remove="Resources\Fonts\DIN.ttf" />
-    <None Remove="Resources\Hydra.ico" />
-    <None Remove="Resources\plus-circle-frame.png" />
-    <None Remove="Resources\plus-small.png" />
-    <None Remove="Resources\plus.png" />
-    <None Remove="Resources\refresh.png" />
-    <None Remove="Resources\repair.png" />
-    <None Remove="Resources\save.png" />
-    <None Remove="Resources\screwdriver.png" />
-    <None Remove="Resources\sort.png" />
-    <None Remove="Resources\wand--arrow.png" />
-    <None Remove="Resources\wrench-screwdriver.png" />
-    <None Remove="Resources\wrench.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Resources\Hydra.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -53,21 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\application--arrow.png" />
-    <Resource Include="Resources\arrow-transition-090.png" />
-    <Resource Include="Resources\arrow-transition-270.png" />
-    <Resource Include="Resources\arrow-transition.png" />
-    <Resource Include="Resources\balance--plus.png" />
-    <Resource Include="Resources\calculator--plus.png" />
-    <Resource Include="Resources\clock--arrow.png" />
-    <Resource Include="Resources\cross.png" />
-    <Resource Include="Resources\csv.png" />
-    <Resource Include="Resources\database-import.png" />
-    <Resource Include="Resources\disk--arrow.png" />
-    <Resource Include="Resources\document-break.png" />
-    <Resource Include="Resources\document-excel-table.png" />
-    <Resource Include="Resources\document-horizontal-text.png" />
-    <Resource Include="Resources\document-pdf.png" />
     <Resource Include="Resources\Fonts\code128.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -83,17 +35,6 @@
     <Resource Include="Resources\Fonts\DIN.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\plus-circle-frame.png" />
-    <Resource Include="Resources\plus-small.png" />
-    <Resource Include="Resources\plus.png" />
-    <Resource Include="Resources\refresh.png" />
-    <Resource Include="Resources\repair.png" />
-    <Resource Include="Resources\save.png" />
-    <Resource Include="Resources\screwdriver.png" />
-    <Resource Include="Resources\sort.png" />
-    <Resource Include="Resources\wand--arrow.png" />
-    <Resource Include="Resources\wrench-screwdriver.png" />
-    <Resource Include="Resources\wrench.png" />
   </ItemGroup>
 
   <ItemGroup>
