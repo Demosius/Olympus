@@ -11,7 +11,7 @@ public partial class BinEditView
     public BinEditView(BinVM parentVM, NAVBin? bin = null)
     {
         InitializeComponent();
-        
+
         VM!.Bin = bin;
         VM.ParentVM = parentVM;
     }

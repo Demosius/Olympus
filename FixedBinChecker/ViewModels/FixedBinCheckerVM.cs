@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using FixedBinChecker.Models;
+﻿using FixedBinChecker.Models;
 using FixedBinChecker.ViewModels.Commands;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

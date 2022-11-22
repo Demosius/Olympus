@@ -10,7 +10,7 @@ public class InvalidDataException : Exception
 {
     public List<string> MissingColumns { get; }
 
-    public InvalidDataException(string message, List<string> missingColumns): base($"Missing Columns:\n\n{string.Join("|", missingColumns)}{(message != "" ? $"\n\n{message}" : message)}")
+    public InvalidDataException(string message, List<string> missingColumns) : base($"Missing Columns:\n\n{string.Join("|", missingColumns)}{(message != "" ? $"\n\n{message}" : message)}")
     {
         MissingColumns = missingColumns;
     }

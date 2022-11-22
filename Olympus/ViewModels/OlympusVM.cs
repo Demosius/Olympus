@@ -137,8 +137,9 @@ public class OlympusVM : INotifyPropertyChanged
             new Project(EProject.Vulcan, "vulcan.ico", App.Helios.StaffReader, "Replenishment DDR management and work assignment. (RefOrge)"),
             new Project(EProject.Aion, "Aion.ico", App.Helios.StaffReader, "Employee clock in and shift time management."),
             new Project(EProject.Hydra, "Hydra.ico", App.Helios.StaffReader, "Manage stock levels between different facilities."),
-            new Project(EProject.FixedBinChecker, "fixedBin.ico", App.Helios.StaffReader, "Verify fixed bins based on content in zone(s).")
-            
+            new Project(EProject.FixedBinChecker, "fixedBin.ico", App.Helios.StaffReader, "Verify fixed bins based on content in zone(s)."),
+            new Project(EProject.Cadmus, "cadmus.ico", App.Helios.StaffReader, "Manages document creation and printing.")
+
         };
 
         App.Helios.StaffCreator.EstablishInitialProjects(projects);

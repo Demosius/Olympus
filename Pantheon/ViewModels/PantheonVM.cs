@@ -1,10 +1,10 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Windows.Controls;
-using Pantheon.Properties;
+﻿using Pantheon.Properties;
 using Pantheon.ViewModels.Commands;
 using Pantheon.Views.Pages;
 using Styx;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Controls;
 using Uranus;
 
 namespace Pantheon.ViewModels;

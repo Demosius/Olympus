@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Automation;
 using Uranus.Inventory;
 using Uranus.Inventory.Models;
 
 namespace FixedBinChecker.Models;
 
-public class ItemCheckResult 
+public class ItemCheckResult
 {
     public NAVItem Item { get; set; }
 
@@ -22,7 +21,7 @@ public class ItemCheckResult
     public string Description => Item.Description;
     public bool HasCases => Item.HasCases;
     public bool HasPacks => Item.HasPacks;
-    
+
     #endregion
 
     public ItemCheckResult(NAVItem coreItem, ICollection<string> fixedZones)

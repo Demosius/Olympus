@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using SQLite;
+﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
+using System.Collections.Generic;
 
 namespace Uranus.Staff.Models;
 

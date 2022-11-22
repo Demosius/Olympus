@@ -29,7 +29,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hydra", "Hydra\Hydra.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Morpheus", "Morpheus\Morpheus.csproj", "{EC939CE7-ED2E-4493-A29C-86AD46C2CB17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FixedBinChecker", "FixedBinChecker\FixedBinChecker.csproj", "{7E24B7C5-D670-4EC4-AF06-C3EEA179B879}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FixedBinChecker", "FixedBinChecker\FixedBinChecker.csproj", "{7E24B7C5-D670-4EC4-AF06-C3EEA179B879}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cadmus", "Cadmus\Cadmus.csproj", "{66CF008A-9914-412F-BB5E-95E268C76DF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -122,6 +124,12 @@ Global
 		{7E24B7C5-D670-4EC4-AF06-C3EEA179B879}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E24B7C5-D670-4EC4-AF06-C3EEA179B879}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E24B7C5-D670-4EC4-AF06-C3EEA179B879}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66CF008A-9914-412F-BB5E-95E268C76DF0}.ClockDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66CF008A-9914-412F-BB5E-95E268C76DF0}.ClockDebug|Any CPU.Build.0 = Debug|Any CPU
+		{66CF008A-9914-412F-BB5E-95E268C76DF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66CF008A-9914-412F-BB5E-95E268C76DF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66CF008A-9914-412F-BB5E-95E268C76DF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66CF008A-9914-412F-BB5E-95E268C76DF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

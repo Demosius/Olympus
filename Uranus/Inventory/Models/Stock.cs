@@ -173,7 +173,7 @@ public class Stock : IEnumerable
             stock.AddStock();
         }
     }
-    
+
     /// <summary>
     /// Merges new stock into this one, and clears to other stock out in the process to keep the overall balance.
     /// </summary>

@@ -110,7 +110,7 @@ public class SiteItemLevel
             levels = new Levels();
             return;
         }
-        
+
         var newLevels = new Levels
         {
             MinEaches = OverrideDefaults ? MinEaches ?? 0 : Site.MinEaches ?? 0,
@@ -162,7 +162,7 @@ public class SiteItemLevel
     private bool EachBreak(int eachesAfter) => EachesWithinLimits && (eachesAfter < Levels.MinEaches || eachesAfter > Levels.MaxEaches);
     private bool CaseBreak(int casesAfter) => CasesWithinLimits && (casesAfter < Levels.MinCases || casesAfter > Levels.MaxCases);
     private bool UnitBreak(int unitsAfter) => UnitsWithinLimits && (unitsAfter < Levels.MinUnits || unitsAfter > Levels.MaxUnits);
-    
+
     public bool BrokenByMove(int eaches, int cases, int units) => EachBreak(EachQty + eaches) || CaseBreak(CaseQty + cases) || UnitBreak(BaseQty + units);
 
     public override string ToString()

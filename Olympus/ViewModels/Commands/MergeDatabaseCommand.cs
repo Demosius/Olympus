@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Olympus.ViewModels.Utility;
+using System;
 using System.Windows.Input;
-using Olympus.ViewModels.Utility;
 
 namespace Olympus.ViewModels.Commands;
 

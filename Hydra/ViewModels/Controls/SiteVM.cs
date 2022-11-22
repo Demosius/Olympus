@@ -123,7 +123,7 @@ public class SiteVM : INotifyPropertyChanged
 
 
     private bool placeTo;
-    public bool  PlaceTo
+    public bool PlaceTo
     {
         get => placeTo;
         set

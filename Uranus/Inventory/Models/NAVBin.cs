@@ -185,7 +185,7 @@ public class NAVBin
         else
             Stock.Add(newStock.ItemNumber, newStock);
     }
-    
+
     public void RemoveStock(Stock stock)
     {
         if (!Stock.TryGetValue(stock.ItemNumber, out var currentStock)) return;

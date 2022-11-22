@@ -16,6 +16,7 @@
     <None Remove="Resources\Images\Icons\Aion.ico" />
     <None Remove="Resources\Images\Icons\AionClock.ico" />
     <None Remove="Resources\Images\Icons\burn.ico" />
+    <None Remove="Resources\Images\Icons\cadmus.ico" />
     <None Remove="Resources\Images\Icons\castle.ico" />
     <None Remove="Resources\Images\Icons\chaos-white.ico" />
     <None Remove="Resources\Images\Icons\chaos.ico" />
@@ -65,6 +66,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\Aion.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\cadmus.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\fixedBin.ico">
@@ -126,6 +130,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Aion\Aion.csproj" />
+    <ProjectReference Include="..\Cadmus\Cadmus.csproj" />
     <ProjectReference Include="..\FixedBinChecker\FixedBinChecker.csproj" />
     <ProjectReference Include="..\Hydra\Hydra.csproj" />
     <ProjectReference Include="..\Khaos\Khaos.csproj" />

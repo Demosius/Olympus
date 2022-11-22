@@ -8,5 +8,5 @@ public partial class InventoryUpdater
     public InventoryUpdater()
     {
         InitializeComponent();
-    } 
+    }
 }

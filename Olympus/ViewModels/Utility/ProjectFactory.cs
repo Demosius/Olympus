@@ -1,4 +1,6 @@
 ﻿using Aion.View;
+using Cadmus.Views;
+using FixedBinChecker.Views;
 using Hydra.Views;
 using Khaos.Views;
 using Pantheon.Views;
@@ -6,7 +8,6 @@ using Phoenix.Views;
 using Prometheus.Views;
 using Styx;
 using System;
-using FixedBinChecker.Views;
 using Uranus.Interfaces;
 using Uranus.Staff;
 using Uranus.Staff.Models;
@@ -30,6 +31,7 @@ public static class ProjectFactory
             EProject.Aion => new AionPage(App.Helios, App.Charon),
             EProject.Hydra => new HydraPage(App.Helios, App.Charon),
             EProject.FixedBinChecker => new FixedBinCheckerPage(App.Helios),
+            EProject.Cadmus => new CadmusPage(),
             EProject.None => null,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
         };
@@ -56,6 +58,7 @@ public static class ProjectFactory
             EProject.Khaos => KhaosPage.RequiresUser,
             EProject.Hydra => HydraPage.RequiresUser,
             EProject.FixedBinChecker => FixedBinCheckerPage.RequiresUser,
+            EProject.Cadmus => CadmusPage.RequiresUser,
             EProject.None => false,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
         };

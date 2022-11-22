@@ -1,5 +1,5 @@
-﻿using System.Windows.Input;
-using Styx;
+﻿using Styx;
+using System.Windows.Input;
 using Uranus;
 using Uranus.Interfaces;
 using Uranus.Staff;
@@ -18,7 +18,7 @@ public partial class AionPage : IProject
         KeyGesture backKeyGesture = null;
         foreach (InputGesture browseBackInputGesture in NavigationCommands.BrowseBack.InputGestures)
         {
-            if (browseBackInputGesture is KeyGesture {Key: Key.Back, Modifiers: ModifierKeys.None} keyGesture)
+            if (browseBackInputGesture is KeyGesture { Key: Key.Back, Modifiers: ModifierKeys.None } keyGesture)
             {
                 backKeyGesture = keyGesture;
             }

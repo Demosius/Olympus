@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FixedBinChecker.Views;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using FixedBinChecker.Views;
 using Uranus;
 using Uranus.Annotations;
 

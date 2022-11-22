@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Aion.ViewModels.Utility;
+using System;
 using System.Windows.Input;
-using Aion.ViewModels.Utility;
 
 namespace Aion.ViewModels.Commands;
 

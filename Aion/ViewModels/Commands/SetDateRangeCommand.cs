@@ -20,7 +20,7 @@ public class SetDateRangeCommand : ICommand
 
     public void Execute(object parameter)
     {
-        var w = (Window) parameter;
+        var w = (Window)parameter;
         VM.SetDateRange();
         w.Close();
     }

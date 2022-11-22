@@ -13,7 +13,7 @@ public class ConfirmInputCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        var w = (Window) parameter!;
+        var w = (Window)parameter!;
         w.DialogResult = true;
         w.Close();
     }

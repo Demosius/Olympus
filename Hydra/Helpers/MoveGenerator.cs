@@ -18,7 +18,7 @@ public static class MoveGenerator
         // Go through and set levels for each relevant item.
         GetSILLists(dataSet, takeSites, placeSites, out var takeableSIL, out var placeableSIL,
             out var targetTakeSIL, out var targetPlaceSIL);
-        
+
         // Go through site/item combinations that are over targets and can be moved out.
         var takeMoves = GetMoves(targetTakeSIL, placeableSIL, true).ToList();
         // Go through site/item combinations that are under targets and require more moved in.
@@ -133,7 +133,7 @@ public static class MoveGenerator
 
             returnList.Add(potentialMove.Move);
             pmList.Remove(potentialMove);
-            
+
             potentialMove.Execute();
 
             pmList = pmList.Where(pm => pm.Potential >= 0).ToList();
@@ -141,7 +141,7 @@ public static class MoveGenerator
 
         return returnList;
     }
-    
+
     private static IEnumerable<PotentialMove> GetPotentialMoves(SiteItemLevel sil, IEnumerable<SiteItemLevel> otherSIL, bool take)
     {
         if (sil.Site is null || sil.Item is null) return new List<PotentialMove>();
@@ -161,10 +161,10 @@ public static class MoveGenerator
             var site = takeSite;
 
             potentialMoves.AddRange(from moveStock in item.StockDict.Values.Where(s => s.Site == site)
-                select GetPotentialMove(take ? sil : siteItemLevel , take ? siteItemLevel : sil, moveStock)
+                                    select GetPotentialMove(take ? sil : siteItemLevel, take ? siteItemLevel : sil, moveStock)
                 into newMove
-                where newMove is not null
-                select (PotentialMove)newMove);
+                                    where newMove is not null
+                                    select (PotentialMove)newMove);
         }
 
         return potentialMoves;
