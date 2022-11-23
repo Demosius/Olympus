@@ -37,6 +37,11 @@ All in one EB DC internal application(s).
     - For drawing/creating and printing labels and documents.
     - Usable directly and anticipated to be called on by other projects.
 
+### Sphinx
+    - About solving riddles.
+    - Tracks and assists with ongoing stock issues.
+    - Replacement for Countables and Product Seach Sheet.
+    
 ### Panacea 
     - Godess of Universal Remedy
     - AllFix Equivalent
@@ -51,6 +56,7 @@ All in one EB DC internal application(s).
     
 ### Unified Batch Checker
     - Still needs name.
+        -  Argus Panoptes (all-seeing) / Argos 
     - Purpose is to ensure everyone has access to the same information regarding where each department is up to with batches.
     - Also allows for a more streamlined and useful interface compared to tracking batches in NAV.
     
