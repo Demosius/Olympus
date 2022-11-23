@@ -30,4 +30,26 @@ All in one EB DC internal application(s).
     - ViewModels.Utility.ProjectFactory.RequiresUser
     
     
-  
+## Project Ideas to Be Implemented
+
+### Cadmus
+    - Greek god of writing.
+    - For drawing/creating and printing labels and documents.
+    - Usable directly and anticipated to be called on by other projects.
+
+### AllFix Equivalent
+    - Still need name.
+    - Include multiple sub-functionality.
+    - Add the fixed bin checker under this umbrella.
+    
+### NIMS
+    - Non-Inventory Management system.
+    - Still open to thematic name.
+    - For tracking non-inventory in the warehouse.
+    - Start with Cardboard and see about adoption rate before attempting to integrate other stock/staff/departments/processes.
+    
+### Unified Batch Checker
+    - Still needs name.
+    - Purpose is to ensure everyone has access to the saem information regarding where each department is up to with batches.
+    - Also allows for a more streamlined and useful interface compared to tracking batches in NAV.
+    
