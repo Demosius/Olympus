@@ -31,7 +31,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Morpheus", "Morpheus\Morphe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FixedBinChecker", "FixedBinChecker\FixedBinChecker.csproj", "{7E24B7C5-D670-4EC4-AF06-C3EEA179B879}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cadmus", "Cadmus\Cadmus.csproj", "{66CF008A-9914-412F-BB5E-95E268C76DF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cadmus", "Cadmus\Cadmus.csproj", "{66CF008A-9914-412F-BB5E-95E268C76DF0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Panacea", "Panacea\Panacea.csproj", "{B2D1BFA4-0C8F-49A4-A1B5-59C6773B8922}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -130,6 +132,12 @@ Global
 		{66CF008A-9914-412F-BB5E-95E268C76DF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66CF008A-9914-412F-BB5E-95E268C76DF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66CF008A-9914-412F-BB5E-95E268C76DF0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2D1BFA4-0C8F-49A4-A1B5-59C6773B8922}.ClockDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2D1BFA4-0C8F-49A4-A1B5-59C6773B8922}.ClockDebug|Any CPU.Build.0 = Debug|Any CPU
+		{B2D1BFA4-0C8F-49A4-A1B5-59C6773B8922}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2D1BFA4-0C8F-49A4-A1B5-59C6773B8922}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2D1BFA4-0C8F-49A4-A1B5-59C6773B8922}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2D1BFA4-0C8F-49A4-A1B5-59C6773B8922}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

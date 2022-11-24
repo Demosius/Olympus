@@ -3,6 +3,7 @@ using Cadmus.Views;
 using FixedBinChecker.Views;
 using Hydra.Views;
 using Khaos.Views;
+using Panacea.Views;
 using Pantheon.Views;
 using Phoenix.Views;
 using Prometheus.Views;
@@ -32,6 +33,7 @@ public static class ProjectFactory
             EProject.Hydra => new HydraPage(App.Helios, App.Charon),
             EProject.FixedBinChecker => new FixedBinCheckerPage(App.Helios),
             EProject.Cadmus => new CadmusPage(),
+            EProject.Panacea => new PanaceaPage(App.Helios),
             EProject.None => null,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
         };
@@ -59,6 +61,7 @@ public static class ProjectFactory
             EProject.Hydra => HydraPage.RequiresUser,
             EProject.FixedBinChecker => FixedBinCheckerPage.RequiresUser,
             EProject.Cadmus => CadmusPage.RequiresUser,
+            EProject.Panacea => PanaceaPage.RequiresUser,
             EProject.None => false,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
         };
