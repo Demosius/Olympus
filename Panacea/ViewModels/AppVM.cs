@@ -1,17 +1,17 @@
-﻿using Cadmus.Annotations;
+﻿using Panacea.Views;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Uranus;
+using Uranus.Annotations;
 
-namespace Cadmus.ViewModels;
+namespace Panacea.ViewModels;
 
-public class CadmusVM : INotifyPropertyChanged
+public class AppVM : INotifyPropertyChanged
 {
-    public Helios Helios { get; set; }
+    public PanaceaPage PanaceaPage { get; set; }
 
-    public CadmusVM(Helios helios)
+    public AppVM()
     {
-        Helios = helios;
+        PanaceaPage = new PanaceaPage(App.Helios);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
