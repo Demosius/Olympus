@@ -1,0 +1,130 @@
+﻿<UserControl x:Class="Panacea.Views.Components.FixedBinChecker"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Panacea.ViewModels.Components"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:FixedBinCheckerVM}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <Grid DockPanel.Dock="Top">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Content="Check From Zone(s):"/>
+            <TextBox Grid.Row="1" Grid.Column="0"
+                     Margin="5,0"
+                     Text="{Binding FromZoneString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Label Grid.Row="0" Grid.Column="1" Content="Is fixed in Zone(s):"/>
+            <TextBox Grid.Row="1" Grid.Column="1"
+                     Margin="5,0"
+                     Text="{Binding FixedZoneString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Label Grid.Row="0" Grid.Column="2" Content="Cases"/>
+            <CheckBox Grid.Row="1" Grid.Column="2"
+                      HorizontalAlignment="Center"
+                      IsChecked="{Binding CheckCase, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Label Grid.Row="0" Grid.Column="3" Content="Packs"/>
+            <CheckBox Grid.Row="1" Grid.Column="3"
+                      HorizontalAlignment="Center"
+                      IsChecked="{Binding CheckPack, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Label Grid.Row="0" Grid.Column="4" Content="Eaches"/>
+            <CheckBox Grid.Row="1" Grid.Column="4"
+                      HorizontalAlignment="Center"
+                      IsChecked="{Binding CheckEach, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Label Grid.Row="0" Grid.Column="5" Content="Eaches - Exclusive"
+                   ToolTip="If item has ONLY an each UoM associated."/>
+            <CheckBox Grid.Row="1" Grid.Column="5"
+                      HorizontalAlignment="Center"
+                      IsChecked="{Binding CheckExclusiveEach, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Button Grid.Row="0" Grid.Column="6" Grid.RowSpan="2"
+                    Width="140" Height="35"
+                    Margin="10"
+                    Content="Check"
+                    Command="{Binding RunChecksCommand}"/>
+
+        </Grid>
+
+        <!-- Filter Row -->
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+            <StackPanel Orientation="Vertical">
+                <Label Content="Pass Filter" 
+                       Margin="0" Padding="10,5,10,0"
+                       FontSize="10"/>
+                <CheckBox IsThreeState="True" 
+                          HorizontalAlignment="Center" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                          Margin="0" Padding="0"
+                          IsChecked="{Binding PassFilter, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Label Content="Bin Filter" 
+                       Margin="0" Padding="10,5,10,0"
+                       FontSize="10"
+                       HorizontalAlignment="Center"/>
+                <TextBox HorizontalAlignment="Center"
+                         MinWidth="100"
+                         Margin="5"
+                         Text="{Binding BinFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip="'^$' - To filter specifically to empty bin values."/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Data View -->
+        <DataGrid ItemsSource="{Binding FilteredCheckResults}"
+                  AutoGenerateColumns="False"
+                  CanUserDeleteRows="True"
+                  CanUserAddRows="False"
+                  CanUserReorderColumns="True"
+                  RowHeaderWidth="15">
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn Header="Pass"
+                                        Binding="{Binding PassCheck}"
+                                        IsReadOnly="True"/>
+                <DataGridTextColumn Header="Item Number"
+                                    Binding="{Binding Number}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Item Description"
+                                    Binding="{Binding Description}"
+                                    IsReadOnly="True"/>
+                <DataGridCheckBoxColumn Header="Has Cases"
+                                        Binding="{Binding HasCases, Mode=OneWay}"
+                                        IsReadOnly="True"/>
+                <DataGridCheckBoxColumn Header="Has Packs"
+                                        Binding="{Binding HasPacks, Mode=OneWay}"
+                                        IsReadOnly="True"/>
+                <DataGridTextColumn Header="Fixed Bins"
+                                    Binding="{Binding FixedBins}"
+                                    IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</UserControl>

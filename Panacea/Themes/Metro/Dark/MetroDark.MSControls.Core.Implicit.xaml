@@ -7,8 +7,6 @@
     <!-- *********************************  RESOURCES  ********************************* -->
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Styles.WPF.xaml" />
-        <ResourceDictionary Source="DatagridStyling.xaml"/>
-        <ResourceDictionary Source="TabControlStyling.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
     <!-- *********************************  BRUSHES  ********************************* -->
@@ -828,7 +826,7 @@
                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource ButtonPressedBorderBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetProperty="Foreground" Storyboard.TargetName="contentControl">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource DarkForegroundBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource LightForegroundBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -869,7 +867,7 @@
                                             </DiscreteObjectKeyFrame>
                                         </ObjectAnimationUsingKeyFrames>
                                         <ObjectAnimationUsingKeyFrames Duration="0" Storyboard.TargetProperty="Foreground" Storyboard.TargetName="contentControl1">
-                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource DarkForegroundBrush}" />
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource LightForegroundBrush}" />
                                         </ObjectAnimationUsingKeyFrames>
                                     </Storyboard>
                                 </VisualState>
@@ -896,8 +894,7 @@
                         <ContentControl x:Name="contentControl" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}" Foreground="{TemplateBinding Foreground}">
                             <ContentPresenter x:Name="contentPresenter" />
                         </ContentControl>
-                        <!-- Changed Visibility (Collapsed => Visible) to assist with image content control for toggle button. -->
-                        <ContentControl x:Name="contentControl1" Visibility="Visible" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}" Foreground="{StaticResource ForegroundBrush}">
+                        <ContentControl x:Name="contentControl1" Visibility="Collapsed" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}" Foreground="{StaticResource ForegroundBrush}">
                             <ContentPresenter x:Name="contentPresenter1" />
                         </ContentControl>
                         <Rectangle x:Name="FocusedVisualElement" Stroke="{StaticResource ButtonPressedBorderBrush}" Visibility="Collapsed" StrokeThickness="2" />

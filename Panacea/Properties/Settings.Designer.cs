@@ -34,5 +34,17 @@ namespace Panacea.Properties {
                 this["SolLocation"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PK|SP PK|BLK PK")]
+        public string IWMBZones {
+            get {
+                return ((string)(this["IWMBZones"]));
+            }
+            set {
+                this["IWMBZones"] = value;
+            }
+        }
     }
 }

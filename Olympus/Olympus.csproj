@@ -152,7 +152,6 @@
     <ProjectReference Include="..\Aion\Aion.csproj" />
     <ProjectReference Include="..\Argos\Argos.csproj" />
     <ProjectReference Include="..\Cadmus\Cadmus.csproj" />
-    <ProjectReference Include="..\FixedBinChecker\FixedBinChecker.csproj" />
     <ProjectReference Include="..\Hades\Hades.csproj" />
     <ProjectReference Include="..\Hydra\Hydra.csproj" />
     <ProjectReference Include="..\Khaos\Khaos.csproj" />
