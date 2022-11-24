@@ -107,7 +107,7 @@ All in one EB DC internal application(s).
         ```
         - Add frame for project page.
         ```
-        <Frame Source="{Binding ProjectNamePage}"
+        <Frame Content="{Binding ProjectNamePage}"
            Margin="0"
            Height="Auto" 
            HorizontalAlignment="Stretch" 
