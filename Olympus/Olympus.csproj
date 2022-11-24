@@ -23,6 +23,7 @@
     <None Remove="Resources\Images\Icons\dredd.ico" />
     <None Remove="Resources\Images\Icons\fixedBin.ico" />
     <None Remove="Resources\Images\Icons\forge.ico" />
+    <None Remove="Resources\Images\Icons\Hades.ico" />
     <None Remove="Resources\Images\Icons\hellsing.ico" />
     <None Remove="Resources\Images\Icons\hydra.ico" />
     <None Remove="Resources\Images\Icons\newlym.ico" />
@@ -72,6 +73,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\fixedBin.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\Hades.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\omega.ico">
@@ -132,6 +136,7 @@
     <ProjectReference Include="..\Aion\Aion.csproj" />
     <ProjectReference Include="..\Cadmus\Cadmus.csproj" />
     <ProjectReference Include="..\FixedBinChecker\FixedBinChecker.csproj" />
+    <ProjectReference Include="..\Hades\Hades.csproj" />
     <ProjectReference Include="..\Hydra\Hydra.csproj" />
     <ProjectReference Include="..\Khaos\Khaos.csproj" />
     <ProjectReference Include="..\Pantheon\Pantheon.csproj" />
