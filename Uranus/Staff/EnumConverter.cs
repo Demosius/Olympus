@@ -12,6 +12,7 @@ public enum EProject
     Hydra,
     FixedBinChecker,
     Cadmus,
+    Hades,
     Panacea
 }
 
@@ -40,6 +41,7 @@ public static class EnumConverter
             "HYDRA" => EProject.Hydra,
             "FIXEDBINCHECKER" => EProject.FixedBinChecker,
             "CADMUS" => EProject.Cadmus,
+            "HADES" => EProject.Hades,
             "PANACEA" => EProject.Panacea,
             _ => EProject.None
         };
