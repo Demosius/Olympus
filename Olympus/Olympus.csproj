@@ -24,6 +24,7 @@
     <None Remove="Resources\Images\Icons\dredd.ico" />
     <None Remove="Resources\Images\Icons\fixedBin.ico" />
     <None Remove="Resources\Images\Icons\forge.ico" />
+    <None Remove="Resources\Images\Icons\Hades.ico" />
     <None Remove="Resources\Images\Icons\hellsing.ico" />
     <None Remove="Resources\Images\Icons\hydra.ico" />
     <None Remove="Resources\Images\Icons\newlym.ico" />
@@ -34,6 +35,7 @@
     <None Remove="Resources\Images\Icons\olym.ico" />
     <None Remove="Resources\Images\Icons\olympus.ico" />
     <None Remove="Resources\Images\Icons\omega.ico" />
+    <None Remove="Resources\Images\Icons\Panacea.ico" />
     <None Remove="Resources\Images\Icons\pantheon.ico" />
     <None Remove="Resources\Images\Icons\phoenix.ico" />
     <None Remove="Resources\Images\Icons\prometheus.ico" />
@@ -79,6 +81,9 @@
     <Content Include="Resources\Images\Icons\fixedBin.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Images\Icons\Hades.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Images\Icons\omega.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -86,6 +91,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\forge.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\Panacea.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\pantheon.ico">
@@ -141,8 +149,10 @@
     <ProjectReference Include="..\Argos\Argos.csproj" />
     <ProjectReference Include="..\Cadmus\Cadmus.csproj" />
     <ProjectReference Include="..\FixedBinChecker\FixedBinChecker.csproj" />
+    <ProjectReference Include="..\Hades\Hades.csproj" />
     <ProjectReference Include="..\Hydra\Hydra.csproj" />
     <ProjectReference Include="..\Khaos\Khaos.csproj" />
+    <ProjectReference Include="..\Panacea\Panacea.csproj" />
     <ProjectReference Include="..\Pantheon\Pantheon.csproj" />
     <ProjectReference Include="..\Phoenix\Phoenix.csproj" />
     <ProjectReference Include="..\Prometheus\Prometheus.csproj" />
