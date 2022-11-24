@@ -61,6 +61,8 @@ All in one EB DC internal application(s).
 1. Edit Views.
     - Copy Themes and Resources (at least such that contains Fonts.xaml and Fonts subfolder) folders from another project to use - and edit as desired.
     - ProjectNamePage.xaml
+        - Set data context for design instance:
+        `d:DataContext="{d:DesignInstance {x:Type vm:ProjectNameVM}, IsDesignTimeCreatable=False}"`
         - Add page resources:
         ```
         <Page.Resources>
