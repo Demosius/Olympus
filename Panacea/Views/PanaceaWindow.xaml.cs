@@ -1,15 +1,20 @@
-﻿using System.Windows;
+﻿using Panacea.Properties;
 
-namespace Panacea.Views
+namespace Panacea.Views;
+
+/// <summary>
+/// Interaction logic for PanaceaWindow.xaml
+/// </summary>
+public partial class PanaceaWindow
 {
-    /// <summary>
-    /// Interaction logic for PanaceaWindow.xaml
-    /// </summary>
-    public partial class PanaceaWindow : Window
+    public PanaceaWindow()
     {
-        public PanaceaWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
+
+    private void PanaceaWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        // Saves the settings when closing the App.
+        Settings.Default.Save();
     }
 }

@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
 
     <!-- ********************************** THEME BRUSHES - For Color Tuner **********************************-->
-    <SolidColorBrush x:Key="Brush01" Color="#FFD8AAF8"/>
+    <SolidColorBrush x:Key="Brush01" Color="#FF00AADE"/>
     <SolidColorBrush x:Key="Brush02" Color="White"/>
     <SolidColorBrush x:Key="Brush03" Color="#FFC6C6C6"/>
     <SolidColorBrush x:Key="Brush04" Color="#FF565656"/>
@@ -50,11 +50,11 @@
     <Color x:Key="Color022">#66E2E2E2</Color>
 
     <!--Theme Accent colors -->
-    <Color x:Key="Color023">#FFb090b0</Color>
-    <Color x:Key="Color024">#FFC8A2C8</Color>
-    <Color x:Key="Color025">#FFD9A2D9</Color>
-    <Color x:Key="Color026">#FFE0C0E0</Color>
-    <Color x:Key="Color027">#26C8A2C8</Color>
+    <Color x:Key="Color023">#FF0086AF</Color>
+    <Color x:Key="Color024">#FF00AADE</Color>
+    <Color x:Key="Color025">#FF80D5EF</Color>
+    <Color x:Key="Color026">#FFB2E1EF</Color>
+    <Color x:Key="Color027">#2600AADE</Color>
 
     <!--Theme Error colors -->
     <Color x:Key="Color028">#FFD0284C</Color>

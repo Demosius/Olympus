@@ -5,5 +5,8 @@
     <Setting Name="SolLocation" Type="System.String" Scope="User">
       <Value Profile="(Default)">\\ausefpdfs01ns\Shares\Public\DC_Data\Olympus\QA\Sol</Value>
     </Setting>
+    <Setting Name="IWMBZones" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PK|SP PK|BLK PK</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

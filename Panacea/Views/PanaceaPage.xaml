@@ -3,8 +3,10 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:Panacea.Views"
+      xmlns:vm="clr-namespace:Panacea.ViewModels"
+      xmlns:components="clr-namespace:Panacea.Views.Components"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type vm:PanaceaVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="PanaceaPage">
 
@@ -16,7 +18,45 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <Grid Background="Aquamarine">
+    <DockPanel Background="{DynamicResource DisabledVisualElement}">
+        <TabControl Background="{DynamicResource DarkForegroundBrush}">
+            <TabItem Header="Fixed Bin Checker">
+                <components:FixedBinChecker DataContext="{Binding FixedBinCheckerVM}"/>
+            </TabItem>
+            <TabItem Header="Items With Multiple Bins">
+                <components:ItemsWithMultipleBins DataContext="{Binding ItemsWithMultipleBinsVM}"/>
+            </TabItem>
+            <TabItem Header="Bins With Multiple Items">
+
+            </TabItem>
+            <TabItem Header="Purge Bins">
+
+            </TabItem>
+            <TabItem Header="Check Negatives">
+
+            </TabItem>
+            <TabItem Header="Find Similar Sku Issues">
+
+            </TabItem>
+            <TabItem Header="Potential Short Picks">
+
+            </TabItem>
+            <TabItem Header="Potential Negatives">
+
+            </TabItem>
+            <TabItem Header="Missing Pack Lines">
+
+            </TabItem>
+            <TabItem Header="Items With No Pick Bin">
+
+            </TabItem>
+            <TabItem Header="Max Fix">
+
+            </TabItem>
+            <TabItem Header="Over Max">
+
+            </TabItem>
+        </TabControl>
         
-    </Grid>
+    </DockPanel>
 </Page>

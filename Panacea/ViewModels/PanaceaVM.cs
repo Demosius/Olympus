@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Panacea.ViewModels.Components;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -11,6 +12,9 @@ namespace Panacea.ViewModels;
 public class PanaceaVM : INotifyPropertyChanged, IDBInteraction
 {
     public Helios Helios { get; set; }
+
+    public FixedBinCheckerVM FixedBinCheckerVM { get; set; }
+    public ItemsWithMultipleBinsVM ItemsWithMultipleBinsVM { get; set; }
 
     #region INotifyProprtyChanged Members
 
@@ -28,6 +32,9 @@ public class PanaceaVM : INotifyPropertyChanged, IDBInteraction
     public PanaceaVM(Helios helios)
     {
         Helios = helios;
+
+        FixedBinCheckerVM = new FixedBinCheckerVM(helios);
+        ItemsWithMultipleBinsVM = new ItemsWithMultipleBinsVM(helios);
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);

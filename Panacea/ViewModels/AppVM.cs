@@ -7,11 +7,19 @@ namespace Panacea.ViewModels;
 
 public class AppVM : INotifyPropertyChanged
 {
-    public PanaceaPage PanaceaPage { get; set; }
+    private PanaceaPage panaceaPage;
+    public PanaceaPage PanaceaPage 
+    { get => panaceaPage;
+        set
+        {
+            panaceaPage = value;
+            OnPropertyChanged();
+        }
+    }
 
     public AppVM()
     {
-        PanaceaPage = new PanaceaPage(App.Helios);
+        panaceaPage = new PanaceaPage(App.Helios);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
