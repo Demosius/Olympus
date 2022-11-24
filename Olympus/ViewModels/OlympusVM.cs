@@ -139,6 +139,7 @@ public class OlympusVM : INotifyPropertyChanged
             new Project(EProject.Hydra, "Hydra.ico", App.Helios.StaffReader, "Manage stock levels between different facilities."),
             new Project(EProject.FixedBinChecker, "fixedBin.ico", App.Helios.StaffReader, "Verify fixed bins based on content in zone(s)."),
             new Project(EProject.Cadmus, "cadmus.ico", App.Helios.StaffReader, "Manages document creation and printing."),
+            new Project(EProject.Argos, "Argos.ico", App.Helios.StaffReader, "UBC: Unified Batch Checker - for cross-department batch progress reports.")
             new Project(EProject.Hades, "Hades.ico", App.Helios.StaffReader, "NIMS - Non-Inventory Management System"),
             new Project(EProject.Panacea, "Panacea.ico", App.Helios.StaffReader, "ALLFIX: Multiple tools to remedy many given issues.")
         };

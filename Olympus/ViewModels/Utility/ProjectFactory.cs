@@ -1,4 +1,5 @@
 ﻿using Aion.View;
+using Argos.Views;
 using Cadmus.Views;
 using FixedBinChecker.Views;
 using Hades.Views;
@@ -34,6 +35,7 @@ public static class ProjectFactory
             EProject.Hydra => new HydraPage(App.Helios, App.Charon),
             EProject.FixedBinChecker => new FixedBinCheckerPage(App.Helios),
             EProject.Cadmus => new CadmusPage(),
+            EProject.Argos => new ArgosPage(App.Helios),
             EProject.Hades => new HadesPage(App.Helios),
             EProject.Panacea => new PanaceaPage(App.Helios),
             EProject.None => null,
@@ -63,6 +65,7 @@ public static class ProjectFactory
             EProject.Hydra => HydraPage.RequiresUser,
             EProject.FixedBinChecker => FixedBinCheckerPage.RequiresUser,
             EProject.Cadmus => CadmusPage.RequiresUser,
+            EProject.Argos => ArgosPage.RequiresUser,
             EProject.Hades => HadesPage.RequiresUser,
             EProject.Panacea => PanaceaPage.RequiresUser,
             EProject.None => false,
