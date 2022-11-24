@@ -9,6 +9,7 @@ using Panacea.Views;
 using Pantheon.Views;
 using Phoenix.Views;
 using Prometheus.Views;
+using Sphynx.Views;
 using Styx;
 using System;
 using Uranus.Interfaces;
@@ -35,6 +36,7 @@ public static class ProjectFactory
             EProject.Hydra => new HydraPage(App.Helios, App.Charon),
             EProject.FixedBinChecker => new FixedBinCheckerPage(App.Helios),
             EProject.Cadmus => new CadmusPage(),
+            EProject.Sphynx => new SphynxPage(App.Helios, App.Charon),
             EProject.Argos => new ArgosPage(App.Helios),
             EProject.Hades => new HadesPage(App.Helios),
             EProject.Panacea => new PanaceaPage(App.Helios),
@@ -65,6 +67,7 @@ public static class ProjectFactory
             EProject.Hydra => HydraPage.RequiresUser,
             EProject.FixedBinChecker => FixedBinCheckerPage.RequiresUser,
             EProject.Cadmus => CadmusPage.RequiresUser,
+            EProject.Sphynx => SphynxPage.RequiresUser,
             EProject.Argos => ArgosPage.RequiresUser,
             EProject.Hades => HadesPage.RequiresUser,
             EProject.Panacea => PanaceaPage.RequiresUser,
