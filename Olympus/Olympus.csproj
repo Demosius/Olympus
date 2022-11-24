@@ -36,6 +36,7 @@
     <None Remove="Resources\Images\Icons\pantheon.ico" />
     <None Remove="Resources\Images\Icons\phoenix.ico" />
     <None Remove="Resources\Images\Icons\prometheus.ico" />
+    <None Remove="Resources\Images\Icons\Sphynx.ico" />
     <None Remove="Resources\Images\Icons\sword-smithing.ico" />
     <None Remove="Resources\Images\Icons\torch.ico" />
     <None Remove="Resources\Images\Icons\vampire.ico" />
@@ -92,6 +93,9 @@
     <Content Include="Resources\Images\Icons\prometheus.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Images\Icons\Sphynx.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Images\Icons\torch.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -137,6 +141,7 @@
     <ProjectReference Include="..\Pantheon\Pantheon.csproj" />
     <ProjectReference Include="..\Phoenix\Phoenix.csproj" />
     <ProjectReference Include="..\Prometheus\Prometheus.csproj" />
+    <ProjectReference Include="..\Sphynx\Sphynx.csproj" />
     <ProjectReference Include="..\Styx\Styx.csproj" />
     <ProjectReference Include="..\Uranus\Uranus.csproj" />
     <ProjectReference Include="..\Vulcan\Vulcan.csproj" />

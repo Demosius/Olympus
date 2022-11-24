@@ -138,8 +138,8 @@ public class OlympusVM : INotifyPropertyChanged
             new Project(EProject.Aion, "Aion.ico", App.Helios.StaffReader, "Employee clock in and shift time management."),
             new Project(EProject.Hydra, "Hydra.ico", App.Helios.StaffReader, "Manage stock levels between different facilities."),
             new Project(EProject.FixedBinChecker, "fixedBin.ico", App.Helios.StaffReader, "Verify fixed bins based on content in zone(s)."),
-            new Project(EProject.Cadmus, "cadmus.ico", App.Helios.StaffReader, "Manages document creation and printing.")
-
+            new Project(EProject.Cadmus, "cadmus.ico", App.Helios.StaffReader, "Manages document creation and printing."),
+            new Project(EProject.Sphynx, "Sphynx.ico", App.Helios.StaffReader, "Product Investigation: Countables and Product Search Sheet")
         };
 
         App.Helios.StaffCreator.EstablishInitialProjects(projects);
