@@ -140,6 +140,7 @@ public class OlympusVM : INotifyPropertyChanged
             new Project(EProject.FixedBinChecker, "fixedBin.ico", App.Helios.StaffReader, "Verify fixed bins based on content in zone(s)."),
             new Project(EProject.Cadmus, "cadmus.ico", App.Helios.StaffReader, "Manages document creation and printing."),
             new Project(EProject.Hades, "Hades.ico", App.Helios.StaffReader, "NIMS - Non-Inventory Management System"),
+            new Project(EProject.Panacea, "Panacea.ico", App.Helios.StaffReader, "ALLFIX: Multiple tools to remedy many given issues.")
         };
 
         App.Helios.StaffCreator.EstablishInitialProjects(projects);

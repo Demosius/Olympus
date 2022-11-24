@@ -13,6 +13,7 @@ public enum EProject
     FixedBinChecker,
     Cadmus,
     Hades,
+    Panacea
 }
 
 public enum ELicence
@@ -41,6 +42,7 @@ public static class EnumConverter
             "FIXEDBINCHECKER" => EProject.FixedBinChecker,
             "CADMUS" => EProject.Cadmus,
             "HADES" => EProject.Hades,
+            "PANACEA" => EProject.Panacea,
             _ => EProject.None
         };
     }
