@@ -442,4 +442,9 @@ public class InventoryReader
 
         return dataSet;
     }
+
+    public IWMBDataSet IWMBDataSet(List<string> zones)
+    {
+        throw new NotImplementedException();
+    }
 }

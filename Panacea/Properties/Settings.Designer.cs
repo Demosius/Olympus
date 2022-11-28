@@ -46,5 +46,17 @@ namespace Panacea.Properties {
                 this["IWMBZones"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IWMBAllowSeparateUoMs {
+            get {
+                return ((bool)(this["IWMBAllowSeparateUoMs"]));
+            }
+            set {
+                this["IWMBAllowSeparateUoMs"] = value;
+            }
+        }
     }
 }

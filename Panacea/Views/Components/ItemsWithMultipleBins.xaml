@@ -9,8 +9,48 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <DockPanel>
-        <TextBox DockPanel.Dock="Top"
-                 Text="{Binding CheckZoneString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>            
-        <Grid></Grid>
+        <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Zones: "></Label>
+                <TextBox Text="{Binding CheckZoneString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         MinWidth="100"
+                         Margin="2"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+                <Label Content="Ignore Different UoMs"/>
+                <CheckBox ToolTip="Will only check for multiple bins with the same UoM."
+                          IsChecked="{Binding AllowSeparatedUoMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+            <Button Content="Run"
+                    Command="{Binding RunIWMBChecksCommand}"
+                    Width="100"
+                    HorizontalAlignment="Left"
+                    Margin="2"/>
+        </StackPanel>
+
+        <!-- Data View -->
+        <DataGrid ItemsSource="{Binding FilteredCheckResults}"
+                  AutoGenerateColumns="False"
+                  CanUserDeleteRows="True"
+                  CanUserAddRows="False"
+                  CanUserReorderColumns="True"
+                  RowHeaderWidth="15">
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn Header="Zone Type"
+                                        Binding="{Binding ZoneType}"
+                                        IsReadOnly="True"/>
+                <DataGridCheckBoxColumn Header="Zones"
+                                        Binding="{Binding Zones}"
+                                        IsReadOnly="True"/>
+                <DataGridTextColumn Header="Item Number"
+                                    Binding="{Binding Number}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Item Description"
+                                    Binding="{Binding Description}"
+                                    IsReadOnly="True"/>
+                <DataGridCheckBoxColumn Header="Bins"
+                                        Binding="{Binding Bins}"
+                                        IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
     </DockPanel>
 </UserControl>

@@ -8,5 +8,8 @@
     <Setting Name="IWMBZones" Type="System.String" Scope="User">
       <Value Profile="(Default)">PK|SP PK|BLK PK</Value>
     </Setting>
+    <Setting Name="IWMBAllowSeparateUoMs" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
