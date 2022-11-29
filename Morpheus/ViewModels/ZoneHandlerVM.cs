@@ -1,8 +1,4 @@
-﻿using Hydra.ViewModels.Commands;
-using Serilog;
-using Styx;
-using Styx.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,18 +6,20 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
-using Morpheus;
+using Morpheus.ViewModels.Commands;
+using Serilog;
+using Styx;
+using Styx.Interfaces;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
 using Uranus.Inventory.Models;
 
-namespace Hydra.ViewModels.Controls;
+namespace Morpheus.ViewModels;
 
 public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 {
-    public HydraVM HydraVM { get; set; }
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }
 
@@ -35,21 +33,20 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
     public RepairDataCommand RepairDataCommand { get; set; }
-    public UpdateZonesCommand UpdateZonesCommand { get; set; }
+    public UploadZonesCommand UpdateZonesCommand { get; set; }
     public SaveZonesCommand SaveZonesCommand { get; set; }
 
     #endregion
 
-    public ZoneHandlerVM(HydraVM hydraVM)
+    public ZoneHandlerVM(Helios helios, Charon? charon)
     {
-        HydraVM = hydraVM;
         Zones = new ObservableCollection<NAVZone>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
-        UpdateZonesCommand = new UpdateZonesCommand(this);
+        UpdateZonesCommand = new UploadZonesCommand(this);
         SaveZonesCommand = new SaveZonesCommand(this);
-        Task.Run(() => SetDataSources(HydraVM.Helios!, HydraVM.Charon!));
+        Task.Run(() => SetDataSources(helios, charon!));
     }
 
     public void RefreshData()
@@ -82,7 +79,7 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public void UpdateZones()
+    public void UploadZones()
     {
         if (Helios is null) return;
 
