@@ -52,8 +52,10 @@ internal class UserVM : INotifyPropertyChanged, IDataSource
 
     #endregion
 
-    public UserVM()
+    public UserVM(Helios helios, Charon charon)
     {
+        SetDataSources(helios, charon);
+
         Pages = new ObservableCollection<EUserPage>()
         {
             EUserPage.Users,

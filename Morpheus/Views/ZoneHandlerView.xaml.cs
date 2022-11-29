@@ -1,16 +1,20 @@
 ﻿using System.Windows.Controls;
+using Morpheus.ViewModels;
+using Styx;
+using Uranus;
 using Uranus.Inventory.Models;
 
-namespace Hydra.Views.Controls;
+namespace Morpheus.Views;
 
 /// <summary>
 /// Interaction logic for ZoneHandlerView.xaml
 /// </summary>
 public partial class ZoneHandlerView
 {
-    public ZoneHandlerView()
+    public ZoneHandlerView(Helios helios, Charon? charon)
     {
         InitializeComponent();
+        DataContext = new ZoneHandlerVM(helios, charon!);
     }
 
     private void DataGrid_OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)

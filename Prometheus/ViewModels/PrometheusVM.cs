@@ -99,7 +99,7 @@ public class PrometheusVM : INotifyPropertyChanged
 
         return category switch
         {
-            EDataCategory.Inventory => GeneratePage(new InventoryPage()),
+            EDataCategory.Inventory => GeneratePage(new InventoryPage(Helios)),
             EDataCategory.Equipment => GeneratePage(new EquipmentPage()),
             EDataCategory.Staff => GeneratePage(new StaffPage()),
             EDataCategory.Users => GeneratePage(new UserPage(Helios, Charon)),
