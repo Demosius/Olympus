@@ -443,8 +443,24 @@ public class InventoryReader
         return dataSet;
     }
 
-    public IWMBDataSet IWMBDataSet(List<string> zones)
+    public IWMBDataSet? IWMBDataSet(List<string> zoneCodes)
     {
-        throw new NotImplementedException();
+        IWMBDataSet? dataSet = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var items = Items().ToList();
+            var zones = Zones(zone => zoneCodes.Contains(zone.Code));
+            var stock = Chariot.PullObjectList<NAVStock>(stock => zoneCodes.Contains(stock.ZoneCode));
+            var bins = Bins(bin => zoneCodes.Contains(bin.ZoneCode));
+            var uomList = NAVUoMs();
+
+            dataSet = new IWMBDataSet(items, zones, bins, stock, uomList);
+        });
+
+        dataSet ??= new IWMBDataSet(new List<NAVItem>(), new List<NAVZone>(), new List<NAVBin>(),
+            new List<NAVStock>(), new List<NAVUoM>());
+
+        return dataSet;
     }
 }

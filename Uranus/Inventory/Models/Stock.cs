@@ -2,6 +2,8 @@
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Uranus.Inventory.Models;
 
@@ -427,6 +429,21 @@ public class Stock : IEnumerable
         {
             Eaches.Qty += units;
         }
+    }
+
+    /// <summary>
+    /// Gets a string representing the units of measure of the item at this bin location.
+    /// e.g. EACH or EACH,PACK etc.
+    /// </summary>
+    /// <returns></returns>
+    public string GetUoMString()
+    {
+        var list = new List<string>();
+        if (Cases is not null) list.Add("CASE");
+        if (Eaches is not null) list.Add("EACH");
+        if (Packs is not null) list.Add("PACK");
+
+        return $"{Bin?.Code} ({string.Join(",", list)})";
     }
 
     public IEnumerator GetEnumerator()

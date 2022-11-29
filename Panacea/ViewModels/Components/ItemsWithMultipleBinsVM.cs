@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using Panacea.Models;
@@ -13,6 +14,7 @@ using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
+using Uranus.Inventory;
 using Uranus.Inventory.Models;
 
 namespace Panacea.ViewModels.Components;
@@ -62,6 +64,32 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters
         }
     }
 
+
+    private string zoneTypeFilter;
+    public string ZoneTypeFilter
+    {
+        get => zoneTypeFilter;
+        set
+        {
+            zoneTypeFilter = value;
+            OnPropertyChanged();
+            ApplyFilters();
+        }
+    }
+
+
+    private string zoneFilter;
+    public string ZoneFilter
+    {
+        get => zoneFilter;
+        set
+        {
+            zoneFilter = value;
+            OnPropertyChanged();
+            ApplyFilters();
+        }
+    }
+
     #endregion
 
     #region Commands
@@ -80,6 +108,12 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters
 
         checkZoneString = Settings.Default.IWMBZones;
         allowSeparatedUoMs = Settings.Default.IWMBAllowSeparateUoMs;
+
+        CheckResults = new List<IWMBCheckResult>();
+        filteredCheckResults = new ObservableCollection<IWMBCheckResult>();
+
+        zoneFilter = string.Empty;
+        zoneTypeFilter = string.Empty;
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
@@ -103,22 +137,14 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters
             return;
         }
 
-        /*// Get items only that exist in from zones.
-        var items = new List<NAVItem>();
         foreach (var (_, item) in dataSet.Items)
         {
-            if (item.StockDict.Values.Any(stock => fromZones.Contains(stock.Bin?.ZoneCode ?? "")))
-                items.Add(item);
+            foreach (EZoneType zoneType in Enum.GetValues(typeof(EZoneType)))
+            {
+                var result = new IWMBCheckResult(item, zoneType, AllowSeparatedUoMs);
+                if (result.HasMultipleBins) CheckResults.Add(result);
+            }
         }
-
-        // Convert items in dataSet to result collection.
-        foreach (var item in items) CheckResults.Add(new ItemCheckResult(item, fixedZones));
-
-        // Run checks against results.
-        foreach (var result in CheckResults)
-        {
-            result.RunChecks(checkCase, checkPack, checkEach, checkExclusiveEach);
-        }*/
 
         // Show results.
         ApplyFilters();
@@ -128,12 +154,27 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters
 
     public void ClearFilters()
     {
-        throw new NotImplementedException();
+        ZoneFilter = string.Empty;
+        ZoneTypeFilter = string.Empty;
+        ApplyFilters();
     }
 
     public void ApplyFilters()
     {
-        throw new NotImplementedException();
+        IEnumerable<IWMBCheckResult> results = CheckResults;
+
+        if (ZoneFilter != string.Empty)
+        {
+            var regex = new Regex(ZoneFilter, RegexOptions.IgnoreCase);
+            results = results.Where(res => regex.IsMatch(res.ZoneString));
+        }
+
+        if (ZoneTypeFilter != string.Empty)
+        {
+            results = results.Where(res => string.Equals(res.ZoneType.ToString(), ZoneTypeFilter, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        FilteredCheckResults = new ObservableCollection<IWMBCheckResult>(results);
     }
 
     public void ApplySorting()
