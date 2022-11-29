@@ -1,4 +1,5 @@
-﻿using Styx;
+﻿using Prometheus.ViewModels.Pages.Users;
+using Styx;
 using Uranus;
 
 namespace Prometheus.Views.Pages.Users;
@@ -11,6 +12,6 @@ public partial class UserViewPage
     public UserViewPage(Helios helios, Charon charon)
     {
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+        DataContext = new UserViewVM(helios, charon);
     }
 }

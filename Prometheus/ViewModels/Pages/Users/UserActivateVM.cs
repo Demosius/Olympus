@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using Uranus;
 using Uranus.Annotations;
@@ -113,7 +114,7 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
 
     #endregion
 
-    public UserActivateVM()
+    public UserActivateVM(Helios helios, Charon charon)
     {
         employees = new ObservableCollection<Employee>();
         fullEmployees = new List<Employee>();
@@ -126,6 +127,8 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
         ActivateUserCommand = new ActivateUserCommand(this);
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
+
+        Task.Run(() => SetDataSources(helios, charon));
     }
 
     public void SetDataSources(Helios helios, Charon charon)

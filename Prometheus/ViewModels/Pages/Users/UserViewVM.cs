@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Uranus;
@@ -89,7 +90,7 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
 
     #endregion
 
-    public UserViewVM()
+    public UserViewVM(Helios helios, Charon charon)
     {
         fullUserList = new List<User>();
         users = new ObservableCollection<User>();
@@ -102,6 +103,8 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
         ApplySortingCommand = new ApplySortingCommand(this);
         DeactivateUserCommand = new DeactivateUserCommand(this);
         ChangeUserRoleCommand = new ChangeUserRoleCommand(this);
+
+        Task.Run(() => SetDataSources(helios, charon));
     }
 
     public void SetDataSources(Helios helios, Charon charon)

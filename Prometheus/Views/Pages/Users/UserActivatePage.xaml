@@ -7,12 +7,9 @@
       xmlns:users="clr-namespace:Prometheus.ViewModels.Pages.Users"
       xmlns:converters="clr-namespace:Prometheus.ViewModels.Converters"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance users:UserActivateVM, IsDesignTimeCreatable=False}"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="UserActivatePage">
-
-    <Page.DataContext>
-        <users:UserActivateVM x:Name="VM"/>
-    </Page.DataContext>
 
     <Page.Resources>
         <ResourceDictionary Source="../../../Themes/MSControls.Core.Implicit.xaml"/>

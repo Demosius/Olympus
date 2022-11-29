@@ -19,7 +19,7 @@
                   Width="Auto"
                   MinWidth="100"
                   ItemsSource="{Binding Pages}"
-                  SelectedValue="{Binding SelectedPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                  SelectedValue="{Binding SelectedPage}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding}" FontSize="14" HorizontalAlignment="Center"/>
