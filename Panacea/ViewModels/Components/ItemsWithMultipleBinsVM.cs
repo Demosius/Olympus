@@ -98,6 +98,7 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public ApplySortingCommand ApplySortingCommand { get; set; }
     public RunIWMBChecksCommand RunIWMBChecksCommand { get; set; }
+    public ItemsToClipboardCommand ItemsToClipboardCommand { get; set; }
 
     #endregion
 
@@ -119,6 +120,7 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters
         ClearFiltersCommand = new ClearFiltersCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
         RunIWMBChecksCommand = new RunIWMBChecksCommand(this);
+        ItemsToClipboardCommand = new ItemsToClipboardCommand(this);
     }
 
     public void RunIWMBChecks()
@@ -182,6 +184,13 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters
         throw new NotImplementedException();
     }
 
+    public void ItemsToClipboard()
+    {
+        var itemList = FilteredCheckResults.Select(checkResult => checkResult.Item.Number.ToString()).ToList();
+        Clipboard.SetText(string.Join("|", itemList));
+        MessageBox.Show($"{itemList.Count} items added to clipboard.");
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]
@@ -189,5 +198,4 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-
 }

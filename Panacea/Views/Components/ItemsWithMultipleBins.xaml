@@ -44,7 +44,8 @@
                 <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
                 <Button Content="Get Items"
                         Margin="2"
-                        ToolTip="Add listed items as pipe-separated string into the clipboard."/>
+                        ToolTip="Add listed items as pipe-separated string into the clipboard."
+                        Command="{Binding ItemsToClipboardCommand}"/>
             </StackPanel>
         </StackPanel>
 
