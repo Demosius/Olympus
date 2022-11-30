@@ -3,7 +3,6 @@ using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Uranus.Inventory.Models;
 
@@ -40,13 +39,20 @@ public class Stock : IEnumerable
     [Ignore] public int PackQty => Packs?.Qty ?? 0;
     [Ignore] public int CaseQty => Cases?.Qty ?? 0;
 
-    [Ignore] public int UnitsInPacks => ((Packs?.Qty ?? 0) * (Item?.QtyPerPack ?? 1));
-    [Ignore] public int UnitsInCases => ((Cases?.Qty ?? 0) * (Item?.QtyPerCase ?? 1));
+    [Ignore] public int UnitsInPacks => (Packs?.Qty ?? 0) * (Item?.QtyPerPack ?? 1);
+    [Ignore] public int UnitsInCases => (Cases?.Qty ?? 0) * (Item?.QtyPerCase ?? 1);
+
+    [Ignore] public bool Merged { get; set; } = false;
 
     [Ignore] public int BaseQty => EachQty + UnitsInPacks + UnitsInCases;
-    [Ignore] public bool NonCommitted => (Eaches is null || Eaches.NonCommitted) &&
+    [Ignore]
+    public bool NonCommitted => (Eaches is null || Eaches.NonCommitted) &&
                                          (Packs is null || Packs.NonCommitted) &&
                                          (Cases is null || Cases.NonCommitted);
+    [Ignore]
+    public bool HasNegativeUoM => (Eaches?.IsNegative ?? false) ||
+                                            (Packs?.IsNegative ?? false) ||
+                                             (Cases?.IsNegative ?? false);
 
     public Stock()
     {
@@ -211,6 +217,7 @@ public class Stock : IEnumerable
 
     /// <summary>
     /// Adds values from new stock to this one without removing them.
+    /// If stock is of the same bin when adding, set sub stock to equal new if it doesn't already exist.
     /// </summary>
     /// <param name="newStock"></param>
     public bool Add(Stock newStock)
@@ -221,21 +228,27 @@ public class Stock : IEnumerable
         // Increase Stock quantities.
         if (newStock.Eaches is not null)
         {
-            Eaches ??= new SubStock(this, EUoM.EACH);
-            Eaches.Qty += newStock.Eaches.Qty;
+            if (Eaches is null)
+                Eaches = newStock.BinID == BinID ? newStock.Eaches.Copy() : Eaches ??= new SubStock(this, EUoM.EACH, newStock.EachQty);
+            else
+                Eaches.Qty += newStock.EachQty;
         }
 
         if (newStock.Packs is not null)
         {
-            Packs ??= new SubStock(this, EUoM.PACK);
-            Packs.Qty += newStock.Packs.Qty;
+            if (Packs is null)
+                Packs ??= newStock.BinID == BinID ? newStock.Packs.Copy() : new SubStock(this, EUoM.PACK, newStock.PackQty);
+            else
+                Packs.Qty += newStock.PackQty;
         }
 
         // ReSharper disable once InvertIf
         if (newStock.Cases is not null)
         {
-            Cases ??= new SubStock(this, EUoM.CASE);
-            Cases.Qty += newStock.Cases.Qty;
+            if (Cases is null)
+                Cases ??= newStock.BinID == BinID ? newStock.Cases.Copy() : new SubStock(this, EUoM.CASE, newStock.CaseQty);
+            else
+                Cases.Qty += newStock.CaseQty;
         }
 
         return true;
@@ -415,7 +428,7 @@ public class Stock : IEnumerable
 
         if (unitsForCases > 0 && Cases is not null)
         {
-            if (unitsForCases > units) unitsForCases = (units / qtyPerCase) * qtyPerCase;
+            if (unitsForCases > units) unitsForCases = units / qtyPerCase * qtyPerCase;
             units -= unitsForCases;
             Cases.Qty += unitsForCases / qtyPerCase;
         }
@@ -423,7 +436,7 @@ public class Stock : IEnumerable
         var unitsForPacks = packs * qtyPerPack;
         if (unitsForPacks > 0 && Packs is not null)
         {
-            if (unitsForPacks > units) unitsForPacks = (units / qtyPerPack) * qtyPerPack;
+            if (unitsForPacks > units) unitsForPacks = units / qtyPerPack * qtyPerPack;
             units -= unitsForPacks;
             Packs.Qty += unitsForPacks / qtyPerPack;
         }

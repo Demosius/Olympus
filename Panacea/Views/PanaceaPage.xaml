@@ -33,7 +33,7 @@
                 <components:PurgeView DataContext="{Binding PurgeVM}"></components:PurgeView>
             </TabItem>
             <TabItem Header="Check Negatives">
-
+                <components:NegativeChecker DataContext="{Binding NegativeCheckerVM}"/>
             </TabItem>
             <TabItem Header="Find Similar Sku Issues">
 

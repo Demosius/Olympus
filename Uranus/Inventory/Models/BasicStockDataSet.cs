@@ -92,9 +92,9 @@ public class BasicStockDataSet
             }
 
             var stock = new Stock(navStock);
-            Stock.Add(stock);
-
             stock.AddStock();
+
+            if (!stock.Merged) Stock.Add(stock);
         }
     }
 }
