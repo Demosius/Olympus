@@ -29,12 +29,14 @@ public partial class ZoneHandlerView
             case nameof(NAVZone.Bins):
             case nameof(NAVZone.Bays):
             case nameof(NAVZone.Location):
+            case nameof(NAVZone.Stock):
+            case nameof(NAVZone.Site):
                 e.Cancel = true;
                 break;
-            case nameof(NAVZone.Site):
             case nameof(NAVZone.ID):
             case nameof(NAVZone.Code):
             case nameof(NAVZone.LocationCode):
+            case nameof(NAVZone.SiteName):
                 e.Column.IsReadOnly = true;
                 break;
             case nameof(NAVZone.AccessLevel):

@@ -19,6 +19,7 @@ public class SubStock
 
     [Ignore] public int AvailableQty => Qty - PickQty - NegAdjQty;
     [Ignore] public int BalanceQty => Qty - PickQty + PutAwayQty - NegAdjQty + PosAdjQty;
+    [Ignore] public bool NonCommitted => PickQty == 0 && NegAdjQty == 0 && PosAdjQty == 0 && PutAwayQty ==0; 
 
     public EUoM UoM { get; set; }
 

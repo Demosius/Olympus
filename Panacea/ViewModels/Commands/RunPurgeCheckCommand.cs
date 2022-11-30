@@ -4,17 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Panacea.Interfaces;
 using Panacea.ViewModels.Components;
 
 namespace Panacea.ViewModels.Commands;
 
 
-public class ItemsToClipboardCommand : ICommand
+public class RunPurgeCheckCommand : ICommand
 {
-    public IItemData VM { get; set; }
+    public PurgeVM VM { get; set; }
 
-    public ItemsToClipboardCommand(IItemData vm) { VM = vm; }
+    public RunPurgeCheckCommand(PurgeVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -23,7 +22,7 @@ public class ItemsToClipboardCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.ItemsToClipboard();
+        VM.RunPurgeCheck();
     }
 
     public event EventHandler? CanExecuteChanged

@@ -11,5 +11,11 @@
     <Setting Name="IWMBAllowSeparateUoMs" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="BWMIZones" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PK|SP PK|BLK PK</Value>
+    </Setting>
+    <Setting Name="PurgeZones" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PK|SP PK|PO PK|BLK PK|SUP PK|BLK SS|HR|PR|OS|OZ|PARK|REFURB|MC</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

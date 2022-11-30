@@ -58,5 +58,29 @@ namespace Panacea.Properties {
                 this["IWMBAllowSeparateUoMs"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PK|SP PK|BLK PK")]
+        public string BWMIZones {
+            get {
+                return ((string)(this["BWMIZones"]));
+            }
+            set {
+                this["BWMIZones"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PK|SP PK|PO PK|BLK PK|SUP PK|BLK SS|HR|PR|OS|OZ|PARK|REFURB|MC")]
+        public string PurgeZones {
+            get {
+                return ((string)(this["PurgeZones"]));
+            }
+            set {
+                this["PurgeZones"] = value;
+            }
+        }
     }
 }

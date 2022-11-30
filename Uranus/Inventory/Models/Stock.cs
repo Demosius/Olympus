@@ -40,10 +40,13 @@ public class Stock : IEnumerable
     [Ignore] public int PackQty => Packs?.Qty ?? 0;
     [Ignore] public int CaseQty => Cases?.Qty ?? 0;
 
-    [Ignore] public int UnitsInPacks => ((Packs?.Qty ?? 0) * (Item?.QtyPerPack ?? 0));
-    [Ignore] public int UnitsInCases => ((Cases?.Qty ?? 0) * (Item?.QtyPerCase ?? 0));
+    [Ignore] public int UnitsInPacks => ((Packs?.Qty ?? 0) * (Item?.QtyPerPack ?? 1));
+    [Ignore] public int UnitsInCases => ((Cases?.Qty ?? 0) * (Item?.QtyPerCase ?? 1));
 
     [Ignore] public int BaseQty => EachQty + UnitsInPacks + UnitsInCases;
+    [Ignore] public bool NonCommitted => (Eaches is null || Eaches.NonCommitted) &&
+                                         (Packs is null || Packs.NonCommitted) &&
+                                         (Cases is null || Cases.NonCommitted);
 
     public Stock()
     {

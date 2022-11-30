@@ -10,11 +10,11 @@ using Panacea.ViewModels.Components;
 namespace Panacea.ViewModels.Commands;
 
 
-public class ItemsToClipboardCommand : ICommand
+public class BinsToClipboardCommand : ICommand
 {
-    public IItemData VM { get; set; }
+    public IBinData VM { get; set; }
 
-    public ItemsToClipboardCommand(IItemData vm) { VM = vm; }
+    public BinsToClipboardCommand(IBinData vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -23,7 +23,7 @@ public class ItemsToClipboardCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.ItemsToClipboard();
+        VM.BinsToClipboard();
     }
 
     public event EventHandler? CanExecuteChanged

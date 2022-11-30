@@ -27,10 +27,10 @@
                 <components:ItemsWithMultipleBins DataContext="{Binding ItemsWithMultipleBinsVM}"/>
             </TabItem>
             <TabItem Header="Bins With Multiple Items">
-
+                <components:BinsWithMultipleItems DataContext="{Binding BinsWithMultipleItemsVM}"/>
             </TabItem>
             <TabItem Header="Purge Bins">
-
+                <components:PurgeView DataContext="{Binding PurgeVM}"></components:PurgeView>
             </TabItem>
             <TabItem Header="Check Negatives">
 

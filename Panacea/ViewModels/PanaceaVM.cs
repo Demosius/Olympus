@@ -15,6 +15,8 @@ public class PanaceaVM : INotifyPropertyChanged, IDBInteraction
 
     public FixedBinCheckerVM FixedBinCheckerVM { get; set; }
     public ItemsWithMultipleBinsVM ItemsWithMultipleBinsVM { get; set; }
+    public BinsWithMultipleItemsVM BinsWithMultipleItemsVM { get; set; }
+    public PurgeVM PurgeVM { get; set; }
 
     #region INotifyProprtyChanged Members
 
@@ -35,6 +37,8 @@ public class PanaceaVM : INotifyPropertyChanged, IDBInteraction
 
         FixedBinCheckerVM = new FixedBinCheckerVM(helios);
         ItemsWithMultipleBinsVM = new ItemsWithMultipleBinsVM(helios);
+        BinsWithMultipleItemsVM = new BinsWithMultipleItemsVM(helios);
+        PurgeVM = new PurgeVM(helios);
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);

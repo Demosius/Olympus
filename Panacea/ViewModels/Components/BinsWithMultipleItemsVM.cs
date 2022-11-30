@@ -15,15 +15,13 @@ using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
-using Uranus.Inventory;
-using Uranus.Inventory.Models;
 
 namespace Panacea.ViewModels.Components;
 
-public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemData
+public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinData
 {
     public Helios Helios { get; set; }
-    public List<IWMBCheckResult> CheckResults { get; set; }
+    public List<BWMICheckResult> CheckResults { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -35,27 +33,13 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
         {
             checkZoneString = value;
             OnPropertyChanged();
-            Settings.Default.IWMBZones = value;
+            Settings.Default.BWMIZones = value;
             Settings.Default.Save();
         }
     }
-
-    private bool allowSeparatedUoMs;
-    public bool AllowSeparatedUoMs
-    {
-        get => allowSeparatedUoMs;
-        set
-        {
-            allowSeparatedUoMs = value;
-            OnPropertyChanged();
-            Settings.Default.IWMBAllowSeparateUoMs = value;
-            Settings.Default.Save();
-        }
-    }
-
-
-    private ObservableCollection<IWMBCheckResult> filteredCheckResults;
-    public ObservableCollection<IWMBCheckResult> FilteredCheckResults
+    
+    private ObservableCollection<BWMICheckResult> filteredCheckResults;
+    public ObservableCollection<BWMICheckResult> FilteredCheckResults
     {
         get => filteredCheckResults;
         set
@@ -98,33 +82,61 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public ApplySortingCommand ApplySortingCommand { get; set; }
-    public RunIWMBChecksCommand RunIWMBChecksCommand { get; set; }
-    public ItemsToClipboardCommand ItemsToClipboardCommand { get; set; }
+    public RunBWMIChecksCommand RunBWMIChecksCommand { get; set; }
+    public BinsToClipboardCommand BinsToClipboardCommand { get; set; }
 
     #endregion
 
-
-    public ItemsWithMultipleBinsVM(Helios helios)
+    public BinsWithMultipleItemsVM(Helios helios)
     {
         Helios = helios;
 
-        checkZoneString = Settings.Default.IWMBZones;
-        allowSeparatedUoMs = Settings.Default.IWMBAllowSeparateUoMs;
-
-        CheckResults = new List<IWMBCheckResult>();
-        filteredCheckResults = new ObservableCollection<IWMBCheckResult>();
-
+        CheckResults = new List<BWMICheckResult>();
+        checkZoneString = Settings.Default.BWMIZones;
+        filteredCheckResults = new ObservableCollection<BWMICheckResult>();
+        
         zoneFilter = string.Empty;
         zoneTypeFilter = string.Empty;
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
-        RunIWMBChecksCommand = new RunIWMBChecksCommand(this);
-        ItemsToClipboardCommand = new ItemsToClipboardCommand(this);
+        RunBWMIChecksCommand = new RunBWMIChecksCommand(this);
+        BinsToClipboardCommand = new BinsToClipboardCommand(this);
     }
 
-    public void RunIWMBChecks()
+    public void ClearFilters()
+    {
+        ZoneFilter = string.Empty;
+        ZoneTypeFilter = string.Empty;
+        ApplyFilters();
+    }
+
+    public void ApplyFilters()
+    {
+        IEnumerable<BWMICheckResult> results = CheckResults;
+
+        if (ZoneFilter != string.Empty)
+        {
+            var regex = new Regex(ZoneFilter, RegexOptions.IgnoreCase);
+            results = results.Where(res => regex.IsMatch(res.Zone));
+        }
+
+        if (ZoneTypeFilter != string.Empty)
+        {
+            var regex = new Regex(ZoneTypeFilter, RegexOptions.IgnoreCase);
+            results = results.Where(res => regex.IsMatch(res.ZoneType.ToString()));
+        }
+
+        FilteredCheckResults = new ObservableCollection<BWMICheckResult>(results);
+    }
+
+    public void ApplySorting()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void RunChecks()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
@@ -140,12 +152,11 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
             return;
         }
 
-        foreach (var (_, item) in dataSet.Items)
+        foreach (var (_, bin) in dataSet.Bins)
         {
-            foreach (EZoneType zoneType in Enum.GetValues(typeof(EZoneType)))
+            if (bin.Stock.Count > 1)
             {
-                var result = new IWMBCheckResult(item, zoneType, AllowSeparatedUoMs);
-                if (result.HasMultipleBins) CheckResults.Add(result);
+                CheckResults.Add(new BWMICheckResult(bin));
             }
         }
 
@@ -155,42 +166,11 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
         Mouse.OverrideCursor = Cursors.Arrow;
     }
 
-    public void ClearFilters()
+    public void BinsToClipboard()
     {
-        ZoneFilter = string.Empty;
-        ZoneTypeFilter = string.Empty;
-        ApplyFilters();
-    }
-
-    public void ApplyFilters()
-    {
-        IEnumerable<IWMBCheckResult> results = CheckResults;
-
-        if (ZoneFilter != string.Empty)
-        {
-            var regex = new Regex(ZoneFilter, RegexOptions.IgnoreCase);
-            results = results.Where(res => regex.IsMatch(res.ZoneString));
-        }
-
-        if (ZoneTypeFilter != string.Empty)
-        {
-            var regex = new Regex(ZoneTypeFilter, RegexOptions.IgnoreCase);
-            results = results.Where(res => regex.IsMatch(res.ZoneType.ToString()));
-        }
-
-        FilteredCheckResults = new ObservableCollection<IWMBCheckResult>(results);
-    }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void ItemsToClipboard()
-    {
-        var itemList = FilteredCheckResults.Select(checkResult => checkResult.Item.Number.ToString()).ToList();
-        Clipboard.SetText(string.Join("|", itemList));
-        MessageBox.Show($"{itemList.Count} items added to clipboard.");
+        var binList = FilteredCheckResults.Select(checkResult => checkResult.Bin.Code).ToList();
+        Clipboard.SetText(string.Join("|", binList));
+        MessageBox.Show($"{binList.Count} bins added to clipboard.");
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

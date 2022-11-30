@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Uranus.Inventory.Models;
 
-public class IWMBDataSet
+public class BasicStockDataSet
 {
     public Dictionary<int, NAVItem> Items { get; set; }
     public Dictionary<string, NAVZone> Zones { get; set; }
@@ -14,7 +14,7 @@ public class IWMBDataSet
     public List<Stock> Stock { get; set; }
 
 
-    public IWMBDataSet(IEnumerable<NAVItem> items, IEnumerable<NAVZone> zones, IEnumerable<NAVBin> bins,
+    public BasicStockDataSet(IEnumerable<NAVItem> items, IEnumerable<NAVZone> zones, IEnumerable<NAVBin> bins,
         IEnumerable<NAVStock> stock, IEnumerable<NAVUoM> uomList)
     {
         Items = items.ToDictionary(i => i.Number, i => i);
