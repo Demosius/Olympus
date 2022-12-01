@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Panacea.ViewModels.Components;
+using System;
 using System.Windows.Input;
-using Panacea.ViewModels.Components;
 
 namespace Panacea.ViewModels.Commands;
 

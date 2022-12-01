@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Panacea.Interfaces;
+using Panacea.Models;
+using Panacea.Properties;
+using Panacea.ViewModels.Commands;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -7,10 +11,6 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
-using Panacea.Interfaces;
-using Panacea.Models;
-using Panacea.Properties;
-using Panacea.ViewModels.Commands;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -155,7 +155,7 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
         var zones = checkZoneString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.IWMBDataSet(zones);
+        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones);
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");

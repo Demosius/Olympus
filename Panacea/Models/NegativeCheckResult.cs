@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Data;
-using System.Threading;
-using Uranus.Annotations;
 using Uranus.Inventory;
 using Uranus.Inventory.Models;
 
@@ -24,14 +22,14 @@ public class NegativeCheckResult
     public int BalanceQty => SubStock?.BalanceQty ?? 0;
 
     #endregion
-    
+
     public string OverstockString { get; }
 
     public NegativeCheckResult(Stock stock, EUoM uom)
     {
         Stock = stock;
         UoM = uom;
-        
+
         SubStock = UoM switch
         {
             EUoM.EACH => Stock.Eaches,

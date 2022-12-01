@@ -18,19 +18,17 @@
                    VerticalContentAlignment="Center"/>
             <Separator/>
             <StackPanel Orientation="Horizontal">
-            <Label Content="Zone Type: "/>
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
-            <Label Content="Zone: "/>
-            <TextBox Text="{Binding ZoneFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                <Label Content="Zone: "/>
+                <TextBox Text="{Binding ZoneFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          MinWidth="80"
                          Margin="2"/>
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
-            <Button Content="Get Bins"
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+                <Button Content="Get Bins"
                         Margin="2"
                         ToolTip="Add listed bins as pipe-separated string into the clipboard."
                         Command="{Binding BinsToClipboardCommand}"/>
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
-            <Button Content="Get Items"
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+                <Button Content="Get Items"
                         Margin="2"
                         ToolTip="Add listed items as pipe-separated string into the clipboard."
                         Command="{Binding ItemsToClipboardCommand}"/>

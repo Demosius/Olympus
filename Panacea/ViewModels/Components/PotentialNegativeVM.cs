@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Panacea.Models;
+using Panacea.Properties;
+using Panacea.ViewModels.Commands;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using Panacea.Models;
-using Panacea.Properties;
-using Panacea.ViewModels.Commands;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Inventory;
@@ -59,18 +58,18 @@ public class PotentialNegativeVM : INotifyPropertyChanged
 
         RunPotentialNegativesCheckCommand = new RunPotentialNegativesCheckCommand(this);
     }
-    
+
     public void RunPotentialNegativesCheck()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
         ShortPickResults.Clear();
         ReplenResults.Clear();
-        
+
         var zones = checkZoneString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.IWMBDataSet(zones);
+        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones);
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");
@@ -85,7 +84,7 @@ public class PotentialNegativeVM : INotifyPropertyChanged
             else
                 ShortPickResults.Add(result);
         }
-        
+
         ShortPickVM.SetResults(ShortPickResults);
         ReplenishmentVM.SetResults(ReplenResults);
 

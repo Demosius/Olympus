@@ -8,8 +8,9 @@ namespace Panacea.ViewModels;
 public class AppVM : INotifyPropertyChanged
 {
     private PanaceaPage panaceaPage;
-    public PanaceaPage PanaceaPage 
-    { get => panaceaPage;
+    public PanaceaPage PanaceaPage
+    {
+        get => panaceaPage;
         set
         {
             panaceaPage = value;

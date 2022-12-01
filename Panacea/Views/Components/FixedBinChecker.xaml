@@ -69,7 +69,7 @@
                     Width="140" Height="35"
                     Margin="10"
                     Content="Check"
-                    Command="{Binding RunChecksCommand}"/>
+                    Command="{Binding RunFixedBinChecksCommand}"/>
 
         </Grid>
 

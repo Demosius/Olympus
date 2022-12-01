@@ -443,7 +443,7 @@ public class InventoryReader
         return dataSet;
     }
 
-    public BasicStockDataSet? IWMBDataSet(List<string> zoneCodes)
+    public BasicStockDataSet? BasicStockDataSet(List<string> zoneCodes)
     {
         BasicStockDataSet? dataSet = null;
 

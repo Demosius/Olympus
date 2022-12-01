@@ -1,6 +1,6 @@
-﻿using System.Windows.Controls;
-using Morpheus.ViewModels;
+﻿using Morpheus.ViewModels;
 using Styx;
+using System.Windows.Controls;
 using Uranus;
 using Uranus.Inventory.Models;
 

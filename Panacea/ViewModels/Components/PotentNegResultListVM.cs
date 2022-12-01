@@ -1,17 +1,14 @@
-﻿using System;
+﻿using Panacea.Interfaces;
+using Panacea.Models;
+using Panacea.ViewModels.Commands;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
-using Panacea.Interfaces;
-using Panacea.Models;
-using Panacea.Properties;
-using Panacea.ViewModels.Commands;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -24,7 +21,7 @@ public class PotentNegResultListVM : INotifyPropertyChanged, IFilters, IBinData,
     public string Header { get; set; }
 
     #region INotifyPropertyChanged Members
-    
+
     private ObservableCollection<PotentNegCheckResult> filteredCheckResults;
     public ObservableCollection<PotentNegCheckResult> FilteredCheckResults
     {
@@ -35,7 +32,7 @@ public class PotentNegResultListVM : INotifyPropertyChanged, IFilters, IBinData,
             OnPropertyChanged();
         }
     }
-    
+
     private string zoneFilter;
     public string ZoneFilter
     {

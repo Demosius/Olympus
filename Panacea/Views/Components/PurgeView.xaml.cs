@@ -1,6 +1,4 @@
-﻿using System.Windows.Controls;
-
-namespace Panacea.Views.Components;
+﻿namespace Panacea.Views.Components;
 
 /// <summary>
 /// Interaction logic for PurgeView.xaml

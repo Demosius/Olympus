@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Panacea.Interfaces;
+using Panacea.Models;
+using Panacea.Properties;
+using Panacea.ViewModels.Commands;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -7,10 +11,6 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
-using Panacea.Interfaces;
-using Panacea.Models;
-using Panacea.Properties;
-using Panacea.ViewModels.Commands;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -146,7 +146,7 @@ public class PurgeVM : INotifyPropertyChanged, IFilters, IBinData, IItemData
         var zones = checkZoneString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.IWMBDataSet(zones);
+        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones);
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");
@@ -156,10 +156,10 @@ public class PurgeVM : INotifyPropertyChanged, IFilters, IBinData, IItemData
         foreach (var (_, item) in dataSet.Items)
         {
             if ((item.Stock?.BaseQty ?? -1) != 0) continue;
-            
+
             foreach (var (_, stock) in item.StockDict)
             {
-                if (stock.NonCommitted && stock.BaseQty == 0) 
+                if (stock.NonCommitted && stock.BaseQty == 0)
                     CheckResults.Add(new PurgeCheckResult(stock));
             }
         }

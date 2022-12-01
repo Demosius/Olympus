@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Panacea.Models;
+using Panacea.ViewModels.Commands;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -6,8 +8,6 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
-using Panacea.Models;
-using Panacea.ViewModels.Commands;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -134,7 +134,7 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
 
     #region Commands
 
-    public RunFixedBinChecksCommand RunChecksCommand { get; set; }
+    public RunFixedBinChecksCommand RunFixedBinChecksCommand { get; set; }
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
@@ -151,7 +151,7 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
         filteredCheckResults = new ObservableCollection<FixedBinCheckResult>();
         binFilter = string.Empty;
 
-        RunChecksCommand = new RunFixedBinChecksCommand(this);
+        RunFixedBinChecksCommand = new RunFixedBinChecksCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);

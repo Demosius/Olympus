@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Panacea.ViewModels.Components;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Panacea.ViewModels.Components;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;

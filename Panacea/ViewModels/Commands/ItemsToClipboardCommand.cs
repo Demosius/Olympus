@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Panacea.Interfaces;
+using System;
 using System.Windows.Input;
-using Panacea.Interfaces;
-using Panacea.ViewModels.Components;
 
 namespace Panacea.ViewModels.Commands;
 
