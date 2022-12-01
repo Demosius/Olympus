@@ -30,18 +30,15 @@
                 <components:BinsWithMultipleItems DataContext="{Binding BinsWithMultipleItemsVM}"/>
             </TabItem>
             <TabItem Header="Purge Bins">
-                <components:PurgeView DataContext="{Binding PurgeVM}"></components:PurgeView>
+                <components:PurgeView DataContext="{Binding PurgeVM}"/>
             </TabItem>
             <TabItem Header="Check Negatives">
                 <components:NegativeChecker DataContext="{Binding NegativeCheckerVM}"/>
             </TabItem>
-            <TabItem Header="Find Similar Sku Issues">
-
-            </TabItem>
-            <TabItem Header="Potential Short Picks">
-
-            </TabItem>
             <TabItem Header="Potential Negatives">
+                <components:PotentialNegatives DataContext="{Binding PotentialNegativeVM}"/>
+            </TabItem>
+            <TabItem Header="Find Similar Sku Issues">
 
             </TabItem>
             <TabItem Header="Missing Pack Lines">

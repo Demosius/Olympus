@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Panacea.ViewModels.Components"
+             xmlns:comp="clr-namespace:Panacea.Views.Components"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:PotentialNegativeVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -19,7 +20,7 @@
                 </StackPanel>
 
                 <Button Content="Run"
-                        Command="{Binding RunPurgeCheckCommand}"
+                        Command="{Binding RunPotentialNegativesCheckCommand}"
                         Width="100"
                         HorizontalAlignment="Left"
                         Margin="2"/>
@@ -33,119 +34,14 @@
             </Grid.ColumnDefinitions>
 
             <!-- Short Pick if Necessary -->
-            <DockPanel Grid.Column="0">
-                <StackPanel Orientation="Horizontal"
-                            DockPanel.Dock="Top">
-                    <Label Content="Zone Type: "/>
-                    <TextBox Text="{Binding ZoneTypeFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         MinWidth="80"
-                         Margin="2"/>
-                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
-                    <Label Content="Zone: "/>
-                    <TextBox Text="{Binding ZoneFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         MinWidth="80"
-                         Margin="2"/>
-                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
-                    <Button Content="Get Bins"
-                        Margin="2"
-                        ToolTip="Add listed bins as pipe-separated string into the clipboard."
-                        Command="{Binding BinsToClipboardCommand}"/>
-                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
-                    <Button Content="Get Items"
-                        Margin="2"
-                        ToolTip="Add listed items as pipe-separated string into the clipboard."
-                        Command="{Binding ItemsToClipboardCommand}"/>
-                </StackPanel>
-                <!-- Data View -->
-                <DataGrid ItemsSource="{Binding FilteredCheckResults}"
-                  AutoGenerateColumns="False"
-                  CanUserDeleteRows="True"
-                  CanUserAddRows="False"
-                  CanUserReorderColumns="True"
-                  RowHeaderWidth="15">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Zone Type"
-                                    Binding="{Binding ZoneType}"
-                                    IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Zone"
-                                    Binding="{Binding Zone}"
-                                    IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Bin"
-                                    Binding="{Binding UoM}"
-                                    IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Item Number"
-                                    Binding="{Binding Item}"
-                                    IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Item Description"
-                                    Binding="{Binding Description}"
-                                    IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Base Qty"
-                                    Binding="{Binding BaseQty}"
-                                    IsReadOnly="True"/>
-                        <DataGridCheckBoxColumn Header="Un-committed"
-                                        Binding="{Binding NonCommitted, Mode=OneWay}"
-                                        IsReadOnly="True"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </DockPanel>
+            <comp:PotentNegResultListView Grid.Column="0"
+                                          DataContext="{Binding ShortPickVM}"/>
+
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
     
             <!-- Replen if necessary -->
-            <DockPanel Grid.Column="2">
-                <StackPanel Orientation="Horizontal"
-                            DockPanel.Dock="Top">
-                    <Label Content="Zone Type: "/>
-                    <TextBox Text="{Binding ZoneTypeFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         MinWidth="80"
-                         Margin="2"/>
-                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
-                    <Label Content="Zone: "/>
-                    <TextBox Text="{Binding ZoneFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         MinWidth="80"
-                         Margin="2"/>
-                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
-                    <Button Content="Get Bins"
-                        Margin="2"
-                        ToolTip="Add listed bins as pipe-separated string into the clipboard."
-                        Command="{Binding BinsToClipboardCommand}"/>
-                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
-                    <Button Content="Get Items"
-                        Margin="2"
-                        ToolTip="Add listed items as pipe-separated string into the clipboard."
-                        Command="{Binding ItemsToClipboardCommand}"/>
-                </StackPanel>
-                <!-- Data View -->
-                <DataGrid ItemsSource="{Binding FilteredCheckResults}"
-                  AutoGenerateColumns="False"
-                  CanUserDeleteRows="True"
-                  CanUserAddRows="False"
-                  CanUserReorderColumns="True"
-                  RowHeaderWidth="15">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Zone Type"
-                                    Binding="{Binding ZoneType}"
-                                    IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Zone"
-                                    Binding="{Binding Zone}"
-                                    IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Bin"
-                                    Binding="{Binding UoM}"
-                                    IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Item Number"
-                                    Binding="{Binding Item}"
-                                    IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Item Description"
-                                    Binding="{Binding Description}"
-                                    IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Base Qty"
-                                    Binding="{Binding BaseQty}"
-                                    IsReadOnly="True"/>
-                        <DataGridCheckBoxColumn Header="Un-committed"
-                                        Binding="{Binding NonCommitted, Mode=OneWay}"
-                                        IsReadOnly="True"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </DockPanel>
+            <comp:PotentNegResultListView Grid.Column="2"
+                                          DataContext="{Binding ReplenishmentVM}"/>
         </Grid>
 
             

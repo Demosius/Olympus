@@ -4,43 +4,29 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using Panacea.Interfaces;
 using Panacea.Models;
 using Panacea.Properties;
 using Panacea.ViewModels.Commands;
-using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
-using Uranus.Inventory;
 
 namespace Panacea.ViewModels.Components;
 
-public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IItemData
+public class PotentNegResultListVM : INotifyPropertyChanged, IFilters, IBinData, IItemData
 {
-    public Helios Helios { get; set; }
-    public List<NegativeCheckResult> CheckResults { get; set; }
+    public List<PotentNegCheckResult> CheckResults { get; set; }
+    public string Header { get; set; }
 
     #region INotifyPropertyChanged Members
-
-    private string checkZoneString;
-    public string CheckZoneString
-    {
-        get => checkZoneString;
-        set
-        {
-            checkZoneString = value;
-            OnPropertyChanged();
-            Settings.Default.NegativeZones = value;
-            Settings.Default.Save();
-        }
-    }
-
-    private ObservableCollection<NegativeCheckResult> filteredCheckResults;
-    public ObservableCollection<NegativeCheckResult> FilteredCheckResults
+    
+    private ObservableCollection<PotentNegCheckResult> filteredCheckResults;
+    public ObservableCollection<PotentNegCheckResult> FilteredCheckResults
     {
         get => filteredCheckResults;
         set
@@ -49,7 +35,7 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
             OnPropertyChanged();
         }
     }
-
+    
     private string zoneFilter;
     public string ZoneFilter
     {
@@ -57,19 +43,6 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
         set
         {
             zoneFilter = value;
-            OnPropertyChanged();
-            ApplyFilters();
-        }
-    }
-
-
-    private bool trueNegative;
-    public bool TrueNegative
-    {
-        get => trueNegative;
-        set
-        {
-            trueNegative = value;
             OnPropertyChanged();
             ApplyFilters();
         }
@@ -84,17 +57,17 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
     public ApplySortingCommand ApplySortingCommand { get; set; }
     public BinsToClipboardCommand BinsToClipboardCommand { get; set; }
     public ItemsToClipboardCommand ItemsToClipboardCommand { get; set; }
-    public RunNegativeChecksCommand RunNegativeChecksCommand { get; set; }
 
     #endregion
 
-    public NegativeCheckerVM(Helios helios)
+    public PotentNegResultListVM(string header)
     {
-        Helios = helios;
+        Header = header;
 
-        CheckResults = new List<NegativeCheckResult>();
-        checkZoneString = Settings.Default.NegativeZones;
-        filteredCheckResults = new ObservableCollection<NegativeCheckResult>();
+        CheckResults = new List<PotentNegCheckResult>();
+
+        filteredCheckResults = new ObservableCollection<PotentNegCheckResult>();
+
         zoneFilter = string.Empty;
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
@@ -102,7 +75,6 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
         ApplySortingCommand = new ApplySortingCommand(this);
         BinsToClipboardCommand = new BinsToClipboardCommand(this);
         ItemsToClipboardCommand = new ItemsToClipboardCommand(this);
-        RunNegativeChecksCommand = new RunNegativeChecksCommand(this);
     }
 
     public void BinsToClipboard()
@@ -119,7 +91,6 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
         MessageBox.Show($"{binList.Count} items added to clipboard.");
     }
 
-
     public void ClearFilters()
     {
         ZoneFilter = string.Empty;
@@ -128,7 +99,7 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
 
     public void ApplyFilters()
     {
-        IEnumerable<NegativeCheckResult> results = CheckResults;
+        IEnumerable<PotentNegCheckResult> results = CheckResults;
 
         if (ZoneFilter != string.Empty)
         {
@@ -136,9 +107,7 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
             results = results.Where(res => regex.IsMatch(res.Zone));
         }
 
-        if (TrueNegative) results = results.Where(res => res.BalanceQty < 0);
-
-        FilteredCheckResults = new ObservableCollection<NegativeCheckResult>(results);
+        FilteredCheckResults = new ObservableCollection<PotentNegCheckResult>(results);
     }
 
     public void ApplySorting()
@@ -146,33 +115,11 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
         throw new NotImplementedException();
     }
 
-    public void RunNegativeChecks()
+    public void SetResults(List<PotentNegCheckResult> newCheckResults)
     {
-        Mouse.OverrideCursor = Cursors.Wait;
+        CheckResults = newCheckResults;
 
-        CheckResults.Clear();
-
-        var zones = checkZoneString.ToUpper().Split(',', '|').ToList();
-
-        // Pull dataSet.
-        var dataSet = Helios.InventoryReader.IWMBDataSet(zones);
-        if (dataSet is null)
-        {
-            MessageBox.Show("Failed to pull relevant data.");
-            return;
-        }
-
-        foreach (var stock in dataSet.Stock.Where(stock => stock.Zone?.ZoneType == EZoneType.Pick && stock.HasNegativeUoM))
-        {
-            if (stock.Eaches?.IsNegative ?? false) CheckResults.Add(new NegativeCheckResult(stock, EUoM.EACH));
-            if (stock.Packs?.IsNegative ?? false) CheckResults.Add(new NegativeCheckResult(stock, EUoM.PACK));
-            if (stock.Cases?.IsNegative ?? false) CheckResults.Add(new NegativeCheckResult(stock, EUoM.CASE));
-        }
-
-        // Show results.
         ApplyFilters();
-
-        Mouse.OverrideCursor = Cursors.Arrow;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -20,5 +20,8 @@
     <Setting Name="NegativeZones" Type="System.String" Scope="User">
       <Value Profile="(Default)">PK|SP PK|BLK SS|BLK PK|SUP PK|OS|PR|HR|ROX</Value>
     </Setting>
+    <Setting Name="PotentNegZones" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PK|SP PK|BLK SS|BLK PK|SUP PK|OS|PR|HR|ROX</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

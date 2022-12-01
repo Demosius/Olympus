@@ -54,6 +54,21 @@ public class Stock : IEnumerable
                                             (Packs?.IsNegative ?? false) ||
                                              (Cases?.IsNegative ?? false);
 
+    [Ignore]
+    public int BasePickQty => (Eaches?.PickQty ?? 0) +
+                              (Packs?.PickQty ?? 0) * (Item?.QtyPerPack ?? 1) +
+                              (Cases?.PickQty ?? 0) * (Item?.QtyPerCase ?? 1);
+
+    [Ignore]
+    public int BasePutAwayQty => (Eaches?.PutAwayQty ?? 0) +
+                                 (Packs?.PutAwayQty ?? 0) * (Item?.QtyPerPack ?? 1) +
+                                 (Cases?.PutAwayQty ?? 0) * (Item?.QtyPerCase ?? 1);
+
+    [Ignore]
+    public int BaseAvailableQty => (Eaches?.AvailableQty ?? 0) +
+                                   (Packs?.AvailableQty ?? 0) * (Item?.QtyPerPack ?? 1) +
+                                   (Cases?.AvailableQty ?? 0) * (Item?.QtyPerCase ?? 1);
+
     public Stock()
     {
         ID = string.Empty;

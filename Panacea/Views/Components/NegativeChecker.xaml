@@ -31,6 +31,11 @@
                          MinWidth="80"
                          Margin="2"/>
                 <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+                <Label Content="True Negatives:"/>
+                <CheckBox IsChecked="{Binding TrueNegative, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          ToolTip="Hide results with a total balance quantity greater than or equal to 0."/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+
                 <Button Content="Get Bins"
                         Margin="2"
                         ToolTip="Add listed bins as pipe-separated string into the clipboard."

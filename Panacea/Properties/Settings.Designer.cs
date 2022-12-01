@@ -94,5 +94,17 @@ namespace Panacea.Properties {
                 this["NegativeZones"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PK|SP PK|BLK SS|BLK PK|SUP PK|OS|PR|HR|ROX")]
+        public string PotentNegZones {
+            get {
+                return ((string)(this["PotentNegZones"]));
+            }
+            set {
+                this["PotentNegZones"] = value;
+            }
+        }
     }
 }
