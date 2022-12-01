@@ -29,7 +29,6 @@
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
     <None Remove="Resources\Fonts\DIN Medium.ttf" />
     <None Remove="Resources\Fonts\DIN.ttf" />
-    <None Remove="Resources\Hydra.ico" />
     <None Remove="Resources\plus-circle-frame.png" />
     <None Remove="Resources\plus-small.png" />
     <None Remove="Resources\plus.png" />
@@ -44,9 +43,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resources\Hydra.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Sphynx.ico" />
   </ItemGroup>
 

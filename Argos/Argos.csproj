@@ -29,7 +29,6 @@
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
     <None Remove="Resources\Fonts\DIN Medium.ttf" />
     <None Remove="Resources\Fonts\DIN.ttf" />
-    <None Remove="Resources\Hydra.ico" />
     <None Remove="Resources\plus-circle-frame.png" />
     <None Remove="Resources\plus-small.png" />
     <None Remove="Resources\plus.png" />
@@ -45,9 +44,6 @@
 
   <ItemGroup>
     <Content Include="Argos.ico" />
-    <Content Include="Resources\Hydra.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
