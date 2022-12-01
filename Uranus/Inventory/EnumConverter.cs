@@ -38,6 +38,14 @@ public enum EVolume
     High
 }
 
+public enum EZoneType
+{
+    Overstock,
+    Pick,
+    HoldZone,
+    Shipping,
+    QualityControl
+}
 
 public static class EnumConverter
 {

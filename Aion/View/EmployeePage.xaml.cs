@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Styx;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Styx;
 using Uranus;
 
 namespace Aion.View;
@@ -38,8 +38,8 @@ public partial class EmployeePage
         var headerName = e.Column.Header.ToString();
 
         //Cancel the column you don't want to generate
-        if (new List<string> { "DisplayName", "PayRate", "RF_ID", "PC_ID", "ReportsToID", "LockerID", "PhoneNumber", "Email", "Email", "Address", "IconName", 
-                "Department", "Role", "Locker", "Licence", "Icon", "Vehicles", "Shifts", "DepartmentsCanWorkIn", "Projects", "InductionReferences", "Rules", 
+        if (new List<string> { "DisplayName", "PayRate", "RF_ID", "PC_ID", "ReportsToID", "LockerID", "PhoneNumber", "Email", "Email", "Address", "IconName",
+                "Department", "Role", "Locker", "Licence", "Icon", "Vehicles", "Shifts", "DepartmentsCanWorkIn", "Projects", "InductionReferences", "Rules",
                 "Reports", "ShiftEntries", "Rosters", "FullName", "ReportsTo" }.Contains(headerName))
         {
             e.Cancel = true;

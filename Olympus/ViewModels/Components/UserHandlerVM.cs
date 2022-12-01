@@ -1,6 +1,7 @@
 ﻿using Olympus.ViewModels.Commands;
 using Olympus.Views;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Olympus.ViewModels.Components;
 
@@ -39,7 +40,7 @@ public class UserHandlerVM : INotifyPropertyChanged
     public UserHandlerVM(OlympusVM olympusVM) : this()
     {
         ParentVM = olympusVM;
-        LogIn();
+        Task.Run(LogIn);
     }
 
     public void CheckUser()

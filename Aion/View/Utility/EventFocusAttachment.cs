@@ -26,14 +26,14 @@ public class EventFocusAttachment
             button.Click += (s, args) =>
             {
                 var control = GetElementToFocus(button);
-                    
+
                 if (control is null) return;
-                    
+
                 control.Focus();
-                    
+
                 if (control is not TextBox tb) return;
-                    
-                tb.AppendText(((Button) sender).Content.ToString());
+
+                tb.AppendText(((Button)sender).Content.ToString());
                 tb.CaretIndex = tb.Text.Length;
             };
         }

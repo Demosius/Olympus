@@ -1,7 +1,7 @@
-﻿using System;
-using System.IO;
-using Aion.Properties;
+﻿using Aion.Properties;
 using Styx;
+using System;
+using System.IO;
 using Uranus;
 
 namespace Aion;

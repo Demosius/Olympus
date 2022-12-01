@@ -146,7 +146,7 @@ public sealed class StringFormatMethodAttribute : Attribute
 /// }
 /// </code></example>
 [AttributeUsage(AttributeTargets.Parameter)]
-public sealed class StructuredMessageTemplateAttribute : Attribute {}
+public sealed class StructuredMessageTemplateAttribute : Attribute { }
 
 /// <summary>
 /// Use this annotation to specify a type that contains static or const fields

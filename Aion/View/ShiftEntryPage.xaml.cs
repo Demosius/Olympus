@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Styx;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Styx;
 using Uranus;
 
 namespace Aion.View;
@@ -137,7 +137,7 @@ public partial class ShiftEntryPage
         grid.Columns.First(c => c.Header.ToString() == "Time Worked").DisplayIndex = 11;
         grid.Columns.First(c => c.Header.ToString() == "Comments").DisplayIndex = 12;
         grid.Columns.First(c => c.Header.ToString() == "Department").DisplayIndex = 13;
-            
+
     }
 
     private void EntryGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)

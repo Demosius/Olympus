@@ -1,6 +1,6 @@
-﻿using System;
+﻿using AionClock.Properties;
+using System;
 using System.IO;
-using AionClock.Properties;
 using Uranus;
 
 namespace AionClock;

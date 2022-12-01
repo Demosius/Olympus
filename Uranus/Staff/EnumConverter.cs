@@ -10,7 +10,11 @@ public enum EProject
     Khaos,
     Aion,
     Hydra,
-    FixedBinChecker
+    Cadmus,
+    Sphynx,
+    Argos,
+    Hades,
+    Panacea,
 }
 
 public enum ELicence
@@ -36,6 +40,11 @@ public static class EnumConverter
             "PROMETHEUS" => EProject.Prometheus,
             "AION" => EProject.Aion,
             "HYDRA" => EProject.Hydra,
+            "CADMUS" => EProject.Cadmus,
+            "SPHYNX" => EProject.Sphynx,
+            "ARGOS" => EProject.Argos,
+            "HADES" => EProject.Hades,
+            "PANACEA" => EProject.Panacea,
             _ => EProject.None
         };
     }

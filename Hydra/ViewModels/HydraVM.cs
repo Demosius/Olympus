@@ -1,9 +1,9 @@
-﻿using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using Hydra.ViewModels.Controls;
+﻿using Hydra.ViewModels.Controls;
 using Styx;
 using Styx.Interfaces;
+using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;

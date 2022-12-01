@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Hydra.ViewModels.Controls;
+using System;
 using System.Windows.Input;
-using Hydra.ViewModels.Controls;
 
 namespace Hydra.ViewModels.Commands;
 

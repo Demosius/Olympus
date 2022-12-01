@@ -71,6 +71,7 @@ public class NAVItem : IEquatable<NAVItem>
     [Ignore] public Stock? Stock { get; set; }
     [Ignore] public Dictionary<string, Stock> StockDict { get; set; }
     [Ignore] public Dictionary<string, Stock> SiteStockDict { get; set; }
+    [Ignore] public Stock? AvailableStock { get; set; } // Stock existing in Pick and Overstock zones.
 
     public NAVItem()
     {
@@ -184,12 +185,22 @@ public class NAVItem : IEquatable<NAVItem>
         if (!StockDict.TryGetValue(newStock.BinID, out _))
             StockDict.Add(newStock.BinID, newStock);
 
-        if (newStock.Site is null) return;
+        if (newStock.Site is not null)
+        {
+            if (SiteStockDict.TryGetValue(newStock.Site.Name, out var oldStock))
+                oldStock.Add(newStock);
+            else
+                SiteStockDict.Add(newStock.Site.Name, newStock.Copy());
+        }
 
-        if (SiteStockDict.TryGetValue(newStock.Site.Name, out var oldStock))
-            oldStock.Add(newStock);
-        else
-            SiteStockDict.Add(newStock.Site.Name, newStock.Copy());
+        // ReSharper disable once InvertIf
+        if (newStock.Zone?.ZoneType is EZoneType.Pick or EZoneType.Overstock)
+        {
+            if (AvailableStock is null)
+                AvailableStock = newStock.Copy();
+            else
+                AvailableStock.Add(newStock);
+        }
     }
 
     public void RemoveStock(Stock stock)

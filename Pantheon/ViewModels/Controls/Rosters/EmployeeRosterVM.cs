@@ -165,7 +165,7 @@ public class EmployeeRosterVM : INotifyPropertyChanged
         FridayRoster = new RosterVM(roster.FridayRoster!);
         SaturdayRoster = new RosterVM(roster.SaturdayRoster!);
         SundayRoster = new RosterVM(roster.SundayRoster!);
-        
+
         shifts = new ObservableCollection<Shift>(roster.Shifts);
     }
 

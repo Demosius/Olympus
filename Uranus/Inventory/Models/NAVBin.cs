@@ -181,11 +181,11 @@ public class NAVBin
     public void AddStock(Stock newStock)
     {
         if (Stock.TryGetValue(newStock.ItemNumber, out var oldStock))
-            oldStock.Merge(newStock);
+            newStock.Merged = oldStock.Merge(newStock);
         else
             Stock.Add(newStock.ItemNumber, newStock);
     }
-    
+
     public void RemoveStock(Stock stock)
     {
         if (!Stock.TryGetValue(stock.ItemNumber, out var currentStock)) return;

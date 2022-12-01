@@ -10,8 +10,8 @@ public class InOutColourConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         var val = (value as string)?.ToUpper();
-        return val == "IN" 
-            ? new SolidColorBrush(Colors.Green) 
+        return val == "IN"
+            ? new SolidColorBrush(Colors.Green)
             : new SolidColorBrush(Colors.Red);
     }
 

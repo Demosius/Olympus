@@ -1,4 +1,5 @@
-﻿using Prometheus.Views.Pages.Users;
+﻿using System.Collections.Generic;
+using Prometheus.Views.Pages.Users;
 using Styx;
 using Styx.Interfaces;
 using System.Collections.ObjectModel;
@@ -22,6 +23,7 @@ internal class UserVM : INotifyPropertyChanged, IDataSource
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }
 
+    public Dictionary<EUserPage, Page?> PageDict { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -52,14 +54,18 @@ internal class UserVM : INotifyPropertyChanged, IDataSource
 
     #endregion
 
-    public UserVM()
+    public UserVM(Helios helios, Charon charon)
     {
+        SetDataSources(helios, charon);
+
         Pages = new ObservableCollection<EUserPage>()
         {
             EUserPage.Users,
             EUserPage.Activate,
             EUserPage.Roles
         };
+
+        PageDict = new Dictionary<EUserPage, Page?>();
     }
 
     public void SetDataSources(Helios helios, Charon charon)
@@ -72,16 +78,21 @@ internal class UserVM : INotifyPropertyChanged, IDataSource
     {
         if (Helios is null || Charon is null || page is null) return;
 
-        CurrentPage = page switch
+        var ePage = (EUserPage)page;
+
+        if (!PageDict.TryGetValue(ePage, out var newPage))
         {
-            // TODO: Compare/convert to dictionary to hold loaded pages.
-            // Load each time for now. Will mean data is always up to date on each page, and there shouldn't 
-            // be an excessive amount of data to load... hopefully.
-            EUserPage.Users => new UserViewPage(Helios, Charon),
-            EUserPage.Activate => new UserActivatePage(Helios, Charon),
-            EUserPage.Roles => new UserDeactivatePage(Helios, Charon),
-            _ => currentPage
-        };
+            newPage = page switch
+            {
+                EUserPage.Users => new UserViewPage(Helios, Charon),
+                EUserPage.Activate => new UserActivatePage(Helios, Charon),
+                EUserPage.Roles => new UserDeactivatePage(Helios, Charon),
+                _ => currentPage
+            };
+            PageDict.Add(ePage, newPage);
+        }
+        
+        CurrentPage = newPage;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

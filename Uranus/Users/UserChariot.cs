@@ -16,7 +16,7 @@ public sealed class UserChariot : MasterChariot
 {
     public override string DatabaseName => "Users.sqlite";
 
-    public override Type[] Tables { get; } = 
+    public override Type[] Tables { get; } =
     {
         typeof(User), typeof(Role), typeof(Login)
     };

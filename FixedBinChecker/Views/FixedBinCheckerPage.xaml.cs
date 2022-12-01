@@ -1,5 +1,5 @@
-﻿using System;
-using FixedBinChecker.ViewModels;
+﻿using FixedBinChecker.ViewModels;
+using System;
 using Uranus;
 using Uranus.Interfaces;
 using Uranus.Staff;

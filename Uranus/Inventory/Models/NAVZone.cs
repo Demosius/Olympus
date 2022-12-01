@@ -57,6 +57,13 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
 
     [Ignore] public Dictionary<int, Stock> Stock { get; set; }
 
+    [Ignore]
+    public EZoneType ZoneType
+    {
+        get => (Extension ??= new ZoneExtension(this)).ZoneType;
+        set => (Extension ??= new ZoneExtension(this)).ZoneType = value;
+    }
+
     public NAVZone()
     {
         ID = string.Empty;

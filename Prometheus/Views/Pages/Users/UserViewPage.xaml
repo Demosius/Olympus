@@ -6,12 +6,9 @@
       xmlns:sys="clr-namespace:System;assembly=System.Runtime"
       xmlns:users="clr-namespace:Prometheus.ViewModels.Pages.Users"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance users:UserViewVM, IsDesignTimeCreatable=False}"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="UserViewPage">
-
-    <Page.DataContext>
-        <users:UserViewVM x:Name="VM"/>
-    </Page.DataContext>
 
     <Page.Resources>
         <ResourceDictionary Source="../../../Themes/MSControls.Core.Implicit.xaml"/>

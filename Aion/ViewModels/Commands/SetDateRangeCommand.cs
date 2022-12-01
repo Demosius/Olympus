@@ -15,12 +15,12 @@ public class SetDateRangeCommand : ICommand
 
     public bool CanExecute(object parameter)
     {
-        return (VM.MinDate.Date != VM.InitialMin.Date || VM.MaxDate.Date != VM.InitialMax.Date);
+        return VM.MinDate.Date != VM.InitialMin.Date || VM.MaxDate.Date != VM.InitialMax.Date;
     }
 
     public void Execute(object parameter)
     {
-        var w = (Window) parameter;
+        var w = (Window)parameter;
         VM.SetDateRange();
         w.Close();
     }

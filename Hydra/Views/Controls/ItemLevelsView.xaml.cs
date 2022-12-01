@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Hydra.ViewModels.Controls;
 using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Hydra.ViewModels.Controls;
 
 namespace Hydra.Views.Controls
 {
@@ -26,7 +15,7 @@ namespace Hydra.Views.Controls
         {
             InitializeComponent();
         }
-        
+
         private void DataGrid_OnSelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
             var addedItems = e.AddedCells;
@@ -41,7 +30,7 @@ namespace Hydra.Views.Controls
 
             if (col.Header.ToString() != "Item")
             {
-                ((DataGridTextColumn) col).ElementStyle = new Style(typeof(TextBlock))
+                ((DataGridTextColumn)col).ElementStyle = new Style(typeof(TextBlock))
                 {
                     Setters =
                     {

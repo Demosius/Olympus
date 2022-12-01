@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Aion.ViewModels.Commands;
+using System.Collections.Generic;
 using System.ComponentModel;
-using Aion.ViewModels.Commands;
 using Uranus;
 using Uranus.Staff.Models;
 

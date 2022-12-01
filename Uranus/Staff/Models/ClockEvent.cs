@@ -1,7 +1,7 @@
-﻿using System;
-using System.ComponentModel;
-using SQLite;
+﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
+using System;
+using System.ComponentModel;
 
 namespace Uranus.Staff.Models;
 
