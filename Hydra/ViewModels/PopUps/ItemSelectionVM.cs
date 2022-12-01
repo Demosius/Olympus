@@ -1,6 +1,7 @@
 ﻿using Hydra.Interfaces;
 using Hydra.ViewModels.Commands;
 using Hydra.ViewModels.Controls;
+using Morpheus;
 using Styx;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
-using Morpheus;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;

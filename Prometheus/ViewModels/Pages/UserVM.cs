@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Prometheus.Views.Pages.Users;
+﻿using Prometheus.Views.Pages.Users;
 using Styx;
 using Styx.Interfaces;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -91,7 +91,7 @@ internal class UserVM : INotifyPropertyChanged, IDataSource
             };
             PageDict.Add(ePage, newPage);
         }
-        
+
         CurrentPage = newPage;
     }
 

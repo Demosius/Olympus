@@ -1,7 +1,7 @@
 ﻿using Prometheus.ViewModels.Helpers;
+using Prometheus.ViewModels.Pages;
 using Styx;
 using System.Windows.Navigation;
-using Prometheus.ViewModels.Pages;
 using Uranus;
 
 namespace Prometheus.Views.Pages;

@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              d:DataContext="{d:DesignInstance {x:Type components:ProjectLauncherVM}, d:IsDesignTimeCreatable=False}"
              xmlns:components="clr-namespace:Olympus.ViewModels.Components"
-             mc:Ignorable="d">
+             mc:Ignorable="d"
+             MaxHeight="300">
 
     <UserControl.DataContext>
         <components:ProjectLauncherVM x:Name="VM"/>

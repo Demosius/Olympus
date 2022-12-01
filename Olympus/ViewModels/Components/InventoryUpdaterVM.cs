@@ -1,11 +1,11 @@
-﻿using Olympus.Properties;
+﻿using Morpheus;
+using Olympus.Properties;
 using Olympus.ViewModels.Commands;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
-using Morpheus;
 using Uranus;
 using Uranus.Inventory;
 using Uranus.Inventory.Models;

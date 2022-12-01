@@ -1,7 +1,7 @@
 ﻿using Olympus.ViewModels.Commands;
 using Olympus.Views;
 using System.ComponentModel;
-using System.Threading.Tasks;
+using Application = System.Windows.Application;
 
 namespace Olympus.ViewModels.Components;
 
@@ -40,7 +40,6 @@ public class UserHandlerVM : INotifyPropertyChanged
     public UserHandlerVM(OlympusVM olympusVM) : this()
     {
         ParentVM = olympusVM;
-        Task.Run(LogIn);
     }
 
     public void CheckUser()
@@ -69,7 +68,10 @@ public class UserHandlerVM : INotifyPropertyChanged
     public void LogIn()
     {
         var user = App.Charon.User;
-        LoginWindow login = new();
+        LoginWindow login = new()
+        {
+            Owner = Application.Current.MainWindow
+        };
         _ = login.ShowDialog();
         CheckUser();
         if (user != App.Charon.User) ParentVM.ClearRunningProjects();

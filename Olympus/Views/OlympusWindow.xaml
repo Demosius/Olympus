@@ -10,7 +10,8 @@
         MinWidth="400"
         MinHeight="300"
         Background="{DynamicResource BackGroundBrush}"
-        Closing="MainWindow_Closing">
+        Closing="MainWindow_Closing"
+        Loaded="MainWindow_OnLoaded">
 
     <Window.DataContext>
         <viewModels:OlympusVM x:Name="VM"/>
@@ -87,18 +88,18 @@
 
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <components:ProjectLauncher Grid.Column="0"
-                                     DataContext="{Binding ProjectLauncherVM, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                     Margin="0"/>
+                                        DataContext="{Binding ProjectLauncherVM, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                        Margin="0"/>
 
             <components:InventoryUpdater Grid.Column="2"
-                                      DataContext="{Binding InventoryUpdaterVM, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                      Margin="0"/>
+                                         DataContext="{Binding InventoryUpdaterVM, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                         Margin="0"/>
         </Grid>
         <Frame Content="{Binding CurrentProject, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                Margin="2,0,2,2" 

@@ -1,6 +1,7 @@
 ﻿using Olympus.Properties;
 using System.Globalization;
 using System.Threading;
+using System.Windows;
 using System.Windows.Navigation;
 
 namespace Olympus.Views;
@@ -25,5 +26,10 @@ public partial class MainWindow
     private void Frame_OnNavigating(object sender, NavigatingCancelEventArgs e)
     {
         if (e.NavigationMode is NavigationMode.Forward or NavigationMode.Back) e.Cancel = true;
+    }
+
+    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+    {
+        VM.UserHandlerVM.LogIn();
     }
 }

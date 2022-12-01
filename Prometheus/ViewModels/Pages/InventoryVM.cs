@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Morpheus.Views;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
-using Morpheus.Views;
 using Uranus;
 using Uranus.Annotations;
 
