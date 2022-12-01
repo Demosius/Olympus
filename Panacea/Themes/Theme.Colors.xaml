@@ -5,6 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
 
     <!-- ********************************** THEME BRUSHES - For Color Tuner **********************************-->
+    <SolidColorBrush x:Key="Brush00" Color="#FFF0CCFF"/>
     <SolidColorBrush x:Key="Brush01" Color="#FFD8AAF8"/>
     <SolidColorBrush x:Key="Brush02" Color="White"/>
     <SolidColorBrush x:Key="Brush03" Color="#FFC6C6C6"/>

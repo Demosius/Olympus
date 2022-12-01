@@ -1,4 +1,6 @@
 ﻿using Prometheus.ViewModels.Helpers;
+using Prometheus.ViewModels.Pages;
+using Uranus;
 
 namespace Prometheus.Views.Pages;
 
@@ -7,9 +9,10 @@ namespace Prometheus.Views.Pages;
 /// </summary>
 public partial class InventoryPage
 {
-    public InventoryPage()
+    public InventoryPage(Helios helios)
     {
         InitializeComponent();
+        DataContext = new InventoryVM(helios);
     }
 
     public override EDataCategory DataCategory => EDataCategory.Inventory;

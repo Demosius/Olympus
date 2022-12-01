@@ -42,7 +42,7 @@
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"			     
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                               SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
-                                              TextBlock.Foreground="{DynamicResource Brush01}"
+                                              TextBlock.Foreground="{DynamicResource Brush00}"
                                               Margin="2"/>
                         </Border>
                     </Grid>
@@ -65,7 +65,7 @@
 
     <!-- ********************************* DataGrid Cell Style ********************************* -->
     <Style TargetType="{x:Type DataGridCell}" x:Key="DataGridCellStyle">
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource Brush01}"/>
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource Brush00}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type DataGridCell}">

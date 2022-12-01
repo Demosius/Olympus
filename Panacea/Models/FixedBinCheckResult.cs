@@ -5,7 +5,7 @@ using Uranus.Inventory.Models;
 
 namespace Panacea.Models;
 
-public class ItemCheckResult
+public class FixedBinCheckResult
 {
     public NAVItem Item { get; set; }
 
@@ -24,7 +24,7 @@ public class ItemCheckResult
 
     #endregion
 
-    public ItemCheckResult(NAVItem coreItem, ICollection<string> fixedZones)
+    public FixedBinCheckResult(NAVItem coreItem, ICollection<string> fixedZones)
     {
         Item = coreItem;
         FixedSubStock = new List<SubStock>();

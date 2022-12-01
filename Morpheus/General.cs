@@ -1,12 +1,11 @@
-﻿using Hydra.Properties;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Windows;
 
-namespace Hydra;
+namespace Morpheus;
 
 public class FileDoesNotExistException : Exception
 {
@@ -87,30 +86,6 @@ public static class Utility
     /// <returns></returns>
     public static List<string> ValidateTableData(DataTable data, List<string> columns)
     {
-        List<string> missing = new();
-        foreach (var column in columns)
-        {
-            if (!data.Columns.Contains(column))
-            {
-                missing.Add(column);
-            }
-        }
-        return missing;
+        return columns.Where(column => !data.Columns.Contains(column)).ToList();
     }
-
-    public static bool MoveDataBase(string newLocation)
-    {
-        // TODO: Expand on this to make sure everything that should happen during database re-assignment, does.
-        try
-        {
-            Settings.Default.SolLocation = newLocation;
-            return true;
-        }
-        catch (Exception ex)
-        {
-            General.ShowUnexpectedException(ex);
-            return false;
-        }
-    }
-
 }

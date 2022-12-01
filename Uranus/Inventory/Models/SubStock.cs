@@ -19,6 +19,8 @@ public class SubStock
 
     [Ignore] public int AvailableQty => Qty - PickQty - NegAdjQty;
     [Ignore] public int BalanceQty => Qty - PickQty + PutAwayQty - NegAdjQty + PosAdjQty;
+    [Ignore] public bool NonCommitted => PickQty == 0 && NegAdjQty == 0 && PosAdjQty == 0 && PutAwayQty == 0;
+    [Ignore] public bool IsNegative => AvailableQty < 0 || BalanceQty < 0;
 
     public EUoM UoM { get; set; }
 
@@ -41,6 +43,11 @@ public class SubStock
     {
         UoM = uom;
         ID = string.Join(":", StockID, UoM);
+    }
+
+    public SubStock(Stock stock, EUoM uom, int qty) : this(stock, uom)
+    {
+        Qty = qty;
     }
 
     public SubStock(Stock stock, NAVStock navStock) : this(stock)

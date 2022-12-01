@@ -9,8 +9,70 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <DockPanel>
-        <TextBox DockPanel.Dock="Top"
-                 Text="{Binding CheckZoneString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>            
-        <Grid></Grid>
+        <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+            <WrapPanel Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Zones: "></Label>
+                    <TextBox Text="{Binding CheckZoneString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             MinWidth="100"
+                             Margin="2"/>
+                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Ignore Different UoMs"/>
+                    <CheckBox ToolTip="Will only check for multiple bins with the same UoM."
+                              IsChecked="{Binding AllowSeparatedUoMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+                </StackPanel>
+                
+                <Button Content="Run"
+                        Command="{Binding RunIWMBChecksCommand}"
+                        Width="100"
+                        HorizontalAlignment="Left"
+                        Margin="2"/>
+            </WrapPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Zone Type: "/>
+                <TextBox Text="{Binding ZoneTypeFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         MinWidth="80"
+                         Margin="2"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+                <Label Content="Zone: "/>
+                <TextBox Text="{Binding ZoneFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         MinWidth="80"
+                         Margin="2"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+                <Button Content="Get Items"
+                        Margin="2"
+                        ToolTip="Add listed items as pipe-separated string into the clipboard."
+                        Command="{Binding ItemsToClipboardCommand}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Data View -->
+        <DataGrid ItemsSource="{Binding FilteredCheckResults}"
+                  AutoGenerateColumns="False"
+                  CanUserDeleteRows="True"
+                  CanUserAddRows="False"
+                  CanUserReorderColumns="True"
+                  RowHeaderWidth="15">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Zone Type"
+                                    Binding="{Binding ZoneType}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Zones"
+                                    Binding="{Binding ZoneString}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Item Number"
+                                    Binding="{Binding Number}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Item Description"
+                                    Binding="{Binding Description}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Bins"
+                                    Binding="{Binding BinString}"
+                                    IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
     </DockPanel>
 </UserControl>

@@ -46,5 +46,65 @@ namespace Panacea.Properties {
                 this["IWMBZones"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IWMBAllowSeparateUoMs {
+            get {
+                return ((bool)(this["IWMBAllowSeparateUoMs"]));
+            }
+            set {
+                this["IWMBAllowSeparateUoMs"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PK|SP PK|BLK PK")]
+        public string BWMIZones {
+            get {
+                return ((string)(this["BWMIZones"]));
+            }
+            set {
+                this["BWMIZones"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PK|SP PK|PO PK|BLK PK|SUP PK|BLK SS|HR|PR|OS|OZ|PARK|REFURB|MC")]
+        public string PurgeZones {
+            get {
+                return ((string)(this["PurgeZones"]));
+            }
+            set {
+                this["PurgeZones"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PK|SP PK|BLK SS|BLK PK|SUP PK|OS|PR|HR|ROX")]
+        public string NegativeZones {
+            get {
+                return ((string)(this["NegativeZones"]));
+            }
+            set {
+                this["NegativeZones"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PK|SP PK|BLK SS|BLK PK|SUP PK|OS|PR|HR|ROX")]
+        public string PotentNegZones {
+            get {
+                return ((string)(this["PotentNegZones"]));
+            }
+            set {
+                this["PotentNegZones"] = value;
+            }
+        }
     }
 }

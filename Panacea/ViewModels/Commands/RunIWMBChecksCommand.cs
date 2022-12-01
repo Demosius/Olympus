@@ -1,24 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Panacea.ViewModels.Components;
 
 namespace Panacea.ViewModels.Commands;
 
-public class RunChecksCommand : ICommand
-{
-    public FixedBinCheckerVM VM { get; set; }
 
-    public RunChecksCommand(FixedBinCheckerVM vm) { VM = vm; }
+public class RunIWMBChecksCommand : ICommand
+{
+    public ItemsWithMultipleBinsVM VM { get; set; }
+
+    public RunIWMBChecksCommand(ItemsWithMultipleBinsVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.FixedZoneString != string.Empty && VM.FromZoneString != string.Empty &&
-               (VM.CheckCase || VM.CheckPack || VM.CheckEach || VM.CheckExclusiveEach);
+    return true;
     }
 
     public void Execute(object? parameter)
     {
-        VM.RunChecks();
+        VM.RunIWMBChecks();
     }
 
     public event EventHandler? CanExecuteChanged

@@ -19,7 +19,7 @@ namespace Panacea.ViewModels.Components;
 public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
 {
     public Helios Helios { get; set; }
-    public List<ItemCheckResult> CheckResults { get; set; }
+    public List<FixedBinCheckResult> CheckResults { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -94,8 +94,8 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
         }
     }
 
-    private ObservableCollection<ItemCheckResult> filteredCheckResults;
-    public ObservableCollection<ItemCheckResult> FilteredCheckResults
+    private ObservableCollection<FixedBinCheckResult> filteredCheckResults;
+    public ObservableCollection<FixedBinCheckResult> FilteredCheckResults
     {
         get => filteredCheckResults;
         set
@@ -134,7 +134,7 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
 
     #region Commands
 
-    public RunChecksCommand RunChecksCommand { get; set; }
+    public RunFixedBinChecksCommand RunChecksCommand { get; set; }
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
@@ -147,11 +147,11 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
         Helios = helios;
         fromZoneString = string.Empty;
         fixedZoneString = string.Empty;
-        CheckResults = new List<ItemCheckResult>();
-        filteredCheckResults = new ObservableCollection<ItemCheckResult>();
+        CheckResults = new List<FixedBinCheckResult>();
+        filteredCheckResults = new ObservableCollection<FixedBinCheckResult>();
         binFilter = string.Empty;
 
-        RunChecksCommand = new RunChecksCommand(this);
+        RunChecksCommand = new RunFixedBinChecksCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
@@ -183,7 +183,7 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
         }
 
         // Convert items in dataSet to result collection.
-        foreach (var item in items) CheckResults.Add(new ItemCheckResult(item, fixedZones));
+        foreach (var item in items) CheckResults.Add(new FixedBinCheckResult(item, fixedZones));
 
         // Run checks against results.
         foreach (var result in CheckResults)
@@ -214,7 +214,7 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
 
     public void ApplyFilters()
     {
-        IEnumerable<ItemCheckResult> results = CheckResults;
+        IEnumerable<FixedBinCheckResult> results = CheckResults;
 
         if (PassFilter is not null)
             results = results.Where(res => PassFilter == res.PassCheck);
@@ -225,7 +225,7 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
             results = results.Where(res => regex.IsMatch(res.FixedBins));
         }
 
-        FilteredCheckResults = new ObservableCollection<ItemCheckResult>(results);
+        FilteredCheckResults = new ObservableCollection<FixedBinCheckResult>(results);
     }
 
     public void ApplySorting()
