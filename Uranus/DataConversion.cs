@@ -13,7 +13,7 @@ namespace Uranus;
 public static class DataConversion
 {
     // Set dictionary head positions, based on a string array from the head of the assumed data.
-    public static void SetHeadPosFromArray(ref Dictionary<string, int> headDict, string[] headArr)
+    public static void SetHeadPosFromArray(ref Dictionary<string, int> headDict, string[] headArr, string dataType)
     {
         List<string> missingHeads = new();
 
@@ -22,7 +22,8 @@ public static class DataConversion
             headDict[key] = Array.IndexOf(headArr, key);
             if (headDict[key] == -1) missingHeads.Add(key);
         }
-        if (missingHeads.Count > 0) throw new InvalidDataException(missingHeads);
+
+        if (missingHeads.Count > 0) throw new InvalidDataException($"Missing columns for {dataType} conversion.", missingHeads);
     }
 
     /// <summary>
@@ -55,7 +56,7 @@ public static class DataConversion
         // First set the headers.
         var line = reader.ReadLine();
         var headArr = line?.Split('\t') ?? Array.Empty<string>();
-        SetHeadPosFromArray(ref headDict, headArr);
+        SetHeadPosFromArray(ref headDict, headArr, "Transfer Orders");
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
 
@@ -118,7 +119,7 @@ public static class DataConversion
         // First set the headers.
         var line = reader.ReadLine();
         var headArr = line?.Split('\t') ?? Array.Empty<string>();
-        SetHeadPosFromArray(ref headDict, headArr);
+        SetHeadPosFromArray(ref headDict, headArr, "Divisions");
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
 
@@ -172,7 +173,7 @@ public static class DataConversion
         // First set the headers.
         var line = reader.ReadLine();
         var headArr = line?.Split('\t') ?? Array.Empty<string>();
-        SetHeadPosFromArray(ref headDict, headArr);
+        SetHeadPosFromArray(ref headDict, headArr, "Categories");
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
 
@@ -228,7 +229,7 @@ public static class DataConversion
         // First set the headers.
         var line = reader.ReadLine();
         var headArr = line?.Split('\t') ?? Array.Empty<string>();
-        SetHeadPosFromArray(ref headDict, headArr);
+        SetHeadPosFromArray(ref headDict, headArr, "Platforms");
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
 
@@ -282,7 +283,7 @@ public static class DataConversion
         // First set the headers.
         var line = reader.ReadLine();
         var headArr = line?.Split('\t') ?? Array.Empty<string>();
-        SetHeadPosFromArray(ref headDict, headArr);
+        SetHeadPosFromArray(ref headDict, headArr, "Genres");
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
 
@@ -335,7 +336,7 @@ public static class DataConversion
         // First set the headers.
         var line = reader.ReadLine();
         var headArr = line?.Split('\t') ?? Array.Empty<string>();
-        SetHeadPosFromArray(ref headDict, headArr);
+        SetHeadPosFromArray(ref headDict, headArr, "Locations");
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
 
@@ -391,7 +392,7 @@ public static class DataConversion
         // First set the headers.
         var line = reader.ReadLine();
         var headArr = line?.Split('\t') ?? Array.Empty<string>();
-        SetHeadPosFromArray(ref headDict, headArr);
+        SetHeadPosFromArray(ref headDict, headArr, "Zones");
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
 
@@ -450,7 +451,7 @@ public static class DataConversion
         // First set the headers.
         var line = reader.ReadLine();
         var headArr = line?.Split('\t') ?? Array.Empty<string>();
-        SetHeadPosFromArray(ref headDict, headArr);
+        SetHeadPosFromArray(ref headDict, headArr, "Bins");
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
 
@@ -505,7 +506,7 @@ public static class DataConversion
         var headDict = Constants.NAVItemColumns;
         using StreamReader reader = new(File.OpenRead(itemCSVLocation));
         var headArr = reader.ReadLine()?.Trim('"').Split(',', '"') ?? Array.Empty<string>();
-        SetHeadPosFromArray(ref headDict, headArr);
+        SetHeadPosFromArray(ref headDict, headArr, "Items");
         var line = reader.ReadLine();
 
         while (line != null)
@@ -573,7 +574,7 @@ public static class DataConversion
         // First set the headers.
         var line = reader.ReadLine();
         var headArr = line?.Split('\t') ?? Array.Empty<string>();
-        SetHeadPosFromArray(ref headDict, headArr);
+        SetHeadPosFromArray(ref headDict, headArr, "Units of Measurement");
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
 
@@ -642,7 +643,7 @@ public static class DataConversion
         // First set the headers.
         var line = reader.ReadLine();
         var headArr = line?.Split('\t') ?? Array.Empty<string>();
-        SetHeadPosFromArray(ref headDict, headArr);
+        SetHeadPosFromArray(ref headDict, headArr, "Stock");
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = headDict.Values.Max();
 

@@ -41,6 +41,7 @@ public sealed class HydraChariot : MasterChariot
         Database?.RunInTransaction(() =>
         {
             lines += UpdateTable(moves);
+            if (dataSet is null) return;
             lines += UpdateTable(dataSet.Stock);
             lines += UpdateTable(dataSet.Zones.Values);
             lines += UpdateTable(dataSet.Items.Values);

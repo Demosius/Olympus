@@ -30,6 +30,9 @@
                                   Command="{Binding DBManager.ChangeDatabaseCommand}"/>
                     </MenuItem>
                     <Separator/>
+                    <MenuItem Header="Set Item List data file"
+                              Command="{Binding DBManager.SelectItemDataFileCommand}"/>
+                    <Separator/>
                     <MenuItem Header="Mer_ge"
                               Command="{Binding DBManager.MergeDatabaseCommand}"/>
                     <MenuItem Header="_Move"

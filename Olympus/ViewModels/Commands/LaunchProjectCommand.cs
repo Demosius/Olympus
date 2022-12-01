@@ -15,22 +15,21 @@ public class LaunchProjectCommand : ICommand
         VM = vm;
     }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
-        if (!Enum.TryParse((string)parameter ?? "None", out EProject eProject)) eProject = EProject.None;
-        if (VM.ProjectGroup is null) return false;
-        return VM.ProjectGroup.ProjectLauncher.OlympusVM.CurrentProject?.Project != eProject && ProjectFactory.CanLaunch(eProject, App.Charon);
+        if (!Enum.TryParse((string)(parameter ?? "None"), out EProject eProject)) eProject = EProject.None;
+        return VM.ProjectGroupVM.ProjectLauncher.OlympusVM.CurrentProject?.Project != eProject && ProjectFactory.CanLaunch(eProject, App.Charon);
     }
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
-        if (!Enum.TryParse((string)parameter ?? "None", out EProject eProject)) eProject = EProject.None;
-        VM.ProjectGroup.ProjectLauncher.OlympusVM.LoadProject(eProject);
+        if (!Enum.TryParse((string)(parameter ?? "None"), out EProject eProject)) eProject = EProject.None;
+        VM.ProjectGroupVM.ProjectLauncher.OlympusVM.LoadProject(eProject);
     }
 }

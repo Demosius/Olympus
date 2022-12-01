@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Cadmus.Annotations;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -25,7 +26,7 @@ public class ProjectLauncherVM : INotifyPropertyChanged
         set
         {
             projectGroups = value;
-            OnPropertyChanged(nameof(ProjectGroups));
+            OnPropertyChanged();
         }
     }
 
@@ -42,18 +43,20 @@ public class ProjectLauncherVM : INotifyPropertyChanged
 
     #endregion
 
-    public ProjectLauncherVM()
+    public ProjectLauncherVM(OlympusVM olympusVM)
     {
+        OlympusVM = olympusVM;
+
         AllProjects = App.Helios.StaffReader.Projects(pullType: EPullType.FullRecursive).ToList();
         Departments = App.Helios.StaffReader.Departments(pullType: EPullType.IncludeChildren);
         UserProjects = App.Charon.Employee is null ? new List<Project>() : App.Charon.Employee.Projects;
-        Projects = new ProjectGroupVM(this, AllProjects, "All");
+        projects = new ProjectGroupVM(this, AllProjects, "All");
 
         // Set Icons for projects.
         foreach (var p in AllProjects)
             p.Icon?.SetDirectory(App.Helios.StaffReader.ProjectIconDirectory);
 
-        ProjectGroups = new ObservableCollection<ProjectGroupVM>();
+        projectGroups = new ObservableCollection<ProjectGroupVM>();
 
         ProjectGroupVM projectGroup = new(this, AllProjects, "All");
         ProjectGroups.Add(projectGroup);
@@ -67,14 +70,10 @@ public class ProjectLauncherVM : INotifyPropertyChanged
         }
     }
 
-    public ProjectLauncherVM(OlympusVM olympusVM) : this()
-    {
-        OlympusVM = olympusVM;
-    }
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

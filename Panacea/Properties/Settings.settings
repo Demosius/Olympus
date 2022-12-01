@@ -23,5 +23,11 @@
     <Setting Name="PotentNegZones" Type="System.String" Scope="User">
       <Value Profile="(Default)">PK|SP PK|BLK SS|BLK PK|SUP PK|OS|PR|HR|ROX</Value>
     </Setting>
+    <Setting Name="FBCFromZones" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="FBCFixedZones" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

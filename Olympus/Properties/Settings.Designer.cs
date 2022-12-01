@@ -37,7 +37,8 @@ namespace Olympus.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\\\ausefpdfs01ns\\Shares\\Public\\DC_Data\\CDB\\PriceBook Sales Ranking.csv")]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\ausefpdfs01ns\\Shares\\Public\\IMR\\Australia\\Pricebook\\IMR_PriceBookSalesRanking.c" +
+            "sv")]
         public string ItemCSVLocation {
             get {
                 return ((string)(this["ItemCSVLocation"]));

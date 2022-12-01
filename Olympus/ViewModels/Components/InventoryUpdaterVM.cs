@@ -1,14 +1,16 @@
-﻿using Morpheus;
+﻿using Cadmus.Annotations;
+using Morpheus;
 using Olympus.Properties;
 using Olympus.ViewModels.Commands;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using Uranus;
 using Uranus.Inventory;
 using Uranus.Inventory.Models;
+using Mouse = System.Windows.Input.Mouse;
 
 namespace Olympus.ViewModels.Components;
 
@@ -74,10 +76,11 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
 
     #endregion
 
-    public static string Info => "Click on the buttons to update the designated data.\n\n" +
+    public string Info => "Click on the buttons to update the designated data.\n\n" +
                                  "Stock (Bin Contents), Bins (Bin List), and UoM (Item Units of Measure) require data copied from NAV.\n\n" +
                                  "Item List takes data from an external workbook (Price book Report) and requires nothing other than pressing the button.\n\n" +
-                                 "Hover over the buttons to be shown the required columns (and where to get the data) for the specific data type.";
+                                 "Hover over the buttons to be shown the required columns (and where to get the data) for the specific data type.\n\n" +
+                                 $"(Data taken from: [ {Settings.Default.ItemCSVLocation} ])";
 
     public static string UoMInfo => "Find the Data:\n" +
                                     "[NAV > Warehouse > Planning & Execution > Bin Contents >> Unit of Measure Code]\n\n" +
@@ -110,9 +113,12 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
     public ShowInfoCommand ShowInfoCommand { get; set; }
 
     // Constructors
-    public InventoryUpdaterVM()
+    public InventoryUpdaterVM(OlympusVM olympusVM)
     {
+        ParentVM = olympusVM;
+
         GetUpdateTimes();
+
         UpdateStockCommand = new UpdateStockCommand(this);
         UpdateBinsCommand = new UpdateBinsCommand(this);
         UpdateUoMCommand = new UpdateUoMCommand(this);
@@ -121,11 +127,6 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         ShowBinListColumnCommand = new ShowBinListColumnCommand(this);
         ShowUlColCommand = new ShowUlColCommand(this);
         ShowInfoCommand = new ShowInfoCommand(this);
-    }
-
-    public InventoryUpdaterVM(OlympusVM olympusVM) : this()
-    {
-        ParentVM = olympusVM;
     }
 
     // Methods
@@ -139,42 +140,123 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
 
     public void UpdateStock()
     {
-        _ = Task.Run(() =>
+
+        Mouse.OverrideCursor = Cursors.Wait;
+
+        try
         {
             if (App.Helios.InventoryUpdater.NAVStock(DataConversion.NAVRawStringToStock(General.ClipboardToString())))
+            {
                 GetUpdateTimes();
-        });
+                MessageBox.Show("Update successful.", "Success", MessageBoxButton.OK);
+            }
+        }
+        catch (InvalidDataException ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                "An unexpected error has occurred:\n\n" +
+                $"\t{ex.Message}\n\n" +
+                "Please notify Olympus Development when possible.",
+                "Unexpected Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        Mouse.OverrideCursor = Cursors.Arrow;
     }
 
     public void UpdateBins()
     {
-        _ = Task.Run(() =>
+        Mouse.OverrideCursor = Cursors.Wait;
+
+        try
         {
             if (App.Helios.InventoryUpdater.NAVBins(DataConversion.NAVRawStringToBins(General.ClipboardToString())) > 0)
+            {
                 GetUpdateTimes();
-        });
+                MessageBox.Show("Update successful.", "Success", MessageBoxButton.OK);
+            }
+        }
+        catch (InvalidDataException ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                "An unexpected error has occurred:\n\n" +
+                $"\t{ex.Message}\n\n" +
+                "Please notify Olympus Development when possible.",
+                "Unexpected Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        Mouse.OverrideCursor = Cursors.Arrow;
     }
 
     public void UpdateUoM()
     {
-        _ = Task.Run(() =>
+        Mouse.OverrideCursor = Cursors.Wait;
+
+        try
         {
             if (App.Helios.InventoryUpdater.NAVUoMs(DataConversion.NAVRawStringToUoMs(General.ClipboardToString())))
+            {
                 GetUpdateTimes();
-        });
+                MessageBox.Show("Update successful.", "Success", MessageBoxButton.OK);
+            }
+        }
+        catch (InvalidDataException ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                "An unexpected error has occurred:\n\n" +
+                $"\t{ex.Message}\n\n" +
+                "Please notify Olympus Development when possible.",
+                "Unexpected Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        Mouse.OverrideCursor = Cursors.Arrow;
     }
 
     public void UpdateItems()
     {
-        _ = Task.Run(() =>
+        Mouse.OverrideCursor = Cursors.Wait;
+
+        try
         {
             if (App.Helios.InventoryCreator.NAVItems(DataConversion.NAV_CSVToItems(Settings.Default.ItemCSVLocation),
                     InventoryReader.LastItemWriteTime(Settings.Default.ItemCSVLocation)))
+            {
                 GetUpdateTimes();
-        });
+                MessageBox.Show("Update successful.", "Success", MessageBoxButton.OK);
+            }
+            else
+            {
+                MessageBox.Show("Did not update Item Data.\n\nLikely already up to date.", "Failed", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+            }
+        }
+        catch (InvalidDataException ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                "An unexpected error has occurred:\n\n" +
+                $"\t{ex.Message}\n\n" +
+                "Please notify Olympus Development when possible.",
+                "Unexpected Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        Mouse.OverrideCursor = Cursors.Arrow;
     }
 
-    public static void ShowInfo()
+    public void ShowInfo()
     {
         _ = MessageBox.Show(Info,
             "Data Upload Help",
@@ -206,9 +288,10 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
             MessageBoxImage.Information);
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

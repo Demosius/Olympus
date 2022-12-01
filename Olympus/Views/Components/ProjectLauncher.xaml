@@ -8,10 +8,6 @@
              mc:Ignorable="d"
              MaxHeight="300">
 
-    <UserControl.DataContext>
-        <components:ProjectLauncherVM x:Name="VM"/>
-    </UserControl.DataContext>
-
     <Grid>
         <ItemsControl ItemsSource="{Binding Projects.Projects}" Margin="2">
             <ItemsControl.ItemsPanel>

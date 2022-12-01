@@ -1,4 +1,5 @@
-﻿using Olympus.Properties;
+﻿using Cadmus.Annotations;
+using Olympus.Properties;
 using Olympus.ViewModels.Commands;
 using Olympus.ViewModels.Components;
 using Olympus.ViewModels.Utility;
@@ -8,6 +9,7 @@ using SQLite;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,8 +24,8 @@ public class OlympusVM : INotifyPropertyChanged
 {
     public Dictionary<EProject, IProject> RunningProjects { get; set; }
 
-    private IProject currentProject;
-    public IProject CurrentProject
+    private IProject? currentProject;
+    public IProject? CurrentProject
     {
         get => currentProject;
         set
@@ -59,13 +61,6 @@ public class OlympusVM : INotifyPropertyChanged
         ChangePasswordCommand = new ChangePasswordCommand(this);
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
     internal void RefreshData()
     {
         foreach (var project in RunningProjects)
@@ -98,9 +93,10 @@ public class OlympusVM : INotifyPropertyChanged
         if (!RunningProjects.TryGetValue(project, out var loadedProject))
         {
             loadedProject = ProjectFactory.GetProject(project);
-            RunningProjects.Add(project, loadedProject);
+            if (loadedProject is not null)
+                RunningProjects.Add(project, loadedProject);
         }
-        SetPage(loadedProject);
+        if (loadedProject is not null) SetPage(loadedProject);
     }
 
     private void SetPage(IProject project)
@@ -194,5 +190,13 @@ public class OlympusVM : INotifyPropertyChanged
         var xml = XmlSerializer.SerializeToString(masters);
         var filePath = Path.Combine(dirPath, "SKUMasterExport.xml");
         File.WriteAllText(filePath, xml);
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

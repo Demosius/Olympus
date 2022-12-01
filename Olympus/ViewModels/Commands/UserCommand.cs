@@ -8,7 +8,7 @@ public class UserCommand : ICommand
 {
     public UserHandlerVM VM { get; set; }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
@@ -19,12 +19,12 @@ public class UserCommand : ICommand
         VM = vm;
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return true;
     }
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
         var commandName = parameter as string;
         switch (commandName)

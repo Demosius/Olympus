@@ -20,9 +20,9 @@ namespace Olympus.ViewModels.Utility;
 
 public static class ProjectFactory
 {
-    public static IProject GetProject(Project project) => GetProject(project.Reference);
+    public static IProject? GetProject(Project project) => GetProject(project.Reference);
 
-    public static IProject GetProject(EProject project)
+    public static IProject? GetProject(EProject project)
     {
         return project switch
         {

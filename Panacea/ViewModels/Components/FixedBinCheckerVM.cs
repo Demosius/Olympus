@@ -1,4 +1,5 @@
 ﻿using Panacea.Models;
+using Panacea.Properties;
 using Panacea.ViewModels.Commands;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -31,6 +32,8 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
         {
             fromZoneString = value;
             OnPropertyChanged();
+            Settings.Default.FBCFromZones = value;
+            Settings.Default.Save();
         }
     }
 
@@ -42,6 +45,8 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
         {
             fixedZoneString = value;
             OnPropertyChanged();
+            Settings.Default.FBCFixedZones = value;
+            Settings.Default.Save();
         }
     }
 
@@ -145,8 +150,8 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
     public FixedBinCheckerVM(Helios helios)
     {
         Helios = helios;
-        fromZoneString = string.Empty;
-        fixedZoneString = string.Empty;
+        fromZoneString = Settings.Default.FBCFromZones;
+        fixedZoneString = Settings.Default.FBCFixedZones;
         CheckResults = new List<FixedBinCheckResult>();
         filteredCheckResults = new ObservableCollection<FixedBinCheckResult>();
         binFilter = string.Empty;

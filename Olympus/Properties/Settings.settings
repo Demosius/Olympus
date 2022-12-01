@@ -6,7 +6,7 @@
       <Value Profile="(Default)">\\ausefpdfs01ns\Shares\Public\DC_Data\Olympus\PROD\Sol</Value>
     </Setting>
     <Setting Name="ItemCSVLocation" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\\ausefpdfs01ns\Shares\Public\DC_Data\CDB\PriceBook Sales Ranking.csv</Value>
+      <Value Profile="(Default)">\\ausefpdfs01ns\Shares\Public\IMR\Australia\Pricebook\IMR_PriceBookSalesRanking.csv</Value>
     </Setting>
   </Settings>
 </SettingsFile>

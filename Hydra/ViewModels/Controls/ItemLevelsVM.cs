@@ -38,7 +38,7 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }
 
-    public HydraDataSet? DataSet { get; set; }
+    public HydraDataSet DataSet { get; set; }
 
     public List<ItemVM> AllItems { get; set; }
     public DataTable DataTable { get; set; }
@@ -153,7 +153,7 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
     {
         if (Helios is null) return;
         Mouse.OverrideCursor = Cursors.Wait;
-        DataSet = Helios.InventoryReader.HydraDataSet(false);
+        DataSet = Helios.InventoryReader.HydraDataSet(false) ?? new HydraDataSet();
 
         SetVMs();
 

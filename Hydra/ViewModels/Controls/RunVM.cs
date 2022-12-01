@@ -263,6 +263,8 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         Mouse.OverrideCursor = Cursors.Wait;
         dataSet = Helios.InventoryReader.HydraDataSet();
 
+        if (dataSet is null) return;
+
         var siteMoves =
             MoveGenerator.GenerateSiteMoves(dataSet, Sites.Where(s => s.TakeFrom).Select(s => s.Name),
                 Sites.Where(s => s.PlaceTo).Select(s => s.Name));

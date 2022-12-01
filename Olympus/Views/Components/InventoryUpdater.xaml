@@ -5,11 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:components="clr-namespace:Olympus.ViewModels.Components"
              mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance {x:Type components:InventoryUpdaterVM}, IsDesignTimeCreatable=False}"
              VerticalAlignment="Top">
-
-    <UserControl.DataContext>
-        <components:InventoryUpdaterVM/>
-    </UserControl.DataContext>
 
     <Border BorderBrush="Black" BorderThickness="1" Margin="2" Padding="0" Background="DarkSlateGray" CornerRadius="5" Height="65">
         <Grid>
@@ -76,7 +73,7 @@
                     Command="{Binding UpdateItemsCommand}"
                     Background="{DynamicResource Graydient}"
                     Style="{DynamicResource InventoryButton}"
-                    ToolTip="{Binding Info}">
+                    ToolTip="{Binding Info, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                 <StackPanel>
                     <TextBlock FontSize="16">Item List</TextBlock>
                     <TextBlock Text="{Binding ItemUpdateString}"

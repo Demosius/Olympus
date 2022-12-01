@@ -1,53 +1,30 @@
-﻿using Olympus.ViewModels.Commands;
+﻿using Cadmus.Annotations;
+using Olympus.ViewModels.Commands;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Uranus.Staff.Models;
 
 namespace Olympus.ViewModels.Components;
 
 public class ProjectButtonVM : INotifyPropertyChanged
 {
-    private ProjectGroupVM projectGroup;
-    public ProjectGroupVM ProjectGroup
-    {
-        get => projectGroup;
-        set
-        {
-            projectGroup = value;
-            OnPropertyChanged(nameof(ProjectGroup));
-        }
-    }
+    public ProjectGroupVM ProjectGroupVM { get; set; }
 
-    private Project project;
-    public Project Project
-    {
-        get => project;
-        set
-        {
-            project = value;
-            OnPropertyChanged(nameof(Project));
-        }
-    }
+    public Project Project { get; set; }
 
     public LaunchProjectCommand LaunchProjectCommand { get; set; }
 
-    public ProjectButtonVM()
+    public ProjectButtonVM(ProjectGroupVM projectGroupVM, Project project)
     {
         LaunchProjectCommand = new LaunchProjectCommand(this);
-    }
-
-    public ProjectButtonVM(ProjectGroupVM projectGroup) : this()
-    {
-        ProjectGroup = projectGroup;
-    }
-
-    public ProjectButtonVM(ProjectGroupVM projectGroup, Project project) : this(projectGroup)
-    {
+        ProjectGroupVM = projectGroupVM;
         Project = project;
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

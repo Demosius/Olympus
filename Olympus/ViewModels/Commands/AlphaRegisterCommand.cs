@@ -8,7 +8,7 @@ public class AlphaRegisterCommand : ICommand
 {
     public AlphaRegistrationVM VM { get; set; }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
@@ -19,7 +19,7 @@ public class AlphaRegisterCommand : ICommand
         VM = vm;
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return VM.PasswordGood &&
                int.TryParse(VM.EmployeeID, out _) &&
@@ -28,7 +28,7 @@ public class AlphaRegisterCommand : ICommand
                VM.RoleName != "";
     }
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
         if (VM.Register(out var message))
         {

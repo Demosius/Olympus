@@ -1,6 +1,8 @@
-﻿using Olympus.ViewModels.Commands;
+﻿using Cadmus.Annotations;
+using Olympus.ViewModels.Commands;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Uranus.Staff.Models;
 using StaffRole = Uranus.Staff.Models.Role;
 
@@ -12,9 +14,9 @@ public class AlphaRegistrationVM : INotifyPropertyChanged
     private const string WarnColour = "Orange";
     private const string BadColour = "Red";
 
-    public Employee Employee { get; set; }
-    public Department Department { get; set; }
-    public StaffRole Role { get; set; }
+    public Employee? Employee { get; set; }
+    public Department? Department { get; set; }
+    public StaffRole? Role { get; set; }
 
     private string departmentName;
     public string DepartmentName
@@ -184,8 +186,22 @@ public class AlphaRegistrationVM : INotifyPropertyChanged
     public bool PasswordGood { get; set; }
 
     public AlphaRegisterCommand AlphaRegisterCommand { get; set; }
+
     public AlphaRegistrationVM()
     {
+        departmentName = string.Empty;
+        roleName = string.Empty;
+        employeeID = string.Empty;
+        displayName = string.Empty;
+        firstName = string.Empty;
+        lastName = string.Empty;
+        rfID = string.Empty;
+        pcID = string.Empty;
+        phoneNumber = string.Empty;
+        email = string.Empty;
+        address = string.Empty;
+
+
         AlphaRegisterCommand = new AlphaRegisterCommand(this);
         CheckPasswords();
     }
@@ -239,9 +255,10 @@ public class AlphaRegistrationVM : INotifyPropertyChanged
         return App.Charon.RegisterAlphaUser(Employee, Department, Role, Password, ConfirmPassword, out message);
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

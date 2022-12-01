@@ -1,5 +1,7 @@
-﻿using Olympus.ViewModels.Commands;
+﻿using Cadmus.Annotations;
+using Olympus.ViewModels.Commands;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Olympus.ViewModels;
 
@@ -12,7 +14,7 @@ public class LogInVM : INotifyPropertyChanged
         set
         {
             userID = value;
-            OnPropertyChanged(nameof(UserID));
+            OnPropertyChanged();
         }
     }
 
@@ -23,7 +25,7 @@ public class LogInVM : INotifyPropertyChanged
         set
         {
             password = value;
-            OnPropertyChanged(nameof(Password));
+            OnPropertyChanged();
         }
     }
 
@@ -31,6 +33,8 @@ public class LogInVM : INotifyPropertyChanged
 
     public LogInVM()
     {
+        userID = string.Empty;
+
         LogInCommand = new LogInCommand(this);
     }
 
@@ -39,9 +43,10 @@ public class LogInVM : INotifyPropertyChanged
         return int.TryParse(UserID, out var id) && App.Charon.LogIn(id, Password);
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    public void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

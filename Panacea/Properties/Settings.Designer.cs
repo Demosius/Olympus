@@ -106,5 +106,29 @@ namespace Panacea.Properties {
                 this["PotentNegZones"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FBCFromZones {
+            get {
+                return ((string)(this["FBCFromZones"]));
+            }
+            set {
+                this["FBCFromZones"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FBCFixedZones {
+            get {
+                return ((string)(this["FBCFixedZones"]));
+            }
+            set {
+                this["FBCFixedZones"] = value;
+            }
+        }
     }
 }

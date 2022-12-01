@@ -4,12 +4,11 @@ using System.Windows.Input;
 
 namespace Olympus.ViewModels.Commands;
 
-
-public class ChangeDatabaseCommand : ICommand
+public class SelectItemDataFileCommand : ICommand
 {
     public DBManager VM { get; set; }
 
-    public ChangeDatabaseCommand(DBManager vm) { VM = vm; }
+    public SelectItemDataFileCommand(DBManager vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -18,7 +17,7 @@ public class ChangeDatabaseCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.ChangeDatabase();
+        VM.SelectItemDataFile();
     }
 
     public event EventHandler? CanExecuteChanged

@@ -1,8 +1,11 @@
-﻿using Olympus.Properties;
+﻿using Cadmus.Annotations;
+using Microsoft.Win32;
+using Olympus.Properties;
 using Olympus.ViewModels.Commands;
 using Ookii.Dialogs.Wpf;
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Windows;
 
 namespace Olympus.ViewModels.Utility;
@@ -26,31 +29,39 @@ public class DBManager : INotifyPropertyChanged
     public UseLocalDBCommand UseLocalDBCommand { get; set; }
     public NewDatabaseCommand NewDatabaseCommand { get; set; }
     public MergeDatabaseCommand MergeDatabaseCommand { get; set; }
+    public SelectItemDataFileCommand SelectItemDataFileCommand { get; set; }
 
     public OlympusVM OlympusVM { get; set; }
 
-    public DBManager()
+    public DBManager(OlympusVM olympusVM)
     {
+        OlympusVM = olympusVM;
+
         ChangeDatabaseCommand = new ChangeDatabaseCommand(this);
         MoveDatabaseCommand = new MoveDatabaseCommand(this);
         CopyDatabaseCommand = new CopyDatabaseCommand(this);
         UseLocalDBCommand = new UseLocalDBCommand(this);
         NewDatabaseCommand = new NewDatabaseCommand(this);
         MergeDatabaseCommand = new MergeDatabaseCommand(this);
+        SelectItemDataFileCommand = new SelectItemDataFileCommand(this);
 
+        dbString = string.Empty;
         DBString = Settings.Default.SolLocation;
     }
 
-    public DBManager(OlympusVM olympusVM) : this()
+    public void SelectItemDataFile()
     {
-        OlympusVM = olympusVM;
-    }
+        var fd = new OpenFileDialog
+        {
+            InitialDirectory = Settings.Default.ItemCSVLocation
+        };
 
-    public event PropertyChangedEventHandler PropertyChanged;
+        fd.ShowDialog();
 
-    private void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        Settings.Default.ItemCSVLocation = fd.FileName;
+        Settings.Default.Save();
+
+        OnPropertyChanged(OlympusVM.InventoryUpdaterVM.Info);
     }
 
     private static string SelectFolder()
@@ -249,5 +260,13 @@ public class DBManager : INotifyPropertyChanged
         if (parent is null)
             return false;   // Once there is no parent, that means that it must be false.
         return parent.FullName == potentialParentDir.FullName || IsSubDirectory(potentialParentDir, parent);
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

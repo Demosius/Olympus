@@ -4,11 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:components="clr-namespace:Olympus.ViewModels.Components"
-             mc:Ignorable="d">
-
-    <UserControl.DataContext>
-        <components:UserHandlerVM/>
-    </UserControl.DataContext>
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance {x:Type components:UserHandlerVM}, IsDesignTimeCreatable=False}">
 
     <StackPanel Orientation="Horizontal"
                 Margin="0">
