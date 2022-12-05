@@ -56,7 +56,7 @@
                                         IsReadOnly="False"/>
                         <DataGridTextColumn Header="Barcode"
                                         Binding="{Binding Barcode}"
-                                        IsReadOnly="False"/>
+                                        IsReadOnly="True"/>
                         <DataGridTextColumn Header="Item Number"
                                         Binding="{Binding ItemNumber}"
                                         IsReadOnly="False"/>
@@ -74,7 +74,8 @@
             </DockPanel>
         </TabItem>
         <TabItem Header="Display">
-            <ListView ItemsSource="{Binding LabelVMs}">
+            <ListView ItemsSource="{Binding LabelVMs}"
+                      HorizontalContentAlignment="Left">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <labels:ReceivingPutAwayLabelView/>

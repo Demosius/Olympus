@@ -5,9 +5,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:Cadmus.ViewModels"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance {x:Type vm:ReceivingPutAwayLabelVM}, IsDesignTimeCreatable=False}">
+             d:DataContext="{d:DesignInstance {x:Type vm:ReceivingPutAwayLabelVM}, IsDesignTimeCreatable=False}"
+             Height="242" Width="356">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../Resources/Fonts/../Fonts.xaml"/>
+                <ResourceDictionary>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="Black"></Setter>
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
 
     <Grid Background="White">
+
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="85"/>
             <ColumnDefinition Width="145"/>
@@ -78,14 +93,23 @@
             <TextBlock Text="{Binding TakeDisplayString}"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
-                       FontSize="10"
-                       FontWeight="Normal"/>
+                       FontSize="12"
+                       FontWeight="Normal"
+                       FontFamily="Courier New"/>
         </Border>
+
+        <!-- Description Area -->
+        <Border Grid.Column="0"
+                Grid.Row="7"
+                Grid.ColumnSpan="2"
+                Grid.RowSpan="4"
+                BorderThickness="1"
+                BorderBrush="Black"/>
 
         <!-- Description -->
         <Border Grid.Column="0"
                 Grid.Row="7"
-                BorderThickness="1"
+                BorderThickness="1,1,2,2"
                 BorderBrush="Black">
             <TextBlock Text="DESCRIPTION"
                        HorizontalAlignment="Center"
@@ -146,8 +170,9 @@
             <TextBlock Text="{Binding Barcode}"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
-                       FontSize="36"
-                       FontWeight="Normal"/>
+                       FontSize="40"
+                       FontWeight="Normal"
+                       FontFamily="{StaticResource Code128}"/>
         </Border>
 
         <!--Item Number-->

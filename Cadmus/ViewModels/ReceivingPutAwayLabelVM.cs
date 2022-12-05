@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using Cadmus.Annotations;
 using Cadmus.Models;
+using Morpheus;
 
 namespace Cadmus.ViewModels;
 
@@ -99,7 +100,9 @@ public class ReceivingPutAwayLabelVM : INotifyPropertyChanged
         set
         {
             Label.ItemNumber = value;
+            Label.Barcode = BarcodeUtility.Encode128(value.ToString());
             OnPropertyChanged();
+            OnPropertyChanged(nameof(Barcode));
         }
     }
 
@@ -145,15 +148,15 @@ public class ReceivingPutAwayLabelVM : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-
+    
     #endregion
-
+    
     public ReceivingPutAwayLabelVM(ReceivingPutAwayLabel label)
     {
         Label = label;
 
         takeDisplayString = string.Empty;
-
+        
         SetTakeDisplayString();
     }
 
