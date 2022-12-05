@@ -65,11 +65,12 @@ public static class BarcodeUtility
             if (!useTableB)
             {
                 // We are using Table C, try to process 2 digits
-                mini = 1;
+                mini = 2;
                 TestNum(ref mini, ref counter, ref sourceString);
                 if (mini < 0) // OK for 2 digits, process it
                 {
                     if (!int.TryParse(sourceString.AsSpan(counter, counter < sourceString.Length - 1 ? 2 : 1), out dummy)) dummy = 0;
+                    /*if (!int.TryParse(sourceString.AsSpan(counter, counter < sourceString.Length - 1 ? 2 : 1), out dummy)) dummy = 0;*/
                     dummy = dummy < 95 ? dummy + 32 : dummy + 100;
                     code128Barcode += (char)dummy;
                     counter += 2;
@@ -95,11 +96,10 @@ public static class BarcodeUtility
             dummy = dummy < 127 ? dummy - 32 : dummy - 100;
             if (counter == 0) checkSum = dummy;
             checkSum = (checkSum + (counter) * dummy) % 103;
-
         }
 
         // Calculation of the checksum ASCII code
-        checkSum = checkSum < 95 ? checkSum + 32 : checkSum & +100;
+        checkSum = checkSum < 95 ? checkSum + 32 : checkSum + 100;
 
         // Add the checksum and the STOP
         code128Barcode = code128Barcode + (char)checkSum + (char)206;
@@ -111,7 +111,7 @@ public static class BarcodeUtility
     {
         // if the mini characters from Counter are numeric, then mini=0
         mini--;
-        if (counter + mini > sourceString.Length) return;
+        if (counter + mini >= sourceString.Length) return;
 
         while (mini >= 0)
         {
