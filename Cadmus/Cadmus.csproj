@@ -14,6 +14,7 @@
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
     <None Remove="Resources\Fonts\DIN Medium.ttf" />
     <None Remove="Resources\Fonts\DIN.ttf" />
+    <None Remove="Resources\Images\printer.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,10 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\Morpheus\Morpheus.csproj" />
     <ProjectReference Include="..\Uranus\Uranus.csproj" />
   </ItemGroup>
 
@@ -44,6 +42,7 @@
     <Resource Include="Resources\Fonts\DIN.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\Images\printer.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,6 +50,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Labels\ReceivingPutAwayLabelView.xaml.cs">
+      <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
 
@@ -86,10 +88,22 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Themes\TabControlStyling.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Themes\Theme.Colors.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\Labels\ReceivingPutAwayLabelView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\Sheets\" />
   </ItemGroup>
 
 </Project>

@@ -1,26 +1,27 @@
 ﻿using System;
+using Cadmus.ViewModels;
 using Uranus.Interfaces;
 using Uranus.Staff;
 
-namespace Cadmus.Views
+namespace Cadmus.Views;
+
+/// <summary>
+/// Interaction logic for CadmusPage.xaml
+/// </summary>
+public partial class CadmusPage : IProject
 {
-    /// <summary>
-    /// Interaction logic for CadmusPage.xaml
-    /// </summary>
-    public partial class CadmusPage : IProject
+    public CadmusPage()
     {
-        public CadmusPage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+        DataContext = new CadmusVM(App.Helios);
+    }
 
-        public EProject Project => EProject.Cadmus;
+    public EProject Project => EProject.Cadmus;
 
-        public static bool RequiresUser => false;
+    public static bool RequiresUser => false;
 
-        public void RefreshData()
-        {
-            throw new NotImplementedException();
-        }
+    public void RefreshData()
+    {
+        throw new NotImplementedException();
     }
 }

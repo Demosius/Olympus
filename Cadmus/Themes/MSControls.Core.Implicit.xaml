@@ -8,6 +8,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Styles.WPF.xaml" />
         <ResourceDictionary Source="DatagridStyling.xaml"/>
+        <ResourceDictionary Source="TabControlStyling.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
     <!-- *********************************  BRUSHES  ********************************* -->

@@ -88,7 +88,7 @@
     <!-- Need to change color or delete -->
     <SolidColorBrush x:Key="ListBoxItemBorderBrush" Color="{StaticResource Color016}" />
     <!-- Need to change color or delete -->
-    <SolidColorBrush x:Key="ListBoxItemSelectedBackgroundBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="ListBoxItemSelectedBackgroundBrush" Color="{StaticResource Color023}" />
     <!-- Need to change color or delete -->
     <SolidColorBrush x:Key="ListBoxItemSelectedBorderBrush" Color="{StaticResource Color024}" />
     <!-- Need to change color or delete -->
