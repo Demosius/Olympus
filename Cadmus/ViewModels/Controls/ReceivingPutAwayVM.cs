@@ -1,15 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 using Cadmus.Annotations;
 using Cadmus.Models;
+using Cadmus.ViewModels.Commands;
+using Cadmus.Views.Labels;
 using Uranus;
 
 namespace Cadmus.ViewModels.Controls;
 
-public class ReceivingPutAwayVM : INotifyPropertyChanged
+public class ReceivingPutAwayVM : INotifyPropertyChanged, IPrintable
 {
     public List<ReceivingPutAwayLabel> Labels { get; set; }
 
@@ -29,10 +35,18 @@ public class ReceivingPutAwayVM : INotifyPropertyChanged
 
     #endregion
 
+    #region Commands
+
+    public PrintCommand PrintCommand { get; set; }
+
+    #endregion
+
     public ReceivingPutAwayVM()
     {
         Labels = new List<ReceivingPutAwayLabel>();
         labelVMs = new ObservableCollection<ReceivingPutAwayLabelVM>();
+
+        PrintCommand = new PrintCommand(this);
 
         GenerateTestData();
     }
@@ -137,6 +151,61 @@ OZ	ASPLEY6	528	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
 
             LabelVMs.Add(lvm);
         }
+
+    }
+
+    public void Print()
+    {
+        var printDialog = new PrintDialog
+        {
+            SelectedPagesEnabled = true,
+            UserPageRangeEnabled = true,
+            PageRange = new PageRange(1, LabelVMs.Count),
+            MaxPage = (uint)LabelVMs.Count,
+            MinPage = 1,
+        };
+
+        if (printDialog.ShowDialog() != true) return;
+
+        switch (printDialog.PageRangeSelection)
+        {
+            case PageRangeSelection.AllPages:
+                foreach (var labelVM in LabelVMs)
+                {
+                    var label = new ReceivingPutAwayLabelView(labelVM);
+                    printDialog.PrintVisual(label, "Label Printing");
+                }
+                break;
+            case PageRangeSelection.SelectedPages:
+                // TODO: Implement label control selection.
+                for (int i = 0; i < 3; ++i)
+                {
+                    var label = new ReceivingPutAwayLabelView(LabelVMs[i]);
+                    printDialog.PrintVisual(label, "Print Visual");
+                }
+                break;
+            case PageRangeSelection.UserPages:
+                var doc = new FlowDocument
+                {
+                    PageHeight = 242 + 4,
+                    PageWidth = 356 + 4,
+                    PagePadding = new Thickness(2)
+                };
+                for (var i = printDialog.PageRange.PageFrom; i <= printDialog.PageRange.PageTo; i++)
+                {
+                    var label = new ReceivingPutAwayLabelView(LabelVMs[i - 1]);
+                    doc.Blocks.Add(new BlockUIContainer(label));
+                }
+
+                IDocumentPaginatorSource idpSource = doc;
+                printDialog.PrintDocument(idpSource.DocumentPaginator, "Print Flow Document");
+                break;
+            case PageRangeSelection.CurrentPage:
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        // printDialog.PrintVisual(label, "Label Printing");
 
     }
 

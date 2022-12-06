@@ -74,14 +74,27 @@
             </DockPanel>
         </TabItem>
         <TabItem Header="Display">
-            <ListView ItemsSource="{Binding LabelVMs}"
-                      HorizontalContentAlignment="Left">
+            <DockPanel Background="Black">
+                <StackPanel Orientation="Horizontal"
+                            DockPanel.Dock="Top">
+                    <Button Margin="2"
+                            Command="{Binding PrintCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../../Resources/Images/printer.png" 
+                                   Width="15" Height="15"></Image>
+                            <Label Content="Print"></Label>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <ListView ItemsSource="{Binding LabelVMs}"
+                          HorizontalContentAlignment="Left">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <labels:ReceivingPutAwayLabelView/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
-            </ListView>
+                </ListView>
+            </DockPanel>
         </TabItem>
     </TabControl>
 </UserControl>
