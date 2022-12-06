@@ -104,7 +104,8 @@
                   CanUserDeleteRows="True"
                   CanUserAddRows="False"
                   CanUserReorderColumns="True"
-                  RowHeaderWidth="15">
+                  RowHeaderWidth="15"
+                  SelectionUnit="CellOrRowHeader">
             <DataGrid.Columns>
                 <DataGridCheckBoxColumn Header="Pass"
                                         Binding="{Binding PassCheck}"
