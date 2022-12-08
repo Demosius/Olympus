@@ -106,4 +106,8 @@
     <Folder Include="Views\Sheets\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="7.0.0" />
+  </ItemGroup>
+
 </Project>

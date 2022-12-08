@@ -81,12 +81,22 @@
                             Command="{Binding PrintCommand}">
                         <StackPanel Orientation="Horizontal">
                             <Image Source="../../Resources/Images/printer.png" 
-                                   Width="15" Height="15"></Image>
-                            <Label Content="Print"></Label>
+                                   Width="15" Height="15"/>
+                            <Label Content="Print"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Margin="2"
+                            Command="{Binding ShowPrinterCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../../Resources/Images/printer.png"
+                                   Width="15" Height="15"/>
+                            <Label Content="Show Printers"></Label>
                         </StackPanel>
                     </Button>
                 </StackPanel>
-                <ListView ItemsSource="{Binding LabelVMs}"
+                <ListView Name="LabelViewList"
+                          ItemsSource="{Binding LabelVMs}"
+                          SelectionChanged="Selector_OnSelectionChanged"
                           HorizontalContentAlignment="Left">
                 <ListView.ItemTemplate>
                     <DataTemplate>
