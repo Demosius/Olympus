@@ -16,6 +16,7 @@ using Cadmus.Annotations;
 using Cadmus.Models;
 using Cadmus.ViewModels.Commands;
 using Cadmus.Views.Labels;
+using Microsoft.Win32.SafeHandles;
 using Uranus;
 
 namespace Cadmus.ViewModels.Controls;
@@ -200,12 +201,13 @@ OZ	ASPLEY6	528	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
                 throw new ArgumentOutOfRangeException();
         }
 
+        
         PrintUIElements(xpsDocWriter, printList);
     }
 
     public void ShowPrinter()
     {
-        ShowPrinters();
+        var dict = ShowPrinters();
 
         var printDialog = new PrintDialog
         {
@@ -266,16 +268,24 @@ OZ	ASPLEY6	528	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
                         $"Parent:\t\t\t {printDialog.PrintQueue.Parent}\n" +
                         $"IsBusy:\t\t\t {printDialog.PrintQueue.IsBusy}\n" +
                         $"Name:\t\t\t {printDialog.PrintQueue.Name}\n" +
+                        $"\nIsXpsDevice:\t\t\t {printDialog.PrintQueue.IsXpsDevice}\n" +
+                        $"\nQueueAttributes:\t\t\t {printDialog.PrintQueue.QueueAttributes}\n" +
+                        $"\nDriverBySystem:\t\t\t {dict[printDialog.PrintQueue.FullName]}\n" +
+                        $"\nDriverByDescription?:\t\t\t {printDialog.PrintQueue.Description}\n" +
+                        $"\nQueueDriver:\t\t {printDialog.PrintQueue.QueueDriver.Name}\n" +
+                        $"\nQueueDriver:\t\t {printDialog.PrintQueue.QueueDriver.Parent}\n" +
                         $"\nQueueDriver:\t\t {printDialog.PrintQueue.QueueDriver}\n");
     }
 
-    public static void ShowPrinters()
+    public static Dictionary<string, string> ShowPrinters()
     {
         const string query = "SELECT * from Win32_Printer";
         var searcher = new ManagementObjectSearcher(query);
         var coll = searcher.Get();
 
         var sb = new StringBuilder();
+
+        var dict = new Dictionary<string, string>();
 
         foreach (var o in coll)
         {
@@ -290,7 +300,6 @@ OZ	ASPLEY6	528	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
             var printerName = printer.Properties["Name"];
             if (driverName.Value.ToString()!.ToLowerInvariant().Contains("zebra"))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
                 sb.Append("ZEBRA: ");
             }
             else if (driverName.Value.ToString()!.ToLowerInvariant().Contains("intermec"))
@@ -299,16 +308,19 @@ OZ	ASPLEY6	528	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Gray;
                 sb.Append("Regular: ");
             }
 
             sb.AppendLine($"\t{printerName.Name}: {printerName.Value}");
             sb.AppendLine($"\t{driverName.Name}: {driverName.Value}\n");
 
+            dict.Add(printerName.Value.ToString() ?? "", driverName.Value.ToString() ?? "");
+
         }
 
         MessageBox.Show(sb.ToString());
+
+        return dict;
     }
 
     /// <summary>
@@ -334,8 +346,30 @@ OZ	ASPLEY6	528	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
             // add the PageContent object the FixedDocument
             fixedDoc.Pages.Add(pageContent);
         }
-
+        
         xpsWriter.Write(fixedDoc);
+    }
+
+    private static void PrintToLabel(PrintQueue printQueue, List<UIElement> uiElements)
+    {
+        var fixedDoc = new FixedDocument();
+
+        foreach (var element in uiElements)
+        {
+            var fixedPage = new FixedPage();
+            var pageContent = new PageContent();
+
+            // add the UIElement object the FixedPage
+            fixedPage.Children.Add(element);
+
+            // add the FixedPage object the PageContent
+            pageContent.Child = fixedPage;
+
+            // add the PageContent object the FixedDocument
+            fixedDoc.Pages.Add(pageContent);
+        }
+        
+        RawPrinterHelper.SendFileToPrinter(printQueue.FullName, fixedDoc.);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -41,6 +41,7 @@ public class ReceivingPutAwayLabelVM : INotifyPropertyChanged
         {
             Label.CaseQty = value;
             OnPropertyChanged();
+            SetTakeDisplayString();
         }
     }
 
@@ -51,6 +52,7 @@ public class ReceivingPutAwayLabelVM : INotifyPropertyChanged
         {
             Label.PackQty = value;
             OnPropertyChanged();
+            SetTakeDisplayString();
         }
     }
 
@@ -61,6 +63,7 @@ public class ReceivingPutAwayLabelVM : INotifyPropertyChanged
         {
             Label.EachQty = value;
             OnPropertyChanged();
+            SetTakeDisplayString();
         }
     }
 
@@ -71,6 +74,7 @@ public class ReceivingPutAwayLabelVM : INotifyPropertyChanged
         {
             Label.QtyPerCase = value;
             OnPropertyChanged();
+            SetTakeDisplayString();
         }
     }
 
@@ -81,6 +85,7 @@ public class ReceivingPutAwayLabelVM : INotifyPropertyChanged
         {
             Label.QtyPerPack = value;
             OnPropertyChanged();
+            SetTakeDisplayString();
         }
     }
 

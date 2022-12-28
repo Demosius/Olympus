@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace Cadmus;
 
@@ -92,6 +93,29 @@ public class RawPrinterHelper
     {
         // Open the file.
         var fs = new FileStream(szFileName, FileMode.Open);
+        // Create a BinaryReader on the file.
+        var br = new BinaryReader(fs);
+        // Dim an array of bytes big enough to hold the file's contents.
+        // Your unmanaged pointer.
+
+        var nLength = Convert.ToInt32(fs.Length);
+        // Read the contents of the file into the array.
+        var bytes = br.ReadBytes(nLength);
+        // Allocate some unmanaged memory for those bytes.
+        var pUnmanagedBytes = Marshal.AllocCoTaskMem(nLength);
+        // Copy the managed byte array into the unmanaged array.
+        Marshal.Copy(bytes, 0, pUnmanagedBytes, nLength);
+        // Send the unmanaged bytes to the printer.
+        var bSuccess = SendBytesToPrinter(szPrinterName, pUnmanagedBytes, nLength);
+        // Free the unmanaged memory that you allocated earlier.
+        Marshal.FreeCoTaskMem(pUnmanagedBytes);
+        return bSuccess;
+    }
+
+    public static bool SendFileToPrinter(string szPrinterName, SafeFileHandle szFile)
+    {
+        // Open the file.
+        var fs = new FileStream(szFile, FileAccess.Read);
         // Create a BinaryReader on the file.
         var br = new BinaryReader(fs);
         // Dim an array of bytes big enough to hold the file's contents.
