@@ -15,16 +15,14 @@ public class StaffChariot : MasterChariot
 
     public override Type[] Tables { get; } =
     {
-        typeof(Clan),                       typeof(ClockEvent),         typeof(Department),                 typeof(DepartmentProject),
-        typeof(Employee),                   typeof(EmployeeAvatar),     typeof(EmployeeDepartmentLoaning),  typeof(EmployeeIcon),
-        typeof(EmployeeInductionReference), typeof(EmployeeProject),    typeof(EmployeeShift),              typeof(EmployeeVehicle),
-        typeof(Induction),                  typeof(Licence),            typeof(LicenceImage),               typeof(Locker),
-        typeof(Shift),                      typeof(ShiftEntry),         typeof(TagUse),
-        typeof(ShiftRuleSingle),            typeof(ShiftRuleRecurring), typeof(ShiftRuleRoster),
-        typeof(TempTag),                    typeof(Vehicle),            typeof(Break),                      typeof(Project),
-        typeof(ProjectIcon),                typeof(Role),
-        typeof(Roster),                     typeof(DepartmentRoster),   typeof(EmployeeRoster),             typeof(DailyRoster),
-        typeof(DailyShiftCounter),          typeof(WeeklyShiftCounter)
+        typeof(Clan), typeof(ClockEvent), typeof(Department), typeof(DepartmentProject), typeof(Employee),
+        typeof(EmployeeAvatar), typeof(EmployeeDepartmentLoaning), typeof(EmployeeIcon),
+        typeof(EmployeeInductionReference), typeof(EmployeeProject), typeof(EmployeeShift), typeof(EmployeeVehicle),
+        typeof(Induction), typeof(Licence), typeof(LicenceImage), typeof(Locker), typeof(Shift), typeof(ShiftEntry),
+        typeof(TagUse), typeof(ShiftRuleSingle), typeof(ShiftRuleRecurring), typeof(ShiftRuleRoster), typeof(TempTag),
+        typeof(Vehicle), typeof(Break), typeof(Project), typeof(ProjectIcon), typeof(Role), typeof(Roster),
+        typeof(DepartmentRoster), typeof(EmployeeRoster), typeof(DailyRoster), typeof(DailyShiftCounter),
+        typeof(WeeklyShiftCounter)
     };
 
     /*************************** Constructors ****************************/
