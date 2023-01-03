@@ -16,7 +16,6 @@ using Cadmus.Annotations;
 using Cadmus.Models;
 using Cadmus.ViewModels.Commands;
 using Cadmus.Views.Labels;
-using Microsoft.Win32.SafeHandles;
 using Uranus;
 
 namespace Cadmus.ViewModels.Controls;
@@ -201,7 +200,6 @@ OZ	ASPLEY6	528	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
                 throw new ArgumentOutOfRangeException();
         }
 
-        
         PrintUIElements(xpsDocWriter, printList);
     }
 
@@ -346,7 +344,7 @@ OZ	ASPLEY6	528	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
             // add the PageContent object the FixedDocument
             fixedDoc.Pages.Add(pageContent);
         }
-        
+
         xpsWriter.Write(fixedDoc);
     }
 
@@ -368,8 +366,12 @@ OZ	ASPLEY6	528	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
             // add the PageContent object the FixedDocument
             fixedDoc.Pages.Add(pageContent);
         }
-        
-        RawPrinterHelper.SendFileToPrinter(printQueue.FullName, fixedDoc.);
+
+        // TODO: IMPORTANT:: Convert uiElements to images.
+        foreach (var s in uiElements.Select(uiElement => Printing.SendImageToPrinter(0, 0, "")))
+        {
+            RawPrinterHelper.SendStringToPrinter(printQueue.FullName, s);
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
