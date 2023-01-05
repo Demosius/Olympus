@@ -68,19 +68,22 @@ public static class DataConversion
 
             if (highestCol < row.Length)
             {
+                var documentNumber = row[headDict["Document No."]];
+                var uom = EnumConverter.StringToUoM(row[headDict["Unit of Measure"]]);
                 if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var item)) item = 0;
                 if (!int.TryParse(row[headDict["Quantity"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var qty)) qty = 0;
-                if (!int.TryParse(row[headDict["Avail. UOM Fulfillment Qty"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var availQty)) availQty = 0;
+                if (!int.TryParse(row[headDict["Avail. UOM Fulfilment Qty"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var availQty)) availQty = 0;
                 if (!DateTime.TryParse(row[headDict["Created On Date"]], provider, DateTimeStyles.None, out var date)) date = new DateTime();
                 if (!DateTime.TryParse(row[headDict["Created On Time"]], provider, DateTimeStyles.NoCurrentDateDefault, out var time)) time = new DateTime();
 
                 var to = new NAVTransferOrder
                 {
-                    ID = row[headDict["Document No."]],
-                    StoreNumber = row[headDict["Transfer-to Code"]],
+                    DocumentNumber = documentNumber,
                     ItemNumber = item,
+                    ID = $"{documentNumber}:{item}:{uom}",
+                    StoreNumber = row[headDict["Transfer-to Code"]],
                     Qty = qty,
-                    UoM = EnumConverter.StringToUoM(row[headDict["Unit of Measure"]]),
+                    UoM = uom,
                     AvailableQty = availQty,
                     CreationTime = date.Date.Add(time.TimeOfDay)
                 };

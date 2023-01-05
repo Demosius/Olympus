@@ -19,7 +19,7 @@ using Uranus.Inventory;
 
 namespace Panacea.ViewModels.Components;
 
-public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IItemData
+public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IItemData, IChecker
 {
     public Helios Helios { get; set; }
     public List<NegativeCheckResult> CheckResults { get; set; }
@@ -35,6 +35,19 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
             checkZoneString = value;
             OnPropertyChanged();
             Settings.Default.NegativeZones = value;
+            Settings.Default.Save();
+        }
+    }
+
+    private string checkLocString;
+    public string CheckLocString
+    {
+        get => checkLocString;
+        set
+        {
+            checkLocString = value;
+            OnPropertyChanged();
+            Settings.Default.NegativeLocations = value;
             Settings.Default.Save();
         }
     }
@@ -84,7 +97,7 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
     public ApplySortingCommand ApplySortingCommand { get; set; }
     public BinsToClipboardCommand BinsToClipboardCommand { get; set; }
     public ItemsToClipboardCommand ItemsToClipboardCommand { get; set; }
-    public RunNegativeChecksCommand RunNegativeChecksCommand { get; set; }
+    public RunChecksCommand RunChecksCommand { get; set; }
 
     #endregion
 
@@ -94,6 +107,7 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
 
         CheckResults = new List<NegativeCheckResult>();
         checkZoneString = Settings.Default.NegativeZones;
+        checkLocString = Settings.Default.NegativeLocations;
         filteredCheckResults = new ObservableCollection<NegativeCheckResult>();
         zoneFilter = string.Empty;
 
@@ -102,7 +116,7 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
         ApplySortingCommand = new ApplySortingCommand(this);
         BinsToClipboardCommand = new BinsToClipboardCommand(this);
         ItemsToClipboardCommand = new ItemsToClipboardCommand(this);
-        RunNegativeChecksCommand = new RunNegativeChecksCommand(this);
+        RunChecksCommand = new RunChecksCommand(this);
     }
 
     public void BinsToClipboard()
@@ -146,16 +160,17 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
         throw new NotImplementedException();
     }
 
-    public void RunNegativeChecks()
+    public void RunChecks()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
         CheckResults.Clear();
 
         var zones = checkZoneString.ToUpper().Split(',', '|').ToList();
+        var locations = checkLocString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones);
+        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones, locations);
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");

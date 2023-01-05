@@ -280,6 +280,15 @@ public class InventoryReader
             : contentsUpdates.Where(bcu => zoneIDs.Contains(bcu.ZoneID)).ToList().Min()!.LastUpdate;
     }
 
+    /* Transfer Order Lines */
+    public List<NAVTransferOrder> TOList(Expression<Func<NAVTransferOrder, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
+    /* STORES */
+    public List<Store>
+        Stores(Expression<Func<Store, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) =>
+        Chariot.PullObjectList(filter, pullType);
+
     /// <summary>
     /// Pulls multiple sets of data from the inventory database and combines them into the SKUMaster data set.
     /// </summary>
@@ -443,16 +452,16 @@ public class InventoryReader
         return dataSet;
     }
 
-    public BasicStockDataSet? BasicStockDataSet(List<string> zoneCodes)
+    public BasicStockDataSet? BasicStockDataSet(IEnumerable<string> zoneCodes, IEnumerable<string> locations)
     {
         BasicStockDataSet? dataSet = null;
 
         Chariot.Database?.RunInTransaction(() =>
         {
             var items = Items().ToList();
-            var zones = Zones(zone => zoneCodes.Contains(zone.Code));
-            var stock = Chariot.PullObjectList<NAVStock>(stock => zoneCodes.Contains(stock.ZoneCode));
-            var bins = Bins(bin => zoneCodes.Contains(bin.ZoneCode));
+            var zones = Zones(zone => zoneCodes.Contains(zone.Code) && locations.Contains(zone.LocationCode));
+            var stock = Chariot.PullObjectList<NAVStock>(stock => zoneCodes.Contains(stock.ZoneCode) && locations.Contains(stock.LocationCode));
+            var bins = Bins(bin => zoneCodes.Contains(bin.ZoneCode) && locations.Contains(bin.LocationCode));
             var uomList = NAVUoMs();
 
             dataSet = new BasicStockDataSet(items, zones, bins, stock, uomList);
@@ -463,4 +472,35 @@ public class InventoryReader
 
         return dataSet;
     }
+
+    public TOStockDataSet? TOStockDataSet(IEnumerable<string> zoneCodes, IEnumerable<string> locations)
+    {
+        TOStockDataSet? dataSet = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var items = Items().ToList();
+            var zones = Zones(zone => zoneCodes.Contains(zone.Code) && locations.Contains(zone.LocationCode));
+            var stock = Chariot.PullObjectList<NAVStock>(stock => zoneCodes.Contains(stock.ZoneCode) && locations.Contains(stock.LocationCode));
+            var bins = Bins(bin => zoneCodes.Contains(bin.ZoneCode) && locations.Contains(bin.LocationCode));
+            var uomList = NAVUoMs();
+            var toList = TOList();
+            var stores = Stores();
+            var platforms = NAVPlatforms();
+            var divisions = NAVDivisions();
+            var categories = NAVCategories();
+            var genres = NAVGenres();
+
+            dataSet = new TOStockDataSet(items, zones, bins, stock, uomList, toList, stores, platforms, genres,
+                categories, divisions);
+        });
+
+        dataSet ??= new TOStockDataSet(new List<NAVItem>(), new List<NAVZone>(), new List<NAVBin>(),
+            new List<NAVStock>(), new List<NAVUoM>(), new List<NAVTransferOrder>(), new List<Store>(),
+            new List<NAVPlatform>(), new List<NAVGenre>(), new List<NAVCategory>(), new List<NAVDivision>());
+
+        return dataSet;
+    }
+
+    public int TOLineCount() => Chariot.Database?.ExecuteScalar<int>("SELECT count(*) FROM TOLineBatchAnalysis;") ?? 0;
 }

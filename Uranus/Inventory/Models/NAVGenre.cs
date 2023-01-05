@@ -25,4 +25,9 @@ public class NAVGenre
         Description = description;
         Items = items;
     }
+
+    public override string ToString()
+    {
+        return $"{Code} - {Description}";
+    }
 }

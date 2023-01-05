@@ -37,4 +37,11 @@ public class Store
     {
         return $"W{WaveNumber:00}";
     }
+
+    public void AddTO(NAVTransferOrder transferOrder)
+    {
+        if (transferOrder.StoreNumber != Number) return;
+        transferOrder.Store = this;
+        TransferOrders.Add(transferOrder);
+    }
 }

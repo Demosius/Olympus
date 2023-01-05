@@ -18,7 +18,7 @@ using Uranus.Interfaces;
 
 namespace Panacea.ViewModels.Components;
 
-public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinData
+public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinData, IChecker
 {
     public Helios Helios { get; set; }
     public List<BWMICheckResult> CheckResults { get; set; }
@@ -34,6 +34,19 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
             checkZoneString = value;
             OnPropertyChanged();
             Settings.Default.BWMIZones = value;
+            Settings.Default.Save();
+        }
+    }
+
+    private string checkLocString;
+    public string CheckLocString
+    {
+        get => checkLocString;
+        set
+        {
+            checkLocString = value;
+            OnPropertyChanged();
+            Settings.Default.BWMILocations = value;
             Settings.Default.Save();
         }
     }
@@ -82,8 +95,8 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public ApplySortingCommand ApplySortingCommand { get; set; }
-    public RunBWMIChecksCommand RunBWMIChecksCommand { get; set; }
     public BinsToClipboardCommand BinsToClipboardCommand { get; set; }
+    public RunChecksCommand RunChecksCommand { get; set; }
 
     #endregion
 
@@ -93,6 +106,7 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
 
         CheckResults = new List<BWMICheckResult>();
         checkZoneString = Settings.Default.BWMIZones;
+        checkLocString = Settings.Default.BWMILocations;
         filteredCheckResults = new ObservableCollection<BWMICheckResult>();
 
         zoneFilter = string.Empty;
@@ -101,8 +115,8 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
-        RunBWMIChecksCommand = new RunBWMIChecksCommand(this);
         BinsToClipboardCommand = new BinsToClipboardCommand(this);
+        RunChecksCommand = new RunChecksCommand(this);
     }
 
     public void ClearFilters()
@@ -136,6 +150,7 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
         throw new NotImplementedException();
     }
 
+
     public void RunChecks()
     {
         Mouse.OverrideCursor = Cursors.Wait;
@@ -143,9 +158,10 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
         CheckResults.Clear();
 
         var zones = checkZoneString.ToUpper().Split(',', '|').ToList();
+        var locations = checkLocString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones);
+        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones, locations);
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");

@@ -43,6 +43,8 @@ public class InventoryCreator
         return true;
     }
 
+    public int NAVTransferOrders(IEnumerable<NAVTransferOrder> transferOrders) => Chariot.ReplaceFullTable(transferOrders);
+
     public int NAVZone(List<NAVZone> zones) => Chariot.ReplaceFullTable(zones);
 
     public int NAVLocation(List<NAVLocation> locations) => Chariot.ReplaceFullTable(locations);

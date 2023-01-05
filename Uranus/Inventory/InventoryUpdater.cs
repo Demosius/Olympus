@@ -65,6 +65,8 @@ public class InventoryUpdater
 
     public int NAVZones(List<NAVZone> zones) => Chariot.UpdateTable(zones);
 
+    public int NAVTransferOrders(IEnumerable<NAVTransferOrder> transferOrders) => Chariot.UpdateTable(transferOrders);
+
     public int Zones(IEnumerable<NAVZone> zones)
     {
         var count = 0;

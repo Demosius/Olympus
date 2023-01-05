@@ -1,15 +1,15 @@
-﻿using Panacea.ViewModels.Components;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Panacea.Interfaces;
 
 namespace Panacea.ViewModels.Commands;
 
 
-public class RunPotentialNegativesCheckCommand : ICommand
+public class RunChecksCommand : ICommand
 {
-    public PotentialNegativeVM VM { get; set; }
+    public IChecker VM { get; set; }
 
-    public RunPotentialNegativesCheckCommand(PotentialNegativeVM vm) { VM = vm; }
+    public RunChecksCommand(IChecker vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -18,7 +18,7 @@ public class RunPotentialNegativesCheckCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.RunPotentialNegativesCheck();
+        VM.RunChecks();
     }
 
     public event EventHandler? CanExecuteChanged

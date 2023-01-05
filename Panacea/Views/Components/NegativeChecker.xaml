@@ -20,7 +20,7 @@
                 </StackPanel>
 
                 <Button Content="Run"
-                        Command="{Binding RunNegativeChecksCommand}"
+                        Command="{Binding RunChecksCommand}"
                         Width="100"
                         HorizontalAlignment="Left"
                         Margin="2"/>

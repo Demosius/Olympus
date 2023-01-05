@@ -18,7 +18,7 @@ using Uranus.Interfaces;
 
 namespace Panacea.ViewModels.Components;
 
-public class PurgeVM : INotifyPropertyChanged, IFilters, IBinData, IItemData
+public class PurgeVM : INotifyPropertyChanged, IFilters, IBinData, IItemData, IChecker
 {
     public Helios Helios { get; set; }
     public List<PurgeCheckResult> CheckResults { get; set; }
@@ -32,6 +32,19 @@ public class PurgeVM : INotifyPropertyChanged, IFilters, IBinData, IItemData
         set
         {
             checkZoneString = value;
+            OnPropertyChanged();
+            Settings.Default.PurgeZones = value;
+            Settings.Default.Save();
+        }
+    }
+
+    private string checkLocString;
+    public string CheckLocString
+    {
+        get => checkLocString;
+        set
+        {
+            checkLocString = value;
             OnPropertyChanged();
             Settings.Default.PurgeZones = value;
             Settings.Default.Save();
@@ -82,7 +95,7 @@ public class PurgeVM : INotifyPropertyChanged, IFilters, IBinData, IItemData
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public ApplySortingCommand ApplySortingCommand { get; set; }
-    public RunPurgeCheckCommand RunPurgeCheckCommand { get; set; }
+    public RunChecksCommand RunChecksCommand { get; set; }
     public BinsToClipboardCommand BinsToClipboardCommand { get; set; }
     public ItemsToClipboardCommand ItemsToClipboardCommand { get; set; }
 
@@ -94,6 +107,7 @@ public class PurgeVM : INotifyPropertyChanged, IFilters, IBinData, IItemData
 
         CheckResults = new List<PurgeCheckResult>();
         checkZoneString = Settings.Default.PurgeZones;
+        checkLocString = Settings.Default.PurgeLocations;
         filteredCheckResults = new ObservableCollection<PurgeCheckResult>();
         zoneFilter = string.Empty;
         zoneTypeFilter = string.Empty;
@@ -101,7 +115,7 @@ public class PurgeVM : INotifyPropertyChanged, IFilters, IBinData, IItemData
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
-        RunPurgeCheckCommand = new RunPurgeCheckCommand(this);
+        RunChecksCommand = new RunChecksCommand(this);
         ItemsToClipboardCommand = new ItemsToClipboardCommand(this);
         BinsToClipboardCommand = new BinsToClipboardCommand(this);
     }
@@ -137,16 +151,17 @@ public class PurgeVM : INotifyPropertyChanged, IFilters, IBinData, IItemData
         throw new NotImplementedException();
     }
 
-    public void RunPurgeCheck()
+    public void RunChecks()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
         CheckResults.Clear();
 
         var zones = checkZoneString.ToUpper().Split(',', '|').ToList();
+        var locations = checkLocString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones);
+        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones, locations);
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");

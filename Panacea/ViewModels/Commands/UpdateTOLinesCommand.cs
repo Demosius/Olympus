@@ -1,15 +1,15 @@
-﻿using Panacea.ViewModels.Components;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Panacea.ViewModels.Components;
 
 namespace Panacea.ViewModels.Commands;
 
 
-public class RunBWMIChecksCommand : ICommand
+public class UpdateTOLinesCommand : ICommand
 {
-    public BinsWithMultipleItemsVM VM { get; set; }
+    public ItemsWithNoPickBinVM VM { get; set; }
 
-    public RunBWMIChecksCommand(BinsWithMultipleItemsVM vm) { VM = vm; }
+    public UpdateTOLinesCommand(ItemsWithNoPickBinVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -18,7 +18,7 @@ public class RunBWMIChecksCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.RunChecks();
+        VM.UpdateTOLines();
     }
 
     public event EventHandler? CanExecuteChanged
