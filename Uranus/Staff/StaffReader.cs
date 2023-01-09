@@ -106,7 +106,7 @@ public class StaffReader
         departmentList = departments;
     }
 
-    public List<int> GetManagerIDs() => Chariot.Database?.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee WHERE IsActive = ?;", true).Select(e => e.ReportsToID).ToList() ?? new List<int>();
+    public IEnumerable<int> GetManagerIDs() => Chariot.Database?.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee WHERE IsActive = ?;", true).Select(e => e.ReportsToID).ToList() ?? new List<int>();
 
     public IEnumerable<string> Locations() => Chariot.Database?.Query<Employee>("SELECT DISTINCT Location FROM Employee WHERE IsActive = ?;", true).Select(e => e.Location) ?? new List<string>();
 
@@ -528,19 +528,6 @@ public class StaffReader
     public int GetClockCount(int employeeCode)
     {
         return ClocksForToday(employeeCode).Count;
-    }
-
-    /// <summary>
-    /// Returns a list of all employees that have direct reports.
-    /// </summary>
-    /// <returns>List of Employees</returns>
-    public List<Employee> Managers()
-    {
-        var conn = Chariot.Database;
-        //List<int> employeeIDs = conn.Query<int>("SELECT DISTINCT ReportsToID FROM Employee;");
-        var employeeIDs = conn?.Query<Employee>("SELECT DISTINCT ReportsToID FROM Employee;").Select(e => e.ReportsToID).ToList() ?? new List<int>();
-
-        return conn?.Query<Employee>($"SELECT * FROM Employee WHERE ID IN ({string.Join(", ", employeeIDs)});") ?? new List<Employee>();
     }
 
     /// <summary>
