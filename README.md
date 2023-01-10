@@ -4,12 +4,12 @@ All in one EB DC internal application(s).
 ## Adding New Project Checklist:
 1. Add new project to Olympus
     - Right Click => Add => New Project...
-        - QPF Application (C#)
+        - WPF Application (C#)
             - ProjectName
                 - .Net 6.0 (Long-term support)
 1. Add Project to Uranus.
     - Staff.EnumConverter.***EProject*** (and EnumConverter)
-1. Add Project reference to Uranus (from new Project) (and other required Projects - such as Styx and Morpheus)
+1. Add Project reference to Uranus and Morpheus (from new Project) (and other required Projects - such as Styx - if appropriate.)
 1. Add project folders.
     - Models
     - Views
@@ -59,7 +59,7 @@ All in one EB DC internal application(s).
         }
         ```
 1. Edit Views.
-    - Copy Themes and Resources (at least such that contains Fonts.xaml and Fonts subfolder) folders from another project to use - and edit as desired.
+    - Copy Resources (at least such that contains Fonts.xaml and Fonts subfolder) folders from another project to use - and edit as desired.
     - ProjectNamePage.xaml
         - Set data context for design instance:
         `d:DataContext="{d:DesignInstance {x:Type vm:ProjectNameVM}, IsDesignTimeCreatable=False}"`
@@ -68,7 +68,7 @@ All in one EB DC internal application(s).
         <Page.Resources>
             <ResourceDictionary>
                 <ResourceDictionary.MergedDictionaries>
-                    <ResourceDictionary Source="../Themes/MSControls.Core.Implicit.xaml"/>
+                    <ResourceDictionary Source="/Morpheus;component/Themes/[Dark/Light]/['colour']/MSControls.Core.Implicit.xaml"/>
                 </ResourceDictionary.MergedDictionaries>
             </ResourceDictionary>
         </Page.Resources>
@@ -100,7 +100,7 @@ All in one EB DC internal application(s).
         <Window.Resources>
             <ResourceDictionary>
                 <ResourceDictionary.MergedDictionaries>
-                    <ResourceDictionary Source="../Themes/MSControls.Core.Implicit.xaml"/>
+                    <ResourceDictionary Source="/Morpheus;component/Themes/[Dark/Light]/['colour']/MSControls.Core.Implicit.xaml"/>
                 </ResourceDictionary.MergedDictionaries>
             </ResourceDictionary>
         </Window.Resources>
