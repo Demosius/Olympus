@@ -13,32 +13,11 @@
                     Command="Refresh"/>
     </UserControl.InputBindings>
 
-    <DockPanel Background="#bb8">
+    <UserControl.Resources>
+        <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Green/MSControls.Core.Implicit.xaml"/>
+    </UserControl.Resources>
 
-        <!-- Standard Functions -->
-        <!--<StackPanel DockPanel.Dock="Top"
-                    Orientation="Horizontal"
-                    Background="{StaticResource Brush05}">
-            <Button Command="{Binding RefreshDataCommand}"
-                    ToolTip="(F5)">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="../../Resources/refresh.png"
-                           MaxHeight="20"
-                           MinHeight="20"
-                           Margin="0,0,2,0"/>
-                    <TextBlock Text="Refresh Data"/>
-                </StackPanel>
-            </Button>
-            <Button Command="{Binding SaveLevelsCommand}">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="../../Resources/save.png"
-                           MaxHeight="20"
-                           MinHeight="20"
-                           Margin="0,0,2,0"/>
-                    <TextBlock Text="Save Changes"/>
-                </StackPanel>
-            </Button>
-        </StackPanel>-->
+    <DockPanel Background="#bb8">
 
         <!-- Setup manager -->
         <Grid DockPanel.Dock="Top"

@@ -11,9 +11,14 @@
 
     <UserControl.Resources>
         <ResourceDictionary>
-            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
-                <Setter Property="Margin" Value="2"/>
-            </Style>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Green/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                        <Setter Property="Margin" Value="2"/>
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
 
