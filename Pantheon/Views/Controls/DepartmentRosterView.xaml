@@ -12,10 +12,6 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Dark Theme -->
-                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
-                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
-
                 <ResourceDictionary>
                     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 
@@ -26,15 +22,6 @@
                     <DataTemplate x:Key="SelectedTemplate">
                         <controls:ActiveEmployeeRosterView DataContext="{Binding}" Padding="0" Margin="0"/>
                     </DataTemplate>
-
-                    <!--<Style TargetType="{x:Type ListBoxItem}" x:Key="RosterStyle" BasedOn="{StaticResource ListBoxItemStyle}">
-                        <Setter Property="ContentTemplate" Value="{StaticResource RosterTemplate}" />
-                        <Style.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="ContentTemplate" Value="{StaticResource SelectedTemplate}" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>-->
                 </ResourceDictionary>
 
             </ResourceDictionary.MergedDictionaries>

@@ -11,7 +11,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../../Resources/Fonts/../Fonts.xaml"/>
+                <ResourceDictionary Source="/Morpheus;component/Resources/Fonts.xaml"/>
                 <ResourceDictionary>
                     <Style TargetType="TextBlock">
                         <Setter Property="Foreground" Value="Black"></Setter>

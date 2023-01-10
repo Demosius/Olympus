@@ -10,16 +10,6 @@
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:EmployeeRosterVM}, IsDesignTimeCreatable=False}">
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <!-- Dark Theme -->
-                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
-                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
-
     <Canvas Height="90">
 
         <!-- Employee -->

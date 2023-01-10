@@ -10,14 +10,9 @@
 
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
-                <ResourceDictionary>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
-                        <Setter Property="Margin" Value="2"></Setter>
-                    </Style>
-                </ResourceDictionary>
-            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                <Setter Property="Margin" Value="2"></Setter>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
 

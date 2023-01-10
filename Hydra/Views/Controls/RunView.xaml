@@ -8,16 +8,6 @@
              d:DataContext="{d:DesignInstance {x:Type vm:RunVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="500" d:DesignWidth="900">
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
-                <ResourceDictionary>
-                </ResourceDictionary>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
-
     <UserControl.InputBindings>
         <KeyBinding Gesture="F5"
                     Command="Refresh"/>

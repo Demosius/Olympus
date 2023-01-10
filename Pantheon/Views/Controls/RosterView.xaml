@@ -9,17 +9,6 @@
              d:DataContext="{d:DesignInstance {x:Type rosters:RosterVM}, IsDesignTimeCreatable=False}"
              Height="40" Width="200">
 
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <!-- Dark Theme -->
-                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
-                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
-                <ResourceDictionary Source="../../Resources/Fonts.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
-
     <Border BorderBrush="{StaticResource ForegroundBrush}"
             BorderThickness=".5">
         <TextBlock Text="{Binding DisplayString, Mode=OneWay}"
