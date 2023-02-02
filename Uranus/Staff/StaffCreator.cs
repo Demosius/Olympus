@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Uranus.Staff.Models;
+using Uranus.Users.Models;
+using Role = Uranus.Staff.Models.Role;
 
 namespace Uranus.Staff;
 
@@ -24,7 +26,8 @@ public class StaffCreator
         Chariot = chariot;
     }
 
-    public bool Employee(Employee employee, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(employee, pushType);
+    public bool Employee(Employee employee, EPushType pushType = EPushType.ObjectOnly) =>
+        Chariot.Create(employee, pushType);
 
     public bool ClockEvent(ClockEvent clockEvent) => Chariot.Create(clockEvent);
 
@@ -60,7 +63,8 @@ public class StaffCreator
         return returnVal;
     }
 
-    public bool Department(Department department, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(department, pushType);
+    public bool Department(Department department, EPushType pushType = EPushType.ObjectOnly) =>
+        Chariot.Create(department, pushType);
 
     public bool Role(Role role, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(role, pushType);
 
@@ -76,10 +80,17 @@ public class StaffCreator
         });
     }
 
-    public EmployeeIcon? CreateEmployeeIconFromSourceFile(string sourceFile) => (EmployeeIcon?)CreateImageFromSourceFile(sourceFile, EImageType.EmployeeIcon);
-    public EmployeeAvatar? CreateEmployeeAvatarFromSourceFile(string sourceFile) => (EmployeeAvatar?)CreateImageFromSourceFile(sourceFile, EImageType.EmployeeAvatar);
-    public ProjectIcon? CreateProjectIconFromSourceFile(string sourceFile) => (ProjectIcon?)CreateImageFromSourceFile(sourceFile, EImageType.ProjectIcon);
-    public LicenceImage? CreateLicenceImageFromSourceFile(string sourceFile) => (LicenceImage?)CreateImageFromSourceFile(sourceFile, EImageType.LicenceImage);
+    public EmployeeIcon? CreateEmployeeIconFromSourceFile(string sourceFile) =>
+        (EmployeeIcon?) CreateImageFromSourceFile(sourceFile, EImageType.EmployeeIcon);
+
+    public EmployeeAvatar? CreateEmployeeAvatarFromSourceFile(string sourceFile) =>
+        (EmployeeAvatar?) CreateImageFromSourceFile(sourceFile, EImageType.EmployeeAvatar);
+
+    public ProjectIcon? CreateProjectIconFromSourceFile(string sourceFile) =>
+        (ProjectIcon?) CreateImageFromSourceFile(sourceFile, EImageType.ProjectIcon);
+
+    public LicenceImage? CreateLicenceImageFromSourceFile(string sourceFile) =>
+        (LicenceImage?) CreateImageFromSourceFile(sourceFile, EImageType.LicenceImage);
 
     public Image? CreateImageFromSourceFile(string sourceFile, EImageType type)
     {
@@ -106,6 +117,7 @@ public class StaffCreator
             newName = $"{name}_{cnt}";
             ++cnt;
         }
+
         name = newName;
         fileName = $"{name}{Path.GetExtension(fileName)}";
 
@@ -197,4 +209,9 @@ public class StaffCreator
         Chariot.Create(shiftRule, pushType);
 
     public int ShiftRuleRosters(IEnumerable<ShiftRuleRoster> rosterRules) => Chariot.InsertIntoTable(rosterRules);
+
+    public bool Conversation(Conversation conversation, EPushType pushType = EPushType.ObjectOnly) =>
+        Chariot.Create(conversation, pushType);
+
+
 }

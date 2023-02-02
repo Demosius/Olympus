@@ -138,6 +138,7 @@ public class OlympusVM : INotifyPropertyChanged
             new Project(EProject.Argos, "UBC.ico", App.Helios.StaffReader, "UBC: Unified Batch Checker - for cross-department batch progress reports."),
             new Project(EProject.Hades, "Hades.ico", App.Helios.StaffReader, "N.I.M.S. - Non-Inventory Management System"),
             new Project(EProject.Panacea, "Panacea.ico", App.Helios.StaffReader, "ALLFIX: Multiple tools to remedy many given issues."),
+            new Project(EProject.Hermes, "Hermes.ico", App.Helios.StaffReader, "Messaging service. Use for dev requests."),
         };
 
         App.Helios.StaffCreator.EstablishInitialProjects(projects);

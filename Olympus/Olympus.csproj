@@ -17,16 +17,19 @@
     <None Remove="Resources\Images\Icons\Aion.ico" />
     <None Remove="Resources\Images\Icons\AionClock.ico" />
     <None Remove="Resources\Images\Icons\Argos.ico" />
+    <None Remove="Resources\Images\Icons\Basilisk.ico" />
     <None Remove="Resources\Images\Icons\burn.ico" />
     <None Remove="Resources\Images\Icons\cadmus.ico" />
     <None Remove="Resources\Images\Icons\castle.ico" />
     <None Remove="Resources\Images\Icons\chaos-white.ico" />
     <None Remove="Resources\Images\Icons\chaos.ico" />
     <None Remove="Resources\Images\Icons\dredd.ico" />
+    <None Remove="Resources\Images\Icons\Falcon.ico" />
     <None Remove="Resources\Images\Icons\fixedBin.ico" />
     <None Remove="Resources\Images\Icons\forge.ico" />
     <None Remove="Resources\Images\Icons\Hades.ico" />
     <None Remove="Resources\Images\Icons\hellsing.ico" />
+    <None Remove="Resources\Images\Icons\Hermes.ico" />
     <None Remove="Resources\Images\Icons\hydra.ico" />
     <None Remove="Resources\Images\Icons\newlym.ico" />
     <None Remove="Resources\Images\Icons\o-bolt.ico" />
@@ -77,13 +80,22 @@
     <Content Include="Resources\Images\Icons\Argos.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Images\Icons\Basilisk.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Images\Icons\cadmus.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\Falcon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\fixedBin.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\Hades.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\Hermes.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\omega.ico">
@@ -154,6 +166,7 @@
     <ProjectReference Include="..\Argos\Argos.csproj" />
     <ProjectReference Include="..\Cadmus\Cadmus.csproj" />
     <ProjectReference Include="..\Hades\Hades.csproj" />
+    <ProjectReference Include="..\Hermes\Hermes.csproj" />
     <ProjectReference Include="..\Hydra\Hydra.csproj" />
     <ProjectReference Include="..\Khaos\Khaos.csproj" />
     <ProjectReference Include="..\Panacea\Panacea.csproj" />
