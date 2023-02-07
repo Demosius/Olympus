@@ -3,9 +3,162 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:vm="clr-namespace:Khaos.ViewModels"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type vm:KhaosVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="KhaosPage">
 
-    <Grid Background="YellowGreen" />
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/White/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary>
+                    <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="MinHeight" Value="10"/>
+                        <Setter Property="Height" Value="25"/>
+                        <Setter Property="Margin" Value="5,3"></Setter>
+                    </Style>
+                    <Style BasedOn="{StaticResource TextBoxStyle}" TargetType="TextBox">
+                        <Setter Property="MinHeight" Value="0"/>
+                        <Setter Property="Height" Value="25"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+                    </Style>
+                    <Style BasedOn="{StaticResource MiniComboBoxStyle}" TargetType="ComboBox">
+                        <Setter Property="MinWidth" Value="120"/>
+                        <Setter Property="Margin" Value="3"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="Height" Value="25"/>
+                        <Setter Property="MinHeight" Value="10"/>
+                    </Style>
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <DockPanel Background="Black" >
+        <!--Instance selection and actions. -->
+        <Grid DockPanel.Dock="Top"
+              Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Select copy of Khaos/Data -->
+            <ComboBox Grid.Column="0"
+                      ToolTip="Select Saved Instance Data"/>
+
+            <!-- Start new save(d/able) instance if Khaos -->
+            <Button Grid.Column="1" 
+                    Content="New Instance"/>
+
+            <!-- Run/Generate MakeBulk Sku lists -->
+            <Button Grid.Column="3" 
+                    Content="Generate"
+                    Style="{StaticResource InverseButtonStyle}"
+                    FontWeight="Bold"
+                    Width="150"
+                    FontSize="16"/>
+
+            <!-- Update TO Data -->
+            <Button Grid.Column="5" 
+                    Content="Input TO Lines"/>
+
+            <!-- Pull Data into Instance -->
+            <Button Grid.Column="6" 
+                    Content="Pull Data"/>
+
+
+        </Grid>
+        <!-- Variable Selection -->
+        <StackPanel DockPanel.Dock="Left" 
+                    Orientation="Vertical">
+
+            <!-- Buffer Batches -->
+            <Border BorderThickness="1" 
+                    BorderBrush="{DynamicResource Brush01}" 
+                    Padding="2,0,5,0"
+                    Background="#333">
+                <CheckBox Content="Buffer Batches"
+                          FontWeight="Bold"
+                          HorizontalAlignment="Center"
+                          IsChecked="{Binding UseBufferBatches, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </Border>
+            <!-- Split MakeBulk -->
+            <Border BorderThickness="1" 
+                    BorderBrush="{DynamicResource Brush01}" 
+                    Padding="2,0,5,0"
+                    Background="#333">
+                <StackPanel Orientation="Vertical">
+                    <CheckBox Content="Split MakeBulk"
+                              FontWeight="Bold"
+                              HorizontalAlignment="Center"
+                              IsChecked="{Binding SplitMakeBulk, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <StackPanel Orientation="Vertical"
+                                Visibility="{Binding Path=SplitMakeBulk, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <CheckBox Content="Split Core/Loot/POP"
+                                  IsChecked="{Binding SplitProductType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Separator/>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox Content="Cube Cap"
+                                      IsChecked="{Binding CapCube, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBox MinWidth="50"
+                                     Margin="15,0,0,0"
+                                     Text="{Binding CubeCap, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                                     LostMouseCapture="TextBox_LostMouseCapture"
+                                     LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                            <Label Content="m³"/>
+                        </StackPanel>
+                        <Separator/>
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton GroupName="GroupLimiting"
+                                         IsChecked="{Binding UseCountCap, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox MinWidth="50"
+                                             Text="{Binding GroupCap, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                             GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                                             LostMouseCapture="TextBox_LostMouseCapture"
+                                             LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                                    <Label Content="Group Count Cap"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox MinWidth="50"
+                                             Text="{Binding CubeTarget, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                             GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                                             LostMouseCapture="TextBox_LostMouseCapture"
+                                             LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                                    <Label Content="Cube per Group Target"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                        <Separator/>
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton GroupName="GroupLimiting"
+                                         IsChecked="{Binding UseCountTarget, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBox MinWidth="50"
+                                     Text="{Binding GroupTarget, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                     GotKeyboardFocus="TextBox_GotKeyboardFocus"
+                                     LostMouseCapture="TextBox_LostMouseCapture"
+                                     LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
+                            <Label Content="Group Count Target"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+        <TabControl Background="Gray">
+
+        </TabControl>
+    </DockPanel>
 </Page>

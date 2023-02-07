@@ -30,7 +30,7 @@ public static class ProjectFactory
             EProject.Prometheus => new PrometheusPage(App.Helios, App.Charon),
             EProject.Pantheon => new PantheonPage(App.Charon, App.Helios),
             EProject.Phoenix => new PhoenixPage(),
-            EProject.Khaos => new KhaosPage(),
+            EProject.Khaos => new KhaosPage(App.Helios),
             EProject.Aion => new AionPage(App.Helios, App.Charon),
             EProject.Hydra => new HydraPage(App.Helios, App.Charon),
             EProject.Cadmus => new CadmusPage(),
