@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Windows.Input;
+using Cadmus.Interfaces;
 
 namespace Cadmus.ViewModels.Commands;
 
 
-public class ShowPrinterCommand : ICommand
+public class AddLineCommand : ICommand
 {
-    public IPrintable VM { get; set; }
+    public IDataLines VM { get; set; }
 
-    public ShowPrinterCommand(IPrintable vm) { VM = vm; }
+    public AddLineCommand(IDataLines vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -17,7 +18,7 @@ public class ShowPrinterCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.ShowPrinter();
+        VM.AddLine();
     }
 
     public event EventHandler? CanExecuteChanged

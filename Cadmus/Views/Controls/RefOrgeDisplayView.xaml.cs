@@ -7,22 +7,22 @@ using Cadmus.ViewModels.Labels;
 namespace Cadmus.Views.Controls;
 
 /// <summary>
-/// Interaction logic for ReceivingPutAway.xaml
+/// Interaction logic for RefOrgeView.xaml
 /// </summary>
-public partial class ReceivingPutAway
+public partial class RefOrgeDisplayView
 {
-    public ReceivingPutAway()
+    public RefOrgeDisplayView()
     {
         InitializeComponent();
-        DataContext = new ReceivingPutAwayVM();
+        DataContext = new RefOrgeDisplayVM();
     }
 
     private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        var vm = (ReceivingPutAwayVM)DataContext;
+        var vm = (RefOrgeDisplayVM)DataContext;
         vm.SelectedLabels =
-            new ObservableCollection<ReceivingPutAwayLabelVM>(LabelViewList.SelectedItems
-                .Cast<ReceivingPutAwayLabelVM>()
+            new ObservableCollection<RefOrgeLabelVM>(LabelViewList.SelectedItems
+                .Cast<RefOrgeLabelVM>()
                 .ToList());
     }
 }

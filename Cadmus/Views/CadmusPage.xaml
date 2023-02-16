@@ -39,9 +39,6 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Button DockPanel.Dock="Top"
-                Click="ButtonBase_OnClick"
-                Content="TEST PRINT"/>
         <UserControl Content="{Binding CurrentControl}"
                      Background="{DynamicResource Brush05}"/>
     </DockPanel>

@@ -1,11 +1,9 @@
 ﻿using Cadmus.ViewModels.Commands;
 
-namespace Cadmus;
+namespace Cadmus.Interfaces;
 
 public interface IPrintable
 {
     public PrintCommand PrintCommand { get; set; }
-    public ShowPrinterCommand ShowPrinterCommand { get; set; }
     void Print();
-    void ShowPrinter();
 }

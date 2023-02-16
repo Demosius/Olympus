@@ -9,7 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="printer.png" />
+    <None Remove="Resources\Fonts\Calibri.ttf" />
+    <None Remove="Resources\Fonts\calibrib.ttf" />
+    <None Remove="Resources\Fonts\calibril.ttf" />
     <None Remove="Resources\Fonts\code128.ttf" />
     <None Remove="Resources\Fonts\DIN Black.ttf" />
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
@@ -20,6 +22,15 @@
 
   <ItemGroup>
     <Content Include="cadmus.ico" />
+    <Content Include="Resources\Fonts\Calibri.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\calibrib.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\calibril.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -28,24 +39,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="printer.png">
+    <Content Include="Resources\Fonts\code128.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="Resources\Fonts\code128.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Fonts\DIN Black.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Fonts\DIN Bold.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Fonts\DIN Medium.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Fonts\DIN.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+    <Content Include="Resources\Fonts\DIN Black.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\DIN Bold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\DIN Medium.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\DIN.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Resources\Images\printer.png" />
   </ItemGroup>
 
@@ -111,10 +119,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Neodynamic.SDK.ThermalLabel" Version="12.0.0" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <PackageReference Include="System.Management" Version="7.0.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
+    <PackageReference Include="ZXing.Net" Version="0.16.8" />
+    <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.10" />
   </ItemGroup>
 
 </Project>

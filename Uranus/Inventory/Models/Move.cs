@@ -1,6 +1,7 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
+using Uranus.Staff.Models;
 
 namespace Uranus.Inventory.Models;
 
@@ -33,7 +34,7 @@ public class Move
 
     public bool HasExecuted { get; set; }
 
-    public int AssignedOperator { get; set; }
+    public int AssignedOperatorID { get; set; }
     public float TimeEstimate { get; set; }
 
     [Ignore] public bool FullPallet => TakeBin != null && (TakeBin.IsFullQty(this) ?? false) && AccessLevel != EAccessLevel.Ground;
@@ -52,6 +53,8 @@ public class Move
 
     [Ignore] public int? BatchPriority => Batch?.Priority;
 
+    [Ignore] public Employee? AssignedOperator { get; set; }
+    [Ignore] public string OperatorName => AssignedOperator?.DisplayName ?? AssignedOperatorID.ToString();
 
     [Ignore]
     public int Priority

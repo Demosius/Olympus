@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -10,14 +11,25 @@ using Cadmus.ViewModels.Labels;
 
 namespace Cadmus.ViewModels.Controls;
 
-public class ReceivingPutAwayVM : INotifyPropertyChanged, IPrintable, IDataLines
+internal class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
 {
-    public List<ReceivingPutAwayLabel> Labels { get; set; }
+    public List<RefOrgeMasterLabel> Masters { get; set; }
 
     #region INotifyPropertyChanged Members
 
-    private ObservableCollection<ReceivingPutAwayLabelVM> labelVMs;
-    public ObservableCollection<ReceivingPutAwayLabelVM> LabelVMs
+    private ObservableCollection<RefOrgeMasterLabelVM> masterVms;
+    public ObservableCollection<RefOrgeMasterLabelVM> MasterVMs
+    {
+        get => masterVms;
+        set
+        {
+            masterVms = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private ObservableCollection<RefOrgeLabelVM> labelVMs;
+    public ObservableCollection<RefOrgeLabelVM> LabelVMs
     {
         get => labelVMs;
         set
@@ -27,10 +39,9 @@ public class ReceivingPutAwayVM : INotifyPropertyChanged, IPrintable, IDataLines
         }
     }
 
-    public ObservableCollection<ReceivingPutAwayLabelVM> SelectedLabels { get; set; }
+    public ObservableCollection<RefOrgeLabelVM> SelectedLabels { get; set; }
 
     #endregion
-
     #region Commands
 
     public PrintCommand PrintCommand { get; set; }
@@ -38,27 +49,24 @@ public class ReceivingPutAwayVM : INotifyPropertyChanged, IPrintable, IDataLines
 
     #endregion
 
-    public ReceivingPutAwayVM()
+    public RefOrgeDisplayVM()
     {
-        Labels = new List<ReceivingPutAwayLabel>();
-        labelVMs = new ObservableCollection<ReceivingPutAwayLabelVM>();
-        SelectedLabels = new ObservableCollection<ReceivingPutAwayLabelVM>();
-
-        // Set Commands
+        labelVMs = new ObservableCollection<RefOrgeLabelVM>();
+        Masters = new List<RefOrgeMasterLabel>();
+        SelectedLabels = new ObservableCollection<RefOrgeLabelVM>();
+        
         PrintCommand = new PrintCommand(this);
         AddLineCommand = new AddLineCommand(this);
     }
 
     public void Print()
     {
-        PrintUtility.PrintLabels(LabelVMs, SelectedLabels);
+        throw new NotImplementedException();
     }
 
     public void AddLine()
     {
-        var label = new ReceivingPutAwayLabel();
-        Labels.Add(label);
-        LabelVMs.Add(new ReceivingPutAwayLabelVM(label));
+        throw new NotImplementedException();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

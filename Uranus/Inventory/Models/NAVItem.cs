@@ -37,6 +37,8 @@ public class NAVItem : IEquatable<NAVItem>
     public List<NAVMoveLine> MoveLines { get; set; }
     [OneToMany(nameof(SiteItemLevel.ItemNumber), nameof(SiteItemLevel.Item), CascadeOperations = CascadeOperation.CascadeRead)]
     public List<SiteItemLevel> SiteLevels { get; set; }
+    [OneToMany( nameof(MixedCartonItem.ItemNumber),nameof(MixedCartonItem.Item), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<MixedCartonItem> MixedCartons { get; set; }
 
     [ManyToOne(nameof(CategoryCode), nameof(NAVCategory.Items), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVCategory? Category { get; set; }
@@ -86,6 +88,7 @@ public class NAVItem : IEquatable<NAVItem>
         Moves = new List<Move>();
         MoveLines = new List<NAVMoveLine>();
         SiteLevels = new List<SiteItemLevel>();
+        MixedCartons = new List<MixedCartonItem>();
     }
 
     public NAVItem(int num) : this()
