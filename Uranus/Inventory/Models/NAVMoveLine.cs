@@ -27,6 +27,15 @@ public class NAVMoveLine
     [ManyToOne(nameof(LocationCode), nameof(NAVLocation.MoveLines), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVLocation? Location { get; set; }
 
+    [Ignore] public int QtyPerUoM => UoM switch
+    {
+        EUoM.CASE => Item?.QtyPerCase ?? 1,
+        EUoM.PACK => Item?.QtyPerPack ?? 1,
+        _ => 1
+    };
+
+    [Ignore] public int BaseQty => Qty * QtyPerUoM;
+
     public NAVMoveLine()
     {
         ID = Guid.NewGuid();
@@ -37,5 +46,7 @@ public class NAVMoveLine
         ZoneCode = string.Empty;
         BinCode = string.Empty;
     }
+
+    public bool IsMatch(NAVMoveLine )
 
 }

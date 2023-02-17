@@ -180,4 +180,16 @@ public class Move
         return PlaceBin.Stock.TryGetValue(Item.Number, out var stock) &&
                stock.IsFull(PlaceEaches, PlacePacks, PlaceCases);
     }
+
+    /// <summary>
+    /// Static method used to generate move from two (presumably matching) move lines.
+    /// </summary>
+    /// <param name="takeLine">A move line with take action to match the place line.</param>
+    /// <param name="placeLine">A move line with place action to match the take line.</param>
+    /// <returns>Null if lines don't match, otherwise a suitable Move object.</returns>
+    public static Move? GetMove(NAVMoveLine takeLine, NAVMoveLine placeLine)
+    {
+        if takeLine
+        return null;
+    }
 }

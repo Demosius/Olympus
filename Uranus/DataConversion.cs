@@ -667,11 +667,11 @@ public static class DataConversion
                 var binID = string.Join(":", zoneID, bin);
                 if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer, provider, out var itemNo)) itemNo = 0;
                 var uomID = string.Join(":", itemNo, uom);
-                if (!int.TryParse(row[headDict["Quantity"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var qty)) itemNo = 0;
-                if (!int.TryParse(row[headDict["Pick Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var pickQty)) itemNo = 0;
-                if (!int.TryParse(row[headDict["Put-away Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var putQty)) itemNo = 0;
-                if (!int.TryParse(row[headDict["Neg. Adjmt. Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var negQty)) itemNo = 0;
-                if (!int.TryParse(row[headDict["Pos. Adjmt. Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var posQty)) itemNo = 0;
+                if (!int.TryParse(row[headDict["Quantity"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var qty)) qty = 0;
+                if (!int.TryParse(row[headDict["Pick Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var pickQty)) pickQty = 0;
+                if (!int.TryParse(row[headDict["Put-away Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var putQty)) putQty = 0;
+                if (!int.TryParse(row[headDict["Neg. Adjmt. Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var negQty)) negQty = 0;
+                if (!int.TryParse(row[headDict["Pos. Adjmt. Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var posQty)) posQty = 0;
                 if (!DateTime.TryParse(row[headDict["Date Created"]], provider, DateTimeStyles.None, out var dateCreated)) dateCreated = new DateTime();
                 if (!DateTime.TryParse(row[headDict["Time Created"]], provider, DateTimeStyles.NoCurrentDateDefault, out var timeCreated)) timeCreated = new DateTime();
 
@@ -702,6 +702,74 @@ public static class DataConversion
         }
 
         return stockList;
+    }
+
+    // Turns clipboard data into a list of stock.
+    public static List<NAVMoveLine> NAVRawStringToMoveLines(string rawData)
+    {
+        var headDict = Constants.NAVMoveColumns;
+
+        if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+        // Start memory stream from which to read.
+        var byteArray = Encoding.UTF8.GetBytes(rawData);
+        MemoryStream stream = new(byteArray);
+        // Start Reading from stream.
+        var moveLines = NAVStreamToMoveLines(stream, headDict);
+
+        return moveLines;
+    }
+
+    // Convert a memory stream into a stock list.
+    private static List<NAVMoveLine> NAVStreamToMoveLines(Stream stream, Dictionary<string, int> headDict)
+    {
+        List<NAVMoveLine> moveLines = new();
+
+        IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+
+        using StreamReader reader = new(stream);
+        // First set the headers.
+        var line = reader.ReadLine();
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
+        SetHeadPosFromArray(ref headDict, headArr, "Stock");
+        // Get highest column value to make sure that any given data line isn't cut short.
+        var highestCol = headDict.Values.Max();
+
+        line = reader.ReadLine();
+        // Add row data.
+        while (line != null)
+        {
+            var row = line.Split('\t');
+
+            if (highestCol < row.Length)
+            {
+                var zone = row[headDict["Zone Code"]];
+                var bin = row[headDict["Bin Code"]];
+                var zoneID = string.Join(":", "9600", zone);
+                var binID = string.Join(":", zoneID, bin);
+
+                if (!Enum.TryParse(row[headDict["Unit of Measure Code"]], out EUoM uom)) uom = EUoM.EACH;
+                if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer, provider, out var itemNo)) itemNo = 0;
+                if (!int.TryParse(row[headDict["Quantity"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var qty)) itemNo = 0;
+                if (!Enum.TryParse(row[headDict["Action Type"]], out EAction action)) action = EAction.Take;
+                
+                var moveLine = new NAVMoveLine
+                {
+                    ActionType = action,
+                    ZoneID = zoneID,
+                    BinID = binID,
+                    ItemNumber = itemNo,
+                    ZoneCode = zone,
+                    BinCode = bin,
+                    Qty = qty,
+                    UoM = uom
+                };
+                moveLines.Add(moveLine);
+            }
+
+            line = reader.ReadLine();
+        }
+
+        return moveLines;
     }
 
     // Reads data from the clipboard, assumes it is rectangular 2-dimensional data separated

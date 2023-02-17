@@ -221,6 +221,8 @@ public class RefOrgeMasterLabelVM : INotifyPropertyChanged
 
     #endregion
 
+    public bool MixedCarton => Label.MixedCarton;
+
     public RefOrgeMasterLabelVM(RefOrgeMasterLabel label)
     {
         Label = label;

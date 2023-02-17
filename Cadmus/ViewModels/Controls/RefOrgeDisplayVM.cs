@@ -2,28 +2,35 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using Cadmus.Annotations;
 using Cadmus.Interfaces;
 using Cadmus.Models;
 using Cadmus.ViewModels.Commands;
 using Cadmus.ViewModels.Labels;
+using Morpheus;
+using Uranus;
+using Uranus.Inventory.Models;
 
 namespace Cadmus.ViewModels.Controls;
 
-internal class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
+public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
 {
+    public Helios Helios { get; set; }
+
     public List<RefOrgeMasterLabel> Masters { get; set; }
 
     #region INotifyPropertyChanged Members
 
-    private ObservableCollection<RefOrgeMasterLabelVM> masterVms;
+    private ObservableCollection<RefOrgeMasterLabelVM> masterVMs;
     public ObservableCollection<RefOrgeMasterLabelVM> MasterVMs
     {
-        get => masterVms;
+        get => masterVMs;
         set
         {
-            masterVms = value;
+            masterVMs = value;
             OnPropertyChanged();
         }
     }
@@ -53,8 +60,9 @@ internal class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
     {
         labelVMs = new ObservableCollection<RefOrgeLabelVM>();
         Masters = new List<RefOrgeMasterLabel>();
+        masterVMs = new ObservableCollection<RefOrgeMasterLabelVM>();
         SelectedLabels = new ObservableCollection<RefOrgeLabelVM>();
-        
+
         PrintCommand = new PrintCommand(this);
         AddLineCommand = new AddLineCommand(this);
     }
@@ -66,7 +74,36 @@ internal class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
 
     public void AddLine()
     {
-        throw new NotImplementedException();
+        var newLabel = new RefOrgeMasterLabel();
+        Masters.Add(newLabel);
+        MasterVMs.Add(new RefOrgeMasterLabelVM(newLabel));
+    }
+
+    public void AddMoves()
+    {
+        List<NAVMoveLine> moveLines = new List<NAVMoveLine>();
+        try
+        {
+            // Get data from clipboard.
+            var raw = General.ClipboardToString();
+
+            // Convert data to moveLines
+            moveLines = DataConversion.NAVRawStringToMoveLines(raw);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message);
+            return;
+        }
+
+        // Get other data from DB.
+        var dataSet = Helios.InventoryReader.BasicStockDataSet(moveLines.Select(m => m.ZoneCode).Distinct().ToList());
+        dataSet?.SetMoveLineData(moveLines);
+
+        // Convert MoveLines to moves.
+
+
+        // Convert Moves to masterLabels
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

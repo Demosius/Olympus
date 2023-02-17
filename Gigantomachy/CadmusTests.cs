@@ -16,6 +16,115 @@ namespace Gigantomachy;
 [TestClass]
 public class CadmusTests
 {
+    [TestMethod]
+    public void TestPrinting()
+    {
+        //LabelsToOneNote();
+        //LabelsToLabelPrinter(2);
+        //DocumentsToPrinter();
+    }
+
+    private static void LabelsToOneNote()
+    {
+        // Arrange
+        var dt = DataConversion.RawStringToTable(REC_LABEL_TEST_STRING);
+
+        var labelVMs = (from DataRow row in dt.Rows
+                        let takeZone = row["Zone"].ToString() ?? ""
+                        let takeBin = row["Bin"].ToString() ?? ""
+                        let caseQty = int.Parse(row["Case"].ToString() ?? "")
+                        let packQty = int.Parse(row["Pack"].ToString() ?? "")
+                        let eachQty = int.Parse(row["Each"].ToString() ?? "")
+                        let qpc = int.Parse(row["QPC"].ToString() ?? "")
+                        let qpp = int.Parse(row["QPP"].ToString() ?? "")
+                        let barcode = row["Barcode"].ToString() ?? ""
+                        let item = int.Parse(row["Item"].ToString() ?? "")
+                        let labelNo = int.Parse(row["LabelNo"].ToString() ?? "")
+                        let labelTotal = int.Parse(row["LabelTotal"].ToString() ?? "")
+                        let description = row["Description"].ToString() ?? ""
+                        select new ReceivingPutAwayLabel(takeZone: takeZone, takeBin: takeBin, caseQty: caseQty, packQty: packQty,
+                            eachQty: eachQty, qtyPerCase: qpc, qtyPerPack: qpp, barcode: barcode, itemNumber: item,
+                            labelNumber: labelNo, labelTotal: labelTotal, description: description)
+            into label
+                        select new ReceivingPutAwayLabelVM(label)).ToList();
+
+        // Act
+        PrintUtility.PrintLabels("OneNote for Windows 10", labelVMs);
+
+        // Assert
+        Assert.AreEqual(1, 2 - 1, "Basic maths is wrong.");
+
+    }
+
+    private static void LabelsToLabelPrinter(int count)
+    {
+        // Arrange
+        var dt = DataConversion.RawStringToTable(REC_LABEL_TEST_STRING);
+
+        var labelVMs = (from DataRow row in dt.Rows
+                        let takeZone = row["Zone"].ToString() ?? ""
+                        let takeBin = row["Bin"].ToString() ?? ""
+                        let caseQty = int.Parse(row["Case"].ToString() ?? "")
+                        let packQty = int.Parse(row["Pack"].ToString() ?? "")
+                        let eachQty = int.Parse(row["Each"].ToString() ?? "")
+                        let qpc = int.Parse(row["QPC"].ToString() ?? "")
+                        let qpp = int.Parse(row["QPP"].ToString() ?? "")
+                        let barcode = row["Barcode"].ToString() ?? ""
+                        let item = int.Parse(row["Item"].ToString() ?? "")
+                        let labelNo = int.Parse(row["LabelNo"].ToString() ?? "")
+                        let labelTotal = int.Parse(row["LabelTotal"].ToString() ?? "")
+                        let description = row["Description"].ToString() ?? ""
+                        select new ReceivingPutAwayLabel(takeZone: takeZone, takeBin: takeBin, caseQty: caseQty, packQty: packQty,
+                            eachQty: eachQty, qtyPerCase: qpc, qtyPerPack: qpp, barcode: barcode, itemNumber: item,
+                            labelNumber: labelNo, labelTotal: labelTotal, description: description)
+            into label
+                        select new ReceivingPutAwayLabelVM(label)).ToList();
+
+        if (labelVMs.Count > count) labelVMs.RemoveRange(count, labelVMs.Count - count);
+
+        // Act
+        PrintUtility.PrintLabels("\\\\AUSEFPPS01.ebusa.com\\Intermec PM43 (203 dpi) - DP", labelVMs);
+
+        // Assert
+        Assert.AreEqual(1, 2 - 1, "Basic maths is wrong.");
+    }
+
+    private static void DocumentsToPrinter()
+    {
+        // Arrange
+        const string s = @"Zone	Bin	Case	Pack	Each	QPC	QPP	Barcode	Item	LabelNo	LabelTotal	Description
+OZ	I AH 3	30	0	0	6	0	Í;[4!Î	275920	1	2	TC POKE CELEBRATIONS PRE FIG
+OZ	I AH 3	30	0	0	6	0	Í;[4!Î	275920	2	2	TC POKE CELEBRATIONS PRE FIG";
+
+        var dt = DataConversion.RawStringToTable(s);
+
+        var labelVMs = (from DataRow row in dt.Rows
+                        let takeZone = row["Zone"].ToString() ?? ""
+                        let takeBin = row["Bin"].ToString() ?? ""
+                        let caseQty = int.Parse(row["Case"].ToString() ?? "")
+                        let packQty = int.Parse(row["Pack"].ToString() ?? "")
+                        let eachQty = int.Parse(row["Each"].ToString() ?? "")
+                        let qpc = int.Parse(row["QPC"].ToString() ?? "")
+                        let qpp = int.Parse(row["QPP"].ToString() ?? "")
+                        let barcode = row["Barcode"].ToString() ?? ""
+                        let item = int.Parse(row["Item"].ToString() ?? "")
+                        let labelNo = int.Parse(row["LabelNo"].ToString() ?? "")
+                        let labelTotal = int.Parse(row["LabelTotal"].ToString() ?? "")
+                        let description = row["Description"].ToString() ?? ""
+                        select new ReceivingPutAwayLabel(takeZone: takeZone, takeBin: takeBin, caseQty: caseQty, packQty: packQty,
+                            eachQty: eachQty, qtyPerCase: qpc, qtyPerPack: qpp, barcode: barcode, itemNumber: item,
+                            labelNumber: labelNo, labelTotal: labelTotal, description: description)
+            into label
+                        select new ReceivingPutAwayLabelVM(label)).ToList();
+
+        // Act
+        //PrintUtility.PrintDocuments("\\\\aubrsisprint\\AUBRPDC002", labelVMs);
+
+        // Assert
+        Assert.AreEqual(1, 2 - 1, "Basic maths is wrong.");
+
+    }
+
     private const string REC_LABEL_TEST_STRING = @"Zone	Bin	Case	Pack	Each	QPC	QPP	Barcode	Item	LabelNo	LabelTotal	Description
 OZ	I AG 3	12	0	0	54	0	Í4Å9uÎ	209725	1	1	PLUSH MINEC OCELOT 14IN
 OZ	I AH 3	30	0	0	6	0	Í;[4!Î	275920	1	2	TC POKE CELEBRATIONS PRE FIG
@@ -76,112 +185,4 @@ OZ	ASPLEY7	450	0	0	4	2	Í;""3zÎ	270219	1	1	GLASS SW VADER'S FREE TIME 4PK
 OZ	ASPLEY6	528	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
 ";
 
-    [TestMethod]
-    public void TestPrinting()
-    {
-        //LabelsToOneNote();
-        //LabelsToLabelPrinter(2);
-        //DocumentsToPrinter();
-    }
-
-    private static void LabelsToOneNote()
-    {
-        // Arrange
-        var dt = DataConversion.RawStringToTable(REC_LABEL_TEST_STRING);
-
-        var labelVMs = (from DataRow row in dt.Rows
-                        let takeZone = row["Zone"].ToString() ?? ""
-                        let takeBin = row["Bin"].ToString() ?? ""
-                        let caseQty = int.Parse(row["Case"].ToString() ?? "")
-                        let packQty = int.Parse(row["Pack"].ToString() ?? "")
-                        let eachQty = int.Parse(row["Each"].ToString() ?? "")
-                        let qpc = int.Parse(row["QPC"].ToString() ?? "")
-                        let qpp = int.Parse(row["QPP"].ToString() ?? "")
-                        let barcode = row["Barcode"].ToString() ?? ""
-                        let item = int.Parse(row["Item"].ToString() ?? "")
-                        let labelNo = int.Parse(row["LabelNo"].ToString() ?? "")
-                        let labelTotal = int.Parse(row["LabelTotal"].ToString() ?? "")
-                        let description = row["Description"].ToString() ?? ""
-                        select new ReceivingPutAwayLabel(takeZone: takeZone, takeBin: takeBin, caseQty: caseQty, packQty: packQty,
-                            eachQty: eachQty, qtyPerCase: qpc, qtyPerPack: qpp, barcode: barcode, itemNumber: item,
-                            labelNumber: labelNo, labelTotal: labelTotal, description: description)
-            into label
-                        select new ReceivingPutAwayLabelVM(label)).ToList();
-
-        // Act
-        PrintUtility.PrintLabels("OneNote for Windows 10", labelVMs);
-
-        // Assert
-        Assert.AreEqual(1, 2 - 1, "Basic maths is wrong.");
-
-    }
-
-    private static void LabelsToLabelPrinter(int count)
-    {
-        // Arrange
-        var dt = DataConversion.RawStringToTable(REC_LABEL_TEST_STRING);
-
-        var labelVMs = (from DataRow row in dt.Rows
-            let takeZone = row["Zone"].ToString() ?? ""
-            let takeBin = row["Bin"].ToString() ?? ""
-            let caseQty = int.Parse(row["Case"].ToString() ?? "")
-            let packQty = int.Parse(row["Pack"].ToString() ?? "")
-            let eachQty = int.Parse(row["Each"].ToString() ?? "")
-            let qpc = int.Parse(row["QPC"].ToString() ?? "")
-            let qpp = int.Parse(row["QPP"].ToString() ?? "")
-            let barcode = row["Barcode"].ToString() ?? ""
-            let item = int.Parse(row["Item"].ToString() ?? "")
-            let labelNo = int.Parse(row["LabelNo"].ToString() ?? "")
-            let labelTotal = int.Parse(row["LabelTotal"].ToString() ?? "")
-            let description = row["Description"].ToString() ?? ""
-            select new ReceivingPutAwayLabel(takeZone: takeZone, takeBin: takeBin, caseQty: caseQty, packQty: packQty,
-                eachQty: eachQty, qtyPerCase: qpc, qtyPerPack: qpp, barcode: barcode, itemNumber: item,
-                labelNumber: labelNo, labelTotal: labelTotal, description: description)
-            into label
-            select new ReceivingPutAwayLabelVM(label)).ToList();
-
-        if (labelVMs.Count > count) labelVMs.RemoveRange(count, labelVMs.Count - count);
-
-        // Act
-        PrintUtility.PrintLabels("\\\\AUSEFPPS01.ebusa.com\\Intermec PM43 (203 dpi) - DP", labelVMs);
-
-        // Assert
-        Assert.AreEqual(1, 2 - 1, "Basic maths is wrong.");
-    }
-
-    private static void DocumentsToPrinter()
-    {
-        // Arrange
-        const string s = @"Zone	Bin	Case	Pack	Each	QPC	QPP	Barcode	Item	LabelNo	LabelTotal	Description
-OZ	I AH 3	30	0	0	6	0	Í;[4!Î	275920	1	2	TC POKE CELEBRATIONS PRE FIG
-OZ	I AH 3	30	0	0	6	0	Í;[4!Î	275920	2	2	TC POKE CELEBRATIONS PRE FIG";
-
-        var dt = DataConversion.RawStringToTable(s);
-
-        var labelVMs = (from DataRow row in dt.Rows
-                        let takeZone = row["Zone"].ToString() ?? ""
-                        let takeBin = row["Bin"].ToString() ?? ""
-                        let caseQty = int.Parse(row["Case"].ToString() ?? "")
-                        let packQty = int.Parse(row["Pack"].ToString() ?? "")
-                        let eachQty = int.Parse(row["Each"].ToString() ?? "")
-                        let qpc = int.Parse(row["QPC"].ToString() ?? "")
-                        let qpp = int.Parse(row["QPP"].ToString() ?? "")
-                        let barcode = row["Barcode"].ToString() ?? ""
-                        let item = int.Parse(row["Item"].ToString() ?? "")
-                        let labelNo = int.Parse(row["LabelNo"].ToString() ?? "")
-                        let labelTotal = int.Parse(row["LabelTotal"].ToString() ?? "")
-                        let description = row["Description"].ToString() ?? ""
-                        select new ReceivingPutAwayLabel(takeZone: takeZone, takeBin: takeBin, caseQty: caseQty, packQty: packQty,
-                            eachQty: eachQty, qtyPerCase: qpc, qtyPerPack: qpp, barcode: barcode, itemNumber: item,
-                            labelNumber: labelNo, labelTotal: labelTotal, description: description)
-            into label
-                        select new ReceivingPutAwayLabelVM(label)).ToList();
-        
-        // Act
-        //PrintUtility.PrintDocuments("\\\\aubrsisprint\\AUBRPDC002", labelVMs);
-
-        // Assert
-        Assert.AreEqual(1, 2 - 1, "Basic maths is wrong.");
-
-    }
 }

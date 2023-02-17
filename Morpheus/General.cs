@@ -191,4 +191,31 @@ public static class Utility
     {
         return columns.Where(column => !data.Columns.Contains(column)).ToList();
     }
+
+    /// <summary>
+    /// Find highest common factor among a set of integers.
+    /// </summary>
+    /// <param name="numbers"></param>
+    /// <returns></returns>
+    public static int HCF(IEnumerable<int> numbers)
+    {
+        return numbers.Aggregate(HCF);
+    }
+
+    /// <summary>
+    /// Find Highest Common Factor of two integers.
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static int HCF(int a, int b)
+    {
+        while (true)
+        {
+            if (b == 0) return a;
+            var a1 = a;
+            a = b;
+            b = a1 % b;
+        }
+    }
 }

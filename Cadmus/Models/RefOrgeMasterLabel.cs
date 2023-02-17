@@ -33,6 +33,8 @@ public class RefOrgeMasterLabel
 
     public Move? Move { get; }
 
+    public bool MixedCarton { get; set; }
+
     public RefOrgeMasterLabel()
     {
         BatchName = string.Empty;
@@ -48,37 +50,11 @@ public class RefOrgeMasterLabel
         TrueOrderTakeBin = string.Empty;
     }
 
-    public RefOrgeMasterLabel(int priority, string batchName, string operatorName, DateTime date, string takeBin,
-        bool pickAsPacks, bool web, int eachQty, int packQty, int caseQty, int qtyPerCase, int qtyPerPack,
-        string placeBin, string barcode, string? checkDigits, int itemNumber, string? totalGrab,
-        int labelTotal, string itemDescription, string trueOrderTakeBin, string takeZone)
-    {
-        Priority = priority;
-        BatchName = batchName;
-        OperatorName = operatorName;
-        Date = date;
-        TakeBin = takeBin;
-        PickAsPacks = pickAsPacks;
-        Web = web;
-        EachQty = eachQty;
-        PackQty = packQty;
-        CaseQty = caseQty;
-        QtyPerCase = qtyPerCase;
-        QtyPerPack = qtyPerPack;
-        PlaceBin = placeBin;
-        Barcode = barcode;
-        CheckDigits = checkDigits;
-        ItemNumber = itemNumber;
-        TotalGrab = totalGrab;
-        LabelTotal = labelTotal;
-        ItemDescription = itemDescription;
-        TrueOrderTakeBin = trueOrderTakeBin;
-        TakeZone = takeZone;
-    }
-
     public RefOrgeMasterLabel(Move move)
     {
         Move = move;
+
+        MixedCarton = move is MixedCartonMove;
 
         Priority = move.Priority;
         BatchName = move.BatchID;
@@ -102,7 +78,7 @@ public class RefOrgeMasterLabel
 
         ItemDescription = move.Item?.Description ?? string.Empty; 
 
-        const string pattern = @"^([\w]{2}|[\w]{4})(\d{2} \d{3})$";
+        const string pattern = @"^(\w{2}|\w{4})(\d{2} \d{3})$";
         TrueOrderTakeBin = Regex.Replace(TakeBin, pattern, "A$2");
 
         // Total Grabs
@@ -129,7 +105,6 @@ public class RefOrgeMasterLabel
             TotalGrab = string.Empty;
 
     }
-
 
     public int CalculateRequiredLabels()
     {

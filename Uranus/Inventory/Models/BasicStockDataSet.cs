@@ -97,4 +97,18 @@ public class BasicStockDataSet
             if (!stock.Merged) Stock.Add(stock);
         }
     }
+
+    /// <summary>
+    /// Iterates through the given move lines and assigns object data based on raw data values.
+    /// </summary>
+    /// <param name="moveLines"></param>
+    public void SetMoveLineData(IEnumerable<NAVMoveLine> moveLines)
+    {
+        foreach (var moveLine in moveLines)
+        {
+            if (Zones.TryGetValue(moveLine.ZoneID, out var zone)) moveLine.Zone = zone;
+            if (Bins.TryGetValue(moveLine.BinID, out var bin)) moveLine.Bin = bin;
+            if (Items.TryGetValue(moveLine.ItemNumber, out var item)) moveLine.Item = item;
+        }
+    }
 }

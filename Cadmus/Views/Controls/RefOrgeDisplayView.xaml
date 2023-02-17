@@ -8,6 +8,7 @@
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:RefOrgeDisplayVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="1200">
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -19,6 +20,10 @@
                         Orientation="Horizontal">
                 <Button Content="Add Line"
                         Command="{Binding AddLineCommand}"
+                        Width="100"
+                        Margin="2"/>
+                <Button Content="Load Moves"
+                        Command="{Binding AddMovesCommand}"
                         Width="100"
                         Margin="2"/>
             </StackPanel>

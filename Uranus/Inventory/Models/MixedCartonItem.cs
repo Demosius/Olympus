@@ -1,4 +1,5 @@
-﻿using SQLiteNetExtensions.Attributes;
+﻿using SQLite;
+using SQLiteNetExtensions.Attributes;
 
 namespace Uranus.Inventory.Models;
 
@@ -12,6 +13,12 @@ public class MixedCartonItem
     public MixedCarton? MixedCarton { get; set; }
     [ManyToOne(nameof(ItemNumber), nameof(NAVItem.MixedCartons), CascadeOperations = CascadeOperation.CascadeRead)]
     public NAVItem? Item { get; set; }
+
+    [Ignore] public double Cube => (Item?.Cube ?? 0) * QtyPerCarton;
+    [Ignore] public double Weight => (Item?.Weight ?? 0) * QtyPerCarton;
+    [Ignore] public double Length => Item?.Length ?? 0;
+    [Ignore] public double Width => Item?.Width ?? 0;
+    [Ignore] public double Height => Item?.Height ?? 0;
 
     public MixedCartonItem()
     {
