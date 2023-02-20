@@ -1,6 +1,8 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Uranus.Staff.Models;
 
 namespace Uranus.Inventory.Models;
@@ -123,6 +125,46 @@ public class Move
         BatchID = string.Empty;
     }
 
+    public Move(NAVMoveLine takeLine, NAVMoveLine placeLine)
+    {
+        ID = Guid.NewGuid();
+        BatchID = string.Empty;
+        Item = takeLine.Item ?? placeLine.Item;
+        ItemNumber = takeLine.ItemNumber;
+        TakeBin = takeLine.Bin;
+        TakeBinID = takeLine.BinID;
+        PlaceBin = placeLine.Bin;
+        PlaceBinID = placeLine.BinID;
+        switch (takeLine.UoM)
+        {
+            case EUoM.EACH:
+                TakeEaches = takeLine.Qty;
+                break;
+            case EUoM.PACK:
+                TakePacks = takeLine.Qty;
+                break;
+            case EUoM.CASE:
+                TakeCases = takeLine.Qty;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+        switch (placeLine.UoM)
+        {
+            case EUoM.EACH:
+                PlaceEaches = placeLine.Qty;
+                break;
+            case EUoM.PACK:
+                PlacePacks = placeLine.Qty;
+                break;
+            case EUoM.CASE:
+                PlaceCases = placeLine.Qty;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
     public bool LineMatch(NAVMoveLine moveLine)
     {
         //TODO: PartialMove line matching.
@@ -189,7 +231,94 @@ public class Move
     /// <returns>Null if lines don't match, otherwise a suitable Move object.</returns>
     public static Move? GetMove(NAVMoveLine takeLine, NAVMoveLine placeLine)
     {
-        if takeLine
-        return null;
+        return !takeLine.IsMatch(placeLine) ? null : new Move(takeLine, placeLine);
+    }
+
+    public static List<Move> GenerateMoveList(List<NAVMoveLine> moveLines)
+    {
+        var moveList = new List<Move>();
+        
+        // Sort into items.
+        var lineDict = moveLines.GroupBy(l => l.ItemNumber)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        // Iterate through item groupings to match and generate moves.
+        foreach (var (itemNo, lines) in lineDict)
+        {
+            // Separate take and place lines.
+            var takeLines = lines.Where(l => l.ActionType == EAction.Take).ToList();
+            var placeLines = lines.Where(l => l.ActionType == EAction.Place).ToList();
+
+            // Make sure total qty matches.
+            var takeQty = takeLines.Sum(l => l.BaseQty);
+            var placeQty = placeLines.Sum(l => l.BaseQty);
+            if (takeQty != placeQty) throw new Exception($"Uneven movement data. Item {itemNo} has take qty of {takeQty} and place qty of {placeQty}.");
+
+            // Prep for potential uneven lines.
+            var unevenTakes = new List<NAVMoveLine>();
+
+            // Iterate through take lines.
+            foreach (var takeLine in takeLines)
+            {
+                // Find place line match.
+                var placeLine = placeLines.FirstOrDefault(p => p.BaseQty == takeLine.BaseQty);
+                if (placeLine is null)
+                {
+                    unevenTakes.Add(takeLine);
+                    continue;
+                }
+
+                // Generate move.
+                var move = GetMove(takeLine, placeLine);
+
+                if (move is null)
+                {
+                    unevenTakes.Add(takeLine);
+                    continue;
+                }
+
+                moveList.Add(move);
+                placeLines.Remove(placeLine);
+            }
+
+            if (unevenTakes.Count > 0 && placeLines.Count > 0) moveList.AddRange(GenerateMovesFromUnevenLines(unevenTakes, placeLines));
+        }
+
+        return moveList;
+    }
+
+    private static List<Move> GenerateMovesFromUnevenLines(List<NAVMoveLine> takeLines, List<NAVMoveLine> placeLines)
+    {
+        var moveList = new List<Move>();
+
+        takeLines = takeLines.OrderByDescending(l => l.BaseQty).ToList();
+        placeLines = placeLines.OrderByDescending(l => l.BaseQty).ToList();
+
+        var attempts = 0;
+
+        while (takeLines.Count > 0 && placeLines.Count > 0 && attempts < 3)
+        {
+            attempts++;
+            // TODO: Find matching move quantity groups.
+        }
+
+        return moveList;
+    }
+
+    /// <summary>
+    /// Given a single move line and a list of (assumed) opposite lines, find a matching group.
+    /// </summary>
+    /// <param name="line"></param>
+    /// <param name="moveLines"></param>
+    /// <returns></returns>
+    private static List<NAVMoveLine> GetMatchingLines(int targetQty, List<NAVMoveLine> moveLines)
+    {
+        var matchQty = 0;
+
+        int[] lines = { };
+
+        int index = 0;
+        // TODO: Finish this.
+        return moveLines;
     }
 }

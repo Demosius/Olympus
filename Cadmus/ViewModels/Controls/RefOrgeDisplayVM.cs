@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Input;
 using Cadmus.Annotations;
 using Cadmus.Interfaces;
 using Cadmus.Models;
@@ -53,11 +54,14 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
 
     public PrintCommand PrintCommand { get; set; }
     public AddLineCommand AddLineCommand { get; set; }
+    public AddMovesCommand AddMovesCommand { get; set; }
 
     #endregion
 
-    public RefOrgeDisplayVM()
+    public RefOrgeDisplayVM(Helios helios)
     {
+        Helios = helios;
+
         labelVMs = new ObservableCollection<RefOrgeLabelVM>();
         Masters = new List<RefOrgeMasterLabel>();
         masterVMs = new ObservableCollection<RefOrgeMasterLabelVM>();
@@ -65,6 +69,7 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
 
         PrintCommand = new PrintCommand(this);
         AddLineCommand = new AddLineCommand(this);
+        AddMovesCommand = new AddMovesCommand(this);
     }
 
     public void Print()
@@ -76,12 +81,13 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
     {
         var newLabel = new RefOrgeMasterLabel();
         Masters.Add(newLabel);
-        MasterVMs.Add(new RefOrgeMasterLabelVM(newLabel));
+        MasterVMs.Add(new RefOrgeMasterLabelVM(newLabel, this));
     }
 
     public void AddMoves()
     {
-        List<NAVMoveLine> moveLines = new List<NAVMoveLine>();
+        Mouse.OverrideCursor = Cursors.Wait;
+        List<NAVMoveLine> moveLines;
         try
         {
             // Get data from clipboard.
@@ -101,9 +107,28 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         dataSet?.SetMoveLineData(moveLines);
 
         // Convert MoveLines to moves.
+        var moves = Move.GenerateMoveList(moveLines);
 
+        // Generate Mixed Carton moves, if applicable.
+        var mixedCartonTemplates = Helios.InventoryReader.MixedCartons().ToList();
+        var mixCtnMoves = MixedCartonMove.GenerateMixedCartonMoveList(ref mixedCartonTemplates, ref moves);
+        moves.AddRange(mixCtnMoves);
 
         // Convert Moves to masterLabels
+        Masters.AddRange(moves.Select(m => new RefOrgeMasterLabel(m)));
+
+        MasterVMs = new ObservableCollection<RefOrgeMasterLabelVM>(Masters.Select(m => new RefOrgeMasterLabelVM(m, this)));
+
+        Mouse.OverrideCursor = Cursors.Arrow;
+    }
+
+    public void GenerateDisplayLabels()
+    {
+        // For each master label, generate the appropriate number of display labels.
+        SelectedLabels.Clear();
+        LabelVMs.Clear();
+
+
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

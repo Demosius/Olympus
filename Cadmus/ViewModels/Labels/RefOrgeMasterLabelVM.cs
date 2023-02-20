@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Cadmus.Annotations;
 using Cadmus.Models;
+using Cadmus.ViewModels.Controls;
 using Morpheus;
 using Uranus.Inventory.Models;
 
@@ -11,6 +13,7 @@ namespace Cadmus.ViewModels.Labels;
 public class RefOrgeMasterLabelVM : INotifyPropertyChanged
 {
     public RefOrgeMasterLabel Label { get; set; }
+    public RefOrgeDisplayVM DisplayVM { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -185,7 +188,7 @@ public class RefOrgeMasterLabelVM : INotifyPropertyChanged
         {
             Label.LabelTotal = value;
             OnPropertyChanged();
-            // TODO: Change labelVM generation to suit new label qty ???
+            DisplayVM.GenerateDisplayLabels();
         }
     }
 
@@ -223,12 +226,25 @@ public class RefOrgeMasterLabelVM : INotifyPropertyChanged
 
     public bool MixedCarton => Label.MixedCarton;
 
-    public RefOrgeMasterLabelVM(RefOrgeMasterLabel label)
+    public RefOrgeMasterLabelVM(RefOrgeMasterLabel label, RefOrgeDisplayVM displayVM)
     {
         Label = label;
+        DisplayVM = displayVM;
     }
 
-    public RefOrgeMasterLabelVM(Move move) : this(new RefOrgeMasterLabel(move)) { }
+    public RefOrgeMasterLabelVM(Move move, RefOrgeDisplayVM displayVM) : this(new RefOrgeMasterLabel(move), displayVM) { }
+
+    public List<RefOrgeLabelVM> GetDisplayLabels()
+    {
+        var labelList = new List<RefOrgeLabelVM>();
+
+        for (var i = 0; i < LabelTotal; i++)
+        {
+            labelList.Add(new RefOrgeLabelVM(Label, i + 1));
+        }
+
+        return labelList;
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

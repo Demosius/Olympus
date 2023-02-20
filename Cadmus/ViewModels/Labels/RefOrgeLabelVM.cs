@@ -12,7 +12,8 @@ namespace Cadmus.ViewModels.Labels;
 
 public class RefOrgeLabelVM : ILabelVM, INotifyPropertyChanged
 {
-    public RefOrgeMasterLabel Label { get; set; }
+    public RefOrgeMasterLabel Master { get; set; }
+    public int LabelNumber { get; set; }
 
     #region Image Dimensions
 
@@ -45,21 +46,20 @@ public class RefOrgeLabelVM : ILabelVM, INotifyPropertyChanged
 
     public int Priority
     {
-        get => Label.Priority;
+        get => Master.Priority;
         set
         {
-            Label.Priority = value;
+            Master.Priority = value;
             OnPropertyChanged();
         }
     }
     
-
-
     #endregion
 
-    public RefOrgeLabelVM(RefOrgeMasterLabel label)
+    public RefOrgeLabelVM(RefOrgeMasterLabel master, int labelNo)
     {
-        Label = label;
+        Master = master;
+        LabelNumber = labelNo;
     }
 
     public Image GetLabelImage()

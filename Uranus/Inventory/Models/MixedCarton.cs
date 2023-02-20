@@ -41,4 +41,31 @@ public class MixedCarton
         Width = Items.Max(i => i.Width);
         Height = Items.Max(i => i.Height);
     }
+
+    /// <summary>
+    /// Checks a given list of moves to determine its validity for this Mixed Carton.
+    /// </summary>
+    /// <param name="moves"></param>
+    /// <returns>True if matches this Mixed carton template items and ratios.</returns>
+    public bool IsValidMoveSet(IEnumerable<Move> moves)
+    {
+        // Check count.
+        var moveList = moves.ToList();
+        if (moveList.Count != Items.Count) return false;
+
+        var cases = 0;
+
+        // Match move against item.
+        foreach (var move in moveList)
+        {
+            var item = Items.FirstOrDefault(i => i.ItemNumber == move.ItemNumber);
+            if (item is null || move.TakeEaches % item.QtyPerCarton != 0) return false;
+            if (cases == 0) 
+                cases = move.TakeEaches / item.QtyPerCarton;
+            else 
+                if (move.TakeEaches / item.QtyPerCarton != cases) return false;
+        }
+
+        return true;
+    }
 }

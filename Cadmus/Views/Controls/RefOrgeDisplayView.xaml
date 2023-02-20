@@ -3,10 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:vm="clr-namespace:Cadmus.ViewModels.Controls"
+             xmlns:controlVM="clr-namespace:Cadmus.ViewModels.Controls"
+             xmlns:labelVM="clr-namespace:Cadmus.ViewModels.Labels"
              xmlns:labels="clr-namespace:Cadmus.Views.Labels"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance {x:Type vm:RefOrgeDisplayVM}, IsDesignTimeCreatable=False}"
+             d:DataContext="{d:DesignInstance {x:Type controlVM:RefOrgeDisplayVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="1200">
 
     <Grid>
@@ -114,18 +115,47 @@
                     </StackPanel>
                 </Button>
             </StackPanel>
+
+
+
             <ListView Name="LabelViewList"
                       ItemsSource="{Binding LabelVMs}"
                       SelectionChanged="Selector_OnSelectionChanged"
                       HorizontalContentAlignment="Center"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+
+                <DataTemplate x:Key="StandardTemplate" DataType="{x:Type labelVM:RefOrgeLabelVM}">
+                    <TextBlock Text="I'm a Person" />
+                </DataTemplate>
+
+                <DataTemplate x:Key="BusinessTemplate" DataType="{x:Type labelVM:RefOrgeLabelVM}">
+                    <TextBlock Text="I'm a Business" />
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type labelVM:RefOrgeLabelVM}">
+                    
+                </DataTemplate>
+
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel Orientation="Horizontal"/>
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
+
                 <ListView.ItemTemplate>
                     <DataTemplate>
+                        <ContentControl Content="{Binding }">
+                        <ContentControl.Style>
+                            <Style TargetType="{x:Type ContentControl}">
+                                <Setter Property="ContentTemplate" Value="{StaticResource labelVM:RefOrgeLabelView}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Master.MixedCarton}" Value="True">
+                                        <Setter Property="ContentTemplate" Value="{StaticResource BusinessTemplate}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ContentControl.Style>
+                    </ContentControl>
                         <labels:RefOrgeLabelView RenderSize="2, 2"/>
                     </DataTemplate>
                 </ListView.ItemTemplate>

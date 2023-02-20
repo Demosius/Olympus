@@ -5,7 +5,7 @@ using System;
 namespace Uranus.Inventory.Models;
 
 [Table("MoveLine")]
-public class NAVMoveLine
+public class NAVMoveLine : IComparable<NAVMoveLine>
 {
     [PrimaryKey] public Guid ID { get; set; }
     public EAction ActionType { get; set; }
@@ -47,6 +47,15 @@ public class NAVMoveLine
         BinCode = string.Empty;
     }
 
-    public bool IsMatch(NAVMoveLine )
+    public bool IsMatch(NAVMoveLine otherLines)
+    {
+        return BaseQty == otherLines.BaseQty &&
+               ItemNumber == otherLines.ItemNumber &&
+               ActionType != otherLines.ActionType;
+    }
 
+    public int CompareTo(NAVMoveLine? other)
+    {
+        return other is null ? 1 : BaseQty.CompareTo(other.BaseQty);
+    }
 }

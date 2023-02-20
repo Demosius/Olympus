@@ -21,32 +21,21 @@ public class MixedCartonMove : Move
     /// Determine MC Move based on list of given moves.
     /// Will check that they are appropriately matched and create a mixed carton type based on these moves.
     /// </summary>
-    /// <param name="moves">Group of moves passed by reference, only removing from that group those that are relevant to the MC Move.</param>
-    public MixedCartonMove(ref List<Move> moves)
+    /// <param name="moves">Group of moves.</param>
+    public MixedCartonMove(List<Move> moves)
     {
-        // Only take moves involving eaches.
-        // Group moves by Take and Place bins.
-        Moves = moves.Where(m => m.TakeCases == 0 && m.TakePacks == 0)
-            .GroupBy(m => $"{m.TakeBinID}:{m.PlaceBinID}")
-            .OrderByDescending(g => g.Count())
-            .First()
-            .ToList();
-
-        if (Moves.Count < 1)
+        // Validate.
+        if (!IsValidMoveList(moves))
         {
             MixedCarton = new MixedCarton();
+            Moves = new List<Move>();
             return;
         }
 
+        Moves = moves;
         MixedCarton = GetMixedCarton(Moves);
 
         SetBaseMoveValues();
-
-        // Remove used moves from move list.
-        foreach (var move in Moves)
-        {
-            moves.Remove(move);
-        }
 
         SuccessfullyGenerated = true;
     }
@@ -56,38 +45,46 @@ public class MixedCartonMove : Move
     /// Will check that they are appropriately matched based on the given mc type, and other factors.
     /// </summary>
     /// <param name="mixedCarton">Mixed Carton Template object.</param>
-    /// <param name="moves">Group of moves passed by reference, only removing from that group those that are relevant to the MC Move.</param>
-    public MixedCartonMove(MixedCarton mixedCarton, ref List<Move> moves)
+    /// <param name="moves">Group of moves.</param>
+    public MixedCartonMove(MixedCarton mixedCarton, List<Move> moves)
     {
         MixedCarton = mixedCarton;
-        var iNos = MixedCarton.Items.Select(i => i.ItemNumber);
+        Moves = moves;
 
-        // Check for validity of moves.
-        Moves = moves.Where(m => iNos.Contains(m.ItemNumber) && m.TakeCases == 0 && m.TakePacks == 0)
-            .GroupBy(m => $"{m.TakeBinID}:{m.PlaceBinID}")
-            .OrderByDescending(g => g.Count())
-            .First()
-            .ToList();
-
-        if (Moves.Count < 1) return;
+        if (!IsValidMoveList(moves) || !MixedCarton.IsValidMoveSet(moves)) return;
 
         SetBaseMoveValues();
-
-        // Remove used moves from move list.
-        foreach (var move in Moves)
-        {
-            moves.Remove(move);
-        }
 
         SuccessfullyGenerated = true;
     }
 
     /// <summary>
-        /// Set up all basic Move values as determined and copied from the listed moves - particularly the first move in list.
-        /// Assumes move list is accurate, valid, and usable.
-        /// Also assumes MixedCarton Object is accurately set.
-        /// </summary>
-        private void SetBaseMoveValues()
+    /// Checks that a given list of moves is valid.
+    /// Must have more than one move. Only eaches. Matching bin locations.
+    /// </summary>
+    /// <param name="moves"></param>
+    /// <returns></returns>
+    private static bool IsValidMoveList(IReadOnlyCollection<Move> moves)
+    {
+        var primeMove = moves.FirstOrDefault();
+
+        return primeMove is not null &&
+               moves.Count > 1 &&
+               !moves.Any(m =>
+                   m.TakeCases > 0 ||
+                   m.TakePacks > 0 ||
+                   m.TakeBinID !=
+                   primeMove.TakeBinID ||
+                   m.PlaceBinID !=
+                   primeMove.PlaceBinID);
+    }
+
+    /// <summary>
+    /// Set up all basic Move values as determined and copied from the listed moves - particularly the first move in list.
+    /// Assumes move list is accurate, valid, and usable.
+    /// Also assumes MixedCarton Object is accurately set.
+    /// </summary>
+    private void SetBaseMoveValues()
     {
         ItemNumber = (int)Math.Round(Moves.Average(m => m.ItemNumber));
 
@@ -108,17 +105,22 @@ public class MixedCartonMove : Move
         Item.UoMs.Add(itemCase);
         Item.Case = itemCase;
 
-        TakeBin = Moves.First().TakeBin;
-        PlaceBin = Moves.First().PlaceBin;
-        TakeBinID = Moves.First().TakeBinID;
-        PlaceBinID = Moves.First().PlaceBinID;
-        BatchID = Moves.First().BatchID;
-        Batch = Moves.First().Batch;
-        AssignedOperator = Moves.First().AssignedOperator;
-        AssignedOperatorID = Moves.First().AssignedOperatorID;
+        var firstMove = Moves.First();
+
+        TakeBin = firstMove.TakeBin;
+        PlaceBin = firstMove.PlaceBin;
+        TakeBinID = firstMove.TakeBinID;
+        PlaceBinID = firstMove.PlaceBinID;
+        BatchID = firstMove.BatchID;
+        Batch = firstMove.Batch;
+        AssignedOperator = firstMove.AssignedOperator;
+        AssignedOperatorID = firstMove.AssignedOperatorID;
 
         IndividualPriority = Moves.Min(m => m.IndividualPriority);
         GroupPriority = Moves.Min(m => m.GroupPriority);
+
+        TakeCases = firstMove.TakeEaches / MixedCarton.Items.First(i => i.ItemNumber == firstMove.ItemNumber).QtyPerCarton;
+        PlaceCases = TakeCases;
     }
 
     /// <summary>
@@ -133,6 +135,7 @@ public class MixedCartonMove : Move
     /// Given moves assumed to represent MC movement(s), generate a Mixed carton item that appropriately represents the items and the ratios.
     /// </summary>
     /// <param name="moves">Move objects that together represent items moving in mixed cartons - with an assumed consistent ratio.</param>
+    /// <param name="caseQty">Returns the calculated case qty based on the move values.</param>
     /// <returns>Calculated MixedCarton Object.</returns>
     public static MixedCarton GetMixedCarton(IEnumerable<Move> moves)
     {
@@ -162,30 +165,72 @@ public class MixedCartonMove : Move
     }
 
     /// <summary>
-    /// Given a list of moves that may include mixed carton moves, attempt to generate a mixed carton movement.
-    /// Will only generate one for the largest number of items if there are multiple.
-    ///
-    /// Will remove moves used in generated MC move, if any.
+    /// Given a list of moves that may result in a mixed carton move, attempt to generate a mixed carton movement.
+    /// Will only generate one if prerequisites are met.
     /// </summary>
-    /// <returns>Null if no MC Moves are available.</returns>
-    public static MixedCartonMove? GenerateMixedCartonMove(ref List<Move> moves)
+    /// <returns>Null if no MC Move is available.</returns>
+    public static MixedCartonMove? GenerateMixedCartonMove(List<Move> moves)
     {
-        var move = new MixedCartonMove(ref moves);
+        var move = new MixedCartonMove(moves);
         return move.SuccessfullyGenerated ? move : null;
     }
 
     /// <summary>
-    /// Given a Mixed Carton frame and a list of moves that may include moves for that mixed carton, attempt to generate a mixed carton movement.
-    /// Will only generate one for the largest number of correct items if there are multiple.
-    ///
-    /// Will remove moves used in generated MC move, if any.
+    /// Given a list of moves that may result in a mixed carton move - and a specific mc template to match against it.
+    /// Attempt to generate a mixed carton movement.
+    /// Will only generate one if prerequisites are met.
     /// </summary>
-    /// <returns>Null if no relevant MC Moves are available.</returns>
-    public static MixedCartonMove? GenerateMixedCartonMove(MixedCarton mc, ref List<Move> moves)
+    /// <returns>Null if no MC Move is available.</returns>
+    public static MixedCartonMove? GenerateMixedCartonMove(MixedCarton mc, List<Move> moves)
     {
-        var move = new MixedCartonMove(mc, ref moves);
+        var move = new MixedCartonMove(mc, moves);
         return move.SuccessfullyGenerated ? move : null;
     }
 
+    /// <summary>
+    /// Generate mixed carton move list.
+    /// </summary>
+    /// <param name="mcTemplates">Reference Mixed Carton Template list. Will add to it as new MC Templates are created.</param>
+    /// <param name="moves">Reference Move List. Moves will be removed as they are put into MC Moves.</param>
+    /// <returns>List of Mixed Carton Move objects.</returns>
+    public static List<MixedCartonMove> GenerateMixedCartonMoveList(ref List<MixedCarton> mcTemplates, ref List<Move> moves)
+    {
+        var mcMoves = new List<MixedCartonMove>();
 
+        var moveGroups = moves.Where(m => m.TakeCases == 0 && m.TakePacks == 0)
+            .GroupBy(m => $"{m.TakeBinID}:{m.PlaceBinID}")
+            .Where(g => g.Count() > 1)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        foreach (var (_, moveGroup) in moveGroups)
+        {
+            MixedCartonMove? mcMove = null;
+
+            // Check first against known MixedCarton templates.
+            // Item count should match - save from checking against templates unnecessarily.
+            var templates = mcTemplates.Where(mc => mc.Items.Count == moveGroup.Count);
+            foreach (var mixedCarton in templates)
+            {
+                mcMove = GenerateMixedCartonMove(mixedCarton, moveGroup);
+                if (mcMove is not null) break;
+            }
+
+            // If template wasn't matched, try to create one.
+            if (mcMove is null)
+            {
+                mcMove = GenerateMixedCartonMove(moveGroup);
+                if (mcMove is not null) mcTemplates.Add(mcMove.MixedCarton);
+            }
+
+            if (mcMove is null) continue;
+
+            mcMoves.Add(mcMove);
+            foreach (var move in moveGroup)
+            {
+                moves.Remove(move);
+            }
+        }
+        
+        return mcMoves;
+    }
 }

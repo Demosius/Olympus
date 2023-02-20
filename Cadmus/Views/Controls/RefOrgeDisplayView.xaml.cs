@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows.Controls;
 using Cadmus.ViewModels.Controls;
 using Cadmus.ViewModels.Labels;
+using Uranus;
 
 namespace Cadmus.Views.Controls;
 
@@ -11,10 +12,10 @@ namespace Cadmus.Views.Controls;
 /// </summary>
 public partial class RefOrgeDisplayView
 {
-    public RefOrgeDisplayView()
+    public RefOrgeDisplayView(Helios helios)
     {
         InitializeComponent();
-        DataContext = new RefOrgeDisplayVM();
+        DataContext = new RefOrgeDisplayVM(helios);
     }
 
     private void Selector_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

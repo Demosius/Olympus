@@ -19,35 +19,43 @@ public class InventoryReader
 
     /* BINS */
     // binID is <locationCode>:<zoneCode>:<binCode>
-    public NAVBin? NAVBin(string binID, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVBin>(binID, pullType);
+    public NAVBin? NAVBin(string binID, EPullType pullType = EPullType.ObjectOnly) =>
+        Chariot.PullObject<NAVBin>(binID, pullType);
 
-    public List<NAVBin> NAVBins(Expression<Func<NAVBin, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<NAVBin> NAVBins(Expression<Func<NAVBin, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     public List<NAVBin> NAVBins(string binCode, EPullType pullType = EPullType.ObjectOnly)
     {
         if (pullType == EPullType.ObjectOnly)
-            return Chariot.Database?.Query<NAVBin>("SELECT FROM ? WHERE [Code] = ?;", Chariot.GetTableName(typeof(NAVBin)), binCode) ?? new List<NAVBin>();
+            return Chariot.Database?.Query<NAVBin>("SELECT FROM ? WHERE [Code] = ?;",
+                Chariot.GetTableName(typeof(NAVBin)), binCode) ?? new List<NAVBin>();
         var recursive = pullType == EPullType.FullRecursive;
         return Chariot.Database.GetAllWithChildren<NAVBin>(bin => bin.Code == binCode, recursive);
     }
 
     /* ITEMS */
-    public NAVItem? NAVItem(int itemNumber, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVItem>(itemNumber, pullType);
+    public NAVItem? NAVItem(int itemNumber, EPullType pullType = EPullType.ObjectOnly) =>
+        Chariot.PullObject<NAVItem>(itemNumber, pullType);
 
-    public List<NAVItem> NAVItems(Expression<Func<NAVItem, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<NAVItem> NAVItems(Expression<Func<NAVItem, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     public static DateTime LastItemWriteTime(string itemCSVLocation) => File.GetLastWriteTime(itemCSVLocation);
 
     /* ZONES */
     // zoneId = locationCode + zoneCode
-    public NAVZone? NAVZone(string zoneID, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVZone>(zoneID, pullType);
+    public NAVZone? NAVZone(string zoneID, EPullType pullType = EPullType.ObjectOnly) =>
+        Chariot.PullObject<NAVZone>(zoneID, pullType);
 
-    public List<NAVZone> NAVZones(Expression<Func<NAVZone, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<NAVZone> NAVZones(Expression<Func<NAVZone, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     public List<NAVZone> NAVZones(string zoneCode, EPullType pullType = EPullType.ObjectOnly)
     {
         if (pullType == EPullType.ObjectOnly)
-            return Chariot.Database?.Query<NAVZone>("SELECT FROM ? WHERE [Code] = ?;", Chariot.GetTableName(typeof(NAVZone)), zoneCode) ?? new List<NAVZone>();
+            return Chariot.Database?.Query<NAVZone>("SELECT FROM ? WHERE [Code] = ?;",
+                Chariot.GetTableName(typeof(NAVZone)), zoneCode) ?? new List<NAVZone>();
         var recursive = pullType == EPullType.FullRecursive;
         return Chariot.Database.GetAllWithChildren<NAVZone>(zone => zone.Code == zoneCode, recursive);
     }
@@ -171,28 +179,39 @@ public class InventoryReader
 
     /* STOCK */
     // Stock.ID = <locationCode>:<zoneCode>:<binCode>:<itemNumber>:<uomCode>
-    public NAVStock? NAVStock(string stockID, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVStock>(stockID, pullType);
+    public NAVStock? NAVStock(string stockID, EPullType pullType = EPullType.ObjectOnly) =>
+        Chariot.PullObject<NAVStock>(stockID, pullType);
 
     // BinID = <locationCode>:<zoneCode>:<binCode> || UoMID = <itemNumber>:<uomCode>
-    public NAVStock? NAVStock(string binID, string uomID, EPullType pullType = EPullType.ObjectOnly) => NAVStock(string.Join(":", binID, uomID), pullType);
+    public NAVStock? NAVStock(string binID, string uomID, EPullType pullType = EPullType.ObjectOnly) =>
+        NAVStock(string.Join(":", binID, uomID), pullType);
 
     // ZoneID = <locationCode>:<zoneCode> || UoMID = <itemNumber>:<uomCode>
-    public NAVStock? NAVStock(string zoneID, string binCode, string uomID, EPullType pullType = EPullType.ObjectOnly) => NAVStock(string.Join(":", zoneID, binCode, uomID), pullType);
+    public NAVStock? NAVStock(string zoneID, string binCode, string uomID, EPullType pullType = EPullType.ObjectOnly) =>
+        NAVStock(string.Join(":", zoneID, binCode, uomID), pullType);
 
     // ZoneID = <locationCode>:<zoneCode>
-    public NAVStock? NAVStock(string zoneID, string binCode, int itemNumber, string uomCode, EPullType pullType = EPullType.ObjectOnly) => NAVStock(string.Join(":", zoneID, binCode, itemNumber, uomCode), pullType);
+    public NAVStock? NAVStock(string zoneID, string binCode, int itemNumber, string uomCode,
+        EPullType pullType = EPullType.ObjectOnly) =>
+        NAVStock(string.Join(":", zoneID, binCode, itemNumber, uomCode), pullType);
 
     // UoMID = <itemNumber>:<uomCode>
-    public NAVStock? NAVStock(string locationCode, string zoneCode, string binCode, string uomID, EPullType pullType = EPullType.ObjectOnly) => NAVStock(string.Join(":", locationCode, zoneCode, binCode, uomID), pullType);
+    public NAVStock? NAVStock(string locationCode, string zoneCode, string binCode, string uomID,
+        EPullType pullType = EPullType.ObjectOnly) =>
+        NAVStock(string.Join(":", locationCode, zoneCode, binCode, uomID), pullType);
 
-    public NAVStock? NAVStock(string locationCode, string zoneCode, string binCode, int itemNumber, string uomCode, EPullType pullType = EPullType.ObjectOnly) => NAVStock(string.Join(":", locationCode, zoneCode, binCode, itemNumber, uomCode), pullType);
+    public NAVStock? NAVStock(string locationCode, string zoneCode, string binCode, int itemNumber, string uomCode,
+        EPullType pullType = EPullType.ObjectOnly) =>
+        NAVStock(string.Join(":", locationCode, zoneCode, binCode, itemNumber, uomCode), pullType);
 
-    public List<NAVStock> NAVAllStock(Expression<Func<NAVStock, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<NAVStock> NAVAllStock(Expression<Func<NAVStock, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     public List<NAVStock> NAVItemStock(int itemNumber, EPullType pullType = EPullType.ObjectOnly)
     {
         if (pullType == EPullType.ObjectOnly)
-            return Chariot.Database?.Query<NAVStock>("SELECT FROM ? WHERE [ItemNumber] = ?;", Chariot.GetTableName(typeof(NAVZone)), itemNumber) ?? new List<NAVStock>();
+            return Chariot.Database?.Query<NAVStock>("SELECT FROM ? WHERE [ItemNumber] = ?;",
+                Chariot.GetTableName(typeof(NAVZone)), itemNumber) ?? new List<NAVStock>();
         var recursive = pullType == EPullType.FullRecursive;
         return Chariot.Database.GetAllWithChildren<NAVStock>(stock => stock.ItemNumber == itemNumber, recursive);
     }
@@ -200,20 +219,24 @@ public class InventoryReader
     public List<NAVStock> NAVBinStock(string binCode, EPullType pullType = EPullType.ObjectOnly)
     {
         if (pullType == EPullType.ObjectOnly)
-            return Chariot.Database?.Query<NAVStock>("SELECT FROM ? WHERE [BinCode] = ?;", Chariot.GetTableName(typeof(NAVZone)), binCode) ?? new List<NAVStock>();
+            return Chariot.Database?.Query<NAVStock>("SELECT FROM ? WHERE [BinCode] = ?;",
+                Chariot.GetTableName(typeof(NAVZone)), binCode) ?? new List<NAVStock>();
         var recursive = pullType == EPullType.FullRecursive;
         return Chariot.Database.GetAllWithChildren<NAVStock>(stock => stock.BinCode == binCode, recursive);
     }
 
     /* UOM */
-    public NAVUoM? NAVUoM(string uomID, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVUoM>(uomID, pullType);
+    public NAVUoM? NAVUoM(string uomID, EPullType pullType = EPullType.ObjectOnly) =>
+        Chariot.PullObject<NAVUoM>(uomID, pullType);
 
-    public List<NAVUoM> NAVUoMs(Expression<Func<NAVUoM, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<NAVUoM> NAVUoMs(Expression<Func<NAVUoM, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     public List<NAVUoM> NAVItemUoMs(int itemNumber, EPullType pullType = EPullType.ObjectOnly)
     {
         if (pullType == EPullType.ObjectOnly)
-            return Chariot.Database?.Query<NAVUoM>("SELECT FROM ? WHERE [ItemNumber] = ?;", Chariot.GetTableName(typeof(NAVUoM)), itemNumber) ?? new List<NAVUoM>();
+            return Chariot.Database?.Query<NAVUoM>("SELECT FROM ? WHERE [ItemNumber] = ?;",
+                Chariot.GetTableName(typeof(NAVUoM)), itemNumber) ?? new List<NAVUoM>();
         var recursive = pullType == EPullType.FullRecursive;
         return Chariot.Database.GetAllWithChildren<NAVUoM>(uom => uom.ItemNumber == itemNumber, recursive);
     }
@@ -221,7 +244,8 @@ public class InventoryReader
     public List<NAVUoM> NAVUoMsByCode(string uomCode, EPullType pullType = EPullType.ObjectOnly)
     {
         if (pullType == EPullType.ObjectOnly)
-            return Chariot.Database?.Query<NAVUoM>("SELECT FROM ? WHERE [Code] = ?;", Chariot.GetTableName(typeof(NAVUoM)), uomCode) ?? new List<NAVUoM>();
+            return Chariot.Database?.Query<NAVUoM>("SELECT FROM ? WHERE [Code] = ?;",
+                Chariot.GetTableName(typeof(NAVUoM)), uomCode) ?? new List<NAVUoM>();
         var recursive = pullType == EPullType.FullRecursive;
         return Chariot.Database.GetAllWithChildren<NAVUoM>(uom => uom.Code == uomCode, recursive);
     }
@@ -233,29 +257,39 @@ public class InventoryReader
     }
 
     /* LOCATION */
-    public NAVLocation? NAVLocation(string locationCode, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVLocation>(locationCode, pullType);
+    public NAVLocation? NAVLocation(string locationCode, EPullType pullType = EPullType.ObjectOnly) =>
+        Chariot.PullObject<NAVLocation>(locationCode, pullType);
 
-    public List<NAVLocation> NAVLocations(Expression<Func<NAVLocation, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<NAVLocation> NAVLocations(Expression<Func<NAVLocation, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     /* DIVISION */
-    public NAVDivision? NAVDivision(int divCode, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVDivision>(divCode, pullType);
+    public NAVDivision? NAVDivision(int divCode, EPullType pullType = EPullType.ObjectOnly) =>
+        Chariot.PullObject<NAVDivision>(divCode, pullType);
 
-    public List<NAVDivision> NAVDivisions(Expression<Func<NAVDivision, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<NAVDivision> NAVDivisions(Expression<Func<NAVDivision, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     /* CATEGORY */
-    public NAVCategory? NAVCategory(int catCode, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVCategory>(catCode, pullType);
+    public NAVCategory? NAVCategory(int catCode, EPullType pullType = EPullType.ObjectOnly) =>
+        Chariot.PullObject<NAVCategory>(catCode, pullType);
 
-    public List<NAVCategory> NAVCategories(Expression<Func<NAVCategory, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<NAVCategory> NAVCategories(Expression<Func<NAVCategory, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     /* Platform */
-    public NAVPlatform? NAVPlatform(int pfCode, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVPlatform>(pfCode, pullType);
+    public NAVPlatform? NAVPlatform(int pfCode, EPullType pullType = EPullType.ObjectOnly) =>
+        Chariot.PullObject<NAVPlatform>(pfCode, pullType);
 
-    public List<NAVPlatform> NAVPlatforms(Expression<Func<NAVPlatform, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<NAVPlatform> NAVPlatforms(Expression<Func<NAVPlatform, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     /* GENRE */
-    public NAVGenre? NAVGenre(int genCode, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<NAVGenre>(genCode, pullType);
+    public NAVGenre? NAVGenre(int genCode, EPullType pullType = EPullType.ObjectOnly) =>
+        Chariot.PullObject<NAVGenre>(genCode, pullType);
 
-    public List<NAVGenre> NAVGenres(Expression<Func<NAVGenre, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public List<NAVGenre> NAVGenres(Expression<Func<NAVGenre, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     /* TABLE UPDATES */
     public DateTime LastTableUpdate(Type type)
@@ -302,7 +336,8 @@ public class InventoryReader
             var categories = NAVCategories().ToDictionary(c => c.Code, c => c.Description);
             var platforms = NAVPlatforms().ToDictionary(p => p.Code, p => p.Description);
             var genres = NAVGenres().ToDictionary(g => g.Code, g => g.Description);
-            returnVal = navItems.Select(item => new SkuMaster(item, stock, uomDict, bins, divisions, categories, platforms, genres));
+            returnVal = navItems.Select(item =>
+                new SkuMaster(item, stock, uomDict, bins, divisions, categories, platforms, genres));
         });
 
         return returnVal;
@@ -463,4 +498,7 @@ public class InventoryReader
 
         return dataSet;
     }
+
+    public IEnumerable<MixedCarton> MixedCartons(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) 
+        => Chariot.PullObjectList(filter, pullType);
 }
