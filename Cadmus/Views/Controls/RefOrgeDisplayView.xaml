@@ -9,6 +9,16 @@
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type controlVM:RefOrgeDisplayVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="1200">
+    
+    <UserControl.Resources>
+        <DataTemplate x:Key="RefOrgeTemplate">
+            <labels:RefOrgeLabelView/>
+        </DataTemplate>
+        <DataTemplate x:Key="MixedCartonTemplate">
+            <labels:RefOrgeMCLabelView/>
+        </DataTemplate>
+        <labels:RefOrgeLabelTemplateSelector x:Key="RefOrgeLabelTemplateSelector"/>
+    </UserControl.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -21,16 +31,25 @@
                         Orientation="Horizontal">
                 <Button Content="Add Line"
                         Command="{Binding AddLineCommand}"
-                        Width="100"
+                        MinWidth="100"
                         Margin="2"/>
                 <Button Content="Load Moves"
                         Command="{Binding AddMovesCommand}"
-                        Width="100"
+                        MinWidth="100"
+                        Margin="2"/>
+                <Button Content="Clear Lines"
+                        Command="{Binding ClearLinesCommand}"
+                        MinWidth="100"
+                        Margin="2"/>
+                <Button Content="Delete Selected"
+                        Command="{Binding DeleteSelectedCommand}"
+                        MinWidth="100"
                         Margin="2"/>
             </StackPanel>
 
             <!-- Data View -->
-            <DataGrid ItemsSource="{Binding MasterVMs}"
+            <DataGrid Name="MasterLabelGrid" 
+                      ItemsSource="{Binding MasterVMs}"
                       AutoGenerateColumns="False"
                       CanUserDeleteRows="True"
                       CanUserAddRows="True"
@@ -39,10 +58,17 @@
                       CanUserResizeRows="True"
                       CanUserSortColumns="True"
                       RowHeaderWidth="15"
-                      SelectionUnit="CellOrRowHeader">
+                      SelectionUnit="CellOrRowHeader"
+                      SelectionChanged="MasterSelection_OnSelectionChanged">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Priority"
-                                        Binding="{Binding Priority}"
+                    <DataGridTextColumn Header="Item Number"
+                                        Binding="{Binding ItemNumber}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Item Description"
+                                        Binding="{Binding ItemDescription}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Take Zone"
+                                        Binding="{Binding TakeZone}"
                                         IsReadOnly="False"/>
                     <DataGridTextColumn Header="Take Bin"
                                         Binding="{Binding TakeBin}"
@@ -56,48 +82,42 @@
                     <DataGridTextColumn Header="Each Qty"
                                         Binding="{Binding EachQty}"
                                         IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Place Bin"
+                                        Binding="{Binding PlaceBin}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Priority"
+                                        Binding="{Binding Priority}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Batch Name"
+                                        Binding="{Binding BatchName}"
+                                        IsReadOnly="False"/>
                     <DataGridTextColumn Header="Qty Per Case"
                                         Binding="{Binding QtyPerCase}"
                                         IsReadOnly="False"/>
                     <DataGridTextColumn Header="Qty Per Pack"
                                         Binding="{Binding QtyPerPack}"
                                         IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Barcode"
-                                        Binding="{Binding Barcode}"
-                                        IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Item Number"
-                                        Binding="{Binding ItemNumber}"
-                                        IsReadOnly="False"/>
                     <DataGridTextColumn Header="Label Total"
                                         Binding="{Binding LabelTotal}"
-                                        IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Item Description"
-                                        Binding="{Binding ItemDescription}"
-                                        IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Batch Name"
-                                        Binding="{Binding BatchName}"
                                         IsReadOnly="False"/>
                     <DataGridTextColumn Header="Operator Name"
                                         Binding="{Binding OperatorName}"
                                         IsReadOnly="False"/>
+                    <DataGridTextColumn Header="True Order Value"
+                                        Binding="{Binding TrueOrderTakeBin}"
+                                        IsReadOnly="False"/>
                     <DataGridTextColumn Header="Date"
-                                        Binding="{Binding Date}"
+                                        Binding="{Binding Date, StringFormat=dd-MMM-yyyy}"
                                         IsReadOnly="False"/>
                     <DataGridTextColumn Header="Check Digits"
                                         Binding="{Binding CheckDigits}"
                                         IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Place Bin"
-                                        Binding="{Binding PlaceBin}"
-                                        IsReadOnly="False"/>
                     <DataGridTextColumn Header="Total Grabs"
                                         Binding="{Binding TotalGrab}"
                                         IsReadOnly="False"/>
-                    <DataGridTextColumn Header="True Order Value"
-                                        Binding="{Binding TrueOrderTakeBin}"
-                                        IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Take Zone"
-                                        Binding="{Binding TakeZone}"
-                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Barcode"
+                                        Binding="{Binding Barcode}"
+                                        IsReadOnly="True"/>
                 </DataGrid.Columns>
             </DataGrid>
         </DockPanel>
@@ -116,49 +136,18 @@
                 </Button>
             </StackPanel>
 
-
-
             <ListView Name="LabelViewList"
                       ItemsSource="{Binding LabelVMs}"
                       SelectionChanged="Selector_OnSelectionChanged"
                       HorizontalContentAlignment="Center"
+                      ItemTemplateSelector="{StaticResource RefOrgeLabelTemplateSelector}"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-
-                <DataTemplate x:Key="StandardTemplate" DataType="{x:Type labelVM:RefOrgeLabelVM}">
-                    <TextBlock Text="I'm a Person" />
-                </DataTemplate>
-
-                <DataTemplate x:Key="BusinessTemplate" DataType="{x:Type labelVM:RefOrgeLabelVM}">
-                    <TextBlock Text="I'm a Business" />
-                </DataTemplate>
-
-                <DataTemplate DataType="{x:Type labelVM:RefOrgeLabelVM}">
-                    
-                </DataTemplate>
 
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel Orientation="Horizontal"/>
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
-
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ContentControl Content="{Binding }">
-                        <ContentControl.Style>
-                            <Style TargetType="{x:Type ContentControl}">
-                                <Setter Property="ContentTemplate" Value="{StaticResource labelVM:RefOrgeLabelView}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Master.MixedCarton}" Value="True">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource BusinessTemplate}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ContentControl.Style>
-                    </ContentControl>
-                        <labels:RefOrgeLabelView RenderSize="2, 2"/>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
             </ListView>
         </DockPanel>
     </Grid>

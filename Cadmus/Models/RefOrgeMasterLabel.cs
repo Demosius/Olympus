@@ -34,6 +34,7 @@ public class RefOrgeMasterLabel
     public Move? Move { get; }
 
     public bool MixedCarton { get; set; }
+    public string MixedContentDisplay { get; set; }
 
     public RefOrgeMasterLabel()
     {
@@ -48,6 +49,7 @@ public class RefOrgeMasterLabel
         Barcode = BarcodeUtility.Encode128(ItemNumber.ToString());
         ItemDescription = string.Empty;
         TrueOrderTakeBin = string.Empty;
+        MixedContentDisplay = string.Empty;
     }
 
     public RefOrgeMasterLabel(Move move)
@@ -59,7 +61,7 @@ public class RefOrgeMasterLabel
         Priority = move.Priority;
         BatchName = move.BatchID;
         OperatorName = move.OperatorName;
-        TakeBin = move.TakeBin?.Code ?? move.TakeBinID;
+        TakeBin = move.TakeBin?.Code ?? move.TakeBinID.Split(':')[2];
         PickAsPacks = move.PlacePacks > 0;
         PlaceBin = move.PlaceBin?.Code ?? move.PlaceBinID;
         ItemNumber = move.ItemNumber;
@@ -70,7 +72,7 @@ public class RefOrgeMasterLabel
         QtyPerCase = move.Item?.QtyPerCase ?? 1;
         QtyPerPack = move.Item?.QtyPerPack ?? 1;
         ItemDescription = move.Item?.Description ?? string.Empty;
-        TakeZone = move.TakeZone?.Code ?? move.TakeLocation ?? string.Empty;
+        TakeZone = move.TakeZone?.Code ?? move.TakeBinID.Split(':')[1];
 
         Web = move.BatchID.Contains("WEB") || move.BatchID == "ECons";
         Date = DateTime.Today;
@@ -80,6 +82,8 @@ public class RefOrgeMasterLabel
 
         const string pattern = @"^(\w{2}|\w{4})(\d{2} \d{3})$";
         TrueOrderTakeBin = Regex.Replace(TakeBin, pattern, "A$2");
+        
+        MixedContentDisplay = move is MixedCartonMove mixMove ? mixMove.MixedContentDisplay : string.Empty;
 
         // Total Grabs
         CalculateTotalGrabs();
@@ -106,17 +110,15 @@ public class RefOrgeMasterLabel
 
     }
 
-    public int CalculateRequiredLabels()
+    public void CalculateRequiredLabels()
     {
         // Get required number of labels.
-        var labelCount = CaseQty + PackQty;
-        if (EachQty <= 0) return labelCount;
+        LabelTotal = CaseQty + PackQty;
+        if (EachQty <= 0) return;
 
         var eachesPerLabel = QtyPerPack > 1 ? QtyPerPack : QtyPerCase > 1 ? QtyPerCase : 12;
 
-        labelCount += (int)Math.Ceiling(EachQty / (double)eachesPerLabel);
-
-        return labelCount;
+        LabelTotal += (int)Math.Ceiling(EachQty / (double)eachesPerLabel);
     }
 
 }

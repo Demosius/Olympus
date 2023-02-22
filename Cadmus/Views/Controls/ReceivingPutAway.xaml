@@ -22,10 +22,20 @@
                         Command="{Binding AddLineCommand}"
                         Width="100"
                         Margin="2"/>
+                <Button Content="Clear Data"
+                        Command="{Binding ClearLinesCommand}"
+                        Width="100"
+                        Margin="2"/>
+                <Button Content="Delete Selected"
+                        Command="{Binding DeleteSelectedCommand}"
+                        Width="100"
+                        Margin="2"/>
             </StackPanel>
 
             <!-- Data View -->
-            <DataGrid ItemsSource="{Binding LabelVMs}"
+            <DataGrid Name="LabelGrid" 
+                      ItemsSource="{Binding LabelVMs}"
+                      SelectionChanged="GridLabels_OnSelectionChanged"
                       AutoGenerateColumns="False"
                       CanUserDeleteRows="True"
                       CanUserAddRows="True"

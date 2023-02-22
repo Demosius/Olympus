@@ -13,5 +13,9 @@ namespace Cadmus.Interfaces;
 public interface IDataLines
 {
     public AddLineCommand AddLineCommand { get; set; }
+    public ClearLinesCommand ClearLinesCommand { get; set; }
+    public DeleteSelectedCommand DeleteSelectedCommand { get; set; }
     public void AddLine();
+    public void ClearLines();
+    public void DeleteSelected();
 }

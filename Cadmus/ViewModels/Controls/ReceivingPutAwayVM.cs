@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Cadmus.Annotations;
+using Cadmus.Helpers;
 using Cadmus.Interfaces;
 using Cadmus.Models;
 using Cadmus.ViewModels.Commands;
@@ -27,6 +28,8 @@ public class ReceivingPutAwayVM : INotifyPropertyChanged, IPrintable, IDataLines
         }
     }
 
+    public ObservableCollection<ReceivingPutAwayLabelVM> SelectedGridLabels { get; set; }
+
     public ObservableCollection<ReceivingPutAwayLabelVM> SelectedLabels { get; set; }
 
     #endregion
@@ -35,6 +38,8 @@ public class ReceivingPutAwayVM : INotifyPropertyChanged, IPrintable, IDataLines
 
     public PrintCommand PrintCommand { get; set; }
     public AddLineCommand AddLineCommand { get; set; }
+    public ClearLinesCommand ClearLinesCommand { get; set; }
+    public DeleteSelectedCommand DeleteSelectedCommand { get; set; }
 
     #endregion
 
@@ -43,10 +48,13 @@ public class ReceivingPutAwayVM : INotifyPropertyChanged, IPrintable, IDataLines
         Labels = new List<ReceivingPutAwayLabel>();
         labelVMs = new ObservableCollection<ReceivingPutAwayLabelVM>();
         SelectedLabels = new ObservableCollection<ReceivingPutAwayLabelVM>();
+        SelectedGridLabels = new ObservableCollection<ReceivingPutAwayLabelVM>();
 
         // Set Commands
         PrintCommand = new PrintCommand(this);
         AddLineCommand = new AddLineCommand(this);
+        ClearLinesCommand = new ClearLinesCommand(this);
+        DeleteSelectedCommand = new DeleteSelectedCommand(this);
     }
 
     public void Print()
@@ -59,6 +67,24 @@ public class ReceivingPutAwayVM : INotifyPropertyChanged, IPrintable, IDataLines
         var label = new ReceivingPutAwayLabel();
         Labels.Add(label);
         LabelVMs.Add(new ReceivingPutAwayLabelVM(label));
+    }
+
+    public void ClearLines()
+    {
+        SelectedLabels.Clear();
+        LabelVMs.Clear();
+        Labels.Clear();
+    }
+
+    public void DeleteSelected()
+    {
+        foreach (var labelVM in SelectedLabels)
+        {
+            Labels.Remove(labelVM.Label);
+            LabelVMs.Remove(labelVM);
+        }
+
+        SelectedLabels.Clear();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

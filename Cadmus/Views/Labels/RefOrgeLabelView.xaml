@@ -3,10 +3,254 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Cadmus.Views.Labels"
+             xmlns:vm="clr-namespace:Cadmus.ViewModels.Labels"
+             xmlns:converters="clr-namespace:Cadmus.ViewModels.Converters"
+             d:DataContext="{d:DesignInstance {x:Type vm:RefOrgeLabelVM}, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+             d:DesignHeight="242" d:DesignWidth="352"
+             Height="{Binding Height}" Width="{Binding Width}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Morpheus;component/Resources/Fonts.xaml"/>
+                <ResourceDictionary>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="Black" />
+                    </Style>
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                    <converters:BoolToBackgroundConverter x:Key="BoolToBackgroundConverter"/>
+                    <converters:BoolToForegroundConverter x:Key="BoolToForegroundConverter"/>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding Col1}"/>
+            <ColumnDefinition Width="{Binding Col2}"/>
+            <ColumnDefinition Width="{Binding Col3}"/>
+            <ColumnDefinition Width="{Binding Col4}"/>
+            <ColumnDefinition Width="{Binding Col5}"/>
+            <ColumnDefinition Width="{Binding Col6}"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+        </Grid.RowDefinitions>
+
+        <!-- Priority -->
+        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                BorderBrush="Black" BorderThickness="1"
+                Background="Black">
+            <TextBlock Text="{Binding Priority}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="14"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"
+                       Foreground="White"/>
+        </Border>
+
+        <!-- Batch -->
+        <Border Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2"
+                Background="Black">
+            <TextBlock Text="{Binding BatchName}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="12"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"
+                       Foreground="White"/>
+        </Border>
+
+        <!-- Operator -->
+        <Border Grid.Row="0" Grid.Column="4"
+                Background="Black">
+            <TextBlock Text="{Binding OperatorName}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="12"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"
+                       Foreground="White"/>
+        </Border>
+
+        <!-- Date -->
+        <Border Grid.Row="0" Grid.Column="5"
+                Background="Black">
+            <TextBlock Text="{Binding Date, StringFormat=dd-MMM-yyyy}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="12"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"
+                       Foreground="White"/>
+        </Border>
+
+        <!-- Take Bin -->
+        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Grid.RowSpan="2" 
+                BorderBrush="Black" BorderThickness="1,0,1,1">
+            <TextBlock Text="{Binding TakeBin}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- Pick as Packs -->
+        <Border Grid.Row="1" Grid.Column="4" Grid.RowSpan="2" 
+                Background="{Binding IsFirstLabel, Converter={StaticResource BoolToBackgroundConverter}}">
+            <TextBlock Visibility="{Binding PickAsPacks, Converter={StaticResource BooleanToVisibilityConverter}}" 
+                       Foreground="{Binding IsFirstLabel, Converter={StaticResource BoolToForegroundConverter}}"
+                       Text="Pick as Pack"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="22"
+                       FontWeight="Normal"
+                       FontFamily="Gloucester MT Extra Condensed"/>
+        </Border>
+
+        <!-- WEB -->
+        <Border Grid.Row="1" Grid.Column="5" Grid.RowSpan="2"
+                BorderBrush="Black" BorderThickness="0,0,1,0"
+                Background="{Binding IsFirstLabel, Converter={StaticResource BoolToBackgroundConverter}}">
+            <TextBlock Visibility="{Binding Web, Converter={StaticResource BooleanToVisibilityConverter}}"
+                       Foreground="{Binding IsFirstLabel, Converter={StaticResource BoolToForegroundConverter}}"
+                       Text="WEB"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="26"
+                       FontWeight="Normal"
+                       FontFamily="Stencil"/>
+        </Border>
+
+        <!-- Take Display -->
+        <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4" Grid.RowSpan="3" 
+                BorderBrush="Black" BorderThickness="1,0,1,1">
+            <TextBlock Text="{Binding TakeDisplayString}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       FontFamily="Courier New"/>
+        </Border>
+
+        <!-- Place Bin -->
+        <Border Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="2" Grid.RowSpan="3" 
+                BorderBrush="Black" BorderThickness="0,0,1,0"
+                Background="{Binding IsFirstLabel, Converter={StaticResource BoolToBackgroundConverter}}">
+            <TextBlock Text="{Binding PlaceBin}"
+                       Foreground="{Binding IsFirstLabel, Converter={StaticResource BoolToForegroundConverter}}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="48"
+                       FontWeight="Normal"
+                       FontFamily="Tw Cen MT Condensed"/>
+        </Border>
+
+        <!-- Barcode -->
+        <Border Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" Grid.RowSpan="2" 
+                BorderBrush="Black" BorderThickness="1,0">
+            <TextBlock Text="{Binding Barcode}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="36"
+                       FontWeight="Normal"
+                       FontFamily="{StaticResource Code128}"/>
+        </Border>
+
+        <!-- Check Digits -->
+        <Border Grid.Row="6" Grid.Column="4" Grid.ColumnSpan="2" Grid.RowSpan="2" 
+                BorderBrush="Black" BorderThickness="0,0,1,0"
+                Background="{Binding IsFirstLabel, Converter={StaticResource BoolToBackgroundConverter}}">
+            <TextBlock Text="{Binding CheckDigits}"
+                       Foreground="{Binding IsFirstLabel, Converter={StaticResource BoolToForegroundConverter}}"
+                       VerticalAlignment="Top"
+                       HorizontalAlignment="Center"
+                       FontSize="24"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- Item Number -->
+        <Border Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="4"
+                BorderBrush="Black" BorderThickness="1,0,1,1">
+            <TextBlock Text="{Binding ItemNumber}"
+                       VerticalAlignment="Top"
+                       HorizontalAlignment="Center"
+                       FontSize="16"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- Item Description -->
+        <Border Grid.Row="8" Grid.Column="4" Grid.ColumnSpan="2" Grid.RowSpan="3" 
+                BorderBrush="Black" BorderThickness="0,1,1,1">
+            <TextBlock Text="{Binding ItemDescription}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       TextDecorations="Underline"
+                       TextWrapping="Wrap"
+                       FontFamily="Courier New"/>
+        </Border>
+
+        <!-- Total Grabs -->
+        <Border Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="4"
+                BorderBrush="Black" BorderThickness="1,0,1,0">
+            <TextBlock Text="{Binding TotalGrab}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left"
+                       FontSize="11"
+                       FontWeight="Bold"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- Label Number -->
+        <Border Grid.Row="10" Grid.Column="0"
+                BorderBrush="Black" BorderThickness="1">
+            <TextBlock Text="{Binding LabelNumber}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="14"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- "of" -->
+        <Border Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="2"
+                BorderBrush="Black" BorderThickness="0,0,0,1">
+            <TextBlock Text="of"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="12"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- Label Total -->
+        <Border Grid.Row="10" Grid.Column="3"
+                BorderBrush="Black" BorderThickness="1">
+            <TextBlock Text="{Binding LabelTotal}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="14"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"/>
+        </Border>
     </Grid>
 </UserControl>

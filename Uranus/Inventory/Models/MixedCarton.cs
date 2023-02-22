@@ -68,4 +68,22 @@ public class MixedCarton
 
         return true;
     }
+
+    /// <summary>
+    /// Generate a display string to show and represent each sku within a given carton.
+    /// </summary>
+    /// <returns></returns>
+    public string GetMixedContentDisplay()
+    {
+        string? s = null;
+        foreach (var mixedCartonItem in Items.OrderBy(i => i.ItemNumber))
+        {
+            if (s is null) 
+                s = $"{mixedCartonItem.ItemNumber} x {mixedCartonItem.QtyPerCarton}";
+            else 
+                s += $"\n{mixedCartonItem.ItemNumber} x {mixedCartonItem.QtyPerCarton}";
+        }
+
+        return s ?? string.Empty;
+    }
 }

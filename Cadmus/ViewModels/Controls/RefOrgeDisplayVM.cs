@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using Cadmus.Annotations;
+using Cadmus.Helpers;
 using Cadmus.Interfaces;
 using Cadmus.Models;
 using Cadmus.ViewModels.Commands;
@@ -47,6 +48,8 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         }
     }
 
+    public ObservableCollection<RefOrgeMasterLabelVM> SelectedMasterLabels { get; set; }
+
     public ObservableCollection<RefOrgeLabelVM> SelectedLabels { get; set; }
 
     #endregion
@@ -54,6 +57,8 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
 
     public PrintCommand PrintCommand { get; set; }
     public AddLineCommand AddLineCommand { get; set; }
+    public ClearLinesCommand ClearLinesCommand { get; set; }
+    public DeleteSelectedCommand DeleteSelectedCommand { get; set; }
     public AddMovesCommand AddMovesCommand { get; set; }
 
     #endregion
@@ -66,15 +71,18 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         Masters = new List<RefOrgeMasterLabel>();
         masterVMs = new ObservableCollection<RefOrgeMasterLabelVM>();
         SelectedLabels = new ObservableCollection<RefOrgeLabelVM>();
+        SelectedMasterLabels = new ObservableCollection<RefOrgeMasterLabelVM>();
 
         PrintCommand = new PrintCommand(this);
         AddLineCommand = new AddLineCommand(this);
         AddMovesCommand = new AddMovesCommand(this);
+        ClearLinesCommand = new ClearLinesCommand(this);
+        DeleteSelectedCommand = new DeleteSelectedCommand(this);
     }
 
     public void Print()
     {
-        throw new NotImplementedException();
+        PrintUtility.PrintLabels(LabelVMs, SelectedLabels);
     }
 
     public void AddLine()
@@ -82,6 +90,26 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         var newLabel = new RefOrgeMasterLabel();
         Masters.Add(newLabel);
         MasterVMs.Add(new RefOrgeMasterLabelVM(newLabel, this));
+    }
+
+    public void ClearLines()
+    {
+        Masters.Clear();
+        MasterVMs.Clear();
+        LabelVMs.Clear();
+        SelectedLabels.Clear();
+        SelectedMasterLabels.Clear();
+    }
+
+    public void DeleteSelected()
+    {
+        foreach (var masterLabel in SelectedMasterLabels)
+        {
+            MasterVMs.Remove(masterLabel);
+            Masters.Remove(masterLabel.Label);
+        }
+
+        GenerateDisplayLabels();
     }
 
     public void AddMoves()
@@ -99,6 +127,7 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         catch (Exception ex)
         {
             MessageBox.Show(ex.Message);
+            Mouse.OverrideCursor = Cursors.Arrow;
             return;
         }
 
@@ -119,6 +148,8 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
 
         MasterVMs = new ObservableCollection<RefOrgeMasterLabelVM>(Masters.Select(m => new RefOrgeMasterLabelVM(m, this)));
 
+        GenerateDisplayLabels();
+
         Mouse.OverrideCursor = Cursors.Arrow;
     }
 
@@ -126,9 +157,14 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
     {
         // For each master label, generate the appropriate number of display labels.
         SelectedLabels.Clear();
-        LabelVMs.Clear();
 
+        var labels = new List<RefOrgeLabelVM>();
+        foreach (var masterLabelVM in MasterVMs)
+        {
+            labels.AddRange(masterLabelVM.GetDisplayLabels());
+        }
 
+        LabelVMs = new ObservableCollection<RefOrgeLabelVM>(labels);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using Cadmus;
+using Cadmus.Helpers;
 using Cadmus.Models;
 using Cadmus.ViewModels.Labels;
 using Microsoft.VisualStudio.TestTools.UnitTesting;

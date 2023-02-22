@@ -56,7 +56,7 @@ public class Move
     [Ignore] public int? BatchPriority => Batch?.Priority;
 
     [Ignore] public Employee? AssignedOperator { get; set; }
-    [Ignore] public string OperatorName => AssignedOperator?.DisplayName ?? AssignedOperatorID.ToString();
+    [Ignore] public string OperatorName => AssignedOperator?.DisplayName ?? (AssignedOperatorID == 0 ? string.Empty : AssignedOperatorID.ToString());
 
     [Ignore]
     public int Priority

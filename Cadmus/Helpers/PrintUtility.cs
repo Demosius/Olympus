@@ -7,15 +7,14 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using Cadmus.Interfaces;
-using Point = System.Drawing.Point;
 
-namespace Cadmus;
+namespace Cadmus.Helpers;
 
 public static class PrintUtility
 {
     private static readonly List<ILabelVM> printList = new();
     private static int printCount;
-    
+
     public static void PrintLabels(IEnumerable<ILabelVM> baseLabels, IEnumerable<ILabelVM>? selectedLabels)
     {
         var labelVMs = baseLabels.ToList();
@@ -171,7 +170,7 @@ public static class PrintUtility
                         $"\nQueueDriver:\t\t {printDialog.PrintQueue.QueueDriver.Parent}\n" +
                         $"\nQueueDriver:\t\t {printDialog.PrintQueue.QueueDriver}\n");
     }
-    
+
     public static Dictionary<string, string> ShowPrinters()
     {
         const string query = "SELECT * from Win32_Printer";

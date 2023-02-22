@@ -25,4 +25,13 @@ public partial class ReceivingPutAway
                 .Cast<ReceivingPutAwayLabelVM>()
                 .ToList());
     }
+
+    private void GridLabels_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var vm = (ReceivingPutAwayVM)DataContext;
+        vm.SelectedGridLabels =
+            new ObservableCollection<ReceivingPutAwayLabelVM>(LabelGrid.SelectedItems
+                .Cast<ReceivingPutAwayLabelVM>()
+                .ToList());
+    }
 }

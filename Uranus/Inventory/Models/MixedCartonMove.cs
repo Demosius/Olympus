@@ -11,6 +11,13 @@ public class MixedCartonMove : Move
 
     public bool SuccessfullyGenerated { get; set; }
 
+    private string? mixedContentDisplay;
+    public string MixedContentDisplay
+    {
+        get => mixedContentDisplay ??= MixedCarton.GetMixedContentDisplay();
+        set => mixedContentDisplay = value;
+    }
+
     public MixedCartonMove(MixedCarton mixedCarton)
     {
         MixedCarton = mixedCarton;
