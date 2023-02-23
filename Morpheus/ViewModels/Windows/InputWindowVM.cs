@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Morpheus.ViewModels;
+namespace Morpheus.ViewModels.Windows;
 
 public class InputWindowVM : INotifyPropertyChanged
 {

@@ -1,4 +1,4 @@
-﻿namespace Morpheus.Views;
+﻿namespace Morpheus.Views.Windows;
 
 /// <summary>
 /// Interaction logic for InputWindow.xaml

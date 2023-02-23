@@ -1,15 +1,17 @@
-﻿using SQLite;
+﻿using System;
+using SQLite;
 using SQLiteNetExtensions.Attributes;
 
 namespace Uranus.Inventory.Models;
 
 public class MixedCartonItem
 {
-    [ForeignKey(typeof(MixedCarton))] public string MixedCartonName { get; set; }
+    [ForeignKey(typeof(MixedCarton))] public Guid MixedCartonID { get; set; }
     [ForeignKey(typeof(NAVItem))] public int ItemNumber { get; set; }
+    public string Identifier { get; set; }
     public int QtyPerCarton { get; set; }
 
-    [ManyToOne(nameof(MixedCartonName), nameof(Models.MixedCarton.Items), CascadeOperations = CascadeOperation.CascadeRead)]
+    [ManyToOne(nameof(MixedCartonID), nameof(Models.MixedCarton.Items), CascadeOperations = CascadeOperation.CascadeRead)]
     public MixedCarton? MixedCarton { get; set; }
     [ManyToOne(nameof(ItemNumber), nameof(NAVItem.MixedCartons), CascadeOperations = CascadeOperation.CascadeRead)]
     public NAVItem? Item { get; set; }
@@ -19,23 +21,36 @@ public class MixedCartonItem
     [Ignore] public double Length => Item?.Length ?? 0;
     [Ignore] public double Width => Item?.Width ?? 0;
     [Ignore] public double Height => Item?.Height ?? 0;
+    [Ignore] public string ItemSignature => $"{ItemNumber}[{QtyPerCarton}]";
 
     public MixedCartonItem()
     {
-        MixedCartonName = string.Empty;
+        MixedCartonID = Guid.Empty;
+        Identifier = string.Empty;
     }
 
-    public MixedCartonItem(string mixedCartonName, int itemNumber)
+    public MixedCartonItem(Guid mixedCartonID, int itemNumber)
     {
-        MixedCartonName = mixedCartonName;
+        MixedCartonID = mixedCartonID;
         ItemNumber = itemNumber;
+        Identifier = string.Empty;
     }
 
-    public MixedCartonItem(MixedCarton mixedCarton, NAVItem item) : this(mixedCarton.Name, item.Number)
+    public MixedCartonItem(MixedCarton mixedCarton, NAVItem item) : this(mixedCarton.ID, item.Number)
     {
         Item = item;
         MixedCarton = mixedCarton;
         item.MixedCartons.Add(this);
         mixedCarton.Items.Add(this);
+    }
+
+    /// <summary>
+    /// Remove self from associated item and carton.
+    /// </summary>
+    /// <exception cref="NotImplementedException"></exception>
+    public void Remove()
+    {
+        Item?.MixedCartons.Remove(this);
+        MixedCarton?.Items.Remove(this);
     }
 }

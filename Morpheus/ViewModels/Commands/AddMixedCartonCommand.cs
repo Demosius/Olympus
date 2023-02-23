@@ -1,17 +1,15 @@
-﻿using Morpheus.ViewModels.Controls;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Morpheus.ViewModels.Controls;
 
 namespace Morpheus.ViewModels.Commands;
 
-public class SaveZonesCommand : ICommand
-{
-    public ZoneHandlerVM VM { get; set; }
 
-    public SaveZonesCommand(ZoneHandlerVM vm)
-    {
-        VM = vm;
-    }
+public class AddMixedCartonCommand : ICommand
+{
+    public MixedCartonHandlerVM VM { get; set; }
+
+    public AddMixedCartonCommand(MixedCartonHandlerVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -20,7 +18,7 @@ public class SaveZonesCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.SaveZones();
+        VM.AddMixedCarton();
     }
 
     public event EventHandler? CanExecuteChanged

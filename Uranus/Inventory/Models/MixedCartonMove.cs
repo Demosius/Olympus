@@ -142,7 +142,6 @@ public class MixedCartonMove : Move
     /// Given moves assumed to represent MC movement(s), generate a Mixed carton item that appropriately represents the items and the ratios.
     /// </summary>
     /// <param name="moves">Move objects that together represent items moving in mixed cartons - with an assumed consistent ratio.</param>
-    /// <param name="caseQty">Returns the calculated case qty based on the move values.</param>
     /// <returns>Calculated MixedCarton Object.</returns>
     public static MixedCarton GetMixedCarton(IEnumerable<Move> moves)
     {

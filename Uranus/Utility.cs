@@ -89,7 +89,7 @@ public static class Utility
                 }
                 else
                 {
-                    if ((i == 0) || (j == 0))
+                    if (i == 0 || j == 0)
                         num[i, j] = 1;
                     else
                         num[i, j] = 1 + num[i - 1, j - 1];
@@ -108,7 +108,7 @@ public static class Utility
                     {
                         lastSubsBegin = thisSubsBegin;
                         subStrBuilder.Length = 0;
-                        subStrBuilder.Append(str1.AsSpan(lastSubsBegin, (i + 1) - lastSubsBegin));
+                        subStrBuilder.Append(str1.AsSpan(lastSubsBegin, i + 1 - lastSubsBegin));
                     }
                 }
             }
@@ -124,6 +124,7 @@ public static class Utility
     /// <returns></returns>
     public static string LongestCommonSubstring(IEnumerable<string> strings)
     {
-        return strings.Aggregate(LongestCommonSubstring);
+        var stringList = strings.ToList();
+        return !stringList.Any() ? string.Empty : stringList.Aggregate(LongestCommonSubstring);
     }
 }

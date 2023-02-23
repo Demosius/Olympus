@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
@@ -7,14 +8,15 @@ namespace Uranus.Inventory.Models;
 
 public class MixedCarton
 {
-    [PrimaryKey] public string Name { get; set; }
+    [PrimaryKey] public Guid ID { get; set; }
+    public string Name { get; set; }
     public double Cube { get; set; }
     public double Weight { get; set; }
     public double Length { get; set; }
     public double Width { get; set; }
     public double Height { get; set; }
 
-    [OneToMany(nameof(MixedCartonItem.MixedCartonName), nameof(MixedCartonItem.MixedCarton), CascadeOperations = CascadeOperation.CascadeRead)]
+    [OneToMany(nameof(MixedCartonItem.MixedCartonID), nameof(MixedCartonItem.MixedCarton), CascadeOperations = CascadeOperation.CascadeRead)]
     public List<MixedCartonItem> Items { get; set; }
 
     private int? unitsPerCarton;
@@ -24,10 +26,27 @@ public class MixedCarton
         set => unitsPerCarton = value;
     }
 
+    private string? signature;
+    [Ignore]
+    public string Signature
+    {
+        get => signature ??= GetSignature();
+        set => signature = value;
+    }
+
     public MixedCarton()
     {
+        ID = Guid.NewGuid();
         Name = string.Empty;
         Items = new List<MixedCartonItem>();
+    }
+    /// <summary>
+    /// Creates a useful signature for comparison to other MC objects based on the associated items and quantities.
+    /// </summary>
+    /// <returns></returns>
+    private string GetSignature()
+    {
+        return string.Join(':', Items.OrderBy(i => i.ItemNumber).Select(i => i.ItemSignature));
     }
 
     /// <summary>
@@ -86,4 +105,41 @@ public class MixedCarton
 
         return s ?? string.Empty;
     }
+
+    public static MixedCarton? GetMixedCarton(IEnumerable<NAVStock> stock)
+    {
+        var stockList = stock.ToList();
+
+        // Ensure there are only eaches.
+        if (stockList.Any(navStock => navStock.GetEUoM() != EUoM.EACH)) return null;
+
+        var items = stockList.Where(m => m.Item is not null).Select(m => m.Item!).ToList();
+
+        if (!items.Any()) return null;
+
+        var mc = new MixedCarton
+        {
+            Name = GetDescription(items)
+        };
+
+        var caseQty = Utility.HCF(stockList.Select(s => s.Qty));
+
+        if (caseQty == 0) return null;
+
+        foreach (var navStock in stockList.Where(navStock => navStock.Item is not null))
+        {
+            // Creation of MCI(mc, i) adds itself to both MC and I.
+            _ = new MixedCartonItem(mc, navStock.Item!)
+            {
+                QtyPerCarton = navStock.Qty / caseQty
+            };
+        }
+
+        mc.CalculateValuesFromItems();
+
+        return mc;
+    }
+
+    public static string GetDescription(IEnumerable<NAVItem> items) =>
+        Utility.LongestCommonSubstring(items.Select(i => i.Description)).Trim();
 }

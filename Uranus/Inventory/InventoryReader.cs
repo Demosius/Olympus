@@ -501,4 +501,29 @@ public class InventoryReader
 
     public IEnumerable<MixedCarton> MixedCartons(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) 
         => Chariot.PullObjectList(filter, pullType);
+
+    public IEnumerable<MixedCartonItem> MixedCartonItems(Expression<Func<MixedCartonItem, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
+        => Chariot.PullObjectList(filter, pullType);
+
+    public List<MixedCarton> GetMixedCartonData(out List<MixedCartonItem> mixedCartonItems, out List<NAVItem> navItems)
+    {
+        List<MixedCarton>? mcList = null;
+        List<MixedCartonItem>? mcItems = null;
+        List<NAVItem>? items = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            items = Items().ToList();
+            mcList = MixedCartons().ToList();
+            mcItems = MixedCartonItems().ToList();
+        });
+
+        mcList ??= new List<MixedCarton>();
+        mcItems ??= new List<MixedCartonItem>();
+        items ??= new List<NAVItem>();
+
+        mixedCartonItems = mcItems;
+        navItems = items;
+        return mcList;
+    }
 }

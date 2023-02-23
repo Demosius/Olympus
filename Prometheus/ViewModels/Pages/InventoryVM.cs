@@ -1,9 +1,9 @@
-﻿using Morpheus.Views;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
+using Morpheus.Views.Controls;
 using Uranus;
 using Uranus.Annotations;
 
@@ -24,7 +24,8 @@ internal class InventoryVM : INotifyPropertyChanged
         Genres,
         Sites,
         Stores,
-        TransferOrders
+        TransferOrders,
+        MixedCartons
     }
 
     public Helios? Helios { get; set; }
@@ -80,6 +81,7 @@ internal class InventoryVM : INotifyPropertyChanged
             EInventoryControl.Zones,
             EInventoryControl.Items,
             EInventoryControl.Stock,
+            EInventoryControl.MixedCartons
         };
     }
 
@@ -105,6 +107,7 @@ internal class InventoryVM : INotifyPropertyChanged
                 EInventoryControl.Stores => currentControl,
                 EInventoryControl.TransferOrders => currentControl,
                 EInventoryControl.Zones => new ZoneHandlerView(Helios, null),
+                EInventoryControl.MixedCartons => new MixedCartonHandlerView(Helios),
                 _ => currentControl
             };
             ControlDict.Add(valueControl, newControl);
