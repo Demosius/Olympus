@@ -1,7 +1,7 @@
-﻿using Pantheon.ViewModels.Interface;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using Pantheon.ViewModels.Interface;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 

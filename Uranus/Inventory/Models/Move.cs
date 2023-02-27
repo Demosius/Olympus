@@ -287,9 +287,9 @@ public class Move
         return moveList;
     }
 
-    private static List<Move> GenerateMovesFromUnevenLines(List<NAVMoveLine> takeLines, List<NAVMoveLine> placeLines)
+    private static IEnumerable<Move> GenerateMovesFromUnevenLines(List<NAVMoveLine> takeLines, List<NAVMoveLine> placeLines)
     {
-        var moveList = new List<Move>();
+        /*var moveList = new List<Move>();
 
         takeLines = takeLines.OrderByDescending(l => l.BaseQty).ToList();
         placeLines = placeLines.OrderByDescending(l => l.BaseQty).ToList();
@@ -302,10 +302,11 @@ public class Move
             // TODO: Find matching move quantity groups.
         }
 
-        return moveList;
+        return moveList;*/
+        return new List<Move>(takeLines.Count + placeLines.Count);
     }
 
-    /// <summary>
+    /*/// <summary>
     /// Given a single move line and a list of (assumed) opposite lines, find a matching group.
     /// </summary>
     /// <param name="line"></param>
@@ -320,5 +321,5 @@ public class Move
         int index = 0;
         // TODO: Finish this.
         return moveLines;
-    }
+    }*/
 }

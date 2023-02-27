@@ -1,6 +1,6 @@
-﻿using Pantheon.ViewModels.Commands;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Pantheon.ViewModels.Commands;
 
 namespace Pantheon.ViewModels;
 

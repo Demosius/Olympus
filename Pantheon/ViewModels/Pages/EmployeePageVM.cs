@@ -1,5 +1,4 @@
-﻿using Pantheon.Properties;
-using Pantheon.ViewModels.Commands.Employees;
+﻿using Pantheon.ViewModels.Commands.Employees;
 using Pantheon.ViewModels.Interface;
 using Pantheon.Views;
 using Pantheon.Views.PopUp.Employees;
@@ -13,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using Pantheon.Annotations;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;

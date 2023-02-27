@@ -1,6 +1,6 @@
-﻿using Pantheon.ViewModels.PopUp.Employees;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 

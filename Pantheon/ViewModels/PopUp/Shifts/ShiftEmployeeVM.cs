@@ -1,5 +1,4 @@
-﻿using Pantheon.Annotations;
-using Pantheon.ViewModels.Commands.Shifts;
+﻿using Pantheon.ViewModels.Commands.Shifts;
 using Pantheon.ViewModels.Pages;
 using Styx;
 using System.Collections.Generic;
@@ -8,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using Pantheon.Annotations;
 using Uranus;
 using Uranus.Staff.Models;
 

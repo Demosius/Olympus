@@ -1,7 +1,7 @@
-﻿using Pantheon.ViewModels.Pages;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using Pantheon.ViewModels.Pages;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Commands.Shifts;

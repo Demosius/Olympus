@@ -548,9 +548,9 @@ public class InventoryReader
     public IEnumerable<MixedCarton> MixedCartonTemplates(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
     {
         Dictionary<Guid, MixedCarton>? mixedCartons = null;
-        List<Guid>? ids = null;
+        List<Guid>? ids;
         IEnumerable<MixedCartonItem>? mcItems = null;
-        IEnumerable<int>? itemNumbers = null;
+        IEnumerable<int>? itemNumbers;
         Dictionary<int, NAVItem>? items = null;
 
         Chariot.Database?.RunInTransaction(() =>

@@ -1,7 +1,7 @@
-﻿using Pantheon.ViewModels.PopUp.Rosters;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using Pantheon.ViewModels.PopUp.Rosters;
 
 namespace Pantheon.ViewModels.Commands.Rosters;
 

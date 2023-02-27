@@ -1,6 +1,6 @@
-﻿using Pantheon.ViewModels.Pages;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Input;
+using Pantheon.ViewModels.Pages;
 using Uranus.Staff.Models;
 
 namespace Pantheon.Views.PopUp.Employees;

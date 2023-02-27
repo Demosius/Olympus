@@ -1,5 +1,4 @@
-﻿using Pantheon.Properties;
-using Pantheon.ViewModels.Commands.Shifts;
+﻿using Pantheon.ViewModels.Commands.Shifts;
 using Pantheon.Views;
 using Pantheon.Views.PopUp.Shifts;
 using Styx;
@@ -9,6 +8,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using Pantheon.Annotations;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;

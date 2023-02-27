@@ -1,8 +1,8 @@
-﻿using Pantheon.Annotations;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Pantheon.Annotations;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Controls.Rosters;

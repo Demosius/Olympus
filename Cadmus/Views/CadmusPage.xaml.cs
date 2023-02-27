@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Windows;
-using System.Windows.Controls;
 using Cadmus.ViewModels;
 using Uranus.Interfaces;
 using Uranus.Staff;

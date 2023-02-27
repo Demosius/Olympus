@@ -158,9 +158,9 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
         // Get zone(s) from user.
         var zoneInput = new InputWindow("Enter Zones (separated with pipe '|' character) to check.", "Zones");
 
-        Mouse.OverrideCursor = Cursors.Wait;
-
         if (zoneInput.ShowDialog() != true) return;
+
+        Mouse.OverrideCursor = Cursors.Wait;
 
         var zoneString = zoneInput.Input.Text;
 

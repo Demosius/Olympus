@@ -132,7 +132,7 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         }
 
         // Get other data from DB.
-        var dataSet = Helios.InventoryReader.BasicStockDataSet(moveLines.Select(m => m.ZoneCode).Distinct().ToList());
+        var dataSet = Helios.InventoryReader.BasicStockDataSet(moveLines.Select(m => m.ZoneCode).Distinct().ToList(), new List<string> {"9600"});
         dataSet?.SetMoveLineData(moveLines);
 
         // Convert MoveLines to moves.

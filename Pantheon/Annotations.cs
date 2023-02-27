@@ -20,7 +20,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 
+#nullable disable
+
 using System;
+
 // ReSharper disable UnusedType.Global
 
 #pragma warning disable 1591
@@ -249,7 +252,7 @@ public sealed class NonNegativeValueAttribute : Attribute { }
 /// <summary>
 /// Indicates that the function argument should be a string literal and match one
 /// of the parameters of the caller function. For example, ReSharper annotates
-/// the parameter of <see cref="System.ArgumentNullException"/>.
+/// the parameter of <see cref="ArgumentNullException"/>.
 /// </summary>
 /// <example><code>
 /// void Foo(string param) {
@@ -482,9 +485,9 @@ public sealed class UsedImplicitlyAttribute : Attribute
 }
 
 /// <summary>
-/// Can be applied to attributes, type parameters, and parameters of a type assignable from <see cref="System.Type"/> .
+/// Can be applied to attributes, type parameters, and parameters of a type assignable from <see cref="Type"/> .
 /// When applied to an attribute, the decorated attribute behaves the same as <see cref="UsedImplicitlyAttribute"/>.
-/// When applied to a type parameter or to a parameter of type <see cref="System.Type"/>,
+/// When applied to a type parameter or to a parameter of type <see cref="Type"/>,
 /// indicates that the corresponding type is used implicitly.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.GenericParameter | AttributeTargets.Parameter)]
@@ -709,9 +712,9 @@ public sealed class SourceTemplateAttribute : Attribute { }
 /// </summary>
 /// <remarks>
 /// You can apply the attribute on the whole method or on any of its additional parameters. The macro expression
-/// is defined in the <see cref="MacroAttribute.Expression"/> property. When applied on a method, the target
-/// template parameter is defined in the <see cref="MacroAttribute.Target"/> property. To apply the macro silently
-/// for the parameter, set the <see cref="MacroAttribute.Editable"/> property value = -1.
+/// is defined in the <see cref="Expression"/> property. When applied on a method, the target
+/// template parameter is defined in the <see cref="Target"/> property. To apply the macro silently
+/// for the parameter, set the <see cref="Editable"/> property value = -1.
 /// </remarks>
 /// <example>
 /// Applying the attribute on a source template method:

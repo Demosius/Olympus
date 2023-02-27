@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
+using Pantheon.Annotations;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -397,7 +398,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    [Annotations.NotifyPropertyChangedInvocator]
+    [NotifyPropertyChangedInvocator]
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

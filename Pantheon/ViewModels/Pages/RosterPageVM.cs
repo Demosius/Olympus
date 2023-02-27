@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-using Pantheon.Properties;
 using Pantheon.ViewModels.Commands.Rosters;
 using Pantheon.ViewModels.Controls.Rosters;
 using Pantheon.ViewModels.Utility;
@@ -16,6 +15,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
+using Pantheon.Annotations;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;

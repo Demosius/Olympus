@@ -1,7 +1,7 @@
-﻿using Pantheon.ViewModels.PopUp.Shifts;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using Pantheon.ViewModels.PopUp.Shifts;
 
 namespace Pantheon.ViewModels.Commands.Shifts;
 
