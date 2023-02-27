@@ -139,7 +139,8 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         var moves = Move.GenerateMoveList(moveLines);
 
         // Generate Mixed Carton moves, if applicable.
-        var mixedCartonTemplates = Helios.InventoryReader.MixedCartons().ToList();
+        var mixedCartonTemplates = Helios.InventoryReader.MixedCartonTemplates().ToList();
+
         var mixCtnMoves = MixedCartonMove.GenerateMixedCartonMoveList(ref mixedCartonTemplates, ref moves);
         moves.AddRange(mixCtnMoves);
 

@@ -20,6 +20,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Cadmus.Helpers;
+using Cadmus.Models;
+using Cadmus.ViewModels.Labels;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -240,22 +243,7 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         ItemFilterString = string.Join("|", numbers.Select(n => n.ToString("000000")).Take(x));
         Mouse.OverrideCursor = Cursors.Arrow;
     }
-
-    public void ActivateAllItems()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void DeActivateAllItems()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void ExclusiveItemActivation()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void GenerateMoves()
     {
         if (Helios is null) return;
@@ -300,7 +288,23 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
 
     public void ExportToLabels()
     {
-        throw new NotImplementedException();
+        // Convert to LabelVM
+        var labels = new List<ReceivingPutAwayLabelVM>();
+
+        foreach (var moveVM in CurrentMoves)
+        {
+            var move = moveVM.Move;
+            var labelCount = new List<int> {move.TakeCases + move.TakePacks + move.TakeEaches, 4}.AsQueryable().Min();
+
+            for (var i = 0; i < labelCount; i++)
+            {
+                var label = new ReceivingPutAwayLabel(move) {LabelTotal = labelCount, LabelNumber = i+1};
+                var labelVM = new ReceivingPutAwayLabelVM(label);
+                labels.Add(labelVM);
+            }
+        }
+
+        PrintUtility.PrintLabels(labels, null);
     }
 
     public void ExportToExcel()

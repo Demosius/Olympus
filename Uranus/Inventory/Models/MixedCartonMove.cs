@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Uranus.Inventory.Models;
 
@@ -166,7 +167,7 @@ public class MixedCartonMove : Move
         }
 
         mc.CalculateValuesFromItems();
-
+        
         return mc;
     }
 

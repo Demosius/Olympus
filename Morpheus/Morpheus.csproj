@@ -159,15 +159,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resources\Fonts\Calibri.ttf">
+    <Resource Include="Resources\Fonts\Calibri.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Fonts\calibrib.ttf">
+    </Resource>
+    <Resource Include="Resources\Fonts\calibrib.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Fonts\calibril.ttf">
+    </Resource>
+    <Resource Include="Resources\Fonts\calibril.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </Resource>
     <Resource Include="Resources\Fonts\code128.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

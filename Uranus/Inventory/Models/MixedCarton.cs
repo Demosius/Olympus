@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
+using Uranus.Extensions;
 
 namespace Uranus.Inventory.Models;
 
@@ -97,10 +98,11 @@ public class MixedCarton
         string? s = null;
         foreach (var mixedCartonItem in Items.OrderBy(i => i.ItemNumber))
         {
+            var a = $"{mixedCartonItem.ItemNumber}{(mixedCartonItem.Identifier.Length is > 0 and < 4 ? $" ({mixedCartonItem.Identifier.PadBoth(3)})" : "")} x {mixedCartonItem.QtyPerCarton}";
             if (s is null) 
-                s = $"{mixedCartonItem.ItemNumber} x {mixedCartonItem.QtyPerCarton}";
+                s = a;
             else 
-                s += $"\n{mixedCartonItem.ItemNumber} x {mixedCartonItem.QtyPerCarton}";
+                s += $"\n{a}";
         }
 
         return s ?? string.Empty;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
 
@@ -42,12 +43,12 @@ public class MixedCartonItem
         MixedCarton = mixedCarton;
         item.MixedCartons.Add(this);
         mixedCarton.Items.Add(this);
+        Identifier = Regex.Replace(Item.Description, MixedCarton.Name, "").Trim();
     }
 
     /// <summary>
     /// Remove self from associated item and carton.
     /// </summary>
-    /// <exception cref="NotImplementedException"></exception>
     public void Remove()
     {
         Item?.MixedCartons.Remove(this);

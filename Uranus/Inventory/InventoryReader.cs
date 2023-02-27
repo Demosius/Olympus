@@ -499,11 +499,48 @@ public class InventoryReader
         return dataSet;
     }
 
-    public IEnumerable<MixedCarton> MixedCartons(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) 
+    public IEnumerable<MixedCarton> MixedCartons(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
         => Chariot.PullObjectList(filter, pullType);
 
     public IEnumerable<MixedCartonItem> MixedCartonItems(Expression<Func<MixedCartonItem, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
         => Chariot.PullObjectList(filter, pullType);
+
+    public IEnumerable<MixedCarton> MixedCartonTemplates(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
+    {
+        Dictionary<Guid, MixedCarton>? mixedCartons = null;
+        List<Guid>? ids = null;
+        IEnumerable<MixedCartonItem>? mcItems = null;
+        IEnumerable<int>? itemNumbers = null;
+        Dictionary<int, NAVItem>? items = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            mixedCartons = MixedCartons(filter, pullType).ToDictionary(mc => mc.ID, mc => mc);
+            ids = mixedCartons.Keys.ToList();
+            mcItems = MixedCartonItems(item => ids.Contains(item.MixedCartonID));
+            itemNumbers = mcItems.Select(item => item.ItemNumber).Distinct();
+            items = Items(i => itemNumbers.Contains(i.Number)).ToDictionary(i => i.Number, i => i);
+        });
+
+        mcItems ??= new List<MixedCartonItem>();
+        items ??= new Dictionary<int, NAVItem>();
+        mixedCartons ??= new Dictionary<Guid, MixedCarton>();
+
+        foreach (var mixedCartonItem in mcItems)
+        {
+            if (items.TryGetValue(mixedCartonItem.ItemNumber, out var item))
+            {
+                mixedCartonItem.Item = item;
+                item.MixedCartons.Add(mixedCartonItem);
+            }
+
+            if (!mixedCartons.TryGetValue(mixedCartonItem.MixedCartonID, out var mixedCarton)) continue;
+            mixedCartonItem.MixedCarton = mixedCarton;
+            mixedCarton.Items.Add(mixedCartonItem);
+        }
+
+        return mixedCartons.Values;
+    }
 
     public List<MixedCarton> GetMixedCartonData(out List<MixedCartonItem> mixedCartonItems, out List<NAVItem> navItems)
     {

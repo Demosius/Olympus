@@ -72,7 +72,7 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
     public MixedCartonHandlerVM(Helios helios)
     {
         Helios = helios;
-        
+
         MixedCartons = new ObservableCollection<MixedCarton>();
         MCItems = new ObservableCollection<MixedCartonItem>();
         Items = new Dictionary<int, NAVItem>();
@@ -194,7 +194,6 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
             MixedCartons.Add(mc);
             foreach (var mixedCartonItem in mc.Items)
             {
-                mixedCartonItem.Identifier = Regex.Replace(mixedCartonItem.Item?.Description ?? "", mc.Name, "");
                 MixedCartonItems.Add(mixedCartonItem);
             }
 
@@ -220,8 +219,11 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
     {
         if (SelectedMixedCarton is null) return;
 
-        MixedCartons.Remove(SelectedMixedCarton);
+        if (MessageBox.Show($"Are you sure you want to delete the {SelectedMixedCarton.Name} Mixed Carton Template?",
+                "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+
         foreach (var mixedCartonItem in SelectedMixedCarton.Items) MixedCartonItems.Remove(mixedCartonItem);
+        MixedCartons.Remove(SelectedMixedCarton);
         MCItems.Clear();
 
         SelectedMixedCarton = null;
@@ -246,9 +248,9 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
     {
         if (SelectedMixCtnItem is null) return;
 
+        SelectedMixCtnItem.Remove();
         MixedCartonItems.Remove(SelectedMixCtnItem);
         MCItems.Remove(SelectedMixCtnItem);
-        SelectedMixCtnItem.Remove();
 
         SelectedMixCtnItem = null;
     }

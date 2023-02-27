@@ -108,7 +108,7 @@
             <TextBlock Text="{Binding TakeBin}"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"
-                       FontSize="18"
+                       FontSize="24"
                        FontWeight="Bold"
                        FontFamily="Calibri"/>
         </Border>
@@ -119,8 +119,9 @@
             <TextBlock Text="{Binding TakeDisplayString}"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"
-                       FontSize="14"
+                       FontSize="18"
                        FontWeight="Bold"
+                       TextWrapping="Wrap"
                        FontFamily="Calibri"/>
         </Border>
 
@@ -156,9 +157,9 @@
             <TextBlock Text="{Binding MixedContentDisplay}"
                        VerticalAlignment="Top"
                        HorizontalAlignment="Center"
-                       FontSize="11"
+                       FontSize="10"
                        FontWeight="Normal"
-                       FontFamily="Calibri"/>
+                       FontFamily="Courier New"/>
         </Border>
 
         <!-- Item Description -->
