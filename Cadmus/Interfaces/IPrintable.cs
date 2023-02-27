@@ -1,6 +1,6 @@
 ﻿using Cadmus.ViewModels.Commands;
 
-namespace Cadmus;
+namespace Cadmus.Interfaces;
 
 public interface IPrintable
 {

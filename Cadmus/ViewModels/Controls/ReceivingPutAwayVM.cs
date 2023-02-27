@@ -1,26 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Runtime.CompilerServices;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
 using Cadmus.Annotations;
+using Cadmus.Helpers;
+using Cadmus.Interfaces;
 using Cadmus.Models;
 using Cadmus.ViewModels.Commands;
-using Cadmus.Views.Labels;
-using Uranus;
+using Cadmus.ViewModels.Labels;
 
 namespace Cadmus.ViewModels.Controls;
 
-public class ReceivingPutAwayVM : INotifyPropertyChanged, IPrintable
+public class ReceivingPutAwayVM : INotifyPropertyChanged, IPrintable, IDataLines
 {
     public List<ReceivingPutAwayLabel> Labels { get; set; }
 
     #region INotifyPropertyChanged Members
-
 
     private ObservableCollection<ReceivingPutAwayLabelVM> labelVMs;
     public ObservableCollection<ReceivingPutAwayLabelVM> LabelVMs
@@ -33,11 +28,18 @@ public class ReceivingPutAwayVM : INotifyPropertyChanged, IPrintable
         }
     }
 
+    public ObservableCollection<ReceivingPutAwayLabelVM> SelectedGridLabels { get; set; }
+
+    public ObservableCollection<ReceivingPutAwayLabelVM> SelectedLabels { get; set; }
+
     #endregion
 
     #region Commands
 
     public PrintCommand PrintCommand { get; set; }
+    public AddLineCommand AddLineCommand { get; set; }
+    public ClearLinesCommand ClearLinesCommand { get; set; }
+    public DeleteSelectedCommand DeleteSelectedCommand { get; set; }
 
     #endregion
 
@@ -45,168 +47,44 @@ public class ReceivingPutAwayVM : INotifyPropertyChanged, IPrintable
     {
         Labels = new List<ReceivingPutAwayLabel>();
         labelVMs = new ObservableCollection<ReceivingPutAwayLabelVM>();
+        SelectedLabels = new ObservableCollection<ReceivingPutAwayLabelVM>();
+        SelectedGridLabels = new ObservableCollection<ReceivingPutAwayLabelVM>();
 
+        // Set Commands
         PrintCommand = new PrintCommand(this);
-
-        GenerateTestData();
-    }
-
-    // TODO: Delete Test Method
-    public void GenerateTestData()
-    {
-        const string s = @"Zone	Bin	Case	Pack	Each	QPC	QPP	Barcode	Item	LabelNo	LabelTotal	Description
-OZ	G AL 1	12	0	0	54	0	Í4Å9uÎ	209725	1	1	PLUSH MINEC OCELOT 14IN
-OZ	I AH 3	30	0	0	6	0	Í;[4!Î	275920	1	2	TC POKE CELEBRATIONS PRE FIG
-OZ	I AH 3	30	0	0	6	0	Í;[4!Î	275920	2	2	TC POKE CELEBRATIONS PRE FIG
-OZ	I AK 2	30	0	0	6	0	Í;[4!Î	275920	1	2	TC POKE CELEBRATIONS PRE FIG
-OZ	I AK 2	30	0	0	6	0	Í;[4!Î	275920	2	2	TC POKE CELEBRATIONS PRE FIG
-OZ	I AL 2	30	0	0	6	0	Í;[4!Î	275920	1	2	TC POKE CELEBRATIONS PRE FIG
-OZ	I AL 2	30	0	0	6	0	Í;[4!Î	275920	2	2	TC POKE CELEBRATIONS PRE FIG
-OZ	I AM 2	30	0	0	6	0	Í;[4!Î	275920	1	2	TC POKE CELEBRATIONS PRE FIG
-OZ	I AM 2	30	0	0	6	0	Í;[4!Î	275920	2	2	TC POKE CELEBRATIONS PRE FIG
-OZ	G AB 3	24	0	0	24	0	Í4Å;{Î	209727	1	2	PLUSH MINEC WOLF 15IN
-OZ	G AB 3	24	0	0	24	0	Í4Å;{Î	209727	2	2	PLUSH MINEC WOLF 15IN
-OZ	F BF 3	25	0	0	6	0	Í;Ya=Î	275765	1	2	STAT HALO MASTER CHIEF W/GRAP
-OZ	F BF 3	25	0	0	6	0	Í;Ya=Î	275765	2	2	STAT HALO MASTER CHIEF W/GRAP
-OZ	G AA 2	0	36	0	0	0	Í:FuRÎ	263885	1	2	REP MARV THOR STORMBREAKER
-OZ	G AA 2	0	36	0	0	0	Í:FuRÎ	263885	2	2	REP MARV THOR STORMBREAKER
-OZ	G AB 2	0	36	0	0	0	Í:FuRÎ	263885	1	2	REP MARV THOR STORMBREAKER
-OZ	G AB 2	0	36	0	0	0	Í:FuRÎ	263885	2	2	REP MARV THOR STORMBREAKER
-OZ	H AF 3	16	0	0	20	0	Í7?crÎ	233167	1	2	COS MINE/C DIAMOND/S ENDER/P
-OZ	H AF 3	16	0	0	20	0	Í7?crÎ	233167	2	2	COS MINE/C DIAMOND/S ENDER/P
-OZ	H AG 3	16	0	0	20	0	Í7?crÎ	233167	1	2	COS MINE/C DIAMOND/S ENDER/P
-OZ	H AG 3	16	0	0	20	0	Í7?crÎ	233167	2	2	COS MINE/C DIAMOND/S ENDER/P
-OZ	H AH 3	16	0	0	20	0	Í7?crÎ	233167	1	2	COS MINE/C DIAMOND/S ENDER/P
-OZ	H AH 3	16	0	0	20	0	Í7?crÎ	233167	2	2	COS MINE/C DIAMOND/S ENDER/P
-OZ	H AI 3	16	0	0	20	0	Í7?crÎ	233167	1	2	COS MINE/C DIAMOND/S ENDER/P
-OZ	H AI 3	16	0	0	20	0	Í7?crÎ	233167	2	2	COS MINE/C DIAMOND/S ENDER/P
-OZ	H AA 2	23	0	0	36	6	Í;.%hÎ	271405	1	1	POP SW MANDO CHILD BUTTERFLY
-OZ	H AV 4	63	2	0	2	0	Í:zH3Î	269040	1	2	REP SW MANDALORIAN HELMET
-OZ	H AV 4	63	2	0	2	0	Í:zH3Î	269040	2	2	REP SW MANDALORIAN HELMET
-OZ	H AV 5	64	0	0	2	0	Í:zH3Î	269040	1	2	REP SW MANDALORIAN HELMET
-OZ	H AV 5	64	0	0	2	0	Í:zH3Î	269040	2	2	REP SW MANDALORIAN HELMET
-OZ	H AW 2	64	0	0	2	0	Í:zH3Î	269040	1	2	REP SW MANDALORIAN HELMET
-OZ	H AW 2	64	0	0	2	0	Í:zH3Î	269040	2	2	REP SW MANDALORIAN HELMET
-OZ	F AR 4	16	0	0	2	0	Í:'jZÎ	260774	1	1	PLUSH POKE GENGAR 24IN
-OZ	F AR 5	16	0	0	2	0	Í:'jZÎ	260774	1	1	PLUSH POKE GENGAR 24IN
-OZ	F AS 4	16	0	0	2	0	Í:'jZÎ	260774	1	1	PLUSH POKE GENGAR 24IN
-OZ	F AS 5	16	0	0	2	0	Í:'jZÎ	260774	1	1	PLUSH POKE GENGAR 24IN
-OZ	F AT 5	16	0	0	2	0	Í:'jZÎ	260774	1	1	PLUSH POKE GENGAR 24IN
-OZ	F AS 1	24	0	0	2	0	Í:'jZÎ	260774	1	2	PLUSH POKE GENGAR 24IN
-OZ	F AS 1	24	0	0	2	0	Í:'jZÎ	260774	2	2	PLUSH POKE GENGAR 24IN
-OZ	F AS 2	24	0	0	2	0	Í:'jZÎ	260774	1	2	PLUSH POKE GENGAR 24IN
-OZ	F AS 2	24	0	0	2	0	Í:'jZÎ	260774	2	2	PLUSH POKE GENGAR 24IN
-OZ	F AT 1	24	0	0	2	0	Í:'jZÎ	260774	1	2	PLUSH POKE GENGAR 24IN
-OZ	F AT 1	24	0	0	2	0	Í:'jZÎ	260774	2	2	PLUSH POKE GENGAR 24IN
-OZ	G AE 1	24	0	0	2	0	Í:'jZÎ	260774	1	2	PLUSH POKE GENGAR 24IN
-OZ	G AE 1	24	0	0	2	0	Í:'jZÎ	260774	2	2	PLUSH POKE GENGAR 24IN
-OZ	G AG 3	29	0	0	8	0	Í9<_bÎ	252863	1	1	RING FIT ADVENTURE NS
-OZ	F BL 1	24	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
-OZ	F BO 1	24	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
-OZ	F BO 2	24	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
-OZ	F BP 1	24	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
-OZ	F BP 2	24	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
-OZ	F BQ 1	24	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
-OZ	F BQ 2	24	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
-OZ	F BR 1	24	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
-OZ	F BR 2	24	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
-OZ	H AC 1	26	0	0	4	2	Í:}F3Î	269338	1	1	GLASS POKE 25 KANTO 4PK
-OZ	ASPLEY1	180	0	0	6	0	Í9""KYÎ	250243	1	1	LAMP ZELDA MASTER SWORD
-OZ	ASPLEY7	450	0	0	4	2	Í;""3zÎ	270219	1	1	GLASS SW VADERS FREETIME 4PK
-OZ	ASPLEY6	528	0	0	2	0	Í;BX[Î	273456	1	1	PLUSH POKE EEVEE HOLIDAY 24IN
-";
-
-        var dt = DataConversion.RawStringToTable(s);
-
-        foreach (DataRow row in dt.Rows)
-        {
-            var takeZone = row["Zone"].ToString() ?? "";
-            var takeBin = row["Bin"].ToString() ?? "";
-            var caseQty = int.Parse(row["Case"].ToString() ?? "");
-            var packQty = int.Parse(row["Pack"].ToString() ?? "");
-            var eachQty = int.Parse(row["Each"].ToString() ?? "");
-            var qpc = int.Parse(row["QPC"].ToString() ?? "");
-            var qpp = int.Parse(row["QPP"].ToString() ?? "");
-            var barcode = row["Barcode"].ToString() ?? "";
-            var item = int.Parse(row["Item"].ToString() ?? "");
-            var labelNo = int.Parse(row["LabelNo"].ToString() ?? "");
-            var labelTotal = int.Parse(row["LabelTotal"].ToString() ?? "");
-            var description = row["Description"].ToString() ?? "";
-
-            var label = new ReceivingPutAwayLabel(
-                takeZone: takeZone,
-                takeBin: takeBin,
-                caseQty: caseQty,
-                packQty: packQty,
-                eachQty: eachQty,
-                qtyPerCase: qpc,
-                qtyPerPack: qpp,
-                barcode: barcode,
-                itemNumber: item,
-                labelNumber: labelNo,
-                labelTotal: labelTotal,
-                description: description);
-
-            var lvm = new ReceivingPutAwayLabelVM(label);
-
-            LabelVMs.Add(lvm);
-        }
-
+        AddLineCommand = new AddLineCommand(this);
+        ClearLinesCommand = new ClearLinesCommand(this);
+        DeleteSelectedCommand = new DeleteSelectedCommand(this);
     }
 
     public void Print()
     {
-        var printDialog = new PrintDialog
+        PrintUtility.PrintLabels(LabelVMs, SelectedLabels);
+    }
+
+    public void AddLine()
+    {
+        var label = new ReceivingPutAwayLabel();
+        Labels.Add(label);
+        LabelVMs.Add(new ReceivingPutAwayLabelVM(label));
+    }
+
+    public void ClearLines()
+    {
+        SelectedLabels.Clear();
+        LabelVMs.Clear();
+        Labels.Clear();
+    }
+
+    public void DeleteSelected()
+    {
+        foreach (var labelVM in SelectedLabels)
         {
-            SelectedPagesEnabled = true,
-            UserPageRangeEnabled = true,
-            PageRange = new PageRange(1, LabelVMs.Count),
-            MaxPage = (uint)LabelVMs.Count,
-            MinPage = 1,
-        };
-
-        if (printDialog.ShowDialog() != true) return;
-
-        switch (printDialog.PageRangeSelection)
-        {
-            case PageRangeSelection.AllPages:
-                foreach (var labelVM in LabelVMs)
-                {
-                    var label = new ReceivingPutAwayLabelView(labelVM);
-                    printDialog.PrintVisual(label, "Label Printing");
-                }
-                break;
-            case PageRangeSelection.SelectedPages:
-                // TODO: Implement label control selection.
-                for (int i = 0; i < 3; ++i)
-                {
-                    var label = new ReceivingPutAwayLabelView(LabelVMs[i]);
-                    printDialog.PrintVisual(label, "Print Visual");
-                }
-                break;
-            case PageRangeSelection.UserPages:
-                var doc = new FlowDocument
-                {
-                    PageHeight = 242 + 4,
-                    PageWidth = 356 + 4,
-                    PagePadding = new Thickness(2)
-                };
-                for (var i = printDialog.PageRange.PageFrom; i <= printDialog.PageRange.PageTo; i++)
-                {
-                    var label = new ReceivingPutAwayLabelView(LabelVMs[i - 1]);
-                    doc.Blocks.Add(new BlockUIContainer(label));
-                }
-
-                IDocumentPaginatorSource idpSource = doc;
-                printDialog.PrintDocument(idpSource.DocumentPaginator, "Print Flow Document");
-                break;
-            case PageRangeSelection.CurrentPage:
-            default:
-                throw new ArgumentOutOfRangeException();
+            Labels.Remove(labelVM.Label);
+            LabelVMs.Remove(labelVM);
         }
 
-        // printDialog.PrintVisual(label, "Label Printing");
-
+        SelectedLabels.Clear();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

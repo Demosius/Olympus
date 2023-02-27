@@ -7,94 +7,114 @@
              xmlns:labels="clr-namespace:Cadmus.Views.Labels"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:ReceivingPutAwayVM}, IsDesignTimeCreatable=False}"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="1200">
 
-    <TabControl>
-        <TabItem Header="Data">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <DockPanel Background="{DynamicResource Brush05}"
+                   Grid.Column="0">
+            <StackPanel DockPanel.Dock="Top"
+                        Orientation="Horizontal">
+                <Button Content="Add Line"
+                        Command="{Binding AddLineCommand}"
+                        Width="100"
+                        Margin="2"/>
+                <Button Content="Clear Data"
+                        Command="{Binding ClearLinesCommand}"
+                        Width="100"
+                        Margin="2"/>
+                <Button Content="Delete Selected"
+                        Command="{Binding DeleteSelectedCommand}"
+                        MinWidth="100"
+                        Margin="2"/>
+            </StackPanel>
 
-            <DockPanel Background="{DynamicResource Brush05}">
-                <StackPanel DockPanel.Dock="Top"
-                            Orientation="Horizontal">
-                    <TextBlock Width="100"
-                               Margin="2"/>
-                    <Button Width="100"
-                            Margin="2"/>
-                </StackPanel>
-
-                <!-- Data View -->
-                <DataGrid ItemsSource="{Binding LabelVMs}"
-                          AutoGenerateColumns="False"
-                          CanUserDeleteRows="True"
-                          CanUserAddRows="True"
-                          CanUserReorderColumns="True"
-                          CanUserResizeColumns="True"
-                          CanUserResizeRows="True"
-                          CanUserSortColumns="True"
-                          RowHeaderWidth="15"
-                          SelectionUnit="CellOrRowHeader">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Take Zone"
+            <!-- Data View -->
+            <DataGrid Name="LabelGrid" 
+                      ItemsSource="{Binding LabelVMs}"
+                      SelectionChanged="GridLabels_OnSelectionChanged"
+                      AutoGenerateColumns="False"
+                      CanUserDeleteRows="True"
+                      CanUserAddRows="True"
+                      CanUserReorderColumns="True"
+                      CanUserResizeColumns="True"
+                      CanUserResizeRows="True"
+                      CanUserSortColumns="True"
+                      RowHeaderWidth="15"
+                      SelectionUnit="CellOrRowHeader">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Take Zone"
                                         Binding="{Binding TakeZone}"
                                         IsReadOnly="False"/>
-                        <DataGridTextColumn Header="Take Bin"
+                    <DataGridTextColumn Header="Take Bin"
                                         Binding="{Binding TakeBin}"
                                         IsReadOnly="False"/>
-                        <DataGridTextColumn Header="Case Qty"
+                    <DataGridTextColumn Header="Case Qty"
                                         Binding="{Binding CaseQty}"
                                         IsReadOnly="False"/>
-                        <DataGridTextColumn Header="Pack Qty"
+                    <DataGridTextColumn Header="Pack Qty"
                                         Binding="{Binding PackQty}"
                                         IsReadOnly="False"/>
-                        <DataGridTextColumn Header="Each Qty"
+                    <DataGridTextColumn Header="Each Qty"
                                         Binding="{Binding EachQty}"
                                         IsReadOnly="False"/>
-                        <DataGridTextColumn Header="Qty Per Case"
+                    <DataGridTextColumn Header="Qty Per Case"
                                         Binding="{Binding QtyPerCase}"
                                         IsReadOnly="False"/>
-                        <DataGridTextColumn Header="Qty Per Pack"
+                    <DataGridTextColumn Header="Qty Per Pack"
                                         Binding="{Binding QtyPerPack}"
                                         IsReadOnly="False"/>
-                        <DataGridTextColumn Header="Barcode"
+                    <DataGridTextColumn Header="Barcode"
                                         Binding="{Binding Barcode}"
                                         IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Item Number"
+                    <DataGridTextColumn Header="Item Number"
                                         Binding="{Binding ItemNumber}"
                                         IsReadOnly="False"/>
-                        <DataGridTextColumn Header="Label Number"
+                    <DataGridTextColumn Header="Label Number"
                                         Binding="{Binding LabelNumber}"
                                         IsReadOnly="False"/>
-                        <DataGridTextColumn Header="Label Total"
+                    <DataGridTextColumn Header="Label Total"
                                         Binding="{Binding LabelTotal}"
                                         IsReadOnly="False"/>
-                        <DataGridTextColumn Header="Description"
+                    <DataGridTextColumn Header="Description"
                                         Binding="{Binding Description}"
                                         IsReadOnly="False"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </DockPanel>
-        </TabItem>
-        <TabItem Header="Display">
-            <DockPanel Background="Black">
-                <StackPanel Orientation="Horizontal"
-                            DockPanel.Dock="Top">
-                    <Button Margin="2"
-                            Command="{Binding PrintCommand}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="../../Resources/Images/printer.png" 
-                                   Width="15" Height="15"></Image>
-                            <Label Content="Print"></Label>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-                <ListView ItemsSource="{Binding LabelVMs}"
-                          HorizontalContentAlignment="Left">
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+        <GridSplitter Grid.Column="0"/>
+        <DockPanel Background="Black"
+                   Grid.Column="1">
+            <StackPanel Orientation="Horizontal"
+                        DockPanel.Dock="Top">
+                <Button Margin="2"
+                        Command="{Binding PrintCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../../Resources/Images/printer.png" 
+                               Width="15" Height="15"/>
+                        <Label Content="Print"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <ListView Name="LabelViewList"
+                      ItemsSource="{Binding LabelVMs}"
+                      SelectionChanged="Selector_OnSelectionChanged"
+                      HorizontalContentAlignment="Center"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <labels:ReceivingPutAwayLabelView/>
+                        <labels:ReceivingPutAwayLabelView RenderSize="2, 2"/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
-                </ListView>
-            </DockPanel>
-        </TabItem>
-    </TabControl>
+            </ListView>
+        </DockPanel>
+    </Grid>
 </UserControl>

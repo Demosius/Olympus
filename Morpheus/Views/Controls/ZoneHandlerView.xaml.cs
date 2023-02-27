@@ -1,10 +1,10 @@
-﻿using Morpheus.ViewModels;
+﻿using System.Windows.Controls;
+using Morpheus.ViewModels.Controls;
 using Styx;
-using System.Windows.Controls;
 using Uranus;
 using Uranus.Inventory.Models;
 
-namespace Morpheus.Views;
+namespace Morpheus.Views.Controls;
 
 /// <summary>
 /// Interaction logic for ZoneHandlerView.xaml

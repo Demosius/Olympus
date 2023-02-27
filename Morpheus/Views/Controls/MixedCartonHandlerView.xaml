@@ -1,0 +1,204 @@
+﻿<UserControl x:Class="Morpheus.Views.Controls.MixedCartonHandlerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Morpheus.ViewModels.Controls"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:MixedCartonHandlerVM}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <DockPanel Background="{StaticResource CheckBoxBackgroundBrush}">
+
+        <!-- Command Header -->
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal"
+                    Background="{StaticResource CheckBoxBackgroundBrush}">
+            <Button Command="{Binding RefreshDataCommand}"
+                    Margin="2">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="../../Resources/img/refresh.png"
+                           MaxHeight="20"
+                           MaxWidth="20"
+                           Margin="0,0,5,0"/>
+                    <TextBlock Text="Refresh"/>
+                </StackPanel>
+            </Button>
+            <Button Command="{Binding SaveMixedCartonsCommand}"
+                    Margin="2">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="../../Resources/img/save.png"
+                           MaxHeight="20"
+                           MinHeight="20"
+                           Margin="0,0,2,0"/>
+                    <TextBlock Text="Save Changes"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <Separator DockPanel.Dock="Top"/>
+
+        <!-- Data -->
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Mixed Carton Templates -->
+            <DockPanel Grid.Column="0">
+                <StackPanel DockPanel.Dock="Top"
+                            Orientation="Horizontal"
+                            Background="{StaticResource CheckBoxBackgroundBrush}">
+                    <Button Command="{Binding AutoGenerateMixedCartonsCommand}"
+                            Margin="2"
+                            ToolTip="Find potential Mixed Cartons based on current stock levels (Bin Contents).">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../../Resources/img/wand--arrow.png"
+                                   MaxHeight="20"
+                                   MinHeight="20"
+                                   Margin="0,0,3,0"/>
+                            <TextBlock Text="Auto Generate"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding AddMixedCartonCommand}"
+                            Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../../Resources/img/plus.png"
+                                   MaxHeight="20"
+                                   MaxWidth="20"
+                                   Margin="0,0,5,0"/>
+                            <TextBlock Text="Add"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding DeleteMixedCartonCommand}"
+                            Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../../Resources/img/cross.png"
+                                   MaxHeight="20"
+                                   MaxWidth="20"
+                                   Margin="0,0,5,0"/>
+                            <TextBlock Text="Delete"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <DataGrid Name="MixedCartonGrid"
+                          ItemsSource="{Binding MixedCartons}"
+                          SelectionMode="Single"
+                          SelectedItem="{Binding SelectedMixedCarton}"
+                          AutoGenerateColumns="False"
+                          CanUserDeleteRows="False"
+                          CanUserAddRows="False"
+                          CanUserReorderColumns="True"
+                          CanUserResizeColumns="True"
+                          CanUserResizeRows="True"
+                          CanUserSortColumns="True"
+                          RowHeaderWidth="15"
+                          SelectionUnit="FullRow"
+                          VerticalScrollBarVisibility="Visible">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name"
+                                            Binding="{Binding Name}"
+                                            IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Cube"
+                                            Binding="{Binding Cube}"
+                                            IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Weight"
+                                            Binding="{Binding Weight}"
+                                            IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Length"
+                                            Binding="{Binding Length}"
+                                            IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Width"
+                                            Binding="{Binding Width}"
+                                            IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Height"
+                                            Binding="{Binding Height}"
+                                            IsReadOnly="False"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+
+            <GridSplitter Grid.Column="0"/>
+
+            <!-- Mixed Carton Items, based on the selected Mixed Carton Template -->
+            <DockPanel Grid.Column="1">
+                <StackPanel DockPanel.Dock="Top"
+                            Orientation="Horizontal"
+                            Background="{StaticResource CheckBoxBackgroundBrush}">
+                    <Button Command="{Binding AddMixCtnItemCommand}"
+                            Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../../Resources/img/plus.png"
+                                   MaxHeight="20"
+                                   MaxWidth="20"
+                                   Margin="0,0,5,0"/>
+                            <TextBlock Text="Add"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding DeleteMixCtnItemCommand}"
+                            Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../../Resources/img/cross.png"
+                           MaxHeight="20"
+                           MaxWidth="20"
+                           Margin="0,0,5,0"/>
+                            <TextBlock Text="Delete"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <DataGrid Name="MixCtnItemGrid" 
+                          ItemsSource="{Binding MCItems}"
+                          SelectedItem="{Binding SelectedMixCtnItem}"
+                          SelectionMode="Single"
+                          AutoGenerateColumns="False"
+                          CanUserDeleteRows="False"
+                          CanUserAddRows="False"
+                          CanUserReorderColumns="True"
+                          CanUserResizeColumns="True"
+                          CanUserResizeRows="True"
+                          CanUserSortColumns="True"
+                          RowHeaderWidth="15"
+                          SelectionUnit="FullRow">
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="ToolTip">
+                                <Setter.Value>
+                                    <TextBlock Text="{Binding Item.Description, FallbackValue=MixedCarton.Name}"></TextBlock>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </DataGrid.RowStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Item"
+                                        Binding="{Binding ItemNumber}"
+                                        IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Qty Per Carton"
+                                        Binding="{Binding QtyPerCarton}"
+                                        IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Identifier"
+                                            Binding="{Binding Identifier}"
+                                            IsReadOnly="False"/>
+                        <DataGridTextColumn Header="Cube"
+                                            Binding="{Binding Item.Cube, FallbackValue=??}"
+                                            IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Weight"
+                                            Binding="{Binding Item.Weight, FallbackValue=??}"
+                                            IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Length"
+                                            Binding="{Binding Item.Length, FallbackValue=??}"
+                                            IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Width"
+                                            Binding="{Binding Item.Width, FallbackValue=??}"
+                                            IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Height"
+                                            Binding="{Binding Item.Height, FallbackValue=??}"
+                                            IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </Grid>
+    </DockPanel>
+
+</UserControl>

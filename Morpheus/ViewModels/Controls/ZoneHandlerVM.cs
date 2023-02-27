@@ -16,7 +16,7 @@ using Uranus.Commands;
 using Uranus.Interfaces;
 using Uranus.Inventory.Models;
 
-namespace Morpheus.ViewModels;
+namespace Morpheus.ViewModels.Controls;
 
 public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 {
@@ -56,7 +56,7 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
         var zones = Helios.InventoryReader.Zones().OrderBy(z => z.Code);
         foreach (var zone in zones) Zones.Add(zone);
-        OnPropertyChanged(nameof(zones));
+        OnPropertyChanged(nameof(Zones));
     }
 
     public void RepairData()
