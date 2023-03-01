@@ -53,8 +53,8 @@
         </ToolBarTray>
 
         <!-- Actual Shift Listings -->
-        <ListView ItemsSource="{Binding Shifts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+        <ListView ItemsSource="{Binding ShiftVMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedValue="{Binding SelectedShiftVM, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource ListBoxItemStyle}">
                     <Setter Property="Focusable" Value="False"/>

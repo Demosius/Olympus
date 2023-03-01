@@ -84,20 +84,20 @@
                    Content="{Binding Type, Mode=OneWay}"
                    Visibility="{Binding NotAtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
 
-            <!-- Shift Selector -->
+            <!-- Shift Selector SUPPOSED TO BE MINI -->
             <ComboBox Canvas.Top="57" Canvas.Left="5"
                       Width="92"
                       Height="27"
                       FontSize="12"
                       HorizontalContentAlignment="Center"
                       VerticalContentAlignment="Center"
-                      Style="{StaticResource MiniComboBoxStyle}"
+                      Style="{StaticResource ComboBoxStyle}"
                       ItemsSource="{Binding DepartmentRosterVM.Shifts, Mode=OneTime}"
                       SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-            <!-- Shift Type Selector (Normal/AL/RDO/etc.) -->
+            <!-- Shift Type Selector (Normal/AL/RDO/etc.) SUPPOSED TO BE MINI -->
             <ComboBox Canvas.Top="57" Canvas.Left="103"
-                      Style="{StaticResource MiniComboBoxStyle}"
+                      Style="{StaticResource ComboBoxStyle}"
                       ItemsSource="{Binding Source={StaticResource RosterTypes}, Mode=OneTime}"
                       Height="27"
                       Width="90"

@@ -188,13 +188,6 @@ public class StaffReader
         {
             var departmentName = departmentRoster.DepartmentName;
 
-            var startDate = departmentRoster.StartDate;
-            // startDate should be monday, but it might not be, so account for that possibility.
-            // Earliest date should cover up to 2 weeks before hand.
-            var earliestDate = startDate.AddDays(DayOfWeek.Monday - startDate.DayOfWeek - 14);
-            // Latest date should be the sunday after the start date.
-            var latestDate = startDate.AddDays(DayOfWeek.Saturday - startDate.DayOfWeek + 1);
-
             // Declare variables.
             List<Employee>? employees = null;
             List<Roster>? rosters = null;
@@ -213,20 +206,17 @@ public class StaffReader
             {
                 //employees = Chariot.PullObjectList<Employee>(e => e.DepartmentName == departmentName && e.EmploymentType != EEmploymentType.SA);
                 employees = EmployeeDataSet().Employees.Values.Where(e => e.DepartmentName == departmentName && e.EmploymentType != EEmploymentType.SA).ToList();
-                rosters = Chariot.PullObjectList<Roster>(r =>
-                    r.DepartmentName == departmentName && r.Date >= earliestDate && r.Date <= latestDate);
-                dailyRosters = Chariot.PullObjectList<DailyRoster>(r =>
-                        r.DepartmentName == departmentName && r.Date >= earliestDate && r.Date <= latestDate);
-                employeeRosters = Chariot.PullObjectList<EmployeeRoster>(r =>
-                    r.DepartmentName == departmentName && r.StartDate >= earliestDate && r.StartDate <= latestDate);
+                rosters = Chariot.PullObjectList<Roster>(r => r.DepartmentRosterID == departmentRoster.ID);
+                dailyRosters = Chariot.PullObjectList<DailyRoster>(r => r.DepartmentRosterID == departmentRoster.ID);
+                employeeRosters = Chariot.PullObjectList<EmployeeRoster>(r => r.DepartmentRosterID == departmentRoster.ID);
                 shifts = Chariot.PullObjectList<Shift>(s => s.DepartmentName == departmentName);
-                breaks = Chariot.PullObjectList<Break>();
+                breaks = Chariot.PullObjectList<Break>(b => shifts.Select(s => s.ID).Contains(b.ShiftID));
                 employeeShiftConnections = Chariot.PullObjectList<EmployeeShift>();
                 singleRules = Chariot.PullObjectList<ShiftRuleSingle>();
                 recurringRules = Chariot.PullObjectList<ShiftRuleRecurring>();
                 rosterRules = Chariot.PullObjectList<ShiftRuleRoster>();
                 weeklyShiftCounters = Chariot.PullObjectList<WeeklyShiftCounter>(wc => wc.RosterID == departmentRoster.ID);
-                dailyShiftCounters = Chariot.PullObjectList<DailyShiftCounter>(dc => dc.Date >= earliestDate && dc.Date <= latestDate);
+                dailyShiftCounters = Chariot.PullObjectList<DailyShiftCounter>(dc => dailyRosters.Select(dr => dr.ID).Contains(dc.RosterID));
             });
 
             // Assign variables that may have been missed.

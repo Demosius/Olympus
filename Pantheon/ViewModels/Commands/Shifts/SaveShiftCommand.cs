@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using Pantheon.ViewModels.Controls.Shifts;
 using Pantheon.ViewModels.Pages;
-using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Commands.Shifts;
 
@@ -19,9 +19,9 @@ public class SaveShiftCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        if (parameter is not Shift shift || VM.Helios is null) return;
+        if (parameter is not ShiftVM shift || VM.Helios is null) return;
         shift.SortBreaks();
-        if (VM.Helios.StaffUpdater.Shift(shift) > 0)
+        if (VM.Helios.StaffUpdater.Shift(shift.Shift) > 0)
             MessageBox.Show("Shift saved successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 

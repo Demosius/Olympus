@@ -9,6 +9,33 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ViewModels\Pages\Employees\**" />
+    <Compile Remove="ViewModels\Pages\Rosters\**" />
+    <Compile Remove="ViewModels\Pages\Shifts\**" />
+    <Compile Remove="Views\Pages\Employees\**" />
+    <Compile Remove="Views\Pages\Rosters\**" />
+    <Compile Remove="Views\Pages\Shifts\**" />
+    <EmbeddedResource Remove="ViewModels\Pages\Employees\**" />
+    <EmbeddedResource Remove="ViewModels\Pages\Rosters\**" />
+    <EmbeddedResource Remove="ViewModels\Pages\Shifts\**" />
+    <EmbeddedResource Remove="Views\Pages\Employees\**" />
+    <EmbeddedResource Remove="Views\Pages\Rosters\**" />
+    <EmbeddedResource Remove="Views\Pages\Shifts\**" />
+    <None Remove="ViewModels\Pages\Employees\**" />
+    <None Remove="ViewModels\Pages\Rosters\**" />
+    <None Remove="ViewModels\Pages\Shifts\**" />
+    <None Remove="Views\Pages\Employees\**" />
+    <None Remove="Views\Pages\Rosters\**" />
+    <None Remove="Views\Pages\Shifts\**" />
+    <Page Remove="ViewModels\Pages\Employees\**" />
+    <Page Remove="ViewModels\Pages\Rosters\**" />
+    <Page Remove="ViewModels\Pages\Shifts\**" />
+    <Page Remove="Views\Pages\Employees\**" />
+    <Page Remove="Views\Pages\Rosters\**" />
+    <Page Remove="Views\Pages\Shifts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Resources\calculator--plus.png" />
     <None Remove="Resources\clock--arrow.png" />
     <None Remove="Resources\csv.png" />
@@ -105,16 +132,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ViewModels\Controls\Employees\" />
-    <Folder Include="ViewModels\Pages\Employees\" />
-    <Folder Include="ViewModels\Pages\Rosters\" />
-    <Folder Include="ViewModels\Pages\Shifts\" />
-    <Folder Include="Views\Pages\Employees\" />
-    <Folder Include="Views\Pages\Rosters\" />
-    <Folder Include="Views\Pages\Shifts\" />
   </ItemGroup>
 
 </Project>

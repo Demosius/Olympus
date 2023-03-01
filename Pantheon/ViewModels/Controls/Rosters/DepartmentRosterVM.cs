@@ -27,14 +27,21 @@ public enum ERosterSortOption
 
 public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
 {
-    public DepartmentRoster DepartmentRoster { get; set; }
     public Helios Helios { get; set; }
+
+    public DepartmentRoster DepartmentRoster { get; set; }
 
     public readonly Dictionary<int, EmployeeRosterVM> EmployeeRosterVMs = new();
 
-    public Dictionary<string, WeeklyShiftCounter> TargetAccessDict { get; set; }
+    public Dictionary<string, WeeklyCounterVM> TargetAccessDict { get; set; }
 
     public bool Archived { get; set; }
+
+    #region Department Roster Access
+
+    public Department? Department => DepartmentRoster.Department;
+
+    #endregion
 
     #region INotifyPropertyChanged Members
 
@@ -149,8 +156,8 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         }
     }
 
-    private ObservableCollection<WeeklyShiftCounter> shiftTargets;
-    public ObservableCollection<WeeklyShiftCounter> ShiftTargets
+    private ObservableCollection<WeeklyCounterVM> shiftTargets;
+    public ObservableCollection<WeeklyCounterVM> ShiftTargets
     {
         get => shiftTargets;
         set
@@ -225,8 +232,8 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         displayRosters = new ObservableCollection<EmployeeRosterVM>();
         IsInitialized = false;
         shifts = new ObservableCollection<Shift>();
-        shiftTargets = new ObservableCollection<WeeklyShiftCounter>();
-        TargetAccessDict = new Dictionary<string, WeeklyShiftCounter>();
+        shiftTargets = new ObservableCollection<WeeklyCounterVM>();
+        TargetAccessDict = new Dictionary<string, WeeklyCounterVM>();
         searchString = string.Empty;
         ShowTargets = true;
         Archived = roster.StartDate < DateTime.Now.Date.AddDays(-7);
@@ -250,8 +257,10 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
 
         if (!DepartmentRoster.IsLoaded) Helios.StaffReader.FillDepartmentRoster(DepartmentRoster);
 
+        if (Department is null) throw new DataException("Department roster initialized without Department Object.");
+
         // Shift Targets
-        foreach (var shiftCounter in DepartmentRoster.ShiftCounters)
+        foreach (var shiftCounter in DepartmentRoster.ShiftCounters.Select(c => new WeeklyCounterVM(c)))
         {
             var shift = shiftCounter.Shift;
             if (shift is null) throw new DataException("Shift should not be null.");
@@ -261,13 +270,13 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         }
 
         // Daily rosters.
-        MondayRoster = new DailyRosterVM(DepartmentRoster.MondayRoster!);
-        TuesdayRoster = new DailyRosterVM(DepartmentRoster.TuesdayRoster!);
-        WednesdayRoster = new DailyRosterVM(DepartmentRoster.WednesdayRoster!);
-        ThursdayRoster = new DailyRosterVM(DepartmentRoster.ThursdayRoster!);
-        FridayRoster = new DailyRosterVM(DepartmentRoster.FridayRoster!);
-        SaturdayRoster = new DailyRosterVM(DepartmentRoster.SaturdayRoster!);
-        SundayRoster = new DailyRosterVM(DepartmentRoster.SundayRoster!);
+        MondayRoster = new DailyRosterVM(DepartmentRoster.MondayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate), this);
+        TuesdayRoster = new DailyRosterVM(DepartmentRoster.TuesdayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate.AddDays(1)), this);
+        WednesdayRoster = new DailyRosterVM(DepartmentRoster.WednesdayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate.AddDays(2)), this);
+        ThursdayRoster = new DailyRosterVM(DepartmentRoster.ThursdayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate.AddDays(3)), this);
+        FridayRoster = new DailyRosterVM(DepartmentRoster.FridayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate.AddDays(4)), this);
+        SaturdayRoster = new DailyRosterVM(DepartmentRoster.SaturdayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate.AddDays(5)), this);
+        SundayRoster = new DailyRosterVM(DepartmentRoster.SundayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate.AddDays(6)), this);
 
         // EmployeeRosters
         foreach (var employeeRoster in DepartmentRoster.EmployeeRosters) AddEmployeeRoster(employeeRoster);
@@ -277,8 +286,34 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         ApplyFilters(EmployeeRosterVMs.Values);
     }
 
-    /*
-    public void AddCount(Shift shift)
+    public void SubShift(Shift rosterShift, DateTime date)
+    {
+        TargetAccessDict[rosterShift.ID].Count--;
+        GetDaily(date.DayOfWeek)?.SubShift(rosterShift);
+    }
+
+    public void AddShift(Shift rosterShift, DateTime date)
+    {
+        TargetAccessDict[rosterShift.ID].Count++;
+        GetDaily(date.DayOfWeek)?.AddShift(rosterShift);
+    }
+
+    public DailyRosterVM? GetDaily(DayOfWeek day)
+    {
+        return day switch
+        {
+            DayOfWeek.Sunday => SundayRoster,
+            DayOfWeek.Monday => MondayRoster,
+            DayOfWeek.Tuesday => TuesdayRoster,
+            DayOfWeek.Wednesday => WednesdayRoster,
+            DayOfWeek.Thursday => ThursdayRoster,
+            DayOfWeek.Friday => FridayRoster,
+            DayOfWeek.Saturday => SaturdayRoster,
+            _ => throw new ArgumentOutOfRangeException(nameof(day), day, null)
+        };
+    }
+
+    /*public void AddCount(Shift shift)
     {
         TargetAccessDict[shift.ID].Count++;
     }
@@ -286,8 +321,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     public void SubCount(Shift shift)
     {
         TargetAccessDict[shift.ID].Count--;
-    }
-    */
+    }*/
 
     /// <summary>
     /// Check if roster is archived, and give the option to un-archive it.
@@ -307,7 +341,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
 
     public EmployeeRosterVM AddEmployeeRoster(EmployeeRoster roster)
     {
-        var erVM = new EmployeeRosterVM(roster);//, this);
+        var erVM = new EmployeeRosterVM(roster, this);
         EmployeeRosterVMs.Add(roster.EmployeeID, erVM);
         if (roster.Shift is not null) DepartmentRoster.AddCount(roster.Shift);
         return erVM;

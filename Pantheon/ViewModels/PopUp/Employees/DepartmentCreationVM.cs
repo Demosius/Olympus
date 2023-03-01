@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Pantheon.Annotations;
+using Pantheon.ViewModels.Controls.Employees;
 using Uranus;
 using Uranus.Staff.Models;
 
@@ -70,8 +71,8 @@ internal class DepartmentCreationVM : INotifyPropertyChanged, IPayPoints
         }
     }
 
-    private ObservableCollection<Employee> employees;
-    public ObservableCollection<Employee> Employees
+    private ObservableCollection<EmployeeVM> employees;
+    public ObservableCollection<EmployeeVM> Employees
     {
         get => employees;
         set
@@ -93,7 +94,7 @@ internal class DepartmentCreationVM : INotifyPropertyChanged, IPayPoints
     public DepartmentCreationVM()
     {
         Department = new Department();
-        employees = new ObservableCollection<Employee>();
+        employees = new ObservableCollection<EmployeeVM>();
         departments = new ObservableCollection<string>();
         payPoints = new ObservableCollection<string>();
         AddPayPointCommand = new AddPayPointCommand(this);
@@ -116,7 +117,7 @@ internal class DepartmentCreationVM : INotifyPropertyChanged, IPayPoints
         Charon = ParentVM.Charon;
 
         Departments = new ObservableCollection<string>(ParentVM.Departments.Select(d => d is null ? "" : d.Name).OrderBy(n => n));
-        Employees = new ObservableCollection<Employee>(ParentVM.ReportingEmployees);
+        Employees = new ObservableCollection<EmployeeVM>(ParentVM.ReportingEmployees);
         PayPoints = new ObservableCollection<string>(ParentVM.PayPoints);
         DepartmentNames = ParentVM.FullDepartments.Select(d => d.Name).ToList();
     }

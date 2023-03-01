@@ -111,8 +111,8 @@ internal class IconSelectionVM : INotifyPropertyChanged, IImageSelector
 
     public void ConfirmImageSelection()
     {
-        if (ParentVM?.SelectedEmployee is null) return;
-        ParentVM.SelectedEmployee.Icon = SelectedIcon;
+        if (ParentVM?.SelectedEmployeeVM is null) return;
+        ParentVM.SelectedEmployeeVM.Icon = SelectedIcon;
     }
 
     public void FindNewImage()

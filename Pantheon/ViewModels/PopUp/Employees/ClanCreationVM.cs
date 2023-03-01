@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Pantheon.Annotations;
+using Pantheon.ViewModels.Controls.Employees;
 using Uranus;
 using Uranus.Staff.Models;
 
@@ -35,8 +36,8 @@ internal class ClanCreationVM : INotifyPropertyChanged
         }
     }
 
-    private ObservableCollection<Employee> employees;
-    public ObservableCollection<Employee> Employees
+    private ObservableCollection<EmployeeVM> employees;
+    public ObservableCollection<EmployeeVM> Employees
     {
         get => employees;
         set
@@ -54,7 +55,7 @@ internal class ClanCreationVM : INotifyPropertyChanged
     {
         Clan = new Clan();
         departments = new ObservableCollection<Department>();
-        employees = new ObservableCollection<Employee>();
+        employees = new ObservableCollection<EmployeeVM>();
         ClanNames = new List<string>();
 
         ConfirmClanCreationCommand = new ConfirmClanCreationCommand(this);
@@ -79,7 +80,7 @@ internal class ClanCreationVM : INotifyPropertyChanged
             if (parentVMDepartment is not null) Departments.Add(parentVMDepartment);
         }
 
-        Employees = new ObservableCollection<Employee>(ParentVM.ReportingEmployees);
+        Employees = new ObservableCollection<EmployeeVM>(ParentVM.ReportingEmployees);
 
         ClanNames = ParentVM.Clans.Select(c => c.Name).ToList();
     }

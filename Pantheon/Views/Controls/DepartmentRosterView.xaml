@@ -58,7 +58,7 @@
                 <Setter Property="HorizontalAlignment" Value="Right"/>
             </Style>
             <Style TargetType="{x:Type DataGrid}">
-                <Setter Property="Background" Value="{StaticResource AccordionBackgroundBrush}"/>
+                <Setter Property="Background" Value="{StaticResource ButtonBackgroundBrush}"/>
             </Style>
             <ObjectDataProvider x:Key="RosterSortOptions"
                                 MethodName="GetValues" 

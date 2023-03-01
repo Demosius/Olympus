@@ -48,7 +48,7 @@
 
                 <!-- Shift Selector -->
                 <ComboBox Canvas.Top="55" Canvas.Left="60" 
-                          Style="{StaticResource MiniComboBoxStyle}"
+                          Style="{StaticResource ComboBoxStyle}"
                           ItemsSource="{Binding Shifts, Mode=OneTime, FallbackValue=''}"
                           SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Width="80"
@@ -57,8 +57,8 @@
                           VerticalContentAlignment="Center"
                           HorizontalContentAlignment="Center"/>
 
-                <!-- Roster Type -->
-                <ComboBox Canvas.Top="55" Canvas.Left="145" Style="{StaticResource MiniComboBoxStyle}"
+                <!-- Roster Type (SUPPOSED TO BE MINI) -->
+                <ComboBox Canvas.Top="55" Canvas.Left="145" Style="{StaticResource ComboBoxStyle}"
                           ItemsSource="{Binding Source={StaticResource RosterTypes}, Mode=OneTime}"
                           SelectedValue="{Binding SelectedRosterType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           Width="80"

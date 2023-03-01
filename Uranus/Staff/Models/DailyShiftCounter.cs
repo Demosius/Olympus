@@ -12,7 +12,7 @@ public class DailyShiftCounter : ShiftCounter
 
     public DailyShiftCounter() { }
 
-    public DailyShiftCounter(DailyRoster roster, Shift shift, int target) : base(shift, target, roster.Date)
+    public DailyShiftCounter(DailyRoster roster, Shift shift, int target) : base(shift, target)
     {
         Roster = roster;
         RosterID = roster.ID;

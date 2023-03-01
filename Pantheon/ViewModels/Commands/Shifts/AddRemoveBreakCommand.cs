@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.Controls.Shifts;
 using Pantheon.ViewModels.Pages;
 using Uranus.Staff.Models;
 
@@ -18,11 +19,11 @@ public class AddRemoveBreakCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        if (parameter is not Break @break || @break.Shift is null) return;
-        if (@break.Name == "Lunch")
-            VM.AddBreak(@break.Shift);
+        if (parameter is not BreakVM breakVM || breakVM.Shift is null) return;
+        if (breakVM.Name == "Lunch")
+            VM.AddBreak(breakVM.ShiftVM);
         else
-            VM.RemoveBreak(@break);
+            VM.RemoveBreak(breakVM);
     }
 
     public event EventHandler? CanExecuteChanged

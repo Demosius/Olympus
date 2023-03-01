@@ -12,7 +12,7 @@ public class LaunchAvatarSelectorCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedEmployee is not null;
+        return VM.SelectedEmployeeVM is not null;
     }
 
     public void Execute(object? parameter)

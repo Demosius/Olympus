@@ -12,8 +12,8 @@ internal class DeleteShiftRuleCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon is not null && VM.Employee is not null &&
-               VM.SelectedRule is not null && VM.Charon.CanUpdateEmployee(VM.Employee);
+        return VM.Charon is not null && VM.EmployeeVM is not null &&
+               VM.SelectedRule is not null && VM.Charon.CanUpdateEmployee(VM.EmployeeVM.Employee);
     }
 
     public void Execute(object? parameter)

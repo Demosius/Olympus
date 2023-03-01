@@ -15,9 +15,9 @@ public class ActivateUserCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedEmployee is not null &&
-               !VM.SelectedEmployee.IsUser &&
-               (VM.Charon?.CanCreateUser(VM.SelectedEmployee) ?? false);
+        return VM.SelectedEmployeeVM is not null &&
+               !VM.SelectedEmployeeVM.IsUser &&
+               (VM.Charon?.CanCreateUser(VM.SelectedEmployeeVM.Employee) ?? false);
     }
 
     public void Execute(object? parameter)

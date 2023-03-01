@@ -5,6 +5,10 @@ using System.Collections.Generic;
 
 namespace Uranus.Staff.Models;
 
+/// <summary>
+/// The roster for a department for a single day.
+/// Will reference the Department Roster object, as well as holding a list of basic Roster objects.
+/// </summary>
 public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
 {
     [PrimaryKey] public Guid ID { get; set; }
@@ -16,13 +20,14 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
 
     [ManyToOne(nameof(DepartmentName), nameof(Models.Department.DailyRosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Department? Department { get; set; }
-    [ManyToOne(nameof(DepartmentRosterID), nameof(Models.DepartmentRoster.DailyRosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public DepartmentRoster? DepartmentRoster { get; set; }
 
     [OneToMany(nameof(Roster.DailyRosterID), nameof(Roster.DailyRoster), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Roster> Rosters { get; set; }
     [OneToMany(nameof(DailyShiftCounter.RosterID), nameof(DailyShiftCounter.Roster), CascadeOperations = CascadeOperation.None)]
     public List<DailyShiftCounter> ShiftCounters { get; set; }
+
+    [OneToOne(nameof(DepartmentRosterID), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public DepartmentRoster? DepartmentRoster { get; set; }
 
     [Ignore] public Dictionary<string, DailyShiftCounter> CounterAccessDict { get; set; }
     [Ignore] public List<Shift> Shifts => Department?.Shifts ?? new List<Shift>();

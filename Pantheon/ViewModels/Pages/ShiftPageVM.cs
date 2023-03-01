@@ -9,6 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Pantheon.Annotations;
+using Pantheon.ViewModels.Controls.Shifts;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -21,27 +22,31 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }
 
+    public Shift? SelectedShift => SelectedShiftVM?.Shift;
+
+    public Break? SelectedBreak => SelectedBreakVM?.Break;
+
     #region NotifiableProperties
 
-    private ObservableCollection<Shift> shifts;
-    public ObservableCollection<Shift> Shifts
+    private ObservableCollection<ShiftVM> shiftVMs;
+    public ObservableCollection<ShiftVM> ShiftVMs
     {
-        get => shifts;
+        get => shiftVMs;
         set
         {
-            shifts = value;
-            OnPropertyChanged(nameof(Shifts));
+            shiftVMs = value;
+            OnPropertyChanged(nameof(ShiftVMs));
         }
     }
 
-    private Shift? selectedShift;
-    public Shift? SelectedShift
+    private ShiftVM? selectedShiftVM;
+    public ShiftVM? SelectedShiftVM
     {
-        get => selectedShift;
+        get => selectedShiftVM;
         set
         {
-            selectedShift = value;
-            OnPropertyChanged(nameof(SelectedShift));
+            selectedShiftVM = value;
+            OnPropertyChanged(nameof(SelectedShiftVM));
         }
     }
 
@@ -64,18 +69,18 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction
         {
             selectedDepartment = value;
             OnPropertyChanged(nameof(SelectedDepartment));
-            Shifts = new ObservableCollection<Shift>(SelectedDepartment?.Shifts ?? new List<Shift>());
+            ShiftVMs = new ObservableCollection<ShiftVM>(SelectedDepartment?.Shifts.Select(s => new ShiftVM(s)) ?? new List<ShiftVM>());
         }
     }
 
-    private Break? selectedBreak;
-    public Break? SelectedBreak
+    private BreakVM? selectedBreakVM;
+    public BreakVM? SelectedBreakVM
     {
-        get => selectedBreak;
+        get => selectedBreakVM;
         set
         {
-            selectedBreak = value;
-            OnPropertyChanged(nameof(SelectedBreak));
+            selectedBreakVM = value;
+            OnPropertyChanged(nameof(SelectedBreakVM));
         }
     }
 
@@ -96,7 +101,7 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction
     public ShiftPageVM()
     {
         departments = new ObservableCollection<Department>();
-        shifts = new ObservableCollection<Shift>();
+        shiftVMs = new ObservableCollection<ShiftVM>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
@@ -152,23 +157,24 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction
         if (!SelectedDepartment.Shifts.Any()) shift.Default = true;
 
         SelectedDepartment.Shifts.Add(shift);
-        Shifts.Add(shift);
+        ShiftVMs.Add(new ShiftVM(shift));
 
         Helios.StaffCreator.Shift(shift);
     }
 
-    public void DeleteShift(Shift shift)
+    public void DeleteShift(ShiftVM shiftVM)
     {
+        var shift = shiftVM.Shift;
         if (MessageBox.Show($"Are you sure you want to delete the {shift.Name} shift?", "Confirm Delete",
                 MessageBoxButton.YesNoCancel, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
 
         SelectedDepartment?.Shifts.Remove(shift);
-        Shifts.Remove(shift);
+        ShiftVMs.Remove(shiftVM); 
 
         Helios?.StaffDeleter.Shift(shift);
     }
 
-    public void AddBreak(Shift shift)
+    public void AddBreak(ShiftVM shift)
     {
         if (Helios is null) return;
 
@@ -180,17 +186,17 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction
 
         if (shift.Breaks.Any(b => b.Name == breakName)) return;
 
-        var @break = new Break(shift, breakName);
+        var @break = new Break(shift.Shift, breakName);
 
         shift.AddBreak(@break);
 
         Helios.StaffCreator.Break(@break);
     }
 
-    public void RemoveBreak(Break @break)
+    public void RemoveBreak(BreakVM breakVM)
     {
-        @break.Shift?.RemoveBreak(@break);
-        Helios?.StaffDeleter.Break(@break);
+        breakVM.Remove();
+        Helios?.StaffDeleter.Break(breakVM.Break);
     }
 
     public void LaunchShiftEmployeeWindow(Shift shift)

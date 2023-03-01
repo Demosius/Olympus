@@ -287,11 +287,10 @@ public class StaffUpdater
         Chariot.Database?.RunInTransaction(() =>
         {
             lines += departmentRoster.Rosters.Sum(roster => Chariot.InsertOrUpdate(roster));
-            lines += departmentRoster.DailyRosters.Sum(dailyRoster => Chariot.InsertOrUpdate(dailyRoster));
+            lines += departmentRoster.DailyRosters().Sum(dailyRoster => Chariot.InsertOrUpdate(dailyRoster));
             lines += departmentRoster.EmployeeRosters.Sum(employeeRoster => Chariot.InsertOrUpdate(employeeRoster));
             lines += departmentRoster.ShiftCounters.Sum(shiftCounter => Chariot.InsertOrUpdate(shiftCounter));
-            lines += departmentRoster.DailyRosters
-                .SelectMany(dailyRoster => dailyRoster.ShiftCounters).Sum(shiftCounter => Chariot.InsertOrUpdate(shiftCounter));
+            lines += departmentRoster.DailyShiftCounters().Sum(shiftCounter => Chariot.InsertOrUpdate(shiftCounter));
             lines += Chariot.Database.Update(departmentRoster);
         });
         return lines;

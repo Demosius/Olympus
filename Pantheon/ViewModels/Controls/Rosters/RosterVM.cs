@@ -12,20 +12,9 @@ public class RosterVM : INotifyPropertyChanged
 {
     public Roster Roster { get; set; }
 
-    #region INotifyPropertyChanged Members
+    public EmployeeRosterVM EmployeeRosterVM { get; set; }
 
-    private ObservableCollection<Shift> shifts;
-    public ObservableCollection<Shift> Shifts
-    {
-        get => shifts;
-        set
-        {
-            shifts = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public string DisplayString => ToString();
+    #region Roster Access
 
     public Shift? SelectedShift
     {
@@ -42,25 +31,9 @@ public class RosterVM : INotifyPropertyChanged
         }
     }
 
-    public Employee? Employee
-    {
-        get => Roster.Employee;
-        set
-        {
-            Roster.Employee = value;
-            OnPropertyChanged();
-        }
-    }
+    public Employee? Employee  => Roster.Employee;
 
-    public DateTime Date
-    {
-        get => Roster.Date;
-        set
-        {
-            Roster.Date = value;
-            OnPropertyChanged();
-        }
-    }
+    public DateTime Date => Roster.Date;
 
     public ERosterType Type
     {
@@ -74,6 +47,7 @@ public class RosterVM : INotifyPropertyChanged
             PromptPublicHoliday();
         }
     }
+
     public string StartTime
     {
         get => $"{Roster.StartTime.Hours:00}:{Roster.StartTime.Minutes:00}";
@@ -124,22 +98,52 @@ public class RosterVM : INotifyPropertyChanged
 
     #endregion
 
-    public RosterVM(Roster roster)
+    #region Parent (EmployeeRoster) VM Access
+
+    public DepartmentRosterVM DepartmentRosterVM => EmployeeRosterVM.DepartmentRosterVM;
+
+    #endregion
+
+    #region INotifyPropertyChanged Members
+
+    private ObservableCollection<Shift> shifts;
+    public ObservableCollection<Shift> Shifts
+    {
+        get => shifts;
+        set
+        {
+            shifts = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string DisplayString => ToString();
+    
+    #endregion
+
+    public RosterVM(Roster roster, EmployeeRosterVM employeeRosterVM)
     {
         Roster = roster;
         shifts = new ObservableCollection<Shift>(Roster.Shifts);
+        EmployeeRosterVM = employeeRosterVM;
 
         if (SelectedShift is not null && AtWork) Roster.AddCount(SelectedShift);
     }
 
     public void SetShift(Shift? shift)
     {
+        // Pass information up chain for Tracking Counts of Shifts.
+        if (Roster.Shift is not null) EmployeeRosterVM.SubShift(Roster.Shift, Date);
+        // Change Actual Shift and data.
         Roster.Shift = shift;
         Roster.StartTime = shift?.StartTime ?? TimeSpan.Zero;
         Roster.EndTime = shift?.EndTime ?? TimeSpan.Zero;
+        // Make sure changes are registered in display.
         OnPropertyChanged(nameof(StartTime));
         OnPropertyChanged(nameof(EndTime));
         OnPropertyChanged(nameof(DisplayString));
+        // Pass information tracking up chain.
+        if (Roster.Shift is not null) EmployeeRosterVM.AddShift(Roster.Shift, Date);
     }
 
     /// <summary>

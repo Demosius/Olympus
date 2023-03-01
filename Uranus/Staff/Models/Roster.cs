@@ -15,6 +15,10 @@ public enum ERosterType
     PublicHoliday
 }
 
+/// <summary>
+/// Instance of a single employee's roster for a single day.
+/// Should reference the Daily Roster object and the Employee Roster object. Will also reference the Department Roster.
+/// </summary>
 public class Roster : IEquatable<Roster>, IComparable<Roster>
 {
     [PrimaryKey] public Guid ID { get; set; }
@@ -40,10 +44,11 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
     public Department? Department { get; set; }
     [ManyToOne(nameof(DailyRosterID), nameof(Models.DailyRoster.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public DailyRoster? DailyRoster { get; set; }
-    [ManyToOne(nameof(EmployeeRosterID), nameof(Models.EmployeeRoster.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public EmployeeRoster? EmployeeRoster { get; set; }
     [ManyToOne(nameof(DepartmentRosterID), nameof(Models.DepartmentRoster.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public DepartmentRoster? DepartmentRoster { get; set; }
+
+    [OneToOne(nameof(EmployeeRosterID), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public EmployeeRoster? EmployeeRoster { get; set; }
 
     [Ignore] public List<Shift> Shifts => EmployeeRoster?.Shifts ?? new List<Shift>();
     [Ignore] public List<ShiftRule> ShiftRules { get; set; }
@@ -146,26 +151,9 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         Day = Date.DayOfWeek;
     }
 
-    public bool Equals(Roster? other)
-    {
-        if (other is null) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return ID == other.ID;
-    }
-
-    public int CompareTo(Roster? other)
-    {
-        return other is null ? 1 : Date.CompareTo(other.Date);
-    }
-
     public string TimeString()
     {
         return $"{StartTime.Hours:00}:{StartTime.Minutes:00} - {EndTime.Hours:00}:{EndTime.Minutes:00}";
-    }
-
-    public override string ToString()
-    {
-        return AtWork ? TimeString() : (RosterType == ERosterType.Standard ? ERosterType.RDO : RosterType).ToString();
     }
 
     public void ApplyShiftRules(List<ShiftRule> rules)
@@ -189,5 +177,88 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
             AtWork = false;
         else
             AtWork = DailyRoster?.Day is not (DayOfWeek.Saturday or DayOfWeek.Sunday) || Shift is not null;
+    }
+
+    public override string ToString()
+    {
+        return AtWork ? TimeString() : (RosterType == ERosterType.Standard ? ERosterType.RDO : RosterType).ToString();
+    }
+
+    public bool Equals(Roster? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return ID == other.ID;
+    }
+
+    public int CompareTo(Roster? other)
+    {
+        return other is null ? 1 : Date.CompareTo(other.Date);
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        return obj switch
+        {
+            null => false,
+            Roster roster => Equals(roster),
+            _ => false
+        };
+    }
+
+    public override int GetHashCode()
+    {
+        // ReSharper disable NonReadonlyMemberInGetHashCode
+        var hashCode = new HashCode();
+        hashCode.Add(EmployeeID);
+        hashCode.Add(ShiftID);
+        hashCode.Add(DepartmentName);
+        hashCode.Add(DepartmentRosterID);
+        hashCode.Add((int) Day);
+        hashCode.Add(Date);
+        hashCode.Add(StartTime);
+        hashCode.Add(EndTime);
+        hashCode.Add((int) RosterType);
+        hashCode.Add(AtWork);
+        hashCode.Add(Shift);
+        hashCode.Add(ShiftRules);
+        return hashCode.ToHashCode();
+        // ReSharper restore NonReadonlyMemberInGetHashCode
+    }
+
+
+    public static bool operator ==(Roster? left, Roster? right)
+    {
+        return left?.Equals(right) ?? right is null;
+    }
+
+    public static bool operator !=(Roster? left, Roster? right)
+    {
+        return !(left == right);
+    }
+
+    public static bool operator <(Roster? left, Roster? right)
+    {
+        return left is null ? right is not null : left.CompareTo(right) < 0;
+    }
+
+    public static bool operator <=(Roster? left, Roster? right)
+    {
+        return left is null || left.CompareTo(right) <= 0;
+    }
+
+    public static bool operator >(Roster? left, Roster? right)
+    {
+        return left is not null && left.CompareTo(right) > 0;
+    }
+
+    public static bool operator >=(Roster? left, Roster? right)
+    {
+        return left is null ? right is null : left.CompareTo(right) >= 0;
     }
 }

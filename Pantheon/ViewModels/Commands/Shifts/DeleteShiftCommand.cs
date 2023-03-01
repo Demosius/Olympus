@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.Controls.Shifts;
 using Pantheon.ViewModels.Pages;
-using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Commands.Shifts;
 
@@ -18,7 +18,7 @@ public class DeleteShiftCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        if (parameter is not Shift shift) return;
+        if (parameter is not ShiftVM shift) return;
         VM.DeleteShift(shift);
     }
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Pantheon.Annotations;
 using Uranus.Staff.Models;
@@ -11,7 +12,9 @@ public class DailyRosterVM : INotifyPropertyChanged
 {
     public DailyRoster DailyRoster { get; set; }
 
-    public Dictionary<string, DailyShiftCounter> CounterAccessDict { get; set; }
+    public DepartmentRosterVM DepartmentRosterVM { get; set; }
+
+    public Dictionary<string, DailyCounterVM> CounterAccessDict { get; set; }
 
     public Dictionary<int, RosterVM> Rosters { get; set; }
 
@@ -23,8 +26,8 @@ public class DailyRosterVM : INotifyPropertyChanged
 
     #region INotifyPropertyChanged Members
 
-    private ObservableCollection<ShiftCounter> shiftCounter;
-    public ObservableCollection<ShiftCounter> ShiftCounter
+    private ObservableCollection<DailyCounterVM> shiftCounter;
+    public ObservableCollection<DailyCounterVM> ShiftCounter
     {
         get => shiftCounter;
         set
@@ -36,14 +39,16 @@ public class DailyRosterVM : INotifyPropertyChanged
 
     #endregion
 
-    public DailyRosterVM(DailyRoster roster)
+    public DailyRosterVM(DailyRoster roster, DepartmentRosterVM departmentRosterVM)
     {
         DailyRoster = roster;
-        shiftCounter = new ObservableCollection<ShiftCounter>();
-        CounterAccessDict = new Dictionary<string, DailyShiftCounter>();
+        shiftCounter = new ObservableCollection<DailyCounterVM>();
+        CounterAccessDict = new Dictionary<string, DailyCounterVM>();
         Rosters = new Dictionary<int, RosterVM>();
 
-        foreach (var counter in DailyRoster.ShiftCounters)
+        DepartmentRosterVM = departmentRosterVM;
+
+        foreach (var counter in DailyRoster.ShiftCounters.Select(c => new DailyCounterVM(c)))
         {
             ShiftCounter.Add(counter);
             CounterAccessDict.Add(counter.ShiftID, counter);
@@ -55,24 +60,22 @@ public class DailyRosterVM : INotifyPropertyChanged
         foreach (var shift in shifts)
         {
             if (CounterAccessDict.ContainsKey(shift.ID)) continue;
-            var dailyShiftCounter = new DailyShiftCounter(DailyRoster, shift, shift.DailyTarget);
+            var dailyShiftCounter = new DailyCounterVM(new DailyShiftCounter(DailyRoster, shift, shift.DailyTarget));
             CounterAccessDict.Add(shift.ID, dailyShiftCounter);
             ShiftCounter.Add(dailyShiftCounter);
         }
     }
 
-    /*
-    public void AddCount(Shift shift)
+    public void SubShift(Shift rosterShift)
     {
-        CounterAccessDict[shift.ID].Count++;
+        CounterAccessDict[rosterShift.ID].Count--;
     }
 
-    public void SubCount(Shift shift)
+    public void AddShift(Shift rosterShift)
     {
-        CounterAccessDict[shift.ID].Count--;
+        CounterAccessDict[rosterShift.ID].Count++;
     }
-    */
-
+    
     /// <summary>
     /// Sets all rosters as public holiday.
     /// </summary>

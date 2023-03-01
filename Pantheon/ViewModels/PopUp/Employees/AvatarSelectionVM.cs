@@ -108,8 +108,8 @@ internal class AvatarSelectionVM : INotifyPropertyChanged, IImageSelector
 
     public void ConfirmImageSelection()
     {
-        if (ParentVM?.SelectedEmployee is null) return;
-        ParentVM.SelectedEmployee.Avatar = SelectedAvatar;
+        if (ParentVM?.SelectedEmployeeVM is null) return;
+        ParentVM.SelectedEmployeeVM.Avatar = SelectedAvatar;
     }
 
     public void FindNewImage()

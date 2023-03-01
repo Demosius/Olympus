@@ -14,6 +14,7 @@ namespace Pantheon.ViewModels.PopUp.Employees;
 internal class EmployeeCreationVM : INotifyPropertyChanged
 {
     public EmployeePageVM? ParentVM { get; set; }
+
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }
 

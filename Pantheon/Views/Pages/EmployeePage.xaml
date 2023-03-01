@@ -134,8 +134,9 @@
                         Command="{Binding ActivateUserCommand}"/>
             </Grid>
 
-            <ListView ItemsSource="{Binding Employees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedValue="{Binding SelectedEmployee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" d:ItemsSource="{d:SampleData ItemCount=5}">
+            <ListView d:ItemsSource="{d:SampleData ItemCount=5}" 
+                      ItemsSource="{Binding Employees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedValue="{Binding SelectedEmployeeVM, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
@@ -194,7 +195,8 @@
                     Content="Save Changes"
                     Command="{Binding SaveEmployeeCommand}"/>
 
-            <ScrollViewer DockPanel.Dock="Bottom">
+            <ScrollViewer DockPanel.Dock="Bottom"
+                          DataContext="{Binding SelectedEmployeeVM, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <Grid Margin="5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -231,7 +233,7 @@
                         HorizontalAlignment="Center"
                         Orientation="Horizontal">
                         <Label  Content="ID - "/>
-                        <Label  Content="{Binding SelectedEmployee.ID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                        <Label  Content="{Binding ID, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                     </StackPanel>
                     <!-- Icon -->
                     <Label Grid.Column="0" Grid.Row="1" 
@@ -240,9 +242,9 @@
                     <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Vertical">
                         <Border Height="135"
                                 Width="135"
-                                BorderBrush="{Binding SelectedEmployee.IsUser, Converter={StaticResource UserToColourConverter}, Mode=OneWay, FallbackValue=''}"
+                                BorderBrush="{Binding IsUser, Converter={StaticResource UserToColourConverter}, Mode=OneWay, FallbackValue=''}"
                                 BorderThickness="1">
-                            <Image Source="{Binding SelectedEmployee.Icon.FullPath, FallbackValue=''}"/>
+                            <Image Source="{Binding Icon.FullPath, Mode=TwoWay, FallbackValue=''}"/>
                         </Border>
                         <Button Content="Change"
                                 Command="{Binding LaunchIconiferCommand}"
@@ -253,34 +255,34 @@
                     <Label Grid.Column="0" Grid.Row="2" 
                            Content="First Name: "/>
                     <TextBox Grid.Column="1" Grid.Row="2"
-                             Text="{Binding SelectedEmployee.FirstName, FallbackValue=''}"/>
+                             Text="{Binding FirstName, Mode=TwoWay, FallbackValue=''}"/>
                     <!-- Last Name -->
                     <Label Grid.Column="0" Grid.Row="3" 
                            Content="Last Name: "/>
                     <TextBox Grid.Column="1" Grid.Row="3"
-                             Text="{Binding SelectedEmployee.LastName, FallbackValue=''}"/>
+                             Text="{Binding LastName, FallbackValue=''}"/>
                     <!-- Display Name -->
                     <Label Grid.Column="0" Grid.Row="4" 
                            Content="Display Name: "/>
                     <TextBox Grid.Column="1" Grid.Row="4"
-                             Text="{Binding SelectedEmployee.DisplayName, FallbackValue=''}"/>
+                             Text="{Binding DisplayName, FallbackValue=''}"/>
                     <!-- PC ID -->
                     <Label Grid.Column="0" Grid.Row="5"
                            Content="PC ID: "/>
                     <TextBox Grid.Column="1" Grid.Row="5"
-                             Text="{Binding SelectedEmployee.PC_ID, FallbackValue=''}"/>
+                             Text="{Binding PC_ID, FallbackValue=''}"/>
                     <!-- RF ID -->
                     <Label Grid.Column="0" Grid.Row="6"
                            Content="RF ID: "/>
                     <TextBox Grid.Column="1" Grid.Row="6"
-                             Text="{Binding SelectedEmployee.RF_ID, FallbackValue=''}"/>
+                             Text="{Binding RF_ID, FallbackValue=''}"/>
                     <!-- Location -->
                     <Label Grid.Column="0" Grid.Row="7"
                            Content="Location: "/>
                     <StackPanel Grid.Column="1" Grid.Row="7" 
                                 Orientation="Horizontal">
                         <ComboBox ItemsSource="{Binding Locations, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  SelectedValue="{Binding SelectedEmployee.Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                                  SelectedValue="{Binding Location, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
                                   HorizontalContentAlignment="Center"/>
                         <Button Content="Add"
                                 Command="{Binding AddLocationCommand}"/>
@@ -292,7 +294,7 @@
                     <StackPanel Grid.Column="1" Grid.Row="8" 
                                 Orientation="Horizontal">
                         <ComboBox ItemsSource="{Binding FullDepartments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              SelectedValue="{Binding SelectedEmployee.Department, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                              SelectedValue="{Binding SelectedEmployeeVM.Department, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
                               HorizontalContentAlignment="Center"/>
                         <Button Content="Add"
                             Command="{Binding AddDepartmentCommand}"/>
@@ -303,7 +305,7 @@
                     <StackPanel Grid.Column="1" Grid.Row="9" 
                                 Orientation="Horizontal">
                         <ComboBox ItemsSource="{Binding RoleNames, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  SelectedValue="{Binding SelectedEmployee.RoleName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                                  SelectedValue="{Binding RoleName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
                                   HorizontalContentAlignment="Center"/>
                         <Button Content="Add"
                             Command="{Binding AddRoleCommand}"/>
@@ -314,7 +316,7 @@
                     <StackPanel Grid.Column="1" Grid.Row="10"
                                 Orientation="Horizontal">
                         <ComboBox ItemsSource="{Binding Managers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  SelectedValue="{Binding SelectedEmployee.ReportsTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                                  SelectedValue="{Binding ReportsTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
                                   HorizontalContentAlignment="Center"/>
                         <StackPanel Orientation="Vertical">
                             <Label Content="Use All" FontSize="8" FontWeight="Light" Margin="0" Padding="0"/>
@@ -328,7 +330,7 @@
                     <StackPanel Grid.Column="1" Grid.Row="11" 
                                 Orientation="Horizontal">
                         <ComboBox ItemsSource="{Binding Clans, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              SelectedValue="{Binding SelectedEmployee.Clan, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                              SelectedValue="{Binding SelectedEmployeeVM.Clan, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
                               HorizontalContentAlignment="Center"/>
                         <Button Content="Add"
                             Command="{Binding AddClanCommand}"/>
@@ -339,7 +341,7 @@
                     <StackPanel Grid.Column="1" Grid.Row="12" 
                                 Orientation="Horizontal">
                         <ComboBox ItemsSource="{Binding PayPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              SelectedValue="{Binding SelectedEmployee.PayPoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                              SelectedValue="{Binding SelectedEmployeeVM.PayPoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
                               HorizontalContentAlignment="Center"/>
                         <Button Content="Add"
                             Command="{Binding AddPayPointCommand}"/>
@@ -349,34 +351,34 @@
                            Content="Employment Type: "/>
                     <ComboBox Grid.Column="1" Grid.Row="13"
                               ItemsSource="{Binding EmploymentTypes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              SelectedValue="{Binding SelectedEmployee.EmploymentType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                              SelectedValue="{Binding SelectedEmployeeVM.EmploymentType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                     <!-- Phone Number -->
                     <Label Grid.Column="0" Grid.Row="14"
                            Content="Phone: "
                            Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                     <TextBox Grid.Column="1" Grid.Row="14"
-                             Text="{Binding SelectedEmployee.PhoneNumber, FallbackValue=''}"
+                             Text="{Binding SelectedEmployeeVM.PhoneNumber, FallbackValue=''}"
                              Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                     <!-- Email -->
                     <Label Grid.Column="0" Grid.Row="15"
                            Content="Email: "
                            Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                     <TextBox Grid.Column="1" Grid.Row="15"
-                             Text="{Binding SelectedEmployee.Email, FallbackValue=''}"
+                             Text="{Binding SelectedEmployeeVM.Email, FallbackValue=''}"
                              Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                     <!-- Address -->
                     <Label Grid.Column="0" Grid.Row="16"
                            Content="Address: "
                            Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                     <TextBox Grid.Column="1" Grid.Row="16"
-                             Text="{Binding SelectedEmployee.Address, FallbackValue=''}"
+                             Text="{Binding SelectedEmployeeVM.Address, FallbackValue=''}"
                              Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                     <!-- Pay Rate -->
                     <Label Grid.Column="0" Grid.Row="17"
                            Content="Pay Rate: "
                            Visibility="{Binding VerySensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                     <TextBox Grid.Column="1" Grid.Row="17"
-                             Text="{Binding SelectedEmployee.PayRate, FallbackValue=''}"
+                             Text="{Binding SelectedEmployeeVM.PayRate, FallbackValue=''}"
                              Visibility="{Binding VerySensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
 
                     <!-- Shift Rules -->
@@ -432,7 +434,7 @@
             <Button DockPanel.Dock="Bottom"
                     Content="Change Avatar"
                     Command="{Binding LaunchAvatarSelectorCommand}"/>
-            <Image Source="{Binding SelectedEmployee.Avatar.FullPath, FallbackValue=''}"/>
+            <Image Source="{Binding SelectedEmployeeVM.Avatar.FullPath, FallbackValue=''}"/>
         </DockPanel>
 
     </DockPanel>
