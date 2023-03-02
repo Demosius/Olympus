@@ -6,15 +6,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:employees="clr-namespace:Pantheon.ViewModels.PopUp.Employees"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type employees:ClanCreationVM}, IsDesignTimeCreatable=False}"
         Title="Create Clan" 
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
         Foreground="{StaticResource LightForegroundBrush}">
-
-    <Window.DataContext>
-        <employees:ClanCreationVM x:Name="VM"/>
-    </Window.DataContext>
 
     <Window.Resources>
         <ResourceDictionary>

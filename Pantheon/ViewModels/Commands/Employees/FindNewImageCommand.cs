@@ -4,7 +4,7 @@ using Pantheon.ViewModels.Interface;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-internal class FindNewImageCommand : ICommand
+public class FindNewImageCommand : ICommand
 {
     public IImageSelector VM { get; set; }
 

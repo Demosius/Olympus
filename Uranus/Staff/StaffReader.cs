@@ -174,6 +174,10 @@ public class StaffReader
         return new EmployeeDataSet();
     }
 
+    public IEnumerable<string> PayPoints() =>
+        Chariot.Database?.Query<Employee>("SELECT DISTINCT PayPoint FROM Employee;").Select(e => e.PayPoint) ??
+        new List<string>();
+
     public DepartmentRoster? DepartmentRoster(string rosterName, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<DepartmentRoster>(rosterName, pullType);
 
     public IEnumerable<DepartmentRoster?> DepartmentRosters(string departmentName)

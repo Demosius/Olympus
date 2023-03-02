@@ -1,23 +1,26 @@
 ﻿using System;
 using System.Windows.Input;
-using Pantheon.ViewModels.Interface;
+using Pantheon.ViewModels.Controls.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-public class SaveImageChangesCommand : ICommand
+public class SelectClanCommand : ICommand
 {
-    public IImageSelector VM { get; set; }
+    public EmployeeVM VM { get; set; }
 
-    public SaveImageChangesCommand(IImageSelector vm) { VM = vm; }
+    public SelectClanCommand(EmployeeVM vm)
+    {
+        VM = vm;
+    }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.CanSaveImage;
+        return VM.Charon.CanCreateClan();
     }
 
     public void Execute(object? parameter)
     {
-        VM.SaveImageChanges();
+        VM.SelectClan();
     }
 
     public event EventHandler? CanExecuteChanged
@@ -25,4 +28,5 @@ public class SaveImageChangesCommand : ICommand
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
     }
+
 }

@@ -13,7 +13,7 @@ using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
-internal class ClanCreationVM : INotifyPropertyChanged
+public class ClanCreationVM : INotifyPropertyChanged
 {
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }
@@ -51,9 +51,11 @@ internal class ClanCreationVM : INotifyPropertyChanged
 
     public ConfirmClanCreationCommand ConfirmClanCreationCommand { get; set; }
 
-    public ClanCreationVM()
+    public ClanCreationVM(Helios helios, Charon charon)
     {
         Clan = new Clan();
+        Helios = helios;
+        Charon = charon;
         departments = new ObservableCollection<Department>();
         employees = new ObservableCollection<EmployeeVM>();
         ClanNames = new List<string>();

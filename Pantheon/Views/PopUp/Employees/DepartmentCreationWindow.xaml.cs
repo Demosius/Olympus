@@ -1,4 +1,5 @@
-﻿using Pantheon.ViewModels.Pages;
+﻿using Pantheon.ViewModels.Controls.Employees;
+using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.Views.PopUp.Employees;
 
@@ -7,9 +8,12 @@ namespace Pantheon.Views.PopUp.Employees;
 /// </summary>
 public partial class DepartmentCreationWindow
 {
-    public DepartmentCreationWindow(EmployeePageVM parentVM)
+    public DepartmentCreationVM VM { get; set; }
+
+    public DepartmentCreationWindow(EmployeeVM parentVM)
     {
         InitializeComponent();
-        VM.SetDataSources(parentVM);
+        VM = new DepartmentCreationVM(parentVM);
+        DataContext = VM;
     }
 }

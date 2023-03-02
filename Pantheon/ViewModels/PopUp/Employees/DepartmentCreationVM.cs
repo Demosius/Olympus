@@ -1,6 +1,5 @@
 ﻿using Pantheon.ViewModels.Commands.Employees;
 using Pantheon.ViewModels.Interface;
-using Pantheon.ViewModels.Pages;
 using Pantheon.Views;
 using Styx;
 using System.Collections.Generic;
@@ -15,11 +14,12 @@ using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
-internal class DepartmentCreationVM : INotifyPropertyChanged, IPayPoints
+public class DepartmentCreationVM : INotifyPropertyChanged, IPayPoints
 {
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
-    public EmployeePageVM? ParentVM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
+
+    public EmployeeVM ParentVM { get; set; }
 
     public Department Department { get; set; }
 
@@ -86,43 +86,29 @@ internal class DepartmentCreationVM : INotifyPropertyChanged, IPayPoints
 
     #region Commands
 
-    public AddPayPointCommand AddPayPointCommand { get; }
+    public SelectPayPointCommand SelectPayPointCommand { get; }
     public ConfirmDepartmentCreationCommand ConfirmDepartmentCreationCommand { get; set; }
 
     #endregion
 
-    public DepartmentCreationVM()
-    {
-        Department = new Department();
-        employees = new ObservableCollection<EmployeeVM>();
-        departments = new ObservableCollection<string>();
-        payPoints = new ObservableCollection<string>();
-        AddPayPointCommand = new AddPayPointCommand(this);
-        ConfirmDepartmentCreationCommand = new ConfirmDepartmentCreationCommand(this);
-        DepartmentNames = new List<string>();
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    public void SetDataSources(EmployeePageVM employeePageVM)
+    public DepartmentCreationVM(EmployeeVM employeePageVM)
     {
         ParentVM = employeePageVM;
         Helios = ParentVM.Helios;
         Charon = ParentVM.Charon;
 
-        Departments = new ObservableCollection<string>(ParentVM.Departments.Select(d => d is null ? "" : d.Name).OrderBy(n => n));
-        Employees = new ObservableCollection<EmployeeVM>(ParentVM.ReportingEmployees);
-        PayPoints = new ObservableCollection<string>(ParentVM.PayPoints);
-        DepartmentNames = ParentVM.FullDepartments.Select(d => d.Name).ToList();
-    }
+        employees = new ObservableCollection<EmployeeVM>(Helios.StaffReader.GetReportsByRole(Charon.Employee?.Role ?? new Role()).Select(e => new EmployeeVM(e, Charon, Helios)));
+        departments = new ObservableCollection<string>(employees.Select(e => e.DepartmentName).Distinct().OrderBy(n => n));
+        payPoints = new ObservableCollection<string>(Helios.StaffReader.PayPoints());
+        DepartmentNames = Helios.StaffReader.Departments().Select(d => d.Name).ToList();
 
-    public void AddPayPoint()
+        Department = new Department();
+        SelectPayPointCommand = new SelectPayPointCommand(this);
+        ConfirmDepartmentCreationCommand = new ConfirmDepartmentCreationCommand(this);
+    }
+    
+
+    public void SelectPayPoint()
     {
         var input = new InputWindow("Enter new Pay Point:", "New PayPoint");
         if (input.ShowDialog() != true) return;
@@ -132,10 +118,18 @@ internal class DepartmentCreationVM : INotifyPropertyChanged, IPayPoints
 
     public bool ConfirmDepartmentCreation()
     {
-        if (Department.Name is null or "" || Helios is null) return false;
+        if (Department.Name is null or "") return false;
 
         if (AssignDepartmentHead && Department.Head is not null) Department.HeadID = Department.Head.ID;
 
         return Helios.StaffCreator.Department(Department);
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

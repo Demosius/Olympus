@@ -1,32 +1,31 @@
 ﻿using System;
 using System.Windows.Input;
-using Pantheon.ViewModels.Pages;
+using Pantheon.ViewModels.Interface;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-public class AddClanCommand : ICommand
+public class SelectPayPointCommand : ICommand
 {
-    public EmployeePageVM VM { get; set; }
+    public IPayPoints VM { get; set; }
 
-    public AddClanCommand(EmployeePageVM vm)
+    public SelectPayPointCommand(IPayPoints vm)
     {
         VM = vm;
     }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon?.CanCreateClan() ?? false;
+        return VM.Charon.CanCreateEmployee();
     }
 
     public void Execute(object? parameter)
     {
-        VM.AddClan();
+        VM.SelectPayPoint();
     }
-
+    
     public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
     }
-
 }

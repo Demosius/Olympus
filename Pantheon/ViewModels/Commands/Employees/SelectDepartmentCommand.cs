@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Windows.Input;
-using Pantheon.ViewModels.Pages;
+using Pantheon.ViewModels.Controls.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-public class AddRoleCommand : ICommand
+public class SelectDepartmentCommand : ICommand
 {
-    public EmployeePageVM VM { get; set; }
+    public EmployeeVM VM { get; set; }
 
-    public AddRoleCommand(EmployeePageVM vm)
+    public SelectDepartmentCommand(EmployeeVM vm)
     {
         VM = vm;
     }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon?.CanCreateStaffRole() ?? false;
+        return VM.Charon.CanCreateDepartment();
     }
 
     public void Execute(object? parameter)
     {
-        VM.AddRole();
+        VM.SelectDepartment();
     }
 
     public event EventHandler? CanExecuteChanged

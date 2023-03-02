@@ -1,26 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
-using Pantheon.ViewModels.Pages;
+using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-public class AddDepartmentCommand : ICommand
-{
-    public EmployeePageVM VM { get; set; }
 
-    public AddDepartmentCommand(EmployeePageVM vm)
-    {
-        VM = vm;
-    }
+public class AddNewPayPointCommand : ICommand
+{
+    public PayPointSelectionVM VM { get; set; }
+
+    public AddNewPayPointCommand(PayPointSelectionVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon?.CanCreateDepartment() ?? false;
+        return VM.CanCreatePayPoints;
     }
 
     public void Execute(object? parameter)
     {
-        VM.AddDepartment();
+        VM.AddNewPayPoint();
     }
 
     public event EventHandler? CanExecuteChanged

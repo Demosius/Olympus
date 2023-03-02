@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Pantheon.Views.Controls.RosterView"
+﻿<UserControl x:Class="Pantheon.Views.Controls.Rosters.RosterView"
              x:Name="RosterControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

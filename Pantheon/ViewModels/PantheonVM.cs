@@ -75,7 +75,7 @@ internal class PantheonVM : INotifyPropertyChanged
 
     public void RefreshPage()
     {
-        if (CurrentPage is EmployeePage) EmployeePage!.VM.RefreshData();
+        if (CurrentPage is EmployeePage) EmployeePage!.VM?.RefreshData();
         if (CurrentPage is ShiftPage) ShiftPage!.VM.RefreshData();
         if (CurrentPage is RosterPage) RosterPage!.VM.RefreshData();
     }

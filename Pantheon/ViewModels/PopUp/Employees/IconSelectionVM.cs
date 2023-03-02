@@ -1,22 +1,22 @@
 ﻿using Microsoft.Win32;
 using Pantheon.ViewModels.Commands.Employees;
 using Pantheon.ViewModels.Interface;
-using Pantheon.ViewModels.Pages;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Pantheon.Annotations;
+using Pantheon.ViewModels.Controls.Employees;
 using Uranus;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
-internal class IconSelectionVM : INotifyPropertyChanged, IImageSelector
+public class IconSelectionVM : INotifyPropertyChanged, IImageSelector
 {
-    public EmployeePageVM? ParentVM { get; set; }
-    public Helios? Helios { get; set; }
+    public EmployeeVM ParentVM { get; set; }
+    public Helios Helios { get; set; }
 
     public Image? SelectedImage => SelectedIcon;
 
@@ -74,9 +74,13 @@ internal class IconSelectionVM : INotifyPropertyChanged, IImageSelector
     public SaveImageChangesCommand SaveImageChangesCommand { get; }
     public FindNewImageCommand FindNewImageCommand { get; set; }
 
-    public IconSelectionVM()
+    public IconSelectionVM(EmployeeVM parentVM)
     {
-        icons = new ObservableCollection<EmployeeIcon>();
+        ParentVM = parentVM;
+        Helios = parentVM.Helios;
+
+        icons = new ObservableCollection<EmployeeIcon>(Helios.StaffReader.Icons());
+
         iconName = string.Empty;
         ConfirmImageSelectionCommand = new ConfirmImageSelectionCommand(this);
         SaveImageChangesCommand = new SaveImageChangesCommand(this);
@@ -91,16 +95,9 @@ internal class IconSelectionVM : INotifyPropertyChanged, IImageSelector
                        Icons.All(i => i.Name != IconName);
     }
 
-    public void SetDataSource(EmployeePageVM employeePageVM)
-    {
-        ParentVM = employeePageVM;
-        Helios = ParentVM.Helios;
-        if (ParentVM?.EmployeeDataSet is not null)
-            Icons = new ObservableCollection<EmployeeIcon>(ParentVM.EmployeeDataSet.EmployeeIcons.Values);
-    }
     public void SaveImageChanges()
     {
-        if (SelectedIcon is null || Helios is null) return;
+        if (SelectedIcon is null) return;
 
         var icon = SelectedIcon;
 
@@ -111,14 +108,11 @@ internal class IconSelectionVM : INotifyPropertyChanged, IImageSelector
 
     public void ConfirmImageSelection()
     {
-        if (ParentVM?.SelectedEmployeeVM is null) return;
-        ParentVM.SelectedEmployeeVM.Icon = SelectedIcon;
+        ParentVM.Icon = SelectedIcon;
     }
 
     public void FindNewImage()
     {
-        if (Helios is null) return;
-
         var dialog = new OpenFileDialog
         {
             InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
@@ -135,7 +129,6 @@ internal class IconSelectionVM : INotifyPropertyChanged, IImageSelector
         if (icon is not null)
         {
             Icons.Add(icon);
-            ParentVM?.EmployeeDataSet?.EmployeeIcons.Add(icon.Name, icon);
         }
         OnPropertyChanged(nameof(EmployeeIcon.FullPath));
 

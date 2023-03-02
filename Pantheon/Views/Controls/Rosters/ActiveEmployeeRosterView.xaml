@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Pantheon.Views.Controls.ActiveEmployeeRosterView"
+﻿<UserControl x:Class="Pantheon.Views.Controls.Rosters.ActiveEmployeeRosterView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,6 +7,7 @@
              xmlns:controls="clr-namespace:Pantheon.Views.Controls"
              xmlns:model="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
              xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Rosters"
+             xmlns:rosters="clr-namespace:Pantheon.Views.Controls.Rosters"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:EmployeeRosterVM}, IsDesignTimeCreatable=False}">
 
@@ -72,13 +73,13 @@
         </Border>
 
         <!-- Rosters -->
-        <controls:ActiveRosterView Canvas.Left="230" DataContext="{Binding MondayRoster, Mode=OneTime}"/>
-        <controls:ActiveRosterView Canvas.Left="430" DataContext="{Binding TuesdayRoster, Mode=OneTime}"/>
-        <controls:ActiveRosterView Canvas.Left="630" DataContext="{Binding WednesdayRoster, Mode=OneTime}"/>
-        <controls:ActiveRosterView Canvas.Left="830" DataContext="{Binding ThursdayRoster, Mode=OneTime}"/>
-        <controls:ActiveRosterView Canvas.Left="1030" DataContext="{Binding FridayRoster, Mode=OneTime}"/>
-        <controls:ActiveRosterView Canvas.Left="1230" DataContext="{Binding SaturdayRoster, Mode=OneTime}"/>
-        <controls:ActiveRosterView Canvas.Left="1430" DataContext="{Binding SundayRoster, Mode=OneTime}"/>
+        <rosters:ActiveRosterView Canvas.Left="230" DataContext="{Binding MondayRoster, Mode=OneTime}"/>
+        <rosters:ActiveRosterView Canvas.Left="430" DataContext="{Binding TuesdayRoster, Mode=OneTime}"/>
+        <rosters:ActiveRosterView Canvas.Left="630" DataContext="{Binding WednesdayRoster, Mode=OneTime}"/>
+        <rosters:ActiveRosterView Canvas.Left="830" DataContext="{Binding ThursdayRoster, Mode=OneTime}"/>
+        <rosters:ActiveRosterView Canvas.Left="1030" DataContext="{Binding FridayRoster, Mode=OneTime}"/>
+        <rosters:ActiveRosterView Canvas.Left="1230" DataContext="{Binding SaturdayRoster, Mode=OneTime}"/>
+        <rosters:ActiveRosterView Canvas.Left="1430" DataContext="{Binding SundayRoster, Mode=OneTime}"/>
 
     </Canvas>
 </UserControl>

@@ -1,26 +1,26 @@
 ﻿using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-public class ConfirmRoleCreationCommand : ICommand
-{
-    public RoleCreationVM VM { get; set; }
 
-    public ConfirmRoleCreationCommand(RoleCreationVM vm) { VM = vm; }
+public class ConfirmManagerSelectionCommand : ICommand
+{
+    public ManagerSelectionVM VM { get; set; }
+
+    public ConfirmManagerSelectionCommand(ManagerSelectionVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Role.Name is not null or "" && VM.Role.Department is not null && !VM.Roles.Select(r => r.Name).Contains(VM.Role.Name);
+        return VM.SelectedManager is not null;
     }
 
     public void Execute(object? parameter)
     {
         if (parameter is not Window w) return;
-        w.DialogResult = VM.ConfirmRoleCreation();
+        w.DialogResult = VM.SelectedManager is not null && VM.SelectedManager != VM.CurrentManager;
         w.Close();
     }
 

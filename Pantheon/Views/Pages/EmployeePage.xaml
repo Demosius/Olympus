@@ -8,12 +8,9 @@
       xmlns:converter="clr-namespace:Pantheon.ViewModels.Converter"
       xmlns:pages="clr-namespace:Pantheon.ViewModels.Pages"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type pages:EmployeePageVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="1080" d:DesignWidth="1200"
       Title="EmployeePage">
-
-    <Page.DataContext>
-        <pages:EmployeePageVM x:Name="VM"/>
-    </Page.DataContext>
 
     <Page.Resources>
         <ResourceDictionary>

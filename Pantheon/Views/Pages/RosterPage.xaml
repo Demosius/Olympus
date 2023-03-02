@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:controls="clr-namespace:Pantheon.Views.Controls"
       xmlns:pages="clr-namespace:Pantheon.ViewModels.Pages"
+      xmlns:rosters="clr-namespace:Pantheon.Views.Controls.Rosters"
       mc:Ignorable="d" 
       d:DesignHeight="1080" d:DesignWidth="1200"
       Title="EmployeePage">
@@ -85,7 +86,7 @@
         </StackPanel>
 
         <!-- Department Roster UI -->
-        <controls:DepartmentRosterView DataContext="{Binding LoadedRoster}"
+        <rosters:DepartmentRosterView DataContext="{Binding LoadedRoster}"
                                        Visibility="{Binding ElementName=VM, Path=IsLoaded, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
 

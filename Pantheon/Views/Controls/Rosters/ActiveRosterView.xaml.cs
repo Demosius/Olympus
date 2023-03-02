@@ -1,7 +1,7 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace Pantheon.Views.Controls;
+namespace Pantheon.Views.Controls.Rosters;
 
 /// <summary>
 /// Interaction logic for RosterView.xaml

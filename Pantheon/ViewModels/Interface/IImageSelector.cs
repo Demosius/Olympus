@@ -3,7 +3,7 @@ using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Interface;
 
-internal interface IImageSelector
+public interface IImageSelector
 {
     public ConfirmImageSelectionCommand ConfirmImageSelectionCommand { get; }
     public SaveImageChangesCommand SaveImageChangesCommand { get; }

@@ -40,6 +40,7 @@
     <None Remove="Resources\clock--arrow.png" />
     <None Remove="Resources\csv.png" />
     <None Remove="Resources\database-import.png" />
+    <None Remove="Resources\edit.png" />
     <None Remove="Resources\Fonts\code128.ttf" />
     <None Remove="Resources\Fonts\DIN Black.ttf" />
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
@@ -57,6 +58,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\edit.png" />
     <Resource Include="Resources\Fonts\code128.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -98,10 +100,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Update="Views\Controls\ActiveEmployeeRosterView.xaml.cs">
+    <Compile Update="Views\Controls\Rosters\ActiveEmployeeRosterView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\Controls\ActiveRosterView.xaml.cs">
+    <Compile Update="Views\Controls\Rosters\ActiveRosterView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\PantheonPage.xaml.cs">
@@ -110,11 +112,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Views\Controls\ActiveEmployeeRosterView.xaml">
+    <Page Update="Views\Controls\Rosters\ActiveEmployeeRosterView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\Controls\ActiveRosterView.xaml">
+    <Page Update="Views\Controls\Rosters\ActiveRosterView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
@@ -132,6 +134,10 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\Controls\Shifts\" />
   </ItemGroup>
 
 </Project>

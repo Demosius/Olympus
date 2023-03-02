@@ -5,7 +5,7 @@ using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-internal class ConfirmDepartmentCreationCommand : ICommand
+public class ConfirmDepartmentCreationCommand : ICommand
 {
     public DepartmentCreationVM VM { get; set; }
 

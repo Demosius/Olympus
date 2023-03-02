@@ -1,19 +1,29 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using Pantheon.Annotations;
+using Pantheon.ViewModels.Commands.Employees;
+using Pantheon.ViewModels.Interface;
+using Pantheon.Views;
+using Pantheon.Views.PopUp.Employees;
+using Styx;
+using Uranus;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Controls.Employees;
 
-public class EmployeeVM : INotifyPropertyChanged
+public class EmployeeVM : INotifyPropertyChanged, IPayPoints
 {
     public Employee Employee { get; set; }
+    public Charon Charon { get; set; }
+    public Helios Helios { get; set; }
 
     #region INotifyPropertyChanged Members
 
     public int ID => Employee.ID;
     public string RoleName => Employee.RoleName;
+    public string ReportToName => ReportsTo is null ? "" : $"{ReportsTo.FullName} - {ReportsTo.RoleName}";
 
     public string DefaultShiftID
     {
@@ -114,7 +124,17 @@ public class EmployeeVM : INotifyPropertyChanged
     public Employee? ReportsTo
     {
         get => Employee.ReportsTo;
-        set { Employee.ReportsTo = value; OnPropertyChanged(); }
+        set
+        {
+            Employee.ReportsTo = value; OnPropertyChanged();
+            ReportsToID = Employee.ReportsTo?.ID ?? 0;
+        }
+    }
+
+    public int ReportsToID
+    {
+        get => Employee.ReportsToID;
+        set { Employee.ReportsToID = value; OnPropertyChanged(); }
     }
 
     public Department? Department
@@ -179,14 +199,133 @@ public class EmployeeVM : INotifyPropertyChanged
 
     #endregion
 
-    public EmployeeVM(Employee employee)
+    #region Commands
+
+    public SaveEmployeeCommand SaveEmployeeCommand { get; set; }
+    public LaunchIconiferCommand LaunchIconiferCommand { get; set; }
+    public SelectClanCommand SelectClanCommand { get; set; }
+    public SelectDepartmentCommand SelectDepartmentCommand { get; set; }
+    public SelectLocationCommand SelectLocationCommand { get; set; }
+    public SelectPayPointCommand SelectPayPointCommand { get; set; }
+    public SelectRoleCommand SelectRoleCommand { get; set; }
+
+    #endregion
+
+    public EmployeeVM(Employee employee, Charon charon, Helios helios)
     {
         Employee = employee;
+
+        Charon = charon;
+        Helios = helios;
+
+        SaveEmployeeCommand = new SaveEmployeeCommand(this);
+        LaunchIconiferCommand = new LaunchIconiferCommand(this);
+        SelectClanCommand = new SelectClanCommand(this);
+        SelectDepartmentCommand = new SelectDepartmentCommand(this);
+        SelectLocationCommand = new SelectLocationCommand(this);
+        SelectPayPointCommand = new SelectPayPointCommand(this);
+        SelectRoleCommand = new SelectRoleCommand(this);
     }
 
     public void SetDataFromObjects() => Employee.SetDataFromObjects();
 
     public void Delete() => Employee.Delete();
+
+    public void SaveEmployee()
+    {
+        // When changing the role, only update the RoleName so that they can be compared.
+        // Update the Role Object once this is confirmed.
+        if ((Role is null || Role.Name != RoleName) && !ConfirmUnEditableChange()) return;
+
+        SetDataFromObjects();
+
+        if (Helios.StaffUpdater.Employee(Employee) > 0)
+            MessageBox.Show($"Successfully saved changes to {FullName}.", "Success",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    public void LaunchIconifer()
+    {
+        var iconifer = new IconSelectionWindow(this);
+        if (iconifer.ShowDialog() != true) return;
+        Icon = iconifer.VM.SelectedIcon;
+    }
+
+    public void SelectLocation()
+    {
+        // TODO: Update to Location Selection Window
+        var input = new InputWindow("Enter new location:", "New Location");
+        if (input.ShowDialog() != true) return;
+
+        Location = input.VM.Input;
+    }
+
+    public void SelectDepartment()
+    {
+        var departmentCreator = new DepartmentCreationWindow(this);
+        if (departmentCreator.ShowDialog() != true) return;
+
+        Department = departmentCreator.VM.Department;
+    }
+
+    public void SelectRole()
+    {
+        var roleCreator = new RoleCreationWindow(Helios, Charon);
+        if (roleCreator.ShowDialog() != true) return;
+
+        Role = roleCreator.VM.Role;
+    }
+
+    public void SelectClan()
+    {
+        var clanCreator = new ClanCreationWindow(Helios, Charon);
+        if (clanCreator.ShowDialog() != true) return;
+
+        Clan = clanCreator.VM.Clan;
+    }
+
+    public void SelectPayPoint()
+    {
+        var payPointSelector = new PayPointSelectionWindow(Helios, Charon);
+        if (payPointSelector.ShowDialog() != true) return;
+
+        var pp = payPointSelector.VM.SelectedPayPoint;
+        if (pp is null) return;
+
+        PayPoint = pp.Name;
+    }
+
+    public void SelectManager()
+    {
+        var managerSelectionWindow = new ManagerSelectionWindow(this);
+        if (managerSelectionWindow.ShowDialog() != true) return;
+        
+        var manager = managerSelectionWindow.VM.SelectedManager?.Employee;
+        if (manager is null) return;
+
+        ReportsTo = manager;
+    }
+
+    /// <summary>
+    /// Assuming the user is about to adjust the employee in such a way that removes that employee from the user's permissions to edit further, make sure confirmation is attained.
+    /// </summary>
+    /// <returns></returns>
+    private bool ConfirmUnEditableChange()
+    {
+        var newRole = Helios.StaffReader.Role(RoleName);
+
+        if (newRole is null) return false;
+
+        if (Charon.CanUpdateEmployee(newRole)) return true;
+
+        if (MessageBox.Show(
+                "Changing this employee's Role will mean you will not be able to edit them in the future.\n\nDo you want to continue?",
+                "Confirm New Role", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning) !=
+            MessageBoxResult.Yes) return false;
+
+        Role = newRole;
+        return true;
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

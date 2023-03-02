@@ -1,23 +1,26 @@
 ﻿using System;
 using System.Windows.Input;
-using Pantheon.ViewModels.Interface;
+using Pantheon.ViewModels.Controls.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-public class SaveImageChangesCommand : ICommand
+public class SelectLocationCommand : ICommand
 {
-    public IImageSelector VM { get; set; }
+    public EmployeeVM VM { get; set; }
 
-    public SaveImageChangesCommand(IImageSelector vm) { VM = vm; }
+    public SelectLocationCommand(EmployeeVM vm)
+    {
+        VM = vm;
+    }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.CanSaveImage;
+        return VM.Charon.CanCreateEmployee();
     }
 
     public void Execute(object? parameter)
     {
-        VM.SaveImageChanges();
+        VM.SelectLocation();
     }
 
     public event EventHandler? CanExecuteChanged

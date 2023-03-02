@@ -5,9 +5,9 @@ namespace Pantheon.ViewModels.Interface;
 
 public interface IPayPoints
 {
-    public Charon? Charon { get; set; }
+    public Charon Charon { get; set; }
 
-    public AddPayPointCommand AddPayPointCommand { get; }
+    public SelectPayPointCommand SelectPayPointCommand { get; }
 
-    public void AddPayPoint();
+    public void SelectPayPoint();
 }

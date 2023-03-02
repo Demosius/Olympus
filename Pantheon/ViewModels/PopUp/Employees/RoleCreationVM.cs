@@ -10,7 +10,7 @@ using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
-internal class RoleCreationVM : INotifyPropertyChanged
+public class RoleCreationVM : INotifyPropertyChanged
 {
     public EmployeePageVM? ParentVM { get; set; }
     public Helios? Helios { get; set; }
@@ -45,12 +45,16 @@ internal class RoleCreationVM : INotifyPropertyChanged
 
     public ConfirmRoleCreationCommand ConfirmRoleCreationCommand { get; set; }
 
-    public RoleCreationVM()
+    public RoleCreationVM(Helios helios, Charon charon)
     {
         Role = new Role
         {
             Name = string.Empty
         };
+
+        Helios = helios;
+        Charon = charon;
+
         roles = new ObservableCollection<Role>();
         departments = new ObservableCollection<Department>();
 

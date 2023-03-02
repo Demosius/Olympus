@@ -1,26 +1,27 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Input;
-using Pantheon.ViewModels.Pages;
+using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-public class AddLocationCommand : ICommand
-{
-    public EmployeePageVM VM { get; set; }
 
-    public AddLocationCommand(EmployeePageVM vm)
-    {
-        VM = vm;
-    }
+public class ConfirmPayPointSelectionCommand : ICommand
+{
+    public PayPointSelectionVM VM { get; set; }
+
+    public ConfirmPayPointSelectionCommand(PayPointSelectionVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon?.CanCreateEmployee() ?? false;
+        return true;
     }
 
     public void Execute(object? parameter)
     {
-        VM.AddLocation();
+        if (parameter is not Window w) return;
+        w.DialogResult = VM.SelectedPayPoint is not null;
+        w.Close();
     }
 
     public event EventHandler? CanExecuteChanged
