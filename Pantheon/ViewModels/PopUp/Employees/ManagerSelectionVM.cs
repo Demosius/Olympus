@@ -65,7 +65,7 @@ public class ManagerSelectionVM : INotifyPropertyChanged
 
         FullEmployeeList = Helios.StaffReader.Employees().OrderBy(e => e.FullName).Select(e => new EmployeeVM(e, employee.Charon, Helios)).ToList();
         var managerIDs = FullEmployeeList.Where(e => e.ReportsToID != 0).Select(e => e.ReportsToID).Distinct();
-        Managers = FullEmployeeList.Where(e => managerIDs.Contains(e.ReportsToID)).ToList();
+        Managers = FullEmployeeList.Where(e => managerIDs.Contains(e.ID)).ToList();
 
         Employees = new ObservableCollection<EmployeeVM>();
 

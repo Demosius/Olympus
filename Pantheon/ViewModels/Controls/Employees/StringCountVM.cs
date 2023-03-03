@@ -4,12 +4,18 @@ using Pantheon.Annotations;
 
 namespace Pantheon.ViewModels.Controls.Employees;
 
-public class PayPointVM : INotifyPropertyChanged
+/// <summary>
+/// Holds a string typically representing some abstract concept that can be broken down to its name.
+/// Holds a count of the thing, to denote the thing's use.
+///
+/// Examples: PayPoint and Location.
+/// </summary>
+public class StringCountVM : INotifyPropertyChanged
 {
     public string Name { get; set; }
     public int Count { get; set; }
 
-    public PayPointVM(string name, int count)
+    public StringCountVM(string name, int count)
     {
         Name = name;
         Count = count;

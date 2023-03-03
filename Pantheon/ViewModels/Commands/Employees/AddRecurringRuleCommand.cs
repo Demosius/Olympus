@@ -4,7 +4,7 @@ using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-internal class AddRecurringRuleCommand : ICommand
+public class AddRecurringRuleCommand : ICommand
 {
     public EmployeeShiftVM VM { get; set; }
 
@@ -12,8 +12,7 @@ internal class AddRecurringRuleCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon is not null && VM.Employee is not null && VM.RecurringRule is not null &&
-            VM.Charon.CanUpdateEmployee(VM.Employee) && VM.RecurringRule.IsValid();
+        return VM.RecurringRule is not null && VM.Charon.CanUpdateEmployee(VM.Employee) && VM.RecurringRule.IsValid();
     }
 
     public void Execute(object? parameter)

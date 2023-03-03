@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.ViewModels.Pages;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
 public class LaunchEmployeeShiftWindowCommand : ICommand
 {
-    public EmployeePageVM VM { get; set; }
+    public EmployeeVM VM { get; set; }
 
-    public LaunchEmployeeShiftWindowCommand(EmployeePageVM vm)
+    public LaunchEmployeeShiftWindowCommand(EmployeeVM vm)
     {
         VM = vm;
     }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon is not null && VM.SelectedEmployee is not null &&
-               (VM.Charon.CanUpdateEmployee(VM.SelectedEmployee) ||
-                VM.SelectedEmployee.Department is not null && VM.Charon.CanUpdateShift(VM.SelectedEmployee.Department));
+        return VM.Charon.CanUpdateEmployee(VM.Employee) ||
+               VM.Department is not null && VM.Charon.CanUpdateShift(VM.Department);
     }
 
     public void Execute(object? parameter)

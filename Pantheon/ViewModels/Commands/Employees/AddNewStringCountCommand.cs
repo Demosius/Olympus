@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Windows.Input;
-using Pantheon.ViewModels.PopUp.Employees;
+using Pantheon.ViewModels.Interface;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-public class CancelRecurringRuleEditCommand : ICommand
-{
-    public EmployeeShiftVM VM { get; set; }
 
-    public CancelRecurringRuleEditCommand(EmployeeShiftVM vm) { VM = vm; }
+public class AddNewStringCountCommand : ICommand
+{
+    public IStringCount VM { get; set; }
+
+    public AddNewStringCountCommand(IStringCount vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.RecurringRule?.InEdit ?? false;
+        return VM.CanAdd;
     }
 
     public void Execute(object? parameter)
     {
-        VM.CancelRecurringRuleEdit();
+        VM.AddNewPayPoint();
     }
 
     public event EventHandler? CanExecuteChanged

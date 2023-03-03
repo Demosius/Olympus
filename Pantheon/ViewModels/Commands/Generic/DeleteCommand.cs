@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Windows.Input;
-using Pantheon.ViewModels.PopUp.Employees;
+using Pantheon.ViewModels.Interface;
 
-namespace Pantheon.ViewModels.Commands.Employees;
+namespace Pantheon.ViewModels.Commands.Generic;
 
-public class CancelSingleRuleEditCommand : ICommand
+public class DeleteCommand : ICommand
 {
-    public EmployeeShiftVM VM { get; set; }
+    public ISelector VM { get; set; }
 
-    public CancelSingleRuleEditCommand(EmployeeShiftVM vm) { VM = vm; }
+    public DeleteCommand(ISelector vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SingleRule?.InEdit ?? false;
+        return VM.CanDelete;
     }
 
     public void Execute(object? parameter)
     {
-        VM.CancelSingleRuleEdit();
+        VM.Delete();
     }
 
     public event EventHandler? CanExecuteChanged

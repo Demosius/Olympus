@@ -4,7 +4,7 @@ using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-internal class CancelRosterRuleEditCommand : ICommand
+public class CancelRosterRuleEditCommand : ICommand
 {
     public EmployeeShiftVM VM { get; set; }
 

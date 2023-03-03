@@ -5,7 +5,7 @@ using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-internal class ConfirmShiftAdjustmentsCommand : ICommand
+public class ConfirmShiftAdjustmentsCommand : ICommand
 {
     public EmployeeShiftVM VM { get; set; }
 

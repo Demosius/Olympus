@@ -1,4 +1,5 @@
 ﻿<Window x:Class="Pantheon.Views.PopUp.Employees.PayPointSelectionWindow"
+        Name="PayPointWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -16,34 +17,34 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Master/MSControls.Core.Implicit.xaml" />
-                <ResourceDictionary>
-                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
-                        <Setter Property="Margin" Value="5"/>
-                    </Style>
-                    <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
-                        <Setter Property="Margin" Value="5"/>
-                        <Setter Property="IsEditable" Value="True"/>
-                        <Setter Property="MinWidth" Value="200"/>
-                        <Setter Property="VerticalAlignment" Value="Center" />
-                    </Style>
-                    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
-                        <Setter Property="VerticalAlignment" Value="Bottom"/>
-                        <Setter Property="VerticalContentAlignment" Value="Bottom"/>
-                        <Setter Property="Margin" Value="0,10,0,0"/>
-                    </Style>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
-                        <Setter Property="Margin" Value="5,5,5,5"/>
-                        <Setter Property="MinWidth" Value="75"/>
-                        <Setter Property="HorizontalAlignment" Value="Right"/>
-                    </Style>
-                    <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
-                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
 
     <StackPanel Orientation="Vertical"
                 Margin="15">
+        <StackPanel.Resources>
+            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="IsEditable" Value="True"/>
+                <Setter Property="MinWidth" Value="200"/>
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+                <Setter Property="Margin" Value="0"/>
+            </Style>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="MinWidth" Value="75"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+            </Style>
+            <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
+        </StackPanel.Resources>
 
         <ListView ItemsSource="{Binding PayPoints}"
                   SelectedItem="{Binding SelectedPayPoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -53,8 +54,9 @@
                 <DataTemplate>
                     <Label Content="{Binding Name}"
                            BorderBrush="{StaticResource ButtonBorderBrush}"
-                           BorderThickness="1"
                            HorizontalContentAlignment="Center"
+                           VerticalAlignment="Center"
+                           VerticalContentAlignment="Center"
                            FontSize="16"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -64,20 +66,16 @@
                     HorizontalAlignment="Right"
                     Visibility="{Binding CanDelete, Converter={StaticResource VisibilityConverter}}">
             <Button Content="Delete"
-                    Command="{Binding DeletePayPointCommand}"/>
+                    Command="{Binding DeleteStringCountCommand}"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal">
-            <Border BorderBrush="{StaticResource ButtonBorderBrush}"
-                    BorderThickness="1"
-                    Margin="5">
-                <TextBlock Text="{Binding NewPayPointName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                       Width="200"
-                       IsEnabled="{Binding CanCreatePayPoints}"/>
-            </Border>
+            <TextBox Text="{Binding NewPayPointName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Width="200"
+                     IsEnabled="{Binding CanCreatePayPoints}"/>
             <Button Width="75"
                     Content="Add"
-                    Command="{Binding AddNewPayPointCommand}"/>
+                    Command="{Binding AddNewStringCountCommand}"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal"
@@ -86,8 +84,8 @@
             <Button Content="Cancel"
                     IsCancel="True"/>
             <Button Content="Confirm"
-                    Command="{Binding ConfirmPayPointSelectionCommand}"
-                    CommandParameter="{Binding ElementName=RoleWindow}"
+                    Command="{Binding ConfirmStringCountSelectionCommand}"
+                    CommandParameter="{Binding ElementName=PayPointWindow}"
                     IsDefault="True"/>
         </StackPanel>
 

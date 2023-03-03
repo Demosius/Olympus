@@ -4,7 +4,7 @@ using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-internal class AddRosterRuleCommand : ICommand
+public class AddRosterRuleCommand : ICommand
 {
     public EmployeeShiftVM VM { get; set; }
 
@@ -12,8 +12,7 @@ internal class AddRosterRuleCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon is not null && VM.Employee is not null && VM.RosterRule is not null &&
-            VM.Charon.CanUpdateEmployee(VM.Employee) && VM.RosterRule.IsValid();
+        return VM.RosterRule is not null && VM.Charon.CanUpdateEmployee(VM.Employee) && VM.RosterRule.IsValid();
     }
 
     public void Execute(object? parameter)

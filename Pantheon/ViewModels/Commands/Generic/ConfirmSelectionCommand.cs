@@ -1,26 +1,25 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
-using Pantheon.ViewModels.PopUp.Employees;
+using Pantheon.ViewModels.Interface;
 
-namespace Pantheon.ViewModels.Commands.Employees;
+namespace Pantheon.ViewModels.Commands.Generic;
 
-
-public class ConfirmPayPointSelectionCommand : ICommand
+public class ConfirmSelectionCommand : ICommand
 {
-    public PayPointSelectionVM VM { get; set; }
+    public ISelector VM { get; set; }
 
-    public ConfirmPayPointSelectionCommand(PayPointSelectionVM vm) { VM = vm; }
+    public ConfirmSelectionCommand(ISelector vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return true;
+        return VM.CanConfirm;
     }
 
     public void Execute(object? parameter)
     {
         if (parameter is not Window w) return;
-        w.DialogResult = VM.SelectedPayPoint is not null;
+        w.DialogResult = VM.CanConfirm;
         w.Close();
     }
 

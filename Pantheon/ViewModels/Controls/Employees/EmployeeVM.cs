@@ -5,7 +5,6 @@ using System.Windows;
 using Pantheon.Annotations;
 using Pantheon.ViewModels.Commands.Employees;
 using Pantheon.ViewModels.Interface;
-using Pantheon.Views;
 using Pantheon.Views.PopUp.Employees;
 using Styx;
 using Uranus;
@@ -19,11 +18,14 @@ public class EmployeeVM : INotifyPropertyChanged, IPayPoints
     public Charon Charon { get; set; }
     public Helios Helios { get; set; }
 
+    public bool SensitiveVisibility { get; }
+    public bool VerySensitiveVisibility { get; }
+
     #region INotifyPropertyChanged Members
 
     public int ID => Employee.ID;
     public string RoleName => Employee.RoleName;
-    public string ReportToName => ReportsTo is null ? "" : $"{ReportsTo.FullName} - {ReportsTo.RoleName}";
+    public string ReportsToName => ReportsTo is null ? "" : $"{ReportsTo.FullName} - {ReportsTo.RoleName}";
 
     public string DefaultShiftID
     {
@@ -128,6 +130,7 @@ public class EmployeeVM : INotifyPropertyChanged, IPayPoints
         {
             Employee.ReportsTo = value; OnPropertyChanged();
             ReportsToID = Employee.ReportsTo?.ID ?? 0;
+            OnPropertyChanged(nameof(ReportsToName));
         }
     }
 
@@ -208,6 +211,8 @@ public class EmployeeVM : INotifyPropertyChanged, IPayPoints
     public SelectLocationCommand SelectLocationCommand { get; set; }
     public SelectPayPointCommand SelectPayPointCommand { get; set; }
     public SelectRoleCommand SelectRoleCommand { get; set; }
+    public SelectManagerCommand SelectManagerCommand { get; set; }
+    public LaunchEmployeeShiftWindowCommand LaunchEmployeeShiftWindowCommand { get; set; }
 
     #endregion
 
@@ -218,6 +223,9 @@ public class EmployeeVM : INotifyPropertyChanged, IPayPoints
         Charon = charon;
         Helios = helios;
 
+        SensitiveVisibility = Charon.CanReadEmployeeSensitive(Employee);
+        VerySensitiveVisibility = Charon.CanReadEmployeeVerySensitive(Employee);
+
         SaveEmployeeCommand = new SaveEmployeeCommand(this);
         LaunchIconiferCommand = new LaunchIconiferCommand(this);
         SelectClanCommand = new SelectClanCommand(this);
@@ -225,6 +233,8 @@ public class EmployeeVM : INotifyPropertyChanged, IPayPoints
         SelectLocationCommand = new SelectLocationCommand(this);
         SelectPayPointCommand = new SelectPayPointCommand(this);
         SelectRoleCommand = new SelectRoleCommand(this);
+        SelectManagerCommand = new SelectManagerCommand(this);
+        LaunchEmployeeShiftWindowCommand = new LaunchEmployeeShiftWindowCommand(this);
     }
 
     public void SetDataFromObjects() => Employee.SetDataFromObjects();
@@ -253,11 +263,13 @@ public class EmployeeVM : INotifyPropertyChanged, IPayPoints
 
     public void SelectLocation()
     {
-        // TODO: Update to Location Selection Window
-        var input = new InputWindow("Enter new location:", "New Location");
-        if (input.ShowDialog() != true) return;
+        var locationSelector = new LocationSelectionWindow(Helios, Charon);
+        if (locationSelector.ShowDialog() != true) return;
 
-        Location = input.VM.Input;
+        var loc = locationSelector.VM.SelectedLocation;
+        if (loc is null) return;
+
+        Location = loc.Name;
     }
 
     public void SelectDepartment()
@@ -299,7 +311,7 @@ public class EmployeeVM : INotifyPropertyChanged, IPayPoints
     {
         var managerSelectionWindow = new ManagerSelectionWindow(this);
         if (managerSelectionWindow.ShowDialog() != true) return;
-        
+
         var manager = managerSelectionWindow.VM.SelectedManager?.Employee;
         if (manager is null) return;
 
@@ -325,6 +337,13 @@ public class EmployeeVM : INotifyPropertyChanged, IPayPoints
 
         Role = newRole;
         return true;
+    }
+
+    public void LaunchEmployeeShiftWindow()
+    {
+        var shiftWindow = new EmployeeShiftWindow(this);
+
+        shiftWindow.ShowDialog();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -1,13 +1,13 @@
-﻿<Window x:Class="Pantheon.Views.PopUp.Employees.ManagerSelectionWindow"
-        Name="ManagerWindow"
+﻿<Window x:Class="Pantheon.Views.PopUp.Employees.LocationSelectionWindow"
+        Name="LocationWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Pantheon.ViewModels.PopUp.Employees"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance {x:Type vm:ManagerSelectionVM}, IsDesignTimeCreatable=False}"
-        Title="Manager Selection" 
+        d:DataContext="{d:DesignInstance {x:Type vm:LocationSelectionVM}, IsDesignTimeCreatable=False}"
+        Title="Location Selection" 
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
@@ -36,43 +36,46 @@
             <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
                 <Setter Property="VerticalAlignment" Value="Bottom"/>
                 <Setter Property="VerticalContentAlignment" Value="Bottom"/>
-                <Setter Property="Margin" Value="2,5"/>
+                <Setter Property="Margin" Value="0"/>
             </Style>
             <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
                 <Setter Property="Margin" Value="5,5,5,5"/>
                 <Setter Property="MinWidth" Value="75"/>
                 <Setter Property="HorizontalAlignment" Value="Right"/>
             </Style>
+            <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
         </StackPanel.Resources>
-        <ListView ItemsSource="{Binding Employees}"
-                  SelectedItem="{Binding SelectedManager, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+
+        <ListView ItemsSource="{Binding Locations}"
+                  SelectedItem="{Binding SelectedLocation, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   d:ItemsSource="{d:SampleData ItemCount=5}"
-                  Height="400">
+                  Height="300">
             <ListView.ItemTemplate>
                 <DataTemplate>
-
-                    <StackPanel Orientation="Vertical" MinWidth="350" Margin="2,10">
-                        <Label Content="{Binding FullName}"
-                               FontSize="16"
-                               FontWeight="Bold"
-                               Margin="0" Padding="0"/>
-                        <Label Content="{Binding RoleName}"
-                               FontSize="16"
-                               FontStyle="Italic"
-                               Margin="0" Padding="0"/>
-                    </StackPanel>
+                    <Label Content="{Binding Name}"
+                           BorderBrush="{StaticResource ButtonBorderBrush}"
+                           HorizontalContentAlignment="Center"
+                           VerticalAlignment="Center"
+                           VerticalContentAlignment="Center"
+                           FontSize="16"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
 
-        <StackPanel Orientation="Horizontal" 
+        <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right"
-                    VerticalAlignment="Center">
-            <Label Content="Show All Employees" Margin="0" Padding="0"
-                   VerticalAlignment="Center"/>
-            <CheckBox IsChecked="{Binding UseAllAsManagers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      Margin="0" Padding="0"
-                      VerticalAlignment="Center"/>
+                    Visibility="{Binding CanDelete, Converter={StaticResource VisibilityConverter}}">
+            <Button Content="Delete"
+                    Command="{Binding DeleteStringCountCommand}"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal">
+            <TextBox Text="{Binding NewLocationName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Width="200"
+                     IsEnabled="{Binding CanCreateLocations}"/>
+            <Button Width="75"
+                    Content="Add"
+                    Command="{Binding AddNewStringCountCommand}"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal"
@@ -81,11 +84,10 @@
             <Button Content="Cancel"
                     IsCancel="True"/>
             <Button Content="Confirm"
-                    Command="{Binding ConfirmManagerSelectionCommand}"
-                    CommandParameter="{Binding ElementName=ManagerWindow}"
+                    Command="{Binding ConfirmStringCountSelectionCommand}"
+                    CommandParameter="{Binding ElementName=LocationWindow}"
                     IsDefault="True"/>
         </StackPanel>
 
     </StackPanel>
-
 </Window>

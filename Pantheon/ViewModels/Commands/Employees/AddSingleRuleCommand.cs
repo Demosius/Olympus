@@ -4,7 +4,7 @@ using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-internal class AddSingleRuleCommand : ICommand
+public class AddSingleRuleCommand : ICommand
 {
     public EmployeeShiftVM VM { get; set; }
 
@@ -12,8 +12,7 @@ internal class AddSingleRuleCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon is not null && VM.SingleRule is not null && VM.Employee is not null &&
-               VM.Charon.CanUpdateEmployee(VM.Employee) && VM.SingleRule.IsValid();
+        return VM.SingleRule is not null && VM.Charon.CanUpdateEmployee(VM.Employee) && VM.SingleRule.IsValid();
     }
 
     public void Execute(object? parameter)

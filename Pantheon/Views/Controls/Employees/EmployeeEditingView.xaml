@@ -5,22 +5,72 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Employees"
              xmlns:converter="clr-namespace:Pantheon.ViewModels.Converter"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:model="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance {x:Type vm:EmployeeVM}, IsDesignTimeCreatable=False}">
 
     <UserControl.Resources>
-        <converter:UserToColourConverter x:Key="UserToColourConverter"/>
-        <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Master/MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary>
+                    <converter:UserToColourConverter x:Key="UserToColourConverter"/>
+                    <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
+                    <ObjectDataProvider x:Key="EmploymentTypes"
+                            MethodName="GetValues" 
+                            ObjectType="{x:Type sys:Enum}">
+                        <ObjectDataProvider.MethodParameters>
+                            <x:Type TypeName="model:EEmploymentType"/>
+                        </ObjectDataProvider.MethodParameters>
+                    </ObjectDataProvider>
+                    <converter:EmploymentToStringConverter x:Key="EmploymentTypeConverter"/>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <DockPanel DockPanel.Dock="Left">
 
         <Button DockPanel.Dock="Bottom" 
-                    Content="Save Changes"
-                    Command="{Binding SaveEmployeeCommand}"/>
+                Content="Save Changes"
+                Command="{Binding SaveEmployeeCommand}"/>
 
         <ScrollViewer DockPanel.Dock="Bottom">
             <Grid Margin="5">
+
+                <Grid.Resources>
+                    <Style x:Key="ObjectLabelStyle"  BasedOn="{StaticResource LabelStyle}" TargetType="{x:Type Label}">
+                        <Setter Property="Foreground" Value="Aqua"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="BorderBrush" Value="{StaticResource ButtonBorderBrush}"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="BorderThickness" Value="1"></Setter>
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        <Setter Property="Margin" Value="5,0,0,0"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="MinHeight" Value="30"></Setter>
+                    </Style>
+                    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                    </Style>
+                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="MinWidth" Value="200"/>
+                        <Setter Property="Margin" Value="5"/>
+                    </Style>
+                    <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
+                        <Setter Property="Margin" Value="5"/>
+                        <Setter Property="MinWidth" Value="200"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    </Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                        <Setter Property="Margin" Value="5"/>
+                    </Style>
+                </Grid.Resources>
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
@@ -108,10 +158,8 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0"
-                           BorderBrush="{StaticResource ButtonBorderBrush}" BorderThickness="1"
-                           Content="{Binding Location, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                           HorizontalAlignment="Stretch"
-                           Margin="5,0,0,0"/>
+                           Style="{DynamicResource ObjectLabelStyle}"
+                           Content="{Binding Location, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                     <Button Grid.Column="1"
                             Command="{Binding SelectLocationCommand}">
                         <Image Source="../../../Resources/edit.png"
@@ -128,12 +176,10 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0"
-                           BorderBrush="{StaticResource ButtonBorderBrush}" BorderThickness="1"
-                           Content="{Binding Department, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                           HorizontalAlignment="Stretch"
-                           Margin="5,0,0,0"/>
+                           Style="{DynamicResource ObjectLabelStyle}"
+                           Content="{Binding Department, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                     <Button Grid.Column="1"
-                            Command="{Binding SelectLocationCommand}">
+                            Command="{Binding SelectDepartmentCommand}">
                         <Image Source="../../../Resources/edit.png"
                                Height="20" Width="20"/>
                     </Button>
@@ -147,10 +193,8 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0"
-                           BorderBrush="{StaticResource ButtonBorderBrush}" BorderThickness="1"
-                           Content="{Binding Role, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                           HorizontalAlignment="Stretch"
-                           Margin="5,0,0,0"/>
+                           Style="{DynamicResource ObjectLabelStyle}"
+                           Content="{Binding Role, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                     <Button Grid.Column="1"
                             Command="{Binding SelectRoleCommand}">
                         <Image Source="../../../Resources/edit.png"
@@ -166,12 +210,10 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0"
-                           BorderBrush="{StaticResource ButtonBorderBrush}" BorderThickness="1"
-                           Content="{Binding ReportsToName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                           HorizontalAlignment="Stretch"
-                           Margin="5,0,0,0"/>
+                           Style="{DynamicResource ObjectLabelStyle}"
+                           Content="{Binding ReportsToName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                     <Button Grid.Column="1"
-                            Command="{Binding }">
+                            Command="{Binding SelectManagerCommand}">
                         <Image Source="../../../Resources/edit.png"
                                Height="20" Width="20"/>
                     </Button>
@@ -179,103 +221,101 @@
                 <!-- Clan -->
                 <Label Grid.Column="0" Grid.Row="11"
                            Content="Clan: "/>
-                <StackPanel Grid.Column="1" Grid.Row="11" 
-                                Orientation="Horizontal">
-                    <ComboBox ItemsSource="{Binding Clans, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              SelectedValue="{Binding SelectedEmployeeVM.Clan, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                              HorizontalContentAlignment="Center"/>
-                    <Button Content="Add"
-                            Command="{Binding AddClanCommand}"/>
-                </StackPanel>
+                <Grid Grid.Column="1" Grid.Row="11">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0"
+                           Style="{DynamicResource ObjectLabelStyle}"
+                           Content="{Binding Clan, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                    <Button Grid.Column="1"
+                            Command="{Binding SelectClanCommand}">
+                        <Image Source="../../../Resources/edit.png"
+                               Height="20" Width="20"/>
+                    </Button>
+                </Grid>
                 <!-- Pay Point -->
                 <Label Grid.Column="0" Grid.Row="12"
                            Content="Pay Point: "/>
-                <StackPanel Grid.Column="1" Grid.Row="12" 
-                                Orientation="Horizontal">
-                    <ComboBox ItemsSource="{Binding PayPoints, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              SelectedValue="{Binding SelectedEmployeeVM.PayPoint, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
-                              HorizontalContentAlignment="Center"/>
-                    <Button Content="Add"
-                            Command="{Binding AddPayPointCommand}"/>
-                </StackPanel>
+                <Grid Grid.Column="1" Grid.Row="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0"
+                           Style="{StaticResource ObjectLabelStyle}"
+                           Content="{Binding PayPoint, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                    <Button Grid.Column="1"
+                            Command="{Binding SelectPayPointCommand}">
+                        <Image Source="../../../Resources/edit.png"
+                               Height="20" Width="20"/>
+                    </Button>
+                </Grid>
                 <!-- Employment Type -->
                 <Label Grid.Column="0" Grid.Row="13"
                            Content="Employment Type: "/>
                 <ComboBox Grid.Column="1" Grid.Row="13"
-                              ItemsSource="{Binding EmploymentTypes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              SelectedValue="{Binding SelectedEmployeeVM.EmploymentType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                          ItemsSource="{Binding Source={StaticResource EmploymentTypes}}"
+                          SelectedValue="{Binding EmploymentType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource EmploymentTypeConverter}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
                 <!-- Phone Number -->
                 <Label Grid.Column="0" Grid.Row="14"
-                           Content="Phone: "
-                           Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
+                       Content="Phone: "
+                       Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                 <TextBox Grid.Column="1" Grid.Row="14"
-                             Text="{Binding SelectedEmployeeVM.PhoneNumber, FallbackValue=''}"
-                             Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
+                         Text="{Binding PhoneNumber, FallbackValue=''}"
+                         Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                 <!-- Email -->
                 <Label Grid.Column="0" Grid.Row="15"
-                           Content="Email: "
-                           Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
+                       Content="Email: "
+                       Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                 <TextBox Grid.Column="1" Grid.Row="15"
-                             Text="{Binding SelectedEmployeeVM.Email, FallbackValue=''}"
-                             Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
+                         Text="{Binding Email, FallbackValue=''}"
+                         Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                 <!-- Address -->
                 <Label Grid.Column="0" Grid.Row="16"
-                           Content="Address: "
-                           Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
+                       Content="Address: "
+                       Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                 <TextBox Grid.Column="1" Grid.Row="16"
-                             Text="{Binding SelectedEmployeeVM.Address, FallbackValue=''}"
-                             Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
+                         Text="{Binding Address, FallbackValue=''}"
+                         Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                 <!-- Pay Rate -->
                 <Label Grid.Column="0" Grid.Row="17"
-                           Content="Pay Rate: "
-                           Visibility="{Binding VerySensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
+                       Content="Pay Rate: "
+                       Visibility="{Binding VerySensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                 <TextBox Grid.Column="1" Grid.Row="17"
-                             Text="{Binding SelectedEmployeeVM.PayRate, FallbackValue=''}"
-                             Visibility="{Binding VerySensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
+                         Text="{Binding PayRate, FallbackValue=''}"
+                         Visibility="{Binding VerySensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
 
                 <!-- Shift Rules -->
                 <Button Grid.Column="0" Grid.Row="18" Grid.ColumnSpan="2"
-                            Content="Manage Shift Rules"
-                            Command="{Binding LaunchEmployeeShiftWindowCommand}"/>
+                        Content="Manage Shift Rules"
+                        Command="{Binding LaunchEmployeeShiftWindowCommand}"/>
 
                 <!-- Licensing -->
                 <Button Grid.Column="0" Grid.Row="19" Grid.ColumnSpan="2"
-                            Content="Manage Licenses"
-                            IsEnabled="False"
-                            ToolTip="Not Yet Implemented"/>
+                        Content="Manage Licenses"
+                        IsEnabled="False"
+                        ToolTip="Not Yet Implemented"/>
 
                 <!-- Vehicles -->
                 <Button Grid.Column="0" Grid.Row="20" Grid.ColumnSpan="2"
-                            Content="Manage Vehicles"
-                            IsEnabled="False"
-                            ToolTip="Not Yet Implemented"/>
+                        Content="Manage Vehicles"
+                        IsEnabled="False"
+                        ToolTip="Not Yet Implemented"/>
 
                 <!-- Lockers -->
                 <Button Grid.Column="0" Grid.Row="21" Grid.ColumnSpan="2"
-                            Content="Manage Locker"
-                            IsEnabled="False"
-                            ToolTip="Not Yet Implemented"/>
+                        Content="Manage Locker"
+                        IsEnabled="False"
+                        ToolTip="Not Yet Implemented"/>
 
-                <Grid.Resources>
-                    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
-                        <Setter Property="FontWeight" Value="Bold"/>
-                        <Setter Property="HorizontalAlignment" Value="Right"/>
-                        <Setter Property="VerticalAlignment" Value="Center"/>
-                    </Style>
-                    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
-                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                        <Setter Property="MinWidth" Value="200"/>
-                        <Setter Property="Margin" Value="5"/>
-                    </Style>
-                    <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
-                        <Setter Property="Margin" Value="5"/>
-                        <Setter Property="MinWidth" Value="200"/>
-                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                    </Style>
-                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
-                        <Setter Property="Margin" Value="5"/>
-                    </Style>
-                </Grid.Resources>
             </Grid>
         </ScrollViewer>
 

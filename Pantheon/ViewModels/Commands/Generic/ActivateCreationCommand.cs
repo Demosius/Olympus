@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Windows.Input;
-using Pantheon.ViewModels.PopUp.Employees;
+using Pantheon.ViewModels.Interface;
 
-namespace Pantheon.ViewModels.Commands.Employees;
+namespace Pantheon.ViewModels.Commands.Generic;
 
 
-public class DeletePayPointCommand : ICommand
+public class ActivateCreationCommand : ICommand
 {
-    public PayPointSelectionVM VM { get; set; }
+    public ICreationMode VM { get; set; }
 
-    public DeletePayPointCommand(PayPointSelectionVM vm) { VM = vm; }
+    public ActivateCreationCommand(ICreationMode vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedPayPoint?.Count == 0;
+        return true;
     }
 
     public void Execute(object? parameter)
     {
-        VM.DeletePayPoint();
+        VM.ActivateCreation();
     }
 
     public event EventHandler? CanExecuteChanged

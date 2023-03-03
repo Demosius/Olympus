@@ -276,7 +276,6 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public DeleteEmployeeCommand DeleteEmployeeCommand { get; set; }
     public ActivateUserCommand ActivateUserCommand { get; set; }
     public LaunchAvatarSelectorCommand LaunchAvatarSelectorCommand { get; set; }
-    public LaunchEmployeeShiftWindowCommand LaunchEmployeeShiftWindowCommand { get; set; }
     public FillFullTimeRostersCommand FillFullTimeRostersCommand { get; set; }
     #endregion
 
@@ -294,7 +293,6 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         DeleteEmployeeCommand = new DeleteEmployeeCommand(this);
         ActivateUserCommand = new ActivateUserCommand(this);
         LaunchAvatarSelectorCommand = new LaunchAvatarSelectorCommand(this);
-        LaunchEmployeeShiftWindowCommand = new LaunchEmployeeShiftWindowCommand(this);
         FillFullTimeRostersCommand = new FillFullTimeRostersCommand(this);
 
         ReportingEmployees = new List<EmployeeVM>();
@@ -482,14 +480,6 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         var avatarSelector = new AvatarSelectionWindow(this);
         if (avatarSelector.ShowDialog() != true) return;
         SelectedEmployeeVM.Avatar = avatarSelector.VM.SelectedAvatar;
-    }
-
-    public void LaunchEmployeeShiftWindow()
-    {
-        if (selectedEmployeeVM is null) return;
-        var shiftWindow = new EmployeeShiftWindow(this, selectedEmployeeVM);
-
-        shiftWindow.ShowDialog();
     }
 
     /// <summary>

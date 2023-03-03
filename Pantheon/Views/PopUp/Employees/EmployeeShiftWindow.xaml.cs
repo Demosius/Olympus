@@ -1,7 +1,7 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Input;
 using Pantheon.ViewModels.Controls.Employees;
-using Pantheon.ViewModels.Pages;
+using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.Views.PopUp.Employees;
 
@@ -10,10 +10,13 @@ namespace Pantheon.Views.PopUp.Employees;
 /// </summary>
 public partial class EmployeeShiftWindow
 {
-    public EmployeeShiftWindow(EmployeePageVM employeePageVM, EmployeeVM employee)
+    public EmployeeShiftVM VM { get; set; }
+
+    public EmployeeShiftWindow(EmployeeVM employee)
     {
         InitializeComponent();
-        VM.SetData(employeePageVM, employee);
+        VM = new EmployeeShiftVM(employee);
+        DataContext = VM;
     }
 
     private void TextBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)

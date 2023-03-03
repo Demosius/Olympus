@@ -11,43 +11,43 @@ using Uranus;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
-public class PayPointSelectionVM : INotifyPropertyChanged, IStringCount
+public class LocationSelectionVM : INotifyPropertyChanged, IStringCount
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
 
-    public ObservableCollection<StringCountVM> PayPoints { get; set; }
+    public ObservableCollection<StringCountVM> Locations { get; set; }
 
-    public bool CanCreatePayPoints { get; set; }
+    public bool CanCreateLocations { get; set; }
 
     #region INotifyPropertyChanged Members
-    
-    private StringCountVM? selectedPayPoint;
-    public StringCountVM? SelectedPayPoint
+
+    private StringCountVM? selectedLocation;
+    public StringCountVM? SelectedLocation
     {
-        get => selectedPayPoint;
+        get => selectedLocation;
         set
         {
-            selectedPayPoint = value;
+            selectedLocation = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(CanDelete));
         }
     }
 
-    private string newPayPointName;
-    public string NewPayPointName
+    private string newLocationName;
+    public string NewLocationName
     {
-        get => newPayPointName;
+        get => newLocationName;
         set
         {
-            newPayPointName = value;
+            newLocationName = value;
             OnPropertyChanged();
         }
     }
 
-    public bool CanDelete => SelectedPayPoint?.Count == 0;
-    public bool CanConfirm => SelectedPayPoint is not null;
-    public bool CanAdd => CanCreatePayPoints && NewPayPointName.Length > 0;
+    public bool CanDelete => SelectedLocation?.Count == 0;
+    public bool CanAdd => CanCreateLocations && NewLocationName.Length > 0;
+    public bool CanConfirm => SelectedLocation is not null;
 
     #endregion
 
@@ -59,21 +59,21 @@ public class PayPointSelectionVM : INotifyPropertyChanged, IStringCount
 
     #endregion
 
-    public PayPointSelectionVM(Helios helios, Charon charon)
+    public LocationSelectionVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
 
-        PayPoints = new ObservableCollection<StringCountVM>(
+        Locations = new ObservableCollection<StringCountVM>(
             Helios.StaffReader.Employees()
-                .GroupBy(e => e.PayPoint)
+                .GroupBy(e => e.Location)
                 .ToDictionary(g => g.Key, g => g.Count())
                 .Select(i => new StringCountVM(i.Key, i.Value))
                 .OrderBy(p => p.Name)
             );
 
-        CanCreatePayPoints = Charon.CanCreateEmployee();
-        newPayPointName = string.Empty;
+        CanCreateLocations = Charon.CanCreateEmployee();
+        newLocationName = string.Empty;
 
         AddNewStringCountCommand = new AddNewStringCountCommand(this);
         DeleteStringCountCommand = new DeleteStringCountCommand(this);
@@ -82,18 +82,18 @@ public class PayPointSelectionVM : INotifyPropertyChanged, IStringCount
 
     public void AddNewPayPoint()
     {
-        var newPP = new StringCountVM(NewPayPointName, 0);
-        PayPoints.Add(newPP);
-        SelectedPayPoint = newPP;
-        NewPayPointName = string.Empty;
+        var newPP = new StringCountVM(NewLocationName, 0);
+        Locations.Add(newPP);
+        SelectedLocation = newPP;
+        NewLocationName = string.Empty;
     }
 
     public void DeletePayPoint()
     {
-        if (SelectedPayPoint is null || SelectedPayPoint.Count > 0) return;
+        if (SelectedLocation is null || SelectedLocation.Count > 0) return;
 
-        PayPoints.Remove(SelectedPayPoint);
-        SelectedPayPoint = null;
+        Locations.Remove(SelectedLocation);
+        SelectedLocation = null;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

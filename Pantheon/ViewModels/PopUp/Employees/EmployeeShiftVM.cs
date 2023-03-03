@@ -1,6 +1,5 @@
 ﻿using Pantheon.ViewModels.Commands.Employees;
 using Pantheon.ViewModels.Controls.Shifts;
-using Pantheon.ViewModels.Pages;
 using Styx;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,15 +13,13 @@ using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
-internal class EmployeeShiftVM : INotifyPropertyChanged
+public class EmployeeShiftVM : INotifyPropertyChanged
 {
-    public EmployeePageVM? ParentVM { get; set; }
+    public EmployeeVM EmployeeVM { get; set; }
+    public Employee Employee => EmployeeVM.Employee;
 
-    public EmployeeVM? EmployeeVM { get; set; }
-    public Employee? Employee => EmployeeVM?.Employee;
-
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     #region Notifiable Properties
 
@@ -84,7 +81,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
             singleCheck = value;
             if (singleCheck)
             {
-                SingleRule ??= EmployeeVM is null ? new SingleRuleVM() : new SingleRuleVM(EmployeeVM.Employee);
+                SingleRule ??= new SingleRuleVM(Employee);
                 RecurringCheck = false;
                 RosterCheck = false;
             }
@@ -103,7 +100,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
             recurringCheck = value;
             if (recurringCheck)
             {
-                RecurringRule ??= EmployeeVM is null ? new RecurringRuleVM() : new RecurringRuleVM(EmployeeVM.Employee);
+                RecurringRule ??= new RecurringRuleVM(Employee);
                 SingleCheck = false;
                 RosterCheck = false;
             }
@@ -122,15 +119,9 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
             rosterCheck = value;
             if (rosterCheck)
             {
-                if (RosterRule is null)
-                {
-                    if (EmployeeVM is null)
-                        RosterRule = new RosterRuleVM();
-                    else if (RosterRules.Count == 0)
-                        RosterRule = new RosterRuleVM(EmployeeVM.Employee);
-                    else
-                        RosterRule = new RosterRuleVM(EmployeeVM.Employee, RosterRules.First());
-                }
+                RosterRule ??= RosterRules.Count == 0
+                    ? new RosterRuleVM(EmployeeVM.Employee)
+                    : new RosterRuleVM(EmployeeVM.Employee, RosterRules.First());
 
                 SingleCheck = false;
                 RecurringCheck = false;
@@ -211,8 +202,11 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
 
     #endregion
 
-    public EmployeeShiftVM()
+    public EmployeeShiftVM(EmployeeVM employee)
     {
+        EmployeeVM = employee;
+        Helios = EmployeeVM.Helios;
+        Charon = EmployeeVM.Charon;
         shiftNames = new ObservableCollection<string>();
         empShifts = new ObservableCollection<EmployeeShift>();
         shifts = new ObservableCollection<Shift>();
@@ -231,19 +225,12 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
         AddSingleRuleCommand = new AddSingleRuleCommand(this);
         AddRecurringRuleCommand = new AddRecurringRuleCommand(this);
         AddRosterRuleCommand = new AddRosterRuleCommand(this);
+
+        SetData();
     }
 
-    public void SetData(EmployeePageVM employeePageVM, EmployeeVM employee)
+    private void SetData()
     {
-        ParentVM = employeePageVM;
-        EmployeeVM = employee;
-        Helios = ParentVM.Helios;
-        Charon = ParentVM.Charon;
-
-        if (ParentVM.EmployeeDataSet is null || Helios is null || Charon is null) return;
-
-        EmployeeVM.DepartmentName = EmployeeVM.Department?.Name ?? EmployeeVM.DepartmentName;
-
         SingleRules.Clear();
         RecurringRules.Clear();
         RosterRules.Clear();
@@ -253,8 +240,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
         foreach (var ruleRoster in EmployeeVM.RosterRules) RosterRules.Add(ruleRoster);
 
         // We will require a basic list of shifts, and a dictionary where the Key by ID is preserved.
-        var shiftList = ParentVM.EmployeeDataSet.Shifts.Values.Where(s => s.DepartmentName == EmployeeVM.DepartmentName)
-            .ToList();
+        var shiftList = Helios.StaffReader.Shifts(Employee).ToList();
         var shiftDict = shiftList.ToDictionary(s => s.ID, s => s);
 
         Shifts = new ObservableCollection<Shift>(shiftList);
@@ -272,7 +258,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
             ? EmployeeVM.DefaultShift?.Name ?? ""
             : "<-- No Default -->";
 
-        EmpShifts = new ObservableCollection<EmployeeShift>(Helios.StaffReader.EmployeeShifts(employee.Employee)
+        EmpShifts = new ObservableCollection<EmployeeShift>(Helios.StaffReader.EmployeeShifts(Employee)
             .Where(es => shiftDict.ContainsKey(es.ShiftID)));
 
         // Set current connections as active and original.
@@ -296,8 +282,6 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
 
     public void ConfirmShiftAdjustments()
     {
-        if (Helios is null || EmployeeVM is null) return;
-
         Helios.StaffUpdater.EmployeeToShiftConnections(EmpShifts);
 
         if (EmployeeVM.DefaultShift == ShiftDict[SelectedShiftName]) return;
@@ -310,7 +294,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
 
     public void AddSingleRule()
     {
-        if (Helios is null || Charon is null || EmployeeVM is null || SingleRule is null || !SingleRule.IsValid()) return;
+        if (SingleRule is null || !SingleRule.IsValid()) return;
         var shiftRule = SingleRule.ShiftRule;
 
         if (SingleRule.InEdit)
@@ -325,7 +309,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
 
     public void AddRecurringRule()
     {
-        if (Helios is null || Charon is null || EmployeeVM is null || RecurringRule is null ||
+        if (RecurringRule is null ||
             !RecurringRule.IsValid()) return;
         var shiftRule = RecurringRule.ShiftRule;
 
@@ -341,7 +325,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
 
     public void AddRosterRule()
     {
-        if (Helios is null || Charon is null || EmployeeVM is null || RosterRule is null || !RosterRule.IsValid()) return;
+        if (RosterRule is null || !RosterRule.IsValid()) return;
         var shiftRule = RosterRule.ShiftRule;
 
         if (RosterRule.InEdit)
@@ -356,7 +340,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
 
     public void CancelSingleRuleEdit()
     {
-        if (SingleRule is null || SingleRule.IsNew || SingleRule.Original is null || EmployeeVM is null) return;
+        if (SingleRule is null || SingleRule.IsNew || SingleRule.Original is null) return;
 
         SingleRules.Add(SingleRule.Original);
         EmployeeVM.SingleRules.Add(SingleRule.Original);
@@ -365,7 +349,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
 
     public void CancelRecurringRuleEdit()
     {
-        if (RecurringRule is null || RecurringRule.IsNew || RecurringRule.Original is null || EmployeeVM is null) return;
+        if (RecurringRule is null || RecurringRule.IsNew || RecurringRule.Original is null) return;
 
         RecurringRules.Add(RecurringRule.Original);
         EmployeeVM.RecurringRules.Add(RecurringRule.Original);
@@ -374,7 +358,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
 
     public void CancelRosterRuleEdit()
     {
-        if (RosterRule is null || RosterRule.IsNew || RosterRule.Original is null || EmployeeVM is null) return;
+        if (RosterRule is null || RosterRule.IsNew || RosterRule.Original is null) return;
 
         RosterRules.Add(RosterRule.Original);
         EmployeeVM.RosterRules.Add(RosterRule.Original);
@@ -383,7 +367,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
 
     public void EditShiftRule()
     {
-        if (Helios is null || Charon is null || EmployeeVM is null || SelectedRule is null) return;
+        if (SelectedRule is null) return;
 
         switch (SelectedRule)
         {
@@ -415,7 +399,7 @@ internal class EmployeeShiftVM : INotifyPropertyChanged
 
     public void DeleteShiftRule()
     {
-        if (Helios is null || Charon is null || EmployeeVM is null || SelectedRule is null) return;
+        if (SelectedRule is null) return;
 
         switch (SelectedRule)
         {
