@@ -12,7 +12,7 @@ using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Controls.Employees;
 
-public class EmployeeVM : INotifyPropertyChanged, IPayPoints
+public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRoles, IManagers, IClans, IPayPoints
 {
     public Employee Employee { get; set; }
     public Charon Charon { get; set; }
@@ -207,11 +207,17 @@ public class EmployeeVM : INotifyPropertyChanged, IPayPoints
     public SaveEmployeeCommand SaveEmployeeCommand { get; set; }
     public LaunchIconiferCommand LaunchIconiferCommand { get; set; }
     public SelectClanCommand SelectClanCommand { get; set; }
+    public ClearClanCommand ClearClanCommand { get; set; }
     public SelectDepartmentCommand SelectDepartmentCommand { get; set; }
+    public ClearDepartmentCommand ClearDepartmentCommand { get; set; }
     public SelectLocationCommand SelectLocationCommand { get; set; }
+    public ClearLocationCommand ClearLocationCommand { get; set; }
     public SelectPayPointCommand SelectPayPointCommand { get; set; }
+    public ClearPayPointCommand ClearPayPointCommand { get; set; }
     public SelectRoleCommand SelectRoleCommand { get; set; }
+    public ClearRoleCommand ClearRoleCommand { get; set; }
     public SelectManagerCommand SelectManagerCommand { get; set; }
+    public ClearManagerCommand ClearManagerCommand { get; set; }
     public LaunchEmployeeShiftWindowCommand LaunchEmployeeShiftWindowCommand { get; set; }
 
     #endregion
@@ -235,6 +241,12 @@ public class EmployeeVM : INotifyPropertyChanged, IPayPoints
         SelectRoleCommand = new SelectRoleCommand(this);
         SelectManagerCommand = new SelectManagerCommand(this);
         LaunchEmployeeShiftWindowCommand = new LaunchEmployeeShiftWindowCommand(this);
+        ClearLocationCommand = new ClearLocationCommand(this);
+        ClearDepartmentCommand = new ClearDepartmentCommand(this);
+        ClearRoleCommand = new ClearRoleCommand(this);
+        ClearManagerCommand = new ClearManagerCommand(this);
+        ClearClanCommand = new ClearClanCommand(this);
+        ClearPayPointCommand = new ClearPayPointCommand(this);
     }
 
     public void SetDataFromObjects() => Employee.SetDataFromObjects();
@@ -272,12 +284,22 @@ public class EmployeeVM : INotifyPropertyChanged, IPayPoints
         Location = loc.Name;
     }
 
+    public void ClearLocation()
+    {
+        Location = string.Empty;
+    }
+
     public void SelectDepartment()
     {
-        var departmentCreator = new DepartmentCreationWindow(this);
-        if (departmentCreator.ShowDialog() != true) return;
+        var departmentSelector = new DepartmentSelectionWindow(Helios, Charon);
+        if (departmentSelector.ShowDialog() != true) return;
 
-        Department = departmentCreator.VM.Department;
+        Department = departmentSelector.VM.SelectedDepartment;
+    }
+
+    public void ClearDepartment()
+    {
+        Department = null;
     }
 
     public void SelectRole()
@@ -288,12 +310,22 @@ public class EmployeeVM : INotifyPropertyChanged, IPayPoints
         Role = roleCreator.VM.Role;
     }
 
+    public void ClearRole()
+    {
+        Role = null;
+    }
+
     public void SelectClan()
     {
         var clanCreator = new ClanCreationWindow(Helios, Charon);
         if (clanCreator.ShowDialog() != true) return;
 
         Clan = clanCreator.VM.Clan;
+    }
+
+    public void ClearClan()
+    {
+        Clan = null;
     }
 
     public void SelectPayPoint()
@@ -307,15 +339,25 @@ public class EmployeeVM : INotifyPropertyChanged, IPayPoints
         PayPoint = pp.Name;
     }
 
+    public void ClearPayPoint()
+    {
+        PayPoint = string.Empty;
+    }
+
     public void SelectManager()
     {
-        var managerSelectionWindow = new ManagerSelectionWindow(this);
+        var managerSelectionWindow = new ManagerSelectionWindow(Helios, Charon);
         if (managerSelectionWindow.ShowDialog() != true) return;
 
         var manager = managerSelectionWindow.VM.SelectedManager?.Employee;
         if (manager is null) return;
 
         ReportsTo = manager;
+    }
+
+    public void ClearManager()
+    {
+        ReportsTo = null;
     }
 
     /// <summary>

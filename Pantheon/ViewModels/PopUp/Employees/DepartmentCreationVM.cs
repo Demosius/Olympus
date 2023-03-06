@@ -87,6 +87,7 @@ public class DepartmentCreationVM : INotifyPropertyChanged, IPayPoints
     #region Commands
 
     public SelectPayPointCommand SelectPayPointCommand { get; }
+    public ClearPayPointCommand ClearPayPointCommand { get; set; }
     public ConfirmDepartmentCreationCommand ConfirmDepartmentCreationCommand { get; set; }
 
     #endregion
@@ -105,6 +106,7 @@ public class DepartmentCreationVM : INotifyPropertyChanged, IPayPoints
         Department = new Department();
         SelectPayPointCommand = new SelectPayPointCommand(this);
         ConfirmDepartmentCreationCommand = new ConfirmDepartmentCreationCommand(this);
+        ClearPayPointCommand = new ClearPayPointCommand(this);
     }
     
 
@@ -114,6 +116,11 @@ public class DepartmentCreationVM : INotifyPropertyChanged, IPayPoints
         if (input.ShowDialog() != true) return;
 
         PayPoints.Add(input.VM.Input);
+    }
+
+    public void ClearPayPoint()
+    {
+        throw new System.NotImplementedException();
     }
 
     public bool ConfirmDepartmentCreation()

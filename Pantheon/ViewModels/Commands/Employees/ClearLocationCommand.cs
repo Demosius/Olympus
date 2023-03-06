@@ -4,23 +4,20 @@ using Pantheon.ViewModels.Interface;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-public class SelectDepartmentCommand : ICommand
+public class ClearLocationCommand : ICommand
 {
-    public IDepartments VM { get; set; }
+    public ILocations VM { get; set; }
 
-    public SelectDepartmentCommand(IDepartments vm)
-    {
-        VM = vm;
-    }
+    public ClearLocationCommand(ILocations vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon.CanCreateDepartment();
+        return true;
     }
 
     public void Execute(object? parameter)
     {
-        VM.SelectDepartment();
+        VM.ClearLocation();
     }
 
     public event EventHandler? CanExecuteChanged

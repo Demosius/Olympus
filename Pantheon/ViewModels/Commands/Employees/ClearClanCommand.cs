@@ -4,23 +4,20 @@ using Pantheon.ViewModels.Interface;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-public class SelectDepartmentCommand : ICommand
+public class ClearClanCommand : ICommand
 {
-    public IDepartments VM { get; set; }
+    public IClans VM { get; set; }
 
-    public SelectDepartmentCommand(IDepartments vm)
-    {
-        VM = vm;
-    }
+    public ClearClanCommand(IClans vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon.CanCreateDepartment();
+        return true;
     }
 
     public void Execute(object? parameter)
     {
-        VM.SelectDepartment();
+        VM.ClearClan();
     }
 
     public event EventHandler? CanExecuteChanged

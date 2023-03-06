@@ -8,6 +8,8 @@ public interface IPayPoints
     public Charon Charon { get; set; }
 
     public SelectPayPointCommand SelectPayPointCommand { get; }
+    public ClearPayPointCommand ClearPayPointCommand { get; set; }
 
     public void SelectPayPoint();
+    public void ClearPayPoint();
 }

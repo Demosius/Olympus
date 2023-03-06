@@ -66,16 +66,16 @@
                     HorizontalAlignment="Right"
                     Visibility="{Binding CanDelete, Converter={StaticResource VisibilityConverter}}">
             <Button Content="Delete"
-                    Command="{Binding DeleteStringCountCommand}"/>
+                    Command="{Binding DeleteCommand}"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal">
             <TextBox Text="{Binding NewPayPointName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      Width="200"
-                     IsEnabled="{Binding CanCreatePayPoints}"/>
+                     IsEnabled="{Binding UserCanCreate}"/>
             <Button Width="75"
                     Content="Add"
-                    Command="{Binding AddNewStringCountCommand}"/>
+                    Command="{Binding CreateCommand}"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal"
@@ -84,7 +84,7 @@
             <Button Content="Cancel"
                     IsCancel="True"/>
             <Button Content="Confirm"
-                    Command="{Binding ConfirmStringCountSelectionCommand}"
+                    Command="{Binding ConfirmSelectionCommand}"
                     CommandParameter="{Binding ElementName=PayPointWindow}"
                     IsDefault="True"/>
         </StackPanel>

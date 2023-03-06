@@ -103,4 +103,6 @@ public class StaffDeleter
     public bool RecurringRule(ShiftRuleRecurring recurring) => Chariot.Delete(recurring);
 
     public bool RosterRule(ShiftRuleRoster roster) => Chariot.Delete(roster);
+
+    public bool Department(Department department) => Chariot.Delete(department);
 }

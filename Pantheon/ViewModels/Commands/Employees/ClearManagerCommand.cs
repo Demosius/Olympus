@@ -1,25 +1,23 @@
 ﻿using System;
 using System.Windows.Input;
 using Pantheon.ViewModels.Interface;
-using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-
-public class DeleteStringCountCommand : ICommand
+public class ClearManagerCommand : ICommand
 {
-    public IStringCount VM { get; set; }
+    public IManagers VM { get; set; }
 
-    public DeleteStringCountCommand(IStringCount vm) { VM = vm; }
+    public ClearManagerCommand(IManagers vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.CanDelete;
+        return true;
     }
 
     public void Execute(object? parameter)
     {
-        VM.DeletePayPoint();
+        VM.ClearManager();
     }
 
     public event EventHandler? CanExecuteChanged

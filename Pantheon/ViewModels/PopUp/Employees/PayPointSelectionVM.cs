@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Pantheon.Annotations;
-using Pantheon.ViewModels.Commands.Employees;
+using Pantheon.ViewModels.Commands.Generic;
 using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.ViewModels.Interface;
 using Styx;
@@ -11,14 +11,17 @@ using Uranus;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
-public class PayPointSelectionVM : INotifyPropertyChanged, IStringCount
+public class PayPointSelectionVM : INotifyPropertyChanged, ISelector
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
 
     public ObservableCollection<StringCountVM> PayPoints { get; set; }
 
-    public bool CanCreatePayPoints { get; set; }
+    public bool UserCanCreate { get; }
+    public bool CanCreate => UserCanCreate && NewPayPointName.Length > 0;
+    public bool CanDelete => SelectedPayPoint?.Count == 0;
+    public bool CanConfirm => SelectedPayPoint is not null;
 
     #region INotifyPropertyChanged Members
     
@@ -31,6 +34,7 @@ public class PayPointSelectionVM : INotifyPropertyChanged, IStringCount
             selectedPayPoint = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(CanDelete));
+            OnPropertyChanged(nameof(CanConfirm));
         }
     }
 
@@ -42,20 +46,17 @@ public class PayPointSelectionVM : INotifyPropertyChanged, IStringCount
         {
             newPayPointName = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(CanCreate));
         }
     }
-
-    public bool CanDelete => SelectedPayPoint?.Count == 0;
-    public bool CanConfirm => SelectedPayPoint is not null;
-    public bool CanAdd => CanCreatePayPoints && NewPayPointName.Length > 0;
 
     #endregion
 
     #region Commands
-
-    public AddNewStringCountCommand AddNewStringCountCommand { get; set; }
-    public DeleteStringCountCommand DeleteStringCountCommand { get; set; }
-    public ConfirmStringCountSelectionCommand ConfirmStringCountSelectionCommand { get; set; }
+    
+    public CreateCommand CreateCommand { get; set; }
+    public DeleteCommand DeleteCommand { get; set; }
+    public ConfirmSelectionCommand ConfirmSelectionCommand { get; set; }
 
     #endregion
 
@@ -72,23 +73,23 @@ public class PayPointSelectionVM : INotifyPropertyChanged, IStringCount
                 .OrderBy(p => p.Name)
             );
 
-        CanCreatePayPoints = Charon.CanCreateEmployee();
+        UserCanCreate = Charon.CanCreateEmployee();
         newPayPointName = string.Empty;
 
-        AddNewStringCountCommand = new AddNewStringCountCommand(this);
-        DeleteStringCountCommand = new DeleteStringCountCommand(this);
-        ConfirmStringCountSelectionCommand = new ConfirmStringCountSelectionCommand(this);
+        CreateCommand = new CreateCommand(this);
+        DeleteCommand = new DeleteCommand(this);
+        ConfirmSelectionCommand = new ConfirmSelectionCommand(this);
     }
 
-    public void AddNewPayPoint()
+    public void Create()
     {
         var newPP = new StringCountVM(NewPayPointName, 0);
         PayPoints.Add(newPP);
-        SelectedPayPoint = newPP;
+        SelectedPayPoint = newPP;   
         NewPayPointName = string.Empty;
     }
 
-    public void DeletePayPoint()
+    public void Delete()
     {
         if (SelectedPayPoint is null || SelectedPayPoint.Count > 0) return;
 

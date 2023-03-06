@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Pantheon.Annotations;
-using Pantheon.ViewModels.Commands.Employees;
+using Pantheon.ViewModels.Commands.Generic;
 using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.ViewModels.Interface;
 using Styx;
@@ -11,14 +11,18 @@ using Uranus;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
-public class LocationSelectionVM : INotifyPropertyChanged, IStringCount
+public class LocationSelectionVM : INotifyPropertyChanged, ISelector
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
 
     public ObservableCollection<StringCountVM> Locations { get; set; }
 
-    public bool CanCreateLocations { get; set; }
+    public bool UserCanCreate { get; }
+    public bool CanCreate => UserCanCreate && NewLocationName.Length > 0 &&
+                             !Locations.Select(l => l.Name).Contains(NewLocationName);
+    public bool CanDelete => SelectedLocation?.Count == 0;
+    public bool CanConfirm => SelectedLocation is not null;
 
     #region INotifyPropertyChanged Members
 
@@ -42,20 +46,17 @@ public class LocationSelectionVM : INotifyPropertyChanged, IStringCount
         {
             newLocationName = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(CanCreate));
         }
     }
-
-    public bool CanDelete => SelectedLocation?.Count == 0;
-    public bool CanAdd => CanCreateLocations && NewLocationName.Length > 0;
-    public bool CanConfirm => SelectedLocation is not null;
 
     #endregion
 
     #region Commands
-
-    public AddNewStringCountCommand AddNewStringCountCommand { get; set; }
-    public DeleteStringCountCommand DeleteStringCountCommand { get; set; }
-    public ConfirmStringCountSelectionCommand ConfirmStringCountSelectionCommand { get; set; }
+    
+    public CreateCommand CreateCommand { get; set; }
+    public DeleteCommand DeleteCommand { get; set; }
+    public ConfirmSelectionCommand ConfirmSelectionCommand { get; set; }
 
     #endregion
 
@@ -72,15 +73,15 @@ public class LocationSelectionVM : INotifyPropertyChanged, IStringCount
                 .OrderBy(p => p.Name)
             );
 
-        CanCreateLocations = Charon.CanCreateEmployee();
+        UserCanCreate = Charon.CanCreateEmployee();
         newLocationName = string.Empty;
 
-        AddNewStringCountCommand = new AddNewStringCountCommand(this);
-        DeleteStringCountCommand = new DeleteStringCountCommand(this);
-        ConfirmStringCountSelectionCommand = new ConfirmStringCountSelectionCommand(this);
+        CreateCommand = new CreateCommand(this);
+        DeleteCommand = new DeleteCommand(this);   
+        ConfirmSelectionCommand = new ConfirmSelectionCommand(this);
     }
 
-    public void AddNewPayPoint()
+    public void Create()
     {
         var newPP = new StringCountVM(NewLocationName, 0);
         Locations.Add(newPP);
@@ -88,7 +89,7 @@ public class LocationSelectionVM : INotifyPropertyChanged, IStringCount
         NewLocationName = string.Empty;
     }
 
-    public void DeletePayPoint()
+    public void Delete()
     {
         if (SelectedLocation is null || SelectedLocation.Count > 0) return;
 

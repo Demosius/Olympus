@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using Pantheon.ViewModels.Controls.Employees;
+using Pantheon.ViewModels.Interface;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
 
 public class SelectManagerCommand : ICommand
 {
-    public EmployeeVM VM { get; set; }
+    public IManagers VM { get; set; }
 
-    public SelectManagerCommand(EmployeeVM vm) { VM = vm; }
+    public SelectManagerCommand(IManagers vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {

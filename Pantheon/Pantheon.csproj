@@ -38,6 +38,7 @@
   <ItemGroup>
     <None Remove="Resources\calculator--plus.png" />
     <None Remove="Resources\clock--arrow.png" />
+    <None Remove="Resources\cross.png" />
     <None Remove="Resources\csv.png" />
     <None Remove="Resources\database-import.png" />
     <None Remove="Resources\edit.png" />
@@ -58,6 +59,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\cross.png" />
     <Resource Include="Resources\edit.png" />
     <Resource Include="Resources\Fonts\code128.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

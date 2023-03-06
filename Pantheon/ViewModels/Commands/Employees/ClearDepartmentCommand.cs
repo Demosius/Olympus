@@ -4,21 +4,20 @@ using Pantheon.ViewModels.Interface;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-
-public class AddNewStringCountCommand : ICommand
+public class ClearDepartmentCommand : ICommand
 {
-    public IStringCount VM { get; set; }
+    public IDepartments VM { get; set; }
 
-    public AddNewStringCountCommand(IStringCount vm) { VM = vm; }
+    public ClearDepartmentCommand(IDepartments vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.CanAdd;
+        return true;
     }
 
     public void Execute(object? parameter)
     {
-        VM.AddNewPayPoint();
+        VM.ClearDepartment();
     }
 
     public event EventHandler? CanExecuteChanged

@@ -1,5 +1,6 @@
-﻿using Pantheon.ViewModels.Controls.Employees;
-using Pantheon.ViewModels.PopUp.Employees;
+﻿using Pantheon.ViewModels.PopUp.Employees;
+using Styx;
+using Uranus;
 
 namespace Pantheon.Views.PopUp.Employees
 {
@@ -10,10 +11,10 @@ namespace Pantheon.Views.PopUp.Employees
     {
         public ManagerSelectionVM VM { get; set; }
 
-        public ManagerSelectionWindow(EmployeeVM employee)
+        public ManagerSelectionWindow(Helios helios, Charon charon)
         {
             InitializeComponent();
-            VM = new ManagerSelectionVM(employee);
+            VM = new ManagerSelectionVM(helios, charon);
             DataContext = VM;
         }
     }

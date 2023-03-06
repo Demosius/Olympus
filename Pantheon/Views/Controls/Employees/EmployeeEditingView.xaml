@@ -68,6 +68,7 @@
                     </Style>
                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
                         <Setter Property="Margin" Value="5"/>
+                        <Setter Property="MinWidth" Value="0"/>
                     </Style>
                 </Grid.Resources>
 
@@ -156,14 +157,22 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0"
                            Style="{DynamicResource ObjectLabelStyle}"
                            Content="{Binding Location, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                     <Button Grid.Column="1"
+                            MinWidth="0"
+                            ToolTip="Clear Selection"
+                            Command="{Binding ClearLocationCommand}">
+                        <Image Source="../../../Resources/cross.png"
+                               Height="15" Width="15"/>
+                    </Button>
+                    <Button Grid.Column="2"
                             Command="{Binding SelectLocationCommand}">
                         <Image Source="../../../Resources/edit.png"
-                               Height="20" Width="20"/>
+                               Height="15" Width="15"/>
                     </Button>
                 </Grid>
                 <!-- Department -->
@@ -174,14 +183,22 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0"
                            Style="{DynamicResource ObjectLabelStyle}"
                            Content="{Binding Department, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                     <Button Grid.Column="1"
+                            MinWidth="0"
+                            ToolTip="Clear Selection"
+                            Command="{Binding ClearDepartmentCommand}">
+                        <Image Source="../../../Resources/cross.png"
+                               Height="15" Width="15"/>
+                    </Button>
+                    <Button Grid.Column="2"
                             Command="{Binding SelectDepartmentCommand}">
                         <Image Source="../../../Resources/edit.png"
-                               Height="20" Width="20"/>
+                               Height="15" Width="15"/>
                     </Button>
                 </Grid>
                 <!-- Role -->
@@ -191,14 +208,22 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0"
                            Style="{DynamicResource ObjectLabelStyle}"
                            Content="{Binding Role, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                     <Button Grid.Column="1"
+                            MinWidth="0"
+                            ToolTip="Clear Selection"
+                            Command="{Binding ClearRoleCommand}">
+                        <Image Source="../../../Resources/cross.png"
+                               Height="15" Width="15"/>
+                    </Button>
+                    <Button Grid.Column="2"
                             Command="{Binding SelectRoleCommand}">
                         <Image Source="../../../Resources/edit.png"
-                               Height="20" Width="20"/>
+                               Height="15" Width="15"/>
                     </Button>
                 </Grid>
                 <!-- Reports To -->
@@ -208,14 +233,22 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0"
                            Style="{DynamicResource ObjectLabelStyle}"
                            Content="{Binding ReportsToName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                     <Button Grid.Column="1"
+                            MinWidth="0"
+                            ToolTip="Clear Selection"
+                            Command="{Binding ClearManagerCommand}">
+                        <Image Source="../../../Resources/cross.png"
+                               Height="15" Width="15"/>
+                    </Button>
+                    <Button Grid.Column="2"
                             Command="{Binding SelectManagerCommand}">
                         <Image Source="../../../Resources/edit.png"
-                               Height="20" Width="20"/>
+                               Height="15" Width="15"/>
                     </Button>
                 </Grid>
                 <!-- Clan -->
@@ -225,14 +258,22 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0"
                            Style="{DynamicResource ObjectLabelStyle}"
                            Content="{Binding Clan, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                     <Button Grid.Column="1"
+                            MinWidth="0"
+                            ToolTip="Clear Selection"
+                            Command="{Binding ClearClanCommand}">
+                        <Image Source="../../../Resources/cross.png"
+                               Height="15" Width="15"/>
+                    </Button>
+                    <Button Grid.Column="2"
                             Command="{Binding SelectClanCommand}">
                         <Image Source="../../../Resources/edit.png"
-                               Height="20" Width="20"/>
+                               Height="15" Width="15"/>
                     </Button>
                 </Grid>
                 <!-- Pay Point -->
@@ -242,14 +283,22 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0"
                            Style="{StaticResource ObjectLabelStyle}"
                            Content="{Binding PayPoint, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                     <Button Grid.Column="1"
+                            MinWidth="0"
+                            ToolTip="Clear Selection"
+                            Command="{Binding ClearPayPointCommand}">
+                        <Image Source="../../../Resources/cross.png"
+                               Height="15" Width="15"/>
+                    </Button>
+                    <Button Grid.Column="2"
                             Command="{Binding SelectPayPointCommand}">
                         <Image Source="../../../Resources/edit.png"
-                               Height="20" Width="20"/>
+                               Height="15" Width="15"/>
                     </Button>
                 </Grid>
                 <!-- Employment Type -->

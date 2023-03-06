@@ -6,19 +6,16 @@ using System.Runtime.CompilerServices;
 using Pantheon.Annotations;
 using Pantheon.ViewModels.Commands.Employees;
 using Pantheon.ViewModels.Controls.Employees;
+using Styx;
 using Uranus;
-using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
 public class ManagerSelectionVM : INotifyPropertyChanged
 {
     public Helios Helios { get; set; }
-
-    public EmployeeVM EmployeeVM { get; set; }
-    public Employee Employee => EmployeeVM.Employee;
-    public EmployeeVM? CurrentManager { get; set; }
-
+    public Charon Charon { get; set; }
+    
     public List<EmployeeVM> FullEmployeeList { get; set; }
     public List<EmployeeVM> Managers { get; set; }
 
@@ -58,20 +55,17 @@ public class ManagerSelectionVM : INotifyPropertyChanged
 
     #endregion
 
-    public ManagerSelectionVM(EmployeeVM employee)
+    public ManagerSelectionVM(Helios helios, Charon charon)
     {
-        EmployeeVM = employee;
-        Helios = EmployeeVM.Helios;
+        Helios = helios;
+        Charon = charon;
 
-        FullEmployeeList = Helios.StaffReader.Employees().OrderBy(e => e.FullName).Select(e => new EmployeeVM(e, employee.Charon, Helios)).ToList();
+        FullEmployeeList = Helios.StaffReader.Employees().OrderBy(e => e.FullName).Select(e => new EmployeeVM(e, Charon, Helios)).ToList();
         var managerIDs = FullEmployeeList.Where(e => e.ReportsToID != 0).Select(e => e.ReportsToID).Distinct();
         Managers = FullEmployeeList.Where(e => managerIDs.Contains(e.ID)).ToList();
 
         Employees = new ObservableCollection<EmployeeVM>();
-
-        var currentManager = EmployeeVM.ReportsTo;
-        CurrentManager = currentManager is null ? null : new EmployeeVM(currentManager, EmployeeVM.Charon, Helios);
-
+        
         SetList();
 
         ConfirmManagerSelectionCommand = new ConfirmManagerSelectionCommand(this);

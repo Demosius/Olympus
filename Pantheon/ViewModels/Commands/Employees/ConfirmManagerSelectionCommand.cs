@@ -20,7 +20,7 @@ public class ConfirmManagerSelectionCommand : ICommand
     public void Execute(object? parameter)
     {
         if (parameter is not Window w) return;
-        w.DialogResult = VM.SelectedManager is not null && VM.SelectedManager != VM.CurrentManager;
+        w.DialogResult = VM.SelectedManager is not null;
         w.Close();
     }
 

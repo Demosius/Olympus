@@ -1,27 +1,23 @@
 ﻿using System;
-using System.Windows;
 using System.Windows.Input;
 using Pantheon.ViewModels.Interface;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-
-public class ConfirmStringCountSelectionCommand : ICommand
+public class ClearRoleCommand : ICommand
 {
-    public IStringCount VM { get; set; }
+    public IRoles VM { get; set; }
 
-    public ConfirmStringCountSelectionCommand(IStringCount vm) { VM = vm; }
+    public ClearRoleCommand(IRoles vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.CanConfirm;
+        return true;
     }
 
     public void Execute(object? parameter)
     {
-        if (parameter is not Window w) return;
-        w.DialogResult = true;
-        w.Close();
+        VM.ClearRole();
     }
 
     public event EventHandler? CanExecuteChanged
