@@ -543,6 +543,9 @@ public class StaffReader
     public List<Department> Departments(Expression<Func<Department, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
+    public List<Clan> Clans(Expression<Func<Clan, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
     public Department? Department(string departmentName, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Department>(departmentName, pullType);
 
     /// <summary>

@@ -1,13 +1,13 @@
-﻿<Window x:Class="Pantheon.Views.PopUp.Employees.RoleSelectionWindow"
-        Name="RoleWindow"
+﻿<Window x:Class="Pantheon.Views.PopUp.Employees.ClanSelectionWindow"
+        Name="ClanWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Pantheon.ViewModels.PopUp.Employees"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance {x:Type vm:RoleSelectionVM}, IsDesignTimeCreatable=False}"
-        Title="Role Selection" 
+        d:DataContext="{d:DesignInstance {x:Type vm:ClanSelectionVM}, IsDesignTimeCreatable=False}"
+        Title="Clan Selection" 
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
@@ -58,7 +58,7 @@
                     IsDefault="True"/>
         </StackPanel>
 
-        <!-- Role Selection -->
+        <!-- Clan Selection -->
         <StackPanel DockPanel.Dock="Left"
                     Orientation="Vertical"
                     Margin="15">
@@ -81,8 +81,8 @@
             </Grid>
 
             <!-- List -->
-            <ListView ItemsSource="{Binding Roles}"
-                      SelectedItem="{Binding SelectedRole, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+            <ListView ItemsSource="{Binding Clans}"
+                      SelectedItem="{Binding SelectedClan, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       d:ItemsSource="{d:SampleData ItemCount=5}"
                       Height="400"
                       MinWidth="300">
@@ -115,7 +115,7 @@
 
         </StackPanel>
 
-        <!-- Role Creation -->
+        <!-- Clan Creation -->
         <Border Visibility="{Binding ShowNew, Converter={StaticResource VisibilityConverter}}"
                 BorderBrush="Aqua"
                 BorderThickness="1"
@@ -155,14 +155,14 @@
                         </Style>
                     </StackPanel.Resources>
 
-                    <Label Content="New Role"
+                    <Label Content="New Clan"
                            FontWeight="Bold"
                            FontSize="18"
                            Foreground="Aqua"
                            HorizontalAlignment="Center"/>
 
-                    <Label Content="Enter New Department Name"/>
-                    <TextBox Text="{Binding NewRoleName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Label Content="Enter New Clan Name"/>
+                    <TextBox Text="{Binding NewClanName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                     <Label Content="Department:"/>
                     <Grid>
@@ -173,7 +173,7 @@
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" MinWidth="120"
                            Style="{DynamicResource ObjectLabelStyle}"
-                           Content="{Binding RoleDepartment, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                           Content="{Binding ClanDepartment, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                         <Button Grid.Column="1"
                             MinWidth="0"
                             ToolTip="Clear Selection"
@@ -189,7 +189,7 @@
                         </Button>
                     </Grid>
 
-                    <Label Content="Reports To:"/>
+                    <Label Content="Leader"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -198,28 +198,24 @@
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0"
                            Style="{StaticResource ObjectLabelStyle}"
-                           Content="{Binding ReportsToRole, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                           Content="{Binding ClanLeader, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
                         <Button Grid.Column="1"
                             MinWidth="0"
                             ToolTip="Clear Selection"
-                            Command="{Binding ClearRoleCommand}">
+                            Command="{Binding ClearManagerCommand}">
                             <Image Source="../../../Resources/cross.png"
                                Height="15" Width="15"/>
                         </Button>
                         <Button Grid.Column="2"
                             MinWidth="0"
-                            Command="{Binding SelectRoleCommand}">
+                            Command="{Binding SelectManagerCommand}">
                             <Image Source="../../../Resources/edit.png"
                                Height="15" Width="15"/>
                         </Button>
                     </Grid>
 
-                    <Label Content="Level:"/>
-                    <TextBox Text="{Binding RoleLevel, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                             HorizontalContentAlignment="Center"/>
-
                 </StackPanel>
-                
+
                 <Grid DockPanel.Dock="Bottom">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>

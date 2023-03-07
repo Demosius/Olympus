@@ -1,27 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+﻿using Pantheon.ViewModels.PopUp.Employees;
+using Styx;
+using Uranus;
 
-namespace Pantheon.Views.PopUp.Employees
+namespace Pantheon.Views.PopUp.Employees;
+
+/// <summary>
+/// Interaction logic for RoleSelectionWindow.xaml
+/// </summary>
+public partial class RoleSelectionWindow
 {
-    /// <summary>
-    /// Interaction logic for RoleSelectionWindow.xaml
-    /// </summary>
-    public partial class RoleSelectionWindow : Window
+    public RoleSelectionVM VM { get; set; }
+
+    public RoleSelectionWindow(Helios helios, Charon charon)
     {
-        public RoleSelectionWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+        VM = new RoleSelectionVM(helios, charon);
+        DataContext = VM;
     }
 }

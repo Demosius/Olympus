@@ -304,10 +304,10 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
 
     public void SelectRole()
     {
-        var roleCreator = new RoleCreationWindow(Helios, Charon);
-        if (roleCreator.ShowDialog() != true) return;
+        var roleSelector = new RoleSelectionWindow(Helios, Charon);
+        if (roleSelector.ShowDialog() != true) return;
 
-        Role = roleCreator.VM.Role;
+        Role = roleSelector.VM.SelectedRole;
     }
 
     public void ClearRole()
@@ -317,10 +317,10 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
 
     public void SelectClan()
     {
-        var clanCreator = new ClanCreationWindow(Helios, Charon);
-        if (clanCreator.ShowDialog() != true) return;
+        var clanSelector = new ClanSelectionWindow(Helios, Charon);
+        if (clanSelector.ShowDialog() != true) return;
 
-        Clan = clanCreator.VM.Clan;
+        Clan = clanSelector.VM.SelectedClan;
     }
 
     public void ClearClan()

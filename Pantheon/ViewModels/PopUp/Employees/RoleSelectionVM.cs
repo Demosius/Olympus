@@ -1,26 +1,36 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+using System.Windows;
 using Pantheon.Annotations;
 using Pantheon.ViewModels.Commands.Employees;
 using Pantheon.ViewModels.Commands.Generic;
 using Pantheon.ViewModels.Interface;
+using Pantheon.Views.PopUp.Employees;
 using Styx;
 using Uranus;
+using Uranus.Commands;
+using Uranus.Interfaces;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
-public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector, IDepartments
+public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector, IDepartments, IRoles, IFilters
 {
+    private const string ANY_DEP_STR = "<Any>";
+
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
-    public SelectDepartmentCommand SelectDepartmentCommand { get; set; }
-    public ClearDepartmentCommand ClearDepartmentCommand { get; set; }
 
     public bool UserCanCreate { get; }
-    public bool CanCreate => UserCanCreate && NewRoleName.Length > 0 && !Roles.Select(r => r.Name).Contains(NewRoleName);
+
+    public bool CanCreate => UserCanCreate &&
+                             NewRoleName.Length > 0 &&
+                             !FullRoles.Select(r => r.Name).Contains(NewRoleName) &&
+                             RoleDepartment is not null;
     public bool UserCanDelete { get; }
     public bool CanDelete => UserCanDelete && SelectedRole is not null && SelectedRole.IsDeletable;
     public bool CanConfirm => SelectedRole is not null;
@@ -28,10 +38,12 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
     public bool ShowCreationOption => !InCreation && UserCanCreate;
     public bool ShowNew => InCreation && UserCanCreate;
 
+    public List<Role> FullRoles { get; set; }
+
     #region INotifyPropertyChanged Members
 
     public ObservableCollection<Role> Roles { get; set; }
-
+    
     private Role? selectedRole;
     public Role? SelectedRole
     {
@@ -44,6 +56,35 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
             OnPropertyChanged();
         }
     }
+
+    // Filters
+
+    private string filterString;
+    public string FilterString
+    {
+        get => filterString;
+        set
+        {
+            filterString = value;
+            OnPropertyChanged();
+            ApplyFilters();
+        }
+    }
+    
+    public ObservableCollection<string> DepartmentNames { get; set; }
+
+    private string? selectedDepartmentName;
+    public string? SelectedDepartmentName
+    {
+        get => selectedDepartmentName;
+        set
+        {
+            selectedDepartmentName = value == ANY_DEP_STR ? null : value;
+            OnPropertyChanged();
+            ApplyFilters();
+        }
+    }
+
 
     // Creating a new Role
 
@@ -90,16 +131,19 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         {
             reportsToRole = value;
             OnPropertyChanged();
+            if (ReportsToRole is not null && ReportsToRole.Level <= roleLevel) RoleLevel = (ReportsToRole.Level - 1).ToString();
         }
     }
 
     private int roleLevel;
-    public int RoleLevel
+    public string RoleLevel
     {
-        get => roleLevel;
+        get => roleLevel.ToString();
         set
         {
-            roleLevel = value;
+            if (!int.TryParse(value, out var i)) i = 0;
+            if (ReportsToRole is not null && ReportsToRole.Level <= i) i = (ReportsToRole?.Level ?? 0) - 1;
+            roleLevel = i;
             OnPropertyChanged();
         }
     }
@@ -112,10 +156,17 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
     public CreateCommand CreateCommand { get; set; }
     public DeleteCommand DeleteCommand { get; set; }
     public ConfirmSelectionCommand ConfirmSelectionCommand { get; set; }
+    public SelectDepartmentCommand SelectDepartmentCommand { get; set; }
+    public ClearDepartmentCommand ClearDepartmentCommand { get; set; }
+    public SelectRoleCommand SelectRoleCommand { get; set; }
+    public ClearRoleCommand ClearRoleCommand { get; set; }
+    public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
+    public ClearFiltersCommand ClearFiltersCommand { get; set; }
+    public ApplySortingCommand ApplySortingCommand { get; set; }
 
     #endregion
 
-    public RoleSelectionVM(Helios helios, Charon charon)
+    public RoleSelectionVM(Helios helios, Charon charon, string? departmentName = null)
     {
         Helios = helios;
         Charon = charon;
@@ -123,14 +174,37 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         UserCanCreate = Charon.CanCreateStaffRole();
         UserCanDelete = Charon.CanDeleteStaffRole();
 
-        Roles = new ObservableCollection<Role>(Helios.StaffReader.Roles().OrderBy(r => r.DepartmentName).ThenBy(r => r.Name));
+        FullRoles = Helios.StaffReader.Roles(pullType: EPullType.IncludeChildren).OrderBy(r => r.DepartmentName).ThenBy(r => r.Name).ToList();
 
+        Roles = new ObservableCollection<Role>(FullRoles);
+
+        DepartmentNames = new ObservableCollection<string> {ANY_DEP_STR};
+
+        var departments = FullRoles.Select(d => d.DepartmentName).Distinct().OrderBy(n => n);
+
+        foreach (var department in departments)
+        {
+            DepartmentNames.Add(department);
+        }
+
+        filterString = string.Empty;
         newRoleName = string.Empty;
+
+        if (departmentName is null || DepartmentNames.Contains(departmentName)) SelectedDepartmentName = departmentName;
+
+        ApplyFilters();
 
         ActivateCreationCommand = new ActivateCreationCommand(this);
         CreateCommand = new CreateCommand(this);
         DeleteCommand = new DeleteCommand(this);
         ConfirmSelectionCommand = new ConfirmSelectionCommand(this);
+        SelectDepartmentCommand = new SelectDepartmentCommand(this);
+        ClearDepartmentCommand = new ClearDepartmentCommand(this);
+        SelectRoleCommand = new SelectRoleCommand(this);
+        ClearRoleCommand = new ClearRoleCommand(this);
+        ApplyFiltersCommand = new ApplyFiltersCommand(this);
+        ClearFiltersCommand = new ClearFiltersCommand(this);
+        ApplySortingCommand = new ApplySortingCommand(this);
     }
 
     public void ActivateCreation()
@@ -140,23 +214,120 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
 
     public void Create()
     {
-        throw new System.NotImplementedException();
+        if (!CanCreate) return;
+
+        // Add to database.
+        var newRole = new Role
+        {
+            Name = NewRoleName,
+            DepartmentName = RoleDepartment!.Name,
+            Level = roleLevel,
+            ReportsToRoleName = ReportsToRole?.Name ?? string.Empty
+        };
+        Helios.StaffCreator.Role(newRole);
+
+        // Reset data to include new role.
+        Roles.Clear();
+        var roleList = Helios.StaffReader.Roles(pullType: EPullType.IncludeChildren).OrderBy(r => r.DepartmentName)
+            .ThenBy(r => r.Name);
+        foreach (var role in roleList) Roles.Add(role);
+
+        // Select newly created role (using role name)
+        SelectedRole = Roles.FirstOrDefault(r => r.Name == NewRoleName);
+
+        // Clear role creation data.
+        NewRoleName = string.Empty;
+        RoleDepartment = null;
+        ReportsToRole = null;
+        RoleLevel = "0";
+        InCreation = false;
+
     }
 
     public void Delete()
     {
-        throw new System.NotImplementedException();
+        // Check that it can be deleted.
+        if (SelectedRole is null || !CanDelete) return;
+
+        // Confirm desire to delete.
+        if (MessageBox.Show(
+                $"Are you sure that you would like to delete the {SelectedRole.Name} role for {SelectedRole.DepartmentName}?",
+                "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+
+        // Delete from database.
+        Helios.StaffDeleter.Role(SelectedRole);
+
+        // Delete from Roles
+        Roles.Remove(SelectedRole);
+
+        // Deselect
+        SelectedRole = null;
     }
 
     public void SelectDepartment()
     {
-        throw new System.NotImplementedException();
+        var departmentSelector = new DepartmentSelectionWindow(Helios, Charon);
+        departmentSelector.ShowDialog();
+
+        if (departmentSelector.DialogResult != true) return;
+
+        var department = departmentSelector.VM.SelectedDepartment;
+
+        if (department is null) return;
+
+        RoleDepartment = department;
     }
 
     public void ClearDepartment()
     {
+        RoleDepartment = null;
+    }
+
+    public void SelectRole()
+    {
+        var roleSelector = new RoleSelectionWindow(Helios, Charon);
+        roleSelector.ShowDialog();
+
+        if (roleSelector.DialogResult != true) return;
+
+        var role = roleSelector.VM.SelectedRole;
+
+        if (role is null) return;
+
+        ReportsToRole = role;
+    }
+
+    public void ClearRole()
+    {
+        ReportsToRole = null;
+    }
+
+    public void ClearFilters()
+    {
+        filterString = string.Empty;
+        selectedDepartmentName = null;
+        ApplyFilters();
+    }
+
+    public void ApplyFilters()
+    {
+        var fRoles = SelectedDepartmentName is null ? FullRoles : FullRoles.Where(x => x.DepartmentName == selectedDepartmentName);
+
+        fRoles = fRoles.Where(r => Regex.IsMatch(r.Name, FilterString));
+
+        Roles.Clear();
+
+        foreach (var role in fRoles)
+        {
+            Roles.Add(role);
+        }
+    }
+
+    public void ApplySorting()
+    {
         throw new System.NotImplementedException();
     }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]
