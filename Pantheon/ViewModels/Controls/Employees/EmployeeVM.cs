@@ -206,6 +206,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
 
     public SaveEmployeeCommand SaveEmployeeCommand { get; set; }
     public LaunchIconiferCommand LaunchIconiferCommand { get; set; }
+    public LaunchAvatarSelectorCommand LaunchAvatarSelectorCommand { get; set; }
     public SelectClanCommand SelectClanCommand { get; set; }
     public ClearClanCommand ClearClanCommand { get; set; }
     public SelectDepartmentCommand SelectDepartmentCommand { get; set; }
@@ -234,6 +235,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
 
         SaveEmployeeCommand = new SaveEmployeeCommand(this);
         LaunchIconiferCommand = new LaunchIconiferCommand(this);
+        LaunchAvatarSelectorCommand = new LaunchAvatarSelectorCommand(this);
         SelectClanCommand = new SelectClanCommand(this);
         SelectDepartmentCommand = new SelectDepartmentCommand(this);
         SelectLocationCommand = new SelectLocationCommand(this);
@@ -273,6 +275,13 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         Icon = iconifer.VM.SelectedIcon;
     }
 
+    public void LaunchAvatarSelector()
+    {
+        var avatarSelector = new AvatarSelectionWindow(this);
+        if (avatarSelector.ShowDialog() != true) return;
+        Avatar = avatarSelector.VM.SelectedAvatar;
+    }
+
     public void SelectLocation()
     {
         var locationSelector = new LocationSelectionWindow(Helios, Charon);
@@ -304,7 +313,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
 
     public void SelectRole()
     {
-        var roleSelector = new RoleSelectionWindow(Helios, Charon);
+        var roleSelector = new RoleSelectionWindow(Helios, Charon, DepartmentName);
         if (roleSelector.ShowDialog() != true) return;
 
         Role = roleSelector.VM.SelectedRole;
@@ -346,10 +355,10 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
 
     public void SelectManager()
     {
-        var managerSelectionWindow = new ManagerSelectionWindow(Helios, Charon);
-        if (managerSelectionWindow.ShowDialog() != true) return;
+        var managerSelector = new EmployeeSelectionWindow(Helios, Charon, true, DepartmentName);
+        if (managerSelector.ShowDialog() != true) return;
 
-        var manager = managerSelectionWindow.VM.SelectedManager?.Employee;
+        var manager = managerSelector.VM.SelectedEmployee?.Employee;
         if (manager is null) return;
 
         ReportsTo = manager;

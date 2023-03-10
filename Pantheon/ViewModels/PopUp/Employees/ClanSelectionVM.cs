@@ -200,10 +200,10 @@ public class ClanSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
 
     public void SelectManager()
     {
-        var leaderSelector = new ManagerSelectionWindow(Helios, Charon);
+        var leaderSelector = new EmployeeSelectionWindow(Helios, Charon, department: ClanDepartment?.Name);
         if (leaderSelector.ShowDialog() != true) return;
 
-        ClanLeader = leaderSelector.VM.SelectedManager?.Employee;
+        ClanLeader = leaderSelector.VM.SelectedEmployee?.Employee;
     }
 
     public void ClearManager()

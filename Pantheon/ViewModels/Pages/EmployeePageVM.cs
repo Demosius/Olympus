@@ -275,7 +275,6 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public CreateNewEmployeeCommand CreateNewEmployeeCommand { get; set; }
     public DeleteEmployeeCommand DeleteEmployeeCommand { get; set; }
     public ActivateUserCommand ActivateUserCommand { get; set; }
-    public LaunchAvatarSelectorCommand LaunchAvatarSelectorCommand { get; set; }
     public FillFullTimeRostersCommand FillFullTimeRostersCommand { get; set; }
     #endregion
 
@@ -292,7 +291,6 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         CreateNewEmployeeCommand = new CreateNewEmployeeCommand(this);
         DeleteEmployeeCommand = new DeleteEmployeeCommand(this);
         ActivateUserCommand = new ActivateUserCommand(this);
-        LaunchAvatarSelectorCommand = new LaunchAvatarSelectorCommand(this);
         FillFullTimeRostersCommand = new FillFullTimeRostersCommand(this);
 
         ReportingEmployees = new List<EmployeeVM>();
@@ -471,15 +469,6 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         if (Charon.CreateNewUser(SelectedEmployeeVM.Employee))
             MessageBox.Show("Successfully Activated new user!", "Success", MessageBoxButton.OK,
                 MessageBoxImage.Asterisk);
-    }
-
-    public void LaunchAvatarSelector()
-    {
-        if (SelectedEmployeeVM is null) return;
-
-        var avatarSelector = new AvatarSelectionWindow(this);
-        if (avatarSelector.ShowDialog() != true) return;
-        SelectedEmployeeVM.Avatar = avatarSelector.VM.SelectedAvatar;
     }
 
     /// <summary>

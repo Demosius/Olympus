@@ -189,11 +189,11 @@
         <controls:EmployeeEditingView DataContext="{Binding SelectedEmployeeVM}"/>
 
         <!-- Avatar -->
-        <DockPanel>
+        <DockPanel DataContext="{Binding SelectedEmployeeVM}">
             <Button DockPanel.Dock="Bottom"
                     Content="Change Avatar"
                     Command="{Binding LaunchAvatarSelectorCommand}"/>
-            <Image Source="{Binding SelectedEmployeeVM.Avatar.FullPath, FallbackValue=''}"/>
+            <Image Source="{Binding Avatar.FullPath, FallbackValue=''}"/>
         </DockPanel>
 
     </DockPanel>

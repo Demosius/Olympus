@@ -225,13 +225,13 @@ public class DepartmentSelectionVM : INotifyPropertyChanged, ICreationMode, ISel
 
     public void SelectManager()
     {
-        var mangerSelector = new ManagerSelectionWindow(Helios, Charon);
+        var mangerSelector = new EmployeeSelectionWindow(Helios, Charon, true, ParentDepartment?.Name);
         mangerSelector.ShowDialog();
 
         if (mangerSelector.DialogResult != true) return;
-        if (mangerSelector.VM.SelectedManager is null) return;
+        if (mangerSelector.VM.SelectedEmployee is null) return;
 
-        DepartmentHead = mangerSelector.VM.SelectedManager.Employee;
+        DepartmentHead = mangerSelector.VM.SelectedEmployee.Employee;
     }
 
     public void ClearManager()

@@ -54,7 +54,7 @@ public class StaffChariot : MasterChariot
         InitializeDatabaseConnection();
     }
 
-    public void CreateIconDirectories()
+    public void  CreateIconDirectories()
     {
         EmployeeIconDirectory = Path.Combine(BaseDataDirectory, "EmployeeIcons");
         EmployeeAvatarDirectory = Path.Combine(BaseDataDirectory, "EmployeeAvatars");

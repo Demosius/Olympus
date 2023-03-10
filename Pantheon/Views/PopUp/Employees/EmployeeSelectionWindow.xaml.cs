@@ -7,14 +7,14 @@ namespace Pantheon.Views.PopUp.Employees
     /// <summary>
     /// Interaction logic for ManagerSelectionWindow.xaml
     /// </summary>
-    public partial class ManagerSelectionWindow
+    public partial class EmployeeSelectionWindow
     {
-        public ManagerSelectionVM VM { get; set; }
+        public EmployeeSelectionVM VM { get; set; }
 
-        public ManagerSelectionWindow(Helios helios, Charon charon)
+        public EmployeeSelectionWindow(Helios helios, Charon charon, bool managers = false, string? department = null)
         {
             InitializeComponent();
-            VM = new ManagerSelectionVM(helios, charon);
+            VM = new EmployeeSelectionVM(helios, charon, managers, department);
             DataContext = VM;
         }
     }

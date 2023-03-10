@@ -4,16 +4,22 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Pantheon.Annotations;
+using Pantheon.ViewModels.Interface;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Controls.Shifts;
 
-public class RecurringRuleVM : INotifyPropertyChanged
+public class RecurringRuleVM : INotifyPropertyChanged, IShiftRuleVM
 {
     public ShiftRuleRecurring ShiftRule { get; set; }
 
     public bool InEdit { get; set; }
     public bool IsNew => !InEdit;
+
+    public bool IsValid => Description != "" &&
+                           FromDate.DayOfWeek == DayOfWeek &&
+                           !(RuleType is ERecurringRuleType.LeaveEarly or ERecurringRuleType.ArriveLate && TimeOfDay is null) &&
+                           (RuleType is not ERecurringRuleType.SetShift || Shift is not null);
 
     public ShiftRuleRecurring? Original { get; set; }
 
@@ -156,13 +162,6 @@ public class RecurringRuleVM : INotifyPropertyChanged
         ShiftRule = recurringRule.Copy();
     }
 
-    public bool IsValid()
-    {
-        if (Description == "") return false;
-        if (FromDate.DayOfWeek != DayOfWeek) return false;
-        if (RuleType is ERecurringRuleType.LeaveEarly or ERecurringRuleType.ArriveLate && TimeOfDay is null) return false;
-        return RuleType is not ERecurringRuleType.SetShift || Shift is not null;
-    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

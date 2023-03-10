@@ -1,4 +1,5 @@
-﻿using Pantheon.ViewModels.Pages;
+﻿using Pantheon.ViewModels.Controls.Employees;
+using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.Views.PopUp.Employees;
 
@@ -7,9 +8,12 @@ namespace Pantheon.Views.PopUp.Employees;
 /// </summary>
 public partial class AvatarSelectionWindow
 {
-    public AvatarSelectionWindow(EmployeePageVM employeePageVM)
+    public AvatarSelectionVM VM { get; }
+
+    public AvatarSelectionWindow(EmployeeVM employeeVM)
     {
         InitializeComponent();
-        VM.SetDataSource(employeePageVM);
+        VM = new AvatarSelectionVM(employeeVM);
+        DataContext = VM;
     }
 }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Pantheon.Annotations;
 using Pantheon.ViewModels.Controls.Employees;
+using Pantheon.ViewModels.Interface;
 using Uranus;
 using Uranus.Staff.Models;
 
@@ -20,6 +21,17 @@ public class EmployeeShiftVM : INotifyPropertyChanged
 
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
+
+    public IShiftRuleVM? Rule =>
+        RosterCheck ? RosterRule :
+        SingleCheck ? SingleRule : 
+        RecurringCheck ? RecurringRule :
+        null;
+
+    public bool InEdit =>
+        RosterCheck ? RosterRule?.InEdit ?? false :
+        SingleCheck ? SingleRule?.InEdit ?? false : 
+        RecurringCheck && (RecurringRule?.InEdit ?? false);
 
     #region Notifiable Properties
 
@@ -91,7 +103,6 @@ public class EmployeeShiftVM : INotifyPropertyChanged
     }
 
     private bool recurringCheck;
-
     public bool RecurringCheck
     {
         get => recurringCheck;
@@ -144,7 +155,6 @@ public class EmployeeShiftVM : INotifyPropertyChanged
     }
 
     private RecurringRuleVM? recurringRule;
-
     public RecurringRuleVM? RecurringRule
     {
         get => recurringRule;
@@ -183,7 +193,6 @@ public class EmployeeShiftVM : INotifyPropertyChanged
         }
     }
 
-
     #endregion
 
     public Dictionary<string, Shift?> ShiftDict { get; set; }
@@ -191,14 +200,10 @@ public class EmployeeShiftVM : INotifyPropertyChanged
     #region Commands
 
     public ConfirmShiftAdjustmentsCommand ConfirmShiftAdjustmentsCommand { get; set; }
-    public AddSingleRuleCommand AddSingleRuleCommand { get; set; }
-    public AddRecurringRuleCommand AddRecurringRuleCommand { get; set; }
-    public AddRosterRuleCommand AddRosterRuleCommand { get; set; }
     public EditShiftRuleCommand EditShiftRuleCommand { get; set; }
     public DeleteShiftRuleCommand DeleteShiftRuleCommand { get; set; }
-    public CancelSingleRuleEditCommand CancelSingleRuleEditCommand { get; set; }
-    public CancelRecurringRuleEditCommand CancelRecurringRuleEditCommand { get; set; }
-    public CancelRosterRuleEditCommand CancelRosterRuleEditCommand { get; set; }
+    public AddRuleCommand AddRuleCommand { get; set; }
+    public CancelRuleEditCommand CancelRuleEditCommand { get; set; }
 
     #endregion
 
@@ -207,6 +212,7 @@ public class EmployeeShiftVM : INotifyPropertyChanged
         EmployeeVM = employee;
         Helios = EmployeeVM.Helios;
         Charon = EmployeeVM.Charon;
+
         shiftNames = new ObservableCollection<string>();
         empShifts = new ObservableCollection<EmployeeShift>();
         shifts = new ObservableCollection<Shift>();
@@ -217,14 +223,9 @@ public class EmployeeShiftVM : INotifyPropertyChanged
         RosterRules = new ObservableCollection<ShiftRuleRoster>();
         EditShiftRuleCommand = new EditShiftRuleCommand(this);
         DeleteShiftRuleCommand = new DeleteShiftRuleCommand(this);
-        CancelSingleRuleEditCommand = new CancelSingleRuleEditCommand(this);
-        CancelRecurringRuleEditCommand = new CancelRecurringRuleEditCommand(this);
-        CancelRosterRuleEditCommand = new CancelRosterRuleEditCommand(this);
-
+        CancelRuleEditCommand = new CancelRuleEditCommand(this);
         ConfirmShiftAdjustmentsCommand = new ConfirmShiftAdjustmentsCommand(this);
-        AddSingleRuleCommand = new AddSingleRuleCommand(this);
-        AddRecurringRuleCommand = new AddRecurringRuleCommand(this);
-        AddRosterRuleCommand = new AddRosterRuleCommand(this);
+        AddRuleCommand = new AddRuleCommand(this);
 
         SetData();
     }
@@ -292,9 +293,9 @@ public class EmployeeShiftVM : INotifyPropertyChanged
         Helios.StaffUpdater.Employee(EmployeeVM.Employee);
     }
 
-    public void AddSingleRule()
+    private void AddSingleRule()
     {
-        if (SingleRule is null || !SingleRule.IsValid()) return;
+        if (SingleRule is null || !SingleRule.IsValid) return;
         var shiftRule = SingleRule.ShiftRule;
 
         if (SingleRule.InEdit)
@@ -307,10 +308,10 @@ public class EmployeeShiftVM : INotifyPropertyChanged
         SingleRule = new SingleRuleVM(EmployeeVM.Employee);
     }
 
-    public void AddRecurringRule()
+    private void AddRecurringRule()
     {
         if (RecurringRule is null ||
-            !RecurringRule.IsValid()) return;
+            !RecurringRule.IsValid) return;
         var shiftRule = RecurringRule.ShiftRule;
 
         if (RecurringRule.InEdit)
@@ -323,9 +324,9 @@ public class EmployeeShiftVM : INotifyPropertyChanged
         RecurringRule = new RecurringRuleVM(EmployeeVM.Employee);
     }
 
-    public void AddRosterRule()
+    private void AddRosterRule()
     {
-        if (RosterRule is null || !RosterRule.IsValid()) return;
+        if (RosterRule is null || !RosterRule.IsValid) return;
         var shiftRule = RosterRule.ShiftRule;
 
         if (RosterRule.InEdit)
@@ -338,7 +339,17 @@ public class EmployeeShiftVM : INotifyPropertyChanged
         RosterRule = new RosterRuleVM(EmployeeVM.Employee, RosterRules.First());
     }
 
-    public void CancelSingleRuleEdit()
+    public void AddRule()
+    {
+        if (RosterCheck)
+            AddRosterRule();
+        else if (RecurringCheck)
+            AddRecurringRule();
+        else if (SingleCheck)
+            AddSingleRule();
+    }
+
+    private void CancelSingleRuleEdit()
     {
         if (SingleRule is null || SingleRule.IsNew || SingleRule.Original is null) return;
 
@@ -347,7 +358,7 @@ public class EmployeeShiftVM : INotifyPropertyChanged
         SingleRule = new SingleRuleVM(EmployeeVM.Employee);
     }
 
-    public void CancelRecurringRuleEdit()
+    private void CancelRecurringRuleEdit()
     {
         if (RecurringRule is null || RecurringRule.IsNew || RecurringRule.Original is null) return;
 
@@ -356,13 +367,23 @@ public class EmployeeShiftVM : INotifyPropertyChanged
         RecurringRule = new RecurringRuleVM(EmployeeVM.Employee);
     }
 
-    public void CancelRosterRuleEdit()
+    private void CancelRosterRuleEdit()
     {
         if (RosterRule is null || RosterRule.IsNew || RosterRule.Original is null) return;
 
         RosterRules.Add(RosterRule.Original);
         EmployeeVM.RosterRules.Add(RosterRule.Original);
         RosterRule = new RosterRuleVM(EmployeeVM.Employee, RosterRule.Original);
+    }
+
+    public void CancelRuleEdit()
+    {
+        if (RecurringCheck)
+            CancelRecurringRuleEdit();
+        else if (RosterCheck)
+            CancelRosterRuleEdit();
+        else if (SingleCheck)
+            CancelSingleRuleEdit();
     }
 
     public void EditShiftRule()
@@ -393,6 +414,8 @@ public class EmployeeShiftVM : INotifyPropertyChanged
                 RosterCheck = true;
                 break;
         }
+
+        OnPropertyChanged(nameof(InEdit));
 
         SelectedRule = null;
     }

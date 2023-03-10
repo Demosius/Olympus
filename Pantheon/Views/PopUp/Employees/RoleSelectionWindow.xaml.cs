@@ -11,10 +11,10 @@ public partial class RoleSelectionWindow
 {
     public RoleSelectionVM VM { get; set; }
 
-    public RoleSelectionWindow(Helios helios, Charon charon)
+    public RoleSelectionWindow(Helios helios, Charon charon, string? departmentName = null)
     {
         InitializeComponent();
-        VM = new RoleSelectionVM(helios, charon);
+        VM = new RoleSelectionVM(helios, charon, departmentName);
         DataContext = VM;
     }
 }

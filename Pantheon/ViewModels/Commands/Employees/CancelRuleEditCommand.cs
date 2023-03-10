@@ -4,20 +4,20 @@ using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-public class AddRosterRuleCommand : ICommand
+public class CancelRuleEditCommand : ICommand
 {
     public EmployeeShiftVM VM { get; set; }
 
-    public AddRosterRuleCommand(EmployeeShiftVM vm) { VM = vm; }
+    public CancelRuleEditCommand(EmployeeShiftVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.RosterRule is not null && VM.Charon.CanUpdateEmployee(VM.Employee) && VM.RosterRule.IsValid();
+        return VM.InEdit;
     }
 
     public void Execute(object? parameter)
     {
-        VM.AddRosterRule();
+        VM.CancelRuleEdit();
     }
 
     public event EventHandler? CanExecuteChanged

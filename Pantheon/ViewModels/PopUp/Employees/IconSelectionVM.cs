@@ -79,9 +79,10 @@ public class IconSelectionVM : INotifyPropertyChanged, IImageSelector
         ParentVM = parentVM;
         Helios = parentVM.Helios;
 
-        icons = new ObservableCollection<EmployeeIcon>(Helios.StaffReader.Icons());
+        icons = new ObservableCollection<EmployeeIcon>(Helios.StaffReader.EmployeeIcons());
 
         iconName = string.Empty;
+
         ConfirmImageSelectionCommand = new ConfirmImageSelectionCommand(this);
         SaveImageChangesCommand = new SaveImageChangesCommand(this);
         FindNewImageCommand = new FindNewImageCommand(this);

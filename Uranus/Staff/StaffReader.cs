@@ -300,8 +300,8 @@ public class StaffReader
     public IEnumerable<EmployeeAvatar> EmployeeAvatars()
     {
         var avatars = Chariot.PullObjectList<EmployeeAvatar>();
-        foreach (var icon in avatars)
-            icon.SetDirectory(EmployeeAvatarDirectory);
+        foreach (var avatar in avatars)
+            avatar.SetDirectory(EmployeeAvatarDirectory);
 
         return avatars;
     }

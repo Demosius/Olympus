@@ -1,0 +1,115 @@
+﻿<UserControl x:Class="Pantheon.Views.Controls.Shifts.RecurringRuleView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Shifts"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:model="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance {x:Type vm:RecurringRuleVM}, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <ObjectDataProvider x:Key="RecurringRuleTypes"
+                            MethodName="GetValues" 
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="model:ERecurringRuleType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="DaysOfTheWeek"
+                            MethodName="GetValues" 
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="sys:DayOfWeek"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="StandardRotations"
+                            MethodName="GetValues" 
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="model:EStandardRotations"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <!--<RowDefinition Height="Auto"/>-->
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" 
+                           Content="Description: "/>
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+
+        <Label Grid.Row="1" Grid.Column="0" 
+                           Content="Week Rotation: "/>
+        <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Source={StaticResource StandardRotations}}"
+                              SelectedValue="{Binding WeekRotation}"/>
+
+        <Label Grid.Row="2" Grid.Column="0" 
+                           Content="Applied Weeks: "
+                           Visibility="{Binding ElementName=AppliedWeeksBox, Path=Visibility}"/>
+        <TextBox Grid.Row="2" Grid.Column="1" x:Name="AppliedWeeksBox"
+                             Text="{Binding WeekNumbersText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             Visibility="{Binding UseDate, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                             ToolTip="Enter week numbers, separated by a comma."/>
+
+        <Label Grid.Row="3" Grid.Column="0" 
+                           Content="Day of Week: "/>
+        <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding Source={StaticResource DaysOfTheWeek}}"
+                              SelectedValue="{Binding DayOfWeek}"/>
+
+        <Label Grid.Row="4" Grid.Column="0" 
+                           Content="Start Date: "
+                           Visibility="{Binding ElementName=DateStartPicker, Path=Visibility}"/>
+        <DatePicker Grid.Row="4" Grid.Column="1" x:Name="DateStartPicker"
+                                HorizontalAlignment="Left"
+                                SelectedDate="{Binding FromDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Visibility="{Binding UseDate, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+        <Label Grid.Row="5" Grid.Column="0" 
+                           Content="Rule Type: "/>
+        <ComboBox Grid.Row="5" Grid.Column="1" ItemsSource="{Binding Source={StaticResource RecurringRuleTypes}}"
+                              SelectedValue="{Binding RuleType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <Label Grid.Row="6" Grid.Column="0" 
+                           Content="Time: "
+                           Visibility="{Binding ElementName=TimeTextBox, Path=Visibility}"/>
+        <TextBox Grid.Row="6" Grid.Column="1" x:Name="TimeTextBox"
+                             Text="{Binding TimeString, Mode=TwoWay, UpdateSourceTrigger=LostFocus, FallbackValue=''}"
+                             Visibility="{Binding UseTime, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+        <Label Grid.Row="7" Grid.Column="0" 
+                           Content="Shift: "
+                           Visibility="{Binding ElementName=ShiftBox, Path=Visibility}" />
+        <ComboBox Grid.Row="7" Grid.Column="1" x:Name="ShiftBox"
+                              ItemsSource="{Binding ElementName=VM, Path=Shifts}"
+                              SelectedValue="{Binding Shift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Visibility="{Binding UseShift, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+        <!--<StackPanel Grid.Row="8" Grid.Column="1" 
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+            <Button Content="Cancel"
+                                Command="{Binding ElementName=VM, Path=CancelRecurringRuleEditCommand}"
+                                Visibility="{Binding InEdit, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Content="{Binding InEdit, Mode=OneWay, Converter={StaticResource EditBoolConverter}}"
+                                Command="{Binding ElementName=VM, Path=AddRecurringRuleCommand}"/>
+        </StackPanel>-->
+    </Grid>
+</UserControl>

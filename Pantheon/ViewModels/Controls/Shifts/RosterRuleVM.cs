@@ -6,17 +6,24 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Pantheon.Annotations;
+using Pantheon.ViewModels.Interface;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Controls.Shifts;
 
-public class RosterRuleVM : INotifyPropertyChanged
+public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 {
     public ShiftRuleRoster? SampleRosterRule { get; set; }
 
     public bool InEdit { get; set; }
     public bool IsNew => !InEdit;
 
+    public bool IsValid => Description != "" &&
+                           RequiredMaxDays() >= MaxDays && 
+                           RequiredMinDays() <= MinDays &&
+                           !(SetShift && Shift is null) &&
+                           (SampleRosterRule is null || ShiftRule.IsHarmoniousRotation(SampleRosterRule));
+    
     public ShiftRuleRoster? Original { get; set; }
 
     public ShiftRuleRoster ShiftRule { get; set; }
@@ -302,17 +309,6 @@ public class RosterRuleVM : INotifyPropertyChanged
         if (Saturday == false) --count;
         if (Sunday == false) --count;
         return count;
-    }
-
-    public bool IsValid()
-    {
-        if (Description == "") return false;
-        if (RequiredMaxDays() < MaxDays) return false;
-        if (RequiredMinDays() > MinDays) return false;
-        if (SetShift && Shift is null) return false;
-        if (SampleRosterRule is not null && !ShiftRule.IsHarmoniousRotation(SampleRosterRule)) return false;
-
-        return true;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

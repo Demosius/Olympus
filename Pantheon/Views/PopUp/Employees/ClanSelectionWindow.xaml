@@ -8,10 +8,10 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance {x:Type vm:ClanSelectionVM}, IsDesignTimeCreatable=False}"
         Title="Clan Selection" 
-        SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
-        Foreground="{StaticResource LightForegroundBrush}">
+        Foreground="{StaticResource LightForegroundBrush}"
+        Width="400" Height="600">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -54,188 +54,201 @@
                     IsCancel="True"/>
             <Button Content="Confirm"
                     Command="{Binding ConfirmSelectionCommand}"
-                    CommandParameter="{Binding ElementName=RoleWindow}"
+                    CommandParameter="{Binding ElementName=ClanWindow}"
                     IsDefault="True"/>
         </StackPanel>
 
-        <!-- Clan Selection -->
-        <StackPanel DockPanel.Dock="Left"
-                    Orientation="Vertical"
-                    Margin="15">
+        <!-- Content -->
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-            <!-- Filters -->
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Label Content="Filters:"
-                       VerticalAlignment="Center"/>
-                <TextBox Grid.Column="1"
-                         Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <ComboBox Grid.Column="2"
-                          MinWidth="120"
-                          ItemsSource="{Binding DepartmentNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                          SelectedItem="{Binding SelectedDepartmentName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            </Grid>
+            <!-- Clan Selection -->
+            <DockPanel Grid.Column="0"
+                       Margin="15">
 
-            <!-- List -->
-            <ListView ItemsSource="{Binding Clans}"
-                      SelectedItem="{Binding SelectedClan, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      d:ItemsSource="{d:SampleData ItemCount=5}"
-                      Height="400"
-                      MinWidth="300">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <Label Content="{Binding Name}"
-                               BorderBrush="{StaticResource ButtonBorderBrush}"
-                               HorizontalContentAlignment="Center"
-                               VerticalAlignment="Center"
-                               VerticalContentAlignment="Center"
-                               FontSize="16"/>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                <!-- Filters -->
+                <Grid DockPanel.Dock="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+                    <Label Content="Filters:"
+                           VerticalAlignment="Center"/>
+                    <TextBox Grid.Column="1"
+                             MinWidth="80"
+                             Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ComboBox Grid.Column="2"
+                              MinWidth="120"
+                              ItemsSource="{Binding DepartmentNames, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                              SelectedItem="{Binding SelectedDepartmentName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </Grid>
 
-                <Button Grid.Column="0" Content="New"
-                        Command="{Binding ActivateCreationCommand}"
-                        Visibility="{Binding ShowCreationOption, Converter={StaticResource VisibilityConverter}}"/>
-                <Button Grid.Column="2" Content="Delete"
-                        Command="{Binding DeleteCommand}"/>
-            </Grid>
-
-
-        </StackPanel>
-
-        <!-- Clan Creation -->
-        <Border Visibility="{Binding ShowNew, Converter={StaticResource VisibilityConverter}}"
-                BorderBrush="Aqua"
-                BorderThickness="1"
-                Margin="0,15,15,20">
-            <DockPanel>
-                <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
-                    <StackPanel.Resources>
-                        <Style x:Key="ObjectLabelStyle"  BasedOn="{StaticResource LabelStyle}" TargetType="{x:Type Label}">
-                            <Setter Property="Foreground" Value="Aqua"/>
-                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource ButtonBorderBrush}"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="BorderThickness" Value="1"></Setter>
-                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                            <Setter Property="Margin" Value="5,0,0,0"/>
-                            <Setter Property="FontWeight" Value="Bold"/>
-                            <Setter Property="MinHeight" Value="30"></Setter>
-                        </Style>
-                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
-                            <Setter Property="Margin" Value="5"/>
-                        </Style>
-                        <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
-                            <Setter Property="Margin" Value="5"/>
-                            <Setter Property="IsEditable" Value="True"/>
-                            <Setter Property="MinWidth" Value="150"/>
-                            <Setter Property="VerticalAlignment" Value="Center" />
-                        </Style>
-                        <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
-                            <Setter Property="VerticalAlignment" Value="Bottom"/>
-                            <Setter Property="VerticalContentAlignment" Value="Bottom"/>
-                            <Setter Property="Margin" Value="0,10,0,0"/>
-                        </Style>
-                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
-                            <Setter Property="Margin" Value="5,5,5,5"/>
-                            <Setter Property="MinWidth" Value="75"/>
-                            <Setter Property="HorizontalAlignment" Value="Right"/>
-                        </Style>
-                    </StackPanel.Resources>
-
-                    <Label Content="New Clan"
-                           FontWeight="Bold"
-                           FontSize="18"
-                           Foreground="Aqua"
-                           HorizontalAlignment="Center"/>
-
-                    <Label Content="Enter New Clan Name"/>
-                    <TextBox Text="{Binding NewClanName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                    <Label Content="Department:"/>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" MinWidth="120"
-                           Style="{DynamicResource ObjectLabelStyle}"
-                           Content="{Binding ClanDepartment, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
-                        <Button Grid.Column="1"
-                            MinWidth="0"
-                            ToolTip="Clear Selection"
-                            Command="{Binding ClearDepartmentCommand}">
-                            <Image Source="../../../Resources/cross.png"
-                               Height="15" Width="15"/>
-                        </Button>
-                        <Button Grid.Column="2"
-                            MinWidth="0"
-                            Command="{Binding SelectDepartmentCommand}">
-                            <Image Source="../../../Resources/edit.png"
-                               Height="15" Width="15"/>
-                        </Button>
-                    </Grid>
-
-                    <Label Content="Leader"/>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0"
-                           Style="{StaticResource ObjectLabelStyle}"
-                           Content="{Binding ClanLeader, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
-                        <Button Grid.Column="1"
-                            MinWidth="0"
-                            ToolTip="Clear Selection"
-                            Command="{Binding ClearManagerCommand}">
-                            <Image Source="../../../Resources/cross.png"
-                               Height="15" Width="15"/>
-                        </Button>
-                        <Button Grid.Column="2"
-                            MinWidth="0"
-                            Command="{Binding SelectManagerCommand}">
-                            <Image Source="../../../Resources/edit.png"
-                               Height="15" Width="15"/>
-                        </Button>
-                    </Grid>
-
-                </StackPanel>
-
-                <Grid DockPanel.Dock="Bottom">
+                <!-- New and Delete Buttons -->
+                <Grid DockPanel.Dock="Bottom"
+                      VerticalAlignment="Bottom">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0"
-                            Width="75"
-                            Content="Cancel"
-                            Command="{Binding ActivateCreationCommand}"/>
-                    <Button Grid.Column="2"
-                            Width="75"
-                            Content="Save"
-                            Command="{Binding CreateCommand}"/>
+
+                    <Button Grid.Column="0" Content="New"
+                            Command="{Binding ActivateCreationCommand}"
+                            Visibility="{Binding ShowCreationOption, Converter={StaticResource VisibilityConverter}}"/>
+                    <Button Grid.Column="2" Content="Delete"
+                            Command="{Binding DeleteCommand}"/>
                 </Grid>
 
-                <!-- Spacer -->
-                <Grid/>
+                <!-- List -->
+                <ListView DockPanel.Dock="Top"
+                          ItemsSource="{Binding Clans}"
+                          SelectedItem="{Binding SelectedClan, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          d:ItemsSource="{d:SampleData ItemCount=5}"
+                          HorizontalAlignment="Stretch">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Label Content="{Binding}"
+                                   BorderBrush="{StaticResource ButtonBorderBrush}"
+                                   HorizontalContentAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   VerticalContentAlignment="Center"
+                                   FontSize="16"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
 
             </DockPanel>
-        </Border>
+
+            <!-- Clan Creation -->
+            <Border Grid.Column="1" 
+                    Visibility="{Binding ShowNew, Converter={StaticResource VisibilityConverter}}"
+                    BorderBrush="Aqua"
+                    BorderThickness="1"
+                    Margin="0,15,15,20"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Stretch">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+                        <StackPanel.Resources>
+                            <Style x:Key="ObjectLabelStyle"  BasedOn="{StaticResource LabelStyle}" TargetType="{x:Type Label}">
+                                <Setter Property="Foreground" Value="Aqua"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource ButtonBorderBrush}"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="BorderThickness" Value="1"></Setter>
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                <Setter Property="Margin" Value="5,0,0,0"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="MinHeight" Value="30"></Setter>
+                            </Style>
+                            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                                <Setter Property="Margin" Value="5"/>
+                            </Style>
+                            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
+                                <Setter Property="Margin" Value="5"/>
+                                <Setter Property="IsEditable" Value="True"/>
+                                <Setter Property="MinWidth" Value="150"/>
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+                                <Setter Property="Margin" Value="0,10,0,0"/>
+                            </Style>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                                <Setter Property="Margin" Value="5,5,5,5"/>
+                                <Setter Property="MinWidth" Value="75"/>
+                                <Setter Property="HorizontalAlignment" Value="Right"/>
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <Label Content="New Clan"
+                               FontWeight="Bold"
+                               FontSize="18"
+                               Foreground="Aqua"
+                               HorizontalAlignment="Center"/>
+
+                        <Label Content="Enter New Clan Name"/>
+                        <TextBox Text="{Binding NewClanName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <Label Content="Department:"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" MinWidth="120"
+                                   Style="{DynamicResource ObjectLabelStyle}"
+                                   Content="{Binding ClanDepartment, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                            <Button Grid.Column="1"
+                                    MinWidth="0"
+                                    ToolTip="Clear Selection"
+                                    Command="{Binding ClearDepartmentCommand}">
+                                <Image Source="../../../Resources/cross.png"
+                                       Height="15" Width="15"/>
+                            </Button>
+                            <Button Grid.Column="2"
+                                    MinWidth="0"
+                                    Command="{Binding SelectDepartmentCommand}">
+                                <Image Source="../../../Resources/edit.png"
+                                       Height="15" Width="15"/>
+                            </Button>
+                        </Grid>
+
+                        <Label Content="Leader"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0"
+                                   Style="{StaticResource ObjectLabelStyle}"
+                                   Content="{Binding ClanLeader, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+                            <Button Grid.Column="1"
+                                    MinWidth="0"
+                                    ToolTip="Clear Selection"
+                                    Command="{Binding ClearManagerCommand}">
+                                <Image Source="../../../Resources/cross.png"
+                                       Height="15" Width="15"/>
+                            </Button>
+                            <Button Grid.Column="2"
+                                    MinWidth="0"
+                                    Command="{Binding SelectManagerCommand}">
+                                <Image Source="../../../Resources/edit.png"
+                                       Height="15" Width="15"/>
+                            </Button>
+                        </Grid>
+
+                    </StackPanel>
+
+                    <Grid DockPanel.Dock="Bottom"
+                          VerticalAlignment="Bottom">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0"
+                                Width="75"
+                                Height="35"
+                                Content="Cancel"
+                                Command="{Binding ActivateCreationCommand}"/>
+                        <Button Grid.Column="2"
+                                Width="75"
+                                Height="35"
+                                Content="Save"
+                                Command="{Binding CreateCommand}"/>
+                    </Grid>
+
+                </DockPanel>
+            </Border>
+        </Grid>
     </DockPanel>
 </Window>

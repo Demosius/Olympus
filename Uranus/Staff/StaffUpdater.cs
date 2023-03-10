@@ -223,14 +223,29 @@ public class StaffUpdater
     /// </summary>
     /// <param name="icon"></param>
     /// <param name="newName"></param>
-    /// <exception cref="NotImplementedException"></exception>
     public void RenameEmployeeIcon(ref EmployeeIcon icon, string newName)
     {
+        var oldName = icon.Name;
         Chariot.Delete(icon);
         icon.Name = newName;
         Chariot.Create(icon);
-    }
+        Chariot.Database?.Execute("UPDATE Employee SET IconName = ? WHERE IconName = ?;", newName, oldName);
 
+    }
+    /// <summary>
+    /// Renames an Employee Avatar by removing it and creating a new one.
+    /// </summary>
+    /// <param name="avatar"></param>
+    /// <param name="newName"></param>
+    public void RenameEmployeeAvatar(ref EmployeeAvatar avatar, string newName)
+    {
+        var oldName = avatar.Name;
+        Chariot.Delete(avatar);
+        avatar.Name = newName;
+        Chariot.Create(avatar);
+        Chariot.Database?.Execute("UPDATE Employee SET AvatarName = ? WHERE AvatarName = ?;", newName, oldName);
+
+    }
     public int Shift(Shift shift)
     {
         var lines = 0;
