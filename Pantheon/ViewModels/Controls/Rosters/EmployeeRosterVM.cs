@@ -17,6 +17,13 @@ public class EmployeeRosterVM : INotifyPropertyChanged
 
     public DepartmentRosterVM DepartmentRosterVM { get; set; }
 
+    public bool UseSaturdays => DepartmentRosterVM.UseSaturdays;
+    public bool UseSundays => DepartmentRosterVM.UseSundays;
+
+    public string EmployeeName => Employee.FullName;
+
+    public string EmployeeIcon => Employee.Icon?.FullPath ?? string.Empty;
+
     #region INotifyPropertyChanged Members
 
     private RosterVM? mondayRoster;

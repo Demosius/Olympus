@@ -50,6 +50,24 @@ public class InputWindowVM : INotifyPropertyChanged
         ConfirmInputCommand = new ConfirmInputCommand();
     }
 
+    public InputWindowVM(string prompt)
+    {
+        title = "Input Window";
+        this.prompt = prompt;
+        input = string.Empty;
+
+        ConfirmInputCommand = new ConfirmInputCommand();
+    }
+
+    public InputWindowVM(string prompt, string title)
+    {
+        this.title = title;
+        this.prompt = prompt;
+        input = string.Empty;
+
+        ConfirmInputCommand = new ConfirmInputCommand();
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

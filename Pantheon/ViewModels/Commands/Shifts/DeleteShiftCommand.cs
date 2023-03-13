@@ -1,25 +1,23 @@
 ﻿using System;
 using System.Windows.Input;
 using Pantheon.ViewModels.Controls.Shifts;
-using Pantheon.ViewModels.Pages;
 
 namespace Pantheon.ViewModels.Commands.Shifts;
 
 public class DeleteShiftCommand : ICommand
 {
-    public ShiftPageVM VM { get; set; }
+    public ShiftVM VM { get; set; }
 
-    public DeleteShiftCommand(ShiftPageVM vm) { VM = vm; }
+    public DeleteShiftCommand(ShiftVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedDepartment is not null && (VM.Charon?.CanDeleteShift(VM.SelectedDepartment) ?? false);
+        return VM.Department is not null && VM.Charon.CanDeleteShift(VM.Department);
     }
 
     public void Execute(object? parameter)
     {
-        if (parameter is not ShiftVM shift) return;
-        VM.DeleteShift(shift);
+        VM.Delete();
     }
 
     public event EventHandler? CanExecuteChanged

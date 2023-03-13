@@ -3,16 +3,12 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:controls="clr-namespace:Pantheon.Views.Controls"
       xmlns:pages="clr-namespace:Pantheon.ViewModels.Pages"
       xmlns:rosters="clr-namespace:Pantheon.Views.Controls.Rosters"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type pages:RosterPageVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="1080" d:DesignWidth="1200"
       Title="EmployeePage">
-
-    <Page.DataContext>
-        <pages:RosterPageVM x:Name="VM"/>
-    </Page.DataContext>
 
     <Page.Resources>
         <ResourceDictionary>
@@ -25,7 +21,7 @@
 
     <DockPanel>
         <DockPanel.Resources>
-            <!--<Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
                 <Setter Property="Margin" Value="5"/>
             </Style>
             <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
@@ -52,9 +48,6 @@
                 <Setter Property="MinHeight" Value="0"/>
                 <Setter Property="HorizontalAlignment" Value="Right"/>
             </Style>
-            <Style TargetType="{x:Type DataGrid}">
-                <Setter Property="Background" Value="{StaticResource AccordionBackgroundBrush}"/>
-            </Style>-->
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         </DockPanel.Resources>
 
@@ -86,9 +79,9 @@
         </StackPanel>
 
         <!-- Department Roster UI -->
-        <rosters:DepartmentRosterView DataContext="{Binding LoadedRoster}"
-                                       Visibility="{Binding ElementName=VM, Path=IsLoaded, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-
+        <Grid Visibility="{Binding IsLoaded, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <rosters:DepartmentRosterView DataContext="{Binding LoadedRoster}"/>
+        </Grid>
 
     </DockPanel>
 </Page>

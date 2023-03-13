@@ -1,4 +1,8 @@
-﻿using Pantheon.ViewModels.Pages;
+﻿using System.Data.Common;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using Pantheon.ViewModels.Controls.Shifts;
+using Pantheon.ViewModels.Pages;
+using Pantheon.ViewModels.PopUp.Shifts;
 using Uranus.Staff.Models;
 
 namespace Pantheon.Views.PopUp.Shifts;
@@ -8,9 +12,12 @@ namespace Pantheon.Views.PopUp.Shifts;
 /// </summary>
 public partial class ShiftEmployeeWindow
 {
-    public ShiftEmployeeWindow(ShiftPageVM shiftPageVM, Shift shift)
+    public ShiftEmployeeVM VM { get; set; }
+
+    public ShiftEmployeeWindow(ShiftVM shift)
     {
         InitializeComponent();
-        VM.SetData(shiftPageVM, shift);
+        VM = new ShiftEmployeeVM(shift);
+        DataContext = VM;
     }
 }

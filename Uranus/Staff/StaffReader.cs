@@ -214,13 +214,15 @@ public class StaffReader
                 dailyRosters = Chariot.PullObjectList<DailyRoster>(r => r.DepartmentRosterID == departmentRoster.ID);
                 employeeRosters = Chariot.PullObjectList<EmployeeRoster>(r => r.DepartmentRosterID == departmentRoster.ID);
                 shifts = Chariot.PullObjectList<Shift>(s => s.DepartmentName == departmentName);
-                breaks = Chariot.PullObjectList<Break>(b => shifts.Select(s => s.ID).Contains(b.ShiftID));
+                var shiftIDs = shifts.Select(s => s.ID);
+                breaks = Chariot.PullObjectList<Break>(b => shiftIDs.Contains(b.ShiftID));
                 employeeShiftConnections = Chariot.PullObjectList<EmployeeShift>();
                 singleRules = Chariot.PullObjectList<ShiftRuleSingle>();
                 recurringRules = Chariot.PullObjectList<ShiftRuleRecurring>();
                 rosterRules = Chariot.PullObjectList<ShiftRuleRoster>();
                 weeklyShiftCounters = Chariot.PullObjectList<WeeklyShiftCounter>(wc => wc.RosterID == departmentRoster.ID);
-                dailyShiftCounters = Chariot.PullObjectList<DailyShiftCounter>(dc => dailyRosters.Select(dr => dr.ID).Contains(dc.RosterID));
+                var dailyIDs = dailyRosters.Select(dr => dr.ID);
+                dailyShiftCounters = Chariot.PullObjectList<DailyShiftCounter>(dc => dailyIDs.Contains(dc.RosterID));
             });
 
             // Assign variables that may have been missed.

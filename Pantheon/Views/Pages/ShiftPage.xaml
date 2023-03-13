@@ -4,14 +4,11 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:converter="clr-namespace:Pantheon.ViewModels.Converter"
-      xmlns:pages="clr-namespace:Pantheon.ViewModels.Pages"
+      xmlns:vm="clr-namespace:Pantheon.ViewModels.Pages"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type vm:ShiftPageVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="1080" d:DesignWidth="1200"
       Title="EmployeePage">
-
-    <Page.DataContext>
-        <pages:ShiftPageVM x:Name="VM"/>
-    </Page.DataContext>
 
     <Page.Resources>
         <ResourceDictionary>
@@ -105,7 +102,7 @@
                                                    Width="60" Height="22"
                                                    FontSize="10"
                                                    HorizontalContentAlignment="Center"/>
-                                            <TextBox Text="{Binding StartString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding StartString, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                      VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalContentAlignment="Center"
                                                      MinWidth="0" MinHeight="0"
                                                      Width="70" Height="22"
@@ -113,7 +110,7 @@
                                                      GotKeyboardFocus="TextBox_GotKeyboardFocus"
                                                      LostMouseCapture="TextBox_LostMouseCapture"
                                                      LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
-                                            <TextBox Text="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                            <TextBox Text="{Binding Length, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                                      VerticalAlignment="Center" HorizontalContentAlignment="Center"
                                                      MinWidth="0" MinHeight="0"
                                                      Width="35" Height="22"
@@ -125,8 +122,7 @@
                                                        FontSize="8" 
                                                        Height="22"/>
                                             <Button Content="{Binding Name, Converter={StaticResource BreakButtonConverter}}" Margin="4,0,0,0"
-                                                    Command="{Binding ElementName=VM, Path=AddRemoveBreakCommand}"
-                                                    CommandParameter="{Binding}" 
+                                                    Command="{Binding AddRemoveBreakCommand}"
                                                     MinWidth="0" MinHeight="0"
                                                     Height="20" Width="22"
                                                     Padding="-1,-1,0,-1"
@@ -177,14 +173,11 @@
                             </StackPanel>
 
                             <Button Content="Save Changes" Height="30" Width="120"
-                                    CommandParameter="{Binding}"
-                                    Command="{Binding ElementName=VM, Path=SaveShiftCommand}"/>
+                                    Command="{Binding SaveShiftCommand}"/>
                             <Button Content="Employees" Height="30" Width="120"
-                                    CommandParameter="{Binding}"
-                                    Command="{Binding ElementName=VM, Path=LaunchShiftEmployeeWindowCommand}"/>
+                                    Command="{Binding LaunchShiftEmployeeWindowCommand}"/>
                             <Button Content="Delete" Height="30" Width="120"
-                                    CommandParameter="{Binding}"
-                                    Command="{Binding ElementName=VM, Path=DeleteShiftCommand}"
+                                    Command="{Binding DeleteShiftCommand}"
                                     Margin="30,0,0,0"/>
                         </StackPanel>
                     </Border>

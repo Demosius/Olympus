@@ -28,6 +28,7 @@ public class RosterVM : INotifyPropertyChanged
             if (AtWork && Roster.Shift is not null) Roster.AddCount(Roster.Shift);
 
             SetShift(value);
+            SetDisplayString();
         }
     }
 
@@ -45,6 +46,7 @@ public class RosterVM : INotifyPropertyChanged
             AtWork = Roster.RosterType == ERosterType.Standard;
             if (Roster.RosterType != ERosterType.PublicHoliday || (Roster.DailyRoster?.IsPublicHoliday ?? false)) return;
             PromptPublicHoliday();
+            SetDisplayString();
         }
     }
 
@@ -57,7 +59,7 @@ public class RosterVM : INotifyPropertyChanged
 
             Roster.StartTime = t;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(DisplayString));
+            SetDisplayString();
         }
     }
 
@@ -70,7 +72,7 @@ public class RosterVM : INotifyPropertyChanged
 
             Roster.EndTime = t;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(DisplayString));
+            SetDisplayString();
         }
     }
 
@@ -83,7 +85,7 @@ public class RosterVM : INotifyPropertyChanged
             Roster.AtWork = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(NotAtWork));
-            OnPropertyChanged(nameof(DisplayString));
+            SetDisplayString();
 
             if (!shiftCount || SelectedShift is null) return;
 
@@ -117,7 +119,16 @@ public class RosterVM : INotifyPropertyChanged
         }
     }
 
-    public string DisplayString => ToString();
+    private string displayString;
+    public string DisplayString
+    {
+        get => displayString;
+        set
+        {
+            displayString = value;
+            OnPropertyChanged();
+        }
+    }
     
     #endregion
 
@@ -126,6 +137,8 @@ public class RosterVM : INotifyPropertyChanged
         Roster = roster;
         shifts = new ObservableCollection<Shift>(Roster.Shifts);
         EmployeeRosterVM = employeeRosterVM;
+
+        displayString = roster.ToString();
 
         if (SelectedShift is not null && AtWork) Roster.AddCount(SelectedShift);
     }
@@ -174,6 +187,7 @@ public class RosterVM : INotifyPropertyChanged
         ShiftRules.AddRange(rules.Where(rule => rule.AppliesToDay(Date)));
         ShiftRules = ShiftRules.Distinct().ToList();
     }*/
+    public void SetDisplayString() => DisplayString = Roster.ToString();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -185,6 +199,6 @@ public class RosterVM : INotifyPropertyChanged
 
     public override string ToString()
     {
-        return Roster.ToString();
+        return DisplayString;
     }
 }

@@ -20,8 +20,8 @@
 
                 <Border Canvas.Top="5" Canvas.Left="5"
                         BorderBrush="{StaticResource ForegroundBrush}" BorderThickness=".5">
-                    <Image Source="{Binding Employee.Icon.FullPath, Mode=OneTime, FallbackValue=''}"
-                           Width="30" Height="30"/>
+                    <!--<Image Source="{Binding Employee.Icon.FullPath, Mode=OneTime, FallbackValue=''}"
+                           Width="30" Height="30"/>-->
                 </Border>
 
                 <!-- Name -->

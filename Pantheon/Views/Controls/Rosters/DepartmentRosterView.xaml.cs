@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Pantheon.ViewModels.Controls.Rosters;
 
 namespace Pantheon.Views.Controls.Rosters;
 
@@ -13,6 +14,52 @@ public partial class DepartmentRosterView
     public DepartmentRosterView()
     {
         InitializeComponent();
+    }
+
+    private readonly Style centerStyle = new()
+    {
+        TargetType = typeof(TextBlock),
+        Setters =
+        {
+            new Setter(TextBlock.TextAlignmentProperty, TextAlignment.Center),
+        }
+    };
+
+    private void DataGrid_OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
+    {
+        var column = e.Column;
+        var header = column.Header.ToString();
+
+        switch (header)
+        {
+            case nameof(EmployeeRosterVM.EmployeeName):
+                column.Header = "Employee";
+                column.IsReadOnly = true;
+                column.DisplayIndex = 0;
+                break;
+            case nameof(EmployeeRosterVM.SelectedShift):
+                column.Header = "Shift";
+                ((DataGridTextColumn)e.Column).ElementStyle = centerStyle;
+                column.IsReadOnly = true;
+                column.DisplayIndex = 1;
+                column.Width = 100;
+                break;
+            case nameof(EmployeeRosterVM.MondayRoster):
+            case nameof(EmployeeRosterVM.TuesdayRoster):
+            case nameof(EmployeeRosterVM.WednesdayRoster):
+            case nameof(EmployeeRosterVM.ThursdayRoster):
+            case nameof(EmployeeRosterVM.FridayRoster):
+            case nameof(EmployeeRosterVM.SaturdayRoster):
+            case nameof(EmployeeRosterVM.SundayRoster):
+                column.Header = Regex.Replace(header, "Roster", "");
+                ((DataGridTextColumn)e.Column).ElementStyle = centerStyle;
+                column.IsReadOnly = true;
+                column.Width = 120;
+                break;
+            default:
+                e.Cancel = true;
+                break;
+        }
     }
 
     private void TextBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)

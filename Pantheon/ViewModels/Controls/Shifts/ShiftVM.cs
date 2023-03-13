@@ -5,13 +5,23 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Pantheon.Annotations;
+using Pantheon.ViewModels.Commands.Shifts;
+using Pantheon.ViewModels.Interface;
+using Pantheon.Views.PopUp.Shifts;
 using SQLite;
+using Styx;
+using Uranus;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Controls.Shifts;
 
 public class ShiftVM : INotifyPropertyChanged
 {
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
+
+    public IShiftManagerVM ParentVM { get; }
+
     public Shift Shift { get; set; }
 
     #region Direct Shift Access
@@ -56,7 +66,7 @@ public class ShiftVM : INotifyPropertyChanged
             Shift.Default = value;
             OnPropertyChanged();
             if (!Default || Department?.Shifts is null) return;
-            foreach (var shift in Department.Shifts.Where(shift => shift.Name != Name))
+            foreach (var shift in ParentVM.ShiftVMs.Where(shift => shift.Name != Name))
                 shift.Default = false;
         }
     }
@@ -95,10 +105,26 @@ public class ShiftVM : INotifyPropertyChanged
 
     #endregion
 
-    public ShiftVM(Shift shift)
+    #region Commands
+
+    public LaunchShiftEmployeeWindowCommand LaunchShiftEmployeeWindowCommand { get; set; }
+    public SaveShiftCommand SaveShiftCommand { get; set; }
+    public DeleteShiftCommand DeleteShiftCommand { get; set; }
+
+    #endregion
+
+    public ShiftVM(Shift shift, IShiftManagerVM parentVM)
     {
         Shift = shift;
+        ParentVM = parentVM;
+        Helios = parentVM.Helios;
+        Charon = parentVM.Charon;   
+
         BreaksObservable = new ObservableCollection<BreakVM>(Breaks.Select(b => new BreakVM(b, this)));
+
+        LaunchShiftEmployeeWindowCommand = new LaunchShiftEmployeeWindowCommand(this);
+        SaveShiftCommand = new SaveShiftCommand(this);
+        DeleteShiftCommand = new DeleteShiftCommand(this);
     }
 
     public void SetBreaks(IEnumerable<Break> newBreaks)
@@ -138,6 +164,14 @@ public class ShiftVM : INotifyPropertyChanged
         OnPropertyChanged(nameof(BreaksObservable));
     }
 
+    public void Delete() => ParentVM.DeleteShift(this);
+
+    public void LaunchShiftEmployeeWindow()
+    {
+        var employeeWindow = new ShiftEmployeeWindow(this);
+        employeeWindow.ShowDialog();
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]
@@ -145,4 +179,5 @@ public class ShiftVM : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+
 }

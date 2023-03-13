@@ -1,6 +1,7 @@
 ﻿using Styx;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Pantheon.ViewModels.Pages;
 using Uranus;
 
 namespace Pantheon.Views.Pages;
@@ -10,10 +11,13 @@ namespace Pantheon.Views.Pages;
 /// </summary>
 public partial class ShiftPage
 {
+    public ShiftPageVM VM { get; set; }
+
     public ShiftPage(Helios helios, Charon charon)
     {
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+        VM = new ShiftPageVM(helios, charon);
+        DataContext = VM;
     }
 
     private void TextBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)

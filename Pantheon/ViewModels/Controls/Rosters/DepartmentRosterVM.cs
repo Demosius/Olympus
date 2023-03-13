@@ -41,6 +41,9 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
 
     public Department? Department => DepartmentRoster.Department;
 
+    public bool UseSaturdays => DepartmentRoster.UseSaturdays;
+    public bool UseSundays => DepartmentRoster.UseSundays;
+
     #endregion
 
     #region INotifyPropertyChanged Members
@@ -55,6 +58,20 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
             OnPropertyChanged();
         }
     }
+
+    private EmployeeRosterVM? selectedRoster;
+    public EmployeeRosterVM? SelectedRoster
+    {
+        get => selectedRoster;
+        set
+        {
+            selectedRoster = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(ShowActive));
+        }
+    }
+
+    public bool ShowActive => SelectedRoster is not null;
 
     private bool isInitialized;
     public bool IsInitialized
@@ -229,6 +246,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     {
         DepartmentRoster = roster;
         Helios = helios;
+
         displayRosters = new ObservableCollection<EmployeeRosterVM>();
         IsInitialized = false;
         shifts = new ObservableCollection<Shift>();

@@ -8,22 +8,21 @@ namespace Pantheon.ViewModels.Commands.Shifts;
 
 public class AddRemoveBreakCommand : ICommand
 {
-    public ShiftPageVM VM { get; set; }
+    public BreakVM VM { get; set; }
 
-    public AddRemoveBreakCommand(ShiftPageVM vm) { VM = vm; }
+    public AddRemoveBreakCommand(BreakVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedDepartment is not null && (VM.Charon?.CanUpdateShift(VM.SelectedDepartment) ?? false);
+        return VM.Department is not null && VM.Charon.CanUpdateShift(VM.Department);
     }
 
     public void Execute(object? parameter)
     {
-        if (parameter is not BreakVM breakVM || breakVM.Shift is null) return;
-        if (breakVM.Name == "Lunch")
-            VM.AddBreak(breakVM.ShiftVM);
+        if (VM.Name == "Lunch")
+            VM.AddBreak();
         else
-            VM.RemoveBreak(breakVM);
+            VM.Remove();
     }
 
     public event EventHandler? CanExecuteChanged

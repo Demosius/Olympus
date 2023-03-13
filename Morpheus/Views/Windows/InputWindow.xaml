@@ -6,14 +6,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:Morpheus.ViewModels.Windows"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type viewModels:InputWindowVM}, IsDesignTimeCreatable=False}"
         SizeToContent="WidthAndHeight"
         Title="{Binding Title}"
         FocusManager.FocusedElement="{Binding ElementName=Input}"
         WindowStartupLocation="CenterOwner">
-
-    <Window.DataContext>
-        <viewModels:InputWindowVM x:Name="VM"/>
-    </Window.DataContext>
 
     <Grid Background="{StaticResource Brush04}">
         <Grid.RowDefinitions>
@@ -43,18 +40,15 @@
                     HorizontalAlignment="Right"
                     Margin="5">
             <Button IsCancel="True"
-                    Content="Cancel"/>
+                    Content="Cancel"
+                    Margin="10,0,0,0"
+                    MinWidth="75"/>
             <Button IsDefault="True"
                     Content="Okay"
+                    Margin="10,0,0,0"
+                    MinWidth="75"
                     Command="{Binding ConfirmInputCommand}"
                     CommandParameter="{Binding ElementName=Window}"/>
         </StackPanel>
-
-        <Grid.Resources>
-            <Style BasedOn="{StaticResource ButtonStyle}" TargetType="{x:Type Button}">
-                <Setter Property="Margin" Value="10,0,0,0"/>
-                <Setter Property="MinWidth" Value="75"/>
-            </Style>
-        </Grid.Resources>
     </Grid>
 </Window>
