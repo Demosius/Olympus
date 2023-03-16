@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows;
 using Pantheon.Annotations;
 using Uranus.Staff.Models;
 
@@ -32,6 +33,12 @@ public class RosterVM : INotifyPropertyChanged
         }
     }
 
+    public List<ShiftRule> ShiftRules
+    {
+        get => Roster. ShiftRules; 
+        set => Roster.ShiftRules = value;
+    }
+
     public Employee? Employee  => Roster.Employee;
 
     public DateTime Date => Roster.Date;
@@ -44,7 +51,7 @@ public class RosterVM : INotifyPropertyChanged
             Roster.RosterType = value;
             OnPropertyChanged();
             AtWork = Roster.RosterType == ERosterType.Standard;
-            if (Roster.RosterType != ERosterType.PublicHoliday || (Roster.DailyRoster?.IsPublicHoliday ?? false)) return;
+            if (Roster.RosterType != ERosterType.PublicHoliday || EmployeeRosterVM.IsPublicHoliday(Date)) return;
             PromptPublicHoliday();
             SetDisplayString();
         }
@@ -104,6 +111,8 @@ public class RosterVM : INotifyPropertyChanged
 
     public DepartmentRosterVM DepartmentRosterVM => EmployeeRosterVM.DepartmentRosterVM;
 
+    public bool IsPublicHoliday => EmployeeRosterVM.IsPublicHoliday(Date);
+
     #endregion
 
     #region INotifyPropertyChanged Members
@@ -127,6 +136,7 @@ public class RosterVM : INotifyPropertyChanged
         {
             displayString = value;
             OnPropertyChanged();
+            EmployeeRosterVM.NotifyDailies();
         }
     }
     
@@ -141,6 +151,12 @@ public class RosterVM : INotifyPropertyChanged
         displayString = roster.ToString();
 
         if (SelectedShift is not null && AtWork) Roster.AddCount(SelectedShift);
+    }
+
+    public void ApplyShiftRules(List<ShiftRule> rules)
+    {
+        ShiftRules.AddRange(rules.Where(rule => rule.AppliesToDay(Date)));
+        ShiftRules = ShiftRules.Distinct().ToList();
     }
 
     public void SetShift(Shift? shift)
@@ -162,12 +178,7 @@ public class RosterVM : INotifyPropertyChanged
     /// <summary>
     /// Checks with the user if this date is to be set as a public holiday for all.
     /// </summary>
-    private void PromptPublicHoliday()
-    {
-        if (MessageBox.Show($"Do you want to set {Date:dddd, dd/MM/yyyy} as a public holiday?", "Public Holiday",
-                MessageBoxButton.YesNo, MessageBoxImage.Asterisk) == MessageBoxResult.Yes)
-            Roster.DailyRoster?.SetPublicHoliday();
-    }
+    private void PromptPublicHoliday() => EmployeeRosterVM.PromptPublicHoliday(Date);
 
     /// <summary>
     /// Sets the roster type as public holiday without using the Type Setter - which would result in recursive prompting.
@@ -187,6 +198,7 @@ public class RosterVM : INotifyPropertyChanged
         ShiftRules.AddRange(rules.Where(rule => rule.AppliesToDay(Date)));
         ShiftRules = ShiftRules.Distinct().ToList();
     }*/
+
     public void SetDisplayString() => DisplayString = Roster.ToString();
 
     public event PropertyChangedEventHandler? PropertyChanged;

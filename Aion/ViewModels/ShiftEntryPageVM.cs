@@ -32,7 +32,7 @@ public enum EEntrySortOption
     DayDateEmployee
 }
 
-public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters, IDateRange
+public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters, IDateRange, ISorting
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }

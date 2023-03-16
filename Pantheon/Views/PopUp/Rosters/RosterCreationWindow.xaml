@@ -6,15 +6,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:rosters="clr-namespace:Pantheon.ViewModels.PopUp.Rosters"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type rosters:RosterCreationVM}, IsDesignTimeCreatable=False}"
         Title="RosterCreationWindow" 
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
         Foreground="{StaticResource LightForegroundBrush}">
-
-    <Window.DataContext>
-        <rosters:RosterCreationVM x:Name="VM"/>
-    </Window.DataContext>
 
     <Window.Resources>
         <ResourceDictionary>

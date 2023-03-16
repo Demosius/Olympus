@@ -173,7 +173,7 @@
                                Foreground="Aqua"
                                HorizontalAlignment="Center"/>
 
-                        <Label Content="Enter New Department Name"/>
+                        <Label Content="Enter New Role Name"/>
                         <TextBox Text="{Binding NewRoleName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <Label Content="Department:"/>

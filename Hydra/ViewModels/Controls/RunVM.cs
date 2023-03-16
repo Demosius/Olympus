@@ -106,7 +106,6 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
     public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public FilterItemsFromClipboardCommand FilterItemsFromClipboardCommand { get; set; }
     public GenerateMovesCommand GenerateMovesCommand { get; set; }
     public ExportToCSVCommand ExportToCSVCommand { get; set; }
@@ -132,7 +131,6 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         FilterItemsFromClipboardCommand = new FilterItemsFromClipboardCommand(this);
         GenerateMovesCommand = new GenerateMovesCommand(this);
         ExportToCSVCommand = new ExportToCSVCommand(this);
@@ -189,12 +187,7 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
             fromRegex.IsMatch(m.TakeSiteName) &&
             toRegex.IsMatch(m.PlaceSiteName)));
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void FilterItemsFromClipboard()
     {
         Mouse.OverrideCursor = Cursors.Wait;

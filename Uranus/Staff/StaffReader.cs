@@ -143,14 +143,14 @@ public class StaffReader
     /// In a single transaction, pulls all the data required for all employees and inserts it into a single data object.
     /// </summary>
     /// <returns>Employee data set, containing Departments, Roles, etc. - with established relationships.</returns>
-    public EmployeeDataSet EmployeeDataSet()
+    public EmployeeDataSet EmployeeDataSet(bool includeInactive = false)
     {
         try
         {
             EmployeeDataSet? data = null;
             Chariot.Database?.RunInTransaction(() =>
             {
-                var employees = Chariot.PullObjectList<Employee>(e => e.IsActive);
+                var employees = Chariot.PullObjectList<Employee>(e => e.IsActive || includeInactive);
                 var departments = Chariot.PullObjectList<Department>();
                 var departmentRosters = Chariot.PullObjectList<DepartmentRoster>();
                 var roles = Chariot.PullObjectList<Role>();
@@ -209,7 +209,7 @@ public class StaffReader
             Chariot.Database?.RunInTransaction(() =>
             {
                 //employees = Chariot.PullObjectList<Employee>(e => e.DepartmentName == departmentName && e.EmploymentType != EEmploymentType.SA);
-                employees = EmployeeDataSet().Employees.Values.Where(e => e.DepartmentName == departmentName && e.EmploymentType != EEmploymentType.SA).ToList();
+                employees = EmployeeDataSet(true).Employees.Values.Where(e => e.DepartmentName == departmentName).ToList();
                 rosters = Chariot.PullObjectList<Roster>(r => r.DepartmentRosterID == departmentRoster.ID);
                 dailyRosters = Chariot.PullObjectList<DailyRoster>(r => r.DepartmentRosterID == departmentRoster.ID);
                 employeeRosters = Chariot.PullObjectList<EmployeeRoster>(r => r.DepartmentRosterID == departmentRoster.ID);
@@ -288,6 +288,22 @@ public class StaffReader
         }
 
         return new RosterDataSet();
+    }
+
+    public IEnumerable<Employee> BorrowableEmployees(string departmentName)
+    {
+        List<EmployeeDepartmentLoaning>? departmentLoaningList;
+        List<Employee>? employees = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            departmentLoaningList =
+                Chariot.PullObjectList<EmployeeDepartmentLoaning>(loan => loan.DepartmentName == departmentName);
+            var employeeIDs = departmentLoaningList.Select(loan => loan.EmployeeID);
+            employees = Chariot.PullObjectList<Employee>(e => employeeIDs.Contains(e.ID));
+        });
+
+        return employees ?? Enumerable.Empty<Employee>();
     }
 
     public IEnumerable<EmployeeIcon> EmployeeIcons()

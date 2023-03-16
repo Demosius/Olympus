@@ -162,7 +162,6 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
     public ClearRoleCommand ClearRoleCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
 
     #endregion
 
@@ -204,7 +203,6 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         ClearRoleCommand = new ClearRoleCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
     }
 
     public void ActivateCreation()
@@ -322,12 +320,7 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
             Roles.Add(role);
         }
     }
-
-    public void ApplySorting()
-    {
-        throw new System.NotImplementedException();
-    }
-
+    
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]

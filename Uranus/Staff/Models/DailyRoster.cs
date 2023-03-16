@@ -2,6 +2,7 @@
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Uranus.Staff.Models;
 
@@ -50,18 +51,30 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
         Date = date;
         Day = date.DayOfWeek;
         Rosters = new List<Roster>();
-        ShiftCounters = new List<DailyShiftCounter>();
-        CounterAccessDict = new Dictionary<string, DailyShiftCounter>();
+        // Create appropriate shift counters if possible.
+        ShiftCounters = department.Shifts.Select(s => new DailyShiftCounter(this, s, s.DailyTarget)).ToList();
+        CounterAccessDict = ShiftCounters.ToDictionary(c => c.ShiftID, c => c);
+    }
+
+    public DailyShiftCounter ShiftCounter(Shift shift)
+    {
+        if (CounterAccessDict.TryGetValue(shift.ID, out var counter)) return counter;
+
+        counter = new DailyShiftCounter(this, shift, 0);
+        ShiftCounters.Add(counter);
+        CounterAccessDict.Add(shift.ID, counter);
+        
+        return counter;
     }
 
     public void AddCount(Shift shift)
     {
-        CounterAccessDict[shift.ID].Count++;
+        ShiftCounter(shift).Count++;
     }
 
     public void SubCount(Shift shift)
     {
-        CounterAccessDict[shift.ID].Count--;
+        ShiftCounter(shift).Count--;
     }
 
     public bool Equals(DailyRoster? other)
@@ -86,18 +99,6 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
         roster.DailyRoster = this;
         roster.DailyRosterID = ID;
     }
-
-    /// <summary>
-    /// Sets all rosters as public holiday.
-    /// </summary>
-    public void SetPublicHoliday(bool isPublicHoliday = true)
-    {
-        // Do not set roster type directly, as that will result in recursive prompting.
-        // Use SetPublicHoliday method.
-        IsPublicHoliday = isPublicHoliday;
-        foreach (var roster in Rosters)
-            roster.SetPublicHoliday(isPublicHoliday);
-    }
-
-    public override string ToString() => $"{Day}\n{Date:dd MMM yyyy}";
+    
+    public override string ToString() => $"{Day} - {Date:dd MMM yyyy}";
 }

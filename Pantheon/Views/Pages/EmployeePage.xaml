@@ -40,6 +40,7 @@
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
             <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
+            <converter:AsyncImageConverter x:Key="AsyncImageConverter"/>
         </DockPanel.Resources>
 
         <ToolBarTray DockPanel.Dock="Top">
@@ -137,10 +138,18 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="{Binding Icon.FullPath, FallbackValue=''}"
-                                   MaxWidth="50"
+                            <Image MaxWidth="50"
                                    MaxHeight="50"
-                                   Margin="0,0,5,0"/>
+                                   Margin="0,0,5,0">
+                                <Image.Source>
+                                    <Binding Path="IconUri" Converter="{StaticResource AsyncImageConverter}">
+                                        <Binding.TargetNullValue>
+                                            <ImageSource>../../Resources/user.png</ImageSource>
+                                        </Binding.TargetNullValue>
+                                    </Binding>
+                                </Image.Source>
+                            </Image>
+                            
                             <StackPanel Orientation="Vertical">
                                 <StackPanel Orientation="Horizontal">
                                     <Label Content="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"

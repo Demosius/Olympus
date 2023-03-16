@@ -8,21 +8,16 @@ using Pantheon.Annotations;
 using Pantheon.ViewModels.Commands.Generic;
 using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.ViewModels.Interface;
-using Styx;
-using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
-public class EmployeeSelectionVM : INotifyPropertyChanged, IFilters, ISelector
+public class EmployeeSelectionVM : INotifyPropertyChanged, IFilters, ISelector, IMultiSelect
 {
     private const string MANAGER_SELECTION = "Manager Selection";
     private const string EMPLOYEE_SELECTION = "Employee Selection";
     private const string ANY_DEP_STR = "<Any>";
-
-    public Helios Helios { get; set; }
-    public Charon Charon { get; set; }
     
     public List<EmployeeVM> FullEmployeeList { get; set; }
     public List<EmployeeVM> Managers { get; set; }
@@ -31,7 +26,10 @@ public class EmployeeSelectionVM : INotifyPropertyChanged, IFilters, ISelector
 
     public bool CanCreate => false;
     public bool CanDelete => false;
-    public bool CanConfirm => SelectedEmployee is not null;
+    public bool CanConfirm => SelectedEmployee is not null || MultiSelect;
+
+    public bool MultiSelect { get; }
+    public bool SingleSelect => !MultiSelect;
 
     #region INotifyPropertyChanged Members
 
@@ -95,24 +93,24 @@ public class EmployeeSelectionVM : INotifyPropertyChanged, IFilters, ISelector
     
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public CreateCommand CreateCommand { get; set; }
     public DeleteCommand DeleteCommand { get; set; }
     public ConfirmSelectionCommand ConfirmSelectionCommand { get; set; }
+    public SelectAllCommand SelectAllCommand { get; set; }
+    public DeSelectCommand DeSelectCommand { get; set; }
 
     #endregion
 
-    public EmployeeSelectionVM(Helios helios, Charon charon, bool managers = false, string? departmentName = null)
+    public EmployeeSelectionVM(IEnumerable<EmployeeVM> employees, bool managers = false, string? departmentName = null, bool multiSelect = false)
     {
-        Helios = helios;
-        Charon = charon;
-
         managersOnly = managers;
         filterString = string.Empty;
 
+        MultiSelect = multiSelect;
+
         SelectionName = managers ? MANAGER_SELECTION : EMPLOYEE_SELECTION;
 
-        FullEmployeeList = Helios.StaffReader.Employees().OrderBy(e => e.FullName).Select(e => new EmployeeVM(e, Charon, Helios)).ToList();
+        FullEmployeeList = employees.OrderBy(e => e.FullName).ToList();
 
         var managerIDs = FullEmployeeList.Where(e => e.ReportsToID != 0).Select(e => e.ReportsToID).Distinct();
 
@@ -130,10 +128,11 @@ public class EmployeeSelectionVM : INotifyPropertyChanged, IFilters, ISelector
         
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         CreateCommand = new CreateCommand(this);
         DeleteCommand  = new DeleteCommand(this);
         ConfirmSelectionCommand = new ConfirmSelectionCommand(this);
+        SelectAllCommand = new SelectAllCommand(this);
+        DeSelectCommand = new DeSelectCommand(this);
 
         ApplyFilters();
     }
@@ -163,14 +162,22 @@ public class EmployeeSelectionVM : INotifyPropertyChanged, IFilters, ISelector
         }
     }
 
+    public void SelectAll()
+    {
+        foreach (var employee in Employees)
+            employee.IsSelected = true;
+    }
+
+    public void DeSelect()
+    {
+        foreach (var employee in Employees)
+            employee.IsSelected = false;
+    }
+
     public void Create() { }
 
     public void Delete() { }
-
-    public void ApplySorting()
-    {
-        throw new System.NotImplementedException();
-    }
+    
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -60,7 +59,6 @@ public class ItemSelectionVM : INotifyPropertyChanged, IFilters
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public ConfirmInputCommand ConfirmInputCommand { get; set; }
 
     #endregion
@@ -73,7 +71,6 @@ public class ItemSelectionVM : INotifyPropertyChanged, IFilters
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         ConfirmInputCommand = new ConfirmInputCommand();
     }
 
@@ -88,12 +85,7 @@ public class ItemSelectionVM : INotifyPropertyChanged, IFilters
         var regex = new Regex(ItemFilter);
         FilteredItems = new ObservableCollection<NAVItem>(Items.Where(i => regex.IsMatch(i.Number.ToString(format: "000000"))));
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]

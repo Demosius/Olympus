@@ -34,7 +34,7 @@ public enum ESortMethod
     ID
 }
 
-internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, IDBInteraction
+internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, IDBInteraction, ISorting
 {
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }

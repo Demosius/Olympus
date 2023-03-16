@@ -2,8 +2,6 @@
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 
 namespace Uranus.Staff.Models;
 
@@ -73,6 +71,7 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
         DepartmentRoster = departmentRoster;
         DepartmentRosterID = DepartmentRoster.ID;
     }
+
     public Roster? GetDaily(DayOfWeek weekDay)
     {
         return weekDay switch
@@ -121,53 +120,6 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
         }
         return true;
     }
-
-    private void FillMissingDailyRosters()
-    {
-        if (Department is null || Employee is null) throw new DataException("Employee Roster missing Department or Employee.");
-
-        // Ensure all daily rosters exist.
-        MondayRoster ??= new Roster(Department, Employee, StartDate);
-        TuesdayRoster ??= new Roster(Department, Employee, StartDate.AddDays(1));
-        WednesdayRoster ??= new Roster(Department, Employee, StartDate.AddDays(2));
-        ThursdayRoster ??= new Roster(Department, Employee, StartDate.AddDays(3));
-        FridayRoster ??= new Roster(Department, Employee, StartDate.AddDays(4));
-        SaturdayRoster ??= new Roster(Department, Employee, StartDate.AddDays(5));
-        SundayRoster ??= new Roster(Department, Employee, StartDate.AddDays(6));
-    }
-
-    public void ApplyShiftRules()
-    {
-        if (Employee is null) return;
-
-        // Gather rules that apply to this weekly roster, from the employee.
-        var rules = Employee.ShiftRules.Where(rule => rule.AppliesToWeek(StartDate)).ToList();
-
-        FillMissingDailyRosters();
-
-        MondayRoster?.ApplyShiftRules(rules);
-        TuesdayRoster?.ApplyShiftRules(rules);
-        WednesdayRoster?.ApplyShiftRules(rules);
-        ThursdayRoster?.ApplyShiftRules(rules);
-        FridayRoster?.ApplyShiftRules(rules);
-        SaturdayRoster?.ApplyShiftRules(rules);
-        SundayRoster?.ApplyShiftRules(rules);
-    }
-
-    /// <summary>
-    /// Sets teh shift to the employee's default if they have one.
-    /// </summary>
-    public void SetDefault()
-    {
-        var shift = Employee?.DefaultShift;
-        if (shift is null) return;
-
-        Shift = shift;
-    }
-
-    public void SubCount(Shift shift) => DepartmentRoster?.SubCount(shift);
-
-    public void AddCount(Shift shift) => DepartmentRoster?.AddCount(shift);
 
     public bool Equals(EmployeeRoster? other)
     {

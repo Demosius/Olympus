@@ -17,6 +17,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Master/MSControls.Core.Implicit.xaml" />
+                <ResourceDictionary>
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -97,12 +100,31 @@
                     </StackPanel>
                 </Grid>
 
+                <!-- (De/)Select All -->
+                <Grid DockPanel.Dock="Top"
+                      Visibility="{Binding MultiSelect, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0"
+                            Content="Select All"
+                            Command="{Binding SelectAllCommand}"/>
+                    <Button Grid.Column="1"
+                            Content="De-Select All"
+                            Command="{Binding DeSelectCommand}"/>
+                </Grid>
+
                 <!-- List -->
+
+                <!-- Single Selector -->
                 <ListView ItemsSource="{Binding Employees}"
                           SelectedItem="{Binding SelectedEmployee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           d:ItemsSource="{d:SampleData ItemCount=5}"
                           HorizontalAlignment="Stretch"
-                          Margin="5">
+                          Margin="5"
+                          Visibility="{Binding SingleSelect, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Vertical" MinWidth="350" Margin="2,10">
@@ -115,6 +137,37 @@
                                        FontStyle="Italic"
                                        Margin="0" Padding="0"/>
                             </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+
+                <!-- Multi Selector -->
+                <ListView ItemsSource="{Binding Employees}"
+                          SelectedItem="{Binding SelectedEmployee, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          d:ItemsSource="{d:SampleData ItemCount=5}"
+                          HorizontalAlignment="Stretch"
+                          Margin="5"
+                          Visibility="{Binding MultiSelect, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox Grid.Column="0" 
+                                          IsChecked="{Binding IsSelected}"/>
+                                <StackPanel Grid.Column="1" Orientation="Vertical" MinWidth="350" Margin="2,10">
+                                    <Label Content="{Binding FullName}"
+                                           FontSize="16"
+                                           FontWeight="Bold"
+                                           Margin="0" Padding="0"/>
+                                    <Label Content="{Binding RoleName}"
+                                           FontSize="16"
+                                           FontStyle="Italic"
+                                           Margin="0" Padding="0"/>
+                                </StackPanel>
+                            </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>

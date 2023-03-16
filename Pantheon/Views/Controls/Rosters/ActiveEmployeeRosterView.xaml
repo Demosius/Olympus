@@ -4,19 +4,27 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-             xmlns:controls="clr-namespace:Pantheon.Views.Controls"
              xmlns:model="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
              xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Rosters"
              xmlns:rosters="clr-namespace:Pantheon.Views.Controls.Rosters"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:EmployeeRosterVM}, IsDesignTimeCreatable=False}">
 
-    <Canvas Height="90">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+    <Grid Height="90">
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
         <!-- Employee -->
-        <Border BorderBrush="{StaticResource Brush01}"
+        <Border Grid.Column="0" BorderBrush="{StaticResource Brush01}"
                 BorderThickness=".5"
-                Width="230"
+                Width="250"
                 Height="90">
             <Canvas>
                 <Canvas.Resources>
@@ -37,7 +45,7 @@
 
                 <!-- Name -->
                 <Label Canvas.Top="0" Canvas.Left="50" 
-                       Width="175"
+                       Width="195"
                        Height="60"
                        FontSize="14"
                        FontWeight="Bold"
@@ -52,17 +60,17 @@
                           Style="{StaticResource ComboBoxStyle}"
                           ItemsSource="{Binding Shifts, Mode=OneTime, FallbackValue=''}"
                           SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Width="80"
+                          Width="90"
                           Height="27"
                           FontSize="12"
                           VerticalContentAlignment="Center"
                           HorizontalContentAlignment="Center"/>
 
                 <!-- Roster Type (SUPPOSED TO BE MINI) -->
-                <ComboBox Canvas.Top="55" Canvas.Left="145" Style="{StaticResource ComboBoxStyle}"
+                <ComboBox Canvas.Top="55" Canvas.Left="155" Style="{StaticResource ComboBoxStyle}"
                           ItemsSource="{Binding Source={StaticResource RosterTypes}, Mode=OneTime}"
                           SelectedValue="{Binding SelectedRosterType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          Width="80"
+                          Width="90"
                           Height="27"
                           FontSize="12"
                           VerticalContentAlignment="Center"
@@ -73,13 +81,36 @@
         </Border>
 
         <!-- Rosters -->
-        <rosters:ActiveRosterView Canvas.Left="230" DataContext="{Binding MondayRoster, Mode=OneTime}"/>
-        <rosters:ActiveRosterView Canvas.Left="430" DataContext="{Binding TuesdayRoster, Mode=OneTime}"/>
-        <rosters:ActiveRosterView Canvas.Left="630" DataContext="{Binding WednesdayRoster, Mode=OneTime}"/>
-        <rosters:ActiveRosterView Canvas.Left="830" DataContext="{Binding ThursdayRoster, Mode=OneTime}"/>
-        <rosters:ActiveRosterView Canvas.Left="1030" DataContext="{Binding FridayRoster, Mode=OneTime}"/>
-        <rosters:ActiveRosterView Canvas.Left="1230" DataContext="{Binding SaturdayRoster, Mode=OneTime}"/>
-        <rosters:ActiveRosterView Canvas.Left="1430" DataContext="{Binding SundayRoster, Mode=OneTime}"/>
+        <StackPanel Orientation="Horizontal" Grid.Column="1">
+            <rosters:ActiveRosterView DataContext="{Binding MondayRoster, Mode=OneTime}"/>
+            <rosters:ActiveRosterView DataContext="{Binding TuesdayRoster, Mode=OneTime}"/>
+            <rosters:ActiveRosterView DataContext="{Binding WednesdayRoster, Mode=OneTime}"/>
+            <rosters:ActiveRosterView DataContext="{Binding ThursdayRoster, Mode=OneTime}"/>
+            <rosters:ActiveRosterView DataContext="{Binding FridayRoster, Mode=OneTime}"/>
+            <Grid Visibility="{Binding UseSaturdays, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <rosters:ActiveRosterView DataContext="{Binding SaturdayRoster, Mode=OneTime}"/>
+            </Grid>
+            <Grid Visibility="{Binding UseSundays, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <rosters:ActiveRosterView DataContext="{Binding SundayRoster, Mode=OneTime}"/>
+            </Grid>
+        </StackPanel>
 
-    </Canvas>
+        <Button Grid.Column="3"
+                Height="30"
+                Command="{Binding DeleteEmployeeRosterCommand}"
+                Margin="5"
+                VerticalAlignment="Center"
+                VerticalContentAlignment="Center"
+                HorizontalAlignment="Center"
+                HorizontalContentAlignment="Center">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="../../../Resources/cross.png" 
+                       MaxHeight="25"
+                       MaxWidth="25"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,5,0"/>
+                <TextBlock Text="Delete" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+    </Grid>
 </UserControl>

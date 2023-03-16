@@ -20,7 +20,7 @@ using Uranus.Users.Models;
 
 namespace Prometheus.ViewModels.Pages.Users;
 
-internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IFilters
+internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IFilters, ISorting
 {
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }

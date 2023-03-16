@@ -2,7 +2,6 @@
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Uranus.Staff.Models;
 
@@ -101,6 +100,26 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         ShiftRules = new List<ShiftRule>();
     }
 
+    public Roster(DepartmentRoster departmentRoster, EmployeeRoster employeeRoster, DailyRoster dailyRoster)
+    {
+        ID = Guid.NewGuid();
+        DepartmentRosterID = departmentRoster.ID;
+        DepartmentRoster = departmentRoster;
+        Employee = employeeRoster.Employee;
+        EmployeeID = employeeRoster.EmployeeID;
+        EmployeeRoster = employeeRoster;
+        EmployeeRosterID = employeeRoster.ID;
+        DailyRoster = dailyRoster;
+        DailyRosterID = dailyRoster.ID;
+        Date = dailyRoster.Date;
+        Day = dailyRoster.Day;
+        Department = departmentRoster.Department;
+        DepartmentName = departmentRoster.DepartmentName;
+        ShiftID = string.Empty;
+        AtWork = Day != DayOfWeek.Saturday && Day != DayOfWeek.Sunday;
+        ShiftRules = Employee?.ShiftRules ?? new List<ShiftRule>();
+    }
+
     public Roster(Department department, DepartmentRoster departmentRoster, EmployeeRoster employeeRoster, Employee employee, DateTime date)
     {
         ID = Guid.NewGuid();
@@ -154,12 +173,6 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
     public string TimeString()
     {
         return $"{StartTime.Hours:00}:{StartTime.Minutes:00} - {EndTime.Hours:00}:{EndTime.Minutes:00}";
-    }
-
-    public void ApplyShiftRules(List<ShiftRule> rules)
-    {
-        ShiftRules.AddRange(rules.Where(rule => rule.AppliesToDay(Date)));
-        ShiftRules = ShiftRules.Distinct().ToList();
     }
 
     public void SubCount(Shift shift) => DailyRoster?.SubCount(shift);

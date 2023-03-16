@@ -12,6 +12,17 @@ public class DailyCounterVM : INotifyPropertyChanged
     #region Direct Counter Access
 
     public string ShiftID => DailyShiftCounter.ShiftID;
+    public string ShiftName => DailyShiftCounter.Shift?.Name ?? DailyShiftCounter.ShiftID.Split('|')[1];
+
+    public int Target
+    {
+        get => DailyShiftCounter.Target;
+        set
+        {
+            DailyShiftCounter.Target = value;
+            OnPropertyChanged();
+        }
+    }
 
     public int Count
     {

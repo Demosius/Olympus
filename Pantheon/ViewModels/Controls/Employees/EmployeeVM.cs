@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Pantheon.Annotations;
@@ -26,6 +28,17 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
     public int ID => Employee.ID;
     public string RoleName => Employee.RoleName;
     public string ReportsToName => ReportsTo is null ? "" : $"{ReportsTo.FullName} - {ReportsTo.RoleName}";
+
+    private bool isSelected;
+    public bool IsSelected
+    {
+        get => isSelected;
+        set
+        {
+            isSelected = value;
+            OnPropertyChanged();
+        }
+    }
 
     public string DefaultShiftID
     {
@@ -108,7 +121,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
     public string Location
     {
         get => Employee.Location;
-        set { Employee.Location = value; OnPropertyChanged(nameof(Location)); }
+        set { Employee.Location = value; OnPropertyChanged(); }
     }
 
     public string PayPoint
@@ -143,55 +156,71 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
     public Department? Department
     {
         get => Employee.Department;
-        set { Employee.Department = value; OnPropertyChanged(nameof(Department)); }
+        set { Employee.Department = value; OnPropertyChanged(); }
     }
 
     public Role? Role
     {
         get => Employee.Role;
-        set { Employee.Role = value; OnPropertyChanged(nameof(Role)); }
+        set { Employee.Role = value; OnPropertyChanged(); }
     }
 
     public string PhoneNumber
     {
         get => Employee.PhoneNumber;
-        set { Employee.PhoneNumber = value; OnPropertyChanged(nameof(PhoneNumber)); }
+        set { Employee.PhoneNumber = value; OnPropertyChanged(); }
     }
 
     public string Email
     {
         get => Employee.Email;
-        set { Employee.Email = value; OnPropertyChanged(nameof(Email)); }
+        set { Employee.Email = value; OnPropertyChanged(); }
     }
 
     public string Address
     {
         get => Employee.Address;
-        set { Employee.Address = value; OnPropertyChanged(nameof(Address)); }
+        set { Employee.Address = value; OnPropertyChanged(); }
     }
 
     public decimal? PayRate
     {
         get => Employee.PayRate;
-        set { Employee.PayRate = value; OnPropertyChanged(nameof(PayRate)); }
+        set { Employee.PayRate = value; OnPropertyChanged(); }
     }
 
     public EmployeeAvatar? Avatar
     {
         get => Employee.Avatar;
-        set { Employee.Avatar = value; OnPropertyChanged(nameof(Avatar)); }
+        set { Employee.Avatar = value; OnPropertyChanged(); }
     }
 
     public Clan? Clan
     {
         get => Employee.Clan;
-        set { Employee.Clan = value; OnPropertyChanged(nameof(Clan)); }
+        set { Employee.Clan = value; OnPropertyChanged(); }
     }
 
     public EmployeeIcon? Icon
     {
-        get => Employee.Icon; set
-        { Employee.Icon = value; OnPropertyChanged(nameof(Icon)); }
+        get => Employee.Icon;
+        set
+        {
+            Employee.Icon = value;
+            OnPropertyChanged();
+            IconUri = new Uri(value?.FullPath ?? "", UriKind.RelativeOrAbsolute);
+        }
+    }
+
+    private Uri? iconUri;
+    public Uri? IconUri
+    {
+        get => iconUri;
+        set
+        {
+            iconUri = value;
+            OnPropertyChanged();
+        }
     }
 
     public bool IsUser
@@ -232,6 +261,8 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
 
         SensitiveVisibility = Charon.CanReadEmployeeSensitive(Employee);
         VerySensitiveVisibility = Charon.CanReadEmployeeVerySensitive(Employee);
+
+        IconUri = Icon is null ? null : new Uri(Icon.FullPath, UriKind.RelativeOrAbsolute);
 
         SaveEmployeeCommand = new SaveEmployeeCommand(this);
         LaunchIconiferCommand = new LaunchIconiferCommand(this);
@@ -355,10 +386,12 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
 
     public void SelectManager()
     {
-        var managerSelector = new EmployeeSelectionWindow(Helios, Charon, true, DepartmentName);
+        var fullEmployeeList = Helios.StaffReader.Employees().OrderBy(e => e.FullName).Select(e => new EmployeeVM(e, Charon, Helios)).ToList();
+
+        var managerSelector = new EmployeeSelectionWindow(fullEmployeeList, true, DepartmentName);
         if (managerSelector.ShowDialog() != true) return;
 
-        var manager = managerSelector.VM.SelectedEmployee?.Employee;
+        var manager = managerSelector.SelectedEmployee?.Employee;
         if (manager is null) return;
 
         ReportsTo = manager;

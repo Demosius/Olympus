@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Rosters"
              xmlns:rosters="clr-namespace:Pantheon.Views.Controls.Rosters"
              mc:Ignorable="d" 
@@ -15,22 +14,6 @@
                 <ResourceDictionary>
 
                     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-
-                    <DataTemplate x:Key="RosterTemplate">
-                        <rosters:EmployeeRosterView DataContext="{Binding}" Padding="0" Margin="0"/>
-                    </DataTemplate>
-
-                    <DataTemplate x:Key="SelectedTemplate">
-                        <rosters:ActiveEmployeeRosterView DataContext="{Binding}" Padding="0" Margin="0"/>
-                    </DataTemplate>
-
-                    <ObjectDataProvider x:Key="RosterSortOptions"
-                                        MethodName="GetValues" 
-                                        ObjectType="{x:Type sys:Enum}">
-                        <ObjectDataProvider.MethodParameters>
-                            <x:Type TypeName="vm:ERosterSortOption"/>
-                        </ObjectDataProvider.MethodParameters>
-                    </ObjectDataProvider>
 
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
@@ -50,24 +33,40 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Orientation="Horizontal">
+                        <WrapPanel Orientation="Horizontal">
                             <!-- Function Buttons -->
-                            <Button Content="Auto-Assign" Width="140"
+                            <Button Content="Auto-Assign" MinWidth="120"
                                     Command="{Binding GenerateRosterCommand}"/>
-                            <Button Content="Clear Shifts" Width="140"
+                            <Button Content="Clear Shifts" MinWidth="120"
                                     Command="{Binding ClearShiftsCommand}"/>
 
                             <!-- Filter -->
                             <Label Content="Filter:"/>
                             <TextBox Width="100"
-                                     Text="{Binding SearchString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
-
-                            <!-- Sorting -->
-                            <Label Content="Sort By:"/>
-                            <ComboBox ItemsSource="{Binding Source={StaticResource RosterSortOptions}, Mode=OneTime}"
-                                      SelectedValue="{Binding SortOption}"/>
-
-                        </StackPanel>
+                                     Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            
+                            <!-- Add Missing Rosters -->
+                            <Button MinWidth="120"
+                                    Command="{Binding GenerateAdditionalRostersCommand}"
+                                    CommandParameter="Missing"
+                                    Visibility="{Binding IsMissingRoster, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Foreground="Red"
+                                               FontSize="10"
+                                               VerticalAlignment="Center">
+                                        <Run>(</Run>
+                                        <Run Text="{Binding EmployeesWithoutRosterCount, Mode=OneWay}"/>
+                                        <Run>)</Run>
+                                    </TextBlock>
+                                    <TextBlock Text=" Add Missing "></TextBlock>
+                                </StackPanel>
+                            </Button>
+                            <!-- Add borrowed employee rosters -->
+                            <Button MinWidth="120"
+                                    Command="{Binding GenerateAdditionalRostersCommand}"
+                                    CommandParameter="Loan"
+                                    Content="Loan Rosters"/>
+                        </WrapPanel>
                         <ToggleButton Grid.Column="1" x:Name="TogglePopupButton" HorizontalAlignment="Left"
                                       Padding="5,0" Margin="5,5" Content="☰"/>
 
@@ -88,48 +87,54 @@
                         BorderBrush="{StaticResource ForegroundBrush}" BorderThickness=".5"
                         Padding="5">
 
-                    <StackPanel Orientation="Horizontal">
-                        <!-- Shift Target Bypass option -->
-                        <CheckBox IsChecked="{Binding ExceedTargets, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              ToolTip="Exceed shift target counts."/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <!-- Shift Target Bypass option -->
+                            <CheckBox IsChecked="{Binding ExceedTargets, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      ToolTip="Exceed shift target counts."/>
 
 
-                        <!-- Shift Count Containers -->
-                        <ItemsControl VerticalContentAlignment="Center"
+                            <!-- Shift Count Containers -->
+                            <ItemsControl VerticalContentAlignment="Center"
                                           VerticalAlignment="Center"
                                           ItemsSource="{Binding ShiftTargets, Mode=OneWay, FallbackValue=''}">
 
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel Orientation="Horizontal"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border BorderBrush="{StaticResource ForegroundBrush}"
-                                                BorderThickness=".5">
-                                        <Grid MinWidth="90">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Label Grid.Column="0" 
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="{StaticResource ForegroundBrush}"
+                                            BorderThickness=".5">
+                                            <Grid MinWidth="90">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Label Grid.Column="0" 
                                                        Content="{Binding Shift.Name, Mode=OneTime, FallbackValue=''}"
                                                        HorizontalAlignment="Center"
                                                        Margin="0"
                                                        FontSize="12"
                                                        FontWeight="Bold"/>
-                                            <Label Grid.Column="1"
+                                                <Label Grid.Column="1"
                                                        Content="{Binding Count, Mode=OneWay}"
                                                        HorizontalAlignment="Center"
                                                        Margin="0"
                                                        FontSize="12"
                                                        FontWeight="Bold"/>
-                                            <Label Grid.Column="2"
+                                                <Label Grid.Column="2"
                                                        Content="/"/>
-                                            <TextBox Grid.Column="3" Text="{Binding MasterTarget, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                                <TextBox Grid.Column="3" Text="{Binding Target, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                          PreviewTextInput="ShiftTarget_OnPreviewTextInput"
                                                          MinHeight="0"
                                                          Height="20"
@@ -144,12 +149,36 @@
                                                          LostKeyboardFocus="TextBox_LostKeyboardFocus"
                                                          LostFocus="ShiftTarget_LostFocus"
                                                          TextChanged="ShiftTarget_Changed"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+
+                        <Expander Grid.Column="1" ExpandDirection="Right">
+
+                            <!-- Headers (Employee => Dailies) -->
+                            <Border BorderBrush="{StaticResource ForegroundBrush}" BorderThickness=".5">
+                                <Grid>
+                                    <WrapPanel Orientation="Horizontal">
+                                        <rosters:DailyRosterView DataContext="{Binding MondayRoster}"/>
+                                        <rosters:DailyRosterView DataContext="{Binding TuesdayRoster}"/>
+                                        <rosters:DailyRosterView DataContext="{Binding WednesdayRoster}"/>
+                                        <rosters:DailyRosterView DataContext="{Binding ThursdayRoster}"/>
+                                        <rosters:DailyRosterView DataContext="{Binding FridayRoster}"/>
+                                        <Grid Visibility="{Binding UseSaturdays, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <rosters:DailyRosterView DataContext="{Binding SaturdayRoster}"/>
                                         </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
+                                        <Grid Visibility="{Binding UseSundays, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <rosters:DailyRosterView DataContext="{Binding SundayRoster}"/>
+                                        </Grid>
+                                    </WrapPanel>
+                                </Grid>
+
+                            </Border>
+                        </Expander>
+                    </Grid>
                 </Border>
 
                 <!-- Selected Employee(Roster) -->
@@ -158,38 +187,17 @@
                               HorizontalScrollBarVisibility="Auto"
                               VerticalScrollBarVisibility="Hidden"
                               Visibility="{Binding ShowActive, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <rosters:ActiveEmployeeRosterView DataContext="{Binding SelectedRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <rosters:ActiveEmployeeRosterView DataContext="{Binding SelectedRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </ScrollViewer>
 
-                <!-- Headers (Employee => Dailies) -->
-                <!--<Border Grid.Column="0" Grid.Row="2"  BorderBrush="{StaticResource ForegroundBrush}" BorderThickness=".5">
-                    <Grid>
-                        <Label Content="Employee"
-                               FontSize="24"
-                               HorizontalAlignment="Center"
-                               FontWeight="Bold"
-                               VerticalAlignment="Center"/>
-                        <CheckBox VerticalAlignment="Top" 
-                                  HorizontalAlignment="Right"
-                                  IsChecked="{Binding ShowTargets, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  ToolTip="Show Daily Shift Targets"/>
-                    </Grid>
-                </Border>
-
-                <rosters:DailyRosterView Grid.Column="1" Grid.Row="2" DataContext="{Binding MondayRoster}"/>
-                <rosters:DailyRosterView Grid.Column="2" Grid.Row="2" DataContext="{Binding TuesdayRoster}"/>
-                <rosters:DailyRosterView Grid.Column="3" Grid.Row="2" DataContext="{Binding WednesdayRoster}"/>
-                <rosters:DailyRosterView Grid.Column="4" Grid.Row="2" DataContext="{Binding ThursdayRoster}"/>
-                <rosters:DailyRosterView Grid.Column="5" Grid.Row="2" DataContext="{Binding FridayRoster}"/>
-                <rosters:DailyRosterView Grid.Column="6" Grid.Row="2" DataContext="{Binding SaturdayRoster}"/>
-                <rosters:DailyRosterView Grid.Column="7" Grid.Row="2" DataContext="{Binding SundayRoster}"/>-->
 
                 <!-- Employee Rosters -->
-                <DataGrid ItemsSource="{Binding DisplayRosters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, IsAsync=true}"
+                <DataGrid ItemsSource="{Binding DisplayRosters, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           SelectedItem="{Binding SelectedRoster, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
                           AutoGenerateColumns="True"
                           AutoGeneratingColumn="DataGrid_OnAutoGeneratingColumn"
+                          AutoGeneratedColumns="DataGrid_OnAutoGeneratedColumns"
                           CanUserResizeColumns="True"
                           CanUserAddRows="False"
                           CanUserDeleteRows="False"
@@ -200,7 +208,7 @@
                           RowHeight="25">
                     <DataGrid.ColumnHeaderStyle>
                         <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeaderStyle}">
-                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="FontSize" Value="13"/>
                             <Setter Property="FontWeight" Value="Bold"/>
                             <Setter Property="HorizontalContentAlignment" Value="Center"/>
                         </Style>
@@ -212,40 +220,7 @@
                             <Setter Property="FontWeight" Value="Bold"/>
                         </Style>
                     </DataGrid.CellStyle>
-                    <!--<DataGrid.Columns>
-                        <DataGridTextColumn Header="Employee"
-                                            Binding="{Binding EmployeeName}"
-                                            IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Shift"
-                                            Binding="{Binding SelectedShift}"/>
-                        <DataGridTextColumn Header="Monday"
-                                            Binding="{Binding MondayRoster}"
-                                            IsReadOnly="True"
-                                            Width="200"
-                                            x:Name="MonCol"/>
-                        <DataGridTextColumn Header="Tuesday"
-                                            Binding="{Binding TuesdayRoster}"
-                                            IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Wednesday"
-                                            Binding="{Binding WednesdayRoster}"
-                                            IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Thursday"
-                                            Binding="{Binding ThursdayRoster}"
-                                            IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Friday"
-                                            Binding="{Binding FridayRoster}"
-                                            IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Saturday"
-                                            Binding="{Binding SaturdayRoster}"
-                                            IsReadOnly="True"
-                                            Visibility="{Binding UseSaturdays, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                        <DataGridTextColumn Header="Sunday"
-                                            Binding="{Binding SundayRoster}"
-                                            IsReadOnly="True"
-                                            Visibility="{Binding UseSundays, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                    </DataGrid.Columns>-->
                 </DataGrid>
-
             </DockPanel>
         </Border>
     </DockPanel>

@@ -35,7 +35,7 @@ public enum ESortMethod
     ID
 }
 
-public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters
+public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, ISorting
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }

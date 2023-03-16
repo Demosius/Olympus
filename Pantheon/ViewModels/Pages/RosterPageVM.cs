@@ -198,14 +198,6 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         ExportRosterCommand = new ExportRosterCommand(this);
     }
 
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
-
-        RefreshData();
-    }
-
     private void SetRosters()
     {
         Rosters.Clear();
@@ -233,6 +225,8 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         SelectedDepartment.DepartmentRosters.Add(newRoster);
         Rosters.Add(newRoster);
         SelectedRoster = newRoster;
+
+        LoadRoster();
     }
 
     public void RefreshData()
@@ -249,6 +243,13 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 
         Departments = new ObservableCollection<Department>(EmployeeDataSet.SubDepartments(Charon.Employee?.DepartmentName ?? ""));
         SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.Employee?.DepartmentName);
+        
+        rosters = new ObservableCollection<DepartmentRoster>();
+        
+        minDate = DateTime.Today.AddDays(DayOfWeek.Sunday - DateTime.Today.DayOfWeek + 1);   // Default to Monday of the current week. (Sunday will get the next monday)
+        maxDate = minDate.AddDays(4);   // Default to the next friday.
+        LoadedRosters = new Dictionary<Guid, DepartmentRosterVM>();
+        LoadedRoster = null;
     }
 
     public void LoadRoster()
@@ -256,7 +257,7 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         if (LoadedRoster is not null || SelectedRoster is null) return;
 
         if (!LoadedRosters.TryGetValue(SelectedRoster.ID, out var vm))
-            vm = new DepartmentRosterVM(SelectedRoster, Helios);
+            vm = new DepartmentRosterVM(SelectedRoster, Helios, Charon);
 
         Mouse.OverrideCursor = Cursors.Wait;
         vm.Initialize();
@@ -271,7 +272,7 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         // Must have a selected roster.
         if (SelectedRoster is null) return;
 
-        var vm = LoadedRoster ?? new DepartmentRosterVM(SelectedRoster, Helios);
+        var vm = LoadedRoster ?? new DepartmentRosterVM(SelectedRoster, Helios, Charon);
         vm.Initialize();
         var depRoster = vm.DepartmentRoster;
 

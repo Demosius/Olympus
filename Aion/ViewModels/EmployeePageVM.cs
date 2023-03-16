@@ -27,7 +27,7 @@ public enum EEmployeeSortOption
     JobClassification
 }
 
-public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
+public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction, ISorting
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }

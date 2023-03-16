@@ -1,4 +1,8 @@
-﻿using Pantheon.ViewModels.PopUp.Employees;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Documents;
+using Pantheon.ViewModels.Controls.Employees;
+using Pantheon.ViewModels.PopUp.Employees;
 using Styx;
 using Uranus;
 
@@ -11,10 +15,14 @@ namespace Pantheon.Views.PopUp.Employees
     {
         public EmployeeSelectionVM VM { get; set; }
 
-        public EmployeeSelectionWindow(Helios helios, Charon charon, bool managers = false, string? department = null)
+        public EmployeeVM? SelectedEmployee => VM.SelectedEmployee;
+
+        public List<EmployeeVM> SelectedEmployees => VM.FullEmployeeList.Where(e => e.IsSelected).ToList();
+
+        public EmployeeSelectionWindow(List<EmployeeVM> employees, bool managers = false, string? department = null, bool multiSelect = false)
         {
             InitializeComponent();
-            VM = new EmployeeSelectionVM(helios, charon, managers, department);
+            VM = new EmployeeSelectionVM(employees, managers, department, multiSelect);
             DataContext = VM;
         }
     }

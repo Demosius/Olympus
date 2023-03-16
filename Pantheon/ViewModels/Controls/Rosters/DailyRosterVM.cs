@@ -77,18 +77,6 @@ public class DailyRosterVM : INotifyPropertyChanged
     }
     
     /// <summary>
-    /// Sets all rosters as public holiday.
-    /// </summary>
-    public void SetPublicHoliday(bool isPublicHoliday = true) => DailyRoster.SetPublicHoliday(isPublicHoliday);
-    /*{
-        // Do not set roster type directly, as that will result in recursive prompting.
-        // Use SetPublicHoliday method.
-        PublicHoliday = isPublicHoliday;
-        foreach (var (_, rosterVM) in Rosters)
-            rosterVM.SetPublicHoliday(isPublicHoliday);
-    }*/
-
-    /// <summary>
     /// Sets associated rosters to standard, typically used when switching from public holiday.
     /// </summary>
     public void SetStandard()

@@ -185,7 +185,16 @@ public class StaffCreator
 
     public void Break(Break @break) => Chariot.Create(@break);
 
-    public void DepartmentRoster(DepartmentRoster roster) => Chariot.Create(roster);
+    public void DepartmentRoster(DepartmentRoster roster)
+    {
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            Chariot.InsertIntoTable(roster.EmployeeRosters);
+            Chariot.InsertIntoTable(roster.Rosters);
+            Chariot.InsertIntoTable(roster.DailyRosters());
+            Chariot.Create(roster);
+        });
+    }
 
     public void ShiftRuleSingle(ShiftRuleSingle shiftRule, EPushType pushType = EPushType.ObjectOnly) =>
         Chariot.Create(shiftRule, pushType);

@@ -8,6 +8,7 @@ using System.Windows;
 using Pantheon.Annotations;
 using Pantheon.ViewModels.Commands.Employees;
 using Pantheon.ViewModels.Commands.Generic;
+using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.ViewModels.Interface;
 using Pantheon.Views.PopUp.Employees;
 using Styx;
@@ -143,7 +144,6 @@ public class ClanSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
     public ActivateCreationCommand ActivateCreationCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public SelectManagerCommand SelectManagerCommand { get; set; }
     public ClearManagerCommand ClearManagerCommand { get; set; }
 
@@ -180,7 +180,6 @@ public class ClanSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         ActivateCreationCommand = new ActivateCreationCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         SelectManagerCommand = new SelectManagerCommand(this);
         ClearManagerCommand = new ClearManagerCommand(this);
     }
@@ -200,7 +199,9 @@ public class ClanSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
 
     public void SelectManager()
     {
-        var leaderSelector = new EmployeeSelectionWindow(Helios, Charon, department: ClanDepartment?.Name);
+        var fullEmployeeList = Helios.StaffReader.Employees().OrderBy(e => e.FullName).Select(e => new EmployeeVM(e, Charon, Helios)).ToList();
+
+        var leaderSelector = new EmployeeSelectionWindow(fullEmployeeList, department: ClanDepartment?.Name);
         if (leaderSelector.ShowDialog() != true) return;
 
         ClanLeader = leaderSelector.VM.SelectedEmployee?.Employee;
@@ -277,12 +278,7 @@ public class ClanSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         Clans.Clear();
         foreach (var clan in clans) Clans.Add(clan);
     }
-
-    public void ApplySorting()
-    {
-        throw new System.NotImplementedException();
-    }
-
+    
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]

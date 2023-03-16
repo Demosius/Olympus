@@ -5,7 +5,7 @@ using Pantheon.ViewModels.PopUp.Rosters;
 
 namespace Pantheon.ViewModels.Commands.Rosters;
 
-internal class ConfirmDepartmentRosterCreationCommand : ICommand
+public class ConfirmDepartmentRosterCreationCommand : ICommand
 {
     public RosterCreationVM VM { get; set; }
 

@@ -6,6 +6,7 @@ using System.Windows;
 using Pantheon.Annotations;
 using Pantheon.ViewModels.Commands.Employees;
 using Pantheon.ViewModels.Commands.Generic;
+using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.ViewModels.Interface;
 using Pantheon.Views.PopUp.Employees;
 using Styx;
@@ -225,7 +226,9 @@ public class DepartmentSelectionVM : INotifyPropertyChanged, ICreationMode, ISel
 
     public void SelectManager()
     {
-        var mangerSelector = new EmployeeSelectionWindow(Helios, Charon, true, ParentDepartment?.Name);
+        var fullEmployeeList = Helios.StaffReader.Employees().OrderBy(e => e.FullName).Select(e => new EmployeeVM(e, Charon, Helios)).ToList();
+
+        var mangerSelector = new EmployeeSelectionWindow(fullEmployeeList, true, ParentDepartment?.Name);
         mangerSelector.ShowDialog();
 
         if (mangerSelector.DialogResult != true) return;

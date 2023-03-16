@@ -15,7 +15,7 @@ public class WeeklyCounterVM : INotifyPropertyChanged
     public DepartmentRoster? Roster => WeeklyShiftCounter.Roster;
 
     public Shift? Shift => WeeklyShiftCounter.Shift;
-
+    
     // Handle the targets of daily shifts of the roster as well.
     public int Target
     {
@@ -47,6 +47,10 @@ public class WeeklyCounterVM : INotifyPropertyChanged
     }
 
     public string ShiftID => WeeklyShiftCounter.ShiftID;
+
+    public int Discrepancy => WeeklyShiftCounter.Discrepancy;
+
+    public bool Lacking => WeeklyShiftCounter.Lacking;
 
     #endregion
 

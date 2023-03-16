@@ -2,7 +2,6 @@
 using Panacea.Models;
 using Panacea.Properties;
 using Panacea.ViewModels.Commands;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -94,7 +93,6 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public BinsToClipboardCommand BinsToClipboardCommand { get; set; }
     public RunChecksCommand RunChecksCommand { get; set; }
 
@@ -114,7 +112,6 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         BinsToClipboardCommand = new BinsToClipboardCommand(this);
         RunChecksCommand = new RunChecksCommand(this);
     }
@@ -144,13 +141,7 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
 
         FilteredCheckResults = new ObservableCollection<BWMICheckResult>(results);
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
-
+    
     public void RunChecks()
     {
         Mouse.OverrideCursor = Cursors.Wait;

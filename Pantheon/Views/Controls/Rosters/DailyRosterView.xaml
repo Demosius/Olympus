@@ -6,27 +6,19 @@
              xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Rosters"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:DailyRosterVM}, IsDesignTimeCreatable=False}"
-             d:DesignHeight="450" Width="200">
-
-    <UserControl.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary>
-                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-                </ResourceDictionary>
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </UserControl.Resources>
+             d:DesignHeight="450">
 
     <Border BorderBrush="{StaticResource  Brush01}"
             BorderThickness=".5">
         <StackPanel Orientation="Vertical">
-            <ItemsControl ItemsSource="{Binding ShiftCounter, Mode=OneTime}"
-                          Visibility="{Binding DepartmentRosterVM.ShowTargets, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Label Content="{Binding Mode=OneTime}"
+                   FontSize="12"
+                   FontWeight="Bold"/>
+            <ItemsControl ItemsSource="{Binding ShiftCounter, Mode=OneTime}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border BorderBrush="{StaticResource ForegroundBrush}"
-                                        BorderThickness=".5">
+                                BorderThickness=".5">
                             <Grid MinWidth="90">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="2*"/>
@@ -35,7 +27,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Label Grid.Column="0" 
-                                       Content="{Binding Shift.Name, Mode=OneTime, FallbackValue=''}"
+                                       Content="{Binding ShiftName, Mode=OneTime, FallbackValue=''}"
                                        HorizontalAlignment="Center"
                                        Margin="0"
                                        FontSize="12"
@@ -69,11 +61,6 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-
-            <Label Content="{Binding Mode=OneTime}"
-                   FontSize="16"
-                   FontWeight="Bold"/>
-
         </StackPanel>
     </Border>
 </UserControl>
