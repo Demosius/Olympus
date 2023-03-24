@@ -11,6 +11,15 @@
              d:DataContext="{d:DesignInstance {x:Type vm:RosterVM}, IsDesignTimeCreatable=False}"
              Height="90" Width="200">
 
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Dark Theme -->
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Master/MSControls.Core.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
     <Border BorderBrush="{StaticResource ForegroundBrush}"
             BorderThickness=".5">
         <Canvas>
@@ -25,8 +34,18 @@
                 <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             </Canvas.Resources>
 
+            <!-- Day of the week -->
+            <Label Canvas.Top="2" Canvas.Left="2"
+                   Padding="0" Margin="0"
+                   Height="22" Width="196"
+                   FontSize="14"
+                   Foreground="{StaticResource  ForegroundBrush}"
+                   VerticalContentAlignment="Top"
+                   HorizontalContentAlignment="Center"
+                   Content="{Binding Day, Mode=OneWay}"/>
+
             <!-- Attendance -->
-            <CheckBox Canvas.Top="15" Canvas.Left="0"
+            <CheckBox Canvas.Top="27" Canvas.Left="0"
                       IsChecked="{Binding AtWork, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       Margin="0"
                       Padding="0"
@@ -34,9 +53,9 @@
                       x:Name="IsAtWork"/>
 
             <!-- Times -->
-            <TextBox Canvas.Top="5" Canvas.Left="28"
+            <TextBox Canvas.Top="24" Canvas.Left="28"
                      Text="{Binding StartTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Height="50"
+                     Height="36"
                      MinHeight="0"
                      FontSize="24"
                      FontFamily="{StaticResource DIN}"
@@ -44,21 +63,21 @@
                      HorizontalAlignment="Center"
                      VerticalContentAlignment="Center"
                      HorizontalContentAlignment="Center"
-                     Width="77"
+                     Width="76"
                      Margin="0"
                      Padding="0"
                      GotKeyboardFocus="TextBox_GotKeyboardFocus"
                      LostMouseCapture="TextBox_LostMouseCapture"
                      LostKeyboardFocus="TextBox_LostKeyboardFocus"
                      Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
-            <Label Canvas.Top="18" Canvas.Left="102"
+            <Label Canvas.Top="30" Canvas.Left="101"
                    Content="to"
                    FontSize="10"
                    Margin="0"
                    Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
-            <TextBox Canvas.Top="5" Canvas.Left="119"  
+            <TextBox Canvas.Top="24" Canvas.Left="119"  
                      Text="{Binding EndTime, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                     Height="50"
+                     Height="36"
                      MinHeight="0"
                      FontSize="24"
                      FontFamily="{StaticResource DIN}"
@@ -66,7 +85,7 @@
                      HorizontalAlignment="Center"
                      VerticalContentAlignment="Center"
                      HorizontalContentAlignment="Center"
-                     Width="77"
+                     Width="76"
                      Margin="0"
                      Padding="0"
                      GotKeyboardFocus="TextBox_GotKeyboardFocus"
@@ -75,7 +94,7 @@
                      Visibility="{Binding AtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
 
             <!-- Away Display -->
-            <Label Canvas.Top="5" Canvas.Left="30"
+            <Label Canvas.Top="18" Canvas.Left="30"
                    Height="50" Width="160"
                    FontSize="22"
                    Foreground="{StaticResource  GridSplitterHoverBorderBrush}"
@@ -85,22 +104,22 @@
                    Visibility="{Binding NotAtWork, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"/>
 
             <!-- Shift Selector SUPPOSED TO BE MINI -->
-            <ComboBox Canvas.Top="57" Canvas.Left="5"
+            <ComboBox Canvas.Top="65" Canvas.Left="5"
                       Width="92"
-                      Height="27"
+                      Height="20"
                       FontSize="12"
                       HorizontalContentAlignment="Center"
                       VerticalContentAlignment="Center"
-                      Style="{StaticResource ComboBoxStyle}"
+                      Style="{StaticResource MiniComboBoxStyle}"
                       ItemsSource="{Binding DepartmentRosterVM.Shifts, Mode=OneTime}"
                       SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <!-- Shift Type Selector (Normal/AL/RDO/etc.) SUPPOSED TO BE MINI -->
-            <ComboBox Canvas.Top="57" Canvas.Left="103"
-                      Style="{StaticResource ComboBoxStyle}"
+            <ComboBox Canvas.Top="65" Canvas.Left="103"
+                      Style="{StaticResource MiniComboBoxStyle}"
                       ItemsSource="{Binding Source={StaticResource RosterTypes}, Mode=OneTime}"
-                      Height="27"
-                      Width="90"
+                      Height="20"
+                      Width="92"
                       FontSize="12"
                       HorizontalContentAlignment="Center"
                       VerticalContentAlignment="Center"

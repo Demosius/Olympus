@@ -303,6 +303,7 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 
         try
         {
+            LoadedRoster.DepartmentRoster.RegenerateRosters();
             Helios.StaffUpdater.DepartmentRoster(LoadedRoster.DepartmentRoster);
             MessageBox.Show("Saved Successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.None);
         }

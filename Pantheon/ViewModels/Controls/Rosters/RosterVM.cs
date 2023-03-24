@@ -22,11 +22,11 @@ public class RosterVM : INotifyPropertyChanged
         get => Roster.Shift;
         set
         {
-            if (AtWork && Roster.Shift is not null) Roster.SubCount(Roster.Shift);
+            if (AtWork && Roster.Shift is not null) SubCount(Roster.Shift);
             Roster.Shift = value;
             Roster.ShiftID = Roster.Shift?.ID ?? "";
             OnPropertyChanged();
-            if (AtWork && Roster.Shift is not null) Roster.AddCount(Roster.Shift);
+            if (AtWork && Roster.Shift is not null) AddCount(Roster.Shift);
 
             SetShift(value);
             SetDisplayString();
@@ -42,6 +42,8 @@ public class RosterVM : INotifyPropertyChanged
     public Employee? Employee  => Roster.Employee;
 
     public DateTime Date => Roster.Date;
+
+    public DayOfWeek Day => Roster.Day;
 
     public ERosterType Type
     {
@@ -97,9 +99,9 @@ public class RosterVM : INotifyPropertyChanged
             if (!shiftCount || SelectedShift is null) return;
 
             if (AtWork)
-                Roster.AddCount(SelectedShift);
+                AddCount(SelectedShift);
             else
-                Roster.SubCount(SelectedShift);
+                SubCount(SelectedShift);
         }
     }
 
@@ -150,8 +152,12 @@ public class RosterVM : INotifyPropertyChanged
 
         displayString = roster.ToString();
 
-        if (SelectedShift is not null && AtWork) Roster.AddCount(SelectedShift);
+        if (SelectedShift is not null && AtWork) AddCount(SelectedShift);
     }
+
+    public void SubCount(Shift shift) => EmployeeRosterVM.SubDailyCount(shift, Day);
+
+    public void AddCount(Shift shift) => EmployeeRosterVM.AddDailyCount(shift, Day);
 
     public void ApplyShiftRules(List<ShiftRule> rules)
     {
@@ -162,7 +168,7 @@ public class RosterVM : INotifyPropertyChanged
     public void SetShift(Shift? shift)
     {
         // Pass information up chain for Tracking Counts of Shifts.
-        if (Roster.Shift is not null) EmployeeRosterVM.SubShift(Roster.Shift, Date);
+        if (Roster.Shift is not null) SubCount(Roster.Shift);
         // Change Actual Shift and data.
         Roster.Shift = shift;
         Roster.StartTime = shift?.StartTime ?? TimeSpan.Zero;
@@ -172,7 +178,7 @@ public class RosterVM : INotifyPropertyChanged
         OnPropertyChanged(nameof(EndTime));
         OnPropertyChanged(nameof(DisplayString));
         // Pass information tracking up chain.
-        if (Roster.Shift is not null) EmployeeRosterVM.AddShift(Roster.Shift, Date);
+        if (Roster.Shift is not null) AddCount(Roster.Shift);
     }
 
     /// <summary>
@@ -200,6 +206,8 @@ public class RosterVM : INotifyPropertyChanged
     }*/
 
     public void SetDisplayString() => DisplayString = Roster.ToString();
+
+    public void Delete() => Roster.Delete();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

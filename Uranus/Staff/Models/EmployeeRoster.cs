@@ -72,9 +72,26 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
         DepartmentRosterID = DepartmentRoster.ID;
     }
 
-    public Roster? GetDaily(DayOfWeek weekDay)
+    public IEnumerable<Roster> Rosters()
     {
-        return weekDay switch
+        var returnList = new List<Roster>
+        {
+            GetDaily(DayOfWeek.Monday),
+            GetDaily(DayOfWeek.Tuesday),
+            GetDaily(DayOfWeek.Wednesday),
+            GetDaily(DayOfWeek.Thursday),
+            GetDaily(DayOfWeek.Friday)
+        };
+
+        if (SaturdayRoster is not null) returnList.Add(SaturdayRoster);
+        if (SundayRoster is not null) returnList.Add(SundayRoster);
+
+        return returnList;
+    }
+
+    public Roster GetDaily(DayOfWeek weekDay)
+    {
+        var roster = weekDay switch
         {
             DayOfWeek.Sunday => SundayRoster,
             DayOfWeek.Monday => MondayRoster,
@@ -85,6 +102,13 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
             DayOfWeek.Saturday => SaturdayRoster,
             _ => throw new ArgumentOutOfRangeException(nameof(weekDay), weekDay, null)
         };
+
+        if (roster is not null) return roster;
+        
+        roster = DepartmentRoster is null ? new Roster() : new Roster(DepartmentRoster!, this, DepartmentRoster!.GetDaily(StartDate.AddDays((weekDay - DayOfWeek.Monday) % 7).DayOfWeek));
+        SetDaily(roster);
+
+        return roster;
     }
 
     public bool SetDaily(Roster dailyRoster)
@@ -96,24 +120,31 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
         {
             case DayOfWeek.Sunday:
                 SundayRoster = dailyRoster;
+                SundayRosterID = SundayRoster.ID;
                 break;
             case DayOfWeek.Monday:
                 MondayRoster = dailyRoster;
+                MondayRosterID = MondayRoster.ID;
                 break;
             case DayOfWeek.Tuesday:
                 TuesdayRoster = dailyRoster;
+                TuesdayRosterID = TuesdayRoster.ID;
                 break;
             case DayOfWeek.Wednesday:
                 WednesdayRoster = dailyRoster;
+                WednesdayRosterID = WednesdayRoster.ID;
                 break;
             case DayOfWeek.Thursday:
                 ThursdayRoster = dailyRoster;
+                ThursdayRosterID = ThursdayRoster.ID;
                 break;
             case DayOfWeek.Friday:
                 FridayRoster = dailyRoster;
+                FridayRosterID = FridayRoster.ID;
                 break;
             case DayOfWeek.Saturday:
                 SaturdayRoster = dailyRoster;
+                SaturdayRosterID = SaturdayRoster.ID;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(dailyRoster), dailyRoster, null);
@@ -134,4 +165,11 @@ public class EmployeeRoster : IEquatable<EmployeeRoster>, IComparable<EmployeeRo
         return string.Compare(Employee.FullName, other.Employee?.FullName ?? "", StringComparison.Ordinal);
     }
 
+    /// <summary>
+    /// Remove self from associated objects.
+    /// </summary>
+    public void Delete()
+    {
+        DepartmentRoster?.EmployeeRosters.Remove(this);
+    }
 }

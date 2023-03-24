@@ -99,7 +99,7 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         AtWork = true;
         ShiftRules = new List<ShiftRule>();
     }
-
+    
     public Roster(DepartmentRoster departmentRoster, EmployeeRoster employeeRoster, DailyRoster dailyRoster)
     {
         ID = Guid.NewGuid();
@@ -175,21 +175,25 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         return $"{StartTime.Hours:00}:{StartTime.Minutes:00} - {EndTime.Hours:00}:{EndTime.Minutes:00}";
     }
 
-    public void SubCount(Shift shift) => DailyRoster?.SubCount(shift);
-
-    public void AddCount(Shift shift) => DailyRoster?.AddCount(shift);
-
     /// <summary>
     /// Sets the roster type as public holiday without using the Type Setter - which would result in recursive prompting.
     /// </summary>
     public void SetPublicHoliday(bool isPublicHoliday = true)
     {
         RosterType = isPublicHoliday ? ERosterType.PublicHoliday : ERosterType.Standard;
-        //OnPropertyChanged(nameof(Type));
         if (isPublicHoliday)
             AtWork = false;
         else
             AtWork = DailyRoster?.Day is not (DayOfWeek.Saturday or DayOfWeek.Sunday) || Shift is not null;
+    }
+
+    /// <summary>
+    /// Delete self from associated objects.
+    /// </summary>
+    public void Delete()
+    {
+        DailyRoster?.Rosters.Remove(this);
+        DepartmentRoster?.Rosters?.Remove(this);
     }
 
     public override string ToString()

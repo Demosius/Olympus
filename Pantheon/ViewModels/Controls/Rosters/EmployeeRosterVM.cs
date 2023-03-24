@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+using System.Windows;
 using Pantheon.Annotations;
 using Pantheon.ViewModels.Commands.Rosters;
 using Uranus.Staff.Models;
@@ -142,12 +142,12 @@ public class EmployeeRosterVM : INotifyPropertyChanged
         get => EmployeeRoster.Shift;
         set
         {
-            if (SelectedShift is not null && SelectedRosterType == ERosterType.Standard) SubCount(SelectedShift);
+            if (SelectedShift is not null && SelectedRosterType == ERosterType.Standard) SubWeeklyCount(SelectedShift);
             EmployeeRoster.Shift = value;
             EmployeeRoster.ShiftID = value?.ID ?? "";
             OnPropertyChanged();
             OnPropertyChanged(nameof(ShiftName));
-            if (SelectedShift is not null && SelectedRosterType == ERosterType.Standard) AddCount(SelectedShift);
+            if (SelectedShift is not null && SelectedRosterType == ERosterType.Standard) AddWeeklyCount(SelectedShift);
             SetShift(value);
         }
     }
@@ -165,9 +165,9 @@ public class EmployeeRosterVM : INotifyPropertyChanged
             SetRosterType(value);
             if (!adjustCounter || SelectedShift is null) return;
             if (SelectedRosterType == ERosterType.Standard)
-                AddCount(SelectedShift);
+                AddWeeklyCount(SelectedShift);
             else
-                SubCount(SelectedShift);
+                SubWeeklyCount(SelectedShift);
         }
     }
 
@@ -179,31 +179,35 @@ public class EmployeeRosterVM : INotifyPropertyChanged
 
     #endregion
 
-    public EmployeeRosterVM(EmployeeRoster roster, DepartmentRosterVM departmentRosterVM)
+    public EmployeeRosterVM(EmployeeRoster employeeRoster, DepartmentRosterVM departmentRosterVM)
     {
-        if (roster.Employee is null) throw new DataException("Employee Roster missing Employee Value.");
+        if (employeeRoster.Employee is null) throw new DataException("Employee Roster missing Employee Value.");
         if (departmentRosterVM.Department is null) throw new DataException("Department Roster missing Department Value.");
 
-        EmployeeRoster = roster;
+        EmployeeRoster = employeeRoster;
         employee = EmployeeRoster.Employee;
         DepartmentRosterVM = departmentRosterVM;
         
-        MondayRoster = new RosterVM(roster.MondayRoster ?? new Roster(DepartmentRosterVM.Department, employee, roster.StartDate), this);
-        TuesdayRoster = new RosterVM(roster.TuesdayRoster ?? new Roster(DepartmentRosterVM.Department, employee, roster.StartDate.AddDays(1)), this);
-        WednesdayRoster = new RosterVM(roster.WednesdayRoster ?? new Roster(DepartmentRosterVM.Department, employee, roster.StartDate.AddDays(2)), this);
-        ThursdayRoster = new RosterVM(roster.ThursdayRoster ?? new Roster(DepartmentRosterVM.Department, employee, roster.StartDate.AddDays(3)), this);
-        FridayRoster = new RosterVM(roster.FridayRoster ?? new Roster(DepartmentRosterVM.Department, employee, roster.StartDate.AddDays(4)), this);
-        SaturdayRoster = new RosterVM(roster.SaturdayRoster ?? new Roster(DepartmentRosterVM.Department, employee, roster.StartDate.AddDays(5)), this);
-        SundayRoster = new RosterVM(roster.SundayRoster ?? new Roster(DepartmentRosterVM.Department, employee, roster.StartDate.AddDays(6)), this);
+        MondayRoster = new RosterVM(employeeRoster.GetDaily(DayOfWeek.Monday), this);
+        TuesdayRoster = new RosterVM(employeeRoster.GetDaily(DayOfWeek.Tuesday), this);
+        WednesdayRoster = new RosterVM(employeeRoster.GetDaily(DayOfWeek.Wednesday), this);
+        ThursdayRoster = new RosterVM(employeeRoster.GetDaily(DayOfWeek.Thursday), this);
+        FridayRoster = new RosterVM(employeeRoster.GetDaily(DayOfWeek.Friday), this);
+        SaturdayRoster = new RosterVM(employeeRoster.GetDaily(DayOfWeek.Saturday), this);
+        SundayRoster = new RosterVM(employeeRoster.GetDaily(DayOfWeek.Sunday), this);
 
-        shifts = new ObservableCollection<Shift>(roster.Shifts);
+        shifts = new ObservableCollection<Shift>(employeeRoster.Shifts);
 
         DeleteEmployeeRosterCommand = new DeleteEmployeeRosterCommand(this);
     }
 
-    public void SubCount(Shift shift) => DepartmentRosterVM.SubCount(shift);
+    public void SubDailyCount(Shift shift, DayOfWeek day) => DepartmentRosterVM.SubDailyCount(shift, day);
 
-    public void AddCount(Shift shift) => DepartmentRosterVM.AddCount(shift);
+    public void AddDailyCount(Shift shift, DayOfWeek day) => DepartmentRosterVM.AddDailyCount(shift, day);
+
+    public void SubWeeklyCount(Shift shift) => DepartmentRosterVM.SubWeeklyCount(shift);
+
+    public void AddWeeklyCount(Shift shift) => DepartmentRosterVM.AddWeeklyCount(shift);
 
     /// <summary>
     /// OnPropertyChanged notify for all rosters.
@@ -241,13 +245,15 @@ public class EmployeeRosterVM : INotifyPropertyChanged
         if (Department is null || Employee is null) throw new DataException("Employee Roster missing Department or Employee.");
 
         // Ensure all daily rosters exist.
-        MondayRoster ??= new RosterVM(EmployeeRoster.MondayRoster ??= new Roster(Department, Employee, StartDate), this);
-        TuesdayRoster ??= new RosterVM(EmployeeRoster.TuesdayRoster ??= new Roster(Department, Employee, StartDate.AddDays(1)), this);
-        WednesdayRoster ??= new RosterVM(EmployeeRoster.WednesdayRoster ??= new Roster(Department, Employee, StartDate.AddDays(2)), this);
-        ThursdayRoster ??= new RosterVM(EmployeeRoster.ThursdayRoster ??= new Roster(Department, Employee, StartDate.AddDays(3)), this);
-        FridayRoster ??= new RosterVM(EmployeeRoster.FridayRoster ??= new Roster(Department, Employee, StartDate.AddDays(4)), this);
-        if (UseSaturdays) SaturdayRoster ??= new RosterVM(EmployeeRoster.SaturdayRoster ??= new Roster(Department, Employee, StartDate.AddDays(5)), this);
-        if (UseSundays) SundayRoster ??= new RosterVM(EmployeeRoster.SundayRoster ??= new Roster(Department, Employee, StartDate.AddDays(6)), this);
+        MondayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Monday), this);
+        TuesdayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Tuesday), this);
+        WednesdayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Wednesday), this);
+        ThursdayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Thursday), this);
+        FridayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Friday), this);
+        if (UseSaturdays) SaturdayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Saturday), this);
+        if (UseSundays) SundayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Sunday), this);
+
+
     }
 
     /// <summary>
@@ -330,25 +336,31 @@ public class EmployeeRosterVM : INotifyPropertyChanged
 
         var returnList = new List<RosterVM>
         {
-            (MondayRoster ??= MondayRoster ??= new RosterVM(EmployeeRoster.MondayRoster ??= new Roster(Department, Employee, StartDate), this)),
-            (TuesdayRoster ??= new RosterVM(EmployeeRoster.TuesdayRoster ??= new Roster(Department, Employee, StartDate.AddDays(1)), this)),
-            (WednesdayRoster ??= new RosterVM(EmployeeRoster.WednesdayRoster ??= new Roster(Department, Employee, StartDate.AddDays(2)), this)),
-            (ThursdayRoster ??= new RosterVM(EmployeeRoster.ThursdayRoster ??= new Roster(Department, Employee, StartDate.AddDays(3)), this)),
-            (FridayRoster ??= new RosterVM(EmployeeRoster.FridayRoster ??= new Roster(Department, Employee, StartDate.AddDays(4)), this))
+            (MondayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Monday), this)),
+            (TuesdayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Tuesday), this)),
+            (WednesdayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Wednesday), this)),
+            (ThursdayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Thursday), this)),
+            (FridayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Friday), this))
         };
-        if (UseSaturdays) returnList.Add(SaturdayRoster ??= new RosterVM(EmployeeRoster.SaturdayRoster ??= new Roster(Department, Employee, StartDate.AddDays(5)), this));
-        if (UseSundays) returnList.Add(SundayRoster ??= new RosterVM(EmployeeRoster.SundayRoster ??= new Roster(Department, Employee, StartDate.AddDays(6)), this));
+        if (UseSaturdays) returnList.Add(SaturdayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Saturday), this));
+        if (UseSundays) returnList.Add(SundayRoster ??= new RosterVM(EmployeeRoster.GetDaily(DayOfWeek.Sunday), this));
 
         return returnList;
     }
 
-    public void SubShift(Shift rosterShift, DateTime date) => DepartmentRosterVM.SubShift(rosterShift, date);
-
-    public void AddShift(Shift rosterShift, DateTime date) => DepartmentRosterVM.AddShift(rosterShift, date);
-
     public void Delete()
     {
-        // TODO: remove this and all sub-objects from everywhere.
+        // Confirm deletion with employee.
+        if (MessageBox.Show($"Are you sure that you want to delete the roster for {Employee} from the roster: {DepartmentRosterVM}?",
+                "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
+
+        EmployeeRoster.Delete();
+        foreach (var rosterVM in RosterVMs())
+        {
+            rosterVM.Delete();
+        }
+
+        DepartmentRosterVM.RemoveEmployee(this);
     }
 
     /*/// <summary>

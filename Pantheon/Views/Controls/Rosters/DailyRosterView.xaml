@@ -14,7 +14,7 @@
             <Label Content="{Binding Mode=OneTime}"
                    FontSize="12"
                    FontWeight="Bold"/>
-            <ItemsControl ItemsSource="{Binding ShiftCounter, Mode=OneTime}">
+            <ItemsControl ItemsSource="{Binding ShiftCounters, Mode=OneTime}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border BorderBrush="{StaticResource ForegroundBrush}"

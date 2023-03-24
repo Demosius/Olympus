@@ -26,14 +26,14 @@ public class DailyRosterVM : INotifyPropertyChanged
 
     #region INotifyPropertyChanged Members
 
-    private ObservableCollection<DailyCounterVM> shiftCounter;
-    public ObservableCollection<DailyCounterVM> ShiftCounter
+    private ObservableCollection<DailyCounterVM> shiftCounters;
+    public ObservableCollection<DailyCounterVM> ShiftCounters
     {
-        get => shiftCounter;
+        get => shiftCounters;
         set
         {
-            shiftCounter = value;
-            OnPropertyChanged(nameof(ShiftCounter));
+            shiftCounters = value;
+            OnPropertyChanged(nameof(ShiftCounters));
         }
     }
 
@@ -42,7 +42,7 @@ public class DailyRosterVM : INotifyPropertyChanged
     public DailyRosterVM(DailyRoster roster, DepartmentRosterVM departmentRosterVM)
     {
         DailyRoster = roster;
-        shiftCounter = new ObservableCollection<DailyCounterVM>();
+        shiftCounters = new ObservableCollection<DailyCounterVM>();
         CounterAccessDict = new Dictionary<string, DailyCounterVM>();
         Rosters = new Dictionary<int, RosterVM>();
 
@@ -50,7 +50,7 @@ public class DailyRosterVM : INotifyPropertyChanged
 
         foreach (var counter in DailyRoster.ShiftCounters.Select(c => new DailyCounterVM(c)))
         {
-            ShiftCounter.Add(counter);
+            ShiftCounters.Add(counter);
             CounterAccessDict.Add(counter.ShiftID, counter);
         }
     }
@@ -62,20 +62,32 @@ public class DailyRosterVM : INotifyPropertyChanged
             if (CounterAccessDict.ContainsKey(shift.ID)) continue;
             var dailyShiftCounter = new DailyCounterVM(new DailyShiftCounter(DailyRoster, shift, shift.DailyTarget));
             CounterAccessDict.Add(shift.ID, dailyShiftCounter);
-            ShiftCounter.Add(dailyShiftCounter);
+            ShiftCounters.Add(dailyShiftCounter);
         }
     }
 
-    public void SubShift(Shift rosterShift)
+    public void SubCount(Shift rosterShift)
     {
-        CounterAccessDict[rosterShift.ID].Count--;
+        ShiftCounter(rosterShift).Count--;
     }
 
-    public void AddShift(Shift rosterShift)
+    public void AddCount(Shift rosterShift)
     {
-        CounterAccessDict[rosterShift.ID].Count++;
+        ShiftCounter(rosterShift).Count++;
     }
-    
+
+    public DailyCounterVM ShiftCounter(Shift shift)
+    {
+        if (CounterAccessDict.TryGetValue(shift.ID, out var counterVM)) return counterVM;
+
+        var counter = DailyRoster.ShiftCounter(shift);
+        counterVM = new DailyCounterVM(counter);
+        ShiftCounters.Add(counterVM);
+        CounterAccessDict.Add(shift.ID, counterVM);
+
+        return counterVM;
+    }
+
     /// <summary>
     /// Sets associated rosters to standard, typically used when switching from public holiday.
     /// </summary>

@@ -143,7 +143,6 @@ public class DepartmentRoster
             foreach (DayOfWeek value in Enum.GetValues(typeof(DayOfWeek)))
             {
                 var daily = GetDaily(value);
-                if (daily is null) continue;
 
                 var roster = new Roster(this, employeeRoster, daily);
 
@@ -263,7 +262,7 @@ public class DepartmentRoster
                 }
                 // Attach DailyRoster as appropriate.
                 var dailyRoster = GetDaily(date.DayOfWeek);
-                if (dailyRoster is null) continue;
+                
                 newEmployeeRoster.SetDaily(roster);
                 dailyRoster.AddRoster(roster);
                 roster.DailyRoster = dailyRoster;
@@ -288,9 +287,9 @@ public class DepartmentRoster
         EmployeesWithoutRoster.AddRange(ActiveEmployees.Where(e => !EmployeeRosters.Select(er => er.EmployeeID).Contains(e.ID)));
     }
 
-    public DailyRoster? GetDaily(DayOfWeek weekDay)
+    public DailyRoster GetDaily(DayOfWeek weekDay)
     {
-        return weekDay switch
+        var daily = weekDay switch
         {
             DayOfWeek.Sunday => SundayRoster,
             DayOfWeek.Monday => MondayRoster,
@@ -301,6 +300,13 @@ public class DepartmentRoster
             DayOfWeek.Saturday => SaturdayRoster,
             _ => throw new ArgumentOutOfRangeException(nameof(weekDay), weekDay, null)
         };
+
+        if (daily is not null) return daily;
+
+        daily = new DailyRoster(Department!, this, StartDate.AddDays((weekDay - DayOfWeek.Monday) % 7));
+        SetDaily(daily);
+
+        return daily;
     }
 
     public bool SetDaily(DailyRoster dailyRoster)
@@ -312,24 +318,31 @@ public class DepartmentRoster
         {
             case DayOfWeek.Sunday:
                 SundayRoster = dailyRoster;
+                SundayRosterID = dailyRoster.ID;
                 break;
             case DayOfWeek.Monday:
                 MondayRoster = dailyRoster;
+                MondayRosterID = dailyRoster.ID;
                 break;
             case DayOfWeek.Tuesday:
                 TuesdayRoster = dailyRoster;
+                TuesdayRosterID = dailyRoster.ID;
                 break;
             case DayOfWeek.Wednesday:
                 WednesdayRoster = dailyRoster;
+                WednesdayRosterID = dailyRoster.ID;
                 break;
             case DayOfWeek.Thursday:
                 ThursdayRoster = dailyRoster;
+                ThursdayRosterID = dailyRoster.ID;
                 break;
             case DayOfWeek.Friday:
                 FridayRoster = dailyRoster;
+                FridayRosterID = dailyRoster.ID;
                 break;
             case DayOfWeek.Saturday:
                 SaturdayRoster = dailyRoster;
+                SaturdayRosterID = dailyRoster.ID;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(dailyRoster), dailyRoster, null);
@@ -456,10 +469,9 @@ public class DepartmentRoster
             {
                 Rosters.Add(roster);
                 roster.DepartmentRoster = this;
-                if (roster.Shift is not null) ShiftCounter(roster.Shift).Count++;
             }
 
-            GetDaily(roster.Day)?.AddRoster(roster);
+            GetDaily(roster.Day).AddRoster(roster);
         }
 
         foreach (var rosterKey in nullIDs)
@@ -558,6 +570,14 @@ public class DepartmentRoster
     }
 
     /// <summary>
+    /// Change roster list to include entirely and solely those contained within the Employee Roster objects.
+    /// </summary>
+    public void RegenerateRosters()
+    {
+        Rosters = EmployeeRosters.SelectMany(er => er.Rosters()).ToList();
+    }
+
+    /// <summary>
     /// Converts the contained array of rosters into a DataTable.
     /// </summary>
     /// <returns></returns>
@@ -589,7 +609,7 @@ public class DepartmentRoster
             for (var d = 0; d < 7; d++)
             {
                 c++;
-                row[c] = employeeRoster.GetDaily(StartDate.AddDays(d).DayOfWeek)?.ToString();
+                row[c] = employeeRoster.GetDaily(StartDate.AddDays(d).DayOfWeek).ToString();
             }
 
             table.Rows.Add(row);

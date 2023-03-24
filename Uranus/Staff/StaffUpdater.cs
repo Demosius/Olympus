@@ -304,7 +304,7 @@ public class StaffUpdater
         var lines = 0;
         Chariot.Database?.RunInTransaction(() =>
         { 
-            lines += Chariot.Database.Execute("DELETE FROM Roster WHERE DepartmentRosterID = ?;", id);
+            lines += Chariot.Database!.Execute("DELETE FROM Roster WHERE DepartmentRosterID = ?;", id);
             lines += Chariot.InsertIntoTable(departmentRoster.Rosters);
             // Get Daily Roster IDs, to use to remove Daily Shift Counters, before deleting them.
             var dailyIDs = Chariot.PullObjectList<DailyRoster>(r => r.DepartmentRosterID == id).Select(roster => roster.ID);
@@ -314,7 +314,7 @@ public class StaffUpdater
             lines += Chariot.InsertIntoTable(departmentRoster.EmployeeRosters);
             lines += Chariot.Database.Execute("DELETE FROM WeeklyShiftCounter WHERE RosterID = ?;", id);
             lines += Chariot.InsertIntoTable(departmentRoster.ShiftCounters);
-            lines += Chariot.Database.Execute("DELETE FROM DailyShiftCounter WHERE RosterID in ('?');", string.Join("', '", dailyIDs));
+            lines += Chariot.Database.Execute($"DELETE FROM DailyShiftCounter WHERE RosterID in ('{string.Join("', '", dailyIDs)}');");
             lines += Chariot.InsertIntoTable(departmentRoster.DailyShiftCounters());
             lines += Chariot.Database.Update(departmentRoster);
         });

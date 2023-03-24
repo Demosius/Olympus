@@ -29,8 +29,7 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
 
     [OneToOne(nameof(DepartmentRosterID), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public DepartmentRoster? DepartmentRoster { get; set; }
-
-    [Ignore] public Dictionary<string, DailyShiftCounter> CounterAccessDict { get; set; }
+    
     [Ignore] public List<Shift> Shifts => Department?.Shifts ?? new List<Shift>();
 
     public DailyRoster()
@@ -38,7 +37,6 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
         DepartmentName = string.Empty;
         Rosters = new List<Roster>();
         ShiftCounters = new List<DailyShiftCounter>();
-        CounterAccessDict = new Dictionary<string, DailyShiftCounter>();
     }
 
     public DailyRoster(Department department, DepartmentRoster departmentRoster, DateTime date)
@@ -53,30 +51,20 @@ public class DailyRoster : IEquatable<DailyRoster>, IComparable<DailyRoster>
         Rosters = new List<Roster>();
         // Create appropriate shift counters if possible.
         ShiftCounters = department.Shifts.Select(s => new DailyShiftCounter(this, s, s.DailyTarget)).ToList();
-        CounterAccessDict = ShiftCounters.ToDictionary(c => c.ShiftID, c => c);
     }
 
     public DailyShiftCounter ShiftCounter(Shift shift)
     {
-        if (CounterAccessDict.TryGetValue(shift.ID, out var counter)) return counter;
+        var counter = ShiftCounters.FirstOrDefault(c => c.ShiftID == shift.ID);
+
+        if (counter is not null) return counter;
 
         counter = new DailyShiftCounter(this, shift, 0);
         ShiftCounters.Add(counter);
-        CounterAccessDict.Add(shift.ID, counter);
-        
+
         return counter;
     }
-
-    public void AddCount(Shift shift)
-    {
-        ShiftCounter(shift).Count++;
-    }
-
-    public void SubCount(Shift shift)
-    {
-        ShiftCounter(shift).Count--;
-    }
-
+    
     public bool Equals(DailyRoster? other)
     {
         if (other is null) return false;

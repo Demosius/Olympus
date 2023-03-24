@@ -30,7 +30,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     public DepartmentRoster DepartmentRoster { get; set; }
 
     public readonly List<EmployeeRosterVM> EmployeeRosters = new();
-    public readonly Dictionary<int, EmployeeRosterVM> EmployeeRosterVMs = new();
+    public readonly Dictionary<int, EmployeeRosterVM> EmployeeRosterDict = new();
 
     public Dictionary<string, WeeklyCounterVM> TargetAccessDict { get; set; }
 
@@ -283,13 +283,13 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         }
 
         // Daily rosters.
-        MondayRoster = new DailyRosterVM(DepartmentRoster.MondayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate), this);
-        TuesdayRoster = new DailyRosterVM(DepartmentRoster.TuesdayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate.AddDays(1)), this);
-        WednesdayRoster = new DailyRosterVM(DepartmentRoster.WednesdayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate.AddDays(2)), this);
-        ThursdayRoster = new DailyRosterVM(DepartmentRoster.ThursdayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate.AddDays(3)), this);
-        FridayRoster = new DailyRosterVM(DepartmentRoster.FridayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate.AddDays(4)), this);
-        SaturdayRoster = new DailyRosterVM(DepartmentRoster.SaturdayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate.AddDays(5)), this);
-        SundayRoster = new DailyRosterVM(DepartmentRoster.SundayRoster ?? new DailyRoster(Department, DepartmentRoster, DepartmentRoster.StartDate.AddDays(6)), this);
+        MondayRoster = new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Monday), this);
+        TuesdayRoster = new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Tuesday), this);
+        WednesdayRoster = new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Wednesday), this);
+        ThursdayRoster = new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Thursday), this);
+        FridayRoster = new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Friday), this);
+        SaturdayRoster = new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Saturday), this);
+        SundayRoster = new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Sunday), this);
 
         // EmployeeRosters
         foreach (var employeeRoster in DepartmentRoster.EmployeeRosters) AddEmployeeRoster(employeeRoster);
@@ -299,26 +299,24 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         ApplyFilters();
     }
 
-    public void AddCount(Shift shift)
+    public void AddWeeklyCount(Shift shift)
     {
         ShiftCounter(shift).Count++;
     }
 
-    public void SubCount(Shift shift)
+    public void SubWeeklyCount(Shift shift)
     {
-        ShiftCounter(shift).Count++;
+        ShiftCounter(shift).Count--;
     }
 
-    public void SubShift(Shift rosterShift, DateTime date)
+    public void SubDailyCount(Shift rosterShift, DayOfWeek day)
     {
-        TargetAccessDict[rosterShift.ID].Count--;
-        GetDaily(date.DayOfWeek)?.SubShift(rosterShift);
+        GetDaily(day)?.SubCount(rosterShift);
     }
 
-    public void AddShift(Shift rosterShift, DateTime date)
+    public void AddDailyCount(Shift rosterShift, DayOfWeek day)
     {
-        TargetAccessDict[rosterShift.ID].Count++;
-        GetDaily(date.DayOfWeek)?.AddShift(rosterShift);
+        GetDaily(day)?.AddCount(rosterShift);
     }
 
     public DailyRosterVM? GetDaily(DayOfWeek day)
@@ -366,9 +364,9 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     public EmployeeRosterVM AddEmployeeRoster(EmployeeRoster roster)
     {
         var erVM = new EmployeeRosterVM(roster, this);
-        EmployeeRosterVMs.Add(roster.EmployeeID, erVM);
+        EmployeeRosterDict.Add(roster.EmployeeID, erVM);
         EmployeeRosters.Add(erVM);
-        if (roster.Shift is not null) AddCount(roster.Shift);
+        if (roster.Shift is not null) AddWeeklyCount(roster.Shift);
         return erVM;
     }
     
@@ -493,10 +491,10 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         if (FilterString != "")
         {
             var regex = new Regex(FilterString, RegexOptions.IgnoreCase);
-            list = EmployeeRosterVMs.Values.Where(e => regex.IsMatch(e.Employee.FullName)).ToList();
+            list = EmployeeRosterDict.Values.Where(e => regex.IsMatch(e.Employee.FullName)).ToList();
         }
         else
-            list = EmployeeRosterVMs.Values.ToList();
+            list = EmployeeRosterDict.Values.ToList();
 
         DisplayRosters.Clear();
         foreach (var employeeRosterVM in list)
@@ -535,7 +533,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         foreach (var roster in rosters)
         {
             var rosterVM = new EmployeeRosterVM(roster, this);
-            EmployeeRosterVMs.Add(roster.EmployeeID, rosterVM);
+            EmployeeRosterDict.Add(roster.EmployeeID, rosterVM);
             EmployeeRosters.Add(rosterVM);
         }
 
@@ -556,7 +554,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         foreach (var employeeRoster in rosters)
         {
             var rosterVM = new EmployeeRosterVM(employeeRoster, this);
-            EmployeeRosterVMs.Add(employeeRoster.EmployeeID, rosterVM);
+            EmployeeRosterDict.Add(employeeRoster.EmployeeID, rosterVM);
             EmployeeRosters.Add(rosterVM);
         }
 
@@ -574,6 +572,18 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         var daily = GetDaily(dayOfWeek);
         if (daily is null) return;
         daily.PublicHoliday = isPublicHoliday;
+    }
+
+    /// <summary>
+    /// Remove the given employee roster from all relevant lists and objects.
+    /// </summary>
+    /// <param name="employeeRosterVM"></param>
+    public void RemoveEmployee(EmployeeRosterVM employeeRosterVM)
+    {
+        if (ReferenceEquals(SelectedRoster, employeeRosterVM)) SelectedRoster = null;
+        DisplayRosters.Remove(employeeRosterVM);
+        EmployeeRosters.Remove(employeeRosterVM);
+        EmployeeRosterDict.Remove(employeeRosterVM.Employee.ID);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
