@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using iText.StyledXmlParser.Jsoup.Select;
 using Pantheon.Annotations;
 using Pantheon.ViewModels.Controls.Employees;
 using Uranus;
@@ -309,14 +310,6 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         roleNames = new ObservableCollection<string>();
     }
 
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
-
-        RefreshData();
-    }
-
     public void RefreshData()
     {
         Task.Run(() =>
@@ -331,6 +324,9 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
             // Reporting employees (and other collections for filtering that list) is base purely on the employees that report to the current user.
             ReportingEmployees = EmployeeDataSet.GetReportsByRole(Charon.Employee?.ID ?? 0)
                 .Select(e => new EmployeeVM(e, Charon, Helios)).ToList();
+
+            if (Charon.Employee is not null && Charon.CanUpdateEmployee(Charon.Employee) && EmployeeDataSet.Employees.TryGetValue(Charon.Employee.ID, out var user))
+                ReportingEmployees.Add(new EmployeeVM(user, Charon, Helios));
 
             Departments = new ObservableCollection<Department?>(ReportingEmployees
                 .Select(employee => employee.Department).Distinct().OrderBy(department => department?.Name));
