@@ -47,6 +47,7 @@
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
     <None Remove="Resources\Fonts\DIN Medium.ttf" />
     <None Remove="Resources\Fonts\DIN.ttf" />
+    <None Remove="Resources\link.png" />
     <None Remove="Resources\plus-circle-frame.png" />
     <None Remove="Resources\refresh.png" />
     <None Remove="Resources\repair.png" />
@@ -90,6 +91,7 @@
     <Resource Include="Resources\clock--arrow.png" />
     <Resource Include="Resources\csv.png" />
     <Resource Include="Resources\database-import.png" />
+    <Resource Include="Resources\link.png" />
     <Resource Include="Resources\plus-circle-frame.png" />
     <Resource Include="Resources\refresh.png" />
     <Resource Include="Resources\repair.png" />

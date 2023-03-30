@@ -183,10 +183,14 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         set { Employee.Address = value; OnPropertyChanged(); }
     }
 
-    public decimal? PayRate
+    public string PayRate
     {
-        get => Employee.PayRate;
-        set { Employee.PayRate = value; OnPropertyChanged(); }
+        get => Employee.PayRate?.ToString("C") ?? "";
+        set
+        {
+            Employee.PayRate = decimal.TryParse(value, out var d) ? d : null;
+            OnPropertyChanged();
+        }
     }
 
     public EmployeeAvatar? Avatar
@@ -436,5 +440,10 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public override string ToString()
+    {
+        return Employee.ToString();
     }
 }

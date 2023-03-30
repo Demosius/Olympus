@@ -22,11 +22,14 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
                            RequiredMaxDays() >= MaxDays && 
                            RequiredMinDays() <= MinDays &&
                            !(SetShift && Shift is null) &&
-                           (SampleRosterRule is null || ShiftRule.IsHarmoniousRotation(SampleRosterRule));
+                           (SampleRosterRule is null || RosterRule.IsHarmoniousRotation(SampleRosterRule));
     
     public ShiftRuleRoster? Original { get; set; }
 
-    public ShiftRuleRoster ShiftRule { get; set; }
+    public ShiftRuleRoster RosterRule { get; set; }
+
+    // All shifts
+    public ObservableCollection<Shift> Shifts { get; set; }
 
     private readonly Regex clearRex = new("[^0-9,]+");
 
@@ -36,20 +39,20 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 
     public string Description
     {
-        get => ShiftRule.Description;
+        get => RosterRule.Description;
         set
         {
-            ShiftRule.Description = value;
+            RosterRule.Description = value;
             OnPropertyChanged();
         }
     }
 
     public bool? Monday
     {
-        get => ShiftRule.Monday;
+        get => RosterRule.Monday;
         set
         {
-            ShiftRule.Monday = value;
+            RosterRule.Monday = value;
             OnPropertyChanged();
             CheckMinMax();
         }
@@ -57,10 +60,10 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 
     public bool? Tuesday
     {
-        get => ShiftRule.Tuesday;
+        get => RosterRule.Tuesday;
         set
         {
-            ShiftRule.Tuesday = value;
+            RosterRule.Tuesday = value;
             OnPropertyChanged();
             CheckMinMax();
         }
@@ -68,10 +71,10 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 
     public bool? Wednesday
     {
-        get => ShiftRule.Wednesday;
+        get => RosterRule.Wednesday;
         set
         {
-            ShiftRule.Wednesday = value;
+            RosterRule.Wednesday = value;
             OnPropertyChanged();
             CheckMinMax();
         }
@@ -79,10 +82,10 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 
     public bool? Thursday
     {
-        get => ShiftRule.Thursday;
+        get => RosterRule.Thursday;
         set
         {
-            ShiftRule.Thursday = value;
+            RosterRule.Thursday = value;
             OnPropertyChanged();
             CheckMinMax();
         }
@@ -90,10 +93,10 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 
     public bool? Friday
     {
-        get => ShiftRule.Friday;
+        get => RosterRule.Friday;
         set
         {
-            ShiftRule.Friday = value;
+            RosterRule.Friday = value;
             OnPropertyChanged();
             CheckMinMax();
         }
@@ -101,10 +104,10 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 
     public bool? Saturday
     {
-        get => ShiftRule.Saturday;
+        get => RosterRule.Saturday;
         set
         {
-            ShiftRule.Saturday = value;
+            RosterRule.Saturday = value;
             OnPropertyChanged();
             CheckMinMax();
         }
@@ -112,10 +115,10 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 
     public bool? Sunday
     {
-        get => ShiftRule.Sunday;
+        get => RosterRule.Sunday;
         set
         {
-            ShiftRule.Sunday = value;
+            RosterRule.Sunday = value;
             OnPropertyChanged();
             CheckMinMax();
         }
@@ -123,10 +126,10 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 
     public int MinDays
     {
-        get => ShiftRule.MinDays;
+        get => RosterRule.MinDays;
         set
         {
-            ShiftRule.MinDays = value < MaxDays ? value : MaxDays;
+            RosterRule.MinDays = value < MaxDays ? value : MaxDays;
             CheckMinMax();
             OnPropertyChanged();
         }
@@ -134,10 +137,10 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 
     public int MaxDays
     {
-        get => ShiftRule.MaxDays;
+        get => RosterRule.MaxDays;
         set
         {
-            ShiftRule.MaxDays = value > MinDays ? value : MinDays;
+            RosterRule.MaxDays = value > MinDays ? value : MinDays;
             CheckMinMax();
             OnPropertyChanged();
         }
@@ -145,11 +148,11 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 
     public bool Rotation
     {
-        get => ShiftRule.Rotation;
+        get => RosterRule.Rotation;
         set
         {
-            ShiftRule.Rotation = value;
-            if (ShiftRule.Rotation)
+            RosterRule.Rotation = value;
+            if (RosterRule.Rotation)
                 FromDate ??= DateTime.Now.Date;
             else
                 FromDate = null;
@@ -159,15 +162,15 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
     // If using rotation.
     public DateTime? FromDate
     {
-        get => ShiftRule.FromDate;
+        get => RosterRule.FromDate;
         set
         {
             if (value is null)
-                ShiftRule.FromDate = value;
+                RosterRule.FromDate = value;
             else // Make sure the date is set to a monday.
             {
                 var date = (DateTime)value;
-                ShiftRule.FromDate = date.AddDays(DayOfWeek.Monday - date.DayOfWeek);
+                RosterRule.FromDate = date.AddDays(DayOfWeek.Monday - date.DayOfWeek);
             }
             OnPropertyChanged();
         }
@@ -175,49 +178,48 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 
     public EStandardRotations WeekRotation
     {
-        get => (EStandardRotations)(ShiftRule.WeekRotation ?? 1);
+        get => (EStandardRotations)(RosterRule.WeekRotation ?? 1);
         set
         {
-            ShiftRule.WeekRotation = (int)value;
+            RosterRule.WeekRotation = (int)value;
             OnPropertyChanged();
         }
     }
 
     public string WeekNumbersText
     {
-        get => string.Join(", ", ShiftRule.WeekNumberList);
+        get => string.Join(", ", RosterRule.WeekNumberList);
         set
         {
             var clean = clearRex.Replace(value, "");
             if (clean == "") clean = "1";
             var stringArray = clean.Split('\u002C');
-            var days = stringArray.Select(int.Parse).Where(x => x <= ShiftRule.WeekRotation).ToList();
+            var days = stringArray.Select(int.Parse).Where(x => x <= RosterRule.WeekRotation).ToList();
             days.Sort();
             if (days.Count == 0) days.Add(1);
-            ShiftRule.WeekNumberList = days;
+            RosterRule.WeekNumberList = days;
             OnPropertyChanged();
         }
     }
-
-    private bool setShift;
+    
     public bool SetShift
     {
-        get => setShift;
+        get => RosterRule.SetShift;
         set
         {
-            setShift = value;
-            if (!setShift) Shift = null;
+            RosterRule.SetShift = value;
+            if (!SetShift) Shift = null;
             OnPropertyChanged();
         }
     }
 
     public Shift? Shift
     {
-        get => ShiftRule.Shift;
+        get => RosterRule.Shift;
         set
         {
-            ShiftRule.Shift = value;
-            ShiftRule.ShiftID = value?.ID ?? string.Empty;
+            RosterRule.Shift = value;
+            RosterRule.ShiftID = value?.ID ?? string.Empty;
             OnPropertyChanged();
         }
     }
@@ -226,25 +228,29 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 
     public RosterRuleVM()
     {
-        ShiftRule = new ShiftRuleRoster();
+        RosterRule = new ShiftRuleRoster();
+        Shifts = new ObservableCollection<Shift>();
     }
 
     public RosterRuleVM(Employee employee)
     {
-        ShiftRule = new ShiftRuleRoster(employee);
+        RosterRule = new ShiftRuleRoster(employee);
+        Shifts = new ObservableCollection<Shift>(employee.Shifts);
     }
 
     public RosterRuleVM(Employee employee, ShiftRuleRoster sampleRosterRule)
     {
-        ShiftRule = new ShiftRuleRoster(employee, sampleRosterRule);
+        RosterRule = new ShiftRuleRoster(employee, sampleRosterRule);
         SampleRosterRule = sampleRosterRule;
+        Shifts = new ObservableCollection<Shift>(employee.Shifts);
     }
 
     public RosterRuleVM(ShiftRuleRoster rosterRule)
     {
         InEdit = true;
         Original = rosterRule;
-        ShiftRule = rosterRule.Copy();
+        RosterRule = rosterRule.Copy();
+        Shifts = new ObservableCollection<Shift>(RosterRule.Employee!.Shifts);
     }
 
     public void CheckMinMax()
@@ -254,25 +260,25 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
 
         if (min > max) throw new DataException("Impossible restrictions met. Max required days lower than min.");
 
-        if (ShiftRule.MinDays < min)
+        if (RosterRule.MinDays < min)
         {
-            ShiftRule.MinDays = min;
+            RosterRule.MinDays = min;
             OnPropertyChanged(nameof(MinDays));
         }
-        else if (ShiftRule.MinDays > max)
+        else if (RosterRule.MinDays > max)
         {
-            ShiftRule.MinDays = max;
+            RosterRule.MinDays = max;
             OnPropertyChanged(nameof(MinDays));
         }
 
-        if (ShiftRule.MaxDays < min)
+        if (RosterRule.MaxDays < min)
         {
-            ShiftRule.MaxDays = min;
+            RosterRule.MaxDays = min;
             OnPropertyChanged(nameof(MaxDays));
         }
-        else if (ShiftRule.MaxDays > max)
+        else if (RosterRule.MaxDays > max)
         {
-            ShiftRule.MaxDays = max;
+            RosterRule.MaxDays = max;
             OnPropertyChanged(nameof(MaxDays));
         }
     }

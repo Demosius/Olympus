@@ -327,7 +327,7 @@ public class EmployeeShiftVM : INotifyPropertyChanged
     private void AddRosterRule()
     {
         if (RosterRule is null || !RosterRule.IsValid) return;
-        var shiftRule = RosterRule.ShiftRule;
+        var shiftRule = RosterRule.RosterRule;
 
         if (RosterRule.InEdit)
             Helios.StaffUpdater.ShiftRuleRoster(shiftRule);

@@ -114,6 +114,12 @@ public class ShiftRuleRecurring : ShiftRule
         };
     }
 
+    public override (Shift, int)? ShiftDedication()
+    {
+        if (RuleType != ERecurringRuleType.SetShift || Shift is null) return null;
+        return (Shift, 1);
+    }
+
     public override bool AppliesToWeek(DateTime weeksStartDate)
     {
         if (WeekRotation is 1 or 0) return true;

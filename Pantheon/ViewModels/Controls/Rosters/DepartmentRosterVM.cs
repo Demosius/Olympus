@@ -16,7 +16,6 @@ using Pantheon.Views.PopUp.Employees;
 using Styx;
 using Uranus;
 using Uranus.Commands;
-using Uranus.Extensions;
 using Uranus.Interfaces;
 using Uranus.Staff.Models;
 
@@ -35,6 +34,12 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     public Dictionary<string, WeeklyCounterVM> TargetAccessDict { get; set; }
 
     public bool Archived { get; set; }
+    public bool HasDefaultShift { get; set; }
+
+    public Dictionary<Shift, int> ShiftEligibilityCount { get; set; }
+    public Dictionary<Shift, float>? DaysPerWeekPerShift { get; set; }
+
+    public int DaysInUse { get; set; }
 
     #region Department Roster Access
 
@@ -209,6 +214,22 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         {
             DepartmentRoster.ExceedTargets = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(SufficientWeeklyShiftTargets));
+        }
+    }
+
+    /// <summary>
+    /// Link weekly and daily targets so that when you change the weekly, each daily changes too.
+    /// Does not work in reverse.
+    /// </summary>
+    private bool linkTargets;
+    public bool LinkTargets
+    {
+        get => linkTargets;
+        set
+        {
+            linkTargets = value;
+            OnPropertyChanged();
         }
     }
 
@@ -222,6 +243,33 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
             OnPropertyChanged();
         }
     }
+
+    private int requiredWeeklyRosters;
+    public int RequiredWeeklyRosters
+    {
+        get => requiredWeeklyRosters;
+        set
+        {
+            requiredWeeklyRosters = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SufficientWeeklyShiftTargets));
+        }
+    }
+
+    private int requiredRosters;
+    public int RequiredRosters
+    {
+        get => requiredRosters;
+        set
+        {
+            requiredRosters = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int TotalWeeklyShiftTargets => DepartmentRoster.ShiftCounters.Sum(c => c.Target);
+
+    public bool SufficientWeeklyShiftTargets => (ExceedTargets && HasDefaultShift) || RequiredWeeklyRosters <= TotalWeeklyShiftTargets;
 
     #endregion
 
@@ -250,6 +298,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         filterString = string.Empty;
         ShowTargets = true;
         Archived = roster.StartDate < DateTime.Now.Date.AddDays(-7);
+        ShiftEligibilityCount = new Dictionary<Shift, int>();
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
@@ -273,7 +322,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         if (Department is null) throw new DataException("Department roster initialized without Department Object.");
 
         // Shift Targets
-        foreach (var shiftCounter in DepartmentRoster.ShiftCounters.Select(c => new WeeklyCounterVM(c)))
+        foreach (var shiftCounter in DepartmentRoster.ShiftCounters.Select(c => new WeeklyCounterVM(c, this)))
         {
             var shift = shiftCounter.Shift;
             if (shift is null) throw new DataException("Shift should not be null.");
@@ -294,9 +343,30 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         // EmployeeRosters
         foreach (var employeeRoster in DepartmentRoster.EmployeeRosters) AddEmployeeRoster(employeeRoster);
 
-        IsInitialized = true;
+        HasDefaultShift = Shifts.Any(s => s.Default);
 
+        CalculateRequiredRosters();
+        
+        IsInitialized = true;
+        
         ApplyFilters();
+    }
+
+    /// <summary>
+    /// Calculate required roster counts for both weeks and days.
+    /// </summary>
+    private void CalculateRequiredRosters()
+    {
+        DaysInUse = DailyRosters().Count(dr => dr.InUse);
+
+        // Make sure targets are set.
+        foreach (var employeeRoster in EmployeeRosters) employeeRoster.SetShiftAssignmentTargets();
+
+        // Required weekly rosters equal to number of employees that require at least one day.
+        RequiredWeeklyRosters = EmployeeRosters.Count(er => er.MinDays >= 1);
+
+        // Required daily rosters equal to the total minimum roster count.
+        RequiredRosters = EmployeeRosters.Sum(er => er.MinDays);
     }
 
     public void AddWeeklyCount(Shift shift)
@@ -338,13 +408,59 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     {
         if (TargetAccessDict.TryGetValue(shift.ID, out var counter)) return counter;
 
-        counter = new WeeklyCounterVM(DepartmentRoster.ShiftCounter(shift));
+        counter = new WeeklyCounterVM(DepartmentRoster.ShiftCounter(shift), this);
         TargetAccessDict.Add(shift.ID, counter);
         ShiftTargets.Add(counter);
 
         return counter;
     }
-    
+
+    /// <summary>
+    /// Adjust the daily targets to match the weekly ones.
+    /// </summary>
+    public void MatchWeeklyTargets()
+    {
+        foreach (var shift in Shifts)
+        {
+            var target = ShiftCounter(shift).Target;
+            foreach (var daily in DailyRosters())
+            {
+                daily.SetTarget(shift, target);
+            }
+        }
+    }
+
+    public IEnumerable<DailyRosterVM> DailyRosters()
+    {
+        MondayRoster ??= new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Monday), this);
+        TuesdayRoster ??= new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Tuesday), this);
+        WednesdayRoster ??= new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Wednesday), this);
+        ThursdayRoster ??= new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Thursday), this);
+        FridayRoster ??= new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Friday), this);
+
+        var dailies = new List<DailyRosterVM>()
+        {
+            MondayRoster,
+            TuesdayRoster,
+            WednesdayRoster,
+            ThursdayRoster,
+            FridayRoster
+        };
+
+        if (UseSaturdays)
+        {
+            SaturdayRoster ??= new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Saturday), this);
+            dailies.Add(SaturdayRoster);
+        }
+
+        if (!UseSundays) return dailies;
+
+        SundayRoster = new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Sunday), this);
+        dailies.Add(SundayRoster);
+
+        return dailies;
+    }
+
     /// <summary>
     /// Check if roster is archived, and give the option to un-archive it.
     /// </summary>
@@ -369,97 +485,89 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         if (roster.Shift is not null) AddWeeklyCount(roster.Shift);
         return erVM;
     }
-    
+
     /// <summary>
     /// Use to automate shift assignment.
     /// </summary>
     public void GenerateRosterAssignments()
     {
         if (ArchiveCheck()) return;
-        ApplyShiftRules();
-        AssignDefaults();
-        CountToTargets();
-        ApplyDepartmentDefault();
+        if (EmployeeRosters.Any(er => er.SelectedShift is not null))
+        {
+            if (MessageBox.Show(
+                    "There are rosters that have been set, are you sure that you want to clear them and re-assign?",
+                    "Confirm Re-Assignment", MessageBoxButton.YesNo, MessageBoxImage.Warning) !=
+                MessageBoxResult.Yes) return;
+            UnAssignAll();
+        }
+        DaysInUse = DailyRosters().Count(dr => dr.InUse);
         CheckPublicHolidays();
+        SetWeeklyShifts();
+        AdjustDailyShifts();
     }
 
     /// <summary>
-    /// Applies shift rules to employees and their weekly/daily shifts as appropriate.
+    /// Applies shift rules to employees and their weekly shifts as appropriate.
     /// </summary>
-    private void ApplyShiftRules()
+    private void SetWeeklyShifts()
     {
-        foreach (var employeeRoster in EmployeeRosters)
+        // Set assignment targets.
+        // Set before randomization so that we can prioritize those with rule based shifts.
+        foreach (var employeeRoster in EmployeeRosters) employeeRoster.SetShiftAssignmentTargets(true);
+
+        // Set employee roster list as a new randomized list.
+        var rand = new Random();
+        var rulingRosters = EmployeeRosters.Where(r => r.RuleShift is not null)
+            .OrderBy(_ => rand.Next(EmployeeRosters.Count * 10));
+        var unrulyRosters = EmployeeRosters.Where(r => r.RuleShift is null)
+            .OrderBy(_ => rand.Next(EmployeeRosters.Count * 10));
+        var employeeRosters = rulingRosters.Concat(unrulyRosters);
+
+        // Calculate targets by comparing weekly shift targets to daily, to determine average days/week for each shift.
+        DaysPerWeekPerShift = Shifts.ToDictionary(shift => shift, GetAverageDaysPerWeek);
+
+        // Iterate through employee rosters to assign shifts.
+        foreach (var employeeRoster in employeeRosters) employeeRoster.CalculateShift(DaysPerWeekPerShift);
+    }
+
+    /// <summary>
+    /// Adjust daily shifts based on daily targets.
+    /// </summary>
+    private void AdjustDailyShifts()
+    {
+        // Sort employee rosters by highest minimum days.
+        var rosters = EmployeeRosters.OrderByDescending(r => r.MinDays).ToList();
+
+        // Iterate through potentially multiple times.
+        // Stop when: everything is correct / no changes were made in the last pass / 5 loops have passed.
+        var loops = 0;
+        var changes = 1;
+        while (loops < 5 && changes > 0 && !DailyShiftsAccurate())
         {
-            // TODO: 
-            employeeRoster.ApplyShiftRules();
+            changes = rosters.Sum(roster => roster.AdjustDailyShifts(DaysPerWeekPerShift ??= Shifts.ToDictionary(shift => shift, GetAverageDaysPerWeek)));
+
+            loops++;
         }
     }
 
-    /// <summary>
-    /// Assigns shifts to employees based on their defined defaults - only if they do not already have assigned shifts..
-    /// </summary>
-    public void AssignDefaults()
+    private bool DailyShiftsAccurate()
     {
-        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.SelectedShift is null))
-            employeeRoster.SetDefault();
+        return (MondayRoster?.ShiftCounters.All(c => c.OnTarget) ?? false) &&
+               (TuesdayRoster?.ShiftCounters.All(c => c.OnTarget) ?? false) &&
+               (WednesdayRoster?.ShiftCounters.All(c => c.OnTarget) ?? false) &&
+               (ThursdayRoster?.ShiftCounters.All(c => c.OnTarget) ?? false) &&
+               (FridayRoster?.ShiftCounters.All(c => c.OnTarget) ?? false) &&
+               (SaturdayRoster?.ShiftCounters.All(c => c.OnTarget) ?? false) &&
+               (SundayRoster?.ShiftCounters.All(c => c.OnTarget) ?? false);
     }
 
-    /// <summary>
-    /// Attempt to reach the targeted number for each shift.
-    /// </summary>
-    public void CountToTargets()
+    public float GetAverageDaysPerWeek(Shift shift)
     {
-        if (Department is null) throw new DataException("Department Roster has null value for department.");
+        var weeklyTarget = ShiftCounter(shift).Target;
 
-        // Get every non-default shift with a target above 0.
-        var targetShifts = Department.Shifts.Where(s => !s.Default && s.DailyTarget > 0)
-            .ToDictionary(s => s, _ => new List<EmployeeRosterVM>());
+        var dailySum = DailyRosters().Sum(dailyRoster => dailyRoster.ShiftCounter(shift).Target);
 
-        foreach (var (shift, _) in targetShifts)
-            targetShifts[shift] = EmployeeRosters
-                .Where(er => er.Employee.Shifts.Contains(shift)).ToList();
-
-        // Order by most needed (discrepancy between those available and number required to reach target.
-        targetShifts = targetShifts.OrderBy(s => s.Value.Count - ShiftCounter(s.Key).Discrepancy)
-            .ToDictionary(e => e.Key, e => e.Value);
-
-        foreach (var (shift, empRosters) in targetShifts)
-        {
-            if (ShiftCounter(shift).Discrepancy <= 0) continue;
-            // Randomize employees #TODO: Check against history to rotate through staff (instead of randomizing).
-            empRosters.Shuffle();
-
-            foreach (var employeeRoster in empRosters.Where(employeeRoster => employeeRoster.SelectedShift is null).TakeWhile(_ => ShiftCounter(shift).Lacking))
-                employeeRoster.SelectedShift = shift;
-        }
-    }
-
-    /// <summary>
-    /// Checks all employees to see if they are assigned. If they aren't, use department defaults if they exist,
-    /// otherwise assign a shift that they are eligible for that is closest to its target count.
-    /// </summary>
-    public void ApplyDepartmentDefault()
-    {
-        if (Shifts.Count == 0) return;
-
-        // Ensure that all shift counters exist that are required.
-        foreach (var shift in Shifts) _ = ShiftCounter(shift);
-
-        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.SelectedShift is null))
-        {
-            if (DefaultShift is not null)
-            {
-                employeeRoster.SelectedShift = DefaultShift;
-                continue;
-            }
-
-            if (employeeRoster.Employee is null)
-                throw new DataException("Employee roster does not have employee initialized.");
-
-            var bestShift = ShiftTargets.First(c => c.Discrepancy == ShiftTargets.Min(counter => counter.Discrepancy)).Shift;
-
-            employeeRoster.SelectedShift = bestShift;
-        }
+        return dailySum / (float) weeklyTarget;
     }
 
     /// <summary>
@@ -467,7 +575,11 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     /// </summary>
     private void CheckPublicHolidays()
     {
-        //throw new NotImplementedException();
+        // Re-affirm current public holidays.
+        foreach (var dailyRosterVM in DailyRosters())
+        {
+            if (dailyRosterVM.PublicHoliday) SetPublicHoliday(dailyRosterVM.Day, true, true);
+        }
     }
 
     /// <summary>
@@ -476,7 +588,11 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     public void UnAssignAll()
     {
         if (ArchiveCheck()) return;
-        foreach (var employeeRosterVM in DisplayRosters) employeeRosterVM.SelectedShift = null;
+        foreach (var employeeRosterVM in DisplayRosters)
+        {
+            employeeRosterVM.SelectedShift = null;
+            employeeRosterVM.SelectedRosterType = ERosterType.Standard;
+        }
     }
 
     public void ClearFilters()
@@ -566,12 +682,10 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
 
     public bool IsPublicHoliday(DateTime date) => GetDaily(date.DayOfWeek)?.PublicHoliday ?? false;
 
-    public void SetPublicHoliday(DayOfWeek dayOfWeek, bool isPublicHoliday)
+    public void SetPublicHoliday(DayOfWeek dayOfWeek, bool isPublicHoliday, bool preserveTargets = false)
     {
         foreach (var employeeRosterVM in EmployeeRosters) employeeRosterVM.SetPublicHoliday(dayOfWeek, isPublicHoliday);
-        var daily = GetDaily(dayOfWeek);
-        if (daily is null) return;
-        daily.PublicHoliday = isPublicHoliday;
+        GetDaily(dayOfWeek)?.SetPublicHoliday(isPublicHoliday, preserveTargets);
     }
 
     /// <summary>
@@ -586,6 +700,41 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         EmployeeRosterDict.Remove(employeeRosterVM.Employee.ID);
     }
 
+    /// <summary>
+    /// Notify property changed for target related values.
+    /// Call from targets as they change.
+    /// </summary>
+    public void RefreshTargets()
+    {
+        OnPropertyChanged(nameof(TotalWeeklyShiftTargets));
+        OnPropertyChanged(nameof(SufficientWeeklyShiftTargets));
+    }
+
+    public int GetShiftEligibilityCount(Shift shift)
+    {
+        if (ShiftEligibilityCount.TryGetValue(shift, out var count)) return count;
+
+        count = EmployeeRosters.Count(er => er.Shifts.Contains(shift));
+        ShiftEligibilityCount.Add(shift, count);
+
+        return count;
+    }
+
+    /// <summary>
+    /// Based on the current assignments and requirements, determine the priority of assignment for the given shifts.
+    /// </summary>
+    /// <param name="eligibleShifts"></param>
+    public IEnumerable<(Shift, float)> CalculateShiftPriority(List<Shift> eligibleShifts)
+    {
+        return (from shift in eligibleShifts
+            let shiftCounter = ShiftCounter(shift)
+            where !shiftCounter.OverTarget || ExceedTargets && shift.Default
+            let priority = (float) GetShiftEligibilityCount(shift)
+            select (shift, priority))
+            .OrderBy(t => t.priority);
+     //           shiftCounter.Target / (float) GetShiftEligibilityCount(shift) * 100 + shiftCounter.Priority * 1
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]
@@ -596,3 +745,74 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
 
     public override string ToString() => DepartmentRoster.ToString();
 }
+ 
+//Removed because unused. Kept in case required for future reference.
+
+/*
+/// <summary>
+/// Assigns shifts to employees based on their defined defaults - only if they do not already have assigned shifts..
+/// </summary>
+private void AssignDefaults()
+{
+    foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.SelectedShift is null))
+        employeeRoster.SetDefault();
+}
+
+/// <summary>
+/// Attempt to reach the targeted number for each shift.
+/// </summary>
+private void CountToTargets()
+{
+    if (Department is null) throw new DataException("Department Roster has null value for department.");
+
+    // Get every non-default shift with a target above 0.
+    var targetShifts = Department.Shifts.Where(s => !s.Default && s.DailyTarget > 0)
+        .ToDictionary(s => s, _ => new List<EmployeeRosterVM>());
+
+    foreach (var (shift, _) in targetShifts)
+        targetShifts[shift] = EmployeeRosters
+            .Where(er => er.Employee.Shifts.Contains(shift)).ToList();
+
+    // Order by most needed (discrepancy between those available and number required to reach target.
+    targetShifts = targetShifts.OrderBy(s => s.Value.Count - ShiftCounter(s.Key).Discrepancy)
+        .ToDictionary(e => e.Key, e => e.Value);
+
+    foreach (var (shift, empRosters) in targetShifts)
+    {
+        if (ShiftCounter(shift).Discrepancy <= 0) continue;
+        // Randomize employees #TODO: Check against history to rotate through staff (instead of randomizing).
+        empRosters.Shuffle();
+
+        foreach (var employeeRoster in empRosters.Where(employeeRoster => employeeRoster.SelectedShift is null).TakeWhile(_ => ShiftCounter(shift).Lacking))
+            employeeRoster.SelectedShift = shift;
+    }
+}
+
+/// <summary>
+/// Checks all employees to see if they are assigned. If they aren't, use department defaults if they exist,
+/// otherwise assign a shift that they are eligible for that is closest to its target count.
+/// </summary>
+private void ApplyDepartmentDefault()
+{
+    if (Shifts.Count == 0) return;
+
+    // Ensure that all shift counters exist that are required.
+    foreach (var shift in Shifts) _ = ShiftCounter(shift);
+
+    foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.SelectedShift is null))
+    {
+        if (DefaultShift is not null)
+        {
+            employeeRoster.SelectedShift = DefaultShift;
+            continue;
+        }
+
+        if (employeeRoster.Employee is null)
+            throw new DataException("Employee roster does not have employee initialized.");
+
+        var bestShift = ShiftTargets.First(c => c.Discrepancy == ShiftTargets.Min(counter => counter.Discrepancy)).Shift;
+
+        employeeRoster.SelectedShift = bestShift;
+    }
+}
+*/

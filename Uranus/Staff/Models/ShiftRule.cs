@@ -27,11 +27,10 @@ public abstract class ShiftRule
         Description = description;
     }
 
+    public virtual (Shift, int)? ShiftDedication() => null;
+
     public virtual bool AppliesToWeek(DateTime weeksStartDate) => true;
     public virtual bool AppliesToDay(DateTime date) => true;
 
-    public override string ToString()
-    {
-        return Description;
-    }
+    public override string ToString() => Description;
 }

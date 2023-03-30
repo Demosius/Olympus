@@ -15,6 +15,8 @@ public class RosterVM : INotifyPropertyChanged
 
     public EmployeeRosterVM EmployeeRosterVM { get; set; }
 
+    private bool? designatedRoster;
+
     #region Roster Access
 
     public Shift? SelectedShift
@@ -115,6 +117,8 @@ public class RosterVM : INotifyPropertyChanged
 
     public bool IsPublicHoliday => EmployeeRosterVM.IsPublicHoliday(Date);
 
+    public int DaysInUse => EmployeeRosterVM.DaysInUse;
+
     #endregion
 
     #region INotifyPropertyChanged Members
@@ -163,7 +167,120 @@ public class RosterVM : INotifyPropertyChanged
     {
         ShiftRules.AddRange(rules.Where(rule => rule.AppliesToDay(Date)));
         ShiftRules = ShiftRules.Distinct().ToList();
+
+        // Apply in order: Roster, Recurring, Single. 
+        // Reverse order of priority so that the higher priority can overwrite the lower.
+        var rosterRules = ShiftRules.OfType<ShiftRuleRoster>();
+        var recurringRules = ShiftRules.OfType<ShiftRuleRecurring>();
+        var singles = ShiftRules.OfType<ShiftRuleSingle>();
+
+        // There shouldn't be clashing roster rules relevant to the day, but if there is let it be random as to which applies. 
+        foreach (var rosterRule in rosterRules)
+        {
+            if (rosterRule.Shift is not null)  SelectedShift = rosterRule.Shift;
+
+            designatedRoster = rosterRule.Day(Day);
+
+            if (Type != ERosterType.PublicHoliday)
+                Type = designatedRoster switch
+                {
+                    true => ERosterType.Standard,
+                    false => ERosterType.RDO,
+                    null => Type
+                };
+        }
+
+        foreach (var recurringRule in recurringRules)
+        {
+            switch (recurringRule.RuleType)
+            {
+                case ERecurringRuleType.Away:
+                    if (Type != ERosterType.PublicHoliday)
+                    {
+                        Type = ERosterType.RDO;
+                        designatedRoster = false;
+                    }
+                    break;
+                case ERecurringRuleType.LeaveEarly:
+                    if (SelectedShift is not null)
+                    {
+                        Type = ERosterType.Standard;
+                        EndTime = recurringRule.TimeOfDay?.ToString() ?? EndTime;
+                    }
+                    break;
+                case ERecurringRuleType.ArriveLate:
+                    if (SelectedShift is not null)
+                    {
+                        Type = ERosterType.Standard;
+                        StartTime = recurringRule.TimeOfDay?.ToString() ?? StartTime;
+                    }
+                    break;
+                case ERecurringRuleType.SetShift:
+                    SelectedShift = recurringRule.Shift;
+                    Type = ERosterType.Standard;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        foreach (var singleRule in singles)
+        {
+            switch (singleRule.RuleType)
+            {
+                case ESingleRuleType.Away:
+                    if (Type != ERosterType.PublicHoliday)
+                    {
+                        Type = (ERosterType)singleRule.LeaveType;
+                        designatedRoster = false;
+                    }
+                    break;
+                case ESingleRuleType.ArriveLate:
+                    if (SelectedShift is not null)
+                    {
+                        Type = ERosterType.Standard;
+                        StartTime = singleRule.Time ?.ToString() ?? StartTime;
+                    }
+                    break;
+                case ESingleRuleType.LeaveEarly:
+                    if (SelectedShift is not null)
+                    {
+                        Type = ERosterType.Standard;
+                        EndTime = singleRule.Time?.ToString() ?? EndTime;
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
+
+    public int AdjustShift(double targetShift)
+    {
+        if (designatedRoster is not null || SelectedShift is null) return 0;
+        var counter = GetDailyCounter();
+        if (counter is null || counter.OnTarget) return 0;
+        if ((counter.UnderTarget && (targetShift < 0 || AtWork)) ||
+            (counter.OverTarget && (targetShift > 0 || !AtWork))) return 0;
+
+        if (targetShift < 0)
+        {
+            Type = ERosterType.RDO;
+            return -1;
+        }
+
+        Type = ERosterType.Standard;
+        return 1;
+    }
+
+    private DailyCounterVM? GetDailyCounter()
+    {
+        var vm = GetDailyRosterVM();
+        if (vm is null || SelectedShift is null) return null;
+        return vm.ShiftCounter(SelectedShift);
+    }
+
+    private DailyRosterVM? GetDailyRosterVM() => EmployeeRosterVM.GetDailyRoster(Day);
 
     public void SetShift(Shift? shift)
     {
@@ -191,12 +308,12 @@ public class RosterVM : INotifyPropertyChanged
     /// </summary>
     public void SetPublicHoliday(bool isPublicHoliday = true)
     {
-        Roster.RosterType = isPublicHoliday ? ERosterType.PublicHoliday : ERosterType.Standard;
+        Roster.RosterType = isPublicHoliday ? ERosterType.PublicHoliday : Type == ERosterType.PublicHoliday ? ERosterType.RDO : Type;
         OnPropertyChanged(nameof(Type));
         if (isPublicHoliday)
             AtWork = false;
         else
-            AtWork = Roster.DailyRoster?.Day is not (DayOfWeek.Saturday or DayOfWeek.Sunday) || Roster.Shift is not null;
+            AtWork = Roster.DailyRoster?.Day is not (DayOfWeek.Saturday or DayOfWeek.Sunday) && Roster.Shift is not null && Type == ERosterType.Standard;
     }
 
     /*public void ApplyShiftRules(List<ShiftRule> rules) => Roster.ApplyShiftRules(rules);*/

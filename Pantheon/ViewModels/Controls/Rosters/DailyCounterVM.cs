@@ -8,6 +8,8 @@ namespace Pantheon.ViewModels.Controls.Rosters;
 public class DailyCounterVM : INotifyPropertyChanged
 {
     public DailyShiftCounter DailyShiftCounter { get; set; }
+    public DailyRosterVM DailyRosterVM { get; set; }
+    public DepartmentRosterVM DepartmentRosterVM => DailyRosterVM.DepartmentRosterVM;
 
     #region Direct Counter Access
 
@@ -21,6 +23,7 @@ public class DailyCounterVM : INotifyPropertyChanged
         {
             DailyShiftCounter.Target = value;
             OnPropertyChanged();
+            // TODO: Refresh targets??
         }
     }
 
@@ -34,11 +37,16 @@ public class DailyCounterVM : INotifyPropertyChanged
         }
     }
 
+    public bool OnTarget => Count == Target;
+    public bool UnderTarget => Count < Target;
+    public bool OverTarget => Count > Target;
+
     #endregion
 
-    public DailyCounterVM(DailyShiftCounter dailyShiftCounter)
+    public DailyCounterVM(DailyShiftCounter dailyShiftCounter, DailyRosterVM dailyRosterVM)
     {
         DailyShiftCounter = dailyShiftCounter;
+        DailyRosterVM = dailyRosterVM;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

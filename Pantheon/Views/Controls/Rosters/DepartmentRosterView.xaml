@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Rosters"
              xmlns:rosters="clr-namespace:Pantheon.Views.Controls.Rosters"
+             xmlns:converter="clr-namespace:Pantheon.ViewModels.Converter"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:DepartmentRosterVM}, IsDesignTimeCreatable=False}">
 
@@ -14,6 +15,7 @@
                 <ResourceDictionary>
 
                     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                    <converter:BoolToColourConverter x:Key="BoolToColourConverter"/>
 
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
@@ -96,8 +98,21 @@
                         <StackPanel Grid.Column="0" Orientation="Horizontal">
                             <!-- Shift Target Bypass option -->
                             <CheckBox IsChecked="{Binding ExceedTargets, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      ToolTip="Exceed shift target counts."/>
+                                      ToolTip="Exceed weekly default shift target."/>
 
+                            <TextBlock Foreground="{Binding SufficientWeeklyShiftTargets, Converter={StaticResource BoolToColourConverter}}"
+                                       FontSize="10" 
+                                       VerticalAlignment="Center" HorizontalAlignment="Center"
+                                       Margin="0,0,8,0"
+                                       ToolTip="Total Employee Count :: Required Rosters / Total Shift Target">
+                                <Run>( </Run>
+                                <Run Text="{Binding DisplayRosters.Count, Mode=OneWay}"/>
+                                <Run> :: </Run>
+                                <Run Text="{Binding RequiredWeeklyRosters, Mode=OneWay}"/>
+                                <Run> / </Run>
+                                <Run Text="{Binding TotalWeeklyShiftTargets, Mode=OneWay}"/>
+                                <Run> )</Run>
+                            </TextBlock> 
 
                             <!-- Shift Count Containers -->
                             <ItemsControl VerticalContentAlignment="Center"
@@ -154,6 +169,16 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+
+                            <ToggleButton IsChecked="{Binding LinkTargets}" 
+                                          Margin="2,0"
+                                          Padding="0"
+                                          VerticalAlignment="Center"
+                                          ToolTip="Link Daily Targets to Weekly">
+                                <Image Source="../../../Resources/link.png"
+                                       Height="20" Width="20"
+                                       Margin="0"/>
+                            </ToggleButton>
                         </StackPanel>
 
                         <Expander Grid.Column="1" ExpandDirection="Right">

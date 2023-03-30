@@ -20,6 +20,8 @@ public class ShiftRuleRoster : ShiftRule
     public int MinDays { get; set; }
     public int MaxDays { get; set; }
 
+    public bool SetShift { get; set; }
+
     public bool Rotation { get; set; }
     // If using rotation.
     public DateTime? FromDate { get; set; }
@@ -117,6 +119,12 @@ public class ShiftRuleRoster : ShiftRule
         };
     }
 
+    public override (Shift, int)? ShiftDedication()
+    {
+        if (!SetShift || Shift is null) return null;
+        return (Shift, MinDays == 0 ? 1 : MinDays);
+    }
+
     public override bool AppliesToWeek(DateTime weeksStartDate)
     {
         if (WeekRotation == 1) return true;
@@ -128,4 +136,24 @@ public class ShiftRuleRoster : ShiftRule
     }
 
     public override bool AppliesToDay(DateTime date) => AppliesToWeek(date.AddDays(date.DayOfWeek - DayOfWeek.Monday));
+
+    /// <summary>
+    /// Given the day of week, returns the appropriate workday object.
+    /// </summary>
+    /// <param name="dayOfWeek"></param>
+    /// <returns></returns>
+    public bool? Day(DayOfWeek dayOfWeek)
+    {
+        return (dayOfWeek) switch
+        {
+            DayOfWeek.Sunday => Sunday,
+            DayOfWeek.Monday => Monday,
+            DayOfWeek.Tuesday => Tuesday,
+            DayOfWeek.Wednesday => Wednesday,
+            DayOfWeek.Thursday => Thursday,
+            DayOfWeek.Friday => Friday,
+            DayOfWeek.Saturday => Saturday,
+            _ => throw new ArgumentOutOfRangeException(nameof(dayOfWeek), dayOfWeek, null)
+        };
+    }
 }

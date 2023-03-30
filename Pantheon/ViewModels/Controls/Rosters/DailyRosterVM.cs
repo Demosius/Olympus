@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -18,11 +19,20 @@ public class DailyRosterVM : INotifyPropertyChanged
 
     public Dictionary<int, RosterVM> Rosters { get; set; }
 
+    public bool InUse => ShiftCounters.Any(c => c.Target > 0);
+
     public bool PublicHoliday
     {
         get => DailyRoster.IsPublicHoliday;
-        set => DailyRoster.IsPublicHoliday = value;
+        set
+        {
+            DailyRoster.IsPublicHoliday = value;
+            if (!value) return;
+            foreach (var counter in ShiftCounters) counter.Target = 0;
+        }
     }
+
+    public DayOfWeek Day => DailyRoster.Day;
 
     #region INotifyPropertyChanged Members
 
@@ -48,7 +58,7 @@ public class DailyRosterVM : INotifyPropertyChanged
 
         DepartmentRosterVM = departmentRosterVM;
 
-        foreach (var counter in DailyRoster.ShiftCounters.Select(c => new DailyCounterVM(c)))
+        foreach (var counter in DailyRoster.ShiftCounters.Select(c => new DailyCounterVM(c, this)))
         {
             ShiftCounters.Add(counter);
             CounterAccessDict.Add(counter.ShiftID, counter);
@@ -60,11 +70,13 @@ public class DailyRosterVM : INotifyPropertyChanged
         foreach (var shift in shifts)
         {
             if (CounterAccessDict.ContainsKey(shift.ID)) continue;
-            var dailyShiftCounter = new DailyCounterVM(new DailyShiftCounter(DailyRoster, shift, shift.DailyTarget));
+            var dailyShiftCounter = new DailyCounterVM(new DailyShiftCounter(DailyRoster, shift, shift.DailyTarget), this);
             CounterAccessDict.Add(shift.ID, dailyShiftCounter);
             ShiftCounters.Add(dailyShiftCounter);
         }
     }
+
+    public void SetTarget(Shift shift, int target) => ShiftCounter(shift).Target = target;
 
     public void SubCount(Shift rosterShift)
     {
@@ -81,7 +93,7 @@ public class DailyRosterVM : INotifyPropertyChanged
         if (CounterAccessDict.TryGetValue(shift.ID, out var counterVM)) return counterVM;
 
         var counter = DailyRoster.ShiftCounter(shift);
-        counterVM = new DailyCounterVM(counter);
+        counterVM = new DailyCounterVM(counter, this);
         ShiftCounters.Add(counterVM);
         CounterAccessDict.Add(shift.ID, counterVM);
 
@@ -96,6 +108,12 @@ public class DailyRosterVM : INotifyPropertyChanged
         PublicHoliday = false;
         foreach (var (_, rosterVM) in Rosters)
             rosterVM.Type = ERosterType.Standard;
+    }
+
+    public void SetPublicHoliday(bool isPublicHoliday, bool preserveTargets = false)
+    {
+        if (!preserveTargets) PublicHoliday = isPublicHoliday;
+        else DailyRoster.IsPublicHoliday = isPublicHoliday;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

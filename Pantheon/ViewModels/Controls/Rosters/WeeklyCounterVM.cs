@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Pantheon.Annotations;
 using Uranus.Staff.Models;
@@ -9,11 +8,10 @@ namespace Pantheon.ViewModels.Controls.Rosters;
 public class WeeklyCounterVM : INotifyPropertyChanged
 {
     public WeeklyShiftCounter WeeklyShiftCounter { get; set; }
+    public DepartmentRosterVM DepartmentRosterVM { get; set; }
 
     #region Direct Counter Access
-
-    public DepartmentRoster? Roster => WeeklyShiftCounter.Roster;
-
+    
     public Shift? Shift => WeeklyShiftCounter.Shift;
     
     // Handle the targets of daily shifts of the roster as well.
@@ -22,17 +20,12 @@ public class WeeklyCounterVM : INotifyPropertyChanged
         get => WeeklyShiftCounter.Target;
         set
         {
-            if (Roster is null) throw new ArgumentNullException(nameof(Roster));
-
-            foreach (var dailyCounter in Roster.DailyShiftCounters(ShiftID))
-            {
-                dailyCounter.Target -= Target;
-                dailyCounter.Target += value;
-                if (dailyCounter.Target < 0) dailyCounter.Target = 0;
-            }
-
             WeeklyShiftCounter.Target = value;
+
+            if (DepartmentRosterVM.LinkTargets) DepartmentRosterVM.MatchWeeklyTargets();
+
             OnPropertyChanged();
+            DepartmentRosterVM.RefreshTargets();
         }
     }
 
@@ -52,6 +45,10 @@ public class WeeklyCounterVM : INotifyPropertyChanged
 
     public bool Lacking => WeeklyShiftCounter.Lacking;
 
+    public bool OverTarget => Count >= Target;
+
+    public float Priority => OverTarget ? 0 : Target / (float) (Count == 0 ? 0.5 : Count);
+
     #endregion
 
     #region INotifyPropertyChanged Members
@@ -59,9 +56,10 @@ public class WeeklyCounterVM : INotifyPropertyChanged
 
     #endregion
 
-    public WeeklyCounterVM(WeeklyShiftCounter weeklyShiftCounter)
+    public WeeklyCounterVM(WeeklyShiftCounter weeklyShiftCounter, DepartmentRosterVM departmentRosterVM)
     {
         WeeklyShiftCounter = weeklyShiftCounter;
+        DepartmentRosterVM = departmentRosterVM;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
