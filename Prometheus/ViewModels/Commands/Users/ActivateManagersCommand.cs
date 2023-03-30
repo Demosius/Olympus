@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Prometheus.ViewModels.Commands.Users;
 
-internal class ActivateManagersCommand : ICommand
+public class ActivateManagersCommand : ICommand
 {
     public UserActivateVM VM { get; set; }
 

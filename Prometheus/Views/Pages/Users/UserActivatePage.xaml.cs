@@ -9,9 +9,12 @@ namespace Prometheus.Views.Pages.Users;
 /// </summary>
 public partial class UserActivatePage
 {
+    public UserActivateVM VM { get; }
+
     public UserActivatePage(Helios helios, Charon charon)
     {
+        VM = new UserActivateVM(helios, charon);
         InitializeComponent();
-        DataContext = new UserActivateVM(helios, charon);
+        DataContext = VM;
     }
 }

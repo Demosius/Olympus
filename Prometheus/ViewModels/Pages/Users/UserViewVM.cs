@@ -1,37 +1,35 @@
 ﻿using Prometheus.ViewModels.Commands.Users;
 using Prometheus.Views.PopUp.Users;
 using Styx;
-using Styx.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Prometheus.ViewModels.Controls;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
 using Uranus.Staff.Models;
-using Uranus.Users.Models;
 
 namespace Prometheus.ViewModels.Pages.Users;
 
-internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IFilters, ISorting
+internal class UserViewVM : INotifyPropertyChanged, IDBInteraction, IFilters, ISorting
 {
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
-    private readonly List<User> fullUserList;
+    private readonly List<UserVM> fullUserList;
     private EmployeeDataSet? employeeDataSet;
 
     #region INotifyPropertyChanged Members
 
-    private ObservableCollection<User> users;
-    public ObservableCollection<User> Users
+    private ObservableCollection<UserVM> users;
+    public ObservableCollection<UserVM> Users
     {
         get => users;
         set
@@ -41,8 +39,8 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
         }
     }
 
-    private User? selectedUser;
-    public User? SelectedUser
+    private UserVM? selectedUser;
+    public UserVM? SelectedUser
     {
         get => selectedUser;
         set
@@ -92,8 +90,11 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
 
     public UserViewVM(Helios helios, Charon charon)
     {
-        fullUserList = new List<User>();
-        users = new ObservableCollection<User>();
+        Helios = helios;
+        Charon = charon;
+
+        fullUserList = new List<UserVM>();
+        users = new ObservableCollection<UserVM>();
         filterString = string.Empty;
 
         RefreshDataCommand = new RefreshDataCommand(this);
@@ -104,30 +105,17 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
         DeactivateUserCommand = new DeactivateUserCommand(this);
         ChangeUserRoleCommand = new ChangeUserRoleCommand(this);
 
-        Task.Run(() => SetDataSources(helios, charon));
-    }
-
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
-
         RefreshData();
     }
-
+    
     public void RefreshData()
     {
-        if (Helios is null || Charon is null) return;
-
         GatherUsers();
-
         ApplyFilters();
     }
 
     private void GatherUsers()
     {
-        if (Helios is null || Charon is null) return;
-
         employeeDataSet = Helios.StaffReader.EmployeeDataSet();
 
         var userList = Helios.UserReader.Users();
@@ -139,7 +127,8 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
             if (roles.TryGetValue(user.RoleName, out var role)) user.Role = role;
             if (!employeeDataSet.Employees.TryGetValue(user.ID, out var employee)) continue;
             user.Employee = employee;
-            fullUserList.Add(user);
+            var uvm = new UserVM(user);
+            fullUserList.Add(uvm);
         }
     }
 
@@ -151,7 +140,7 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
 
     public void ApplyFilters()
     {
-        IEnumerable<User> userList = fullUserList;
+        IEnumerable<UserVM> userList = fullUserList;
 
         if (FilterString != "")
         {
@@ -167,7 +156,7 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
         ApplySorting(fullUserList);
     }
 
-    public void ApplySorting(IEnumerable<User> userList)
+    public void ApplySorting(IEnumerable<UserVM> userList)
     {
         userList = SelectedSortMethod switch
         {
@@ -186,12 +175,16 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
             _ => userList.OrderBy(user => user.Employee?.EmploymentType)
                 .ThenBy(user => user.Employee?.FullName ?? "")
         };
-        Users = new ObservableCollection<User>(userList);
+        Users.Clear();
+        foreach (var userVM in userList)
+        {
+            Users.Add(userVM);
+        }
     }
 
     public void ChangeUserRole()
     {
-        if (Helios is null || Charon is null || SelectedUser is null) return;
+        if (SelectedUser is null) return;
 
         var roleWindow = new SetUserRoleView(Helios, Charon, SelectedUser);
 
@@ -202,7 +195,7 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
 
     public void DeactivateUser()
     {
-        if (Helios is null || Charon is null || SelectedUser is null) return;
+        if (SelectedUser is null) return;
 
         if (MessageBox.Show(
                 $"Are you sure you want to deactivate the user: {SelectedUser.Employee?.FullName ?? SelectedUser.ID.ToString()}?",
@@ -211,7 +204,7 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
 
 
         Mouse.OverrideCursor = Cursors.Wait;
-        if (!Charon.DeactivateUser(SelectedUser))
+        if (!Charon.DeactivateUser(SelectedUser.User))
         {
             Mouse.OverrideCursor = Cursors.Arrow;
             MessageBox.Show(

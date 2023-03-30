@@ -100,7 +100,7 @@ public partial class Charon
 
     public int GetLevelDifference(int employeeID)
     {
-        var employee = staffReader.Employee(employeeID, EPullType.FullRecursive);
+        var employee = staffReader.RoleStackEmployee(employeeID);
         return employee is null ? 999 : GetLevelDifference(employee);
     }
 

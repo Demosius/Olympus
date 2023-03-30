@@ -27,6 +27,45 @@ public class StaffReader
     public Employee? Employee(int id, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Employee>(id, pullType);
 
     /// <summary>
+    /// Pulls a full list of employees that have all appropriate connections established through their roles.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<Employee> EmployeeRoleStack()
+    {
+        List<Employee>? employees = null;
+        List<Role>? roles = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            employees = Chariot.PullObjectList<Employee>();
+            roles = Chariot.PullObjectList<Role>();
+        });
+        employees ??= new List<Employee>();
+        roles ??= new List<Role>();
+
+        var employeeDict = employees.ToDictionary(e => e.ID, e => e);
+        var roleDict = roles.ToDictionary(r => r.Name, r => r);
+
+        foreach (var role in roles)
+            if (roleDict.TryGetValue(role.ReportsToRoleName, out var parentRole))
+                parentRole.AddReportingRole(role);
+
+        foreach (var employee in employees)
+        {
+            if (roleDict.TryGetValue(employee.RoleName, out var role)) role.AddEmployee(employee);
+            
+            if (!employeeDict.TryGetValue(employee.ReportsToID, out var manager)) continue;
+
+            employee.ReportsTo= manager;
+            manager.Reports.Add(employee);
+        }
+
+        return employees;
+    }
+
+    public Employee? RoleStackEmployee(int id) => EmployeeRoleStack().FirstOrDefault(e => e.ID == id);
+
+    /// <summary>
     /// Gets the employee with all appropriate relationships loaded.
     /// </summary>
     /// <param name="id"></param>

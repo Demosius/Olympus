@@ -23,6 +23,7 @@
     <None Remove="Resources\repair.png" />
     <None Remove="Resources\save.png" />
     <None Remove="Resources\sort.png" />
+    <None Remove="Resources\user.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -72,6 +73,7 @@
     <Resource Include="Resources\repair.png" />
     <Resource Include="Resources\save.png" />
     <Resource Include="Resources\sort.png" />
+    <Resource Include="Resources\user.png" />
   </ItemGroup>
 
   <ItemGroup>

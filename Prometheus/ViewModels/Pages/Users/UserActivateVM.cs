@@ -1,19 +1,17 @@
 ﻿using Prometheus.ViewModels.Commands.Users;
 using Styx;
-using Styx.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
+using Prometheus.ViewModels.Controls;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
-using Uranus.Staff.Models;
 using UserRole = Uranus.Users.Models.Role;
 
 namespace Prometheus.ViewModels.Pages.Users;
@@ -34,17 +32,17 @@ public enum ESortMethod
     ID
 }
 
-internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, IDBInteraction, ISorting
+public class UserActivateVM : INotifyPropertyChanged, IFilters, IDBInteraction, ISorting
 {
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
-    private IEnumerable<Employee> fullEmployees;
+    private IEnumerable<EmployeeVM> fullEmployees;
 
     #region INotifyPropertyChanged Members
 
-    private ObservableCollection<Employee> employees;
-    public ObservableCollection<Employee> Employees
+    private ObservableCollection<EmployeeVM> employees;
+    public ObservableCollection<EmployeeVM> Employees
     {
         get => employees;
         set
@@ -54,8 +52,8 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
         }
     }
 
-    private Employee? selectedEmployee;
-    public Employee? SelectedEmployee
+    private EmployeeVM? selectedEmployee;
+    public EmployeeVM? SelectedEmployee
     {
         get => selectedEmployee;
         set
@@ -116,8 +114,13 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
 
     public UserActivateVM(Helios helios, Charon charon)
     {
-        employees = new ObservableCollection<Employee>();
-        fullEmployees = new List<Employee>();
+        Helios = helios;
+        Charon = charon;
+
+        CanMassCreate = Charon.User?.Role?.CreateUser >= 10;
+
+        employees = new ObservableCollection<EmployeeVM>();
+        fullEmployees = new List<EmployeeVM>();
         filterString = string.Empty;
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
@@ -128,20 +131,11 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
 
-        Task.Run(() => SetDataSources(helios, charon));
-    }
-
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
-
         RefreshData();
     }
-
+    
     public void RefreshData()
     {
-        CanMassCreate = Charon?.User?.Role?.CreateUser >= 10;
 
         GatherEmployees();
 
@@ -159,7 +153,7 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
     /// </summary>
     private void GatherEmployees()
     {
-        if (Charon?.User is null || Helios is null) return;
+        if (Charon.User is null) return;
 
         // Get the full data set.
         var dataSet = Helios.StaffReader.EmployeeDataSet();
@@ -174,7 +168,7 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
         }
 
         fullEmployees = dataSet.Employees.Values
-            .Where(employee => employee.IsActive && !employee.IsUser && Charon.CanCreateUser(employee));
+            .Where(employee => employee.IsActive && !employee.IsUser && Charon.CanCreateUser(employee)).Select(e => new EmployeeVM(e));
     }
 
     public void ClearFilters()
@@ -185,7 +179,7 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
 
     public void ApplyFilters()
     {
-        IEnumerable<Employee> employeeList = fullEmployees;
+        IEnumerable<EmployeeVM> employeeList = fullEmployees;
 
         if (FilterString != "")
         {
@@ -201,7 +195,7 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
         ApplySorting(fullEmployees);
     }
 
-    public void ApplySorting(IEnumerable<Employee> employeeList)
+    public void ApplySorting(IEnumerable<EmployeeVM> employeeList)
     {
         employeeList = SelectedSortMethod switch
         {
@@ -219,21 +213,17 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
             ESortMethod.ID => employeeList.OrderBy(e => e.ID),
             _ => employeeList.OrderBy(e => e.EmploymentType).ThenBy(e => e.FullName)
         };
-        Employees = new ObservableCollection<Employee>(employeeList);
+        Employees.Clear();
+        foreach (var employeeVM in employeeList) Employees.Add(employeeVM);
     }
 
     public void ActivateManagers()
     {
-        if (Helios is null || Charon is null) return;
-
         if (MessageBox.Show("Do you want to activate all managers (any employee with direct reports) as users?",
                 "Activate Managers", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
 
-        var role = Helios.UserReader.Role("Manager");
-        role ??= CreateManagerRole();
-
-        if (role is null) return;
-
+        if (Helios.UserReader.Role("Manager") is null) CreateManagerRole();
+        
         var managers = Helios.StaffReader.GetManagers();
 
         var i = 0;
@@ -255,10 +245,8 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
             MessageBox.Show($"Successfully activated {i} managers as users.", "Success", MessageBoxButton.OK);
     }
 
-    private UserRole? CreateManagerRole()
+    private void CreateManagerRole()
     {
-        if (Helios is null || Charon is null) return null;
-
         var role = new UserRole()
         {
             Name = "Manager",
@@ -297,15 +285,13 @@ internal class UserActivateVM : INotifyPropertyChanged, IDataSource, IFilters, I
         };
 
         Helios.UserCreator.Role(role);
-
-        return role;
     }
 
     public void ActivateUser()
     {
-        if (Charon is null || Helios is null || SelectedEmployee is null) return;
+        if (SelectedEmployee is null) return;
 
-        if (Charon.CreateNewUser(SelectedEmployee, "Default"))
+        if (Charon.CreateNewUser(SelectedEmployee.Employee, "Default"))
             MessageBox.Show($"{SelectedEmployee} has successfully been activated as a user.", "Success",
                 MessageBoxButton.OK);
 

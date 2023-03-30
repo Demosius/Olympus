@@ -11,7 +11,7 @@ using Uranus.Annotations;
 
 namespace Prometheus.ViewModels.Pages;
 
-internal class UserVM : INotifyPropertyChanged, IDataSource
+internal class UserPageVM : INotifyPropertyChanged, IDataSource
 {
     public enum EUserPage
     {
@@ -54,7 +54,7 @@ internal class UserVM : INotifyPropertyChanged, IDataSource
 
     #endregion
 
-    public UserVM(Helios helios, Charon charon)
+    public UserPageVM(Helios helios, Charon charon)
     {
         SetDataSources(helios, charon);
 
