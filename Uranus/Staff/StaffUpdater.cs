@@ -269,7 +269,6 @@ public class StaffUpdater
     /// </summary>
     /// <param name="empShifts"></param>
     /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
     public int EmployeeToShiftConnections(IEnumerable<EmployeeShift> empShifts)
     {
         var lines = 0;
@@ -283,7 +282,7 @@ public class StaffUpdater
                         lines += Chariot.Database.Insert(employeeShift);
                         break;
                     case false when employeeShift.Original:
-                        lines += Chariot.Database.Delete(employeeShift);
+                        lines += Chariot.Database.Execute("DELETE FROM EmployeeShift WHERE EmployeeID = ? AND ShiftID = ?;", employeeShift.EmployeeID, employeeShift.ShiftID);
                         break;
                 }
             }
