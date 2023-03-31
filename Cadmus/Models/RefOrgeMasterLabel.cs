@@ -52,7 +52,7 @@ public class RefOrgeMasterLabel
         MixedContentDisplay = string.Empty;
     }
 
-    public RefOrgeMasterLabel(Move move)
+    public RefOrgeMasterLabel(Move move, int? maxLabels)
     {
         Move = move;
 
@@ -78,28 +78,30 @@ public class RefOrgeMasterLabel
         Date = DateTime.Today;
         Barcode = BarcodeUtility.Encode128(move.ItemNumber.ToString());
 
-        ItemDescription = move.Item?.Description ?? string.Empty; 
+        ItemDescription = move.Item?.Description ?? string.Empty;
 
         const string pattern = @"^(\w{2}|\w{4})(\d{2} \d{3})$";
         TrueOrderTakeBin = Regex.Replace(TakeBin, pattern, "A$2");
-        
+
         MixedContentDisplay = move is MixedCartonMove mixMove ? mixMove.MixedContentDisplay : string.Empty;
-
-        // Total Grabs
-        CalculateTotalGrabs();
-
-        CalculateRequiredLabels();
+        
+        CalculateRequiredLabels(maxLabels);
     }
 
+    /// <summary>
+    /// Calculates the total grab qty of this item for this place location.
+    ///
+    /// Run after all moves created so no data is out of sync.
+    /// </summary>
     public void CalculateTotalGrabs()
     {
         var moves = Move?.PlaceBin?.ToMoves.Where(m => m != Move && m.ItemNumber == ItemNumber).ToList() ?? new List<Move>();
 
         if (moves.Any())
         {
-            var cases = moves.Sum(m => m.TakeCases);
-            var packs = moves.Sum(m => m.TakePacks);
-            var eaches = moves.Sum(m => m.TakeEaches);
+            var cases = moves.Sum(m => m.TakeCases) + Move?.TakeCases;
+            var packs = moves.Sum(m => m.TakePacks) + Move?.TakePacks;
+            var eaches = moves.Sum(m => m.TakeEaches) + Move?.TakeEaches;
             TotalGrab =
                 $"(T:{(cases > 0 ? $" {cases} CASE" : "")}" +
                 $"{(packs > 0 ? $"{packs} PACK" : "")}" +
@@ -110,15 +112,21 @@ public class RefOrgeMasterLabel
 
     }
 
-    public void CalculateRequiredLabels()
+    public void CalculateRequiredLabels(int? maxLabels = null)
     {
         // Get required number of labels.
         LabelTotal = CaseQty + PackQty;
-        if (EachQty <= 0) return;
+        if (EachQty <= 0)
+        {
+            if (maxLabels < LabelTotal) LabelTotal = (int)maxLabels;
+            return;
+        }
 
         var eachesPerLabel = QtyPerPack > 1 ? QtyPerPack : QtyPerCase > 1 ? QtyPerCase : 12;
 
         LabelTotal += (int)Math.Ceiling(EachQty / (double)eachesPerLabel);
+
+        if (maxLabels < LabelTotal) LabelTotal = (int)maxLabels;
     }
 
 }

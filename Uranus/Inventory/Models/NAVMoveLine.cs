@@ -47,6 +47,24 @@ public class NAVMoveLine : IComparable<NAVMoveLine>
         BinCode = string.Empty;
     }
 
+    public void SetZone(NAVZone zone)
+    {
+        Zone = zone;
+        Zone.MoveLines.Add(this);
+    }
+
+    public void SetBin(NAVBin bin)
+    {
+        Bin = bin;
+        Bin.MoveLines.Add(this);
+    }
+
+    public void SetItem(NAVItem item)
+    {
+        Item = item;
+        Item.MoveLines.Add(this);
+    }
+
     public bool IsMatch(NAVMoveLine otherLines)
     {
         return BaseQty == otherLines.BaseQty &&

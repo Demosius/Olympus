@@ -163,6 +163,10 @@ public class Move
             default:
                 throw new ArgumentOutOfRangeException();
         }
+
+        // Add self to other objects where applicable.
+        TakeBin?.FromMoves.Add(this);
+        PlaceBin?.ToMoves.Add(this);
     }
 
     public bool LineMatch(NAVMoveLine moveLine)
@@ -283,7 +287,7 @@ public class Move
 
             if (unevenTakes.Count > 0 && placeLines.Count > 0) moveList.AddRange(GenerateMovesFromUnevenLines(unevenTakes, placeLines));
         }
-
+        
         return moveList;
     }
 

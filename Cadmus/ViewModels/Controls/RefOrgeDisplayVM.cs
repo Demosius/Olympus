@@ -22,6 +22,8 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
 {
     public Helios Helios { get; set; }
 
+    public BasicStockDataSet? StockDataSet { get; set; }
+
     public List<RefOrgeMasterLabel> Masters { get; set; }
 
     #region INotifyPropertyChanged Members
@@ -44,6 +46,30 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         set
         {
             labelVMs = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private int? labelMax;
+
+    public int? LabelMax
+    {
+        get => labelMax;
+        set
+        {
+            labelMax = value;
+            OnPropertyChanged();
+            SetLabelMax();
+        }
+    }
+
+    public string LabelMaxString
+    {
+        get => LabelMax?.ToString() ?? "";
+        set
+        {
+            _ = int.TryParse(value, out var val);
+            LabelMax = val > 0 ? val : null;
             OnPropertyChanged();
         }
     }
@@ -99,6 +125,13 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         LabelVMs.Clear();
         SelectedLabels.Clear();
         SelectedMasterLabels.Clear();
+        StockDataSet = null;
+    }
+
+    private void SetLabelMax()
+    {
+        foreach (var masterVM in MasterVMs) masterVM.SetLabelMax(LabelMax);
+        GenerateDisplayLabels();
     }
 
     public void DeleteSelected()
@@ -127,16 +160,38 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         catch (Exception ex)
         {
             MessageBox.Show(ex.Message);
+            if (!MasterVMs.Any() && !LabelVMs.Any()) StockDataSet = null;
             Mouse.OverrideCursor = Cursors.Arrow;
             return;
         }
 
         // Get other data from DB.
-        var dataSet = Helios.InventoryReader.BasicStockDataSet(moveLines.Select(m => m.ZoneCode).Distinct().ToList(), new List<string> {"9600"});
-        dataSet?.SetMoveLineData(moveLines);
+        StockDataSet ??= Helios.InventoryReader.BasicStockDataSet(moveLines.Select(m => m.ZoneCode).Distinct().ToList(), new List<string> { "9600" });
+        try
+        {
+            StockDataSet?.SetMoveLineData(moveLines);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Missing Data", MessageBoxButton.OK, MessageBoxImage.Error);
+            if (!MasterVMs.Any() && !LabelVMs.Any()) StockDataSet = null;
+            Mouse.OverrideCursor = Cursors.Arrow;
+            return;
+        }
 
         // Convert MoveLines to moves.
-        var moves = Move.GenerateMoveList(moveLines);
+        List<Move> moves;
+        try
+        {
+            moves = Move.GenerateMoveList(moveLines);
+        }
+        catch (Exception ex)
+        {
+            Mouse.OverrideCursor = Cursors.Arrow;
+            MessageBox.Show($"Error generating moves. Data is likely out of date.\n\n{ex}", "Error",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+            return;
+        }
 
         // Generate Mixed Carton moves, if applicable.
         var mixedCartonTemplates = Helios.InventoryReader.MixedCartonTemplates().ToList();
@@ -145,13 +200,28 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         moves.AddRange(mixCtnMoves);
 
         // Convert Moves to masterLabels
-        Masters.AddRange(moves.Select(m => new RefOrgeMasterLabel(m)));
+        var newMasters = moves.Select(m => new RefOrgeMasterLabel(m, LabelMax)).ToList();
+        Masters.AddRange(newMasters);
 
-        MasterVMs = new ObservableCollection<RefOrgeMasterLabelVM>(Masters.Select(m => new RefOrgeMasterLabelVM(m, this)));
+        var newMasterVMs = newMasters.Select(m => new RefOrgeMasterLabelVM(m, this)).ToList();
+        foreach (var refOrgeMasterLabelVM in newMasterVMs)
+        {
+            MasterVMs.Add(refOrgeMasterLabelVM);
+        }
 
-        GenerateDisplayLabels();
+        CalculateTotalGrabs();
+
+        GenerateDisplayLabels(newMasterVMs);
 
         Mouse.OverrideCursor = Cursors.Arrow;
+    }
+
+    private void CalculateTotalGrabs()
+    {
+        foreach (var refOrgeMasterLabelVM in MasterVMs)
+        {
+            refOrgeMasterLabelVM.CalculateTotalGrabs();
+        }
     }
 
     public void GenerateDisplayLabels()
@@ -166,6 +236,50 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         }
 
         LabelVMs = new ObservableCollection<RefOrgeLabelVM>(labels);
+    }
+
+    public void GenerateDisplayLabels(IEnumerable<RefOrgeMasterLabelVM> newMasterVMs)
+    {
+        var labels = new List<RefOrgeLabelVM>();
+        foreach (var masterLabelVM in newMasterVMs)
+        {
+            labels.AddRange(masterLabelVM.GetDisplayLabels());
+        }
+
+        foreach (var refOrgeLabelVM in labels)
+        {
+            LabelVMs.Add(refOrgeLabelVM);
+        }
+    }
+
+    public void GenerateDisplayLabels(RefOrgeMasterLabelVM masterLabel)
+    {
+        // Get first label matching given master.
+        var label = LabelVMs.FirstOrDefault(l => l.Master == masterLabel);
+        if (label is null)
+        {
+            GenerateDisplayLabels(new List<RefOrgeMasterLabelVM> { masterLabel });
+            return;
+        }
+
+        // Find index of this label.
+        var index = LabelVMs.IndexOf(label);
+        if (index == -1)
+        {
+            GenerateDisplayLabels(new List<RefOrgeMasterLabelVM> { masterLabel });
+            return;
+        }
+
+        // Remove relevant labels from list.
+        while (LabelVMs[index].Master == masterLabel) LabelVMs.RemoveAt(index);
+
+        // Create and insert new appropriate labels to original list.
+        var newLabels = masterLabel.GetDisplayLabels();
+        foreach (var refOrgeLabelVM in newLabels)
+        {
+            LabelVMs.Insert(index, refOrgeLabelVM);
+            index++;
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

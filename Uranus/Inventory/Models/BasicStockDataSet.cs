@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace Uranus.Inventory.Models;
@@ -104,11 +105,47 @@ public class BasicStockDataSet
     /// <param name="moveLines"></param>
     public void SetMoveLineData(IEnumerable<NAVMoveLine> moveLines)
     {
+        var missingZones = new List<string>();
+        var missingBins = new List<string>();
+        var missingItems = new List<string>();
+        var missingUoMs = new List<string>();
+
         foreach (var moveLine in moveLines)
         {
-            if (Zones.TryGetValue(moveLine.ZoneID, out var zone)) moveLine.Zone = zone;
-            if (Bins.TryGetValue(moveLine.BinID, out var bin)) moveLine.Bin = bin;
-            if (Items.TryGetValue(moveLine.ItemNumber, out var item)) moveLine.Item = item;
+            if (Zones.TryGetValue(moveLine.ZoneID, out var zone))
+                moveLine.SetZone(zone);
+            else
+                missingZones.Add(moveLine.ZoneID);
+            if (Bins.TryGetValue(moveLine.BinID, out var bin))
+                moveLine.SetBin(bin);
+            else
+                missingBins.Add(moveLine.BinID);
+            if (Items.TryGetValue(moveLine.ItemNumber, out var item))
+            {
+                moveLine.SetItem(item);
+                var uom = moveLine.UoM;
+                if ((uom == EUoM.CASE && !item.HasCases) || (uom == EUoM.PACK && !item.HasPacks))
+                    missingUoMs.Add($"{item.Number} ({uom})");
+            }
+            else
+                missingItems.Add(moveLine.ItemNumber.ToString());
         }
+
+        if (!missingZones.Any() && !missingItems.Any() && !missingBins.Any() && !missingUoMs.Any()) return;
+
+        missingZones = missingZones.Distinct().ToList();
+        missingBins = missingBins.Distinct().ToList();
+        missingItems = missingItems.Distinct().ToList();
+        missingUoMs = missingUoMs.Distinct().ToList();
+        var errorMessage = "Cannot accurately parse move lines as there is data missing from the database:\n\n" +
+                           "  Missing Zones:\n\t" +
+                           $"{(missingZones.Count > 3 ? $"{string.Join(" | ", missingZones.Take(3))}... (+{missingZones.Count - 3}) " : string.Join(" | ", missingZones))}\n\n" +
+                           "  Missing Bins:\n\t" +
+                           $"{(missingBins.Count > 3 ? $"{string.Join(" | ", missingBins.Take(3))}... (+{missingBins.Count - 3}) " : string.Join(" | ", missingBins))}\n\n" +
+                           "  Missing Items:\n\t" +
+                           $"{(missingItems.Count > 3 ? $"{string.Join(" | ", missingItems.Take(3))}... (+{missingItems.Count - 3}) " : string.Join(" | ", missingItems))}\n\n " +
+                           "  Missing UoMs:\n\t" +
+                           $"{(missingUoMs.Count > 3 ? $"{string.Join(" | ", missingUoMs.Take(3))}... (+{missingUoMs.Count - 3}) " : string.Join(" | ", missingUoMs))}\n\n";
+        throw new DataException(errorMessage);
     }
 }

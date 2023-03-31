@@ -4,13 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:controlVM="clr-namespace:Cadmus.ViewModels.Controls"
-             xmlns:labelVM="clr-namespace:Cadmus.ViewModels.Labels"
              xmlns:labels="clr-namespace:Cadmus.Views.Labels"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type controlVM:RefOrgeDisplayVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="1200">
-    
+
     <UserControl.Resources>
+        <!-- templates pulled and used by code-behind -->
         <DataTemplate x:Key="RefOrgeTemplate">
             <labels:RefOrgeLabelView/>
         </DataTemplate>
@@ -27,8 +27,8 @@
         </Grid.ColumnDefinitions>
         <DockPanel Background="{DynamicResource Brush05}"
                    Grid.Column="0">
-            <StackPanel DockPanel.Dock="Top"
-                        Orientation="Horizontal">
+            <WrapPanel DockPanel.Dock="Top"
+                       Orientation="Horizontal">
                 <Button Content="Add Line"
                         Command="{Binding AddLineCommand}"
                         MinWidth="100"
@@ -45,7 +45,21 @@
                         Command="{Binding DeleteSelectedCommand}"
                         MinWidth="100"
                         Margin="2"/>
-            </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Max Labels"
+                           VerticalAlignment="Center"
+                           FontSize="8"
+                           Margin="5,0,0,0"/>
+                    <TextBox Text="{Binding LabelMaxString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                             MinWidth="55"
+                             MinHeight="20"
+                             Height="28"
+                             Margin="0,2" Padding="0"
+                             VerticalContentAlignment="Center" VerticalAlignment="Center"
+                             FontSize="14"
+                             HorizontalContentAlignment="Center"/>
+                </StackPanel>
+            </WrapPanel>
 
             <!-- Data View -->
             <DataGrid Name="MasterLabelGrid" 

@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Windows;
+using Serilog;
 
 namespace Morpheus;
 
@@ -132,17 +133,27 @@ public static class General
     // Gets raw string data from the clipboard.
     public static string ClipboardToString()
     {
-        var rawData = "";
-        Thread thread = new(delegate ()
+        try
         {
-            rawData = Clipboard.GetText(TextDataFormat.Text);
-        });
+            var rawData = "";
 
-        thread.SetApartmentState(ApartmentState.STA);
-        thread.Start();
-        thread.Join();
+            Thread thread = new(delegate ()
+            {
+                rawData = Clipboard.GetText(TextDataFormat.Text);
+            });
 
-        return rawData;
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
+
+            return rawData;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.Message);
+            MessageBox.Show(ex.Message, "Bad Clipboard Data", MessageBoxButton.OK, MessageBoxImage.Error);
+            return string.Empty;
+        }
     }
 }
 

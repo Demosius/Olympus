@@ -207,7 +207,7 @@ public class RefOrgeMasterLabelVM : INotifyPropertyChanged
         {
             Label.LabelTotal = value;
             OnPropertyChanged();
-            DisplayVM.GenerateDisplayLabels();
+            DisplayVM.GenerateDisplayLabels(this);
         }
     }
 
@@ -282,7 +282,7 @@ public class RefOrgeMasterLabelVM : INotifyPropertyChanged
         SetTakeDisplayString();
     }
 
-    public RefOrgeMasterLabelVM(Move move, RefOrgeDisplayVM displayVM) : this(new RefOrgeMasterLabel(move), displayVM) { }
+    public RefOrgeMasterLabelVM(Move move, RefOrgeDisplayVM displayVM) : this(new RefOrgeMasterLabel(move, displayVM.LabelMax), displayVM) { }
 
     public List<RefOrgeLabelVM> GetDisplayLabels()
     {
@@ -294,6 +294,21 @@ public class RefOrgeMasterLabelVM : INotifyPropertyChanged
         }
 
         return DisplayLabels;
+    }
+
+    public void SetLabelMax(int? labelMax)
+    {
+        CalculateRequiredLabels(labelMax);
+        OnPropertyChanged(nameof(LabelTotal));
+    }
+
+    public void CalculateRequiredLabels(int? maxLabels = null) => Label.CalculateRequiredLabels(maxLabels);
+
+    public void CalculateTotalGrabs()
+    {
+        Label.CalculateTotalGrabs();
+        OnPropertyChanged(nameof(TotalGrab));
+        UpdateDisplay(nameof(TotalGrab));
     }
 
     private void SetTakeDisplayString()
