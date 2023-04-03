@@ -1,11 +1,11 @@
-﻿using Pantheon.ViewModels.PopUp.Employees;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-internal class ConfirmShiftAdjustmentsCommand : ICommand
+public class ConfirmShiftAdjustmentsCommand : ICommand
 {
     public EmployeeShiftVM VM { get; set; }
 

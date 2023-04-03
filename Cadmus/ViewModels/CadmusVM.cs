@@ -70,7 +70,7 @@ public class CadmusVM : INotifyPropertyChanged
             newControl = printable switch
             {
                 EPrintable.ReceivingPutAwayLabels => new ReceivingPutAway(),
-                EPrintable.ReplenLabels => new ReceivingPutAway(),
+                EPrintable.ReplenLabels => new RefOrgeDisplayView(Helios),
                 _ => throw new ArgumentOutOfRangeException()
             };
 

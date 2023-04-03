@@ -16,6 +16,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using Morpheus.Views.Windows;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -31,7 +32,7 @@ public enum EEntrySortOption
     DayDateEmployee
 }
 
-public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters, IDateRange
+public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters, IDateRange, ISorting
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
@@ -289,8 +290,11 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public ApplySortingCommand ApplySortingCommand { get; set; }
     public RepairDataCommand RepairDataCommand { get; set; }
 
-    public ShiftEntryPageVM()
+    public ShiftEntryPageVM(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
+
         minDate = DateTime.Now.AddDays(-((int)DateTime.Now.DayOfWeek - 1) - 7 - ((int)DateTime.Now.DayOfWeek <= 1 ? 7 : 0)).Date;
         maxDate = DateTime.Now.AddDays(-1).Date;
         sortOption = EEntrySortOption.EmployeeDate;
@@ -314,6 +318,11 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         CreateMissingShiftsCommand = new CreateMissingShiftsCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
+
+        Manager = charon.Employee;
+        Employees = Helios.StaffReader.GetManagedEmployees(Manager?.ID ?? 0).ToList();
+
+        Task.Run(SetEntries);
     }
 
     public bool CheckDateChange()
@@ -327,16 +336,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
         return result != MessageBoxResult.Cancel;
     }
-
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
-        Manager = charon.Employee;
-        Employees = Helios.StaffReader.GetManagedEmployees(Manager?.ID ?? 0).ToList();
-
-        Task.Run(SetEntries);
-    }
+    
 
     /// <summary>
     /// Sets the entries according to the _manager.
@@ -679,7 +679,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         {
             VistaFolderBrowserDialog folderBrowserDialog = new()
             {
-                Description = "Select Export Folder",
+                Description = @"Select Export Folder",
                 UseDescriptionForTitle = true
             };
             if (!folderBrowserDialog.ShowDialog() == true) return;
@@ -865,7 +865,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
         if (inputWindow.ShowDialog() != true) return;
 
-        var comment = inputWindow.Input.Text;
+        var comment = inputWindow.InputText;
 
         var newEntries = false;
 

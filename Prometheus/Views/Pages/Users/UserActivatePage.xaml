@@ -12,7 +12,7 @@
       Title="UserActivatePage">
 
     <Page.Resources>
-        <ResourceDictionary Source="../../../Themes/MSControls.Core.Implicit.xaml"/>
+        <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Orange/MSControls.Core.Implicit.xaml" />
     </Page.Resources>
 
     <DockPanel>
@@ -26,6 +26,7 @@
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
             <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
+            <converters:AsyncImageConverter x:Key="AsyncImageConverter"/>
         </DockPanel.Resources>
         <!-- Function Buttons -->
         <StackPanel DockPanel.Dock="Top"
@@ -44,6 +45,13 @@
             <Button Content="Activate Selected"
                     ToolTip="Activate the selected employee as a user."
                     Command="{Binding ActivateUserCommand}"/>
+            <Button Height="30" Width="30" MinWidth="0" MinHeight="0"
+                    Padding="0"
+                    Command="{Binding RefreshDataCommand}"
+                    ToolTip="Refresh Data">
+                <Image Source="../../../Resources/refresh.png"
+                       Margin="5"/>
+            </Button>
         </StackPanel>
 
         <!-- Sorting and Filtering -->
@@ -65,10 +73,17 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <Image Source="{Binding Icon.FullPath, FallbackValue=''}"
-                                   MaxWidth="50"
-                                   MaxHeight="50"
-                                   Margin="0,0,5,0"/>
+                        <Image MaxWidth="50"
+                               MaxHeight="50"
+                               Margin="0,0,5,0">
+                            <Image.Source>
+                                <Binding Path="IconUri" Converter="{StaticResource AsyncImageConverter}">
+                                    <Binding.TargetNullValue>
+                                        <ImageSource>../../../Resources/user.png</ImageSource>
+                                    </Binding.TargetNullValue>
+                                </Binding>
+                            </Image.Source>
+                        </Image>
                         <StackPanel Orientation="Vertical">
                             <StackPanel Orientation="Horizontal">
                                 <Label Content="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"

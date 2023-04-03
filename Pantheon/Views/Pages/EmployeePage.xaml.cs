@@ -1,4 +1,5 @@
-﻿using Styx;
+﻿using Pantheon.ViewModels.Pages;
+using Styx;
 using Uranus;
 
 namespace Pantheon.Views.Pages;
@@ -8,9 +9,13 @@ namespace Pantheon.Views.Pages;
 /// </summary>
 public partial class EmployeePage
 {
+    public EmployeePageVM VM { get; set; }
+
     public EmployeePage(Charon charon, Helios helios)
     {
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+        VM = new EmployeePageVM(helios, charon);
+        DataContext = VM;
+        VM.RefreshData();
     }
 }

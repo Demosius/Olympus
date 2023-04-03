@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Aion.ViewModels;
 using Uranus;
 
 namespace Aion.View;
@@ -14,10 +15,13 @@ namespace Aion.View;
 /// </summary>
 public partial class ShiftEntryPage
 {
+    public ShiftEntryPageVM VM { get; set; }
+
     public ShiftEntryPage(Helios helios, Charon charon)
     {
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+        VM = new ShiftEntryPageVM(helios, charon);
+        DataContext = VM;
     }
 
     private readonly Style centerStyle = new()

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+// ReSharper disable StringLiteralTypo
 
 namespace Uranus.Inventory;
 
@@ -107,10 +108,19 @@ public static class Constants
         { "Item No.", -1 },
         { "Quantity", -1 },
         { "Unit of Measure", -1 },
-        // ReSharper disable once StringLiteralTypo
         { @"Avail. UOM Fulfilment Qty", -1 },
         { "Created On Date", -1 },
         { "Created On Time", -1 }
+    };
+
+    public static readonly Dictionary<string, int> NAVMoveColumns = new()
+    {
+        { "Action Type", -1 },
+        { "Item No.", -1 },
+        { "Zone Code", -1 },
+        { "Bin Code", -1 },
+        { "Quantity", -1 },
+        { "Unit of Measure Code", -1 },
     };
 
     public static readonly Dictionary<string, string> BinColumns = new()

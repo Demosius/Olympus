@@ -143,7 +143,6 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
 
     #endregion
 
@@ -159,7 +158,6 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
         RunFixedBinChecksCommand = new RunFixedBinChecksCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
     }
 
     public void RunChecks()
@@ -231,10 +229,5 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
         }
 
         FilteredCheckResults = new ObservableCollection<FixedBinCheckResult>(results);
-    }
-
-    public void ApplySorting()
-    {
-        throw new System.NotImplementedException();
     }
 }

@@ -5,9 +5,9 @@ namespace Argos.Views
     /// <summary>
     /// Interaction logic for HadesWindow.xaml
     /// </summary>
-    public partial class HadesWindow : Window
+    public partial class ArgosWindow : Window
     {
-        public HadesWindow()
+        public ArgosWindow()
         {
             InitializeComponent();
         }

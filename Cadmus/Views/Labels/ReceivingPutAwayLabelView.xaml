@@ -4,14 +4,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:Cadmus.ViewModels"
+             xmlns:labels="clr-namespace:Cadmus.ViewModels.Labels"
              mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance {x:Type vm:ReceivingPutAwayLabelVM}, IsDesignTimeCreatable=False}"
-             Height="242" Width="356">
+             d:DataContext="{d:DesignInstance {x:Type labels:ReceivingPutAwayLabelVM}, IsDesignTimeCreatable=False}"
+             Height="{Binding Height}" Width="{Binding Width}">
 
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../../Resources/Fonts/../Fonts.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Morpheus;component/Resources/Fonts.xaml"/>
                 <ResourceDictionary>
                     <Style TargetType="TextBlock">
                         <Setter Property="Foreground" Value="Black"></Setter>
@@ -24,23 +25,23 @@
     <Grid Background="White">
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="85"/>
-            <ColumnDefinition Width="145"/>
-            <ColumnDefinition Width="63"/>
-            <ColumnDefinition Width="63"/>
+            <ColumnDefinition Width="{Binding Col1}"/>
+            <ColumnDefinition Width="{Binding Col2}"/>
+            <ColumnDefinition Width="{Binding Col3}"/>
+            <ColumnDefinition Width="{Binding Col4}"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="22"/>
-            <RowDefinition Height="22"/>
-            <RowDefinition Height="22"/>
-            <RowDefinition Height="22"/>
-            <RowDefinition Height="22"/>
-            <RowDefinition Height="22"/>
-            <RowDefinition Height="22"/>
-            <RowDefinition Height="22"/>
-            <RowDefinition Height="22"/>
-            <RowDefinition Height="22"/>
-            <RowDefinition Height="22"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
         </Grid.RowDefinitions>
 
         <!-- Take Zone -->

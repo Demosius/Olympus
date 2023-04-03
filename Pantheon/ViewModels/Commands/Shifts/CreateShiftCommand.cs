@@ -1,6 +1,6 @@
-﻿using Pantheon.ViewModels.Pages;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.Pages;
 
 namespace Pantheon.ViewModels.Commands.Shifts;
 

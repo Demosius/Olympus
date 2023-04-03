@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:Panacea"
              StartupUri="Views/PanaceaWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Lilac/MSControls.Core.Implicit.xaml" />
     </Application.Resources>
 </Application>

@@ -49,6 +49,13 @@ public class NAVBin
         set => (Extension ??= new BinExtension(this)).SetBay(value);
     }
 
+    [Ignore]
+    public string CheckDigits
+    {
+        get => Extension?.CheckDigits ?? string.Empty;
+        set => (Extension ??= new BinExtension(this)).CheckDigits = value;
+    }
+
     [Ignore] public Dictionary<int, Stock> Stock { get; set; }
 
     [Ignore] public EAccessLevel? AccessLevel => Zone?.AccessLevel;

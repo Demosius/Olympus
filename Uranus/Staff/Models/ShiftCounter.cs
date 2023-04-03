@@ -10,11 +10,11 @@ namespace Uranus.Staff.Models;
 /// <summary>
 /// Core shift counter.
 /// </summary>
-public class ShiftCounter : INotifyPropertyChanged
+public abstract class ShiftCounter
 {
     [PrimaryKey] public Guid ID { get; set; }
     [ForeignKey(typeof(Shift))] public string ShiftID { get; set; }
-    public DateTime Date { get; set; }
+    public int Target { get; set; }
 
     [ManyToOne(nameof(ShiftID), CascadeOperations = CascadeOperation.None)]
     public Shift? Shift { get; set; }
@@ -22,28 +22,7 @@ public class ShiftCounter : INotifyPropertyChanged
     #region INotifyPropertyChanged Members
 
     // Do not store the shift count, but instead recount upon initialization.
-    private int count;
-    [Ignore]
-    public int Count
-    {
-        get => count;
-        set
-        {
-            count = value;
-            OnPropertyChanged();
-        }
-    }
-
-    private int target;
-    public int Target
-    {
-        get => target;
-        set
-        {
-            target = value;
-            OnPropertyChanged();
-        }
-    }
+    [Ignore] public int Count { get; set; }
 
     [Ignore] public int Discrepancy => Target - Count;
 
@@ -51,26 +30,17 @@ public class ShiftCounter : INotifyPropertyChanged
 
     #endregion
 
-    public ShiftCounter()
+    protected ShiftCounter()
     {
         ID = Guid.NewGuid();
         ShiftID = string.Empty;
     }
 
-    public ShiftCounter(Shift shift, int target, DateTime date)
+    protected ShiftCounter(Shift shift, int target)
     {
         ID = Guid.NewGuid();
         ShiftID = shift.ID;
         Shift = shift;
         Target = target;
-        Date = date;
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

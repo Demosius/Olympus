@@ -111,7 +111,6 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public ItemsToClipboardCommand ItemsToClipboardCommand { get; set; }
     public RunChecksCommand RunChecksCommand { get; set; }
 
@@ -134,7 +133,6 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         ItemsToClipboardCommand = new ItemsToClipboardCommand(this);
         RunChecksCommand = new RunChecksCommand(this);
     }
@@ -207,12 +205,7 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
 
         FilteredCheckResults = new ObservableCollection<IWMBCheckResult>(results);
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void ItemsToClipboard()
     {
         var itemList = FilteredCheckResults.Select(checkResult => checkResult.Item.Number.ToString()).ToList();

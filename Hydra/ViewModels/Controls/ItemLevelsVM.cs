@@ -116,7 +116,6 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
     public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public SelectItemsCommand SelectItemsCommand { get; set; }
     public SaveLevelsCommand SaveLevelsCommand { get; set; }
     public ManageSiteCommand ManageSiteCommand { get; set; }
@@ -140,7 +139,6 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
         RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         SelectItemsCommand = new SelectItemsCommand(this);
         SaveLevelsCommand = new SaveLevelsCommand(this);
         ManageSiteCommand = new ManageSiteCommand(this);
@@ -293,12 +291,7 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
 
         DisplayData = dataRows.AsDataView();
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void SelectItems()
     {
         var vm = new ItemSelectionVM(this);

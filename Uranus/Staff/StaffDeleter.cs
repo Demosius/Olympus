@@ -103,4 +103,18 @@ public class StaffDeleter
     public bool RecurringRule(ShiftRuleRecurring recurring) => Chariot.Delete(recurring);
 
     public bool RosterRule(ShiftRuleRoster roster) => Chariot.Delete(roster);
+
+    public bool Department(Department department) => Chariot.Delete(department);
+
+    public bool Role(Role role) => Chariot.Delete(role);
+
+    public void Clan(Clan clan)
+    {
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            // Remove all associations first.
+            Chariot.Database.Execute("UPDATE Employee SET ClanName = null WHERE ClanName = ?;", clan.Name);
+            Chariot.Delete(clan);
+        });
+    }
 }

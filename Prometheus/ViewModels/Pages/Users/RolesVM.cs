@@ -24,7 +24,7 @@ public enum ERoleSortMethod
     UserCount
 }
 
-internal class RolesVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IFilters
+internal class RolesVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IFilters, ISorting
 {
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }

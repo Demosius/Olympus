@@ -156,7 +156,6 @@ public class ItemsWithNoPickBinVM : INotifyPropertyChanged, IFilters, IItemData,
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public ItemsToClipboardCommand ItemsToClipboardCommand { get; set; }
     public RunChecksCommand RunChecksCommand { get; set; }
     public UpdateTOLinesCommand UpdateTOLinesCommand { get; set; }
@@ -179,7 +178,6 @@ public class ItemsWithNoPickBinVM : INotifyPropertyChanged, IFilters, IItemData,
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         ItemsToClipboardCommand = new ItemsToClipboardCommand(this);
         RunChecksCommand = new RunChecksCommand(this);
         UpdateTOLinesCommand = new UpdateTOLinesCommand(this);
@@ -237,12 +235,7 @@ public class ItemsWithNoPickBinVM : INotifyPropertyChanged, IFilters, IItemData,
 
         FilteredCheckResults = new ObservableCollection<IWNPBCheckResult>(results);
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void ItemsToClipboard()
     {
         var itemList = FilteredCheckResults.Select(checkResult => checkResult.ItemNumber).ToList();

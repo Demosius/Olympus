@@ -1,0 +1,84 @@
+﻿<UserControl x:Class="Pantheon.Views.Controls.Shifts.SingleRuleView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Shifts"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:model="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:SingleRuleVM}, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="SingleRuleTypes"
+                            MethodName="GetValues" 
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="model:ESingleRuleType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="LeaveTypes"
+                            MethodName="GetValues" 
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="model:ELeaveType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <!--<RowDefinition Height="Auto"/>-->
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" 
+                           Content="Description: "/>
+        <TextBox Grid.Row="0" Grid.Column="1"
+                             Text="{Binding Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"
+                             HorizontalAlignment="Stretch"/>
+
+        <Label Grid.Row="1" Grid.Column="0" 
+                           Content="Date Range: "/>
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+            <DatePicker SelectedDate="{Binding StartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+            <DatePicker SelectedDate="{Binding EndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=''}"/>
+        </StackPanel>
+
+        <Label Grid.Row="2" Grid.Column="0"
+                           Content="Rule Type: "/>
+        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+            <ComboBox ItemsSource="{Binding Source={StaticResource SingleRuleTypes}}"
+                                  SelectedValue="{Binding RuleType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <ComboBox ItemsSource="{Binding Source={StaticResource LeaveTypes}}"
+                                  SelectedValue="{Binding LeaveType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Visibility="{Binding UseLeaveType, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        </StackPanel>
+        <Label Grid.Row="3" Grid.Column="0" 
+                           Content="Time of Day: "
+                           Visibility="{Binding ElementName=TimeText, Path=Visibility, Mode=OneWay}"/>
+        <TextBox Grid.Row="3" Grid.Column="1" x:Name="TimeText"
+                             Text="{Binding TimeString, Mode=TwoWay, UpdateSourceTrigger=LostFocus, FallbackValue=''}"
+                             Visibility="{Binding UseTime, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+        <!--<StackPanel Grid.Row="4" Grid.Column="1" 
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+            <Button Content="Cancel"
+                                Command="{Binding ElementName=VM, Path=CancelSingleRuleEditCommand}"
+                                Visibility="{Binding InEdit, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            <Button Content="{Binding InEdit, Mode=OneWay, Converter={StaticResource EditBoolConverter}}"
+                                Command="{Binding ElementName=VM, Path=AddSingleRuleCommand}"/>
+        </StackPanel>-->
+    </Grid>
+</UserControl>

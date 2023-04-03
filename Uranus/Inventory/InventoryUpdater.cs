@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Uranus.Inventory.Models;
 
@@ -106,6 +107,19 @@ public class InventoryUpdater
         return lines;
     }
 
+    public int ReplaceMixedCartons(IEnumerable<MixedCarton> mixedCartons)
+    {
+        var lines = 0;
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var mcList = mixedCartons.ToList();
+            var mcItems = mcList.SelectMany(mc => mc.Items);
+            lines += Chariot.ReplaceFullTable(mcItems);
+            lines += Chariot.ReplaceFullTable(mcList);
+        });
+        return lines;
+    }
+
     public int Sites(IEnumerable<Site> sites)
     {
         var lines = 0;
@@ -135,4 +149,5 @@ public class InventoryUpdater
     public int SiteItemLevels(IEnumerable<SiteItemLevel> siteItemLevels) => Chariot.UpdateTable(siteItemLevels);
 
     public int Site(Site site) => Chariot.Update(site);
+
 }

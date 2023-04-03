@@ -223,14 +223,29 @@ public class StaffUpdater
     /// </summary>
     /// <param name="icon"></param>
     /// <param name="newName"></param>
-    /// <exception cref="NotImplementedException"></exception>
     public void RenameEmployeeIcon(ref EmployeeIcon icon, string newName)
     {
+        var oldName = icon.Name;
         Chariot.Delete(icon);
         icon.Name = newName;
         Chariot.Create(icon);
-    }
+        Chariot.Database?.Execute("UPDATE Employee SET IconName = ? WHERE IconName = ?;", newName, oldName);
 
+    }
+    /// <summary>
+    /// Renames an Employee Avatar by removing it and creating a new one.
+    /// </summary>
+    /// <param name="avatar"></param>
+    /// <param name="newName"></param>
+    public void RenameEmployeeAvatar(ref EmployeeAvatar avatar, string newName)
+    {
+        var oldName = avatar.Name;
+        Chariot.Delete(avatar);
+        avatar.Name = newName;
+        Chariot.Create(avatar);
+        Chariot.Database?.Execute("UPDATE Employee SET AvatarName = ? WHERE AvatarName = ?;", newName, oldName);
+
+    }
     public int Shift(Shift shift)
     {
         var lines = 0;
@@ -254,7 +269,6 @@ public class StaffUpdater
     /// </summary>
     /// <param name="empShifts"></param>
     /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
     public int EmployeeToShiftConnections(IEnumerable<EmployeeShift> empShifts)
     {
         var lines = 0;
@@ -268,7 +282,7 @@ public class StaffUpdater
                         lines += Chariot.Database.Insert(employeeShift);
                         break;
                     case false when employeeShift.Original:
-                        lines += Chariot.Database.Delete(employeeShift);
+                        lines += Chariot.Database.Execute("DELETE FROM EmployeeShift WHERE EmployeeID = ? AND ShiftID = ?;", employeeShift.EmployeeID, employeeShift.ShiftID);
                         break;
                 }
             }
@@ -279,19 +293,28 @@ public class StaffUpdater
     /// <summary>
     /// Saves relevant data from the given department roster, assuming it is appropriately filled with
     /// DailyRosters, EmployeeRosters, and Roster objects.
+    ///
+    /// Remove all previous data tied to this department roster so that all appropriate changes are saved, including roster deletions.
     /// </summary>
     /// <param name="departmentRoster">Filled and initialized department roster with daily/employee/roster references.</param>
     public int DepartmentRoster(DepartmentRoster departmentRoster)
     {
+        var id = departmentRoster.ID;
         var lines = 0;
         Chariot.Database?.RunInTransaction(() =>
-        {
-            lines += departmentRoster.Rosters.Sum(roster => Chariot.InsertOrUpdate(roster));
-            lines += departmentRoster.DailyRosters.Sum(dailyRoster => Chariot.InsertOrUpdate(dailyRoster));
-            lines += departmentRoster.EmployeeRosters.Sum(employeeRoster => Chariot.InsertOrUpdate(employeeRoster));
-            lines += departmentRoster.ShiftCounters.Sum(shiftCounter => Chariot.InsertOrUpdate(shiftCounter));
-            lines += departmentRoster.DailyRosters
-                .SelectMany(dailyRoster => dailyRoster.ShiftCounters).Sum(shiftCounter => Chariot.InsertOrUpdate(shiftCounter));
+        { 
+            lines += Chariot.Database!.Execute("DELETE FROM Roster WHERE DepartmentRosterID = ?;", id);
+            lines += Chariot.InsertIntoTable(departmentRoster.Rosters);
+            // Get Daily Roster IDs, to use to remove Daily Shift Counters, before deleting them.
+            var dailyIDs = Chariot.PullObjectList<DailyRoster>(r => r.DepartmentRosterID == id).Select(roster => roster.ID);
+            lines += Chariot.Database.Execute("DELETE FROM DailyRoster WHERE DepartmentRosterID = ?;", id);
+            lines += Chariot.InsertIntoTable(departmentRoster.DailyRosters());
+            lines += Chariot.Database.Execute("DELETE FROM EmployeeRoster WHERE DepartmentRosterID = ?;", id);
+            lines += Chariot.InsertIntoTable(departmentRoster.EmployeeRosters);
+            lines += Chariot.Database.Execute("DELETE FROM WeeklyShiftCounter WHERE RosterID = ?;", id);
+            lines += Chariot.InsertIntoTable(departmentRoster.ShiftCounters);
+            lines += Chariot.Database.Execute($"DELETE FROM DailyShiftCounter WHERE RosterID in ('{string.Join("', '", dailyIDs)}');");
+            lines += Chariot.InsertIntoTable(departmentRoster.DailyShiftCounters());
             lines += Chariot.Database.Update(departmentRoster);
         });
         return lines;

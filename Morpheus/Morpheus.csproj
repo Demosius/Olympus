@@ -16,6 +16,39 @@
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
     <None Remove="Resources\Fonts\DIN Medium.ttf" />
     <None Remove="Resources\Fonts\DIN.ttf" />
+    <None Remove="Resources\Icons\Aion.ico" />
+    <None Remove="Resources\Icons\AionClock.ico" />
+    <None Remove="Resources\Icons\Argos.ico" />
+    <None Remove="Resources\Icons\cadmus.ico" />
+    <None Remove="Resources\Icons\castle.ico" />
+    <None Remove="Resources\Icons\chaos-white.ico" />
+    <None Remove="Resources\Icons\chaos.ico" />
+    <None Remove="Resources\Icons\dredd.ico" />
+    <None Remove="Resources\Icons\fixedBin.ico" />
+    <None Remove="Resources\Icons\forge.ico" />
+    <None Remove="Resources\Icons\Hades.ico" />
+    <None Remove="Resources\Icons\hellsing.ico" />
+    <None Remove="Resources\Icons\hydra.ico" />
+    <None Remove="Resources\Icons\newlym.ico" />
+    <None Remove="Resources\Icons\o-bolt.ico" />
+    <None Remove="Resources\Icons\o-sport.ico" />
+    <None Remove="Resources\Icons\ol.ico" />
+    <None Remove="Resources\Icons\oly.ico" />
+    <None Remove="Resources\Icons\olym.ico" />
+    <None Remove="Resources\Icons\olympus.ico" />
+    <None Remove="Resources\Icons\omega.ico" />
+    <None Remove="Resources\Icons\Panacea.ico" />
+    <None Remove="Resources\Icons\pantheon.ico" />
+    <None Remove="Resources\Icons\phoenix.ico" />
+    <None Remove="Resources\Icons\prometheus.ico" />
+    <None Remove="Resources\Icons\Sphynx.ico" />
+    <None Remove="Resources\Icons\sword-smithing.ico" />
+    <None Remove="Resources\Icons\torch.ico" />
+    <None Remove="Resources\Icons\UBC.ico" />
+    <None Remove="Resources\Icons\vampire.ico" />
+    <None Remove="Resources\Icons\vulcan.ico" />
+    <None Remove="Resources\Icons\z.ico" />
+    <None Remove="Resources\Icons\zed.ico" />
     <None Remove="Resources\img\application--arrow.png" />
     <None Remove="Resources\img\arrow-transition-090.png" />
     <None Remove="Resources\img\arrow-transition-270.png" />
@@ -32,8 +65,8 @@
     <None Remove="Resources\img\document-horizontal-text.png" />
     <None Remove="Resources\img\document-pdf.png" />
     <None Remove="Resources\img\dog.jpg" />
+    <None Remove="Resources\img\edit.png" />
     <None Remove="Resources\img\fox.png" />
-    <None Remove="Resources\img\Hydra.ico" />
     <None Remove="Resources\img\plus-circle-frame.png" />
     <None Remove="Resources\img\plus-small.png" />
     <None Remove="Resources\img\plus.png" />
@@ -48,14 +81,71 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Resources\Icons\Aion.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\AionClock.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\Argos.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\cadmus.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\chaos.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\fixedBin.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\forge.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\Hades.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\hydra.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\omega.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\Panacea.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\pantheon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\phoenix.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\prometheus.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\Sphynx.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\torch.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\UBC.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\vampire.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\vulcan.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Icons\zed.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\img\dog.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\img\fox.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\img\Hydra.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
@@ -70,15 +160,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resources\Fonts\Calibri.ttf">
+    <Resource Include="Resources\Fonts\Calibri.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Fonts\calibrib.ttf">
+    </Resource>
+    <Resource Include="Resources\Fonts\calibrib.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Fonts\calibril.ttf">
+    </Resource>
+    <Resource Include="Resources\Fonts\calibril.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </Resource>
     <Resource Include="Resources\Fonts\code128.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -94,6 +184,19 @@
     <Resource Include="Resources\Fonts\DIN.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\Icons\castle.ico" />
+    <Resource Include="Resources\Icons\chaos-white.ico" />
+    <Resource Include="Resources\Icons\dredd.ico" />
+    <Resource Include="Resources\Icons\hellsing.ico" />
+    <Resource Include="Resources\Icons\newlym.ico" />
+    <Resource Include="Resources\Icons\o-bolt.ico" />
+    <Resource Include="Resources\Icons\o-sport.ico" />
+    <Resource Include="Resources\Icons\ol.ico" />
+    <Resource Include="Resources\Icons\oly.ico" />
+    <Resource Include="Resources\Icons\olym.ico" />
+    <Resource Include="Resources\Icons\olympus.ico" />
+    <Resource Include="Resources\Icons\sword-smithing.ico" />
+    <Resource Include="Resources\Icons\z.ico" />
     <Resource Include="Resources\img\application--arrow.png" />
     <Resource Include="Resources\img\arrow-transition-090.png" />
     <Resource Include="Resources\img\arrow-transition-270.png" />
@@ -109,6 +212,7 @@
     <Resource Include="Resources\img\document-excel-table.png" />
     <Resource Include="Resources\img\document-horizontal-text.png" />
     <Resource Include="Resources\img\document-pdf.png" />
+    <Resource Include="Resources\img\edit.png" />
     <Resource Include="Resources\img\plus-circle-frame.png" />
     <Resource Include="Resources\img\plus-small.png" />
     <Resource Include="Resources\img\plus.png" />
@@ -123,9 +227,42 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Views\ZoneHandlerView.xaml.cs">
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Update="Resource.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Controls\ZoneHandlerView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resource.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -133,39 +270,35 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Resources\img\Fonts.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Update="Themes\DatagridStyling.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Themes\MSControls.Core.Implicit.xaml">
+    <Page Update="Themes\Light\Master\MSControls.Core.Implicit.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Themes\MSControls.Toolkit.Implicit.xaml">
+    <Page Update="Themes\Light\Master\MSControls.Toolkit.Implicit.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Themes\Styles.Shared.xaml">
+    <Page Update="Themes\Light\Master\Styles.Shared.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Themes\Styles.WPF.xaml">
+    <Page Update="Themes\Light\Master\Styles.WPF.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Themes\Theme.Colors.xaml">
+    <Page Update="Themes\Light\Master\Theme.Colors.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\InputWindow.xaml">
+    <Page Update="Views\Windows\InputWindow.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\ZoneHandlerView.xaml">
+    <Page Update="Views\Controls\ZoneHandlerView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

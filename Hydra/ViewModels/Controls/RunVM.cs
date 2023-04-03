@@ -20,6 +20,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Cadmus.Helpers;
+using Cadmus.Models;
+using Cadmus.ViewModels.Labels;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -103,7 +106,6 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
     public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public FilterItemsFromClipboardCommand FilterItemsFromClipboardCommand { get; set; }
     public GenerateMovesCommand GenerateMovesCommand { get; set; }
     public ExportToCSVCommand ExportToCSVCommand { get; set; }
@@ -129,7 +131,6 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         FilterItemsFromClipboardCommand = new FilterItemsFromClipboardCommand(this);
         GenerateMovesCommand = new GenerateMovesCommand(this);
         ExportToCSVCommand = new ExportToCSVCommand(this);
@@ -186,12 +187,7 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
             fromRegex.IsMatch(m.TakeSiteName) &&
             toRegex.IsMatch(m.PlaceSiteName)));
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void FilterItemsFromClipboard()
     {
         Mouse.OverrideCursor = Cursors.Wait;
@@ -240,22 +236,7 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         ItemFilterString = string.Join("|", numbers.Select(n => n.ToString("000000")).Take(x));
         Mouse.OverrideCursor = Cursors.Arrow;
     }
-
-    public void ActivateAllItems()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void DeActivateAllItems()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void ExclusiveItemActivation()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void GenerateMoves()
     {
         if (Helios is null) return;
@@ -300,7 +281,23 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
 
     public void ExportToLabels()
     {
-        throw new NotImplementedException();
+        // Convert to LabelVM
+        var labels = new List<ReceivingPutAwayLabelVM>();
+
+        foreach (var moveVM in CurrentMoves)
+        {
+            var move = moveVM.Move;
+            var labelCount = new List<int> {move.TakeCases + move.TakePacks + move.TakeEaches, 4}.AsQueryable().Min();
+
+            for (var i = 0; i < labelCount; i++)
+            {
+                var label = new ReceivingPutAwayLabel(move) {LabelTotal = labelCount, LabelNumber = i+1};
+                var labelVM = new ReceivingPutAwayLabelVM(label);
+                labels.Add(labelVM);
+            }
+        }
+
+        PrintUtility.PrintLabels(labels, null);
     }
 
     public void ExportToExcel()

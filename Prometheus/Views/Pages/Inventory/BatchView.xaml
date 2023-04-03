@@ -9,7 +9,7 @@
                 Title="Batch">
 
     <Page.Resources>
-        <ResourceDictionary Source="../../../Themes/MSControls.Core.Implicit.xaml"/>
+        <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Orange/MSControls.Core.Implicit.xaml" />
     </Page.Resources>
 
     <Grid Background="AliceBlue" />

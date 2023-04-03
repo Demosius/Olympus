@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:Argos"
              StartupUri="Views/ArgosWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Aqua/MSControls.Core.Implicit.xaml" />
     </Application.Resources>
 </Application>

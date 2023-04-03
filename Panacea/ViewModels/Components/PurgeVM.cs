@@ -2,7 +2,6 @@
 using Panacea.Models;
 using Panacea.Properties;
 using Panacea.ViewModels.Commands;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -96,7 +95,6 @@ public class PurgeVM : INotifyPropertyChanged, IFilters, IBinData, IItemData, IC
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public RunChecksCommand RunChecksCommand { get; set; }
     public BinsToClipboardCommand BinsToClipboardCommand { get; set; }
     public ItemsToClipboardCommand ItemsToClipboardCommand { get; set; }
@@ -116,7 +114,6 @@ public class PurgeVM : INotifyPropertyChanged, IFilters, IBinData, IItemData, IC
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         RunChecksCommand = new RunChecksCommand(this);
         ItemsToClipboardCommand = new ItemsToClipboardCommand(this);
         BinsToClipboardCommand = new BinsToClipboardCommand(this);
@@ -147,12 +144,7 @@ public class PurgeVM : INotifyPropertyChanged, IFilters, IBinData, IItemData, IC
 
         FilteredCheckResults = new ObservableCollection<PurgeCheckResult>(results);
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void RunChecks()
     {
         Mouse.OverrideCursor = Cursors.Wait;

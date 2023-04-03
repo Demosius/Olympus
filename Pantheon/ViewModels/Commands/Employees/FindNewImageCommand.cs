@@ -1,10 +1,10 @@
-﻿using Pantheon.ViewModels.Interface;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.Interface;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-internal class FindNewImageCommand : ICommand
+public class FindNewImageCommand : ICommand
 {
     public IImageSelector VM { get; set; }
 

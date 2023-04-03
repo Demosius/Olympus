@@ -1,22 +1,21 @@
-﻿using Pantheon.ViewModels.Pages;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.Controls.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
 public class SaveEmployeeCommand : ICommand
 {
-    public EmployeePageVM VM { get; set; }
+    public EmployeeVM VM { get; set; }
 
-    public SaveEmployeeCommand(EmployeePageVM vm)
+    public SaveEmployeeCommand(EmployeeVM vm)
     {
         VM = vm;
     }
 
     public bool CanExecute(object? parameter)
     {
-        if (VM.SelectedEmployee is null) return false;
-        return VM.Charon?.CanUpdateEmployee(VM.SelectedEmployee) ?? false;
+        return VM.Charon.CanUpdateEmployee(VM.Employee);
     }
 
     public void Execute(object? parameter)

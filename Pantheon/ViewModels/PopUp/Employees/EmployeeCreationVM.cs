@@ -1,11 +1,11 @@
-﻿using Pantheon.Annotations;
-using Pantheon.ViewModels.Commands.Employees;
+﻿using Pantheon.ViewModels.Commands.Employees;
 using Pantheon.ViewModels.Pages;
 using Styx;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Pantheon.Annotations;
 using Uranus;
 using Uranus.Staff.Models;
 
@@ -14,6 +14,7 @@ namespace Pantheon.ViewModels.PopUp.Employees;
 internal class EmployeeCreationVM : INotifyPropertyChanged
 {
     public EmployeePageVM? ParentVM { get; set; }
+
     public Helios? Helios { get; set; }
     public Charon? Charon { get; set; }
 

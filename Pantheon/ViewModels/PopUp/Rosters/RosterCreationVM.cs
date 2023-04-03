@@ -1,12 +1,11 @@
-﻿using Pantheon.Annotations;
-using Pantheon.ViewModels.Commands.Rosters;
+﻿using Pantheon.ViewModels.Commands.Rosters;
 using Styx;
 using System;
 using System.ComponentModel;
-using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using Pantheon.Annotations;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Extensions;
@@ -15,11 +14,11 @@ using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.PopUp.Rosters;
 
-internal class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
+public class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
 {
-    public Department? Department { get; set; }
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Department Department { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public DepartmentRoster? Roster { get; set; }
 
@@ -81,38 +80,30 @@ internal class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
 
     #endregion
 
-    public RosterCreationVM()
+    public RosterCreationVM(Department department, Helios helios, Charon charon)
     {
+        Department = department;
+        Helios = helios;
+        Charon = charon;
+
         startDate = DateTime.Today.AddDays(DayOfWeek.Monday - DateTime.Today.DayOfWeek + 7);
         rosterName = $"{startDate.FiscalWeek()} ({startDate.Year})";
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
         ConfirmDepartmentRosterCreationCommand = new ConfirmDepartmentRosterCreationCommand(this);
-    }
-
-    public void SetDataSources(Department department, Helios helios, Charon charon)
-    {
-        Department = department;
-        Helios = helios;
-        Charon = charon;
 
         RefreshData();
     }
-
+    
     public void RefreshData()
     {
-        if (Department is null) throw new DataException("Department not set in RosterCreation.");
-
         if (Department.DepartmentRosters.Any())
             StartDate = Department.DepartmentRosters.Select(dr => dr.StartDate).Max().AddDays(7);
     }
 
     public bool ConfirmDepartmentRosterCreation()
     {
-        if (Helios is null) return false;
-        if (Department is null) throw new DataException("Department not set in RosterCreation.");
-
         Roster = new DepartmentRoster(RosterName, StartDate, UseSaturdays, UseSundays, Department);
 
         // Check name.

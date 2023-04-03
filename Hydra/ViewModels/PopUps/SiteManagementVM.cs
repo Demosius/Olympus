@@ -65,7 +65,6 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
     public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public FilterItemsFromClipboardCommand FilterItemsFromClipboardCommand { get; set; }
     public ActivateAllItemsCommand ActivateAllItemsCommand { get; set; }
     public DeActivateAllItemsCommand DeActivateAllItemsCommand { get; set; }
@@ -83,7 +82,6 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
         RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         FilterItemsFromClipboardCommand = new FilterItemsFromClipboardCommand(this);
         ActivateAllItemsCommand = new ActivateAllItemsCommand(this);
         DeActivateAllItemsCommand = new DeActivateAllItemsCommand(this);
@@ -132,12 +130,7 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
         CurrentItems =
             new ObservableCollection<SiteItemLevelVM>(AllItems.Where(sil => regex.IsMatch(sil.ItemNumber.ToString())));
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void FilterItemsFromClipboard()
     {
         Mouse.OverrideCursor = Cursors.Wait;

@@ -1,6 +1,0 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-
-    <FontFamily x:Key="DIN">./Fonts/DIN.ttf#DIN</FontFamily>
-    <FontFamily x:Key="Code128">./Fonts/code128.ttf#Code 128</FontFamily>
-</ResourceDictionary>

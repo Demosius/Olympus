@@ -1,8 +1,10 @@
-﻿using Pantheon.Annotations;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using Pantheon.Annotations;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Controls.Rosters;
@@ -11,41 +13,54 @@ public class DailyRosterVM : INotifyPropertyChanged
 {
     public DailyRoster DailyRoster { get; set; }
 
-    public Dictionary<string, DailyShiftCounter> CounterAccessDict { get; set; }
+    public DepartmentRosterVM DepartmentRosterVM { get; set; }
+
+    public Dictionary<string, DailyCounterVM> CounterAccessDict { get; set; }
 
     public Dictionary<int, RosterVM> Rosters { get; set; }
+
+    public bool InUse => ShiftCounters.Any(c => c.Target > 0);
 
     public bool PublicHoliday
     {
         get => DailyRoster.IsPublicHoliday;
-        set => DailyRoster.IsPublicHoliday = value;
+        set
+        {
+            DailyRoster.IsPublicHoliday = value;
+            if (!value) return;
+            foreach (var counter in ShiftCounters) counter.Target = 0;
+        }
     }
+
+    public DayOfWeek Day => DailyRoster.Day;
 
     #region INotifyPropertyChanged Members
 
-    private ObservableCollection<ShiftCounter> shiftCounter;
-    public ObservableCollection<ShiftCounter> ShiftCounter
+    private ObservableCollection<DailyCounterVM> shiftCounters;
+    public ObservableCollection<DailyCounterVM> ShiftCounters
     {
-        get => shiftCounter;
+        get => shiftCounters;
         set
         {
-            shiftCounter = value;
-            OnPropertyChanged(nameof(ShiftCounter));
+            shiftCounters = value;
+            OnPropertyChanged(nameof(ShiftCounters));
         }
     }
 
     #endregion
 
-    public DailyRosterVM(DailyRoster roster)
+    public DailyRosterVM(DailyRoster roster, DepartmentRosterVM departmentRosterVM)
     {
         DailyRoster = roster;
-        shiftCounter = new ObservableCollection<ShiftCounter>();
-        CounterAccessDict = new Dictionary<string, DailyShiftCounter>();
+        shiftCounters = new ObservableCollection<DailyCounterVM>();
+        CounterAccessDict = new Dictionary<string, DailyCounterVM>();
         Rosters = new Dictionary<int, RosterVM>();
 
-        foreach (var counter in DailyRoster.ShiftCounters)
+        DepartmentRosterVM = departmentRosterVM;
+
+        foreach (var counter in DailyRoster.ShiftCounters.Select(c => new DailyCounterVM(c, this)))
         {
-            ShiftCounter.Add(counter);
+            ShiftCounters.Add(counter);
             CounterAccessDict.Add(counter.ShiftID, counter);
         }
     }
@@ -55,35 +70,35 @@ public class DailyRosterVM : INotifyPropertyChanged
         foreach (var shift in shifts)
         {
             if (CounterAccessDict.ContainsKey(shift.ID)) continue;
-            var dailyShiftCounter = new DailyShiftCounter(DailyRoster, shift, shift.DailyTarget);
+            var dailyShiftCounter = new DailyCounterVM(new DailyShiftCounter(DailyRoster, shift, shift.DailyTarget), this);
             CounterAccessDict.Add(shift.ID, dailyShiftCounter);
-            ShiftCounter.Add(dailyShiftCounter);
+            ShiftCounters.Add(dailyShiftCounter);
         }
     }
 
-    /*
-    public void AddCount(Shift shift)
+    public void SetTarget(Shift shift, int target) => ShiftCounter(shift).Target = target;
+
+    public void SubCount(Shift rosterShift)
     {
-        CounterAccessDict[shift.ID].Count++;
+        ShiftCounter(rosterShift).Count--;
     }
 
-    public void SubCount(Shift shift)
+    public void AddCount(Shift rosterShift)
     {
-        CounterAccessDict[shift.ID].Count--;
+        ShiftCounter(rosterShift).Count++;
     }
-    */
 
-    /// <summary>
-    /// Sets all rosters as public holiday.
-    /// </summary>
-    public void SetPublicHoliday(bool isPublicHoliday = true) => DailyRoster.SetPublicHoliday(isPublicHoliday);
-    /*{
-        // Do not set roster type directly, as that will result in recursive prompting.
-        // Use SetPublicHoliday method.
-        PublicHoliday = isPublicHoliday;
-        foreach (var (_, rosterVM) in Rosters)
-            rosterVM.SetPublicHoliday(isPublicHoliday);
-    }*/
+    public DailyCounterVM ShiftCounter(Shift shift)
+    {
+        if (CounterAccessDict.TryGetValue(shift.ID, out var counterVM)) return counterVM;
+
+        var counter = DailyRoster.ShiftCounter(shift);
+        counterVM = new DailyCounterVM(counter, this);
+        ShiftCounters.Add(counterVM);
+        CounterAccessDict.Add(shift.ID, counterVM);
+
+        return counterVM;
+    }
 
     /// <summary>
     /// Sets associated rosters to standard, typically used when switching from public holiday.
@@ -93,6 +108,12 @@ public class DailyRosterVM : INotifyPropertyChanged
         PublicHoliday = false;
         foreach (var (_, rosterVM) in Rosters)
             rosterVM.Type = ERosterType.Standard;
+    }
+
+    public void SetPublicHoliday(bool isPublicHoliday, bool preserveTargets = false)
+    {
+        if (!preserveTargets) PublicHoliday = isPublicHoliday;
+        else DailyRoster.IsPublicHoliday = isPublicHoliday;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -1,18 +1,21 @@
-﻿using Pantheon.Annotations;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Pantheon.Annotations;
+using Pantheon.ViewModels.Interface;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Controls.Shifts;
 
-public class SingleRuleVM : INotifyPropertyChanged
+public class SingleRuleVM : INotifyPropertyChanged, IShiftRuleVM
 {
     public ShiftRuleSingle ShiftRule { get; set; }
 
     public bool InEdit { get; set; }
     public bool IsNew => !InEdit;
 
+    public bool IsValid => Description != "" && EndDate >= StartDate && (RuleType is not (ESingleRuleType.ArriveLate or ESingleRuleType.LeaveEarly) || Time is not null);
+    
     public ShiftRuleSingle? Original { get; set; }
 
     #region INotifyPropertyChanged Memebers
@@ -126,14 +129,7 @@ public class SingleRuleVM : INotifyPropertyChanged
         Original = singleRule;
         ShiftRule = singleRule.Copy();
     }
-
-    public bool IsValid()
-    {
-        if (Description == "") return false;
-        if (StartDate > EndDate) return false;
-        return RuleType is not (ESingleRuleType.ArriveLate or ESingleRuleType.LeaveEarly) || Time is not null;
-    }
-
+    
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]

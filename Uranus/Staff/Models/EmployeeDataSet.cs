@@ -96,16 +96,15 @@ public class EmployeeDataSet
         {
             if (BreakDict.TryGetValue(shift.ID, out var breaks))
             {
-                shift.SetBreaks(breaks);
+                shift.Breaks = breaks;
                 foreach (var @break in breaks)
                     @break.Shift = shift;
             }
 
-            if (Departments.TryGetValue(shift.DepartmentName, out var department))
-            {
-                department.Shifts.Add(shift);
-                shift.Department = department;
-            }
+            if (!Departments.TryGetValue(shift.DepartmentName, out var department)) continue;
+
+            department.Shifts.Add(shift);
+            shift.Department = department;
         }
     }
 

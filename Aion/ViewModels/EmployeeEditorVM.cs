@@ -1,9 +1,9 @@
-﻿using Aion.View;
-using Aion.ViewModels.Commands;
+﻿using Aion.ViewModels.Commands;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using Morpheus.Views.Windows;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -307,9 +307,9 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
         InputWindow input = new();
         if (input.ShowDialog() != true) return;
 
-        Locations.Add(input.Input.Text);
+        Locations.Add(input.InputText);
         Locations = new ObservableCollection<string>(Locations.OrderBy(s => s));
-        Location = input.Input.Text;
+        Location = input.InputText;
     }
 
     public void AddPayPoint()
@@ -317,9 +317,9 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
         InputWindow input = new();
         if (input.ShowDialog() != true) return;
 
-        PayPoints.Add(input.Input.Text);
+        PayPoints.Add(input.InputText);
         PayPoints = new ObservableCollection<string>(PayPoints.OrderBy(s => s));
-        PayPoint = input.Input.Text;
+        PayPoint = input.InputText;
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

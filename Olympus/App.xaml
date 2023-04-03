@@ -7,7 +7,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Themes/Olympus/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Olympus/MSControls.Core.Implicit.xaml"/>
                 <ResourceDictionary>
                     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
                 </ResourceDictionary>

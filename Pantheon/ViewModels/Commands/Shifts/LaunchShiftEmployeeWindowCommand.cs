@@ -1,25 +1,25 @@
-﻿using Pantheon.ViewModels.Pages;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.Controls.Shifts;
+using Pantheon.ViewModels.Pages;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Commands.Shifts;
 
 public class LaunchShiftEmployeeWindowCommand : ICommand
 {
-    public ShiftPageVM VM { get; set; }
+    public ShiftVM VM { get; set; }
 
-    public LaunchShiftEmployeeWindowCommand(ShiftPageVM vm) { VM = vm; }
+    public LaunchShiftEmployeeWindowCommand(ShiftVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedDepartment is not null && (VM.Charon?.CanUpdateShift(VM.SelectedDepartment) ?? false);
+        return VM.Department is not null && VM.Charon.CanUpdateShift(VM.Department);
     }
 
     public void Execute(object? parameter)
     {
-        if (parameter is not Shift shift) return;
-        VM.LaunchShiftEmployeeWindow(shift);
+        VM.LaunchShiftEmployeeWindow();
     }
 
     public event EventHandler? CanExecuteChanged

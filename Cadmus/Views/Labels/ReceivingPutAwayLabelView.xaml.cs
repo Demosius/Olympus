@@ -1,4 +1,4 @@
-﻿using Cadmus.ViewModels;
+﻿using Cadmus.ViewModels.Labels;
 
 namespace Cadmus.Views.Labels;
 

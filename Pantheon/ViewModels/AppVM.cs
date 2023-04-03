@@ -1,8 +1,8 @@
-﻿using Pantheon.Properties;
-using Pantheon.Views;
+﻿using Pantheon.Views;
 using Styx;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Pantheon.Annotations;
 using Uranus;
 
 namespace Pantheon.ViewModels;

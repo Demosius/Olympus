@@ -42,6 +42,8 @@ public class Department : IComparable
     public List<Employee> EmployeesCanLoan { get; set; }
     [ManyToMany(typeof(DepartmentProject), nameof(DepartmentProject.DepartmentName), nameof(Project.Departments), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Project> Projects { get; set; }
+    
+    [Ignore] public bool IsDeletable => !Employees.Any() && !SubDepartments.Any();
 
     public Department()
     {

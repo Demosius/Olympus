@@ -17,10 +17,11 @@ using System.Windows.Input;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
+using Uranus.Interfaces;
 
 namespace Hydra.ViewModels.PopUps;
 
-public class ItemSelectionVM : INotifyPropertyChanged, IItemDataVM
+public class ItemSelectionVM : INotifyPropertyChanged, IItemDataVM, ISorting
 {
     public ItemLevelsVM ItemLevelsVM { get; set; }
     public Helios? Helios { get; set; }
