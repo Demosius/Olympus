@@ -17,6 +17,7 @@ public class BasicStockDataSet
     public List<string> MissingZones = new();
     public List<string> MissingItems = new();
     public List<string> MissingBins = new();
+    public List<string> MissingUoMs = new();
 
     public BasicStockDataSet(IEnumerable<NAVItem> items, IEnumerable<NAVZone> zones, IEnumerable<NAVBin> bins,
         IEnumerable<NAVStock> stock, IEnumerable<NAVUoM> uomList)
@@ -36,13 +37,14 @@ public class BasicStockDataSet
         MissingBins.Clear();
         MissingZones.Clear();
         MissingItems.Clear();
+        MissingUoMs.Clear();
 
         SetFromUoMs();
         SetFromBins();
         SetFromStock();
 
         var missingData = MissingDataText();
-        if (missingData is not null) throw new Exception(missingData);
+        if (missingData is not null) throw new DataException(missingData);
     }
 
     private void SetFromUoMs()
@@ -130,17 +132,18 @@ public class BasicStockDataSet
         }
     }
 
-    private string? MissingDataText()
+    private string? MissingDataText(string? errorLine = null)
     {
-        if (!MissingBins.Any() && !MissingZones.Any() && !MissingItems.Any()) return null;
+        if (!MissingBins.Any() && !MissingZones.Any() && !MissingItems.Any() && !MissingUoMs.Any()) return null;
 
-        return "Missing data from database:\n" +
-               $"{MissingBinsText()}{MissingZonesText()}{MissingItemsText()}";
+        return $"{errorLine ?? "Missing data from database"}:\n" +
+               $"{MissingBinsText()}{MissingZonesText()}{MissingItemsText()}{MissingUoMsText()}";
     }
 
     private string MissingBinsText()
     {
         if (!MissingBins.Any()) return string.Empty;
+        MissingBins = MissingBins.Distinct().ToList();
         return "\n  Missing Bins:\n\t" +
                $"{(MissingBins.Count > 3 ? $"{string.Join("|", MissingBins.Take(3))}...(+{MissingBins.Count - 3})" : $"{string.Join("|", MissingBins)}")}\n";
     }
@@ -148,6 +151,7 @@ public class BasicStockDataSet
     private string MissingZonesText()
     {
         if (!MissingZones.Any()) return string.Empty;
+        MissingZones = MissingZones.Distinct().ToList();
         return "\n  Missing Zones:\n\t" +
                $"{(MissingZones.Count > 3 ? $"{string.Join("|", MissingZones.Take(3))}...(+{MissingZones.Count - 3})" : $"{string.Join("|", MissingZones)}")}\n";
     }
@@ -155,8 +159,17 @@ public class BasicStockDataSet
     private string MissingItemsText()
     {
         if (!MissingItems.Any()) return string.Empty;
+        MissingItems = MissingItems.Distinct().ToList();
         return "\n  Missing Items:\n\t" +
                $"{(MissingItems.Count > 3 ? $"{string.Join("|", MissingItems.Take(3))}...(+{MissingItems.Count - 3})" : $"{string.Join("|", MissingItems)}")}\n";
+    }
+
+    private string MissingUoMsText()
+    {
+        if (!MissingItems.Any()) return string.Empty;
+        MissingUoMs = MissingItems.Distinct().ToList();
+        return "\n  Missing UoMs:\n\t" +
+               $"{(MissingUoMs.Count > 3 ? $"{string.Join("|", MissingUoMs.Take(3))}...(+{MissingUoMs.Count - 3})" : $"{string.Join("|", MissingUoMs)}")}\n";
     }
 
     /// <summary>
@@ -165,47 +178,31 @@ public class BasicStockDataSet
     /// <param name="moveLines"></param>
     public void SetMoveLineData(IEnumerable<NAVMoveLine> moveLines)
     {
-        var missingZones = new List<string>();
-        var missingBins = new List<string>();
-        var missingItems = new List<string>();
-        var missingUoMs = new List<string>();
-
         foreach (var moveLine in moveLines)
         {
             if (Zones.TryGetValue(moveLine.ZoneID, out var zone))
                 moveLine.SetZone(zone);
             else
-                missingZones.Add(moveLine.ZoneID);
+                MissingZones.Add(moveLine.ZoneID);
             if (Bins.TryGetValue(moveLine.BinID, out var bin))
                 moveLine.SetBin(bin);
             else
-                missingBins.Add(moveLine.BinID);
+                MissingBins.Add(moveLine.BinID);
             if (Items.TryGetValue(moveLine.ItemNumber, out var item))
             {
                 moveLine.SetItem(item);
                 var uom = moveLine.UoM;
                 if ((uom == EUoM.CASE && !item.HasCases) || (uom == EUoM.PACK && !item.HasPacks))
-                    missingUoMs.Add($"{item.Number} ({uom})");
+                    MissingUoMs.Add($"{item.Number} ({uom})");
             }
             else
-                missingItems.Add(moveLine.ItemNumber.ToString());
+                MissingItems.Add(moveLine.ItemNumber.ToString());
         }
 
-        if (!missingZones.Any() && !missingItems.Any() && !missingBins.Any() && !missingUoMs.Any()) return;
+        var errorMessage = MissingDataText("Cannot accurately parse move lines as there is data missing from the database");
 
-        missingZones = missingZones.Distinct().ToList();
-        missingBins = missingBins.Distinct().ToList();
-        missingItems = missingItems.Distinct().ToList();
-        missingUoMs = missingUoMs.Distinct().ToList();
-        var errorMessage = "Cannot accurately parse move lines as there is data missing from the database:\n\n" +
-                           "  Missing Zones:\n\t" +
-                           $"{(missingZones.Count > 3 ? $"{string.Join(" | ", missingZones.Take(3))}... (+{missingZones.Count - 3}) " : string.Join(" | ", missingZones))}\n\n" +
-                           "  Missing Bins:\n\t" +
-                           $"{(missingBins.Count > 3 ? $"{string.Join(" | ", missingBins.Take(3))}... (+{missingBins.Count - 3}) " : string.Join(" | ", missingBins))}\n\n" +
-                           "  Missing Items:\n\t" +
-                           $"{(missingItems.Count > 3 ? $"{string.Join(" | ", missingItems.Take(3))}... (+{missingItems.Count - 3}) " : string.Join(" | ", missingItems))}\n\n " +
-                           "  Missing UoMs:\n\t" +
-                           $"{(missingUoMs.Count > 3 ? $"{string.Join(" | ", missingUoMs.Take(3))}... (+{missingUoMs.Count - 3}) " : string.Join(" | ", missingUoMs))}\n\n";
+        if (errorMessage is null) return;
+        
         throw new DataException(errorMessage);
     }
 }

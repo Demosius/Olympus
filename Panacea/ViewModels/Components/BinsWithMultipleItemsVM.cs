@@ -1,4 +1,5 @@
-﻿using Panacea.Interfaces;
+﻿using System;
+using Panacea.Interfaces;
 using Panacea.Models;
 using Panacea.Properties;
 using Panacea.ViewModels.Commands;
