@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Uranus.Staff.Models;
 
@@ -302,7 +303,7 @@ public class StaffUpdater
         var id = departmentRoster.ID;
         var lines = 0;
         Chariot.Database?.RunInTransaction(() =>
-        { 
+        {
             lines += Chariot.Database!.Execute("DELETE FROM Roster WHERE DepartmentRosterID = ?;", id);
             lines += Chariot.InsertIntoTable(departmentRoster.Rosters);
             // Get Daily Roster IDs, to use to remove Daily Shift Counters, before deleting them.
@@ -332,4 +333,42 @@ public class StaffUpdater
     public int ShiftRuleRecurring(ShiftRuleRecurring shiftRule) => Chariot.Update(shiftRule);
 
     public int ShiftRuleRoster(ShiftRuleRoster shiftRule) => Chariot.Update(shiftRule);
+
+    /* Temp Tags */
+    public int AssignTempTag(TempTag tag, Employee employee)
+    {
+        var lines = 0;
+        lines += UnassignTempTag(tag);
+
+        var usage = tag.SetEmployee(employee, true);
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            lines += usage is null ? 0 : Chariot.InsertOrUpdate(usage);
+            lines += Chariot.InsertOrUpdate(tag);
+        });
+
+        return lines;
+    }
+
+    public int UnassignTempTag(TempTag tempTag)
+    {
+        var employeeID = tempTag.EmployeeID;
+        if (employeeID == 0) return 0;
+
+        tempTag.Employee = null;
+        tempTag.EmployeeID = 0;
+
+        var lines = 0;
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            lines += Chariot.Database.Execute(
+                "UPDATE TagUse SET EndDate = ? WHERE EmployeeID = ? AND TempTagRF_ID = ? AND EndDate is null;",
+                DateTime.Today, employeeID, tempTag.RF_ID);
+
+            lines += Chariot.Update(tempTag);
+        });
+
+        return lines;
+    }
 }

@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using System;
+using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
 
@@ -10,7 +11,7 @@ public class TempTag
     [PrimaryKey] public string RF_ID { get; set; }
     [ForeignKey(typeof(Employee))] public int EmployeeID { get; set; }
 
-    [OneToMany(nameof(Models.TagUse.TempTagRFID), nameof(Models.TagUse.TempTag), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToMany(nameof(Models.TagUse.TempTagRF_ID), nameof(Models.TagUse.TempTag), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<TagUse> TagUse { get; set; }
 
     [OneToOne(nameof(EmployeeID), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
@@ -28,5 +29,30 @@ public class TempTag
         EmployeeID = employeeID;
         TagUse = tagUse;
         Employee = employee;
+    }
+
+    public TagUse? SetEmployee(Employee employee, bool isNew = false)
+    {
+        Employee = employee;
+        EmployeeID = employee.ID;
+
+        if (isNew)
+        {
+            var usage = new TagUse
+            {
+                Employee = employee, 
+                EmployeeID = EmployeeID,
+                EndDate = null,
+                StartDate = DateTime.Today,
+                TempTag = this,
+                TempTagRF_ID = RF_ID,
+            };
+            TagUse.Add(usage);
+            return usage;
+        }
+        else
+        {
+            return null;
+        }
     }
 }

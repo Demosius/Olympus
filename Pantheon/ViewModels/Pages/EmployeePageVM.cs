@@ -10,7 +10,6 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using iText.StyledXmlParser.Jsoup.Select;
 using Pantheon.Annotations;
 using Pantheon.ViewModels.Controls.Employees;
 using Uranus;
@@ -418,20 +417,23 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
 
     public void CreateNewEmployee()
     {
-        var employeeCreationWindow = new EmployeeCreationWindow(this);
+        var employeeCreationWindow = new EmployeeCreationWindow(Helios, Charon);
         if (employeeCreationWindow.ShowDialog() != true) return;
 
         var newEmployee = employeeCreationWindow.VM.Employee;
 
         if (newEmployee is null) return;
 
-        ReportingEmployees.Add(new EmployeeVM(newEmployee, Charon, Helios));
+        EmployeeDataSet?.AddEmployee(newEmployee);
+
+        var employeeVM = new EmployeeVM(newEmployee, Charon, Helios);
+        ReportingEmployees.Add(employeeVM);
         EmployeeDataSet?.AddEmployee(newEmployee);
         if (newEmployee.Reports.Any()) Managers.Add(newEmployee);
 
         ApplyFilters();
 
-        SelectedEmployeeVM = new EmployeeVM(newEmployee, Charon, Helios);
+        SelectedEmployeeVM = employeeVM;
     }
 
     public void DeleteEmployee()

@@ -1,4 +1,6 @@
-﻿using Pantheon.ViewModels.Pages;
+﻿using Pantheon.ViewModels.PopUp.Employees;
+using Styx;
+using Uranus;
 
 namespace Pantheon.Views.PopUp.Employees;
 
@@ -7,9 +9,12 @@ namespace Pantheon.Views.PopUp.Employees;
 /// </summary>
 public partial class EmployeeCreationWindow
 {
-    public EmployeeCreationWindow(EmployeePageVM pageVM)
+    public EmployeeCreationVM VM { get; }
+
+    public EmployeeCreationWindow(Helios helios, Charon charon)
     {
         InitializeComponent();
-        VM.SetDataSources(pageVM);
+        VM = new EmployeeCreationVM(helios, charon);
+        DataContext = VM;
     }
 }

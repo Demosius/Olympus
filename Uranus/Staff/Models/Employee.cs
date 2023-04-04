@@ -113,7 +113,7 @@ public class Employee
     public List<EmployeeRoster> EmployeeRosters { get; set; }
     [OneToMany(nameof(ClockEvent.EmployeeID), nameof(ClockEvent.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<ClockEvent> ClockEvents { get; set; }
-    [OneToMany(nameof(Models.TagUse.TempTagRFID), nameof(Models.TagUse.TempTag), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToMany(nameof(Models.TagUse.TempTagRF_ID), nameof(Models.TagUse.TempTag), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<TagUse> TagUse { get; set; }
 
     [Ignore] public string FullName => $"{FirstName} {LastName}";
