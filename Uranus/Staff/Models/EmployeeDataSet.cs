@@ -104,8 +104,8 @@ public class EmployeeDataSet
     {
         foreach (var tempTag in TagDict.Values)
             if (tempTag.EmployeeID != 0 && Employees.TryGetValue(tempTag.EmployeeID, out var employee))
-                tempTag.Employee = employee;
-
+                tempTag.SetEmployee(employee);
+        
         foreach (var tagUse in TagUses)
         {
             if (TagDict.TryGetValue(tagUse.TempTagRF_ID, out var tag))
@@ -435,6 +435,18 @@ public class EmployeeDataSet
         {
             employee.ReportsTo = newEmployee;
             newEmployee.Reports.Add(employee);
+        }
+
+        foreach (var tagUse in TagUses.Where(u => u.EmployeeID == newEmployee.ID))
+        {
+            newEmployee.TagUse.Add(tagUse);
+            tagUse.Employee = newEmployee;
+        }
+
+        if (TagDict.TryGetValue(newEmployee.TempTagRF_ID, out var tempTag))
+        {
+            newEmployee.TempTag = tempTag;
+            tempTag.Employee = newEmployee;
         }
 
         Employees.Add(newEmployee.ID, newEmployee);

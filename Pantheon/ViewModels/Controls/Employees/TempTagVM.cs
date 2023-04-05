@@ -17,6 +17,10 @@ public class TempTagVM :INotifyPropertyChanged
 
     public Employee? Employee => TempTag.Employee;
 
+    public int EmployeeID => TempTag.EmployeeID;
+
+    public string EmployeeString => Employee is null ? EmployeeID == 0 ? "" : EmployeeID.ToString() : $"{Employee.ID} - {Employee.FullName}";
+
     #endregion
 
     public TempTagVM(TempTag tempTag)

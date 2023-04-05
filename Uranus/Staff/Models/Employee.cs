@@ -62,6 +62,7 @@ public class Employee
     [ForeignKey(typeof(EmployeeIcon))] public string IconName { get; set; }
     [ForeignKey(typeof(EmployeeAvatar))] public string AvatarName { get; set; }
     [ForeignKey(typeof(Licence))] public string LicenceNumber { get; set; }
+    [ForeignKey(typeof(TempTag))] public string TempTagRF_ID { get; set; }
 
     [DefaultValue(false)] public bool IsUser { get; set; }
     [DefaultValue(true)] public bool IsActive { get; set; }     // Employees are de-activated instead of deleted.
@@ -85,6 +86,8 @@ public class Employee
     public Locker? Locker { get; set; }
     [OneToOne(nameof(LicenceNumber), nameof(Models.Licence.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Licence? Licence { get; set; }
+    [OneToOne(nameof(TempTagRF_ID), nameof(Models.TempTag.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public TempTag? TempTag { get; set; }
 
     [ManyToMany(typeof(EmployeeVehicle), nameof(EmployeeVehicle.EmployeeID), nameof(Vehicle.Owners), CascadeOperations = CascadeOperation.All)]
     public List<Vehicle> Vehicles { get; set; }
@@ -144,6 +147,7 @@ public class Employee
         Address = string.Empty;
         IconName = string.Empty;
         AvatarName = string.Empty;
+        TempTagRF_ID = string.Empty;
         Vehicles = new List<Vehicle>();
         Shifts = new List<Shift>();
         DepartmentsCanWorkIn = new List<Department>();

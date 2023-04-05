@@ -14,7 +14,7 @@ public class TempTag
     [OneToMany(nameof(Models.TagUse.TempTagRF_ID), nameof(Models.TagUse.TempTag), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<TagUse> TagUse { get; set; }
 
-    [OneToOne(nameof(EmployeeID), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToOne(nameof(EmployeeID), nameof(Models.Employee.TempTag), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Employee? Employee { get; set; }
 
     public TempTag()
@@ -36,23 +36,34 @@ public class TempTag
         Employee = employee;
         EmployeeID = employee.ID;
 
-        if (isNew)
+        Employee.TempTagRF_ID = RF_ID;
+        Employee.TempTag = this;
+
+        if (!isNew) return null;
+
+        var usage = new TagUse
         {
-            var usage = new TagUse
-            {
-                Employee = employee, 
-                EmployeeID = EmployeeID,
-                EndDate = null,
-                StartDate = DateTime.Today,
-                TempTag = this,
-                TempTagRF_ID = RF_ID,
-            };
-            TagUse.Add(usage);
-            return usage;
-        }
-        else
+            Employee = employee, 
+            EmployeeID = EmployeeID,
+            EndDate = null,
+            StartDate = DateTime.Today,
+            TempTag = this,
+            TempTagRF_ID = RF_ID,
+        };
+        TagUse.Add(usage);
+        return usage;
+
+    }
+
+    public void Unassign()
+    {
+        if (Employee is not null)
         {
-            return null;
+            Employee.TempTag = null;
+            Employee.TempTagRF_ID = string.Empty;
         }
+
+        Employee = null;
+        EmployeeID = 0;
     }
 }

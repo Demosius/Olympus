@@ -1,0 +1,121 @@
+﻿<Window x:Class="Pantheon.Views.PopUp.Employees.TempTagSelectionWindow"
+        Name="TempTagWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Pantheon.ViewModels.PopUp.Employees"
+        xmlns:employees="clr-namespace:Pantheon.Views.Controls.Employees"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type vm:TempTagSelectionVM}, IsDesignTimeCreatable=False}"
+        Title="Temp Tag Selection" 
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource TooltipBackgroundBrush}"
+        Foreground="{StaticResource LightForegroundBrush}"
+        Width="400" Height="550">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Master/MSControls.Core.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <DockPanel>
+
+        <DockPanel.Resources>
+            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource TextBoxStyle}">
+                <Setter Property="Margin" Value="5"/>
+            </Style>
+            <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ComboBoxStyle}">
+                <Setter Property="Margin" Value="5"/>
+                <Setter Property="IsEditable" Value="True"/>
+                <Setter Property="MinWidth" Value="200"/>
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                <Setter Property="VerticalContentAlignment" Value="Bottom"/>
+                <Setter Property="Margin" Value="0"/>
+            </Style>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
+                <Setter Property="Margin" Value="5,5,5,5"/>
+                <Setter Property="MinWidth" Value="0"/>
+                <Setter Property="Width" Value="75"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+            </Style>
+            <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
+        </DockPanel.Resources>
+
+        <!-- Filters -->
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal"
+                    Margin="5,5,5,0">
+            <Label Content="Show Assigned" FontSize="8"
+                   VerticalAlignment="Center"/>
+            <CheckBox IsChecked="{Binding ShowAssigned, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Margin="0" MinWidth="100" MinHeight="0" Height="25"
+                     Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
+
+        <!-- Confirm/Cancel -->
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,10,0,0">
+            <Button Content="Cancel"
+                    IsCancel="True"/>
+            <Button Content="Confirm"
+                    Command="{Binding ConfirmSelectionCommand}"
+                    CommandParameter="{Binding ElementName=TempTagWindow}"
+                    IsDefault="True"/>
+        </StackPanel>
+
+        <!-- Content -->
+        <DockPanel Margin="10">
+            <!-- New & Delete -->
+            <Grid DockPanel.Dock="Bottom">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBox Text="{Binding NewRF_ID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Width="120"
+                             IsEnabled="{Binding UserCanCreate}"
+                             Margin="0,5"/>
+                    <Button MinWidth="0"
+                            Width="65"
+                            Content="Add"
+                            Command="{Binding CreateCommand}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <Button Content="Delete"
+                            Command="{Binding DeleteCommand}"
+                            Visibility="{Binding CanDelete, Converter={StaticResource VisibilityConverter}}"
+                            Width="65"/>
+                    <Button Content="Unassign"
+                            Command="{Binding UnassignTempTagCommand}"
+                            Visibility="{Binding CanUnassign, Converter={StaticResource VisibilityConverter}}"
+                            Width="85"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- List -->
+            <ListView ItemsSource="{Binding TempTags}"
+                      SelectedItem="{Binding SelectedTag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      d:ItemsSource="{d:SampleData ItemCount=5}"
+                      HorizontalAlignment="Stretch">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <employees:TempTagView DataContext="{Binding}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </DockPanel>
+    </DockPanel>
+</Window>

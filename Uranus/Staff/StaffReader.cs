@@ -747,4 +747,38 @@ public class StaffReader
 
         return tags;
     }
+
+    public TagUse? GetValidUsage(Employee employee, TempTag tempTag, DateTime date) =>
+        GetValidUsage(employee.ID, tempTag.RF_ID, date);
+
+    public TagUse? GetValidUsage(int employeeID, string tempTagRFID, DateTime date) => Chariot.PullObjectList<TagUse>(u =>
+        u.EmployeeID == employeeID && u.TempTagRF_ID == tempTagRFID && u.StartDate <= date &&
+        (u.EndDate == null || u.EndDate >= date)).MinBy(u => u.StartDate);
+
+    public Employee? TagUser(TempTag tempTag, DateTime date) => TagUser(tempTag.RF_ID, date);
+
+    public Employee? TagUser(string tempTagRF, DateTime date) => Employee(TagUserID(tempTagRF, date));
+
+    public int TagUserID(TempTag tempTag, DateTime date) => TagUserID(tempTag.RF_ID, date);
+
+    public int TagUserID(string tempTagRF, DateTime date)
+    {
+        var id = 0;
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var usage = Chariot.PullObjectList<TagUse>(u =>
+                u.TempTagRF_ID == tempTagRF && u.StartDate <= date && (u.EndDate == null || u.EndDate >= date));
+            if (!usage.Any()) return;
+            if (usage.Count == 1)
+            {
+                id = usage.First().EmployeeID;
+                return;
+            }
+
+            if (usage.Any(u => u.EndDate is null))
+                usage = usage.Where(u => u.EndDate is null).ToList();
+            id = usage.OrderBy(u => u.StartDate).First().EmployeeID;
+        });
+        return id;
+    }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Uranus.Staff.Models;
 
@@ -9,10 +8,12 @@ namespace Uranus.Staff;
 public class StaffUpdater
 {
     private StaffChariot Chariot { get; }
+    private StaffReader Reader { get; }
 
-    public StaffUpdater(ref StaffChariot chariot)
+    public StaffUpdater(ref StaffChariot chariot, StaffReader reader)
     {
         Chariot = chariot;
+        Reader = reader;
     }
 
     public int ClockEvent(ClockEvent clock) => Chariot.Update(clock);
@@ -340,31 +341,45 @@ public class StaffUpdater
         var lines = 0;
         lines += UnassignTempTag(tag);
 
-        var usage = tag.SetEmployee(employee, true);
 
         Chariot.Database?.RunInTransaction(() =>
         {
-            lines += usage is null ? 0 : Chariot.InsertOrUpdate(usage);
+            var usage = Reader.GetValidUsage(employee, tag, DateTime.Today);
+            if (usage is null)
+            {
+                usage = tag.SetEmployee(employee, true);
+                lines += usage is null ? 0 : Chariot.Create(usage) ? 1 : 0;
+            }
+            else
+            {
+                usage.EndDate = null;
+                tag.SetEmployee(employee);
+                tag.TagUse.Add(usage);
+                employee.TagUse.Add(usage);
+                lines += Chariot.InsertOrUpdate(usage);
+            }
             lines += Chariot.InsertOrUpdate(tag);
+            lines += Chariot.InsertOrUpdate(employee);
         });
-
+        
         return lines;
     }
-
+    
     public int UnassignTempTag(TempTag tempTag)
     {
         var employeeID = tempTag.EmployeeID;
         if (employeeID == 0) return 0;
 
-        tempTag.Employee = null;
-        tempTag.EmployeeID = 0;
-
+        tempTag.Unassign();
+        
         var lines = 0;
         Chariot.Database?.RunInTransaction(() =>
         {
             lines += Chariot.Database.Execute(
                 "UPDATE TagUse SET EndDate = ? WHERE EmployeeID = ? AND TempTagRF_ID = ? AND EndDate is null;",
                 DateTime.Today, employeeID, tempTag.RF_ID);
+
+            lines += Chariot.Database.Execute("UPDATE Employee SET TempTagRF_ID = ? WHERE ID = ?;", null, employeeID);
 
             lines += Chariot.Update(tempTag);
         });
