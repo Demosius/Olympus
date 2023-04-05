@@ -8,10 +8,12 @@ namespace Uranus.Staff;
 public class StaffUpdater
 {
     private StaffChariot Chariot { get; }
+    private StaffReader Reader { get; }
 
-    public StaffUpdater(ref StaffChariot chariot)
+    public StaffUpdater(ref StaffChariot chariot, StaffReader reader)
     {
         Chariot = chariot;
+        Reader = reader;
     }
 
     public int ClockEvent(ClockEvent clock) => Chariot.Update(clock);
@@ -269,7 +271,6 @@ public class StaffUpdater
     /// </summary>
     /// <param name="empShifts"></param>
     /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
     public int EmployeeToShiftConnections(IEnumerable<EmployeeShift> empShifts)
     {
         var lines = 0;
@@ -283,7 +284,7 @@ public class StaffUpdater
                         lines += Chariot.Database.Insert(employeeShift);
                         break;
                     case false when employeeShift.Original:
-                        lines += Chariot.Database.Delete(employeeShift);
+                        lines += Chariot.Database.Execute("DELETE FROM EmployeeShift WHERE EmployeeID = ? AND ShiftID = ?;", employeeShift.EmployeeID, employeeShift.ShiftID);
                         break;
                 }
             }
@@ -303,7 +304,7 @@ public class StaffUpdater
         var id = departmentRoster.ID;
         var lines = 0;
         Chariot.Database?.RunInTransaction(() =>
-        { 
+        {
             lines += Chariot.Database!.Execute("DELETE FROM Roster WHERE DepartmentRosterID = ?;", id);
             lines += Chariot.InsertIntoTable(departmentRoster.Rosters);
             // Get Daily Roster IDs, to use to remove Daily Shift Counters, before deleting them.
@@ -333,4 +334,56 @@ public class StaffUpdater
     public int ShiftRuleRecurring(ShiftRuleRecurring shiftRule) => Chariot.Update(shiftRule);
 
     public int ShiftRuleRoster(ShiftRuleRoster shiftRule) => Chariot.Update(shiftRule);
+
+    /* Temp Tags */
+    public int AssignTempTag(TempTag tag, Employee employee)
+    {
+        var lines = 0;
+        lines += UnassignTempTag(tag);
+
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var usage = Reader.GetValidUsage(employee, tag, DateTime.Today);
+            if (usage is null)
+            {
+                usage = tag.SetEmployee(employee, true);
+                lines += usage is null ? 0 : Chariot.Create(usage) ? 1 : 0;
+            }
+            else
+            {
+                usage.EndDate = null;
+                tag.SetEmployee(employee);
+                tag.TagUse.Add(usage);
+                employee.TagUse.Add(usage);
+                lines += Chariot.InsertOrUpdate(usage);
+            }
+            lines += Chariot.InsertOrUpdate(tag);
+            lines += Chariot.InsertOrUpdate(employee);
+        });
+        
+        return lines;
+    }
+    
+    public int UnassignTempTag(TempTag tempTag)
+    {
+        var employeeID = tempTag.EmployeeID;
+        if (employeeID == 0) return 0;
+
+        tempTag.Unassign();
+        
+        var lines = 0;
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            lines += Chariot.Database.Execute(
+                "UPDATE TagUse SET EndDate = ? WHERE EmployeeID = ? AND TempTagRF_ID = ? AND EndDate is null;",
+                DateTime.Today, employeeID, tempTag.RF_ID);
+
+            lines += Chariot.Database.Execute("UPDATE Employee SET TempTagRF_ID = ? WHERE ID = ?;", null, employeeID);
+
+            lines += Chariot.Update(tempTag);
+        });
+
+        return lines;
+    }
 }

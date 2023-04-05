@@ -1,4 +1,5 @@
-﻿using Panacea.Interfaces;
+﻿using System;
+using Panacea.Interfaces;
 using Panacea.Models;
 using Panacea.Properties;
 using Panacea.ViewModels.Commands;
@@ -10,11 +11,13 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
+using Serilog;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
 using Uranus.Inventory;
+using Uranus.Inventory.Models;
 
 namespace Panacea.ViewModels.Components;
 
@@ -162,7 +165,18 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
         var locations = checkLocString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones, locations);
+        BasicStockDataSet? dataSet;
+        try
+        {
+            dataSet = Helios.InventoryReader.BasicStockDataSet(zones, locations);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Missing Data");
+            Log.Error(ex, "Error pulling data for purge.");
+            Mouse.OverrideCursor = Cursors.Arrow;
+            return;
+        }
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");

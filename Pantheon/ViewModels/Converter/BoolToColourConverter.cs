@@ -7,8 +7,9 @@ namespace Pantheon.ViewModels.Converter;
 
 internal class BoolToColourConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
     {
+        if (value == null) return new SolidColorBrush(Colors.Orange);
         var val = (bool)value;
         return val ? new SolidColorBrush(Colors.GreenYellow) : new SolidColorBrush(Colors.Red);
     }

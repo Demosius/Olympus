@@ -8,25 +8,24 @@ public class TagUse
 {
     [PrimaryKey, AutoIncrement] public int ID { get; set; }
     [ForeignKey(typeof(Employee))] public int EmployeeID { get; set; }
-    [ForeignKey(typeof(TempTag))] public string TempTagRFID { get; set; }
+    [ForeignKey(typeof(TempTag))] public string TempTagRF_ID { get; set; }
     public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
+    public DateTime? EndDate { get; set; }
 
-    [ManyToOne(nameof(TempTagRFID), nameof(Models.TempTag.TagUse), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(TempTagRF_ID), nameof(Models.TempTag.TagUse), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public TempTag? TempTag { get; set; }
     [ManyToOne(nameof(EmployeeID), nameof(Models.Employee.TagUse), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Employee? Employee { get; set; }
 
     public TagUse()
     {
-        TempTagRFID = string.Empty;
+        TempTagRF_ID = string.Empty;
     }
 
-    public TagUse(int id, int employeeID, string tempTagRFID, DateTime startDate, DateTime endDate, TempTag tempTag, Employee employee)
+    public TagUse(int employeeID, string tempTagRFID, DateTime startDate, DateTime endDate, TempTag tempTag, Employee employee)
     {
-        ID = id;
         EmployeeID = employeeID;
-        TempTagRFID = tempTagRFID;
+        TempTagRF_ID = tempTagRFID;
         StartDate = startDate;
         EndDate = endDate;
         TempTag = tempTag;

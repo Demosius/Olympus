@@ -14,7 +14,7 @@ using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Controls.Employees;
 
-public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRoles, IManagers, IClans, IPayPoints
+public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRoles, IManagers, IClans, IPayPoints, ITempTags
 {
     public Employee Employee { get; set; }
     public Charon Charon { get; set; }
@@ -233,6 +233,21 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         set { Employee.IsUser = value; OnPropertyChanged(); }
     }
 
+    public TempTag? TempTag
+    {
+        get => Employee.TempTag;
+        set { Employee.TempTag = value; OnPropertyChanged(); }
+    }
+
+    public string TempTagRF_ID
+    {
+        get => Employee.TempTagRF_ID;
+        set { Employee.TempTagRF_ID = value; OnPropertyChanged(); }
+    }
+
+    public bool HasTempTag => TempTag is not null;
+    public bool HasNoTempTag => !HasTempTag;
+
     #endregion
 
     #region Commands
@@ -253,6 +268,8 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
     public SelectManagerCommand SelectManagerCommand { get; set; }
     public ClearManagerCommand ClearManagerCommand { get; set; }
     public LaunchEmployeeShiftWindowCommand LaunchEmployeeShiftWindowCommand { get; set; }
+    public SelectTempTagCommand SelectTempTagCommand { get; set; }
+    public UnassignTempTagCommand UnassignTempTagCommand { get; set; }
 
     #endregion
 
@@ -284,6 +301,8 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         ClearManagerCommand = new ClearManagerCommand(this);
         ClearClanCommand = new ClearClanCommand(this);
         ClearPayPointCommand = new ClearPayPointCommand(this);
+        SelectTempTagCommand = new SelectTempTagCommand(this);
+        UnassignTempTagCommand = new UnassignTempTagCommand(this);
     }
 
     public void SetDataFromObjects() => Employee.SetDataFromObjects();
@@ -404,6 +423,34 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
     public void ClearManager()
     {
         ReportsTo = null;
+    }
+
+    public void SelectTempTag()
+    {
+        var tagSelector = new TempTagSelectionWindow(Helios, Charon);
+        if (tagSelector.ShowDialog() != true) return;
+
+        var tag = tagSelector.TempTag;
+        if (tag is null) return;
+
+        Helios.StaffUpdater.AssignTempTag(tag, Employee);
+        OnPropertyChanged(nameof(TempTag));
+        OnPropertyChanged(nameof(TempTagRF_ID));
+        OnPropertyChanged(nameof(HasNoTempTag));
+        OnPropertyChanged(nameof(HasTempTag));
+
+        // Adjust temptags for all in dataset ??
+
+    }
+
+    public void UnassignTempTag()
+    {
+        if (TempTag is null) return;
+        Helios.StaffUpdater.UnassignTempTag(TempTag);
+        OnPropertyChanged(nameof(HasTempTag));
+        OnPropertyChanged(nameof(HasNoTempTag));
+        OnPropertyChanged(nameof(TempTag));
+        OnPropertyChanged(nameof(TempTagRF_ID));
     }
 
     /// <summary>

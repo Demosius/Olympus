@@ -206,4 +206,6 @@ public class StaffCreator
         Chariot.Create(shiftRule, pushType);
 
     public int ShiftRuleRosters(IEnumerable<ShiftRuleRoster> rosterRules) => Chariot.InsertIntoTable(rosterRules);
+
+    public bool TempTag(TempTag newTag, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(newTag, pushType);
 }

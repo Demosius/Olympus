@@ -3,10 +3,61 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Pantheon.Views.Controls.Employees"
+             xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Employees"
+             xmlns:converter="clr-namespace:Pantheon.ViewModels.Converter"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+             d:DataContext="{d:DesignInstance {x:Type vm:EmployeeVM}, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+        <converter:EmploymentToStringConverter x:Key="EmploymentTypeConverter"/>
+        <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
+        <converter:AsyncImageConverter x:Key="AsyncImageConverter"/>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Horizontal">
+        <Image MaxWidth="50"
+               MaxHeight="50"
+               Margin="0,0,5,0">
+            <Image.Source>
+                <Binding Path="IconUri" Converter="{StaticResource AsyncImageConverter}">
+                    <Binding.TargetNullValue>
+                        <ImageSource>../../../Resources/user.png</ImageSource>
+                    </Binding.TargetNullValue>
+                </Binding>
+            </Image.Source>
+        </Image>
+
+        <StackPanel Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource LightForegroundBrush}"/>
+                <Label Content=" - "
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource LightForegroundBrush}"/>
+                <Label Content="{Binding ID, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                       FontSize="14"
+                       FontStyle="Italic"
+                       Foreground="{StaticResource LightForegroundBrush}"/>
+                <Label Content=" U" 
+                       Foreground="DarkOrange"
+                       FontSize="14"
+                       FontWeight="Black"
+                       Visibility="{Binding IsUser, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"/>
+            </StackPanel>
+            <WrapPanel Orientation="Horizontal">
+                <TextBlock Text="Employment: "/>
+                <TextBlock Text="{Binding EmploymentType, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmploymentTypeConverter}}"/>
+                <Separator/>
+                <TextBlock Text="Role: "/>
+                <TextBlock Text="{Binding Role, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Separator/>
+                <TextBlock Text="Department: "/>
+                <TextBlock Text="{Binding Department, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+
+            </WrapPanel>
+        </StackPanel>
+    </StackPanel>
 </UserControl>

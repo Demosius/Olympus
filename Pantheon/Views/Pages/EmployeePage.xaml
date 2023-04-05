@@ -137,52 +137,7 @@
                       SelectedValue="{Binding SelectedEmployeeVM, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <Image MaxWidth="50"
-                                   MaxHeight="50"
-                                   Margin="0,0,5,0">
-                                <Image.Source>
-                                    <Binding Path="IconUri" Converter="{StaticResource AsyncImageConverter}">
-                                        <Binding.TargetNullValue>
-                                            <ImageSource>../../Resources/user.png</ImageSource>
-                                        </Binding.TargetNullValue>
-                                    </Binding>
-                                </Image.Source>
-                            </Image>
-                            
-                            <StackPanel Orientation="Vertical">
-                                <StackPanel Orientation="Horizontal">
-                                    <Label Content="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                           FontSize="14"
-                                           FontWeight="Bold"
-                                           Foreground="{StaticResource LightForegroundBrush}"/>
-                                    <Label Content=" - "
-                                           FontSize="14"
-                                           FontWeight="Bold"
-                                           Foreground="{StaticResource LightForegroundBrush}"/>
-                                    <Label Content="{Binding ID, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                           FontSize="14"
-                                           FontStyle="Italic"
-                                           Foreground="{StaticResource LightForegroundBrush}"/>
-                                    <Label Content=" U" 
-                                           Foreground="DarkOrange"
-                                           FontSize="14"
-                                           FontWeight="Black"
-                                           Visibility="{Binding IsUser, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"/>
-                                </StackPanel>
-                                <WrapPanel Orientation="Horizontal">
-                                    <TextBlock Text="Employment: "/>
-                                    <TextBlock Text="{Binding EmploymentType, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EmploymentTypeConverter}}"/>
-                                    <Separator/>
-                                    <TextBlock Text="Role: "/>
-                                    <TextBlock Text="{Binding Role, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <Separator/>
-                                    <TextBlock Text="Department: "/>
-                                    <TextBlock Text="{Binding Department, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-
-                                </WrapPanel>
-                            </StackPanel>
-                        </StackPanel>
+                        <controls:EmployeeListItemView DataContext="{Binding}"/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
                 <ListView.Resources>

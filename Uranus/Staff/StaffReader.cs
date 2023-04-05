@@ -201,8 +201,10 @@ public class StaffReader
                 var singleRules = Chariot.PullObjectList<ShiftRuleSingle>();
                 var recurringRules = Chariot.PullObjectList<ShiftRuleRecurring>();
                 var rosterRules = Chariot.PullObjectList<ShiftRuleRoster>();
+                var tags = Chariot.PullObjectList<TempTag>();
+                var tagUse = Chariot.PullObjectList<TagUse>();
                 data = new EmployeeDataSet(employees, departments, departmentRosters, clans, roles, icons, avatars,
-                    shifts, breaks, singleRules, recurringRules, rosterRules);
+                    shifts, breaks, singleRules, recurringRules, rosterRules, tags, tagUse);
             });
             if (data is not null) return data;
         }
@@ -702,5 +704,81 @@ public class StaffReader
             newSet.ShiftEntries = ShiftEntries().ToDictionary(e => e.ID, e => e);
         });
         return newSet;
+    }
+
+    /* TEMP TAGS */
+    public IEnumerable<TempTag> TempTags()
+    {
+        List<TempTag>? tags = null;
+        List<TagUse>? tagsUse = null;
+        List<Employee>? employees = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            tags = Chariot.PullObjectList<TempTag>();
+            tagsUse = Chariot.PullObjectList<TagUse>();
+            employees = Chariot.PullObjectList<Employee>();
+        });
+
+        tags ??= new List<TempTag>();
+        tagsUse ??= new List<TagUse>();
+        employees ??= new List<Employee>();
+
+        var tagDict = tags.ToDictionary(e => e.RF_ID, e => e);
+        var employeeDict = employees.ToDictionary(e => e.ID, e => e);
+
+        foreach (var tempTag in tags)
+            if (tempTag.EmployeeID != 0 && employeeDict.TryGetValue(tempTag.EmployeeID, out var employee))
+                tempTag.Employee = employee;
+
+        foreach (var tagUse in tagsUse)
+        {
+            if (tagDict.TryGetValue(tagUse.TempTagRF_ID, out var tag))
+            {
+                tag.TagUse.Add(tagUse);
+                tagUse.TempTag = tag;
+            }
+
+            if (!employeeDict.TryGetValue(tagUse.EmployeeID, out var employee)) continue;
+
+            employee.TagUse.Add(tagUse);
+            tagUse.Employee = employee;
+        }
+
+        return tags;
+    }
+
+    public TagUse? GetValidUsage(Employee employee, TempTag tempTag, DateTime date) =>
+        GetValidUsage(employee.ID, tempTag.RF_ID, date);
+
+    public TagUse? GetValidUsage(int employeeID, string tempTagRFID, DateTime date) => Chariot.PullObjectList<TagUse>(u =>
+        u.EmployeeID == employeeID && u.TempTagRF_ID == tempTagRFID && u.StartDate <= date &&
+        (u.EndDate == null || u.EndDate >= date)).MinBy(u => u.StartDate);
+
+    public Employee? TagUser(TempTag tempTag, DateTime date) => TagUser(tempTag.RF_ID, date);
+
+    public Employee? TagUser(string tempTagRF, DateTime date) => Employee(TagUserID(tempTagRF, date));
+
+    public int TagUserID(TempTag tempTag, DateTime date) => TagUserID(tempTag.RF_ID, date);
+
+    public int TagUserID(string tempTagRF, DateTime date)
+    {
+        var id = 0;
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var usage = Chariot.PullObjectList<TagUse>(u =>
+                u.TempTagRF_ID == tempTagRF && u.StartDate <= date && (u.EndDate == null || u.EndDate >= date));
+            if (!usage.Any()) return;
+            if (usage.Count == 1)
+            {
+                id = usage.First().EmployeeID;
+                return;
+            }
+
+            if (usage.Any(u => u.EndDate is null))
+                usage = usage.Where(u => u.EndDate is null).ToList();
+            id = usage.OrderBy(u => u.StartDate).First().EmployeeID;
+        });
+        return id;
     }
 }

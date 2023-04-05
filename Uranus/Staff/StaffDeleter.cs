@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Uranus.Staff.Models;
 
 namespace Uranus.Staff;
@@ -116,5 +117,34 @@ public class StaffDeleter
             Chariot.Database.Execute("UPDATE Employee SET ClanName = null WHERE ClanName = ?;", clan.Name);
             Chariot.Delete(clan);
         });
+    }
+
+    /// <summary>
+    /// Delete tag from database.
+    /// Will fail if there is any use of it, as it will be required for historic data.
+    /// </summary>
+    /// <param name="tempTag"></param>
+    /// <returns>True if deletion successful.</returns>
+    public bool TempTag(TempTag tempTag)
+    {
+        if (tempTag.Employee is not null || tempTag.EmployeeID != 0 || tempTag.TagUse.Any()) return false;
+
+        var linesOfUse = 0;
+        var success = false;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            linesOfUse += Chariot.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM Employee WHERE TempTagRF_ID = ?;",
+                tempTag.RF_ID);
+            linesOfUse += Chariot.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM TagUse WHERE TempTagRF_ID = ?;",
+                tempTag.RF_ID);
+
+            // Do not delete if still assigned and/or has historic use.
+            if (linesOfUse > 0) 
+                return;
+            success = Chariot.Delete(tempTag);
+        });
+
+        return success;
     }
 }
