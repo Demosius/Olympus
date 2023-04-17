@@ -2,14 +2,13 @@
 using System.Windows.Input;
 using Pantheon.ViewModels.Interface;
 
-namespace Pantheon.ViewModels.Commands.Employees;
+namespace Pantheon.ViewModels.Commands.TempTags;
 
-
-public class UnassignTempTagCommand : ICommand
+public class AssignTempTagCommand : ICommand
 {
     public ITempTags VM { get; set; }
 
-    public UnassignTempTagCommand(ITempTags vm) { VM = vm; }
+    public AssignTempTagCommand(ITempTags vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -18,7 +17,7 @@ public class UnassignTempTagCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.UnassignTempTag();
+        VM.AssignTempTag();
     }
 
     public event EventHandler? CanExecuteChanged

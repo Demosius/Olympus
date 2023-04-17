@@ -341,7 +341,6 @@ public class StaffUpdater
         var lines = 0;
         lines += UnassignTempTag(tag);
 
-
         Chariot.Database?.RunInTransaction(() =>
         {
             var usage = Reader.GetValidUsage(employee, tag, DateTime.Today);
@@ -386,4 +385,24 @@ public class StaffUpdater
 
         return lines;
     }
+
+    /// <summary>
+    /// Update the usage of the given tag, removing existing lines and replacing with the given.
+    /// </summary>
+    /// <param name="tag"></param>
+    /// <returns>Number of lines affected in the database.</returns>
+    public int TagUsage(TempTag tag)
+    {
+        var lines = 0;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            lines += Chariot.Database.Execute("DELETE FROM TagUse WHERE TempTagRF_ID = ?;", tag.RF_ID);
+            lines += Chariot.InsertIntoTable(tag.TagUse);
+        });
+
+        return lines;
+    }
+
+    public int TagUsage(TagUse use) => Chariot.InsertOrUpdate(use);
 }

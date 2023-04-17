@@ -6,9 +6,9 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 using Pantheon.Annotations;
-using Pantheon.ViewModels.Commands.Employees;
 using Pantheon.ViewModels.Commands.Generic;
-using Pantheon.ViewModels.Controls.Employees;
+using Pantheon.ViewModels.Commands.TempTags;
+using Pantheon.ViewModels.Controls.TempTags;
 using Pantheon.ViewModels.Interface;
 using Styx;
 using Uranus;
@@ -16,7 +16,7 @@ using Uranus.Commands;
 using Uranus.Interfaces;
 using Uranus.Staff.Models;
 
-namespace Pantheon.ViewModels.PopUp.Employees;
+namespace Pantheon.ViewModels.PopUp.TempTags;
 
 public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, ITempTags
 {
@@ -28,6 +28,7 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
     public bool CanDelete => UserCanCreate && SelectedTag is not null && !SelectedTag.IsAssigned;
     public bool CanConfirm => SelectedTag is not null && !SelectedTag.IsAssigned;
     public bool CanUnassign => SelectedTag is not null && SelectedTag.IsAssigned;
+    public bool CanAssign => false;
 
     public List<TempTagVM> AllTags { get; set; }
 
@@ -96,6 +97,7 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public SelectTempTagCommand SelectTempTagCommand { get; set; }
     public UnassignTempTagCommand UnassignTempTagCommand { get; set; }
+    public AssignTempTagCommand AssignTempTagCommand { get; set; }
 
     #endregion
 
@@ -113,7 +115,7 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
         newRF_ID = string.Empty;
 
         filterString = string.Empty;
-        
+
         ApplyFilters();
 
         CreateCommand = new CreateCommand(this);
@@ -123,6 +125,7 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
         ClearFiltersCommand = new ClearFiltersCommand(this);
         SelectTempTagCommand = new SelectTempTagCommand(this);
         UnassignTempTagCommand = new UnassignTempTagCommand(this);
+        AssignTempTagCommand = new AssignTempTagCommand(this);
     }
 
     public void ClearFilters()
@@ -155,7 +158,7 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
         }
 
         var currentSelected = SelectedTag;
-        var newTag = new TempTag {RF_ID = NewRF_ID};
+        var newTag = new TempTag { RF_ID = NewRF_ID };
 
         Helios.StaffCreator.TempTag(newTag);
 
@@ -205,6 +208,11 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
         Helios.StaffUpdater.UnassignTempTag(SelectedTag.TempTag);
 
         ApplyFilters();
+    }
+
+    public void AssignTempTag()
+    {
+        throw new System.NotImplementedException();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

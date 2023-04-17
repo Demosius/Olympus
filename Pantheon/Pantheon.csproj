@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Resources\broken-link.png" />
     <None Remove="Resources\calculator--plus.png" />
     <None Remove="Resources\clock--arrow.png" />
     <None Remove="Resources\cross.png" />
@@ -61,6 +62,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\broken-link.png" />
     <Resource Include="Resources\cross.png" />
     <Resource Include="Resources\edit.png" />
     <Resource Include="Resources\Fonts\code128.ttf">

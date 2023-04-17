@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.Interface;
 
-namespace Pantheon.ViewModels.Commands;
+namespace Pantheon.ViewModels.Commands.TempTags;
 
-public class ShowRosterPageCommand : ICommand
+
+public class SelectTempTagCommand : ICommand
 {
-    public PantheonVM VM { get; set; }
+    public ITempTags VM { get; set; }
 
-    public ShowRosterPageCommand(PantheonVM vm)
-    {
-        VM = vm;
-    }
+    public SelectTempTagCommand(ITempTags vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -19,7 +18,7 @@ public class ShowRosterPageCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.ShowRosterPage();
+        VM.SelectTempTag();
     }
 
     public event EventHandler? CanExecuteChanged

@@ -1,25 +1,24 @@
 ﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.Interface;
 
-namespace Pantheon.ViewModels.Commands;
+namespace Pantheon.ViewModels.Commands.TempTags;
 
-public class ShowRosterPageCommand : ICommand
+
+public class UnassignTempTagCommand : ICommand
 {
-    public PantheonVM VM { get; set; }
+    public ITempTags VM { get; set; }
 
-    public ShowRosterPageCommand(PantheonVM vm)
-    {
-        VM = vm;
-    }
+    public UnassignTempTagCommand(ITempTags vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return true;
+        return VM.CanUnassign;
     }
 
     public void Execute(object? parameter)
     {
-        VM.ShowRosterPage();
+        VM.UnassignTempTag();
     }
 
     public event EventHandler? CanExecuteChanged
