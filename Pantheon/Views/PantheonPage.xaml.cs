@@ -1,6 +1,7 @@
 ﻿using Styx;
 using System;
 using System.Windows.Navigation;
+using Pantheon.ViewModels;
 using Uranus;
 using Uranus.Interfaces;
 using Uranus.Staff;
@@ -12,10 +13,13 @@ namespace Pantheon.Views;
 /// </summary>
 public partial class PantheonPage : IProject
 {
+    public PantheonVM VM { get; set; }
+
     public PantheonPage(Charon charon, Helios helios)
     {
         InitializeComponent();
-        VM.SetDataSources(charon, helios);
+        VM = new PantheonVM(helios, charon);
+        DataContext = VM;
     }
 
     public EProject Project => EProject.Pantheon;

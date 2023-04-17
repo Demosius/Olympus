@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="Pantheon.Views.Controls.TempTags.TempTagEmployeeItemView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:converter="clr-namespace:Pantheon.ViewModels.Converter"
+             xmlns:employees="clr-namespace:Pantheon.ViewModels.Controls.Employees"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type employees:EmployeeVM}, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
+        <converter:AsyncImageConverter x:Key="AsyncImageConverter"/>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Horizontal">
+        <Border Width="50" Height="50">
+            <Image MaxWidth="50"
+                   MaxHeight="50"
+                   Margin="0,0,5,0">
+                <Image.Source>
+                    <Binding Path="IconUri" Converter="{StaticResource AsyncImageConverter}">
+                        <Binding.TargetNullValue>
+                            <ImageSource>../../../Resources/user.png</ImageSource>
+                        </Binding.TargetNullValue>
+                    </Binding>
+                </Image.Source>
+            </Image>
+        </Border>
+
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=FullName}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource LightForegroundBrush}"/>
+                <Label Content="-"
+                       FontSize="14"
+                       FontWeight="Bold"/>
+                <Label Content="{Binding ID, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=12345}"
+                       FontSize="14"
+                       FontStyle="Italic"/>
+                <Label Content="-"
+                       FontSize="14"
+                       FontWeight="Bold"/>
+                <Label Content="{Binding Department, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=Department}"/>
+                <Label Content=" U" 
+                       Foreground="DarkOrange"
+                       FontSize="14"
+                       FontWeight="Black"
+                       Visibility="{Binding IsUser, Mode=OneWay, Converter={StaticResource VisibilityConverter}}"/>
+            </StackPanel>
+            <WrapPanel Orientation="Horizontal">
+                <TextBlock Foreground="Gold"
+                           FontSize="14"
+                           FontWeight="Bold"
+                           Visibility="{Binding HasTempTag, Converter={StaticResource VisibilityConverter}}">
+                    <Run Text=" "></Run>
+                    <Run>( </Run>
+                    <Run Text="{Binding TempTagRF_ID, FallbackValue=RF_12345}"/>
+                    <Run> )</Run>
+                </TextBlock>
+            </WrapPanel>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

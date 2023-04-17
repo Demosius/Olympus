@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using Pantheon.Annotations;
 using Pantheon.ViewModels.Commands.Employees;
+using Pantheon.ViewModels.Commands.TempTags;
 using Pantheon.ViewModels.Interface;
 using Pantheon.Views.PopUp.Employees;
 using Styx;
@@ -22,6 +23,9 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
 
     public bool SensitiveVisibility { get; }
     public bool VerySensitiveVisibility { get; }
+
+    public bool CanUnassign => Charon.CanCreateEmployee() && TempTag is not null;
+    public bool CanAssign => Charon.CanCreateEmployee() && TempTag is null;
 
     #region INotifyPropertyChanged Members
 
@@ -270,6 +274,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
     public LaunchEmployeeShiftWindowCommand LaunchEmployeeShiftWindowCommand { get; set; }
     public SelectTempTagCommand SelectTempTagCommand { get; set; }
     public UnassignTempTagCommand UnassignTempTagCommand { get; set; }
+    public AssignTempTagCommand AssignTempTagCommand { get; set; }
 
     #endregion
 
@@ -303,6 +308,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         ClearPayPointCommand = new ClearPayPointCommand(this);
         SelectTempTagCommand = new SelectTempTagCommand(this);
         UnassignTempTagCommand = new UnassignTempTagCommand(this);
+        AssignTempTagCommand = new AssignTempTagCommand(this);
     }
 
     public void SetDataFromObjects() => Employee.SetDataFromObjects();
@@ -439,7 +445,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         OnPropertyChanged(nameof(HasNoTempTag));
         OnPropertyChanged(nameof(HasTempTag));
 
-        // Adjust temptags for all in dataset ??
+        // TODO: Adjust temptags for all in dataset ??
 
     }
 
@@ -452,6 +458,8 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         OnPropertyChanged(nameof(TempTag));
         OnPropertyChanged(nameof(TempTagRF_ID));
     }
+
+    public void AssignTempTag() => SelectTempTag();
 
     /// <summary>
     /// Assuming the user is about to adjust the employee in such a way that removes that employee from the user's permissions to edit further, make sure confirmation is attained.
@@ -479,6 +487,19 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         var shiftWindow = new EmployeeShiftWindow(this);
 
         shiftWindow.ShowDialog();
+    }
+
+    /// <summary>
+    /// Execute OnPropertyChanged on Members to signify a change on TempTag status.
+    /// </summary>
+    public void RefreshTempTag()
+    {
+        OnPropertyChanged(nameof(TempTag));
+        OnPropertyChanged(nameof(TempTagRF_ID));
+        OnPropertyChanged(nameof(CanAssign));
+        OnPropertyChanged(nameof(CanUnassign));
+        OnPropertyChanged(nameof(HasTempTag));
+        OnPropertyChanged(nameof(HasNoTempTag));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

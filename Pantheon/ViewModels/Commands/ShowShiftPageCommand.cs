@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace Pantheon.ViewModels.Commands;
 
-internal class ShowShiftPageCommand : ICommand
+public class ShowShiftPageCommand : ICommand
 {
     public PantheonVM VM { get; set; }
 

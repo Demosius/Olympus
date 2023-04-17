@@ -2,6 +2,7 @@
 using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Uranus.Staff.Models;
 
@@ -57,12 +58,17 @@ public class TempTag
 
     public void Unassign()
     {
+        // Change applicable use.
+        var empID = EmployeeID;
+        var use = TagUse.FirstOrDefault(use => use.EmployeeID == empID && use.EndDate is null);
+        if (use is not null) use.EndDate = DateTime.Today;
+        // Change Employee object.
         if (Employee is not null)
         {
             Employee.TempTag = null;
             Employee.TempTagRF_ID = string.Empty;
         }
-
+        // Change relevant tag data.
         Employee = null;
         EmployeeID = 0;
     }
