@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using Uranus.Inventory;
 using Uranus.Inventory.Models;
+using Uranus.Staff.Models;
 
 namespace Uranus;
 
@@ -897,5 +898,89 @@ public static class DataConversion
                 row[col] = b;
             }
         }
+    }
+
+    // Turns clipboard data into a list of Pick Events.
+    public static List<PickEvent> RawStringToPickEvents(string rawData)
+    {
+        var headDict = Constants.DematicPickEventColumns;
+
+        if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+        // Start memory stream from which to read.
+        var byteArray = Encoding.UTF8.GetBytes(rawData);
+        MemoryStream stream = new(byteArray);
+        // Start Reading from stream.
+        var events = StreamToPickEvents(stream, headDict);
+
+        return events;
+    }
+
+    // Convert a memory stream into a Bin list.
+    private static List<PickEvent> StreamToPickEvents(MemoryStream stream, Dictionary<string, int> headDict)
+    {
+        List<PickEvent> events = new();
+
+        IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+
+        using StreamReader reader = new(stream);
+        // First set the headers.
+        var line = reader.ReadLine();
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
+        SetHeadPosFromArray(ref headDict, headArr, "Pick Events");
+        // Get highest column value to make sure that any given data line isn't cut short.
+        var highestCol = headDict.Values.Max();
+
+        line = reader.ReadLine();
+        // Add row data.
+        while (line != null)
+        {
+            var row = line.Split('\t');
+
+            if (highestCol < row.Length)
+            {
+                var timeStamp = row[headDict["Timestamp"]];
+                if (!DateTime.TryParse(timeStamp, out var dateTime)) dateTime = DateTime.Today;
+                var demID = row[headDict["Operator ID"]];
+                var rfID = row[headDict["Operator Name"]];
+                if (!int.TryParse(row[headDict["Qty"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var qty)) qty = 0;
+                var container = row[headDict["Container"]];
+                var tech = row[headDict["Tech Type"]];
+                var zone = row[headDict["Zone ID"]];
+                var wave = row[headDict["Wave ID"]];
+                var workAss = row[headDict["Work Assignment"]];
+                var store = row[headDict["Store"]];
+                var deviceID = row[headDict["Device ID"]];
+                if (!int.TryParse(row[headDict["SKU ID"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var itemNo)) itemNo = 0;
+                var itemDesc = row[headDict["SKU Description"]];
+                var cluster = row[headDict["Cluster Ref"]];
+
+                var pickEvent = new PickEvent
+                {
+                    ID = PickEvent.GetEventID(demID, dateTime),
+                    TimeStamp = timeStamp,
+                    DateTime = dateTime,
+                    Date = dateTime.Date,
+                    OperatorDematicID = demID,
+                    OperatorRF_ID = rfID,
+                    Qty = qty,
+                    ContainerID = container,
+                    TechString = tech,
+                    TechType = PickEvent.GetTechType(tech),
+                    ZoneID = zone,
+                    WaveID = wave,
+                    WorkAssignment = workAss,
+                    StoreNumber = store,
+                    DeviceID = deviceID,
+                    ItemNumber = itemNo,
+                    ItemDescription = itemDesc,
+                    ClusterReference = cluster,
+                };
+                events.Add(pickEvent);
+            }
+
+            line = reader.ReadLine();
+        }
+
+        return events;
     }
 }

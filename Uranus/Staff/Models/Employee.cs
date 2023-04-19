@@ -2,6 +2,7 @@
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Uranus.Annotations;
@@ -44,8 +45,9 @@ public class Employee
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public decimal? PayRate { get; set; }
-    public string RF_ID { get; set; }
-    public string PC_ID { get; set; }
+    [Indexed] public string RF_ID { get; set; }
+    [Indexed] public string PC_ID { get; set; }
+    [Indexed, StringLength(4)] public string DematicID { get; set; }
     public string Location { get; set; }
     public string PayPoint { get; set; }
     public EEmploymentType EmploymentType { get; set; }
@@ -118,6 +120,12 @@ public class Employee
     public List<ClockEvent> ClockEvents { get; set; }
     [OneToMany(nameof(Models.TagUse.TempTagRF_ID), nameof(Models.TagUse.TempTag), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<TagUse> TagUse { get; set; }
+    [OneToMany(nameof(PickEvent.OperatorID), nameof(PickEvent.Operator), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<PickEvent> PickEvents { get; set; }
+    [OneToMany(nameof(PickSession.OperatorID), nameof(PickSession.Operator), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<PickSession> PickSessions { get; set; }
+    [OneToMany(nameof(PickStatisticsByDay.OperatorID), nameof(PickStatisticsByDay.Operator), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<PickStatisticsByDay> PickStatistics { get; set; }
 
     [Ignore] public string FullName => $"{FirstName} {LastName}";
     [Ignore] public string ReportsToName => ReportsTo?.FullName ?? "";
@@ -134,6 +142,7 @@ public class Employee
         DisplayName = string.Empty;
         RF_ID = string.Empty;
         PC_ID = string.Empty;
+        DematicID = string.Empty;
         Location = string.Empty;
         DepartmentName = string.Empty;
         RoleName = string.Empty;
@@ -162,6 +171,9 @@ public class Employee
         EmployeeRosters = new List<EmployeeRoster>();
         ClockEvents = new List<ClockEvent>();
         TagUse = new List<TagUse>();
+        PickEvents = new List<PickEvent>();
+        PickSessions = new List<PickSession>();
+        PickStatistics = new List<PickStatisticsByDay>();
     }
 
     public Employee(int id) : this()

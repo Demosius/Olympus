@@ -123,6 +123,24 @@ public static class Constants
         { "Unit of Measure Code", -1 },
     };
 
+    public static readonly Dictionary<string, int> DematicPickEventColumns = new()
+    {
+        {"Timestamp", -1 },
+        {"Operator ID", -1 },
+        {"Operator Name", -1 },
+        {"Qty", -1 },
+        {"Container", -1 },
+        {"Tech Type", -1 },
+        {"Zone ID", -1 },
+        {"Wave ID", -1 },
+        {"Work Assignment", -1 },
+        {"Store", -1 },
+        {"Device ID", -1 },
+        {"SKU ID", -1 },
+        {"SKU Description", -1 },
+        {"Cluster Ref", -1 },
+    };
+
     public static readonly Dictionary<string, string> BinColumns = new()
     {
         { "location", "Location Code" },

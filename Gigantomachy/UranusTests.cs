@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Morpheus;
+using Uranus;
 using Uranus.Extensions;
 
 namespace Gigantomachy;
@@ -11,6 +13,30 @@ namespace Gigantomachy;
 [TestClass]
 public class UranusTests
 {
+    [TestMethod]
+    public void EventTracking()
+    {
+        var raw = General.ClipboardToString();
+
+        Assert.AreNotEqual("",raw);
+
+        var helios = new Helios("\\\\ausefpdfs01ns\\Shares\\Public\\DC_Data\\Olympus\\QA\\Sol");
+
+        /*
+        var lines = helios.StaffUpdater.UploadPickEvents(raw);
+
+        Assert.AreNotEqual(0, lines);*/
+
+        var stats = helios.StaffReader.PickStats(new DateTime(2020, 1, 1), DateTime.Today, true).ToList();
+        Assert.AreEqual(126, stats.Count);
+
+        var sessions = stats.SelectMany(s => s.PickSessions).ToList();
+        Assert.AreEqual(529, sessions.Count);
+
+        var events = stats.SelectMany(s => s.PickEvents).ToList();
+        Assert.AreEqual(64008, events.Count);
+    }
+
     [TestMethod]
     public void FiscalWeekTesting()
     {
@@ -29,7 +55,6 @@ public class UranusTests
             Console.WriteLine($"{date:d} = {date.FiscalWeek()}");
             date = date.AddDays(1);
         }
-
 
         // Assert
         Assert.AreEqual("Jan-Wk2", date1.FiscalWeek(), $"{date1} did not give the correct result.");

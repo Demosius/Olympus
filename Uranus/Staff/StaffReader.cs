@@ -53,10 +53,10 @@ public class StaffReader
         foreach (var employee in employees)
         {
             if (roleDict.TryGetValue(employee.RoleName, out var role)) role.AddEmployee(employee);
-            
+
             if (!employeeDict.TryGetValue(employee.ReportsToID, out var manager)) continue;
 
-            employee.ReportsTo= manager;
+            employee.ReportsTo = manager;
             manager.Reports.Add(employee);
         }
 
@@ -781,4 +781,121 @@ public class StaffReader
         });
         return id;
     }
+
+    /* Pick Event Tracking */
+    public IEnumerable<PickEvent> PickEvents(DateTime startDate, DateTime endDate, bool includeEmployees = false)
+    {
+        IEnumerable<PickEvent>? events = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            events = Chariot.PullObjectList<PickEvent>(e => e.Date >= startDate.Date && e.Date <= endDate.Date);
+
+            if (!includeEmployees) return;
+
+            var employees = Employees();
+            var empDict = employees.ToDictionary(e => e.ID, e => e);
+
+            // Get ID Mapping dictionary to use for reference between RF/Dematic ID to employee ID.
+            Dictionary<string, int> idDict = new();
+            foreach (var employee in employees)
+            {
+                if (employee.DematicID != string.Empty && employee.DematicID != "0000" &&
+                    !idDict.ContainsKey(employee.DematicID)) idDict.Add(employee.DematicID, employee.ID);
+                if (employee.RF_ID != string.Empty && !idDict.ContainsKey(employee.RF_ID))
+                    idDict.Add(employee.RF_ID, employee.ID);
+            }
+
+            // Assign actual OperatorID.
+            foreach (var pickEvent in events)
+            {
+                if (pickEvent.OperatorID == 0)
+                {
+                    if (idDict.TryGetValue(pickEvent.OperatorDematicID, out var id))
+                        pickEvent.OperatorID = id;
+                    else if (idDict.TryGetValue(pickEvent.OperatorRF_ID, out id))
+                        pickEvent.OperatorID = id;
+                }
+
+                if (!empDict.TryGetValue(pickEvent.OperatorID, out var employee)) continue;
+
+                employee.PickEvents.Add(pickEvent);
+                pickEvent.Operator = employee;
+            }
+
+        });
+        events ??= new List<PickEvent>();
+
+        return events;
+    }
+
+    public IEnumerable<PickEvent> PickEvents(DateTime date, bool includeEmployees = false) =>
+        PickEvents(date, date, includeEmployees);
+
+    public IEnumerable<PickSession> PickSessions(DateTime startDate, DateTime endDate, bool includeEmployees = false)
+    {
+        IEnumerable<PickSession>? sessions = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var events = PickEvents(startDate, endDate, includeEmployees);
+
+            sessions = Chariot.PullObjectList<PickSession>(s => s.Date >= startDate.Date && s.Date <= endDate.Date);
+            var sessionDict = sessions.ToDictionary(s => s.ID, s => s);
+
+            foreach (var pickEvent in events)
+            {
+                if (!sessionDict.TryGetValue(pickEvent.SessionID, out var session)) continue;
+
+                session.PickEvents.Add(pickEvent);
+                pickEvent.Session = session;
+
+                if (!includeEmployees) continue;
+
+                session.Operator = pickEvent.Operator;
+                session.Operator?.PickSessions.Add(session);
+            }
+
+        });
+
+        sessions ??= new List<PickSession>();
+
+        return sessions;
+    }
+
+    public IEnumerable<PickSession> PickSessions(DateTime date, bool includeEmployees = false) =>
+        PickSessions(date, date, includeEmployees);
+
+    public IEnumerable<PickStatisticsByDay> PickStats(DateTime startDate, DateTime endDate,
+        bool includeEmployees = false)
+    {
+        IEnumerable<PickStatisticsByDay>? stats = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            var sessions = PickSessions(startDate, endDate, includeEmployees);
+
+            stats = Chariot.PullObjectList<PickStatisticsByDay>(s => s.Date >= startDate.Date && s.Date <= endDate.Date);
+            var statDict = stats.ToDictionary(s => s.ID, s => s);
+
+            foreach (var pickSession in sessions)
+            {
+                if (!statDict.TryGetValue(pickSession.StatsID, out var statistics)) continue;
+
+                statistics.AddSession(pickSession);
+
+                if (!includeEmployees) continue;
+
+                statistics.Operator = pickSession.Operator;
+                statistics.Operator?.PickStatistics.Add(statistics);
+            }
+        });
+
+        stats ??= new List<PickStatisticsByDay>();
+
+        return stats;
+    }
+
+    public IEnumerable<PickStatisticsByDay> PickStats(DateTime date, bool includeEmployees = false) =>
+        PickStats(date, date, includeEmployees);
 }

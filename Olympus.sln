@@ -39,6 +39,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hades", "Hades\Hades.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Panacea", "Panacea\Panacea.csproj", "{B2D1BFA4-0C8F-49A4-A1B5-59C6773B8922}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Quest", "Quest\Quest.csproj", "{347B55CE-8156-484E-BE2B-4400C4D71BF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		ClockDebug|Any CPU = ClockDebug|Any CPU
@@ -154,6 +156,12 @@ Global
 		{B2D1BFA4-0C8F-49A4-A1B5-59C6773B8922}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2D1BFA4-0C8F-49A4-A1B5-59C6773B8922}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2D1BFA4-0C8F-49A4-A1B5-59C6773B8922}.Release|Any CPU.Build.0 = Release|Any CPU
+		{347B55CE-8156-484E-BE2B-4400C4D71BF2}.ClockDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{347B55CE-8156-484E-BE2B-4400C4D71BF2}.ClockDebug|Any CPU.Build.0 = Debug|Any CPU
+		{347B55CE-8156-484E-BE2B-4400C4D71BF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{347B55CE-8156-484E-BE2B-4400C4D71BF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{347B55CE-8156-484E-BE2B-4400C4D71BF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{347B55CE-8156-484E-BE2B-4400C4D71BF2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

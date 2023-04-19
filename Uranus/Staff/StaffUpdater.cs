@@ -335,6 +335,72 @@ public class StaffUpdater
 
     public int ShiftRuleRoster(ShiftRuleRoster shiftRule) => Chariot.Update(shiftRule);
 
+    /* Pick Event Tracking */
+
+    /// <summary>
+    /// Takes data (in theory) fresh from the clipboard, converts it to pick events (if possible), and updates as appropriate the
+    /// relevant Pick Events, Pick Sessions, and PickStatisticsByDate.
+    /// </summary>
+    /// <returns>Number of impacted lines in the database.</returns>
+    public int UploadPickEvents(string rawClipboardData, TimeSpan? breakSpan = null)
+    {
+        // Convert to base pick events.
+        var pickEvents = DataConversion.RawStringToPickEvents(rawClipboardData);
+        var lines = 0;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            // get relevant dates.
+            var dates = pickEvents.Select(e => e.Date).Distinct().ToList();
+
+            // Get existing pick events within the same dates.
+            var existingEvents = Chariot.PullObjectList<PickEvent>(e => dates.Contains(e.Date));
+
+            // Merge existing with new.
+            var allEvents = existingEvents.Concat(pickEvents).Distinct().ToList();
+
+            // Get ID reference dictionary.
+            var idDict = new Dictionary<string, int>();
+            foreach (var employee in Chariot.PullObjectList<Employee>())
+            {
+                if (employee.DematicID != string.Empty && employee.DematicID != "0000" && !idDict.ContainsKey(employee.DematicID)) idDict.Add(employee.DematicID, employee.ID);
+                if (employee.RF_ID != string.Empty && !idDict.ContainsKey(employee.RF_ID)) idDict.Add(employee.RF_ID, employee.ID);
+            }
+
+            // Assign actual OperatorID.
+            foreach (var pickEvent in allEvents.Where(e => e.OperatorID == 0))
+            {
+                if (idDict.TryGetValue(pickEvent.OperatorDematicID, out var id))
+                    pickEvent.OperatorID = id;
+                else if (idDict.TryGetValue(pickEvent.OperatorRF_ID, out id))
+                    pickEvent.OperatorID = id;
+            }
+
+            // Generate sessions.
+            var sessionDict = PickSession.GeneratePickSessions(allEvents, breakSpan);
+            var sessions = sessionDict.Values.SelectMany(v => v).ToList();
+
+            // Generate PickStat objects.
+            var pickStats = sessionDict.Select(dictItem => new PickStatisticsByDay(dictItem.Key.Item1, dictItem.Key.Item2, dictItem.Value)).ToList();
+
+            // Remove existing database lines that may cause conflicts (they have been pulled out, so we should never lose any).
+            // TODO: Figure out how to implement query using 'IN' - requiring to pre-convert to SQLite style dateTime?
+            foreach (var date in dates)
+            {
+                lines += Chariot.Database!.ExecuteScalar<int>("DELETE FROM PickEvent WHERE Date = ?;", date);
+                lines += Chariot.Database.ExecuteScalar<int>("DELETE FROM PickSession WHERE Date = ?;", date);
+                lines += Chariot.Database.ExecuteScalar<int>("DELETE FROM PickStatisticsByDay WHERE Date = ?;", date);
+            }
+
+            // Enter new lines as appropriate.
+            lines += Chariot.InsertIntoTable(allEvents);
+            lines += Chariot.InsertIntoTable(sessions);
+            lines += Chariot.InsertIntoTable(pickStats);
+        });
+
+        return lines;
+    }
+
     /* Temp Tags */
     public int AssignTempTag(TempTag tag, Employee employee)
     {
@@ -360,17 +426,17 @@ public class StaffUpdater
             lines += Chariot.InsertOrUpdate(tag);
             lines += Chariot.InsertOrUpdate(employee);
         });
-        
+
         return lines;
     }
-    
+
     public int UnassignTempTag(TempTag tempTag)
     {
         var employeeID = tempTag.EmployeeID;
         if (employeeID == 0) return 0;
 
         tempTag.Unassign();
-        
+
         var lines = 0;
         Chariot.Database?.RunInTransaction(() =>
         {

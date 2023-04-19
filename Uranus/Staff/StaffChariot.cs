@@ -24,7 +24,8 @@ public class StaffChariot : MasterChariot
         typeof(TempTag),                    typeof(Vehicle),            typeof(Break),                      typeof(Project),
         typeof(ProjectIcon),                typeof(Role),
         typeof(Roster),                     typeof(DepartmentRoster),   typeof(EmployeeRoster),             typeof(DailyRoster),
-        typeof(DailyShiftCounter),          typeof(WeeklyShiftCounter)
+        typeof(DailyShiftCounter),          typeof(WeeklyShiftCounter),
+        typeof(PickEvent),                  typeof(PickSession),        typeof(PickStatisticsByDay)
     };
 
     /*************************** Constructors ****************************/
