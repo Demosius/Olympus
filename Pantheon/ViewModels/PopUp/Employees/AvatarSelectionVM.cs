@@ -1,13 +1,12 @@
 ﻿using Microsoft.Win32;
 using Pantheon.ViewModels.Commands.Employees;
-using Pantheon.ViewModels.Interface;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Pantheon.Annotations;
 using Pantheon.ViewModels.Controls.Employees;
+using Pantheon.ViewModels.Interfaces;
 using Uranus;
 using Uranus.Staff.Models;
 

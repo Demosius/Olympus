@@ -4,9 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Employees"
-             xmlns:converter="clr-namespace:Pantheon.ViewModels.Converter"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:model="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
+             xmlns:converters="clr-namespace:Pantheon.ViewModels.Converters"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance {x:Type vm:EmployeeVM}, IsDesignTimeCreatable=False}">
 
@@ -15,7 +15,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Master/MSControls.Core.Implicit.xaml" />
                 <ResourceDictionary>
-                    <converter:UserToColourConverter x:Key="UserToColourConverter"/>
+                    <converters:UserToColourConverter x:Key="UserToColourConverter"/>
                     <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
                     <ObjectDataProvider x:Key="EmploymentTypes"
                             MethodName="GetValues" 
@@ -24,7 +24,7 @@
                             <x:Type TypeName="model:EEmploymentType"/>
                         </ObjectDataProvider.MethodParameters>
                     </ObjectDataProvider>
-                    <converter:EmploymentToStringConverter x:Key="EmploymentTypeConverter"/>
+                    <converters:EmploymentToStringConverter x:Key="EmploymentTypeConverter"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

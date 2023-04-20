@@ -1,0 +1,119 @@
+﻿<Window x:Class="Olympus.Views.Windows.BinContentsUpdaterWindow"
+        Name="BCUpdateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Olympus.ViewModels.Windows"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type vm:BinContentsUpdaterVM}, IsDesignTimeCreatable=False}"
+        Background="{StaticResource  RedGradient}"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="WidthAndHeight">
+
+    <DockPanel>
+        <!-- Basic Options -->
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0"
+                    Width="150"
+                    Name="ClearNoneButton"
+                    Content="Standard Upload"
+                    Click="ClearNoneButton_OnClick"
+                    ToolTip="Override existing data that match zones included in the new data, leaving the rest under the assumption that those zones simply weren't included in the data copy."/>
+            <Button Grid.Column="1"
+                    Width="150"
+                    Name="ClearAllButton"
+                    Content="Complete Overwrite"
+                    Click="ClearAllButton_OnClick"
+                    ToolTip="Completely replace any current data with the new data - making the assumption that all relevant data has been included in the new."/>
+        </Grid>
+        <Separator DockPanel.Dock="Top"
+                   Margin="5"
+                   Foreground="{StaticResource ForeGradient}"/>
+
+        <Expander ExpandDirection="Down">
+            <Expander.Header>
+                <Label DockPanel.Dock="Top"
+               Content="Manage Zones"
+               HorizontalAlignment="Center"
+               Margin="0"/>
+            </Expander.Header>
+            <DockPanel>
+                <Grid DockPanel.Dock="Top"
+              Margin="4,0,4,5">
+                    <TextBlock TextWrapping="Wrap"
+                       HorizontalAlignment="Center"
+                       Foreground="{StaticResource ForeGradient}"
+                       FontSize="11"
+                       Width="300">
+                The following are zones not included in the given data. Select existing zones that are to be removed from the database.
+                    </TextBlock>
+                </Grid>
+
+                <StackPanel DockPanel.Dock="Top" 
+                    Orientation="Horizontal">
+                    <Button Content="Select All"
+                    Command="{Binding SelectAllCommand}"
+                    ToolTip="Select ALL zones (whether shown or hidden)."/>
+                    <Button Content="Deselect All"
+                    Command="{Binding DeselectAllCommand}"
+                    ToolTip="Deselect ALL zones (whether shown or hidden)."/>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Top" 
+                    Orientation="Horizontal">
+                    <TextBox MinWidth="100" 
+                     Margin="5"
+                     Text="{Binding FilterString}"/>
+                    <Button Content="All"
+                    Command="{Binding SelectFilteredCommand}"
+                    ToolTip="Select all displayed zones."/>
+                    <Button Content="None"
+                    Command="{Binding DeselectFilteredCommand}"
+                    ToolTip="Deselect all displayed zones."/>
+                    <Button Content="Only Shown"
+                    Command="{Binding SelectFilteredExclusiveCommand}"
+                    ToolTip="Select all displayed zones, and deselect all else."/>
+                </StackPanel>
+
+                <ListView DockPanel.Dock="Top"
+                  ItemsSource="{Binding Zones}"
+                  d:ItemsSource="{d:SampleData ItemCount=5}"
+                  Margin="5"
+                  Height="300"
+                  Background="{StaticResource SolidBackDark}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <CheckBox Grid.Column="0"
+                                  IsChecked="{Binding Selected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                <Label Grid.Column="1" Content="{Binding Name}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+
+                </ListView>
+
+                <!-- Confirm Selection -->
+                <Grid DockPanel.Dock="Bottom">
+                    <Button VerticalAlignment="Center"
+                    HorizontalAlignment="Right"
+                    Content="Confirm"
+                    Width="120"
+                    Command="{Binding ConfirmAndCloseCommand}"
+                    CommandParameter="{Binding ElementName=BCUpdateWindow}"/>
+                </Grid>
+            </DockPanel>
+        </Expander>
+
+    </DockPanel>
+</Window>

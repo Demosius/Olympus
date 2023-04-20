@@ -6,7 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using Pantheon.ViewModels.Controls.Rosters;
-using Pantheon.ViewModels.Converter;
+using Pantheon.ViewModels.Converters;
 
 namespace Pantheon.Views.Controls.Rosters;
 

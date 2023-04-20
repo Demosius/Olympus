@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using Pantheon.Annotations;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Controls.TempTags;

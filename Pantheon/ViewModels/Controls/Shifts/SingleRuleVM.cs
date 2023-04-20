@@ -1,8 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Pantheon.Annotations;
-using Pantheon.ViewModels.Interface;
+using Pantheon.ViewModels.Interfaces;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Controls.Shifts;

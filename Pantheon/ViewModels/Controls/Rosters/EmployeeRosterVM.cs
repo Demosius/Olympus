@@ -6,7 +6,6 @@ using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using Pantheon.Annotations;
 using Pantheon.ViewModels.Commands.Rosters;
 using Uranus.Staff.Models;
 
