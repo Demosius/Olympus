@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows.Input;
 using Pantheon.ViewModels.Controls.Employees;
-using Pantheon.ViewModels.Pages;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
