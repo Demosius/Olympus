@@ -2,7 +2,6 @@
 using Prometheus.ViewModels.PopUp.Users;
 using Styx;
 using Uranus;
-using Uranus.Users.Models;
 
 namespace Prometheus.Views.PopUp.Users;
 

@@ -10,7 +10,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
-using Pantheon.Annotations;
 using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.Views.PopUp.Employees;
 using Styx;

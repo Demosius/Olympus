@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Rosters"
              xmlns:rosters="clr-namespace:Pantheon.Views.Controls.Rosters"
-             xmlns:converter="clr-namespace:Pantheon.ViewModels.Converter"
+             xmlns:converters="clr-namespace:Pantheon.ViewModels.Converters"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:DepartmentRosterVM}, IsDesignTimeCreatable=False}">
 
@@ -15,7 +15,7 @@
                 <ResourceDictionary>
 
                     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-                    <converter:BoolToColourConverter x:Key="BoolToColourConverter"/>
+                    <converters:BoolToColourConverter x:Key="BoolToColourConverter"/>
 
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>

@@ -7,6 +7,9 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
+using Olympus.ViewModels.Windows;
+using Olympus.Views.Windows;
+using Serilog;
 using Uranus;
 using Uranus.Inventory;
 using Uranus.Inventory.Models;
@@ -140,12 +143,33 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
 
     public void UpdateStock()
     {
-
-        Mouse.OverrideCursor = Cursors.Wait;
-
+        BinContentsUpdaterWindow? window = null;
         try
         {
-            if (App.Helios.InventoryUpdater.NAVStock(DataConversion.NAVRawStringToStock(General.ClipboardToString())))
+            Mouse.OverrideCursor = Cursors.Wait;
+
+            var newStock = DataConversion.NAVRawStringToStock(General.ClipboardToString());
+
+            var vm = new BinContentsUpdaterVM(App.Helios, newStock);
+
+            // Check that there are any zones to consider.
+            int lines;
+            if (vm.ZonesMissing)
+            {
+                window = new BinContentsUpdaterWindow(vm);
+
+                Mouse.OverrideCursor = Cursors.Arrow;
+
+                if (window.ShowDialog() != true) return;
+                lines = window.UploadedLines;
+            }
+            else
+            {
+                lines = App.Helios.InventoryUpdater.NAVStock(newStock);
+                Mouse.OverrideCursor = Cursors.Arrow;
+            }
+
+            if (lines > 0)
             {
                 GetUpdateTimes();
                 MessageBox.Show("Update successful.", "Success", MessageBoxButton.OK);
@@ -162,7 +186,9 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
                 $"\t{ex.Message}\n\n" +
                 "Please notify Olympus Development when possible.",
                 "Unexpected Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            Log.Error(ex, "Occurred when uploading Bin Contents data.");
         }
+        window?.Close();
 
         Mouse.OverrideCursor = Cursors.Arrow;
     }

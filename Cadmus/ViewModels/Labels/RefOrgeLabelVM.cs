@@ -12,7 +12,6 @@ using System.Windows.Media.Imaging;
 using Cadmus.Annotations;
 using Cadmus.Interfaces;
 using Cadmus.Views.Labels;
-using iText.Layout.Renderer;
 using Image = System.Drawing.Image;
 using Point = System.Drawing.Point;
 using Size = System.Windows.Size;
