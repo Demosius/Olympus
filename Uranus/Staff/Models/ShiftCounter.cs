@@ -1,9 +1,6 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
 using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using Uranus.Annotations;
 
 namespace Uranus.Staff.Models;
 

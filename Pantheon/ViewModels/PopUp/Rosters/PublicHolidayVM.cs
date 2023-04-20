@@ -3,7 +3,6 @@ using Pantheon.ViewModels.Commands.Rosters;
 using Pantheon.ViewModels.Controls.Rosters;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Pantheon.Annotations;
 
 namespace Pantheon.ViewModels.PopUp.Rosters;
 

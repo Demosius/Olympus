@@ -1,5 +1,4 @@
-﻿using SQLite;
-using SQLiteNetExtensions.Attributes;
+﻿using SQLiteNetExtensions.Attributes;
 using System;
 
 namespace Uranus.Staff.Models;

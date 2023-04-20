@@ -6,7 +6,7 @@
              xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Shifts"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:model="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
-             xmlns:converter="clr-namespace:Pantheon.ViewModels.Converter"
+             xmlns:converters="clr-namespace:Pantheon.ViewModels.Converters"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:RosterRuleVM}, IsDesignTimeCreatable=False}">
     
@@ -19,7 +19,7 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <converter:NBoolToAttendanceStringConverter x:Key="AttendanceStringConverter"/>
+        <converters:NBoolToAttendanceStringConverter x:Key="AttendanceStringConverter"/>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>

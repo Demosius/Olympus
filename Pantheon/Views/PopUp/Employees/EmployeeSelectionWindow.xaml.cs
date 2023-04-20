@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Documents;
 using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.ViewModels.PopUp.Employees;
-using Styx;
-using Uranus;
 
 namespace Pantheon.Views.PopUp.Employees
 {

@@ -1,18 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Drawing.Printing;
-using System.IO;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Cadmus.ViewModels.Controls;
 using Cadmus.ViewModels.Labels;
 using Uranus;
-using Point = System.Windows.Point;
 
 // ReSharper disable StringLiteralTypo
 

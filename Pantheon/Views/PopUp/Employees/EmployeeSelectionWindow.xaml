@@ -113,7 +113,7 @@
                             Command="{Binding SelectAllCommand}"/>
                     <Button Grid.Column="1"
                             Content="De-Select All"
-                            Command="{Binding DeSelectCommand}"/>
+                            Command="{Binding DeselectAllCommand}"/>
                 </Grid>
 
                 <!-- List -->

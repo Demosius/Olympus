@@ -10,8 +10,6 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using iText.StyledXmlParser.Jsoup.Select;
-using Pantheon.Annotations;
 using Pantheon.ViewModels.Controls.Employees;
 using Uranus;
 using Uranus.Commands;

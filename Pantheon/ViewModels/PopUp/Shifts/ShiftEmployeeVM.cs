@@ -6,7 +6,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using Pantheon.Annotations;
 using Pantheon.ViewModels.Controls.Shifts;
 using Uranus;
 using Uranus.Staff.Models;

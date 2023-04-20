@@ -5,9 +5,9 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:sys="clr-namespace:System;assembly=System.Runtime"
       xmlns:model="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
-      xmlns:converter="clr-namespace:Pantheon.ViewModels.Converter"
       xmlns:pages="clr-namespace:Pantheon.ViewModels.Pages"
       xmlns:controls="clr-namespace:Pantheon.Views.Controls.Employees"
+      xmlns:converters="clr-namespace:Pantheon.ViewModels.Converters"
       mc:Ignorable="d" 
       d:DataContext="{d:DesignInstance {x:Type pages:EmployeePageVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="1080" d:DesignWidth="1200"
@@ -24,7 +24,7 @@
 
     <DockPanel>
         <DockPanel.Resources>
-            <converter:EmploymentToStringConverter x:Key="EmploymentTypeConverter"/>
+            <converters:EmploymentToStringConverter x:Key="EmploymentTypeConverter"/>
             <ObjectDataProvider x:Key="EmploymentTypes"
                                 MethodName="GetValues" 
                                 ObjectType="{x:Type sys:Enum}">
@@ -40,7 +40,7 @@
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
             <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
-            <converter:AsyncImageConverter x:Key="AsyncImageConverter"/>
+            <converters:AsyncImageConverter x:Key="AsyncImageConverter"/>
         </DockPanel.Resources>
 
         <ToolBarTray DockPanel.Dock="Top">
