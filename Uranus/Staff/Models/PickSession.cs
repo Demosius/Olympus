@@ -12,7 +12,8 @@ namespace Uranus.Staff.Models;
 /// </summary>
 public class PickSession
 {
-    public static TimeSpan BreakSpan => new(0, 10, 0);
+    public static TimeSpan PTLBreakSpan => new(0, 2, 0);
+    public static TimeSpan RFTBreakSpan => new(0, 5, 0);
 
     [PrimaryKey] public string ID { get; set; } // Example: 6118.2022.11.23.23.09.03 ([OperatorID].[Year].[Month].[Day].[Hour].[Minute].[Second] - Where time based on initial pick even in session.) 
     public string StartTimeStamp { get; set; }
@@ -108,9 +109,10 @@ public class PickSession
     public static string GetSessionID(string dematicID, DateTime dateTime) => $"{dematicID}.{dateTime:yyyy.MM.dd.hh.mm.ss}";
 
     public static Dictionary<(string, DateTime), List<PickSession>> GeneratePickSessions(
-        IEnumerable<PickEvent> pickEvents, TimeSpan? breakSpan = null)
+        IEnumerable<PickEvent> pickEvents, TimeSpan? ptlBreak = null, TimeSpan? rftBreak = null)
     {
-        breakSpan ??= BreakSpan;
+        ptlBreak ??= PTLBreakSpan;
+        rftBreak ??= RFTBreakSpan;
 
         var orderedEvents = pickEvents.OrderBy(e => e.DateTime);
         var eventDict = orderedEvents.GroupBy(e => (e.OperatorDematicID, e.Date))
@@ -134,7 +136,8 @@ public class PickSession
                 // Session over if: There is no more events; Tech Type changes; time between events passes break span.
                 if (nextEvent is null ||
                     pickEvent.TechType != nextEvent.TechType ||
-                    nextEvent.DateTime.Subtract(pickEvent.DateTime) >= breakSpan)
+                    (pickEvent.TechType == ETechType.PTL && nextEvent.DateTime.Subtract(pickEvent.DateTime) >= ptlBreak) ||
+                    (pickEvent.TechType == ETechType.RFT && nextEvent.DateTime.Subtract(pickEvent.DateTime) >= rftBreak))
                 {
                     var session = new PickSession(sessionEvents);
                     sessionEvents.Clear();
