@@ -4,16 +4,14 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using Pantheon.Annotations;
-using Pantheon.ViewModels.Commands.Generic;
+using Morpheus.ViewModels.Commands;
+using Morpheus.ViewModels.Interfaces;
 using Pantheon.ViewModels.Controls.Employees;
-using Pantheon.ViewModels.Interface;
 using Uranus.Commands;
-using Uranus.Interfaces;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
-public class EmployeeSelectionVM : INotifyPropertyChanged, IFilters, ISelector, IMultiSelect
+public class EmployeeSelectionVM : INotifyPropertyChanged, ISelector, IMultiSelect
 {
     private const string MANAGER_SELECTION = "Manager Selection";
     private const string EMPLOYEE_SELECTION = "Employee Selection";
@@ -97,7 +95,10 @@ public class EmployeeSelectionVM : INotifyPropertyChanged, IFilters, ISelector, 
     public DeleteCommand DeleteCommand { get; set; }
     public ConfirmSelectionCommand ConfirmSelectionCommand { get; set; }
     public SelectAllCommand SelectAllCommand { get; set; }
-    public DeSelectCommand DeSelectCommand { get; set; }
+    public DeselectAllCommand DeselectAllCommand { get; set; }
+    public SelectFilteredCommand SelectFilteredCommand { get; set; }
+    public DeselectFilteredCommand DeselectFilteredCommand { get; set; }
+    public SelectFilteredExclusiveCommand SelectFilteredExclusiveCommand { get; set; }
 
     #endregion
 
@@ -132,7 +133,10 @@ public class EmployeeSelectionVM : INotifyPropertyChanged, IFilters, ISelector, 
         DeleteCommand  = new DeleteCommand(this);
         ConfirmSelectionCommand = new ConfirmSelectionCommand(this);
         SelectAllCommand = new SelectAllCommand(this);
-        DeSelectCommand = new DeSelectCommand(this);
+        DeselectAllCommand = new DeselectAllCommand(this);
+        SelectFilteredCommand = new SelectFilteredCommand(this);
+        DeselectFilteredCommand = new DeselectFilteredCommand(this);
+        SelectFilteredExclusiveCommand = new SelectFilteredExclusiveCommand(this);
 
         ApplyFilters();
     }
@@ -168,10 +172,22 @@ public class EmployeeSelectionVM : INotifyPropertyChanged, IFilters, ISelector, 
             employee.IsSelected = true;
     }
 
-    public void DeSelect()
+    public void DeselectAll()
     {
         foreach (var employee in Employees)
             employee.IsSelected = false;
+    }
+
+    public void SelectFiltered() => SelectAll();
+
+    public void DeselectFiltered() => DeselectAll();
+
+    public void SelectFilteredExclusive()
+    {
+        foreach (var employeeVM in FullEmployeeList)
+            employeeVM.IsSelected = false;
+        foreach (var employeeVM in Employees)
+            employeeVM.IsSelected = true;
     }
 
     public void Create() { }

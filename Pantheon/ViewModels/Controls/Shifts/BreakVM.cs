@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Morpheus.Views.Windows;
-using Pantheon.Annotations;
 using Pantheon.ViewModels.Commands.Shifts;
 using Styx;
 using Uranus;

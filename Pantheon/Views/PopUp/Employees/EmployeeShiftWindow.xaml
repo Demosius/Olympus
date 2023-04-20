@@ -4,9 +4,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:converter="clr-namespace:Pantheon.ViewModels.Converter"
         xmlns:vm="clr-namespace:Pantheon.ViewModels.PopUp.Employees"
         xmlns:controls="clr-namespace:Pantheon.Views.Controls.Shifts"
+        xmlns:converters="clr-namespace:Pantheon.ViewModels.Converters"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance {x:Type vm:EmployeeShiftVM}, IsDesignTimeCreatable=False}"
         Title="Shift Management" 
@@ -52,7 +52,7 @@
                 <Setter Property="Margin" Value="5" />
             </Style>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-            <converter:EditBoolToLabelConverter x:Key="EditBoolConverter"/>
+            <converters:EditBoolToLabelConverter x:Key="EditBoolConverter"/>
         </StackPanel.Resources>
 
         <!--Shift Eligibility -->

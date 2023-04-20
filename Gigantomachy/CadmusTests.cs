@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Drawing.Drawing2D;
+﻿using System.Data;
 using System.Linq;
 using Cadmus.Helpers;
 using Cadmus.Models;

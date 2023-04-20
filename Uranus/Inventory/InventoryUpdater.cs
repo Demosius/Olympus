@@ -51,16 +51,44 @@ public class InventoryUpdater
         return true;
     }
 
-    public bool NAVStock(List<NAVStock> stock)
+    public int NAVStock(List<NAVStock> stock)
     {
-        if (stock.Count == 0) return false;
-        // Remove from stock table anything with zones equal to what is being put in.
-        Chariot.StockZoneDeletes(stock.Select(s => s.ZoneID).Distinct().ToList());
-        if (Chariot.InsertIntoTable(stock) <= 0) return false;
+        if (stock.Count == 0) return 0;
 
-        _ = Chariot.SetTableUpdateTime(typeof(NAVStock));
-        _ = Chariot.SetStockUpdateTimes(stock);
-        return true;
+        var lines = 0;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            // Remove from stock table anything with zones equal to what is being put in.
+            lines += Chariot.StockZoneDeletes(stock.Select(s => s.ZoneID).Distinct().ToList());
+            lines += Chariot.InsertIntoTable(stock);
+
+            lines += Chariot.SetTableUpdateTime(typeof(NAVStock));
+            lines += Chariot.SetStockUpdateTimes(stock);
+        });
+
+        return lines;
+    }
+
+    public int NAVStock(List<NAVStock> newStock, List<string> zonesToRemove)
+    {
+        if (newStock.Count == 0) return 0;
+
+        zonesToRemove.AddRange(newStock.Select(s => s.ZoneID).Distinct());
+        var lines = 0;
+
+        /*Chariot.Database?.RunInTransaction(() =>
+        {*/
+            // Remove from stock table anything with zones equal to what is being put in.
+            lines += Chariot.StockZoneDeletes(zonesToRemove);
+
+            lines += Chariot.InsertIntoTable(newStock);
+
+            lines += Chariot.SetTableUpdateTime(typeof(NAVStock));
+            lines += Chariot.SetStockUpdateTimes(newStock);
+        /*});*/
+
+        return lines;
     }
 
     public int NAVZones(List<NAVZone> zones) => Chariot.UpdateTable(zones);

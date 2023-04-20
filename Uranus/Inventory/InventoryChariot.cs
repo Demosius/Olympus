@@ -50,30 +50,27 @@ public sealed class InventoryChariot : MasterChariot
     /***************************** CREATE Data ****************************/
 
     /*                             Update Times                           */
-    public bool SetStockUpdateTimes(List<NAVStock> stock)
+    public int SetStockUpdateTimes(List<NAVStock> stock)
     {
         var dateTime = DateTime.Now;
         // Convert stock to list of BCUpdate items.
-        var distinctStockByZone = stock.GroupBy(s => s.ZoneID).Select(g => g.First()).ToList();
-        List<BinContentsUpdate> contentsUpdates = new();
-        foreach (var s in distinctStockByZone)
-        {
-            contentsUpdates.Add(new BinContentsUpdate
-            {
-                ZoneID = s.ZoneID,
-                ZoneCode = s.ZoneCode,
-                LocationCode = s.LocationCode,
-                LastUpdate = dateTime
-            });
-        }
+        var distinctStockByZone = stock.GroupBy(s => s.ZoneID).Select(g => g.First());
+        var contentsUpdates = distinctStockByZone
+            .Select(
+                s => new BinContentsUpdate
+                {
+                    ZoneID = s.ZoneID, 
+                    ZoneCode = s.ZoneCode, 
+                    LocationCode = s.LocationCode, 
+                    LastUpdate = dateTime
+                })
+            .ToList();
 
         // Update Database
-        _ = UpdateTable(contentsUpdates);
-
-        return true;
+        return UpdateTable(contentsUpdates);
     }
 
-    public bool SetTableUpdateTime(Type type, DateTime dateTime = new())
+    public int SetTableUpdateTime(Type type, DateTime dateTime = new())
     {
         if (dateTime == new DateTime()) dateTime = DateTime.Now;
         TableUpdate update = new()
@@ -81,8 +78,8 @@ public sealed class InventoryChariot : MasterChariot
             TableName = Database?.GetMapping(type).TableName ?? type.ToString(),
             LastUpdate = dateTime
         };
-        _ = Database?.InsertOrReplace(update);
-        return true;
+
+        return Database?.InsertOrReplace(update) ?? 0;
     }
 
     /***************************** READ Data ******************************/
@@ -92,16 +89,17 @@ public sealed class InventoryChariot : MasterChariot
     /***************************** DELETE Data ****************************/
     /* Stock */
     // Used by more than just deleter.
-    public void StockZoneDeletes(List<string> zoneIDs)
+    public int StockZoneDeletes(List<string> zoneIDs)
     {
-        Database?.RunInTransaction(() =>
-        {
-            foreach (var zoneID in zoneIDs)
-            {
-                var tableName = GetTableName(typeof(NAVStock));
-                _ = Database.Execute($"DELETE FROM [{tableName}] WHERE [ZoneID]=?;", zoneID);
-            }
-        });
+        var lines = 0;
+
+        if (Database is null) return 0;
+
+        var tableName = GetTableName(typeof(NAVStock));
+        var zoneString = string.Join("','", zoneIDs);
+        lines += Database.Execute($"DELETE FROM [{tableName}] WHERE [ZoneID] IN ('{zoneString}');");
+        
+        return lines;
     }
 
     /* UOM */
