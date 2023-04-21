@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
+using Uranus.Annotations;
 
 namespace Uranus.Staff.Models;
 
@@ -45,6 +46,8 @@ public class PickSession
 
     [OneToMany(nameof(PickEvent.SessionID), nameof(PickEvent.Session), CascadeOperations = CascadeOperation.CascadeRead)]
     public List<PickEvent> PickEvents { get; set; }
+    [OneToMany(nameof(MissPick.PickSessionID), nameof(MissPick.PickSession), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<MissPick> MissPicks { get; set; }
 
     [Ignore] public int Hits => EventCount;
 
@@ -61,6 +64,7 @@ public class PickSession
         StatsID = string.Empty;
 
         PickEvents = new List<PickEvent>();
+        MissPicks = new List<MissPick>();
     }
 
     // Assume all given events do indeed form a valid pick session, and are in the correct order.
@@ -104,6 +108,26 @@ public class PickSession
             pickEvent.Session = this;
             pickEvent.StatsID = StatsID;
         }
+
+        MissPicks = new List<MissPick>();
+        foreach (var missPick in PickEvents.Select(e => e.MissPick))
+        {
+            if (missPick is null) continue;
+
+            MissPicks.Add(missPick);
+            missPick.PickSessionID = ID;
+            missPick.PickSession = this;
+        }
+    }
+
+    public void AssignMissPick(MissPick missPick)
+    {
+        MissPicks.Add(missPick);
+
+        missPick.PickSessionID = ID;
+        missPick.PickSession = this;
+
+        PickStats?.AssignMissPick(missPick);
     }
 
     public static string GetSessionID(string dematicID, DateTime dateTime) => $"{dematicID}.{dateTime:yyyy.MM.dd.hh.mm.ss}";
@@ -146,7 +170,6 @@ public class PickSession
 
                 i++;
             }
-
         }
 
         return returnDict;

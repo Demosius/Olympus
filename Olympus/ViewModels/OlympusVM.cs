@@ -139,6 +139,7 @@ public class OlympusVM : INotifyPropertyChanged
             new Project(EProject.Hades, "Hades.ico", App.Helios.StaffReader, "N.I.M.S. - Non-Inventory Management System"),
             new Project(EProject.Panacea, "Panacea.ico", App.Helios.StaffReader, "ALLFIX: Multiple tools to remedy many given issues."),
             new Project(EProject.Quest, "quest.ico", App.Helios.StaffReader, "Manage Restock Staff assignment and tracking. (ZLAM & PickRate Tracker)"),
+            new Project(EProject.Deimos, "deimos.ico", App.Helios.StaffReader, "PickRate tracking and error allocation. (Dredd)"),
         };
 
         App.Helios.StaffCreator.EstablishInitialProjects(projects);

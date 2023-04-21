@@ -342,10 +342,17 @@ public class StaffUpdater
     /// relevant Pick Events, Pick Sessions, and PickStatisticsByDate.
     /// </summary>
     /// <returns>Number of impacted lines in the database.</returns>
-    public int UploadPickEvents(string rawClipboardData, TimeSpan? breakSpan = null)
+    public int UploadPickEvents(string rawData, TimeSpan? ptlBreak = null, TimeSpan? rftBreak = null) =>
+        UploadPickEvents(DataConversion.RawStringToPickEvents(rawData), ptlBreak, rftBreak);
+    
+
+    /// <summary>
+    /// Updates pick events with new given list of events.
+    /// </summary>
+    /// <returns>Number of impacted lines in the database.</returns>
+    public int UploadPickEvents(List<PickEvent> pickEvents, TimeSpan? ptlBreak = null, TimeSpan? rftBreak = null)
     {
-        // Convert to base pick events.
-        var pickEvents = DataConversion.RawStringToPickEvents(rawClipboardData);
+        if (!pickEvents.Any()) return 0;
         var lines = 0;
 
         Chariot.Database?.RunInTransaction(() =>
@@ -377,7 +384,7 @@ public class StaffUpdater
             }
 
             // Generate sessions.
-            var sessionDict = PickSession.GeneratePickSessions(allEvents, breakSpan);
+            var sessionDict = PickSession.GeneratePickSessions(allEvents, ptlBreak, rftBreak);
             var sessions = sessionDict.Values.SelectMany(v => v).ToList();
 
             // Generate PickStat objects.

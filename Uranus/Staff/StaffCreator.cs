@@ -208,4 +208,32 @@ public class StaffCreator
     public int ShiftRuleRosters(IEnumerable<ShiftRuleRoster> rosterRules) => Chariot.InsertIntoTable(rosterRules);
 
     public bool TempTag(TempTag newTag, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(newTag, pushType);
+
+    /* Miss Pick Data */
+    public int UploadMissPickData(string rawData) =>
+        UploadMissPickData(DataConversion.RawStringToMissPicks(rawData));
+
+    public int UploadMissPickData(List<MissPick> missPicks)
+    {
+        if (!missPicks.Any()) return 0;
+        var lines = 0;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            // Figure out what data, if any, already exists within the data base.
+            // What is the date range?
+            var dates = missPicks.Select(mp => mp.ShipmentDate).ToList();
+            var startDate = dates.Min();
+            var endDate = dates.Max();
+            var existingData = Chariot
+                .PullObjectList<MissPick>(mp => mp.ShipmentDate >= startDate && mp.ShipmentDate <= endDate)
+                .ToDictionary(mp => mp.ID, mp => mp);
+
+            var newLines = missPicks.Where(mp => !existingData.ContainsKey(mp.ID));
+
+            lines += Chariot.InsertIntoTable(newLines);
+        });
+
+        return lines;
+    }
 }

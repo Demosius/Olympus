@@ -22,6 +22,7 @@
     <None Remove="Resources\Images\Icons\castle.ico" />
     <None Remove="Resources\Images\Icons\chaos-white.ico" />
     <None Remove="Resources\Images\Icons\chaos.ico" />
+    <None Remove="Resources\Images\Icons\deimos.ico" />
     <None Remove="Resources\Images\Icons\dredd.ico" />
     <None Remove="Resources\Images\Icons\fixedBin.ico" />
     <None Remove="Resources\Images\Icons\forge.ico" />
@@ -79,6 +80,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\cadmus.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\deimos.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\fixedBin.ico">
@@ -157,6 +161,7 @@
     <ProjectReference Include="..\Aion\Aion.csproj" />
     <ProjectReference Include="..\Argos\Argos.csproj" />
     <ProjectReference Include="..\Cadmus\Cadmus.csproj" />
+    <ProjectReference Include="..\Deimos\Deimos.csproj" />
     <ProjectReference Include="..\Hades\Hades.csproj" />
     <ProjectReference Include="..\Hydra\Hydra.csproj" />
     <ProjectReference Include="..\Khaos\Khaos.csproj" />

@@ -34,7 +34,7 @@ public partial class QuestPage : IProject
     private void UploadButton_OnClick(object sender, RoutedEventArgs e)
     {
         var raw = General.ClipboardToString();
-
+        // TODO: Wrap this, or whatever function replaces it in a try/catch.
         var lines = VM.Helios.StaffUpdater.UploadPickEvents(raw);
 
         MessageBox.Show($"{lines} lines affected by the upload.");

@@ -33,6 +33,8 @@ public class PickEvent : IEquatable<PickEvent>
     public string ItemDescription { get; set; }
     public string ClusterReference { get; set; }
 
+    public string MissPickID { get; set; }
+
     [ForeignKey(typeof(PickSession))] public string SessionID { get; set; }
     [ForeignKey(typeof(PickStatisticsByDay))]
     public string StatsID { get; set; }
@@ -48,6 +50,9 @@ public class PickEvent : IEquatable<PickEvent>
     public PickSession? Session { get; set; }
     [ManyToOne(nameof(StatsID), nameof(PickStatisticsByDay.PickEvents), CascadeOperations = CascadeOperation.CascadeRead)]
     public PickStatisticsByDay? PickStats { get; set; }
+
+    [OneToOne(nameof(MissPickID), nameof(Models.MissPick.PickEvent), CascadeOperations = CascadeOperation.CascadeRead)]
+    public MissPick? MissPick { get; set; }
 
     // Cannot be tied to items directly, as they belong to a separate database.
     [Ignore] public NAVItem? Item { get; set; }
@@ -71,6 +76,8 @@ public class PickEvent : IEquatable<PickEvent>
 
         SessionID = string.Empty;
         StatsID = string.Empty;
+
+        MissPickID = string.Empty;
     }
 
     public static string GetEventID(string dematicID, DateTime dateTime) => $"{dematicID}.{dateTime:yyyy.MM.dd.hh.mm.ss}";
@@ -81,6 +88,19 @@ public class PickEvent : IEquatable<PickEvent>
         return tt;
     }
 
+    public void AssignMissPick(MissPick missPick)
+    {
+        MissPickID = missPick.ID;
+        MissPick = missPick;
+
+        MissPick.PickEventID = ID;
+        MissPick.PickEvent = this;
+
+        MissPick.AssignedRF_ID = OperatorRF_ID;
+        MissPick.AssignedDematicID = OperatorDematicID;
+        
+        Session?.AssignMissPick(missPick);
+    }
 
     /* Equality Members */
 

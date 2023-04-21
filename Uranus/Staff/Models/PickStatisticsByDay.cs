@@ -37,6 +37,8 @@ public class PickStatisticsByDay
     public List<PickSession> PickSessions { get; set; }
     [OneToMany(nameof(PickEvent.StatsID), nameof(PickEvent.PickStats), CascadeOperations = CascadeOperation.CascadeRead)]
     public List<PickEvent> PickEvents { get; set; }
+    [OneToMany(nameof(MissPick.PickStatsID), nameof(MissPick.PickStats), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<MissPick> MissPicks { get; set; }
 
     public PickStatisticsByDay()
     {
@@ -48,9 +50,9 @@ public class PickStatisticsByDay
 
         PickSessions = new List<PickSession>();
         PickEvents = new List<PickEvent>();
+        MissPicks = new List<MissPick>();
     }
-
-    // 
+    
     public PickStatisticsByDay(string dematicID, DateTime date, List<PickSession> sessions)
     {
         ID = GetStatsID(dematicID, date);
@@ -83,6 +85,13 @@ public class PickStatisticsByDay
 
         foreach (var pickSession in sessions) pickSession.PickStats = this;
         foreach (var pickEvent in PickEvents) pickEvent.PickStats = this;
+
+        MissPicks = new List<MissPick>();
+        foreach (var missPick in PickEvents.Select(e => e.MissPick))
+        {
+            if (missPick is null) continue;
+            AssignMissPick(missPick);
+        }
     }
 
     public static string GetStatsID(string dematicID, DateTime date) => $"{dematicID}.{date:yyyy.MM.dd}";
@@ -92,5 +101,13 @@ public class PickStatisticsByDay
         PickSessions.Add(session);
         session.PickStats = this;
         PickEvents.AddRange(session.PickEvents);
+    }
+
+    public void AssignMissPick(MissPick missPick)
+    {
+        missPick.PickStatsID = ID;
+        missPick.PickStats = this;
+
+        MissPicks.Add(missPick);
     }
 }

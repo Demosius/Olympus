@@ -8,6 +8,7 @@ using System.Text;
 using Uranus.Inventory;
 using Uranus.Inventory.Models;
 using Uranus.Staff.Models;
+// ReSharper disable StringLiteralTypo
 
 namespace Uranus;
 
@@ -982,5 +983,76 @@ public static class DataConversion
         }
 
         return events;
+    }
+
+    public static List<MissPick> RawStringToMissPicks(string rawData)
+    {
+        var headDict = Constants.DematicMissPickColumns;
+
+        if (string.IsNullOrEmpty(rawData)) throw new InvalidDataException("No data on clipboard.", headDict.Keys.ToList());
+        // Start memory stream from which to read.
+        var byteArray = Encoding.UTF8.GetBytes(rawData);
+        MemoryStream stream = new(byteArray);
+        // Start Reading from stream.
+        var missPicks = StreamToMissPicks(stream, headDict);
+
+        return missPicks;
+    }
+
+    // Convert a memory stream into a Bin list.
+    private static List<MissPick> StreamToMissPicks(MemoryStream stream, Dictionary<string, int> headDict)
+    {
+        List<MissPick> missPicks = new();
+
+        IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+
+        using StreamReader reader = new(stream);
+        // First set the headers.
+        var line = reader.ReadLine();
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
+        SetHeadPosFromArray(ref headDict, headArr, "Miss Pick Data");
+        // Get highest column value to make sure that any given data line isn't cut short.
+        var highestCol = headDict.Values.Max();
+
+        line = reader.ReadLine();
+        // Add row data.
+        while (line != null)
+        {
+            var row = line.Split('\t');
+
+            if (highestCol < row.Length)
+            {
+                if (!DateTime.TryParse(row[headDict["Actual Shipment Date"]], out var shipDate)) shipDate = DateTime.Today;
+                if (!DateTime.TryParse(row[headDict["Actual Received Date"]], out var recDate)) recDate = DateTime.Today;
+                var cartonID = row[headDict["Carton ID"]];
+                if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var itemNo)) itemNo = 0;
+                var itemDesc = row[headDict["Item Description"]];
+                var actionNotes = row[headDict["Action Notes"]];
+                if (!int.TryParse(row[headDict["Original Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var originalQty)) originalQty = 0;
+                if (!int.TryParse(row[headDict["Received Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var receivedQty)) receivedQty = 0;
+                if (!int.TryParse(row[headDict["Variance Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var varianceQty)) varianceQty = 0;
+                if (!DateTime.TryParse(row[headDict["Posted Date"]], out var postedDate)) postedDate = DateTime.Today;
+                
+                var missPick = new MissPick
+                {
+                    ID = MissPick.GetMissPickID(cartonID, itemNo),
+                    ShipmentDate = shipDate,
+                    ReceivedDate = recDate,
+                    CartonID = cartonID,
+                    ItemNumber = itemNo,
+                    ItemDescription = itemDesc,
+                    ActionNotes = actionNotes,
+                    OriginalQty = originalQty,
+                    ReceivedQty = receivedQty,
+                    VarianceQty = varianceQty,
+                    PostedDate = postedDate,
+                };
+                missPicks.Add(missPick);
+            }
+
+            line = reader.ReadLine();
+        }
+
+        return missPicks;
     }
 }

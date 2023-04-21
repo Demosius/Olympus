@@ -783,6 +783,13 @@ public class StaffReader
     }
 
     /* Pick Event Tracking */
+
+    public IEnumerable<PickEvent> RawPickEvents(DateTime startDate, DateTime endDate) =>
+        Chariot.PullObjectList<PickEvent>(e => e.Date >= startDate.Date && e.Date <= endDate.Date);
+
+    public IEnumerable<MissPick> RawMissPicks(DateTime startDate, DateTime endDate) =>
+        Chariot.PullObjectList<MissPick>(mp => mp.ShipmentDate >= startDate.Date && mp.ShipmentDate <= endDate.Date);
+
     public IEnumerable<PickEvent> PickEvents(DateTime startDate, DateTime endDate, bool includeEmployees = false)
     {
         IEnumerable<PickEvent>? events = null;

@@ -11,6 +11,7 @@ using Prometheus.Views;
 using Sphynx.Views;
 using Styx;
 using System;
+using Deimos.Views;
 using Quest.Views;
 using Uranus.Interfaces;
 using Uranus.Staff;
@@ -40,6 +41,7 @@ public static class ProjectFactory
             EProject.Hades => new HadesPage(App.Helios),
             EProject.Panacea => new PanaceaPage(App.Helios),
             EProject.Quest => new QuestPage(App.Helios, App.Charon),
+            EProject.Deimos => new DeimosPage(App.Helios),
             EProject.None => null,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
         };
@@ -71,6 +73,7 @@ public static class ProjectFactory
             EProject.Hades => HadesPage.RequiresUser,
             EProject.Panacea => PanaceaPage.RequiresUser,
             EProject.Quest => QuestPage.RequiresUser,
+            EProject.Deimos => DeimosPage.RequiresUser,
             EProject.None => false,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
         };

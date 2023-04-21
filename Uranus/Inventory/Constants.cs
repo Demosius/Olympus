@@ -141,6 +141,20 @@ public static class Constants
         {"Cluster Ref", -1 },
     };
 
+    public static Dictionary<string, int> DematicMissPickColumns = new()
+    {
+        {"Actual Shipment Date", -1},
+        {"Actual Received Date", -1},
+        {"Carton ID", -1},
+        {"Item No.", -1},
+        {"Item Description", -1},
+        {"Action Notes", -1},
+        {"Original Qty.", -1},
+        {"Received Qty.", -1},
+        {"Variance Qty.", -1},
+        {"Posted Date", -1},
+    };
+
     public static readonly Dictionary<string, string> BinColumns = new()
     {
         { "location", "Location Code" },
@@ -212,4 +226,5 @@ public static class Constants
         { "type", "Type" },
         { "description", "Description" }
     };
+
 }
