@@ -81,66 +81,66 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resources\Icons\Aion.ico">
+    <Resource Include="Resources\Icons\Aion.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\AionClock.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\AionClock.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\Argos.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\Argos.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\cadmus.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\cadmus.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\chaos.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\chaos.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\fixedBin.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\fixedBin.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\forge.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\forge.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\Hades.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\Hades.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\hydra.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\hydra.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\omega.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\omega.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\Panacea.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\Panacea.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\pantheon.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\pantheon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\phoenix.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\phoenix.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\prometheus.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\prometheus.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\Sphynx.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\Sphynx.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\torch.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\torch.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\UBC.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\UBC.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\vampire.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\vampire.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\vulcan.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\vulcan.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\Icons\zed.ico">
+    </Resource>
+    <Resource Include="Resources\Icons\zed.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </Resource>
     <Resource Include="Resources\img\dog.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
