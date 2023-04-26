@@ -12,12 +12,60 @@
             <Button Command="{Binding RefreshDataCommand}"
                     Width="30"
                     Height="30"
-                    Margin="5"
+                    Margin="2"
+                    Padding="5"
                     ToolTip="Refresh">
                 <Image Source="../../Resources/img/refresh.png"/>
             </Button>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+            <TextBox Margin="2"
+                     MinWidth="120"
+                     Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Command="{Binding ApplyFiltersCommand}"
+                    Width="30"
+                    Height="30"
+                    Margin="2"
+                    Padding="5"
+                    ToolTip="Apply Filter">
+                <Image Source="../../Resources/img/search.png"/>
+            </Button>
+            <Button Command="{Binding ClearFiltersCommand}"
+                    Width="30"
+                    Height="30"
+                    Margin="2"
+                    Padding="5"
+                    ToolTip="Clear Filter">
+                <Image Source="../../Resources/img/cross.png"/>
+            </Button>
         </StackPanel>
 
-        <DataGrid></DataGrid>
+        <DataGrid ItemsSource="{Binding Errors}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  CanUserResizeRows="False"
+                  CanUserResizeColumns="True"
+                  CanUserSortColumns="True"
+                  CanUserReorderColumns="True">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Date"
+                                    Binding="{Binding Date, StringFormat=dd/MM/yyyy}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Assigned RF ID"
+                                    Binding="{Binding AssignedRF_ID}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Error Count"
+                                    Binding="{Binding ErrorCount}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Error Unit Sum"
+                                    Binding="{Binding ErrorSum}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Employee"
+                                    Binding="{Binding Employee}"
+                                    IsReadOnly="True"/>
+            </DataGrid.Columns>
+
+        </DataGrid>
     </DockPanel>
 </UserControl>

@@ -9,8 +9,7 @@
       mc:Ignorable="d" 
       d:DataContext="{d:DesignInstance {x:Type vm:DeimosVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="DeimosPage"
-      Background="{StaticResource Brush05}">
+      Title="DeimosPage">
 
     <Page.Resources>
         <ResourceDictionary>
@@ -23,7 +22,7 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <DockPanel>
+    <DockPanel Background="{StaticResource ButtonBackgroundBrush}">
 
         <!-- Function list. -->
         <StackPanel DockPanel.Dock="Left"
@@ -51,6 +50,7 @@
             <CheckBox IsChecked="{Binding Overwrite, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
             <Button Content="RUN"
+                    Command="{Binding RunCommand}"
                     Margin="5"
                     Foreground="{StaticResource Brush01}"
                     FontWeight="Bold"

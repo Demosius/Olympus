@@ -748,6 +748,32 @@ public class StaffReader
         return tags;
     }
 
+    /// <summary>
+    /// A dictionary that assigns Employee objects according to their RF ID - and also takes into account Temp Tags.
+    /// </summary>
+    /// <returns></returns>
+    public TagAssignmentTool TagAssignmentTool()
+    {
+        List<TempTag>? tags = null;
+        List<TagUse>? tagsUse = null;
+        List<Employee>? employees = null;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            tags = Chariot.PullObjectList<TempTag>();
+            tagsUse = Chariot.PullObjectList<TagUse>();
+            employees = Chariot.PullObjectList<Employee>();
+        });
+
+        tags ??= new List<TempTag>();
+        employees ??= new List<Employee>();
+        tagsUse ??= new List<TagUse>();
+
+        var tool = new TagAssignmentTool(tags, employees, tagsUse);
+
+        return tool;
+    }
+
     public TagUse? GetValidUsage(Employee employee, TempTag tempTag, DateTime date) =>
         GetValidUsage(employee.ID, tempTag.RF_ID, date);
 

@@ -478,4 +478,48 @@ public class StaffUpdater
     }
 
     public int TagUsage(TagUse use) => Chariot.InsertOrUpdate(use);
+
+    public int MissPick(MissPick missPick) => Chariot.InsertOrUpdate(missPick);
+
+    /// <summary>
+    /// Update pick data and miss pick data.
+    /// Intended for use after error assignment.
+    ///
+    /// WARNING: Assumes data present represents all data for these days.
+    /// </summary>
+    /// <param name="missPicks"></param>
+    /// <param name="pickEvents"></param>
+    /// <param name="pickSessions"></param>
+    /// <param name="stats"></param>
+    /// <returns>The number of rows modified in the database as a result of this execution.</returns>
+    public int ErrorAssignment(List<MissPick> missPicks, List<PickEvent> pickEvents, List<PickSession> pickSessions, List<PickStatisticsByDay> stats)
+    {
+        var lines = 0;
+
+        // get dates
+        var dates = missPicks.Select(m => m.ShipmentDate).ToList();
+        dates.AddRange(pickEvents.Select(e => e.Date));
+
+        dates = dates.Distinct().ToList();
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            // Remove existing data.
+            foreach (var dateTime in dates)
+            {
+                lines += Chariot.Database.Execute("DELETE FROM PickEvent WHERE Date = ?;", dateTime);
+                lines += Chariot.Database.Execute("DELETE FROM PickSession WHERE Date = ?;", dateTime);
+                lines += Chariot.Database.Execute("DELETE FROM PickStatisticsByDay WHERE Date = ?;", dateTime);
+                lines += Chariot.Database.Execute("DELETE FROM MissPick WHERE ShipmentDate = ?;", dateTime);
+            }
+
+            // Insert new data.
+            lines += Chariot.InsertIntoTable(missPicks);
+            lines += Chariot.InsertIntoTable(pickEvents);
+            lines += Chariot.InsertIntoTable(pickSessions);
+            lines += Chariot.InsertIntoTable(stats);
+        });
+
+        return lines;
+    }
 }

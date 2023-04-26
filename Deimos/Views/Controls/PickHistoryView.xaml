@@ -26,13 +26,58 @@
                     Height="30"
                     Margin="2"
                     Padding="5"
-                    ToolTip="Refresh">
+                    ToolTip="Apply Filter">
                 <Image Source="../../Resources/img/search.png"></Image>
+            </Button>
+            <Button Command="{Binding ClearFiltersCommand}"
+                    Width="30"
+                    Height="30"
+                    Margin="2"
+                    Padding="5"
+                    ToolTip="Clear Filter">
+                <Image Source="../../Resources/img/cross.png"></Image>
             </Button>
         </StackPanel>
             
         <DataGrid ItemsSource="{Binding PickEvents}"
-                  AutoGenerateColumns="True">
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  CanUserResizeRows="False"
+                  CanUserResizeColumns="True"
+                  CanUserSortColumns="True"
+                  CanUserReorderColumns="True">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="TimeStamp"
+                                    Binding="{Binding TimeStamp}"/>
+                <DataGridTextColumn Header="Dematic ID"
+                                    Binding="{Binding OperatorDematicID}"/>
+                <DataGridTextColumn Header="RF ID"
+                                    Binding="{Binding OperatorRF_ID}"/>
+                <DataGridTextColumn Header="Tech"
+                                    Binding="{Binding TechString}"/>
+                <DataGridTextColumn Header="Zone"
+                                    Binding="{Binding ZoneID}"/>
+                <DataGridTextColumn Header="Qty"
+                                    Binding="{Binding Qty}"/>
+                <DataGridTextColumn Header="Item No."
+                                    Binding="{Binding ItemNumber}"/>
+                <DataGridTextColumn Header="Description"
+                                    Binding="{Binding ItemDescription}"/>
+                <DataGridTextColumn Header="Wave"
+                                    Binding="{Binding WaveID}"/>
+                <DataGridTextColumn Header="Store"
+                                    Binding="{Binding StoreNumber}"/>
+                <DataGridTextColumn Header="Work Assignment"
+                                    Binding="{Binding WorkAssignment}"/>
+                <DataGridTextColumn Header="Device"
+                                    Binding="{Binding DeviceID}"/>
+                <DataGridTextColumn Header="Container"
+                                    Binding="{Binding ContainerID}"/>
+                <DataGridTextColumn Header="Cluster"
+                                    Binding="{Binding ClusterReference}"/>
+
+            </DataGrid.Columns>
 
         </DataGrid>
     </DockPanel>

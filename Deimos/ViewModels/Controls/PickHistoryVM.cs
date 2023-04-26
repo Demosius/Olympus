@@ -94,7 +94,10 @@ public class PickHistoryVM : INotifyPropertyChanged, IDBInteraction, IFilters
     {
         var events = AllEvents.Where(e =>
             Regex.IsMatch(e.OperatorRF_ID, FilterString, RegexOptions.IgnoreCase) ||
-            Regex.IsMatch(e.OperatorDematicID, FilterString, RegexOptions.IgnoreCase));
+            Regex.IsMatch(e.OperatorDematicID, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(e.ItemDescription, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(e.ContainerID, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(e.ItemNumber.ToString(), FilterString, RegexOptions.IgnoreCase));
 
         PickEvents.Clear();
         foreach (var pickEvent in events) PickEvents.Add(pickEvent);   

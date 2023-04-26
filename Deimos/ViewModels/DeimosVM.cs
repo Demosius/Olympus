@@ -261,7 +261,30 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
     }
     public void Run()
     {
-        throw new NotImplementedException();
+        if (StartDate is null || EndDate is null)
+        {
+            MessageBox.Show("Please ensure dates are set before running assignment tool.", "No Dates",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        Mouse.OverrideCursor = Cursors.Wait;
+        var errorTool = new ErrorAssignmentTool(Helios, (DateTime) StartDate, (DateTime) EndDate, Overwrite);
+
+        if (errorTool.AssignErrors())
+        {
+            Mouse.OverrideCursor = Cursors.Arrow;
+            MessageBox.Show("Error assignment complete.\n\n" +
+                            $"Assigned: {errorTool.AssignedCount} - {errorTool.AssignedUnits}\n" +
+                            $"Unassigned: {errorTool.UnassignedCount} - {errorTool.UnassignedUnits}", 
+                "Success", MessageBoxButton.OK);
+        }
+        else
+        {
+            Mouse.OverrideCursor = Cursors.Arrow;
+            MessageBox.Show("Failed to complete error assignment.", "Failure", MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
