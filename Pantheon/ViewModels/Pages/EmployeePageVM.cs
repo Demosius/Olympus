@@ -427,7 +427,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
 
         var employeeVM = new EmployeeVM(newEmployee, Charon, Helios);
         ReportingEmployees.Add(employeeVM);
-        EmployeeDataSet?.AddEmployee(newEmployee);
+
         if (newEmployee.Reports.Any()) Managers.Add(newEmployee);
 
         ApplyFilters();
