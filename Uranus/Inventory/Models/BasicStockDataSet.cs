@@ -166,8 +166,8 @@ public class BasicStockDataSet
 
     private string MissingUoMsText()
     {
-        if (!MissingItems.Any()) return string.Empty;
-        MissingUoMs = MissingItems.Distinct().ToList();
+        if (!MissingUoMs.Any()) return string.Empty;
+        MissingUoMs = MissingUoMs.Distinct().ToList();
         return "\n  Missing UoMs:\n\t" +
                $"{(MissingUoMs.Count > 3 ? $"{string.Join("|", MissingUoMs.Take(3))}...(+{MissingUoMs.Count - 3})" : $"{string.Join("|", MissingUoMs)}")}\n";
     }

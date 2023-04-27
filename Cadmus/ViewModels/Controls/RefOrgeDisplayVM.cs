@@ -166,9 +166,9 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         }
 
         // Get other data from DB.
-        StockDataSet ??= Helios.InventoryReader.BasicStockDataSet(moveLines.Select(m => m.ZoneCode).Distinct().ToList(), new List<string> { "9600" });
         try
         {
+            StockDataSet ??= Helios.InventoryReader.BasicStockDataSet(moveLines.Select(m => m.ZoneCode).Distinct().ToList(), new List<string> { "9600" });
             StockDataSet?.SetMoveLineData(moveLines);
         }
         catch (Exception ex)
