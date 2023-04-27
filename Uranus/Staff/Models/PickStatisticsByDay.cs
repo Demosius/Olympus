@@ -26,6 +26,7 @@ public class PickStatisticsByDay
     [Ignore] public TimeSpan EndTime => EndDateTime.TimeOfDay;
     [Ignore] public TimeSpan TrackingDuration => EndTime.Subtract(StartTime);
     [Ignore] public TimeSpan DownTime => TrackingDuration.Subtract(PickDuration);
+    [Ignore] public int BreakCount => SessionCount - 1;
 
     // Must be set after original creation.
     [ForeignKey(typeof(Employee))] public int OperatorID { get; set; }
@@ -40,6 +41,15 @@ public class PickStatisticsByDay
     [OneToMany(nameof(MissPick.PickStatsID), nameof(MissPick.PickStats), CascadeOperations = CascadeOperation.CascadeRead)]
     public List<MissPick> MissPicks { get; set; }
 
+    [Ignore] public int Hits => EventCount;
+    [Ignore] public int Units => Qty;
+    [Ignore] public double HitsPerMinute => Hits / (PickDuration.Seconds / 60.0);
+    [Ignore] public double UnitsPerMinute => Units / (PickDuration.Seconds / 60.0);
+
+    [Ignore] public List<MissPick> ShipDateMissPicks => MissPicks;
+    [Ignore] public List<MissPick> ReceiveDateMissPicks { get; set; }
+    [Ignore] public List<MissPick> PostedDateMissPicks { get; set; }
+
     public PickStatisticsByDay()
     {
         ID = Guid.NewGuid().ToString(); // This should be immediately overwritten, but automatically should be unique so as not to cause potential issues.
@@ -51,6 +61,9 @@ public class PickStatisticsByDay
         PickSessions = new List<PickSession>();
         PickEvents = new List<PickEvent>();
         MissPicks = new List<MissPick>();
+
+        ReceiveDateMissPicks = new List<MissPick>();
+        PostedDateMissPicks = new List<MissPick>();
     }
     
     public PickStatisticsByDay(string dematicID, DateTime date, List<PickSession> sessions)
@@ -69,7 +82,7 @@ public class PickStatisticsByDay
         PickEvents = sessions.SelectMany(s => s.PickEvents).ToList();
 
         Date = date;
-        PickDuration = last.EndDateTime.Subtract(first.StartDateTime);
+        PickDuration = new TimeSpan(sessions.Sum(s => s.Duration.Ticks));
         Qty = sessions.Sum(s => s.Qty);
         SessionCount = sessions.Count;
         EventCount = sessions.Sum(s => s.EventCount);
@@ -92,6 +105,9 @@ public class PickStatisticsByDay
             if (missPick is null) continue;
             AssignMissPick(missPick);
         }
+
+        ReceiveDateMissPicks = new List<MissPick>();
+        PostedDateMissPicks = new List<MissPick>();
     }
 
     public static string GetStatsID(string dematicID, DateTime date) => $"{dematicID}.{date:yyyy.MM.dd}";

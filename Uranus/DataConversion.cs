@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ExcelDataReader;
 using Uranus.Inventory;
 using Uranus.Inventory.Models;
 using Uranus.Staff.Models;
@@ -756,7 +757,7 @@ public static class DataConversion
                 if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer, provider, out var itemNo)) itemNo = 0;
                 if (!int.TryParse(row[headDict["Quantity"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var qty)) itemNo = 0;
                 if (!Enum.TryParse(row[headDict["Action Type"]], out EAction action)) action = EAction.Take;
-                
+
                 var moveLine = new NAVMoveLine
                 {
                     ActionType = action,
@@ -915,8 +916,7 @@ public static class DataConversion
 
         return events;
     }
-
-    // Convert a memory stream into a Bin list.
+    
     private static List<PickEvent> StreamToPickEvents(MemoryStream stream, Dictionary<string, int> headDict)
     {
         List<PickEvent> events = new();
@@ -984,6 +984,95 @@ public static class DataConversion
 
         return events;
     }
+    
+    public static List<PickEvent> CSVToPickEvents(string csvPath)
+    {
+        List<PickEvent> events = new();
+        IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+        var headDict = Constants.DematicPickEventColumns;
+        using StreamReader reader = new(File.OpenRead(csvPath));
+        var headArr = reader.ReadLine()?.Trim('"').Split(',', '"') ?? Array.Empty<string>();
+        SetHeadPosFromArray(ref headDict, headArr, "Items");
+        var line = reader.ReadLine();
+
+        while (line != null)
+        {
+            var row = line.Split('\t');
+
+            var timeStamp = row[headDict["Timestamp"]];
+            if (!DateTime.TryParse(timeStamp, out var dateTime)) dateTime = DateTime.Today;
+            var demID = row[headDict["Operator ID"]];
+            var rfID = row[headDict["Operator Name"]];
+            if (!int.TryParse(row[headDict["Qty"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var qty)) qty = 0;
+            var container = row[headDict["Container"]];
+            var tech = row[headDict["Tech Type"]];
+            var zone = row[headDict["Zone ID"]];
+            var wave = row[headDict["Wave ID"]];
+            var workAss = row[headDict["Work Assignment"]];
+            var store = row[headDict["Store"]];
+            var deviceID = row[headDict["Device ID"]];
+            if (!int.TryParse(row[headDict["SKU ID"]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var itemNo)) itemNo = 0;
+            var itemDesc = row[headDict["SKU Description"]];
+            var cluster = row[headDict["Cluster Ref"]];
+
+            var pickEvent = new PickEvent
+            {
+                ID = PickEvent.GetEventID(demID, dateTime),
+                TimeStamp = timeStamp,
+                DateTime = dateTime,
+                Date = dateTime.Date,
+                OperatorDematicID = demID,
+                OperatorRF_ID = rfID,
+                Qty = qty,
+                ContainerID = container,
+                TechString = tech,
+                TechType = PickEvent.GetTechType(tech),
+                ZoneID = zone,
+                WaveID = wave,
+                WorkAssignment = workAss,
+                StoreNumber = store,
+                DeviceID = deviceID,
+                ItemNumber = itemNo,
+                ItemDescription = itemDesc,
+                ClusterReference = cluster,
+            };
+            events.Add(pickEvent);
+
+
+            line = reader.ReadLine();
+        }
+
+        return events;
+    }
+
+    public static List<PickEvent> ExcelToPickEvents(string excelPath)
+    {
+        using var stream = File.Open(excelPath, FileMode.Open, FileAccess.Read);
+        using var reader = ExcelReaderFactory.CreateReader(stream);
+        
+        
+
+        var dataSet = reader.AsDataSet();
+
+        var events = new List<PickEvent>();
+
+        foreach (DataTable table in dataSet.Tables)
+            events.AddRange(DataTableToPickEvents(table));
+
+        return events;
+    }
+    // TODO: Excel to (miss)picks
+    public static List<PickEvent> DataTableToPickEvents(DataTable dataTable)
+    {
+        var events = new List<PickEvent>();
+
+        // Check headers.
+        dataTable.Columns[0].ColumnName
+
+        // Iterate through rows.
+
+        return events;
+    }
 
     public static List<MissPick> RawStringToMissPicks(string rawData)
     {
@@ -998,8 +1087,7 @@ public static class DataConversion
 
         return missPicks;
     }
-
-    // Convert a memory stream into a Bin list.
+    
     private static List<MissPick> StreamToMissPicks(MemoryStream stream, Dictionary<string, int> headDict)
     {
         List<MissPick> missPicks = new();
@@ -1032,7 +1120,7 @@ public static class DataConversion
                 if (!int.TryParse(row[headDict["Received Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var receivedQty)) receivedQty = 0;
                 if (!int.TryParse(row[headDict["Variance Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var varianceQty)) varianceQty = 0;
                 if (!DateTime.TryParse(row[headDict["Posted Date"]], out var postedDate)) postedDate = DateTime.Today;
-                
+
                 var missPick = new MissPick
                 {
                     ID = MissPick.GetMissPickID(cartonID, itemNo),
@@ -1054,5 +1142,57 @@ public static class DataConversion
         }
 
         return missPicks;
+    }
+    
+    public static List<MissPick> CSVToMissPicks(string csvPath)
+    {
+        List<MissPick> missPicks = new();
+        IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+        var headDict = Constants.DematicMissPickColumns;
+        using StreamReader reader = new(File.OpenRead(csvPath));
+        var headArr = reader.ReadLine()?.Trim('"').Split(',', '"') ?? Array.Empty<string>();
+        SetHeadPosFromArray(ref headDict, headArr, "Items");
+        var line = reader.ReadLine();
+
+        while (line != null)
+        {
+            var row = line.Split('\t');
+
+            if (!DateTime.TryParse(row[headDict["Actual Shipment Date"]], out var shipDate)) shipDate = DateTime.Today;
+            if (!DateTime.TryParse(row[headDict["Actual Received Date"]], out var recDate)) recDate = DateTime.Today;
+            var cartonID = row[headDict["Carton ID"]];
+            if (!int.TryParse(row[headDict["Item No."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var itemNo)) itemNo = 0;
+            var itemDesc = row[headDict["Item Description"]];
+            var actionNotes = row[headDict["Action Notes"]];
+            if (!int.TryParse(row[headDict["Original Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var originalQty)) originalQty = 0;
+            if (!int.TryParse(row[headDict["Received Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var receivedQty)) receivedQty = 0;
+            if (!int.TryParse(row[headDict["Variance Qty."]], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var varianceQty)) varianceQty = 0;
+            if (!DateTime.TryParse(row[headDict["Posted Date"]], out var postedDate)) postedDate = DateTime.Today;
+
+            var missPick = new MissPick
+            {
+                ID = MissPick.GetMissPickID(cartonID, itemNo),
+                ShipmentDate = shipDate,
+                ReceivedDate = recDate,
+                CartonID = cartonID,
+                ItemNumber = itemNo,
+                ItemDescription = itemDesc,
+                ActionNotes = actionNotes,
+                OriginalQty = originalQty,
+                ReceivedQty = receivedQty,
+                VarianceQty = varianceQty,
+                PostedDate = postedDate,
+            };
+            missPicks.Add(missPick);
+
+            line = reader.ReadLine();
+        }
+
+        return missPicks;
+    }
+
+    public static List<MissPick> ExcelToMissPicks(string excelPath)
+    {
+
     }
 }

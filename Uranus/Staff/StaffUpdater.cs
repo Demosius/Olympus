@@ -344,7 +344,7 @@ public class StaffUpdater
     /// <returns>Number of impacted lines in the database.</returns>
     public int UploadPickEvents(string rawData, TimeSpan? ptlBreak = null, TimeSpan? rftBreak = null) =>
         UploadPickEvents(DataConversion.RawStringToPickEvents(rawData), ptlBreak, rftBreak);
-    
+
 
     /// <summary>
     /// Updates pick events with new given list of events.
@@ -370,8 +370,10 @@ public class StaffUpdater
             var idDict = new Dictionary<string, int>();
             foreach (var employee in Chariot.PullObjectList<Employee>())
             {
-                if (employee.DematicID != string.Empty && employee.DematicID != "0000" && !idDict.ContainsKey(employee.DematicID)) idDict.Add(employee.DematicID, employee.ID);
-                if (employee.RF_ID != string.Empty && !idDict.ContainsKey(employee.RF_ID)) idDict.Add(employee.RF_ID, employee.ID);
+                if (employee.DematicID != string.Empty && employee.DematicID != "0000" && !idDict.ContainsKey(employee.DematicID)) 
+                    idDict.Add(employee.DematicID, employee.ID);
+                if (employee.RF_ID != string.Empty && !idDict.ContainsKey(employee.RF_ID))
+                    idDict.Add(employee.RF_ID, employee.ID);
             }
 
             // Assign actual OperatorID.
@@ -388,17 +390,15 @@ public class StaffUpdater
             var sessions = sessionDict.Values.SelectMany(v => v).ToList();
 
             // Generate PickStat objects.
-            var pickStats = sessionDict.Select(dictItem => new PickStatisticsByDay(dictItem.Key.Item1, dictItem.Key.Item2, dictItem.Value)).ToList();
+            var pickStats = sessionDict.Select(dictItem =>
+                new PickStatisticsByDay(dictItem.Key.Item1, dictItem.Key.Item2, dictItem.Value)).ToList();
 
             // Remove existing database lines that may cause conflicts (they have been pulled out, so we should never lose any).
-            // TODO: Figure out how to implement query using 'IN' - requiring to pre-convert to SQLite style dateTime?
-            foreach (var date in dates)
-            {
-                lines += Chariot.Database!.ExecuteScalar<int>("DELETE FROM PickEvent WHERE Date = ?;", date);
-                lines += Chariot.Database.ExecuteScalar<int>("DELETE FROM PickSession WHERE Date = ?;", date);
-                lines += Chariot.Database.ExecuteScalar<int>("DELETE FROM PickStatisticsByDay WHERE Date = ?;", date);
-            }
-
+            var dateString = string.Join(", ", dates.Select(d => d.Ticks));
+            lines += Chariot.Database.ExecuteScalar<int>($"DELETE FROM PickEvent WHERE Date IN ({dateString});");
+            lines += Chariot.Database.ExecuteScalar<int>($"DELETE FROM PickSession WHERE Date IN ({dateString});");
+            lines += Chariot.Database.ExecuteScalar<int>($"DELETE FROM PickStatisticsByDay WHERE Date IN ({dateString});");
+            
             // Enter new lines as appropriate.
             lines += Chariot.InsertIntoTable(allEvents);
             lines += Chariot.InsertIntoTable(sessions);
@@ -505,13 +505,11 @@ public class StaffUpdater
         Chariot.Database?.RunInTransaction(() =>
         {
             // Remove existing data.
-            foreach (var dateTime in dates)
-            {
-                lines += Chariot.Database.Execute("DELETE FROM PickEvent WHERE Date = ?;", dateTime);
-                lines += Chariot.Database.Execute("DELETE FROM PickSession WHERE Date = ?;", dateTime);
-                lines += Chariot.Database.Execute("DELETE FROM PickStatisticsByDay WHERE Date = ?;", dateTime);
-                lines += Chariot.Database.Execute("DELETE FROM MissPick WHERE ShipmentDate = ?;", dateTime);
-            }
+            var dateString = string.Join(", ", dates.Select(d => d.Ticks));
+            lines += Chariot.Database.Execute($"DELETE FROM PickEvent WHERE Date IN ({dateString});");
+            lines += Chariot.Database.Execute($"DELETE FROM PickSession WHERE Date IN ({dateString});");
+            lines += Chariot.Database.Execute($"DELETE FROM PickStatisticsByDay WHERE Date IN ({dateString});");
+            lines += Chariot.Database.Execute($"DELETE FROM MissPick WHERE ShipmentDate IN ({dateString});");
 
             // Insert new data.
             lines += Chariot.InsertIntoTable(missPicks);

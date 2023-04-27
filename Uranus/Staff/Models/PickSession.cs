@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
-using Uranus.Annotations;
 
 namespace Uranus.Staff.Models;
 
@@ -50,6 +49,9 @@ public class PickSession
     public List<MissPick> MissPicks { get; set; }
 
     [Ignore] public int Hits => EventCount;
+    [Ignore] public int Units => Qty;
+    [Ignore] public double HitsPerMinute => Hits / (Duration.Seconds / 60.0);
+    [Ignore] public double UnitsPerMinute => Units / (Duration.Seconds / 60.0);
 
     public PickSession()
     {
@@ -87,7 +89,7 @@ public class PickSession
         EndDateTime = last.DateTime;
         Date = first.Date;
         OperatorDematicID = first.OperatorDematicID;
-
+        
         ID = GetSessionID(OperatorDematicID, StartDateTime);
 
         OperatorRF_ID = first.OperatorRF_ID;

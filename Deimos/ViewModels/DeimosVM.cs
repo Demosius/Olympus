@@ -8,6 +8,7 @@ using System.Windows.Input;
 using Deimos.Models;
 using Deimos.ViewModels.Commands;
 using Deimos.ViewModels.Controls;
+using Microsoft.Win32;
 using Morpheus;
 using Morpheus.ViewModels.Commands;
 using Morpheus.ViewModels.Interfaces;
@@ -156,6 +157,7 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         Mouse.OverrideCursor = Cursors.Wait;
         try
         {
+            // First check the clipboard for relevant data.
             var lines = Helios.StaffUpdater.UploadPickEvents(General.ClipboardToString());
             if (lines > 0)
             {
@@ -166,8 +168,21 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
             else
             {
                 Mouse.OverrideCursor = Cursors.Arrow;
-                MessageBox.Show("Failed to upload data. Check that clipboard contents are correct, and try again.", "Upload Failed",
+                MessageBox.Show("Failed to upload data. Check that clipboard contents are correct, and try again.",
+                    "Upload Failed",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+        // Clipboard data not accurate. Offer to check for excel/csv files instead.
+        catch (InvalidDataException dataException)
+        {
+            Mouse.OverrideCursor = Cursors.Arrow;
+            if (MessageBox.Show(
+                    "Could not recognise data on clipboard. Would you like to search for the appropriate file(s)?\n\n\n" +
+                    $"{{{{\nMissing Columns:\n{string.Join(" || ", dataException.MissingColumns)}\n}}}}",
+                    "File Load", MessageBoxButton.YesNoCancel, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                PickEventFileLoad();
             }
         }
         catch (Exception ex)
@@ -178,6 +193,33 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         }
 
         RefreshData();
+    }
+
+    public void PickEventFileLoad()
+    {
+        var fd = new OpenFileDialog()
+        {
+            Multiselect = true,
+            Filter = "Excel/CSV (*.xls*;*.csv)|*.xls*;*.csv"
+        };
+
+        if (fd.ShowDialog() != true) return;
+
+        var files = fd.FileNames.ToList();
+
+        Mouse.OverrideCursor = Cursors.Wait;
+
+        var lines = files.Sum(LoadPickEventsFromFile);
+
+        Mouse.OverrideCursor = Cursors.Arrow;
+
+        MessageBox.Show($"{lines} pick event lines successfully uploaded.", "Upload Success", MessageBoxButton.OK,
+            MessageBoxImage.Information);
+    }
+
+    public int LoadPickEventsFromFile(string filePath)
+    {
+
     }
 
     public void UploadMissPickData()
@@ -199,6 +241,18 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
                     MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+        // Clipboard data not accurate. Offer to check for excel/csv files instead.
+        catch (InvalidDataException dataException)
+        {
+            Mouse.OverrideCursor = Cursors.Arrow;
+            if (MessageBox.Show(
+                    "Could not recognise data on clipboard. Would you like to search for the appropriate file(s)?\n\n\n" +
+                    $"{{{{\nMissing Columns:\n{string.Join(" || ", dataException.MissingColumns)}\n}}}}",
+                    "File Load", MessageBoxButton.YesNoCancel, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                MissPickFileLoad();
+            }
+        }
         catch (Exception ex)
         {
             Mouse.OverrideCursor = Cursors.Arrow;
@@ -207,6 +261,11 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         }
 
         RefreshData();
+    }
+
+    public void MissPickFileLoad()
+    {
+
     }
 
     public void RefreshData()
