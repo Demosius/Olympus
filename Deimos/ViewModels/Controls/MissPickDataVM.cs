@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -15,12 +16,10 @@ namespace Deimos.ViewModels.Controls;
 public class MissPickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
     public DeimosVM ParentVM { get; set; }
-
+    public Helios Helios { get; set; }
     public List<MissPickVM> AllMissPicks { get; set; }
 
     #region ParentVM Access
-
-    public Helios Helios => ParentVM.Helios;
 
     public DateTime? StartDate => ParentVM.StartDate;
     public DateTime? EndDate => ParentVM.EndDate;
@@ -47,7 +46,6 @@ public class MissPickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
 
@@ -56,6 +54,7 @@ public class MissPickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public MissPickDataVM(DeimosVM parentVM)
     {
         ParentVM = parentVM;
+        Helios = parentVM.Helios;
 
         filterString = string.Empty;
 
@@ -64,24 +63,18 @@ public class MissPickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
         MissPicks = new ObservableCollection<MissPickVM>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
         if (StartDate is null || EndDate is null)
             AllMissPicks = new List<MissPickVM>();
         else
-            AllMissPicks = Helios.StaffReader.RawMissPicks((DateTime)StartDate, (DateTime)EndDate).Select(mp => new MissPickVM(mp, Helios)).ToList();
+            AllMissPicks = (await Helios.StaffReader.RawMissPicksAsync((DateTime) StartDate, (DateTime) EndDate)).Select(mp => new MissPickVM(mp, Helios)).ToList();
 
         ApplyFilters();
-    }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
     }
 
     public void ClearFilters()

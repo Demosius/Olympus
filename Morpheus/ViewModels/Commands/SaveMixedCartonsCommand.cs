@@ -16,9 +16,9 @@ public class SaveMixedCartonsCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.SaveMixedCartons();
+        await VM.SaveMixedCartons();
     }
 
     public event EventHandler? CanExecuteChanged

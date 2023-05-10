@@ -14,9 +14,9 @@ public class UploadPickEventsCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.UploadPickEvents();
+        await VM.UploadPickEvents();
     }
 
     public event EventHandler? CanExecuteChanged

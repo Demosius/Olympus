@@ -1,8 +1,6 @@
 ﻿using Morpheus.ViewModels.Commands;
 using Serilog;
 using Styx;
-using Styx.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -18,9 +16,9 @@ using Uranus.Inventory.Models;
 
 namespace Morpheus.ViewModels.Controls;
 
-public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
+public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction
 {
-    public Helios? Helios { get; set; }
+    public Helios Helios { get; set; }
     public Charon? Charon { get; set; }
 
     #region INotifyPropertyChanged Members
@@ -32,7 +30,6 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public UploadZonesCommand UpdateZonesCommand { get; set; }
     public SaveZonesCommand SaveZonesCommand { get; set; }
 
@@ -40,35 +37,23 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
     public ZoneHandlerVM(Helios helios, Charon? charon)
     {
+        Helios = helios;
+        Charon = charon;
         Zones = new ObservableCollection<NAVZone>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         UpdateZonesCommand = new UploadZonesCommand(this);
         SaveZonesCommand = new SaveZonesCommand(this);
-        Task.Run(() => SetDataSources(helios, charon!));
+        Task.Run(RefreshDataAsync);
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        if (Helios is null) return;
         Zones.Clear();
 
-        var zones = Helios.InventoryReader.Zones().OrderBy(z => z.Code);
+        var zones = (await Helios.InventoryReader.ZonesAsync()).OrderBy(z => z.Code);
         foreach (var zone in zones) Zones.Add(zone);
         OnPropertyChanged(nameof(Zones));
-    }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
-        RefreshData();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -79,10 +64,8 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public void UploadZones()
+    public async Task UploadZones()
     {
-        if (Helios is null) return;
-
         // Get data sets and check data validity.
         List<NAVZone>? newZones;
         try
@@ -113,19 +96,18 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
         if (result != MessageBoxResult.Yes) return;
 
         // Apply update/replacement.
-        Helios.InventoryUpdater.ReplaceZones(newZones);
+        await Helios.InventoryUpdater.ReplaceZonesAsync(newZones);
 
-        RefreshData();
+        await RefreshDataAsync();
     }
 
-    public void SaveZones()
+    public async Task SaveZones()
     {
         // Confirm with user.
-        if (Helios is null || MessageBox.Show("Are you sure you want to save the changes made to the zones?",
+        if (MessageBox.Show("Are you sure you want to save the changes made to the zones?",
                 "Confirm Changes", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
 
         // Update/Replace table.
-        Helios.InventoryUpdater.ReplaceZones(Zones);
-
+        await Helios.InventoryUpdater.ReplaceZonesAsync(Zones);
     }
 }

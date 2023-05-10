@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Controls.TempTags;
@@ -103,14 +104,14 @@ public class TempTagVM : INotifyPropertyChanged
             Usage.Add(tagUseVM);
 
         // Update DB if possible.
-        ParentVM?.UpdateTagUse(this);
+        ParentVM?.UpdateTagUseAsync(this);
 
         return count;
     }
 
     public void RefreshLayout() => ParentVM?.RefreshTagView();
 
-    public int UpdateUse(TagUseVM tagUseVM) => ParentVM?.UpdateTagUse(tagUseVM) ?? 0;
+    public async Task<int> UpdateUse(TagUseVM tagUseVM) => ParentVM is null ? 0 : await ParentVM.UpdateTagUseAsync(tagUseVM);
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

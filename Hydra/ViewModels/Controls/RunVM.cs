@@ -6,7 +6,6 @@ using Microsoft.Win32;
 using Morpheus;
 using Morpheus.Helpers;
 using Styx;
-using Styx.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -31,11 +30,11 @@ using Uranus.Inventory.Models;
 
 namespace Hydra.ViewModels.Controls;
 
-public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemFilters
+public class RunVM : INotifyPropertyChanged, IDBInteraction, IItemFilters
 {
     public HydraVM HydraVM { get; set; }
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     private HydraDataSet? dataSet;
 
@@ -103,7 +102,6 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public FilterItemsFromClipboardCommand FilterItemsFromClipboardCommand { get; set; }
@@ -116,9 +114,13 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
 
     #endregion
 
-    public RunVM(HydraVM hydraVM)
+    public RunVM(HydraVM hydraVM, Helios helios, Charon charon)
     {
         HydraVM = hydraVM;
+
+        Helios = helios;
+        Charon = charon;
+
         Sites = new ObservableCollection<SiteVM>();
         AllMoves = new List<MoveVM>();
         currentMoves = new ObservableCollection<MoveVM>();
@@ -128,7 +130,6 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         toSiteFilterString = string.Empty;
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         FilterItemsFromClipboardCommand = new FilterItemsFromClipboardCommand(this);
@@ -139,32 +140,18 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         ExportToLabelsCommand = new ExportToLabelsCommand(this);
         SaveGenerationCommand = new SaveGenerationCommand(this);
 
-        Task.Run(() => SetDataSources(HydraVM.Helios!, HydraVM.Charon!));
+        Task.Run(RefreshDataAsync);
     }
+    
 
-    public void SetDataSources(Helios helios, Charon charon)
+    public async Task RefreshDataAsync()
     {
-        Helios = helios;
-        Charon = charon;
-        RefreshData();
-    }
-
-    public void RefreshData()
-    {
-        if (Helios is null) return;
-
         Sites.Clear();
-        foreach (var site in Helios.InventoryReader.Sites(out _))
-        {
+        var (sites, _) = await Helios.InventoryReader.SitesAsync();
+        foreach (var site in sites)
             Sites.Add(new SiteVM(site));
-        }
     }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void ClearFilters()
     {
         itemFilterString = string.Empty;
@@ -237,12 +224,10 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         Mouse.OverrideCursor = Cursors.Arrow;
     }
     
-    public void GenerateMoves()
+    public async Task GenerateMoves()
     {
-        if (Helios is null) return;
-
         Mouse.OverrideCursor = Cursors.Wait;
-        dataSet = Helios.InventoryReader.HydraDataSet();
+        dataSet = await Helios.InventoryReader.HydraDataSetAsync();
 
         if (dataSet is null) return;
 
@@ -255,10 +240,8 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         Mouse.OverrideCursor = Cursors.Arrow;
     }
 
-    public void SaveGeneration()
+    public async Task SaveGeneration()
     {
-        if (Helios is null) return;
-
         var dir = Path.Combine(Helios.SolLocation, "Inventory", "Hydra");
         if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
@@ -274,9 +257,9 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
 
         var filePath = dialog.FileName;
 
-        var chariot = new HydraChariot(filePath);
+        var chariot = await new Task<HydraChariot>(() => new HydraChariot(filePath));
 
-        chariot.SendData(dataSet, AllMoves.Select(vm => vm.Move));
+        await chariot.SendDataAsync(dataSet, AllMoves.Select(vm => vm.Move));
     }
 
     public void ExportToLabels()

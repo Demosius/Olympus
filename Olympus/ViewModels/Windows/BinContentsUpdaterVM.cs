@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Cadmus.Annotations;
 using Morpheus.ViewModels.Commands;
@@ -68,7 +69,7 @@ public class BinContentsUpdaterVM : INotifyPropertyChanged, IMultiSelect, IConfi
         Helios = helios;
         NewStock = newStock;
 
-        OldStock = Helios.InventoryReader.NAVAllStock();
+        OldStock = AsyncHelper.RunSync(() => Helios.InventoryReader.NAVAllStockAsync());
 
         // What Zones are present in old data and not in new?
         var newZones = NewStock.Select(s => s.ZoneID).Distinct().ToList();
@@ -139,14 +140,17 @@ public class BinContentsUpdaterVM : INotifyPropertyChanged, IMultiSelect, IConfi
 
     public bool Confirm()
     {
-
         Mouse.OverrideCursor = Cursors.Wait;
-        SuccessfulUploadLines =
-            Helios.InventoryUpdater.NAVStock(NewStock, allZones.Where(z => z.Selected).Select(z => z.Name).ToList());
+        SuccessfulUploadLines = AsyncHelper.RunSync(UploadStock);
         Mouse.OverrideCursor = Cursors.Arrow;
 
         return SuccessfulUploadLines > 0;
     }
+
+    private async Task<int> UploadStock() =>
+        await Helios.InventoryUpdater.NAVStockAsync(NewStock,
+            allZones.Where(z => z.Selected).Select(z => z.Name).ToList());
+    
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

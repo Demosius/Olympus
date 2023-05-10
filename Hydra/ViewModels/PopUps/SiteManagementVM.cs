@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Uranus;
@@ -25,8 +26,8 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
 {
     public ItemLevelsVM ItemLevelsVM { get; set; }
     public SiteVM Site { get; set; }
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public List<SiteItemLevelVM> AllItems { get; set; }
 
@@ -62,7 +63,6 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public FilterItemsFromClipboardCommand FilterItemsFromClipboardCommand { get; set; }
@@ -76,10 +76,11 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
     public SiteManagementVM(ItemLevelsVM parentVM, Site site)
     {
         ItemLevelsVM = parentVM;
+        Helios = ItemLevelsVM.Helios;
+        Charon = ItemLevelsVM.Charon;
         Site = new SiteVM(site);
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         FilterItemsFromClipboardCommand = new FilterItemsFromClipboardCommand(this);
@@ -92,30 +93,20 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
         filterString = string.Empty;
         currentItems = new ObservableCollection<SiteItemLevelVM>();
 
-        SetDataSources(ItemLevelsVM.Helios!, ItemLevelsVM.Charon!);
+        Task.Run(RefreshDataAsync);
     }
 
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        AllItems = ItemLevelsVM.SiteItemLevelVMs.Values
-            .Where(sil => sil.SiteName == Site.Site.Name && (sil.Item?.SiteLevelTarget ?? false))
-            .OrderBy(sil => sil.ItemNumber)
-            .ToList();
-        ApplyFilters();
-
-    }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
-        RefreshData();
+        await new Task(() =>
+        {
+            AllItems = ItemLevelsVM.SiteItemLevelVMs.Values
+                .Where(sil => sil.SiteName == Site.Site.Name && (sil.Item?.SiteLevelTarget ?? false))
+                .OrderBy(sil => sil.ItemNumber)
+                .ToList();
+            ApplyFilters();
+        });
     }
 
     public void ClearFilters()
@@ -130,7 +121,7 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
         CurrentItems =
             new ObservableCollection<SiteItemLevelVM>(AllItems.Where(sil => regex.IsMatch(sil.ItemNumber.ToString())));
     }
-    
+
     public void FilterItemsFromClipboard()
     {
         Mouse.OverrideCursor = Cursors.Wait;
@@ -196,14 +187,12 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
         foreach (var siteItemLevelVM in CurrentItems) siteItemLevelVM.Active = true;
     }
 
-    public void ConfirmSiteChanges()
+    public async Task ConfirmSiteChanges()
     {
-        if (Helios is null) return;
+        var silTask = Helios.InventoryUpdater.SiteItemLevelsAsync(AllItems.Select(vm => vm.SiteItemLevel));
+        var siteTask = new Task(() => Helios.InventoryUpdater.Site(Site.Site));
 
-        Mouse.OverrideCursor = Cursors.Wait;
-        Helios.InventoryUpdater.SiteItemLevels(AllItems.Select(vm => vm.SiteItemLevel));
-        Helios.InventoryUpdater.Site(Site.Site);
-        Mouse.OverrideCursor = Cursors.Arrow;
+        await Task.WhenAll(siteTask, silTask);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

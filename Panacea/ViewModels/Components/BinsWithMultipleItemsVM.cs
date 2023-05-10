@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Serilog;
@@ -145,7 +146,7 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
         FilteredCheckResults = new ObservableCollection<BWMICheckResult>(results);
     }
     
-    public void RunChecks()
+    public async Task RunChecksAsync()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
@@ -158,7 +159,7 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
         BasicStockDataSet? dataSet;
         try
         {
-            dataSet = Helios.InventoryReader.BasicStockDataSet(zones, locations);
+            dataSet = await Helios.InventoryReader.BasicStockDataSetAsync(zones, locations);
         }
         catch (Exception ex)
         {
@@ -167,6 +168,7 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
             Mouse.OverrideCursor = Cursors.Arrow;
             return;
         }
+
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");

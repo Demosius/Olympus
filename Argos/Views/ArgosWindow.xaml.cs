@@ -1,15 +1,12 @@
-﻿using System.Windows;
+﻿namespace Argos.Views;
 
-namespace Argos.Views
+/// <summary>
+/// Interaction logic for HadesWindow.xaml
+/// </summary>
+public partial class ArgosWindow
 {
-    /// <summary>
-    /// Interaction logic for HadesWindow.xaml
-    /// </summary>
-    public partial class ArgosWindow : Window
+    public ArgosWindow()
     {
-        public ArgosWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

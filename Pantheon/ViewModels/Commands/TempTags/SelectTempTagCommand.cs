@@ -18,7 +18,7 @@ public class SelectTempTagCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.SelectTempTag();
+        VM.SelectTempTagAsync();
     }
 
     public event EventHandler? CanExecuteChanged

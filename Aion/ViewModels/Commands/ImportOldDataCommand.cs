@@ -14,9 +14,9 @@ public class ImportOldDataCommand : ICommand
         return true;
     }
 
-    public void Execute(object parameter)
+    public async void Execute(object parameter)
     {
-        VM.ImportOldData();
+        await VM.ImportOldData();
     }
 
     public event EventHandler CanExecuteChanged

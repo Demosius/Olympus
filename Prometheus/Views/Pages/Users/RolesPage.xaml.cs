@@ -1,5 +1,6 @@
 ﻿using Styx;
 using System.Windows.Controls;
+using Prometheus.ViewModels.Pages.Users;
 using Uranus;
 
 namespace Prometheus.Views.Pages.Users;
@@ -9,10 +10,13 @@ namespace Prometheus.Views.Pages.Users;
 /// </summary>
 public partial class UserDeactivatePage
 {
+    public RolesVM VM { get; set; }
+
     public UserDeactivatePage(Helios helios, Charon charon)
     {
+        VM = new RolesVM(helios, charon);
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+        DataContext = VM;
     }
 
     private void RoleGrid_OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)

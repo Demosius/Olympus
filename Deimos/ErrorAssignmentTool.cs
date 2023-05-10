@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using Serilog;
 using Uranus;
@@ -16,7 +17,7 @@ public class ErrorAssignmentTool
     public bool Overwrite { get; set; } // If true, check and assign errors that already have assignments.
 
     public List<MissPick> MissPicks { get; set; }
-    public List<PickStatisticsByDay> Stats { get; set; }
+    public List<PickDailyStats> Stats { get; set; }
     public List<PickSession> PickSessions { get; set; }
     public List<PickEvent> PickEvents { get; set; }
     public Dictionary<DateTime, Dictionary<string, Dictionary<int, List<PickEvent>>>> PickEventDictionary { get; set; }   // Date => Container => Item
@@ -41,8 +42,26 @@ public class ErrorAssignmentTool
         EndDate = endDate;
         Overwrite = overwrite;
 
-        MissPicks = Helios.StaffReader.RawMissPicks(startDate, endDate).ToList();
-        Stats = Helios.StaffReader.PickStats(startDate, endDate).ToList();
+        MissPicks = new List<MissPick>();
+        Stats = new List<PickDailyStats>();
+        PickSessions = new List<PickSession>();
+        PickEvents = new List<PickEvent>();
+        PickEventDictionary = new Dictionary<DateTime, Dictionary<string, Dictionary<int, List<PickEvent>>>>();
+        CartonDictionary = new Dictionary<string, List<PickEvent>>();
+        ItemDictionary = new Dictionary<(int, DateTime), List<PickEvent>>();
+        
+        UnassignedMissPicks = new List<MissPick>();
+        AssignedMissPicks = new List<MissPick>();
+
+        Task.Run(SetData);
+    }
+
+    private async Task SetData()
+    {
+        var missPickTask = Helios.StaffReader.RawMissPicksAsync(StartDate, EndDate);
+        var statsTask = Helios.StaffReader.PickStatsAsync(StartDate, EndDate);
+
+        Stats = (await statsTask).ToList();
         PickSessions = Stats.SelectMany(stats => stats.PickSessions).ToList();
         PickEvents = PickSessions.SelectMany(session => session.PickEvents).ToList();
         PickEventDictionary = PickEvents
@@ -51,13 +70,11 @@ public class ErrorAssignmentTool
                     .GroupBy(e => e.ItemNumber).ToDictionary(itemGroup => itemGroup.Key, itemGroup => itemGroup.ToList())));
         CartonDictionary = PickEvents.GroupBy(e => e.ContainerID).ToDictionary(g => g.Key, g => g.ToList());
         ItemDictionary = PickEvents.GroupBy(e => (e.ItemNumber, e.Date)).ToDictionary(g => g.Key, g => g.ToList());
-
-        UnassignedMissPicks = new List<MissPick>();
-        AssignedMissPicks = new List<MissPick>();
-
+        
+        MissPicks = (await missPickTask).ToList();
     }
 
-    public bool AssignErrors()
+    public async Task<bool> AssignErrors()
     {
         if (StartDate > EndDate) return false;
 
@@ -95,15 +112,15 @@ public class ErrorAssignmentTool
 
         MatchUnassigned();
 
-        return SaveData();
+        return await SaveData();
     }
 
-    private bool SaveData()
+    private async Task<bool> SaveData()
     {
         bool success;
         try
         {
-            success = Helios.StaffUpdater.ErrorAssignment(MissPicks, PickEvents, PickSessions, Stats) > 0;
+            success = await Helios.StaffUpdater.ErrorAssignmentAsync(MissPicks, PickEvents, PickSessions, Stats) > 0;
         }
         catch (Exception ex)
         {
@@ -287,7 +304,7 @@ public class ErrorAssignmentTool
         return sessions.Count != 1 ? null : sessions.First();
     }
 
-    private PickStatisticsByDay? GetStats(string dematicID, DateTime date)
+    private PickDailyStats? GetStats(string dematicID, DateTime date)
     {
         return Stats.FirstOrDefault(s => s.OperatorDematicID == dematicID && s.Date == date);
     }

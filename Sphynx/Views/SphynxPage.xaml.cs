@@ -1,6 +1,6 @@
 ﻿using Sphynx.ViewModels;
 using Styx;
-using System;
+using System.Threading.Tasks;
 using Uranus;
 using Uranus.Interfaces;
 using Uranus.Staff;
@@ -22,8 +22,8 @@ public partial class SphynxPage : IProject
 
     public static bool RequiresUser => false;
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        throw new NotImplementedException();
+        await new Task(() => {});
     }
 }

@@ -1,6 +1,9 @@
 ﻿using Prometheus.ViewModels.Helpers;
 using System.Collections.Generic;
 using System.Windows.Controls;
+using Prometheus.ViewModels.Pages.Inventory;
+using Styx;
+using Uranus;
 
 namespace Prometheus.Views.Pages.Inventory;
 
@@ -9,9 +12,13 @@ namespace Prometheus.Views.Pages.Inventory;
 /// </summary>
 public partial class BinView
 {
-    public BinView()
+    public BinVM VM { get; set; }
+
+    public BinView(Helios helios, Charon charon)
     {
+        VM = new BinVM(helios, charon);
         InitializeComponent();
+        DataContext = VM;
     }
 
     public override EDataType DataType => EDataType.NAVBin;

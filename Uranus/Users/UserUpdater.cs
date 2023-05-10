@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Uranus.Users.Models;
 
 namespace Uranus.Users;
@@ -17,16 +17,16 @@ public class UserUpdater
 
     public int User(User user) => Chariot.Update(user);
 
-    public int Roles(IEnumerable<Role> roles)
+    public async Task<int> RolesAsync(List<Role> roles)
     {
-        // Avoid multiple enum
-        var enumerable = roles as Role[] ?? roles.ToArray();
         // Make sure that any master or default is set to the correct values.
-        foreach (var role in enumerable) role.CheckStandards();
+        foreach (var role in roles) role.CheckStandards();
 
         var lines = 0;
 
-        Chariot.Database?.RunInTransaction(() => lines = enumerable.Sum(role => Chariot.InsertOrUpdate(role)));
+        async void Action() => lines = await Chariot.UpdateTableAsync(roles);
+
+        await new Task(() => Chariot.Database?.RunInTransaction(Action));
 
         return lines;
     }

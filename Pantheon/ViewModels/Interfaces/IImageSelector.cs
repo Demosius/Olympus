@@ -1,4 +1,5 @@
-﻿using Pantheon.ViewModels.Commands.Employees;
+﻿using System.Threading.Tasks;
+using Pantheon.ViewModels.Commands.Employees;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.Interfaces;
@@ -9,8 +10,8 @@ public interface IImageSelector
     public SaveImageChangesCommand SaveImageChangesCommand { get; }
     public FindNewImageCommand FindNewImageCommand { get; set; }
     public void ConfirmImageSelection();
-    public void SaveImageChanges();
-    public void FindNewImage();
+    public Task SaveImageChangesAsync();
+    public Task FindNewImageAsync();
     public bool CanSaveImage { get; set; }
     public Image? SelectedImage { get; }
 }

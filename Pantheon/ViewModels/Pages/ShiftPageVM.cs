@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using Morpheus.Views.Windows;
 using Pantheon.ViewModels.Controls.Shifts;
@@ -26,17 +27,8 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction, IShiftManager
     public Break? SelectedBreak => SelectedBreakVM?.Break;
 
     #region NotifiableProperties
-
-    private ObservableCollection<ShiftVM> shiftVMs;
-    public ObservableCollection<ShiftVM> ShiftVMs
-    {
-        get => shiftVMs;
-        set
-        {
-            shiftVMs = value;
-            OnPropertyChanged(nameof(ShiftVMs));
-        }
-    }
+    
+    public ObservableCollection<ShiftVM> ShiftVMs { get; set; }
 
     private ShiftVM? selectedShiftVM;
     public ShiftVM? SelectedShiftVM
@@ -48,17 +40,8 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction, IShiftManager
             OnPropertyChanged(nameof(SelectedShiftVM));
         }
     }
-
-    private ObservableCollection<Department> departments;
-    public ObservableCollection<Department> Departments
-    {
-        get => departments;
-        set
-        {
-            departments = value;
-            OnPropertyChanged(nameof(departments));
-        }
-    }
+    
+    public ObservableCollection<Department> Departments { get; set; }
 
     private Department? selectedDepartment;
     public Department? SelectedDepartment
@@ -88,7 +71,6 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction, IShiftManager
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public CreateShiftCommand CreateShiftCommand { get; set; }
 
     #endregion
@@ -98,24 +80,26 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction, IShiftManager
         Helios = helios;
         Charon = charon;
 
-        departments = new ObservableCollection<Department>(Helios.StaffReader.SubDepartments(Charon.Employee?.DepartmentName ?? "")); 
-        SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.Employee?.DepartmentName);
-        shiftVMs = new ObservableCollection<ShiftVM>(SelectedDepartment?.Shifts.Select(s => new ShiftVM(s, this)) ?? new List<ShiftVM>());
+        Departments = new ObservableCollection<Department>();
+        ShiftVMs = new ObservableCollection<ShiftVM>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         CreateShiftCommand = new CreateShiftCommand(this);
-    }
-    
-    public void RefreshData()
-    {
-        Departments = new ObservableCollection<Department>(Helios.StaffReader.SubDepartments(Charon.Employee?.DepartmentName ?? ""));
-        SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.Employee?.DepartmentName);
+
+        Task.Run(RefreshDataAsync);
     }
 
-    public void RepairData()
+    public async Task RefreshDataAsync()
     {
-        throw new System.NotImplementedException();
+        Departments.Clear();
+        ShiftVMs.Clear();
+
+        foreach (var department in await Helios.StaffReader.SubDepartmentsAsync(Charon.Employee?.DepartmentName ?? ""))
+            Departments.Add(department);
+
+        SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.Employee?.DepartmentName);
+        foreach (var shift in SelectedDepartment?.Shifts.Select(s => new ShiftVM(s, this)) ?? new List<ShiftVM>())
+            ShiftVMs.Add(shift);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

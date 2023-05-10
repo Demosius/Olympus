@@ -20,7 +20,7 @@ public class FindNewImageCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.FindNewImage();
+        VM.FindNewImageAsync();
     }
 
     public event EventHandler? CanExecuteChanged

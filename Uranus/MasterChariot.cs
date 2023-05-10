@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 
 namespace Uranus;
@@ -77,27 +78,34 @@ public abstract class MasterChariot
     /// <typeparam name="T"></typeparam>
     /// <param name="objList"></param>
     /// <returns>Difference between objects deleted and objects inserted.</returns>
-    public int ReplaceFullTable<T>(IEnumerable<T> objList)
+    public async Task<int> ReplaceFullTableAsync<T>(IEnumerable<T> objList)
     {
         var line = 0;
-        Database?.RunInTransaction(() =>
+
+        void Action()
         {
             line -= Database.DeleteAll<T>();
             line += Database.InsertAll(objList);
-        });
+        }
+
+        await new Task(() => Database?.RunInTransaction(Action));
+
         return line;
     }
 
     // Insert data into a table. Assumes that there will be no issues with duplicate data.
-    public int InsertIntoTable<T>(IEnumerable<T> objList)
+    public async Task<int> InsertIntoTableAsync<T>(IEnumerable<T> objList)
     {
         var enumerable = objList as T[] ?? objList.ToArray();
         if (!enumerable.Any()) return 0;
         var lines = 0;
-        Database?.RunInTransaction(() =>
+
+        async void Action()
         {
-            lines = Database.InsertAll(enumerable);
-        });
+            lines = await new Task<int>(() => Database.InsertAll(enumerable));
+        }
+        await new Task(() => Database?.RunInTransaction(Action));
+
         return lines;
     }
 
@@ -118,12 +126,14 @@ public abstract class MasterChariot
 
     /**************************** READ Data ****************************/
 
-    public List<T> PullObjectList<T>(Expression<Func<T, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) where T : new()
+    public async Task<List<T>> PullObjectListAsync<T>(Expression<Func<T, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) where T : new()
     {
         if (pullType == EPullType.ObjectOnly)
-            return (filter is null ? Database?.Table<T>().ToList() : Database?.Table<T>().Where(filter).ToList()) ?? new List<T>();
+            return await new Task<List<T>>(() =>
+                (filter is null ? Database?.Table<T>().ToList() : Database?.Table<T>().Where(filter).ToList()) ??
+                new List<T>());
         var recursive = pullType == EPullType.FullRecursive;
-        return Database.GetAllWithChildren(filter, recursive);
+        return await new Task<List<T>>(() => Database.GetAllWithChildren(filter, recursive));
     }
 
     public T? PullObject<T>(object primaryKey, EPullType pullType = EPullType.ObjectOnly) where T : new()
@@ -164,16 +174,20 @@ public abstract class MasterChariot
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="objList"></param>
-    /// <returns></returns>
-    public int UpdateTable<T>(IEnumerable<T> objList)
+    /// <returns>The number of rows modified in the database by this transaction.</returns>
+    public async Task<int> UpdateTableAsync<T>(IEnumerable<T> objList)
     {
-        var count = 0;
-        var list = objList as T[] ?? objList.ToArray();
-        if (!list.Any()) return count;
+        var lines = 0;
 
-        Database?.RunInTransaction(() => { count += list.Sum(obj => Database.InsertOrReplace(obj)); });
+        async void Action()
+        {
+            var tasks = objList.Select(InsertOrUpdateAsync);
+            var taskLines = await Task.WhenAll(tasks);
+            lines += taskLines.Sum();
+        }
 
-        return count;
+        await new Task(() => Database?.RunInTransaction(Action));
+        return lines;
     }
 
     /// <summary>
@@ -184,7 +198,8 @@ public abstract class MasterChariot
     /// <returns>The number of database rows affected.</returns>
     public int Update<T>(T item) => Database?.Update(item) ?? 0;
 
-    public int InsertOrUpdate<T>(T item) => Database?.InsertOrReplace(item) ?? 0;
+    public async Task<int> InsertOrUpdateAsync<T>(T item) =>
+        await new Task<int>(() => Database?.InsertOrReplace(item) ?? 0);
 
     /**************************** DELETE Data ****************************/
     public bool EmptyTable<T>()
@@ -236,6 +251,28 @@ public abstract class MasterChariot
         });
         return true;
     }
+
+    /**************************** Async Overrides  ****************************/
+    public async Task<int> ExecuteAsync(string query, params object[] args)
+    {
+        return await new Task<int>(() => Database?.Execute(query, args) ?? 0);
+    }
+
+    public async Task<int> UpdateAsync(object obj)
+    {
+        return await new Task<int>(() => Database?.Update(obj) ?? 0);
+    }
+
+    public async Task<int> UpdateAsync(object obj, Type objType)
+    {
+        return await new Task<int>(() => Database?.Update(obj, objType) ?? 0);
+    }
+    
+    public async Task<List<T>> QueryAsync<T>(string query, params object[] args) where T : new()
+    {
+        return await new Task<List<T>>(() => Database?.Query<T>(query, args) ?? new List<T>());
+    }
+
 
     /// <summary>
     ///  Goes through validation checks, but aims to repair the database if it fails.

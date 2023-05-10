@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Uranus;
@@ -160,7 +161,7 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
         ClearFiltersCommand = new ClearFiltersCommand(this);
     }
 
-    public void RunChecks()
+    public async Task RunChecksAsync()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
@@ -170,7 +171,7 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
         var fixedZones = fixedZoneString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.FixedBinCheckDataSet(fromZones, fixedZones);
+        var dataSet = await Helios.InventoryReader.FixedBinCheckDataSetAsync(fromZones, fixedZones);
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");

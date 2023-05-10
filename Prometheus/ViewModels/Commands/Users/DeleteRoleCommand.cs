@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Prometheus.ViewModels.Commands.Users;
 
-internal class DeleteRoleCommand : ICommand
+public class DeleteRoleCommand : ICommand
 {
     public RolesVM VM { get; set; }
 
@@ -13,14 +13,13 @@ internal class DeleteRoleCommand : ICommand
     public bool CanExecute(object? parameter)
     {
         return VM.SelectedRole is not null &&
-               VM.Charon is not null &&
                VM.SelectedRole.Users.Count == 0 &&
                VM.Charon.CanDeleteUserRole();
     }
 
     public void Execute(object? parameter)
     {
-        VM.DeleteRole();
+        _ = VM.DeleteRole();
     }
 
     public event EventHandler? CanExecuteChanged

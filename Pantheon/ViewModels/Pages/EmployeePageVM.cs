@@ -267,7 +267,6 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
 
     #region Commands
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public ApplySortingCommand ApplySortingCommand { get; set; }
@@ -283,7 +282,6 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         Charon = charon;
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
@@ -306,13 +304,15 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         clans = new ObservableCollection<Clan>();
         payPoints = new ObservableCollection<string>();
         roleNames = new ObservableCollection<string>();
+
+        Task.Run(RefreshDataAsync);
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        Task.Run(() =>
+        await Task.Run(async () =>
         {
-            EmployeeDataSet = Helios.StaffReader.EmployeeDataSet();
+            EmployeeDataSet = await Helios.StaffReader.EmployeeDataSetAsync();
 
             // Make sure that the user has an assigned role.
             if (Charon.Employee is not null && Charon.Employee.Role is null)
@@ -354,12 +354,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
             ApplyFilters();
         });
     }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void ClearFilters()
     {
         SelectedDepartment = null;
@@ -495,7 +490,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         }
 
         // Update database with full group of new rules.
-        var lines = Helios.StaffCreator.ShiftRuleRosters(targets.SelectMany(e => e.RosterRules));
+        var lines = Helios.StaffCreator.ShiftRuleRostersAsync(targets.SelectMany(e => e.RosterRules));
 
         MessageBox.Show($"Created {lines} new roster rules for current Full-Time Permanent employees.", "Success",
             MessageBoxButton.OK);

@@ -33,7 +33,7 @@ public class TempTagPageVM : INotifyPropertyChanged, IDBInteraction, ITempTags, 
 
     public bool CanConfirm => false;
 
-    public bool CanUnassign => CanCreate && SelectedTag is not null && SelectedEmployee is not null && 
+    public bool CanUnassign => CanCreate && SelectedTag is not null && SelectedEmployee is not null &&
                                SelectedTag.EmployeeID == SelectedEmployee.ID;
 
     public bool CanAssign => CanCreate && SelectedTag is not null &&
@@ -75,7 +75,6 @@ public class TempTagPageVM : INotifyPropertyChanged, IDBInteraction, ITempTags, 
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public SelectTempTagCommand SelectTempTagCommand { get; set; }
     public UnassignTempTagCommand UnassignTempTagCommand { get; set; }
     public AssignTempTagCommand AssignTempTagCommand { get; set; }
@@ -97,7 +96,6 @@ public class TempTagPageVM : INotifyPropertyChanged, IDBInteraction, ITempTags, 
         TagEmployeeVM = new TempTagEmployeeVM(this, DataSet);
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         SelectTempTagCommand = new SelectTempTagCommand(this);
         UnassignTempTagCommand = new UnassignTempTagCommand(this);
         CreateCommand = new CreateCommand(this);
@@ -105,32 +103,24 @@ public class TempTagPageVM : INotifyPropertyChanged, IDBInteraction, ITempTags, 
         ConfirmSelectionCommand = new ConfirmSelectionCommand(this);
         AssignTempTagCommand = new AssignTempTagCommand(this);
 
-        RefreshData();
+        Task.Run(RefreshDataAsync);
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        Task.Run(() =>
-        {
-            DataSet = Helios.StaffReader.EmployeeDataSet();
-            ManagementVM.RefreshData(DataSet);
-            TagEmployeeVM.RefreshData(DataSet);
-        });
+        DataSet = await Helios.StaffReader.EmployeeDataSetAsync();
+        ManagementVM.RefreshData(DataSet);
+        TagEmployeeVM.RefreshData(DataSet);
     }
 
     public void ReOrderEmployees()
     {
         TagEmployeeVM.ReOrderEmployees();
     }
-
-    public void RepairData()
+    
+    public async Task SelectTempTagAsync()
     {
-        throw new System.NotImplementedException();
-    }
-
-    public void SelectTempTag()
-    {
-        throw new System.NotImplementedException();
+        await new Task(() => { });
     }
 
     public void UnassignTempTag()
@@ -143,10 +133,10 @@ public class TempTagPageVM : INotifyPropertyChanged, IDBInteraction, ITempTags, 
         TagEmployeeVM.ReOrderEmployees();
     }
 
-    public void AssignTempTag()
+    public async Task AssignTempTagAsync()
     {
         if (!CanAssign) return;
-        Helios.StaffUpdater.AssignTempTag(ManagementVM.SelectedTag!.TempTag, TagEmployeeVM.SelectedEmployee!.Employee);
+        await Helios.StaffUpdater.AssignTempTagAsync(ManagementVM.SelectedTag!.TempTag, TagEmployeeVM.SelectedEmployee!.Employee);
         // Make sure objects are up to date.
         SelectedTag!.RefreshEmployee();
         SelectedEmployee!.RefreshTempTag();

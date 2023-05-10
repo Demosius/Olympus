@@ -1,4 +1,5 @@
-﻿using Pantheon.ViewModels.Commands.TempTags;
+﻿using System.Threading.Tasks;
+using Pantheon.ViewModels.Commands.TempTags;
 
 namespace Pantheon.ViewModels.Interfaces;
 
@@ -11,7 +12,7 @@ public interface ITempTags
     public UnassignTempTagCommand UnassignTempTagCommand { get; set; }
     public AssignTempTagCommand AssignTempTagCommand { get; set; }
 
-    public void SelectTempTag();
+    public Task SelectTempTagAsync();
     public void UnassignTempTag();
-    public void AssignTempTag();
+    public Task AssignTempTagAsync();
 }

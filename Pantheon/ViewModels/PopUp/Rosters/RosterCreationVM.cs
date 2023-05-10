@@ -4,6 +4,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using Uranus;
 using Uranus.Commands;
@@ -74,7 +75,6 @@ public class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ConfirmDepartmentRosterCreationCommand ConfirmDepartmentRosterCreationCommand { get; set; }
 
     #endregion
@@ -89,19 +89,21 @@ public class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
         rosterName = $"{startDate.FiscalWeek()} ({startDate.Year})";
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ConfirmDepartmentRosterCreationCommand = new ConfirmDepartmentRosterCreationCommand(this);
 
-        RefreshData();
-    }
-    
-    public void RefreshData()
-    {
-        if (Department.DepartmentRosters.Any())
-            StartDate = Department.DepartmentRosters.Select(dr => dr.StartDate).Max().AddDays(7);
+        Task.Run(RefreshDataAsync);
     }
 
-    public bool ConfirmDepartmentRosterCreation()
+    public async Task RefreshDataAsync()
+    {
+        await Task.Run(() =>
+        {
+            if (Department.DepartmentRosters.Any())
+                StartDate = Department.DepartmentRosters.Select(dr => dr.StartDate).Max().AddDays(7);
+        });
+    }
+
+    public async Task<bool> ConfirmDepartmentRosterCreation()
     {
         Roster = new DepartmentRoster(RosterName, StartDate, UseSaturdays, UseSundays, Department);
 
@@ -115,14 +117,10 @@ public class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
                 return false;
         }
 
-        Helios.StaffCreator.DepartmentRoster(Roster);
+        await Helios.StaffCreator.DepartmentRosterAsync(Roster);
         return true;
     }
 
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]

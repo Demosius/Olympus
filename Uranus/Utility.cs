@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Uranus;
 
@@ -29,6 +31,33 @@ public class InvalidDataException : Exception
 public class FailedConnectionException : Exception
 {
     public FailedConnectionException(string message) : base(message) { }
+}
+
+public static class AsyncHelper
+{
+    private static readonly TaskFactory myTaskFactory = new(
+        CancellationToken.None,
+        TaskCreationOptions.None,
+        TaskContinuationOptions.None,
+        TaskScheduler.Default);
+
+    public static TResult RunSync<TResult>(Func<Task<TResult>> func)
+    {
+        return myTaskFactory
+            .StartNew(func)
+            .Unwrap()
+            .GetAwaiter()
+            .GetResult();
+    }
+
+    public static void RunSync(Func<Task> func)
+    {
+        myTaskFactory
+            .StartNew(func)
+            .Unwrap()
+            .GetAwaiter()
+            .GetResult();
+    }
 }
 
 /// <summary>

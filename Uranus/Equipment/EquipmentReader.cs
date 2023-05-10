@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Uranus.Equipment.Models;
 
 namespace Uranus.Equipment;
@@ -16,18 +17,17 @@ public class EquipmentReader
     }
 
     /* Machines */
-    public List<Machine> Machines(Expression<Func<Machine, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+    public async Task<List<Machine>> MachinesAsync(Expression<Func<Machine, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) =>
+        await Chariot.PullObjectListAsync(filter, pullType);
 
-    public Dictionary<string, List<Machine>> MachineDictionary(Expression<Func<Machine, bool>>? filter = null, EPullType pullType = EPullType.IncludeChildren)
+    public async Task<Dictionary<string, List<Machine>>> MachineDictionary(Expression<Func<Machine, bool>>? filter = null, EPullType pullType = EPullType.IncludeChildren)
     {
-        return Machines(filter, pullType)
+        return (await MachinesAsync(filter, pullType))
             .GroupBy(m => m.TypeCode)
             .ToDictionary(g => g.Key, g => g.ToList());
     }
 
-    public List<Machine> Machines(string machineTypeCode, EPullType pullType = EPullType.ObjectOnly)
-    {
-        return Machines(m => m.TypeCode == machineTypeCode, pullType);
-    }
+    public async Task<List<Machine>> MachinesAsync(string machineTypeCode, EPullType pullType = EPullType.ObjectOnly)
+    => await MachinesAsync(m => m.TypeCode == machineTypeCode, pullType);
 
 }

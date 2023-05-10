@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 using Pantheon.ViewModels.PopUp.Rosters;
+using Uranus;
 
 namespace Pantheon.ViewModels.Commands.Rosters;
 
@@ -9,10 +10,7 @@ public class ConfirmDepartmentRosterCreationCommand : ICommand
 {
     public RosterCreationVM VM { get; set; }
 
-    public ConfirmDepartmentRosterCreationCommand(RosterCreationVM vm)
-    {
-        VM = vm;
-    }
+    public ConfirmDepartmentRosterCreationCommand(RosterCreationVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -23,8 +21,7 @@ public class ConfirmDepartmentRosterCreationCommand : ICommand
     {
         if (parameter is not Window w) return;
 
-        if (!VM.ConfirmDepartmentRosterCreation()) return;
-
+        if (!AsyncHelper.RunSync(() => VM.ConfirmDepartmentRosterCreation())) return;
         w.DialogResult = true;
         w.Close();
     }

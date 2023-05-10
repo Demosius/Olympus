@@ -6,7 +6,7 @@ using SQLiteNetExtensions.Attributes;
 
 namespace Uranus.Staff.Models;
 
-public class MissPick
+public class MissPick : IEquatable<MissPick>
 {
     [PrimaryKey] public string ID { get; set; } // e.g. 8292418:215854 => [CartonID]:[ItemNumber]
     public DateTime ShipmentDate { get; set; }
@@ -31,7 +31,7 @@ public class MissPick
     // MissPick Assignment Data
     [ForeignKey(typeof(PickEvent))] public string PickEventID { get; set; }
     [ForeignKey(typeof(PickSession))] public string PickSessionID { get; set; }
-    [ForeignKey(typeof(PickStatisticsByDay))] public string PickStatsID { get; set; }
+    [ForeignKey(typeof(PickDailyStats))] public string PickStatsID { get; set; }
 
     public string AssignedRF_ID { get; set; }
     public string AssignedDematicID { get; set; }
@@ -47,8 +47,8 @@ public class MissPick
     public PickEvent? PickEvent { get; set; }
     [ManyToOne(nameof(PickSessionID), nameof(Models.PickSession.MissPicks), CascadeOperations = CascadeOperation.CascadeRead)]
     public PickSession? PickSession { get; set; }
-    [ManyToOne(nameof(PickStatsID), nameof(PickStatisticsByDay.MissPicks), CascadeOperations = CascadeOperation.CascadeRead)]
-    public PickStatisticsByDay? PickStats { get; set; }
+    [ManyToOne(nameof(PickStatsID), nameof(PickDailyStats.MissPicks), CascadeOperations = CascadeOperation.CascadeRead)]
+    public PickDailyStats? PickStats { get; set; }
 
     [Ignore] public Employee? Employee { get; set; }
 
@@ -107,7 +107,7 @@ public class MissPick
         PickStats?.MissPicks.Add(this);
     }
     // Use when it can only be determined that the miss pick was made by a specific operator on a given date.
-    public void AssignPickStats(PickStatisticsByDay pickStats, ETechType tech)
+    public void AssignPickStats(PickDailyStats pickStats, ETechType tech)
     {
         PickStatsID = pickStats.ID;
         PickStats = pickStats;
@@ -158,4 +158,38 @@ public class MissPick
     }
 
     public static string GetMissPickID(string cartonID, int itemNo) => $"{cartonID}:{itemNo}";
+
+    public bool Equals(MissPick? x, MissPick? y)
+    {
+        if (ReferenceEquals(x, y)) return true;
+        if (ReferenceEquals(x, null)) return false;
+        if (ReferenceEquals(y, null)) return false;
+        if (x.GetType() != y.GetType()) return false;
+        return x.ID == y.ID;
+    }
+
+    public int GetHashCode(MissPick obj)
+    {
+        return obj.ID.GetHashCode();
+    }
+
+    public bool Equals(MissPick? other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return ID == other.ID;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        return obj.GetType() == GetType() && Equals((MissPick) obj);
+    }
+
+    public override int GetHashCode()
+    {
+        // ReSharper disable once NonReadonlyMemberInGetHashCode
+        return ID.GetHashCode();
+    }
 }

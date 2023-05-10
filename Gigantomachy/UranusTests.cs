@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Morpheus;
 using Uranus;
 using Uranus.Extensions;
+// ReSharper disable StringLiteralTypo
 
 namespace Gigantomachy;
 
@@ -14,7 +16,7 @@ namespace Gigantomachy;
 public class UranusTests
 {
     [TestMethod]
-    public void EventTracking()
+    public async Task EventTracking()
     {
         var raw = General.ClipboardToString();
 
@@ -27,7 +29,7 @@ public class UranusTests
 
         Assert.AreNotEqual(0, lines);*/
 
-        var stats = helios.StaffReader.PickStats(new DateTime(2020, 1, 1), DateTime.Today, true).ToList();
+        var stats = (await helios.StaffReader.PickStatsAsync(new DateTime(2020, 1, 1), DateTime.Today, true)).ToList();
         Assert.AreEqual(126, stats.Count);
 
         var sessions = stats.SelectMany(s => s.PickSessions).ToList();

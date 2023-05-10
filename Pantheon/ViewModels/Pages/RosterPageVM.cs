@@ -13,6 +13,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Uranus;
@@ -57,17 +58,8 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
             OnPropertyChanged();
         }
     }
-
-    private ObservableCollection<Department> departments;
-    public ObservableCollection<Department> Departments
-    {
-        get => departments;
-        set
-        {
-            departments = value;
-            OnPropertyChanged();
-        }
-    }
+    
+    public ObservableCollection<Department> Departments { get; set; }
 
     private Department? selectedDepartment;
     public Department? SelectedDepartment
@@ -112,17 +104,8 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
             OnPropertyChanged();
         }
     }
-
-    private ObservableCollection<DepartmentRoster> rosters;
-    public ObservableCollection<DepartmentRoster> Rosters
-    {
-        get => rosters;
-        set
-        {
-            rosters = value;
-            OnPropertyChanged();
-        }
-    }
+    
+    public ObservableCollection<DepartmentRoster> Rosters { get; set; }
 
     private DepartmentRoster? selectedRoster;
     public DepartmentRoster? SelectedRoster
@@ -155,7 +138,6 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public LoadRosterCommand LoadRosterCommand { get; set; }
     public NewRosterCommand NewRosterCommand { get; set; }
     public SaveRosterCommand SaveRosterCommand { get; set; }
@@ -168,33 +150,21 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
     {
         Helios = helios;
         Charon = charon;
-        
-        EmployeeDataSet = Helios.StaffReader.EmployeeDataSet();
-        
-        // Make sure that the user has an assigned role.
-        if (Charon.Employee is not null && Charon.Employee.Role is null)
-            if (EmployeeDataSet.Roles.TryGetValue(Charon.Employee.RoleName, out var role))
-                Charon.Employee.Role = role;
 
-        departments = new ObservableCollection<Department>(EmployeeDataSet.SubDepartments(Charon.Employee?.DepartmentName ?? ""));
-        
-        // Reporting employees (and other collections for filtering that list) is base purely on the employees that report to the current user.
-        ReportingEmployees = EmployeeDataSet.GetReportsByRole(Charon.Employee?.ID ?? 0).ToList();
-
-        rosters = new ObservableCollection<DepartmentRoster>();
-        SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.Employee?.DepartmentName);
-
-        minDate = DateTime.Today.AddDays(DayOfWeek.Sunday - DateTime.Today.DayOfWeek + 1);   // Default to Monday of the current week. (Sunday will get the next monday)
-        maxDate = minDate.AddDays(4);   // Default to the next friday.
+        EmployeeDataSet = new EmployeeDataSet();
+        ReportingEmployees = new List<Employee>();
         LoadedRosters = new Dictionary<Guid, DepartmentRosterVM>();
+        Departments = new ObservableCollection<Department>();
+        Rosters = new ObservableCollection<DepartmentRoster>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         LoadRosterCommand = new LoadRosterCommand(this);
         NewRosterCommand = new NewRosterCommand(this);
         SaveRosterCommand = new SaveRosterCommand(this);
         DeleteRosterCommand = new DeleteRosterCommand(this);
         ExportRosterCommand = new ExportRosterCommand(this);
+
+        Task.Run(RefreshDataAsync);
     }
 
     private void SetRosters()
@@ -210,7 +180,7 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
                      Rosters.Min(dr => DateTime.Now.Date.Subtract(dr.StartDate).TotalDays)) < .05);
     }
 
-    public void NewRoster()
+    public async Task NewRoster()
     {
         if (SelectedDepartment is null) return;
 
@@ -225,12 +195,12 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         Rosters.Add(newRoster);
         SelectedRoster = newRoster;
 
-        LoadRoster();
+        await LoadRoster();
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        EmployeeDataSet = Helios.StaffReader.EmployeeDataSet();
+        EmployeeDataSet = await Helios.StaffReader.EmployeeDataSetAsync();
 
         // Make sure that the user has an assigned role.
         if (Charon.Employee is not null && Charon.Employee.Role is null)
@@ -240,10 +210,13 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         // Reporting employees (and other collections for filtering that list) is base purely on the employees that report to the current user.
         ReportingEmployees = EmployeeDataSet.GetReportsByRole(Charon.Employee?.ID ?? 0).ToList();
 
-        Departments = new ObservableCollection<Department>(EmployeeDataSet.SubDepartments(Charon.Employee?.DepartmentName ?? ""));
+        Departments.Clear();
+        foreach (var subDepartment in EmployeeDataSet.SubDepartments(Charon.Employee?.DepartmentName ?? "")) 
+            Departments.Add(subDepartment);
+
         SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.Employee?.DepartmentName);
         
-        rosters = new ObservableCollection<DepartmentRoster>();
+        Rosters.Clear();
         
         minDate = DateTime.Today.AddDays(DayOfWeek.Sunday - DateTime.Today.DayOfWeek + 1);   // Default to Monday of the current week. (Sunday will get the next monday)
         maxDate = minDate.AddDays(4);   // Default to the next friday.
@@ -251,7 +224,7 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         LoadedRoster = null;
     }
 
-    public void LoadRoster()
+    public async Task LoadRoster()
     {
         if (LoadedRoster is not null || SelectedRoster is null) return;
 
@@ -259,20 +232,20 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
             vm = new DepartmentRosterVM(SelectedRoster, Helios, Charon);
 
         Mouse.OverrideCursor = Cursors.Wait;
-        vm.Initialize();
+        await vm.Initialize();
 
         if (!LoadedRosters.ContainsKey(SelectedRoster.ID)) LoadedRosters.Add(SelectedRoster.ID, vm);
 
         LoadedRoster = vm;
     }
 
-    public void ExportRoster()
+    public async Task ExportRoster()
     {
         // Must have a selected roster.
         if (SelectedRoster is null) return;
 
         var vm = LoadedRoster ?? new DepartmentRosterVM(SelectedRoster, Helios, Charon);
-        vm.Initialize();
+        await vm.Initialize();
         var depRoster = vm.DepartmentRoster;
 
         // Prompt for file/directory.
@@ -296,14 +269,14 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
             "Successful Export", MessageBoxButton.OK, MessageBoxImage.None);
     }
 
-    public void SaveRoster()
+    public async Task SaveRoster()
     {
         if (LoadedRoster is null || !LoadedRoster.IsInitialized) return;
 
         try
         {
             LoadedRoster.DepartmentRoster.RegenerateRosters();
-            Helios.StaffUpdater.DepartmentRoster(LoadedRoster.DepartmentRoster);
+            await Helios.StaffUpdater.DepartmentRosterAsync(LoadedRoster.DepartmentRoster);
             MessageBox.Show("Saved Successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.None);
         }
         catch (Exception ex)
@@ -329,12 +302,7 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         Rosters.Remove(SelectedRoster);
         SelectedRoster = null;
     }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]

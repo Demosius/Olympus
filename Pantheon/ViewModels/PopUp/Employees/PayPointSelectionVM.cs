@@ -65,7 +65,7 @@ public class PayPointSelectionVM : INotifyPropertyChanged, ISelector
         Charon = charon;
 
         PayPoints = new ObservableCollection<StringCountVM>(
-            Helios.StaffReader.Employees()
+            AsyncHelper.RunSync(() =>Helios.StaffReader.EmployeesAsync())
                 .GroupBy(e => e.PayPoint)
                 .ToDictionary(g => g.Key, g => g.Count())
                 .Select(i => new StringCountVM(i.Key, i.Value))

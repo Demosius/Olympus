@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using Cadmus.ViewModels;
 using Uranus;
 using Uranus.Interfaces;
@@ -21,8 +21,8 @@ public partial class CadmusPage : IProject
 
     public static bool RequiresUser => false;
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        throw new NotImplementedException();
+        await new Task(() => {});
     }
 }

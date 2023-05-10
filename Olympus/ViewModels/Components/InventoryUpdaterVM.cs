@@ -5,6 +5,7 @@ using Olympus.ViewModels.Commands;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Olympus.ViewModels.Windows;
@@ -141,7 +142,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         ItemUpdateTime = App.Helios.InventoryReader.LastTableUpdate(typeof(NAVItem));
     }
 
-    public void UpdateStock()
+    public async Task UpdateStock()
     {
         BinContentsUpdaterWindow? window = null;
         try
@@ -165,7 +166,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
             }
             else
             {
-                lines = App.Helios.InventoryUpdater.NAVStock(newStock);
+                lines = await App.Helios.InventoryUpdater.NAVStockAsync(newStock);
                 Mouse.OverrideCursor = Cursors.Arrow;
             }
 
@@ -193,13 +194,14 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         Mouse.OverrideCursor = Cursors.Arrow;
     }
 
-    public void UpdateBins()
+    public async Task UpdateBins()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
         try
         {
-            if (App.Helios.InventoryUpdater.NAVBins(DataConversion.NAVRawStringToBins(General.ClipboardToString())) > 0)
+            if (await App.Helios.InventoryUpdater.NAVBinsAsync(
+                    DataConversion.NAVRawStringToBins(General.ClipboardToString())) > 0)
             {
                 GetUpdateTimes();
                 MessageBox.Show("Update successful.", "Success", MessageBoxButton.OK);
@@ -221,13 +223,14 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         Mouse.OverrideCursor = Cursors.Arrow;
     }
 
-    public void UpdateUoM()
+    public async Task UpdateUoM()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
         try
         {
-            if (App.Helios.InventoryUpdater.NAVUoMs(DataConversion.NAVRawStringToUoMs(General.ClipboardToString())))
+            if (await App.Helios.InventoryUpdater.NAVUoMsAsync(
+                    DataConversion.NAVRawStringToUoMs(General.ClipboardToString())) > 0)
             {
                 GetUpdateTimes();
                 MessageBox.Show("Update successful.", "Success", MessageBoxButton.OK);
@@ -249,14 +252,14 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         Mouse.OverrideCursor = Cursors.Arrow;
     }
 
-    public void UpdateItems()
+    public async Task UpdateItems()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
         try
         {
-            if (App.Helios.InventoryCreator.NAVItems(DataConversion.NAV_CSVToItems(Settings.Default.ItemCSVLocation),
-                    InventoryReader.LastItemWriteTime(Settings.Default.ItemCSVLocation)))
+            if (await App.Helios.InventoryCreator.NAVItemsAsync(DataConversion.NAV_CSVToItems(Settings.Default.ItemCSVLocation),
+                    InventoryReader.LastItemWriteTime(Settings.Default.ItemCSVLocation)) > 0)
             {
                 GetUpdateTimes();
                 MessageBox.Show("Update successful.", "Success", MessageBoxButton.OK);

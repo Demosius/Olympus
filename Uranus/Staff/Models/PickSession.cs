@@ -20,7 +20,7 @@ public class PickSession
     public string EndTimeStamp { get; set; }
     public DateTime StartDateTime { get; set; }
     public DateTime EndDateTime { get; set; }
-    public DateTime Date { get; set; }
+    [Indexed] public DateTime Date { get; set; }
     [StringLength(4)] public string OperatorDematicID { get; set; }
     public string OperatorRF_ID { get; set; }
     public int Qty { get; set; }
@@ -28,7 +28,7 @@ public class PickSession
     public string TechString { get; set; }
     public ETechType TechType { get; set; }
 
-    [ForeignKey(typeof(PickStatisticsByDay))]
+    [ForeignKey(typeof(PickDailyStats))]
     public string StatsID { get; set; }
 
     [Ignore] public TimeSpan StartTime => StartDateTime.TimeOfDay;
@@ -40,8 +40,8 @@ public class PickSession
 
     [ManyToOne(nameof(OperatorID), nameof(Employee.PickSessions), CascadeOperations = CascadeOperation.CascadeRead)]
     public Employee? Operator { get; set; }
-    [ManyToOne(nameof(StatsID), nameof(PickStatisticsByDay.PickSessions), CascadeOperations = CascadeOperation.CascadeRead)]
-    public PickStatisticsByDay? PickStats { get; set; }
+    [ManyToOne(nameof(StatsID), nameof(PickDailyStats.PickSessions), CascadeOperations = CascadeOperation.CascadeRead)]
+    public PickDailyStats? PickStats { get; set; }
 
     [OneToMany(nameof(PickEvent.SessionID), nameof(PickEvent.Session), CascadeOperations = CascadeOperation.CascadeRead)]
     public List<PickEvent> PickEvents { get; set; }
@@ -101,7 +101,7 @@ public class PickSession
         OperatorID = first.OperatorID;
         Operator = first.Operator;
 
-        StatsID = PickStatisticsByDay.GetStatsID(OperatorDematicID, Date);
+        StatsID = PickDailyStats.GetStatsID(OperatorDematicID, Date);
 
         PickEvents = pickEvents;
         foreach (var pickEvent in pickEvents)
@@ -134,8 +134,8 @@ public class PickSession
 
     public static string GetSessionID(string dematicID, DateTime dateTime) => $"{dematicID}.{dateTime:yyyy.MM.dd.hh.mm.ss}";
 
-    public static Dictionary<(string, DateTime), List<PickSession>> GeneratePickSessions(
-        IEnumerable<PickEvent> pickEvents, TimeSpan? ptlBreak = null, TimeSpan? rftBreak = null)
+    public static List<PickSession> GeneratePickSessions(
+        IEnumerable<PickEvent> pickEvents, out List<PickDailyStats> stats, TimeSpan? ptlBreak = null, TimeSpan? rftBreak = null)
     {
         ptlBreak ??= PTLBreakSpan;
         rftBreak ??= RFTBreakSpan;
@@ -144,11 +144,12 @@ public class PickSession
         var eventDict = orderedEvents.GroupBy(e => (e.OperatorDematicID, e.Date))
             .ToDictionary(g => g.Key, g => g.ToList());
 
-        var returnDict = new Dictionary<(string, DateTime), List<PickSession>>();
+        var sessionDict = new Dictionary<(string, DateTime), List<PickSession>>();
+        var allSessions = new List<PickSession>();
 
         foreach (var (key, events) in eventDict)
         {
-            returnDict.Add(key, new List<PickSession>());
+            sessionDict.Add(key, new List<PickSession>());
 
             var i = 0;
             var sessionEvents = new List<PickEvent>();
@@ -166,14 +167,18 @@ public class PickSession
                     (pickEvent.TechType == ETechType.RFT && nextEvent.DateTime.Subtract(pickEvent.DateTime) >= rftBreak))
                 {
                     var session = new PickSession(sessionEvents);
+                    allSessions.Add(session);
                     sessionEvents.Clear();
-                    returnDict[key].Add(session);
+                    sessionDict[key].Add(session);
                 }
 
                 i++;
             }
         }
 
-        return returnDict;
+        stats = sessionDict.Select(dictItem =>
+            new PickDailyStats(dictItem.Key.Item1, dictItem.Key.Item2, dictItem.Value)).ToList();
+
+        return allSessions;
     }
 }

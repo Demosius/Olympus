@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Styx;
-using Styx.Interfaces;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -23,7 +23,6 @@ public class QuestVM : INotifyPropertyChanged, IDBInteraction
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
 
     #endregion
 
@@ -33,18 +32,13 @@ public class QuestVM : INotifyPropertyChanged, IDBInteraction
         Charon = charon;
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        throw new System.NotImplementedException();
+        await new Task(() => {});
     }
-
-    public void RepairData()
-    {
-        throw new System.NotImplementedException();
-    }
+    
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

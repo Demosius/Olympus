@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using Morpheus.ViewModels.Commands;
 using Morpheus.ViewModels.Interfaces;
@@ -170,7 +171,7 @@ public class TempTagManagementVM : INotifyPropertyChanged, IFilters, ISelector, 
 
         var tags = allTags
             .Where(tag => Regex.IsMatch(tag.RF_ID, FilterString, RegexOptions.IgnoreCase) &&
-                          (FilterAssigned is null || 
+                          (FilterAssigned is null ||
                            (FilterAssigned == true && tag.IsAssigned) ||
                            (FilterAssigned == false && !tag.IsAssigned)));
 
@@ -235,9 +236,9 @@ public class TempTagManagementVM : INotifyPropertyChanged, IFilters, ISelector, 
         SelectedTag = null;
     }
 
-    public void SelectTempTag()
+    public async Task SelectTempTagAsync()
     {
-        throw new System.NotImplementedException();
+        await new Task(() => { });
     }
 
     public void UnassignTempTag()
@@ -253,21 +254,21 @@ public class TempTagManagementVM : INotifyPropertyChanged, IFilters, ISelector, 
         ApplyFilters();
     }
 
-    public void AssignTempTag()
+    public async Task AssignTempTagAsync()
     {
-        throw new System.NotImplementedException();
+        await new Task(() => { });
     }
 
     /// <summary>
     /// Updates the usage in the database for the given tag.
     /// </summary>
     /// <param name="tag"></param>
-    public int UpdateTagUse(TempTagVM tag) => Helios.StaffUpdater.TagUsage(tag.TempTag);
+    public async Task<int> UpdateTagUseAsync(TempTagVM tag) => await Helios.StaffUpdater.TagUsageAsync(tag.TempTag);
 
     /// <summary>
     /// Updates the given usage in the database.
     /// </summary>
-    public int UpdateTagUse(TagUseVM tagUse) => Helios.StaffUpdater.TagUsage(tagUse.TagUse);
+    public async Task<int> UpdateTagUseAsync(TagUseVM tagUse) => await Helios.StaffUpdater.TagUsageAsync(tagUse.TagUse);
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

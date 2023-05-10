@@ -133,8 +133,11 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction, 
     public GoToEmployeeCommand GoToEmployeeCommand { get; set; }
     public RepairDataCommand RepairDataCommand { get; set; }
 
-    public EmployeePageVM()
+    public EmployeePageVM(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
+
         // Commands
         LaunchEmployeeEditorCommand = new LaunchEmployeeEditorCommand(this);
         LaunchEmployeeCreatorCommand = new LaunchEmployeeCreatorCommand(this);
@@ -144,15 +147,8 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction, 
         RefreshDataCommand = new RefreshDataCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
         GoToEmployeeCommand = new GoToEmployeeCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
-    }
 
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
-        allEmployees ??= new List<Employee>(Helios.StaffReader.GetManagedEmployees(Charon.Employee!.ID));
-        Task.Run(RefreshData);
+        Task.Run(RefreshDataAsync);
     }
 
     /// <summary>
@@ -256,14 +252,14 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction, 
         };
     }
 
-    internal void LaunchEmployeeCreator()
+    internal async Task LaunchEmployeeCreator()
     {
         EmployeeCreationWindow creator = new(Helios);
         if (creator.ShowDialog() != true) return;
 
         EmployeeEditorWindow editor = new(Helios, creator.VM.NewEmployee, true);
         if (editor.ShowDialog() == true)
-            RefreshData();
+            await RefreshDataAsync();
     }
 
     internal void LaunchEmployeeEditor()
@@ -301,15 +297,10 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction, 
         ApplyFilters();
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        allEmployees = new List<Employee>(Helios.StaffReader.GetManagedEmployees(Charon.Employee?.ID ?? 0));
+        allEmployees = new List<Employee>(await Helios.StaffReader.GetManagedEmployeesAsync(Charon.Employee?.ID ?? 0));
         ClearFilters();
-    }
-
-    public void RepairData()
-    {
-        throw new System.NotImplementedException();
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

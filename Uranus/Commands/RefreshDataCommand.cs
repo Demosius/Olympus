@@ -21,6 +21,6 @@ public class RefreshDataCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.RefreshData();
+        VM.RefreshDataAsync();
     }
 }

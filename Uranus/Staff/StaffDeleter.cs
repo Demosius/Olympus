@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Uranus.Staff.Models;
 
 namespace Uranus.Staff;
@@ -39,19 +41,22 @@ public class StaffDeleter
         });
     }
 
-    public void EntriesAndClocks(IEnumerable<ShiftEntry> deletedEntries, IEnumerable<ClockEvent> deletedClocks)
+    public async Task EntriesAndClocksAsync(IEnumerable<ShiftEntry> deletedEntries, IEnumerable<ClockEvent> deletedClocks)
     {
-        Chariot.Database?.RunInTransaction(() =>
+        await new Task(() =>
         {
-            foreach (var deletedEntry in deletedEntries)
+            Chariot.Database?.RunInTransaction(() =>
             {
-                ShiftEntry(deletedEntry);
-            }
+                foreach (var deletedEntry in deletedEntries)
+                {
+                    ShiftEntry(deletedEntry);
+                }
 
-            foreach (var deletedClock in deletedClocks)
-            {
-                ClockEvent(deletedClock);
-            }
+                foreach (var deletedClock in deletedClocks)
+                {
+                    ClockEvent(deletedClock);
+                }
+            });
         });
     }
 
@@ -140,11 +145,47 @@ public class StaffDeleter
                 tempTag.RF_ID);
 
             // Do not delete if still assigned and/or has historic use.
-            if (linesOfUse > 0) 
+            if (linesOfUse > 0)
                 return;
             success = Chariot.Delete(tempTag);
         });
 
         return success;
+    }
+
+    public int PickEvents(List<DateTime> dates)
+    {
+        var lines = 0;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            lines += dates.Sum(date => Chariot.Database?.Execute("DELETE FROM PickEvent WHERE Date = ?;", date.Ticks) ?? 0);
+        });
+
+        return lines;
+    }
+
+    public int PickSessions(List<DateTime> dates)
+    {
+        var lines = 0;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            lines += dates.Sum(date => Chariot.Database?.Execute("DELETE FROM PickSession WHERE Date = ?;", date.Ticks) ?? 0);
+        });
+
+        return lines;
+    }
+
+    public int PickStats(List<DateTime> dates)
+    {
+        var lines = 0;
+
+        Chariot.Database?.RunInTransaction(() =>
+        {
+            lines += dates.Sum(date => Chariot.Database?.Execute("DELETE FROM PickStatisticsByDay WHERE Date = ?;", date.Ticks) ?? 0);
+        });
+
+        return lines;
     }
 }

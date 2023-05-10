@@ -16,9 +16,9 @@ public class RunFixedBinChecksCommand : ICommand
                (VM.CheckCase || VM.CheckPack || VM.CheckEach || VM.CheckExclusiveEach);
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.RunChecks();
+        await VM.RunChecksAsync();
     }
 
     public event EventHandler? CanExecuteChanged

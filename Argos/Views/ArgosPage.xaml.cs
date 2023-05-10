@@ -1,5 +1,5 @@
 ﻿using Argos.ViewModels;
-using System;
+using System.Threading.Tasks;
 using Uranus;
 using Uranus.Interfaces;
 using Uranus.Staff;
@@ -21,8 +21,8 @@ public partial class ArgosPage : IProject
 
     public static bool RequiresUser => false;
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        throw new NotImplementedException();
+        await new Task(() => {});
     }
 }

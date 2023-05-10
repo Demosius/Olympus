@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using Uranus.Interfaces;
 using Uranus.Staff;
 
@@ -18,8 +18,8 @@ public partial class PhoenixPage : IProject
 
     public static bool RequiresUser => false;
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        throw new NotImplementedException();
+        await new Task(() => { });
     }
 }

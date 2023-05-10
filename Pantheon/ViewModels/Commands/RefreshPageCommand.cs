@@ -14,9 +14,9 @@ public class RefreshPageCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.RefreshPage();
+        await VM.RefreshPage();
     }
 
     public event EventHandler? CanExecuteChanged

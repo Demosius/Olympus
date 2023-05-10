@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Serilog;
@@ -155,7 +156,7 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
         FilteredCheckResults = new ObservableCollection<NegativeCheckResult>(results);
     }
     
-    public void RunChecks()
+    public async Task RunChecksAsync()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
@@ -168,7 +169,7 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
         BasicStockDataSet? dataSet;
         try
         {
-            dataSet = Helios.InventoryReader.BasicStockDataSet(zones, locations);
+            dataSet = await Helios.InventoryReader.BasicStockDataSetAsync(zones, locations);
         }
         catch (Exception ex)
         {

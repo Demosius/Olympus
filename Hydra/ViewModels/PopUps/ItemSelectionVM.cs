@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Uranus;
@@ -24,8 +25,8 @@ namespace Hydra.ViewModels.PopUps;
 public class ItemSelectionVM : INotifyPropertyChanged, IItemDataVM, ISorting
 {
     public ItemLevelsVM ItemLevelsVM { get; set; }
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public List<ItemVM> AllItems { get; set; }
 
@@ -60,7 +61,6 @@ public class ItemSelectionVM : INotifyPropertyChanged, IItemDataVM, ISorting
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public ApplySortingCommand ApplySortingCommand { get; set; }
@@ -75,9 +75,10 @@ public class ItemSelectionVM : INotifyPropertyChanged, IItemDataVM, ISorting
     public ItemSelectionVM(ItemLevelsVM vm)
     {
         ItemLevelsVM = vm;
+        Helios = vm.Helios;
+        Charon = vm.Charon;
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
@@ -91,25 +92,16 @@ public class ItemSelectionVM : INotifyPropertyChanged, IItemDataVM, ISorting
         AllItems = new List<ItemVM>();
         currentItems = new ObservableCollection<ItemVM>();
 
-        SetDataSources(vm.Helios!, vm.Charon!);
+        Task.Run(RefreshDataAsync);
     }
 
-    public void SetDataSources(Helios helios, Charon charon)
+    public async Task RefreshDataAsync()
     {
-        Helios = helios;
-        Charon = charon;
-        RefreshData();
-    }
-
-    public void RefreshData()
-    {
-        AllItems = ItemLevelsVM.AllItems;
-        ApplyFilters();
-    }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
+        await new Task(() =>
+        {
+            AllItems = ItemLevelsVM.AllItems;
+            ApplyFilters();
+        });
     }
 
     public void ClearFilters()
@@ -128,12 +120,10 @@ public class ItemSelectionVM : INotifyPropertyChanged, IItemDataVM, ISorting
         CurrentItems = new ObservableCollection<ItemVM>(CurrentItems.OrderBy(i => i.Number));
     }
 
-
-    public void ConfirmItemSelection()
+    public async Task ConfirmItemSelection()
     {
-        if (Helios is null) return;
         ItemLevelsVM.AllItems = AllItems;
-        Helios.InventoryUpdater.NAVItems(ItemLevelsVM.AllItems.Select(vm => vm.Item), DateTime.Now);
+        await Helios.InventoryUpdater.NAVItemsAsync(ItemLevelsVM.AllItems.Select(vm => vm.Item), DateTime.Now);
     }
 
     public void FilterItemsFromClipboard()

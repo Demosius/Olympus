@@ -3,26 +3,30 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Deimos.Models;
 using Deimos.ViewModels.Commands;
 using Deimos.ViewModels.Controls;
-using Microsoft.Win32;
 using Morpheus;
 using Morpheus.ViewModels.Commands;
+using Morpheus.ViewModels.Controls;
 using Morpheus.ViewModels.Interfaces;
 using Serilog;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
+using PDU = Deimos.PickDataUtility;
+
 
 namespace Deimos.ViewModels;
 
 public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
 {
     public Helios Helios { get; set; }
+    public ProgressBarVM ProgressBar { get; set; }
 
     public PickHistoryVM PickHistoryVM { get; }
     public MissPickDataVM MissPickDataVM { get; }
@@ -47,7 +51,7 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
                 OnPropertyChanged(nameof(endDate));
             }
             OnPropertyChanged();
-            RefreshData();
+            _ = RefreshDataAsync();
         }
     }
 
@@ -64,7 +68,7 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
                 OnPropertyChanged(nameof(startDate));
             }
             OnPropertyChanged();
-            RefreshData();
+            _ = RefreshDataAsync();
         }
     }
 
@@ -128,16 +132,16 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public RunCommand RunCommand { get; set; }
     public UploadPickEventsCommand UploadPickEventsCommand { get; set; }
     public UploadMissPickDataCommand UploadMissPickDataCommand { get; set; }
 
     #endregion
 
-    public DeimosVM(Helios helios)
+    public DeimosVM(Helios helios, ProgressBarVM progressBar)
     {
         Helios = helios;
+        ProgressBar = progressBar;
 
         PickHistoryVM = new PickHistoryVM(this);
         MissPickDataVM = new MissPickDataVM(this);
@@ -146,19 +150,19 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         DataComps = new ObservableCollection<DataDateComparison>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         RunCommand = new RunCommand(this);
         UploadPickEventsCommand = new UploadPickEventsCommand(this);
         UploadMissPickDataCommand = new UploadMissPickDataCommand(this);
     }
 
-    public void UploadPickEvents()
+    public async Task UploadPickEvents()
     {
+        var lines = 0;
         Mouse.OverrideCursor = Cursors.Wait;
         try
         {
             // First check the clipboard for relevant data.
-            var lines = Helios.StaffUpdater.UploadPickEvents(General.ClipboardToString());
+            lines += await Helios.StaffUpdater.UploadPickHistoryDataAsync(General.ClipboardToString());
             if (lines > 0)
             {
                 Mouse.OverrideCursor = Cursors.Arrow;
@@ -182,7 +186,7 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
                     $"{{{{\nMissing Columns:\n{string.Join(" || ", dataException.MissingColumns)}\n}}}}",
                     "File Load", MessageBoxButton.YesNoCancel, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                PickEventFileLoad();
+                lines += await PDU.PickEventFileLoadAsync(Helios);
             }
         }
         catch (Exception ex)
@@ -192,42 +196,16 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
             MessageBox.Show($"Unexpected Error:\n\n{ex}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        RefreshData();
+        if (lines > 0) _ = RefreshDataAsync();
     }
 
-    public void PickEventFileLoad()
+    public async Task UploadMissPickData()
     {
-        var fd = new OpenFileDialog()
-        {
-            Multiselect = true,
-            Filter = "Excel/CSV (*.xls*;*.csv)|*.xls*;*.csv"
-        };
-
-        if (fd.ShowDialog() != true) return;
-
-        var files = fd.FileNames.ToList();
-
-        Mouse.OverrideCursor = Cursors.Wait;
-
-        var lines = files.Sum(LoadPickEventsFromFile);
-
-        Mouse.OverrideCursor = Cursors.Arrow;
-
-        MessageBox.Show($"{lines} pick event lines successfully uploaded.", "Upload Success", MessageBoxButton.OK,
-            MessageBoxImage.Information);
-    }
-
-    public int LoadPickEventsFromFile(string filePath)
-    {
-
-    }
-
-    public void UploadMissPickData()
-    {
+        var lines = 0;
         Mouse.OverrideCursor = Cursors.Wait;
         try
         {
-            var lines = Helios.StaffCreator.UploadMissPickData(General.ClipboardToString());
+            lines += await Helios.StaffCreator.UploadMissPickDataAsync(General.ClipboardToString());
             if (lines > 0)
             {
                 Mouse.OverrideCursor = Cursors.Arrow;
@@ -237,8 +215,8 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
             else
             {
                 Mouse.OverrideCursor = Cursors.Arrow;
-                MessageBox.Show("Failed to upload data. Check that clipboard contents are correct, and try again.", "Upload Failed",
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("No miss-pick data uploaded. It data is valid, it is possible that the database already contains matching miss-picks.", "Upload Failed",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
         // Clipboard data not accurate. Offer to check for excel/csv files instead.
@@ -250,7 +228,7 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
                     $"{{{{\nMissing Columns:\n{string.Join(" || ", dataException.MissingColumns)}\n}}}}",
                     "File Load", MessageBoxButton.YesNoCancel, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                MissPickFileLoad();
+                lines += await PDU.MissPickFileLoad(Helios);
             }
         }
         catch (Exception ex)
@@ -260,15 +238,12 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
             MessageBox.Show($"Unexpected Error:\n\n{ex}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        RefreshData();
+        if (lines > 0) await RefreshDataAsync();
+        Mouse.OverrideCursor = Cursors.Arrow;
     }
 
-    public void MissPickFileLoad()
-    {
 
-    }
-
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
         DataComps.Clear();
 
@@ -280,8 +255,13 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
 
         Mouse.OverrideCursor = Cursors.Wait;
 
-        var events = Helios.StaffReader.RawPickEvents((DateTime)StartDate, (DateTime)EndDate).ToList();
-        var missPicks = Helios.StaffReader.RawMissPicks((DateTime) StartDate, (DateTime) EndDate).ToList();
+        var eventTask = Helios.StaffReader.RawPickEventsAsync((DateTime)StartDate, (DateTime)EndDate);
+        var missPickTask = Helios.StaffReader.RawMissPicksAsync((DateTime) StartDate, (DateTime) EndDate);
+
+        await Task.WhenAll(eventTask, missPickTask);
+
+        var events = (await eventTask).ToList();
+        var missPicks = (await missPickTask).ToList();
 
         var comps = DataDateComparison.GetDateComparisons(events, missPicks).OrderBy(d => d.Date);
 
@@ -314,11 +294,7 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         DatesWithoutMissPicks = DataComps.Count(d => !d.HasMissPicks);
     }
 
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
-    public void Run()
+    public async Task Run()
     {
         if (StartDate is null || EndDate is null)
         {
@@ -330,7 +306,7 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         Mouse.OverrideCursor = Cursors.Wait;
         var errorTool = new ErrorAssignmentTool(Helios, (DateTime) StartDate, (DateTime) EndDate, Overwrite);
 
-        if (errorTool.AssignErrors())
+        if (await errorTool.AssignErrors())
         {
             Mouse.OverrideCursor = Cursors.Arrow;
             MessageBox.Show("Error assignment complete.\n\n" +

@@ -2,11 +2,11 @@
 using Serilog;
 using Serilog.Events;
 using Styx;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using Prometheus.ViewModels.Controls;
 using Uranus;
@@ -34,17 +34,8 @@ public class SetUserRoleVM : INotifyPropertyChanged, IDBInteraction
             OnPropertyChanged();
         }
     }
-
-    private ObservableCollection<Role> roles;
-    public ObservableCollection<Role> Roles
-    {
-        get => roles;
-        set
-        {
-            roles = value;
-            OnPropertyChanged();
-        }
-    }
+    
+    public ObservableCollection<Role> Roles { get; set; }
 
     private Role? selectedRole;
     public Role? SelectedRole
@@ -62,7 +53,6 @@ public class SetUserRoleVM : INotifyPropertyChanged, IDBInteraction
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ConfirmRoleCommand ConfirmRoleCommand { get; set; }
 
     #endregion
@@ -73,18 +63,20 @@ public class SetUserRoleVM : INotifyPropertyChanged, IDBInteraction
         Charon = charon;
         user = newUser;
 
-        roles = new ObservableCollection<Role>(Helios.UserReader.Roles().OrderBy(r => r.Name));
+        Roles = new ObservableCollection<Role>();
         SelectedRole = Roles.FirstOrDefault(r => r.Name == User.RoleName);
         User.Role ??= SelectedRole;
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ConfirmRoleCommand = new ConfirmRoleCommand(this);
     }
     
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        roles = new ObservableCollection<Role>(Helios.UserReader.Roles().OrderBy(r => r.Name));
+        Roles.Clear();
+        foreach (var role in (await Helios.UserReader.RolesAsync()).OrderBy(r => r.Name))
+            Roles.Add(role);
+
         // Set selected role to be equal to the user's current role.
         SelectedRole = Roles.FirstOrDefault(r => r.Name == User.RoleName);
         User.Role ??= SelectedRole;
@@ -112,12 +104,7 @@ public class SetUserRoleVM : INotifyPropertyChanged, IDBInteraction
 
         return false;
     }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]

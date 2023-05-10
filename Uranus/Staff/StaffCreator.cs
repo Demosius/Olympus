@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Uranus.Staff.Models;
 
 namespace Uranus.Staff;
@@ -28,34 +29,36 @@ public class StaffCreator
 
     public bool ClockEvent(ClockEvent clockEvent) => Chariot.Create(clockEvent);
 
-    public bool SetShiftEntry(DateTime date, Employee employee)
+    public async Task<bool> SetShiftEntryAsync(DateTime date, Employee employee)
     {
         var returnVal = false;
-        Chariot.Database?.RunInTransaction(() =>
+
+        async void Action()
         {
             // Get suitable clock events.
-            var clocks = Chariot.Database.Query<ClockEvent>(
-                "SELECT * FROM ClockEvent WHERE Date = ? AND EmployeeID = ? AND Status <> ?;",
-                date.ToString("yyyy-MM-dd"), employee.ID, EClockStatus.Deleted);
-
-            if (!clocks.Any()) return;
+            var clockTask = Chariot.PullObjectListAsync<ClockEvent>(c => c.Date == date.ToString("yyyy-MM-dd") && c.EmployeeID == employee.ID && c.Status != EClockStatus.Deleted);
 
             // Get existing entry - if it exists.
-            var entryList = Chariot.Database.Query<ShiftEntry>(
-                "SELECT * FROM ShiftEntry WHERE Date = ? AND EmployeeID = ?;",
-                date.ToString("yyyy-MM-dd"), employee.ID);
+            var entryTask = Chariot.PullObjectListAsync<ShiftEntry>(e => e.Date == date.ToString("yyyy-MM-dd") && e.EmployeeID == employee.ID);
+
+            var clocks = await clockTask;
+            if (!clocks.Any()) return;
+
+            var entryList = await entryTask;
 
             var entry = entryList.Any() ? entryList.First() : new ShiftEntry(employee, date);
 
             entry.ApplyClockTimes(clocks);
 
-            foreach (var clockEvent in clocks)
-            {
-                Chariot.InsertOrUpdate(clockEvent);
-            }
+            var clockUpdateTask = Chariot.UpdateTableAsync(clocks);
+            var entryUpdateTask = Chariot.InsertOrUpdateAsync(entry);
 
-            returnVal = Chariot.InsertOrUpdate(entry) > 0;
-        });
+            var lines = await Task.WhenAll(clockUpdateTask, entryUpdateTask);
+
+            returnVal = lines.Sum() > 0;
+        }
+
+        await new Task(() => Chariot.Database?.RunInTransaction(Action));
 
         return returnVal;
     }
@@ -76,12 +79,12 @@ public class StaffCreator
         });
     }
 
-    public EmployeeIcon? CreateEmployeeIconFromSourceFile(string sourceFile) => (EmployeeIcon?)CreateImageFromSourceFile(sourceFile, EImageType.EmployeeIcon);
-    public EmployeeAvatar? CreateEmployeeAvatarFromSourceFile(string sourceFile) => (EmployeeAvatar?)CreateImageFromSourceFile(sourceFile, EImageType.EmployeeAvatar);
-    public ProjectIcon? CreateProjectIconFromSourceFile(string sourceFile) => (ProjectIcon?)CreateImageFromSourceFile(sourceFile, EImageType.ProjectIcon);
-    public LicenceImage? CreateLicenceImageFromSourceFile(string sourceFile) => (LicenceImage?)CreateImageFromSourceFile(sourceFile, EImageType.LicenceImage);
+    public async Task<EmployeeIcon?> CreateEmployeeIconFromSourceFileAsync(string sourceFile) => (EmployeeIcon?)await CreateImageFromSourceFileAsync(sourceFile, EImageType.EmployeeIcon);
+    public async Task<EmployeeAvatar?> CreateEmployeeAvatarFromSourceFileAsync(string sourceFile) => (EmployeeAvatar?)await CreateImageFromSourceFileAsync(sourceFile, EImageType.EmployeeAvatar);
+    public async Task<ProjectIcon?> CreateProjectIconFromSourceFileAsync(string sourceFile) => (ProjectIcon?)await CreateImageFromSourceFileAsync(sourceFile, EImageType.ProjectIcon);
+    public async Task<LicenceImage?> CreateLicenceImageFromSourceFileAsync(string sourceFile) => (LicenceImage?)await CreateImageFromSourceFileAsync(sourceFile, EImageType.LicenceImage);
 
-    public Image? CreateImageFromSourceFile(string sourceFile, EImageType type)
+    public async Task<Image?> CreateImageFromSourceFileAsync(string sourceFile, EImageType type)
     {
         if (!File.Exists(sourceFile)) return null;
 
@@ -97,7 +100,7 @@ public class StaffCreator
             _ => Path.GetDirectoryName(sourceFile) ?? ""
         };
 
-        var existingIcons = Chariot.PullObjectList<EmployeeIcon>().ToDictionary(i => i.Name, i => i);
+        var existingIcons = (await Chariot.PullObjectListAsync<EmployeeIcon>()).ToDictionary(i => i.Name, i => i);
 
         var newName = name;
         var cnt = 0;
@@ -149,21 +152,28 @@ public class StaffCreator
         }
     }
 
-    public int Employees(IEnumerable<Employee> employees) => Chariot.InsertIntoTable(employees);
+    public async Task<int> EmployeesAsync(IEnumerable<Employee> employees) => await Chariot.InsertIntoTableAsync(employees);
 
-    public int ShiftEntries(IEnumerable<ShiftEntry> entries) => Chariot.InsertIntoTable(entries);
+    public async Task<int> ShiftEntriesAsync(IEnumerable<ShiftEntry> entries) => await Chariot.InsertIntoTableAsync(entries);
 
-    public int ClockEvents(IEnumerable<ClockEvent> clocks) => Chariot.InsertIntoTable(clocks);
+    public async Task<int> ClockEventsAsync(IEnumerable<ClockEvent> clocks) => await Chariot.InsertIntoTableAsync(clocks);
 
-    public int AionDataSet(AionDataSet dataSet)
+    public async Task<int> AionDataSetAsync(AionDataSet dataSet)
     {
         var lines = 0;
-        Chariot.Database?.RunInTransaction(() =>
+
+        async void Action()
         {
-            if (dataSet.HasEmployees()) lines += Employees(dataSet.Employees.Select(entry => entry.Value));
-            if (dataSet.HasClockEvents()) lines += ClockEvents(dataSet.ClockEvents.Select(entry => entry.Value));
-            if (dataSet.HasShiftEntries()) lines += ShiftEntries(dataSet.ShiftEntries.Select(entry => entry.Value));
-        });
+            var tasks = new List<Task<int>>();
+            if (dataSet.HasClockEvents()) tasks.Add(ClockEventsAsync(dataSet.ClockEvents.Select(entry => entry.Value)));
+            if (dataSet.HasShiftEntries()) tasks.Add(ShiftEntriesAsync(dataSet.ShiftEntries.Select(entry => entry.Value)));
+            if (dataSet.HasEmployees()) tasks.Add(EmployeesAsync(dataSet.Employees.Select(entry => entry.Value)));
+
+            lines = (await Task.WhenAll(tasks)).Sum();
+        }
+
+        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+
         return lines;
     }
 
@@ -185,15 +195,21 @@ public class StaffCreator
 
     public void Break(Break @break) => Chariot.Create(@break);
 
-    public void DepartmentRoster(DepartmentRoster roster)
+    public async Task DepartmentRosterAsync(DepartmentRoster roster)
     {
-        Chariot.Database?.RunInTransaction(() =>
+        async void Action()
         {
-            Chariot.InsertIntoTable(roster.EmployeeRosters);
-            Chariot.InsertIntoTable(roster.Rosters);
-            Chariot.InsertIntoTable(roster.DailyRosters());
-            Chariot.Create(roster);
-        });
+            var tasks = new List<Task>
+            {
+                Chariot.InsertIntoTableAsync(roster.EmployeeRosters),
+                Chariot.InsertIntoTableAsync(roster.Rosters),
+                Chariot.InsertIntoTableAsync(roster.DailyRosters()),
+                Task.Run(() => Chariot.Create(roster))
+            };
+            await Task.WhenAll(tasks);
+        }
+
+        await new Task(() => Chariot.Database?.RunInTransaction(Action));
     }
 
     public void ShiftRuleSingle(ShiftRuleSingle shiftRule, EPushType pushType = EPushType.ObjectOnly) =>
@@ -205,35 +221,44 @@ public class StaffCreator
     public void ShiftRuleRoster(ShiftRuleRoster shiftRule, EPushType pushType = EPushType.ObjectOnly) =>
         Chariot.Create(shiftRule, pushType);
 
-    public int ShiftRuleRosters(IEnumerable<ShiftRuleRoster> rosterRules) => Chariot.InsertIntoTable(rosterRules);
+    public async Task<int> ShiftRuleRostersAsync(IEnumerable<ShiftRuleRoster> rosterRules) => await Chariot.InsertIntoTableAsync(rosterRules);
 
     public bool TempTag(TempTag newTag, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(newTag, pushType);
 
     /* Miss Pick Data */
-    public int UploadMissPickData(string rawData) =>
-        UploadMissPickData(DataConversion.RawStringToMissPicks(rawData));
+    public async Task<int> UploadMissPickDataAsync(string rawData) =>
+        await UploadMissPickDataAsync(DataConversion.RawStringToMissPicks(rawData));
 
-    public int UploadMissPickData(List<MissPick> missPicks)
+    public async Task<int> UploadMissPickDataAsync(List<MissPick> missPicks)
     {
         if (!missPicks.Any()) return 0;
         var lines = 0;
 
-        Chariot.Database?.RunInTransaction(() =>
+        async void Action()
         {
             // Figure out what data, if any, already exists within the data base.
             // What is the date range?
             var dates = missPicks.Select(mp => mp.ShipmentDate).ToList();
             var startDate = dates.Min();
             var endDate = dates.Max();
-            var existingData = Chariot
-                .PullObjectList<MissPick>(mp => mp.ShipmentDate >= startDate && mp.ShipmentDate <= endDate)
+            var existingData =
+                (await Chariot.PullObjectListAsync<MissPick>(mp =>
+                    mp.ShipmentDate >= startDate && mp.ShipmentDate <= endDate))
                 .ToDictionary(mp => mp.ID, mp => mp);
 
             var newLines = missPicks.Where(mp => !existingData.ContainsKey(mp.ID));
 
-            lines += Chariot.InsertIntoTable(newLines);
-        });
+            lines += await Chariot.InsertIntoTableAsync(newLines);
+        }
+
+        await new Task(() => Chariot.Database?.RunInTransaction(Action));
 
         return lines;
     }
+
+    public int PickEvents(List<PickEvent> events) => Chariot.Database?.InsertAll(events) ?? 0;
+
+    public int PickSessions(List<PickSession> sessions) => Chariot.Database?.InsertAll(sessions) ?? 0;
+
+    public int PickStats(List<PickDailyStats> pickStats) => Chariot.Database?.InsertAll(pickStats) ?? 0;
 }

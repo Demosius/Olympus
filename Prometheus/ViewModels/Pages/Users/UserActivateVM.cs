@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using Prometheus.ViewModels.Controls;
 using Uranus;
@@ -108,7 +109,6 @@ public class UserActivateVM : INotifyPropertyChanged, IFilters, IDBInteraction, 
     public ActivateManagersCommand ActivateManagersCommand { get; set; }
     public ActivateUserCommand ActivateUserCommand { get; set; }
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
 
     #endregion
 
@@ -129,34 +129,25 @@ public class UserActivateVM : INotifyPropertyChanged, IFilters, IDBInteraction, 
         ActivateManagersCommand = new ActivateManagersCommand(this);
         ActivateUserCommand = new ActivateUserCommand(this);
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
 
-        RefreshData();
+        Task.Run(RefreshDataAsync);
     }
     
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-
-        GatherEmployees();
-
+        await GatherEmployees();
         ApplyFilters();
     }
-
-    public void RepairData()
-    {
-        throw new System.NotImplementedException();
-    }
-
-
+    
     /// <summary>
     /// Fill the employees list based on User Role permissions and Employee reports (as required).
     /// </summary>
-    private void GatherEmployees()
+    private async Task GatherEmployees()
     {
         if (Charon.User is null) return;
 
         // Get the full data set.
-        var dataSet = Helios.StaffReader.EmployeeDataSet();
+        var dataSet = await Helios.StaffReader.EmployeeDataSetAsync();
 
         // Make sure that the user is assigned a relevant employee.role.
         if (dataSet.Employees.TryGetValue(Charon.User.ID, out var userEmployee))
@@ -217,25 +208,25 @@ public class UserActivateVM : INotifyPropertyChanged, IFilters, IDBInteraction, 
         foreach (var employeeVM in employeeList) Employees.Add(employeeVM);
     }
 
-    public void ActivateManagers()
+    public async Task ActivateManagers()
     {
         if (MessageBox.Show("Do you want to activate all managers (any employee with direct reports) as users?",
                 "Activate Managers", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
 
         if (Helios.UserReader.Role("Manager") is null) CreateManagerRole();
         
-        var managers = Helios.StaffReader.GetManagers();
+        var managers = Helios.StaffReader.GetManagersAsync();
 
         var i = 0;
 
-        foreach (var manager in managers)
+        foreach (var manager in await managers)
         {
             if (manager.IsUser) continue;
             Charon.CreateNewUser(manager, "Manager");
             ++i;
         }
 
-        RefreshData();
+        var refresh = RefreshDataAsync();
 
         if (i == 0)
             MessageBox.Show(
@@ -243,6 +234,8 @@ public class UserActivateVM : INotifyPropertyChanged, IFilters, IDBInteraction, 
                 "No New Users", MessageBoxButton.OK);
         else
             MessageBox.Show($"Successfully activated {i} managers as users.", "Success", MessageBoxButton.OK);
+
+        await refresh;
     }
 
     private void CreateManagerRole()

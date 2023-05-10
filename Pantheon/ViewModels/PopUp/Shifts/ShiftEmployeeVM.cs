@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Pantheon.ViewModels.Controls.Shifts;
 using Uranus;
 using Uranus.Staff.Models;
@@ -67,14 +68,18 @@ public class ShiftEmployeeVM : INotifyPropertyChanged
 
         ConfirmEmployeeAssignmentCommand = new ConfirmEmployeeAssignmentCommand(this);
 
-        SetData();
+        Task.Run(SetData);
     }
 
-    public void SetData()
+    public async Task SetData()
     {
-        empShifts = Helios.StaffReader.EmployeeShifts(Shift).ToList(); 
-        Employees = Helios.StaffReader.Employees(e => e.DepartmentName == Department.Name).ToDictionary(e => e.ID, e => e);
+        var shiftTask = Helios.StaffReader.EmployeeShiftsAsync(Shift); 
+        var empTask = Helios.StaffReader.EmployeesAsync(e => e.DepartmentName == Department.Name);
 
+        await Task.WhenAll(shiftTask, empTask);
+
+        empShifts = (await shiftTask).ToList();
+        Employees = (await empTask).ToDictionary(e => e.ID, e => e);
         // Set current connections as active and original.
         foreach (var employeeShift in empShifts)
         {

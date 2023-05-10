@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Uranus.Inventory.Models;
 
 namespace Uranus.Inventory;
@@ -50,7 +51,7 @@ public sealed class InventoryChariot : MasterChariot
     /***************************** CREATE Data ****************************/
 
     /*                             Update Times                           */
-    public int SetStockUpdateTimes(List<NAVStock> stock)
+    public async Task<int> SetStockUpdateTimesAsync(List<NAVStock> stock)
     {
         var dateTime = DateTime.Now;
         // Convert stock to list of BCUpdate items.
@@ -67,7 +68,7 @@ public sealed class InventoryChariot : MasterChariot
             .ToList();
 
         // Update Database
-        return UpdateTable(contentsUpdates);
+        return await UpdateTableAsync(contentsUpdates);
     }
 
     public int SetTableUpdateTime(Type type, DateTime dateTime = new())

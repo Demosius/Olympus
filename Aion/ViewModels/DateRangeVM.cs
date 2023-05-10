@@ -3,6 +3,7 @@ using Aion.ViewModels.Commands;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Aion.ViewModels;
 
@@ -74,10 +75,10 @@ public class DateRangeVM : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public void SetDateRange()
+    public async Task SetDateRange()
     {
         ShiftEntryPageVM.MinDate = MinDate;
         ShiftEntryPageVM.MaxDate = MaxDate;
-        ShiftEntryPageVM.RefreshData(true);
+        await ShiftEntryPageVM.RefreshDataAsync(true);
     }
 }

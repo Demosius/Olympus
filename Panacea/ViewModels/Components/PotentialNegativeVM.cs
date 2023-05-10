@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Panacea.Interfaces;
@@ -77,7 +78,7 @@ public class PotentialNegativeVM : INotifyPropertyChanged, IChecker
         RunChecksCommand = new RunChecksCommand(this);
     }
 
-    public void RunChecks()
+    public async Task RunChecksAsync()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
@@ -91,7 +92,7 @@ public class PotentialNegativeVM : INotifyPropertyChanged, IChecker
         BasicStockDataSet? dataSet;
         try
         {
-            dataSet = Helios.InventoryReader.BasicStockDataSet(zones, locations);
+            dataSet = await Helios.InventoryReader.BasicStockDataSetAsync(zones, locations);
         }
         catch (Exception ex)
         {

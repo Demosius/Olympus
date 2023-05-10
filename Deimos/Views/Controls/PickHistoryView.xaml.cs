@@ -1,13 +1,12 @@
-﻿namespace Deimos.Views.Controls
+﻿namespace Deimos.Views.Controls;
+
+/// <summary>
+/// Interaction logic for PickHistoryView.xaml
+/// </summary>
+public partial class PickHistoryView
 {
-    /// <summary>
-    /// Interaction logic for PickHistoryView.xaml
-    /// </summary>
-    public partial class PickHistoryView
+    public PickHistoryView()
     {
-        public PickHistoryView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

@@ -5,12 +5,9 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:users="clr-namespace:Prometheus.ViewModels.Pages.Users"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type users:RolesVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="UserDeactivatePage">
-
-    <Page.DataContext>
-        <users:RolesVM x:Name="VM"/>
-    </Page.DataContext>
 
     <Page.Resources>
         <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Orange/MSControls.Core.Implicit.xaml" />

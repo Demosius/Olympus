@@ -20,8 +20,8 @@ public class LaunchEmployeeCreatorCommand : ICommand
         return true;
     }
 
-    public void Execute(object parameter)
+    public async void Execute(object parameter)
     {
-        VM.LaunchEmployeeCreator();
+        await VM.LaunchEmployeeCreator();
     }
 }

@@ -16,9 +16,9 @@ public class ManageSiteCommand : ICommand
         return VM.SelectedObject is SiteItemLevelVM;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.ManageSite();
+        await VM.ManageSite();
     }
 
     public event EventHandler? CanExecuteChanged

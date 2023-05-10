@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Uranus;
 using Uranus.Staff;
 using Uranus.Staff.Models;
@@ -98,9 +99,9 @@ public partial class Charon
         return Employee.Role.LookUp(ref level, Employee.Role, ref targetRole) ? level - Employee.Role.Level : 999;
     }
 
-    public int GetLevelDifference(int employeeID)
+    public async Task<int> GetLevelDifference(int employeeID)
     {
-        var employee = staffReader.RoleStackEmployee(employeeID);
+        var employee = await staffReader.RoleStackEmployeeAsync(employeeID);
         return employee is null ? 999 : GetLevelDifference(employee);
     }
 
@@ -137,7 +138,7 @@ public partial class Charon
         User = null;
     }
 
-    public bool LogIn(int userID, string password)
+    public async Task<bool> LogInAsync(int userID, string password)
     {
         var login = userReader.Login(userID);
 
@@ -147,7 +148,7 @@ public partial class Charon
         var newUser = userReader.User(userID);
         if (newUser is null) return false;
 
-        newUser.Employee = staffReader.EmployeeLogIn(userID);
+        newUser.Employee = await staffReader.EmployeeLogInAsync(userID);
         User = newUser;
 
         return true;
@@ -157,7 +158,7 @@ public partial class Charon
     // Creating the original user. Only valid when there are no current employees/users/departments/etc.
     public bool RegisterAlphaUser(Employee employee, Department department, StaffRole staffRole, string password, string confirmPassword, out string message)
     {
-        userCreator.AssureDBManagerRole();
+        _ = userCreator.AssureDBManagerRoleAsync();
 
         // Make sure that the passwords are valid before continuing too far.
         if (!ValidatePassword(password, confirmPassword, out message)) return false;
@@ -309,9 +310,9 @@ public partial class Charon
     /// Deactivates the given user. Deletes the user and login from the appropriate database, and changes the associated data to reflect that they are no longer a user.
     /// </summary>
     /// <param name="targetUser"></param>
-    public bool DeactivateUser(User targetUser)
+    public async Task<bool> DeactivateUserAsync(User targetUser)
     {
-        var isSuccess = DeactivateUser(targetUser.ID);
+        var isSuccess = await DeactivateUserAsync(targetUser.ID);
         if (isSuccess && targetUser.Employee is not null) targetUser.Employee.IsUser = false;
         return isSuccess;
     }
@@ -320,10 +321,10 @@ public partial class Charon
     /// Deactivates the given user. Deletes the user and login from the appropriate database, and changes the associated data to reflect that they are no longer a user.
     /// </summary>
     /// <param name="userID"></param>
-    public bool DeactivateUser(int userID)
+    public async Task<bool> DeactivateUserAsync(int userID)
     {
         // Make sure the current user can (has permission to) deactivate the given user.
-        if (!CanDeleteUser(userID)) return false;
+        if (!await CanDeleteUserAsync(userID)) return false;
 
         // Remove from user database.
         // Edit employee in staff database only if user is deleted.

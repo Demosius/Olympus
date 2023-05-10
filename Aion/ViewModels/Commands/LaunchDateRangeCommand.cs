@@ -20,7 +20,7 @@ public class LaunchDateRangeCommand : ICommand
 
     public void Execute(object parameter)
     {
-        VM.LaunchDateRangeWindow();
+        VM.LaunchDateRangeWindowAsync();
     }
 
     public event EventHandler CanExecuteChanged

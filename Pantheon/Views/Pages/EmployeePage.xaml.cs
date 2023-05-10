@@ -16,6 +16,5 @@ public partial class EmployeePage
         InitializeComponent();
         VM = new EmployeePageVM(helios, charon);
         DataContext = VM;
-        VM.RefreshData();
     }
 }

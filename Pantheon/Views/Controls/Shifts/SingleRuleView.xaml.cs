@@ -1,15 +1,12 @@
-﻿using System.Windows.Controls;
+﻿namespace Pantheon.Views.Controls.Shifts;
 
-namespace Pantheon.Views.Controls.Shifts
+/// <summary>
+/// Interaction logic for SingleRuleView.xaml
+/// </summary>
+public partial class SingleRuleView
 {
-    /// <summary>
-    /// Interaction logic for SingleRuleView.xaml
-    /// </summary>
-    public partial class SingleRuleView : UserControl
+    public SingleRuleView()
     {
-        public SingleRuleView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

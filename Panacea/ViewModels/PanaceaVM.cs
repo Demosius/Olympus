@@ -1,7 +1,7 @@
 ﻿using Panacea.ViewModels.Components;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -30,7 +30,6 @@ public class PanaceaVM : INotifyPropertyChanged, IDBInteraction
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
 
     #endregion
 
@@ -47,17 +46,11 @@ public class PanaceaVM : INotifyPropertyChanged, IDBInteraction
         ItemsWithNoPickBinVM = new ItemsWithNoPickBinVM(helios);
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        throw new NotImplementedException();
-    }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
+        await new Task(() => { });
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

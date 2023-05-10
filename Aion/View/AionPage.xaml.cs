@@ -1,4 +1,5 @@
-﻿using Styx;
+﻿using System.Threading.Tasks;
+using Styx;
 using System.Windows.Input;
 using Uranus;
 using Uranus.Interfaces;
@@ -36,8 +37,8 @@ public partial class AionPage : IProject
 
     public static bool RequiresUser => true;
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        VM.RefreshData();
+        await VM.RefreshDataAsync();
     }
 }

@@ -3,8 +3,10 @@ using Aion.ViewModels.Commands;
 using Aion.ViewModels.Utility;
 using Styx;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Uranus;
@@ -13,7 +15,7 @@ using Uranus.Interfaces;
 
 namespace Aion.ViewModels;
 
-public class AionVM : INotifyPropertyChanged, IDBInteraction
+public class AionVM : INotifyPropertyChanged, IDBInteraction, IDBRepair
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
@@ -110,26 +112,30 @@ public class AionVM : INotifyPropertyChanged, IDBInteraction
         IsEntry = EntryView || EntryEdit;
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        EmployeePage?.VM.RefreshData();
-        ShiftEntryPage?.VM.RefreshData(true);
+        var tasks = new List<Task>
+        {
+            EmployeePage?.VM.RefreshDataAsync(),
+            ShiftEntryPage?.VM.RefreshDataAsync(true)
+        };
+
+        await Task.WhenAll(tasks);
     }
 
-    public void RepairData()
+    public async Task RepairDataAsync()
     {
-        EmployeePage?.VM.RepairData();
-        ShiftEntryPage?.VM.RepairData();
+        await ShiftEntryPage.VM.RepairDataAsync();
     }
 
-    public void ImportOldData()
+    public async Task ImportOldData()
     {
         try
         {
             var archivedData = OldDataUtil.GetArchivedData();
             if (archivedData is null || !archivedData.HasData()) return;
 
-            var currentData = Helios.StaffReader.GetAionDataSet();
+            var currentData = await Helios.StaffReader.GetAionDataSetAsync();
 
             // Remove non-unique data - where keys or specific unique combinations already exist.
             if (archivedData.HasEmployees())
@@ -144,9 +150,9 @@ public class AionVM : INotifyPropertyChanged, IDBInteraction
                                 !currentData.ShiftEntries.Select(d => d.Value).ToDictionary(se => (se.EmployeeID, se.Date)).ContainsKey((e.EmployeeID, e.Date)))
                     .ToDictionary(e => e.ID, e => e);
 
-            var lines = Helios.StaffCreator.AionDataSet(archivedData);
+            var lines = await Helios.StaffCreator.AionDataSetAsync(archivedData);
 
-            Helios.StaffUpdater.ApplyPendingClockEvents();
+            await Helios.StaffUpdater.ApplyPendingClockEventsAsync();
 
             MessageBox.Show($"Successfully converted and added {lines} new line of data.", "Update Successful", MessageBoxButton.OK);
         }

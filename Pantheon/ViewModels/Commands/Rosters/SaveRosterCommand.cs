@@ -15,9 +15,9 @@ public class SaveRosterCommand : ICommand
         return VM.IsLoaded;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.SaveRoster();
+        await VM.SaveRoster();
     }
 
     public event EventHandler? CanExecuteChanged

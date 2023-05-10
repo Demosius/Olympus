@@ -65,7 +65,7 @@ public class LocationSelectionVM : INotifyPropertyChanged, ISelector
         Charon = charon;
 
         Locations = new ObservableCollection<StringCountVM>(
-            Helios.StaffReader.Employees()
+            AsyncHelper.RunSync(() => Helios.StaffReader.EmployeesAsync())
                 .GroupBy(e => e.Location)
                 .ToDictionary(g => g.Key, g => g.Count())
                 .Select(i => new StringCountVM(i.Key, i.Value))

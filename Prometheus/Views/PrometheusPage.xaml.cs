@@ -1,5 +1,5 @@
 ﻿using Styx;
-using System;
+using System.Threading.Tasks;
 using System.Windows.Navigation;
 using Uranus;
 using Uranus.Interfaces;
@@ -22,9 +22,9 @@ public partial class PrometheusPage : IProject
 
     public static bool RequiresUser => false;
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        throw new NotImplementedException();
+        await new Task(() => {});
     }
 
     private void Frame_OnNavigating(object sender, NavigatingCancelEventArgs e)

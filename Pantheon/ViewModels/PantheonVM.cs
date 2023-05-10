@@ -1,8 +1,10 @@
-﻿using Pantheon.ViewModels.Commands;
+﻿using System.Collections.Generic;
+using Pantheon.ViewModels.Commands;
 using Pantheon.Views.Pages;
 using Styx;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using Uranus;
 
@@ -83,12 +85,14 @@ public class PantheonVM : INotifyPropertyChanged
         CurrentPage = TempTagPage ??= new TempTagPage(Helios, Charon);
     }
 
-    public void RefreshPage()
+    public async Task RefreshPage()
     {
-        if (CurrentPage is EmployeePage) EmployeePage!.VM.RefreshData();
-        if (CurrentPage is ShiftPage) ShiftPage!.VM.RefreshData();
-        if (CurrentPage is RosterPage) RosterPage!.VM.RefreshData();
-        if (CurrentPage is TempTagPage) TempTagPage!.VM.RefreshData();
+        var tasks = new List<Task>();
+        if (CurrentPage is EmployeePage) tasks.Add(EmployeePage!.VM.RefreshDataAsync());
+        if (CurrentPage is ShiftPage) tasks.Add(ShiftPage!.VM.RefreshDataAsync());
+        if (CurrentPage is RosterPage) tasks.Add(RosterPage!.VM.RefreshDataAsync());
+        if (CurrentPage is TempTagPage) tasks.Add(TempTagPage!.VM.RefreshDataAsync());
+        await Task.WhenAll(tasks);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

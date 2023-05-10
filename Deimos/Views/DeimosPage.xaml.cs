@@ -1,4 +1,6 @@
-﻿using Deimos.ViewModels;
+﻿using System.Threading.Tasks;
+using Deimos.ViewModels;
+using Morpheus.ViewModels.Controls;
 using Uranus;
 using Uranus.Interfaces;
 using Uranus.Staff;
@@ -12,9 +14,9 @@ public partial class DeimosPage : IProject
 {
     public DeimosVM VM { get; set; }
 
-    public DeimosPage(Helios helios)
+    public DeimosPage(Helios helios, ProgressBarVM progressBar)
     {
-        VM = new DeimosVM(helios);
+        VM = new DeimosVM(helios, progressBar);
         InitializeComponent();
         DataContext = VM;
     }
@@ -23,8 +25,8 @@ public partial class DeimosPage : IProject
 
     public static bool RequiresUser => false;
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        throw new System.NotImplementedException();
+        await new Task(() => {});
     }
 }

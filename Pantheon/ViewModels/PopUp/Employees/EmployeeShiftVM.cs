@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.ViewModels.Interfaces;
 using Uranus;
@@ -226,10 +227,10 @@ public class EmployeeShiftVM : INotifyPropertyChanged
         ConfirmShiftAdjustmentsCommand = new ConfirmShiftAdjustmentsCommand(this);
         AddRuleCommand = new AddRuleCommand(this);
 
-        SetData();
+        Task.Run(SetData);
     }
 
-    private void SetData()
+    private async Task SetData()
     {
         SingleRules.Clear();
         RecurringRules.Clear();
@@ -240,7 +241,7 @@ public class EmployeeShiftVM : INotifyPropertyChanged
         foreach (var ruleRoster in EmployeeVM.RosterRules) RosterRules.Add(ruleRoster);
 
         // We will require a basic list of shifts, and a dictionary where the Key by ID is preserved.
-        var shiftList = Helios.StaffReader.Shifts(Employee).ToList();
+        var shiftList = (await Helios.StaffReader.ShiftsAsync(Employee)).ToList();
         var shiftDict = shiftList.ToDictionary(s => s.ID, s => s);
 
         Shifts = new ObservableCollection<Shift>(shiftList);
@@ -258,7 +259,7 @@ public class EmployeeShiftVM : INotifyPropertyChanged
             ? EmployeeVM.DefaultShift?.Name ?? ""
             : "<-- No Default -->";
 
-        EmpShifts = new ObservableCollection<EmployeeShift>(Helios.StaffReader.EmployeeShifts(Employee)
+        EmpShifts = new ObservableCollection<EmployeeShift>((await Helios.StaffReader.EmployeeShiftsAsync(Employee))
             .Where(es => shiftDict.ContainsKey(es.ShiftID)));
 
         // Set current connections as active and original.

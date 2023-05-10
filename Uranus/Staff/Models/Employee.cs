@@ -124,8 +124,8 @@ public class Employee
     public List<PickEvent> PickEvents { get; set; }
     [OneToMany(nameof(PickSession.OperatorID), nameof(PickSession.Operator), CascadeOperations = CascadeOperation.CascadeRead)]
     public List<PickSession> PickSessions { get; set; }
-    [OneToMany(nameof(PickStatisticsByDay.OperatorID), nameof(PickStatisticsByDay.Operator), CascadeOperations = CascadeOperation.CascadeRead)]
-    public List<PickStatisticsByDay> PickStatistics { get; set; }
+    [OneToMany(nameof(PickDailyStats.OperatorID), nameof(PickDailyStats.Operator), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<PickDailyStats> PickStatistics { get; set; }
 
     [Ignore] public string FullName => $"{FirstName} {LastName}";
     [Ignore] public string ReportsToName => ReportsTo?.FullName ?? "";
@@ -173,7 +173,7 @@ public class Employee
         TagUse = new List<TagUse>();
         PickEvents = new List<PickEvent>();
         PickSessions = new List<PickSession>();
-        PickStatistics = new List<PickStatisticsByDay>();
+        PickStatistics = new List<PickDailyStats>();
     }
 
     public Employee(int id) : this()

@@ -1,9 +1,10 @@
-﻿using Aion.ViewModels.Commands;
+﻿using System.Threading.Tasks;
+using Aion.ViewModels.Commands;
 
 namespace Aion.ViewModels.Interfaces;
 
 public interface IDateRange
 {
     public LaunchDateRangeCommand LaunchDateRangeCommand { get; set; }
-    public void LaunchDateRangeWindow();
+    public Task LaunchDateRangeWindowAsync();
 }

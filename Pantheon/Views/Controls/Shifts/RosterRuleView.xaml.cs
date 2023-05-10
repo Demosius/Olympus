@@ -1,15 +1,12 @@
-﻿using System.Windows.Controls;
+﻿namespace Pantheon.Views.Controls.Shifts;
 
-namespace Pantheon.Views.Controls.Shifts
+/// <summary>
+/// Interaction logic for RosterRuleView.xaml
+/// </summary>
+public partial class RosterRuleView
 {
-    /// <summary>
-    /// Interaction logic for RosterRuleView.xaml
-    /// </summary>
-    public partial class RosterRuleView : UserControl
+    public RosterRuleView()
     {
-        public RosterRuleView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

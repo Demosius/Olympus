@@ -1,4 +1,5 @@
-﻿using Uranus.Staff;
+﻿using System.Threading.Tasks;
+using Uranus.Staff;
 
 namespace Uranus.Interfaces;
 
@@ -9,5 +10,5 @@ public interface IProject
     public static bool RequiresUser => requiresUser;
 
     EProject Project { get; }
-    public void RefreshData();
+    public Task RefreshDataAsync();
 }

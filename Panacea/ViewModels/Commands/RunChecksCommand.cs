@@ -18,7 +18,7 @@ public class RunChecksCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.RunChecks();
+        VM.RunChecksAsync();
     }
 
     public event EventHandler? CanExecuteChanged

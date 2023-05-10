@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Cadmus.Annotations;
@@ -145,7 +146,7 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         GenerateDisplayLabels();
     }
 
-    public void AddMoves()
+    public async Task AddMoves()
     {
         Mouse.OverrideCursor = Cursors.Wait;
         List<NAVMoveLine> moveLines;
@@ -168,7 +169,7 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         // Get other data from DB.
         try
         {
-            StockDataSet ??= Helios.InventoryReader.BasicStockDataSet(moveLines.Select(m => m.ZoneCode).Distinct().ToList(), new List<string> { "9600" });
+            StockDataSet ??= await Helios.InventoryReader.BasicStockDataSetAsync(moveLines.Select(m => m.ZoneCode).Distinct().ToList(), new List<string> { "9600" });
             StockDataSet?.SetMoveLineData(moveLines);
         }
         catch (Exception ex)
@@ -194,7 +195,7 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         }
 
         // Generate Mixed Carton moves, if applicable.
-        var mixedCartonTemplates = Helios.InventoryReader.MixedCartonTemplates().ToList();
+        var mixedCartonTemplates = (await Helios.InventoryReader.MixedCartonTemplatesAsync()).ToList();
 
         var mixCtnMoves = MixedCartonMove.GenerateMixedCartonMoveList(ref mixedCartonTemplates, ref moves);
         moves.AddRange(mixCtnMoves);

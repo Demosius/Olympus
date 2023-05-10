@@ -15,9 +15,9 @@ public class ExportRosterCommand : ICommand
         return VM.SelectedRoster is not null;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.ExportRoster();
+        await VM.ExportRoster();
     }
 
     public event EventHandler? CanExecuteChanged

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Aion.ViewModels;
 using Uranus;
 
 namespace Aion.View;
@@ -13,10 +14,13 @@ namespace Aion.View;
 /// </summary>
 public partial class EmployeePage
 {
+    public EmployeePageVM VM { get; set; }
+
     public EmployeePage(Helios helios, Charon charon)
     {
+        VM = new EmployeePageVM(helios, charon);
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+        DataContext = VM;
     }
 
     private readonly Style centerStyle = new()

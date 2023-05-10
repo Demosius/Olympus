@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Deimos.Views;
-using Uranus;
 using Uranus.Annotations;
 
 namespace Deimos.ViewModels;
@@ -12,7 +11,7 @@ public class AppVM : INotifyPropertyChanged
 
     public AppVM()
     {
-        DeimosPage = new DeimosPage(App.Helios);
+        DeimosPage = new DeimosPage(App.Helios, App.ProgressBar);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

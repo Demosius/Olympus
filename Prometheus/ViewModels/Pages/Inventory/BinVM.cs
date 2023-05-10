@@ -4,18 +4,21 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows;
 using Uranus;
 using Uranus.Annotations;
+using Uranus.Commands;
+using Uranus.Interfaces;
 using Uranus.Inventory.Models;
 
 namespace Prometheus.ViewModels.Pages.Inventory;
 
-public class BinVM : INotifyPropertyChanged
+public class BinVM : INotifyPropertyChanged, IDBInteraction
 {
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+
+    public Charon Charon { get; set; }
 
     private List<NAVBin> bins;
     public List<NAVBin> Bins
@@ -27,16 +30,8 @@ public class BinVM : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-    private ObservableCollection<NAVBin> displayBins;
-    public ObservableCollection<NAVBin> DisplayBins
-    {
-        get => displayBins;
-        set
-        {
-            displayBins = value;
-            OnPropertyChanged();
-        }
-    }
+
+    public ObservableCollection<NAVBin> DisplayBins { get; set; }
 
     private NAVBin? selectedBin;
     public NAVBin? SelectedBin
@@ -61,44 +56,37 @@ public class BinVM : INotifyPropertyChanged
         }
     }
 
-    public BinVM()
-    {
-        bins = new List<NAVBin>();
-        displayBins = new ObservableCollection<NAVBin>();
-        selectedBin = new NAVBin();
-        binFilter = string.Empty;
+    public RefreshDataCommand RefreshDataCommand { get; set; }
 
-        if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
-        {
-            Bins = new List<NAVBin>();
-            DisplayBins = new ObservableCollection<NAVBin>(Bins);
-        }
-        else
-        {
-            _ = Task.Run(SetBins);
-        }
-    }
-
-    public void SetDataSources(Helios helios, Charon charon)
+    public BinVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
-        SetBins();
+
+        bins = new List<NAVBin>();
+        DisplayBins = new ObservableCollection<NAVBin>();
+        selectedBin = new NAVBin();
+        binFilter = string.Empty;
+
+        RefreshDataCommand = new RefreshDataCommand(this);
+
+        Task.Run(RefreshDataAsync);
+    }
+
+    public async Task RefreshDataAsync()
+    {
+        Bins = await Helios.InventoryReader.NAVBinsAsync(pullType: EPullType.ObjectOnly);
+        DisplayBins = new ObservableCollection<NAVBin>(Bins);
     }
 
     private void ApplyFilter()
     {
-        DisplayBins = BinFilter == ""
-            ? new ObservableCollection<NAVBin>(Bins)
-            : new ObservableCollection<NAVBin>(Bins.Where(b => b.Code.ToLower().Contains(BinFilter.ToLower()))
-                .ToList());
-    }
+        DisplayBins.Clear();
 
-    private void SetBins()
-    {
-        if (Helios is null) return;
-        Bins = Helios.InventoryReader.NAVBins(pullType: EPullType.ObjectOnly);
-        DisplayBins = new ObservableCollection<NAVBin>(Bins);
+        var binList = Bins.Where(b => Regex.IsMatch(b.Code, BinFilter, RegexOptions.IgnoreCase));
+
+        foreach (var bin in binList)
+            DisplayBins.Add(bin);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

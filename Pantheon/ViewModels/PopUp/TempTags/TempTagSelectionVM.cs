@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using Morpheus.ViewModels.Commands;
 using Morpheus.ViewModels.Interfaces;
@@ -18,9 +19,10 @@ using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.PopUp.TempTags;
 
-public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, ITempTags
+public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, ITempTags, IDBInteraction
 {
     public Helios Helios { get; set; }
+
     public Charon Charon { get; set; }
 
     public bool UserCanCreate { get; }
@@ -98,6 +100,7 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
     public SelectTempTagCommand SelectTempTagCommand { get; set; }
     public UnassignTempTagCommand UnassignTempTagCommand { get; set; }
     public AssignTempTagCommand AssignTempTagCommand { get; set; }
+    public RefreshDataCommand RefreshDataCommand { get; set; }
 
     #endregion
 
@@ -105,8 +108,6 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
     {
         Helios = helios;
         Charon = charon;
-
-        AllTags = Helios.StaffReader.TempTags().Select(tag => new TempTagVM(tag)).ToList();
 
         TempTags = new ObservableCollection<TempTagVM>();
 
@@ -116,7 +117,8 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
 
         filterString = string.Empty;
 
-        ApplyFilters();
+        AllTags = new List<TempTagVM>();
+        Task.Run(RefreshDataAsync);
 
         CreateCommand = new CreateCommand(this);
         DeleteCommand = new DeleteCommand(this);
@@ -126,6 +128,13 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
         SelectTempTagCommand = new SelectTempTagCommand(this);
         UnassignTempTagCommand = new UnassignTempTagCommand(this);
         AssignTempTagCommand = new AssignTempTagCommand(this);
+        RefreshDataCommand = new RefreshDataCommand(this);
+    }
+
+    public async Task RefreshDataAsync()
+    {
+        AllTags = (await Helios.StaffReader.TempTagsAsync()).Select(tag => new TempTagVM(tag)).ToList();
+        ApplyFilters();
     }
 
     public void ClearFilters()
@@ -192,9 +201,9 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
         SelectedTag = null;
     }
 
-    public void SelectTempTag()
+    public async Task SelectTempTagAsync()
     {
-        throw new System.NotImplementedException();
+        await new Task(() => { });
     }
 
     public void UnassignTempTag()
@@ -210,9 +219,9 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
         ApplyFilters();
     }
 
-    public void AssignTempTag()
+    public async Task AssignTempTagAsync()
     {
-        throw new System.NotImplementedException();
+        await new Task(() => { });
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

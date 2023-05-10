@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using Pantheon.ViewModels.Commands.Employees;
 using Pantheon.ViewModels.Commands.TempTags;
@@ -414,7 +415,10 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
 
     public void SelectManager()
     {
-        var fullEmployeeList = Helios.StaffReader.Employees().OrderBy(e => e.FullName).Select(e => new EmployeeVM(e, Charon, Helios)).ToList();
+        var fullEmployeeList = AsyncHelper.RunSync(() => Helios.StaffReader.EmployeesAsync())
+            .OrderBy(e => e.FullName)
+            .Select(e => new EmployeeVM(e, Charon, Helios))
+            .ToList();
 
         var managerSelector = new EmployeeSelectionWindow(fullEmployeeList, true, DepartmentName);
         if (managerSelector.ShowDialog() != true) return;
@@ -430,7 +434,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         ReportsTo = null;
     }
 
-    public void SelectTempTag()
+    public async Task SelectTempTagAsync()
     {
         var tagSelector = new TempTagSelectionWindow(Helios, Charon);
         if (tagSelector.ShowDialog() != true) return;
@@ -438,7 +442,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         var tag = tagSelector.TempTag;
         if (tag is null) return;
 
-        Helios.StaffUpdater.AssignTempTag(tag, Employee);
+        await Helios.StaffUpdater.AssignTempTagAsync(tag, Employee);
         OnPropertyChanged(nameof(TempTag));
         OnPropertyChanged(nameof(TempTagRF_ID));
         OnPropertyChanged(nameof(HasNoTempTag));
@@ -458,7 +462,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         OnPropertyChanged(nameof(TempTagRF_ID));
     }
 
-    public void AssignTempTag() => SelectTempTag();
+    public async Task AssignTempTagAsync() => await SelectTempTagAsync();
 
     /// <summary>
     /// Assuming the user is about to adjust the employee in such a way that removes that employee from the user's permissions to edit further, make sure confirmation is attained.

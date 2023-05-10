@@ -16,9 +16,9 @@ public class AutoGenerateMixedCartonsCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.AutoGenerateMixedCartons();
+        await VM.AutoGenerateMixedCartons();
     }
 
     public event EventHandler? CanExecuteChanged

@@ -49,7 +49,7 @@ public class TagUseVM : INotifyPropertyChanged
             if (DateTime.TryParse(value, out var date))
             {
                 TagUse.EndDate = date;
-                TempTag.UpdateUse(this);
+                _ = TempTag.UpdateUse(this);
             }
             else
             {

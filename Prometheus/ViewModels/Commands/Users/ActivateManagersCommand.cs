@@ -15,9 +15,9 @@ public class ActivateManagersCommand : ICommand
         return VM.CanMassCreate;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.ActivateManagers();
+        await VM.ActivateManagers();
     }
 
     public event EventHandler? CanExecuteChanged

@@ -17,7 +17,7 @@ public class SaveImageChangesCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.SaveImageChanges();
+        VM.SaveImageChangesAsync();
     }
 
     public event EventHandler? CanExecuteChanged

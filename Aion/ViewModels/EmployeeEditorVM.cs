@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using Morpheus.Views.Windows;
 using Uranus;
 using Uranus.Commands;
@@ -204,32 +205,19 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
     public RefreshDataCommand RefreshDataCommand { get; set; }
     public AddLocationCommand AddLocationCommand { get; set; }
     public AddPayPointCommand AddPayPointCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
 
-    public EmployeeEditorVM()
+    public EmployeeEditorVM(Helios helios, Employee employee, bool isNew)
     {
+        Helios = helios;
+        IsNew = isNew;
+
         ConfirmEmployeeEditCommand = new ConfirmEmployeeEditCommand(this);
         RefreshDataCommand = new RefreshDataCommand(this);
         AddLocationCommand = new AddLocationCommand(this);
         AddPayPointCommand = new AddPayPointCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         UseManagers = true;
-    }
 
-    public EmployeeEditorVM(Employee employee)
-    {
-        SetEmployee(employee);
-    }
-
-    public EmployeeEditorVM(Employee employee, bool isNew) : this(employee)
-    {
-        IsNew = isNew;
-    }
-
-    public void SetDataSource(Helios helios)
-    {
-        Helios = helios;
-        RefreshData();
+        Task.Run(() => SetInitialData(employee));
     }
 
     public void SetEmployee(Employee newEmployee)
@@ -247,11 +235,10 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
         JobClassification = JobClassifications.FirstOrDefault(r => r.Name == newEmployee.RoleName);
     }
 
-    public void SetData(Helios helios, Employee newEmployee, bool isNew)
+    private async Task SetInitialData(Employee newEmployee)
     {
-        SetDataSource(helios);
-        IsNew = isNew;
-        SetEmployee(newEmployee);
+        await RefreshDataAsync();
+        await Task.Run(() =>SetEmployee(newEmployee));
     }
 
     /// <summary>
@@ -266,25 +253,22 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
             : new ObservableCollection<Employee>(employees.OrderBy(e => e.FullName));
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        Helios.StaffReader.AionEmployeeRefresh(out managerIDs, out employees,
-            out var locationsList, out var payPointList,
-            out var employmentTypeList, out var roleList,
-            out var departmentList);
+        (managerIDs, employees, var locationsList, var payPointList,
+                var employmentTypeList, var roleList, var departmentList)
+            = await Helios.StaffReader.AionEmployeeRefreshAsync();
 
-        Locations = new ObservableCollection<string>(locationsList.OrderBy(s => s));
-        PayPoints = new ObservableCollection<string>(payPointList.OrderBy(s => s));
-        EmploymentTypes = new ObservableCollection<EEmploymentType>(employmentTypeList);
-        JobClassifications = new ObservableCollection<Role>(roleList.OrderBy(r => r.Name));
-        Departments = new ObservableCollection<Department>(departmentList.OrderBy(d => d.Name));
+        await Task.Run(() =>
+        {
+            Locations = new ObservableCollection<string>(locationsList.OrderBy(s => s));
+            PayPoints = new ObservableCollection<string>(payPointList.OrderBy(s => s));
+            EmploymentTypes = new ObservableCollection<EEmploymentType>(employmentTypeList);
+            JobClassifications = new ObservableCollection<Role>(roleList.OrderBy(r => r.Name));
+            Departments = new ObservableCollection<Department>(departmentList.OrderBy(d => d.Name));
 
-        SetReportList();
-    }
-
-    public void RepairData()
-    {
-        throw new System.NotImplementedException();
+            SetReportList();
+        });
     }
 
     public void ConfirmEdit()

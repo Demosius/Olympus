@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.ViewModels.Interfaces;
 using Uranus;
@@ -78,7 +79,7 @@ public class IconSelectionVM : INotifyPropertyChanged, IImageSelector
         ParentVM = parentVM;
         Helios = parentVM.Helios;
 
-        icons = new ObservableCollection<EmployeeIcon>(Helios.StaffReader.EmployeeIcons());
+        icons = new ObservableCollection<EmployeeIcon>(AsyncHelper.RunSync(() => Helios.StaffReader.EmployeeIconsAsync()));
 
         iconName = string.Empty;
 
@@ -95,13 +96,13 @@ public class IconSelectionVM : INotifyPropertyChanged, IImageSelector
                        Icons.All(i => i.Name != IconName);
     }
 
-    public void SaveImageChanges()
+    public async Task SaveImageChangesAsync()
     {
         if (SelectedIcon is null) return;
 
         var icon = SelectedIcon;
 
-        Helios.StaffUpdater.RenameEmployeeIcon(ref icon, IconName);
+        await Task.Run(() => Helios.StaffUpdater.RenameEmployeeIcon(ref icon, IconName));
 
         SelectedIcon = icon;
     }
@@ -111,7 +112,7 @@ public class IconSelectionVM : INotifyPropertyChanged, IImageSelector
         ParentVM.Icon = SelectedIcon;
     }
 
-    public void FindNewImage()
+    public async Task FindNewImageAsync()
     {
         var dialog = new OpenFileDialog
         {
@@ -124,7 +125,7 @@ public class IconSelectionVM : INotifyPropertyChanged, IImageSelector
 
         if (dialog.ShowDialog() != true) return;
 
-        var icon = Helios.StaffCreator.CreateEmployeeIconFromSourceFile(dialog.FileName);
+        var icon = await Helios.StaffCreator.CreateEmployeeIconFromSourceFileAsync(dialog.FileName);
 
         if (icon is not null)
         {

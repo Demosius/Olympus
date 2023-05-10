@@ -1,6 +1,7 @@
 ﻿using Aion.ViewModels.Commands;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using Uranus;
 using Uranus.Staff.Models;
 
 namespace Aion.ViewModels;
@@ -48,7 +49,7 @@ public class SignInVM : INotifyPropertyChanged
 
     public SignInVM()
     {
-        Managers = new ObservableCollection<Employee>(App.Helios.StaffReader.GetManagers());
+        Managers = new ObservableCollection<Employee>(AsyncHelper.RunSync(() => App.Helios.StaffReader.GetManagersAsync()));
         SignInCommand = new SignInCommand(this);
     }
 

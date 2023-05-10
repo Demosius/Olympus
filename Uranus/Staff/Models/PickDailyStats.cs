@@ -7,10 +7,10 @@ using SQLiteNetExtensions.Attributes;
 
 namespace Uranus.Staff.Models;
 
-public class PickStatisticsByDay
+public class PickDailyStats
 {
     [PrimaryKey] public string ID { get; set; } // Example: 6118.2022.11.23 ([OperatorID].[Year].[Month].[Day]) 
-    public DateTime Date { get; set; }
+    [Indexed] public DateTime Date { get; set; }
     public TimeSpan PickDuration { get; set; }
     public int Qty { get; set; }
     public int SessionCount { get; set; }
@@ -50,7 +50,7 @@ public class PickStatisticsByDay
     [Ignore] public List<MissPick> ReceiveDateMissPicks { get; set; }
     [Ignore] public List<MissPick> PostedDateMissPicks { get; set; }
 
-    public PickStatisticsByDay()
+    public PickDailyStats()
     {
         ID = Guid.NewGuid().ToString(); // This should be immediately overwritten, but automatically should be unique so as not to cause potential issues.
         OperatorDematicID = string.Empty;
@@ -66,7 +66,7 @@ public class PickStatisticsByDay
         PostedDateMissPicks = new List<MissPick>();
     }
     
-    public PickStatisticsByDay(string dematicID, DateTime date, List<PickSession> sessions)
+    public PickDailyStats(string dematicID, DateTime date, List<PickSession> sessions)
     {
         ID = GetStatsID(dematicID, date);
 

@@ -17,7 +17,7 @@ public class AssignTempTagCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.AssignTempTag();
+        VM.AssignTempTagAsync();
     }
 
     public event EventHandler? CanExecuteChanged

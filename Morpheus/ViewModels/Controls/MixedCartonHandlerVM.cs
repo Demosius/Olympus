@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Morpheus.ViewModels.Commands;
@@ -57,7 +58,6 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public SaveMixedCartonsCommand SaveMixedCartonsCommand { get; set; }
     public AutoGenerateMixedCartonsCommand AutoGenerateMixedCartonsCommand { get; set; }
     public AddMixedCartonCommand AddMixedCartonCommand { get; set; }
@@ -78,7 +78,6 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
         MixedCartonItems = new List<MixedCartonItem>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         SaveMixedCartonsCommand = new SaveMixedCartonsCommand(this);
         AutoGenerateMixedCartonsCommand = new AutoGenerateMixedCartonsCommand(this);
         AddMixedCartonCommand = new AddMixedCartonCommand(this);
@@ -87,14 +86,14 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
         DeleteMixCtnItemCommand = new DeleteMixCtnItemCommand(this);
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
         MixedCartons.Clear();
 
         // Get existing Mixed carton data.
-        var mixedCartons = Helios.InventoryReader.GetMixedCartonData(out var mcItems, out var items);
+        var (mixedCartons, mcItems, items) = await Helios.InventoryReader.GetMixedCartonData();
 
         Items = items.ToDictionary(i => i.Number, i => i);
 
@@ -135,27 +134,24 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
         }
     }
 
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void SaveMixedCartons()
+    public async Task SaveMixedCartons()
     {
         // Confirm with user.
         if (MessageBox.Show("Are you sure you want to save the changes made to the Mixed Cartons?",
                 "Confirm Changes", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
 
         // Update/Replace table.
-        Helios.InventoryUpdater.ReplaceMixedCartons(MixedCartons);
+        await Helios.InventoryUpdater.ReplaceMixedCartonsAsync(MixedCartons);
     }
 
-    public void AutoGenerateMixedCartons()
+    public async Task AutoGenerateMixedCartons()
     {
-        if (!Items.Any() && !MixedCartons.Any()) RefreshData();
+        var dataTask = !Items.Any() && !MixedCartons.Any() ? RefreshDataAsync() : null;
 
         // Get zone(s) from user.
         var zoneInput = new InputWindow("Enter Zones (separated with pipe '|' character) to check.", "Zones");
+
+        if (dataTask is not null) await dataTask;
 
         if (zoneInput.ShowDialog() != true) return;
 
@@ -165,8 +161,14 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
 
         var zones = zoneString.Split('|');
 
-        var stock = Helios.InventoryReader
-            .NAVAllStock(s => zones.Contains(s.ZoneCode) && s.LocationCode == "9600")
+        var stockTask = Helios.InventoryReader
+                .NAVAllStockAsync(s => zones.Contains(s.ZoneCode) && s.LocationCode == "9600");
+
+        var existingSignatures = MixedCartons.Select(mc => mc.Signature).ToList();
+
+        var count = 0;
+
+        var stock = (await stockTask)
             .Where(s => s.Qty > 0)
             .GroupBy(s => s.BinID)
             .Where(g => g.Count() > 1)
@@ -175,13 +177,8 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
 
         // Set item objects against stock.
         foreach (var navStock in stock.SelectMany(s => s.Value))
-        {
             if (Items.TryGetValue(navStock.ItemNumber, out var item)) navStock.Item = item;
-        }
-
-        var existingSignatures = MixedCartons.Select(mc => mc.Signature).ToList();
-
-        var count = 0;
+        
 
         foreach (var (_, stockList) in stock)
         {

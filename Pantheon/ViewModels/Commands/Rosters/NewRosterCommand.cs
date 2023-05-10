@@ -15,9 +15,9 @@ public class NewRosterCommand : ICommand
         return VM.SelectedDepartment is not null;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.NewRoster();
+        await VM.NewRoster();
     }
 
     public event EventHandler? CanExecuteChanged

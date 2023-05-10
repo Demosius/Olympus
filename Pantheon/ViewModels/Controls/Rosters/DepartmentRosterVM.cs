@@ -9,6 +9,7 @@ using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.Views.PopUp.Employees;
@@ -312,11 +313,11 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
     /// 
     /// Full initialization can take some time, so only call to initialize when the specific Department Roster is to be used/viewed.
     /// </summary>
-    public void Initialize()
+    public async Task Initialize()
     {
         if (IsInitialized) return;
 
-        if (!DepartmentRoster.IsLoaded) Helios.StaffReader.FillDepartmentRoster(DepartmentRoster);
+        if (!DepartmentRoster.IsLoaded) await Helios.StaffReader.FillDepartmentRoster(DepartmentRoster);
 
         if (Department is null) throw new DataException("Department roster initialized without Department Object.");
 
@@ -633,11 +634,11 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         publicHolidayWindow.ShowDialog();
     }
 
-    public void GenerateLoanRosters()
+    public async Task GenerateLoanRosters()
     {
         if (Department is null) throw new DataException("Department roster initialized without Department Object.");
 
-        var employees = Helios.StaffReader.BorrowableEmployees(Department.Name)
+        var employees = (await Helios.StaffReader.BorrowableEmployeesAsync(Department.Name))
             .Select(e => new EmployeeVM(e, Charon, Helios)).ToList();
 
         var employeeSelector = new EmployeeSelectionWindow(employees, false, Department.Name, true);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Uranus;
 using Uranus.Inventory.Models;
 
@@ -34,59 +35,109 @@ public sealed class HydraChariot : MasterChariot
         InitializeDatabaseConnection();
     }
 
-    public int SendData(HydraDataSet? dataSet, IEnumerable<Move> moves)
+    public async Task<int> SendDataAsync(HydraDataSet? dataSet, IEnumerable<Move> moves)
     {
         var lines = 0;
 
-        Database?.RunInTransaction(() =>
+        async void Action()
         {
-            lines += UpdateTable(moves);
-            if (dataSet is null) return;
-            lines += UpdateTable(dataSet.Stock);
-            lines += UpdateTable(dataSet.Zones.Values);
-            lines += UpdateTable(dataSet.Items.Values);
-            lines += UpdateTable(dataSet.Bins.Values);
-            lines += UpdateTable(dataSet.Locations.Values);
-            lines += UpdateTable(dataSet.SiteItemLevels.Values);
-            lines += UpdateTable(dataSet.Sites.Values);
-            lines += UpdateTable(dataSet.NAVStock);
-            lines += UpdateTable(dataSet.UoMs);
-        });
+            var tasks = new List<Task<int>> {UpdateTableAsync(moves)};
+            if (dataSet is not null)
+            {
+                tasks.Add(UpdateTableAsync(dataSet.Stock));
+                tasks.Add(UpdateTableAsync(dataSet.Zones.Values));
+                tasks.Add(UpdateTableAsync(dataSet.Items.Values));
+                tasks.Add(UpdateTableAsync(dataSet.Bins.Values));
+                tasks.Add(UpdateTableAsync(dataSet.Locations.Values));
+                tasks.Add(UpdateTableAsync(dataSet.SiteItemLevels.Values));
+                tasks.Add(UpdateTableAsync(dataSet.Sites.Values));
+                tasks.Add(UpdateTableAsync(dataSet.NAVStock));
+                tasks.Add(UpdateTableAsync(dataSet.UoMs));
+            }
+
+            lines += (await Task.WhenAll(tasks)).Sum();
+        }
+
+        await new Task(() => Database?.RunInTransaction(Action));
 
         return lines;
     }
 
-    public IEnumerable<Move> GetOldMoves(out HydraDataSet dataSet)
+    public async Task<(IEnumerable<Move>, HydraDataSet)> GetOldMovesAsync()
     {
-        dataSet = HydraDataSet();
+        var dataSetTask = HydraDataSetAsync();
+        var moveTask = PullObjectListAsync<Move>();
 
-        return PullObjectList<Move>();
+        await Task.WhenAll(dataSetTask, moveTask);
+
+        return (await moveTask, await dataSetTask);
+    }
+
+    /// <summary>
+    /// Get stock relevant to Hydra Data.
+    /// </summary>
+    /// <returns>Tuple: (Stock, Bins, UoMs)</returns>
+    public async Task<(List<NAVStock>, IEnumerable<NAVBin>, List<NAVUoM>)> HydraStockAsync()
+    {
+        List<NAVStock>? stock = null;
+        IEnumerable<NAVBin>? bins = null;
+        List<NAVUoM>? uomList = null;
+
+        async void Action()
+        {
+            var stockTask = PullObjectListAsync<NAVStock>();
+            var binTask = BinsAsync();
+            var uomTask = PullObjectListAsync<NAVUoM>();
+
+            await Task.WhenAll(stockTask, binTask, uomTask);
+
+            stock = await stockTask;
+            bins = await binTask;
+            uomList = await uomTask;
+        }
+
+        await new Task(() => Database?.RunInTransaction(Action));
+
+        stock ??= new List<NAVStock>();
+        bins ??= new List<NAVBin>();
+        uomList ??= new List<NAVUoM>();
+
+        return (stock, bins, uomList);
     }
 
     /// <summary>
     /// Get the full set of data required for standard Hydra functionality.
     /// </summary>
     /// <returns></returns>
-    public HydraDataSet HydraDataSet(bool includeStock = true)
+    public async Task<HydraDataSet> HydraDataSetAsync(bool includeStock = true)
     {
         HydraDataSet? dataSet = null;
 
-        Database?.RunInTransaction(() =>
+        List<NAVStock> stock;
+        IEnumerable<NAVBin> bins;
+        List<NAVUoM> uomList;
+
+        async void Action()
         {
-            var items = Items().ToList();
-            var sites = Sites(out var zones).ToList();
-            var levels = PullObjectList<SiteItemLevel>().ToDictionary(l => (l.ItemNumber, l.SiteName), l => l);
-            var stock = includeStock
-                ? PullObjectList<NAVStock>()
-                : new List<NAVStock>();
-            var bins = includeStock
-                ? Bins()
-                : new List<NAVBin>();
-            var uomList = includeStock
-                ? PullObjectList<NAVUoM>()
-                : new List<NAVUoM>();
+            var stockTask = includeStock
+                ? HydraStockAsync()
+                : new Task<(List<NAVStock> stock, IEnumerable<NAVBin> bins, List<NAVUoM> uomList)>(() =>
+                    (new List<NAVStock>(), new List<NAVBin>(), new List<NAVUoM>()));
+            var itemTask = ItemsAsync();
+            var siteTask = SitesAsync();
+            var levelTask = PullObjectListAsync<SiteItemLevel>();
+            var locationTask = PullObjectListAsync<NAVLocation>();
+
+            await Task.WhenAll(itemTask, siteTask, levelTask, locationTask, stockTask);
+
+            (stock, bins, uomList) = await stockTask;
+
+            var items = (await itemTask).ToList();
+            var (s, zones) = await siteTask;
+            var sites = s.ToList();
+            var levels = (await levelTask).ToDictionary(l => (l.ItemNumber, l.SiteName), l => l);
             var newLevels = new List<SiteItemLevel>();
-            var locations = PullObjectList<NAVLocation>();
+            var locations = await locationTask;
 
             foreach (var item in items)
             {
@@ -110,7 +161,7 @@ public sealed class HydraChariot : MasterChariot
             IEnumerable<SiteItemLevel> allLevels;
             if (newLevels.Any())
             {
-                InsertIntoTable(newLevels);
+                _ = InsertIntoTableAsync(newLevels);
                 allLevels = newLevels.Concat(levels.Values);
             }
             else
@@ -119,7 +170,9 @@ public sealed class HydraChariot : MasterChariot
             }
 
             dataSet = new HydraDataSet(items, sites, zones, allLevels, bins, stock, uomList, locations);
-        });
+        }
+
+        await new Task(() => Database?.RunInTransaction(Action));
 
         dataSet ??= new HydraDataSet(new List<NAVItem>(), new List<Site>(), new List<NAVZone>(),
             new List<SiteItemLevel>(), new List<NAVBin>(), new List<NAVStock>(), new List<NAVUoM>(),
@@ -133,20 +186,27 @@ public sealed class HydraChariot : MasterChariot
     /// Gets all sites with the appropriately attached zones (with their zone extensions).
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<Site> Sites(out List<NAVZone> zones)
+    public async Task<(IEnumerable<Site>, List<NAVZone>)> SitesAsync()
     {
-        List<NAVZone>? zoneList = null;
+        List<NAVZone>? zones = null;
         Dictionary<string, Site>? siteDict = null;
 
-        Database?.RunInTransaction(() =>
+        async void Action()
         {
-            zoneList = Zones().ToList();
-            siteDict = PullObjectList<Site>().ToDictionary(s => s.Name, s => s);
-        });
-        zoneList ??= new List<NAVZone>();
-        siteDict ??= new Dictionary<string, Site>();
-        zones = zoneList;
+            var zoneTask = Zones();
+            var siteTask = PullObjectListAsync<Site>();
 
+            await Task.WhenAll(zoneTask, siteTask);
+
+            zones = (await zoneTask).ToList();
+            siteDict = (await siteTask).ToDictionary(s => s.Name, s => s);
+        }
+
+        await new Task(() => Database?.RunInTransaction(Action));
+
+        zones ??= new List<NAVZone>();
+        siteDict ??= new Dictionary<string, Site>();
+        
         foreach (var zone in zones.Where(zone => zone.SiteName != ""))
         {
             if (!siteDict.TryGetValue(zone.SiteName, out var site))
@@ -160,22 +220,27 @@ public sealed class HydraChariot : MasterChariot
             }
         }
 
-        return siteDict.Values;
+        return (siteDict.Values, zones);
     }
 
     /// <summary>
     /// Items with matched item-extension objects.
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<NAVItem> Items()
+    public async Task<IEnumerable<NAVItem>> ItemsAsync()
     {
         IEnumerable<NAVItem>? returnItems = null;
 
-        Database?.RunInTransaction(() =>
+        async void Action()
         {
-            var items = PullObjectList<NAVItem>().ToDictionary(i => i.Number, i => i);
-            var extensions = PullObjectList<ItemExtension>().ToDictionary(e => e.ItemNumber, e => e);
+            var itemTask = PullObjectListAsync<NAVItem>();
+            var extensionTask = PullObjectListAsync<ItemExtension>();
             var newExtensions = new List<ItemExtension>();
+
+            await Task.WhenAll(itemTask, extensionTask);
+
+            var items = (await itemTask).ToDictionary(i => i.Number, i => i);
+            var extensions = (await extensionTask).ToDictionary(e => e.ItemNumber, e => e);
 
             foreach (var (no, item) in items)
             {
@@ -191,9 +256,11 @@ public sealed class HydraChariot : MasterChariot
                 }
             }
 
-            InsertIntoTable(newExtensions);
+            await InsertIntoTableAsync(newExtensions);
             returnItems = items.Values;
-        });
+        }
+
+        await new Task(() => Database?.RunInTransaction(Action));
         returnItems ??= new List<NAVItem>();
 
         return returnItems;
@@ -203,16 +270,21 @@ public sealed class HydraChariot : MasterChariot
     /// Items with matched item-extension objects.
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<NAVBin> Bins()
+    public async Task<IEnumerable<NAVBin>> BinsAsync()
     {
         IEnumerable<NAVBin>? returnBins = null;
 
-        Database?.RunInTransaction(() =>
+        async void Action()
         {
-            var bins = PullObjectList<NAVBin>().ToDictionary(i => i.ID, i => i);
-            var bays = PullObjectList<Bay>().ToDictionary(b => b.ID, b => b);
-            var extensions = PullObjectList<BinExtension>().ToDictionary(e => e.BinID, e => e);
+            var binTask = PullObjectListAsync<NAVBin>();
+            var bayTask = PullObjectListAsync<Bay>();
+            var extensionTask = PullObjectListAsync<BinExtension>();
+
             var newExtensions = new List<BinExtension>();
+
+            var bins = (await binTask).ToDictionary(i => i.ID, i => i);
+            var bays = (await bayTask).ToDictionary(b => b.ID, b => b);
+            var extensions = (await extensionTask).ToDictionary(e => e.BinID, e => e);
 
             foreach (var (no, bin) in bins)
             {
@@ -235,9 +307,11 @@ public sealed class HydraChariot : MasterChariot
                 bin.Bay = bay;
             }
 
-            InsertIntoTable(newExtensions);
+            await InsertIntoTableAsync(newExtensions);
             returnBins = bins.Values;
-        });
+        }
+
+        await new Task(() => Database?.RunInTransaction(Action));
         returnBins ??= new List<NAVBin>();
 
         return returnBins;
@@ -247,15 +321,18 @@ public sealed class HydraChariot : MasterChariot
     /// Zones with matched zone-extension objects.
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<NAVZone> Zones()
+    public async Task<IEnumerable<NAVZone>> Zones()
     {
         IEnumerable<NAVZone>? returnZones = null;
 
-        Database?.RunInTransaction(() =>
+        async void Action()
         {
-            var zones = PullObjectList<NAVZone>().ToDictionary(z => z.ID, z => z);
-            var extensions = PullObjectList<ZoneExtension>().ToDictionary(e => e.ZoneID, e => e);
+            var zoneTask = PullObjectListAsync<NAVZone>();
+            var extensionTask = PullObjectListAsync<ZoneExtension>();
             var newExtensions = new List<ZoneExtension>();
+
+            var zones = (await zoneTask).ToDictionary(z => z.ID, z => z);
+            var extensions = (await extensionTask).ToDictionary(e => e.ZoneID, e => e);
 
             foreach (var (id, zone) in zones)
             {
@@ -271,9 +348,12 @@ public sealed class HydraChariot : MasterChariot
                 }
             }
 
-            InsertIntoTable(newExtensions);
+            await InsertIntoTableAsync(newExtensions);
             returnZones = zones.Values;
-        });
+        }
+
+        await new Task(() => Database?.RunInTransaction(Action));
+
         returnZones ??= new List<NAVZone>();
 
         return returnZones;

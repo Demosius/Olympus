@@ -2,7 +2,6 @@
 using Hydra.ViewModels.PopUps;
 using Hydra.Views.PopUps;
 using Styx;
-using Styx.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,11 +31,11 @@ public enum EItemLevelFilter
     Custom
 }
 
-public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IFilters
+public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
     public HydraVM HydraVM { get; set; }
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public HydraDataSet DataSet { get; set; }
 
@@ -113,7 +112,6 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public SelectItemsCommand SelectItemsCommand { get; set; }
@@ -126,6 +124,10 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
     public ItemLevelsVM(HydraVM hydraVM)
     {
         HydraVM = hydraVM;
+
+        Helios = hydraVM.Helios;
+        Charon = hydraVM.Charon;
+
         DataSet = new HydraDataSet();
         AllItems = new List<ItemVM>();
         items = new ObservableCollection<ItemVM>();
@@ -136,7 +138,6 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
         filterString = string.Empty;
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         SelectItemsCommand = new SelectItemsCommand(this);
@@ -144,14 +145,13 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
         ManageSiteCommand = new ManageSiteCommand(this);
         CustomizeLevelsCommand = new CustomizeLevelsCommand(this);
 
-        Task.Run(() => SetDataSources(HydraVM.Helios!, HydraVM.Charon!));
+        Task.Run(RefreshDataAsync);
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        if (Helios is null) return;
         Mouse.OverrideCursor = Cursors.Wait;
-        DataSet = Helios.InventoryReader.HydraDataSet(false) ?? new HydraDataSet();
+        DataSet = await Helios.InventoryReader.HydraDataSetAsync(false) ?? new HydraDataSet();
 
         SetVMs();
 
@@ -231,18 +231,6 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
         DisplayData = new DataView(DataTable);
     }
 
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
-        RefreshData();
-    }
-
     public void ClearFilters()
     {
         filterString = string.Empty;
@@ -292,19 +280,17 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
         DisplayData = dataRows.AsDataView();
     }
     
-    public void SelectItems()
+    public async Task SelectItems()
     {
         var vm = new ItemSelectionVM(this);
         var itemWindow = new ItemSelectionWindow(vm);
         if (itemWindow.ShowDialog() == true)
-            RefreshData();
+            await RefreshDataAsync();
     }
 
-    public void SaveLevels()
+    public async Task SaveLevels()
     {
-        if (Helios is null) return;
-
-        Helios.InventoryUpdater.SiteItemLevels(DataSet.SiteItemLevels.Values.Where(sil => sil.Item?.SiteLevelTarget ?? false));
+        await Helios.InventoryUpdater.SiteItemLevelsAsync(DataSet.SiteItemLevels.Values.Where(sil => sil.Item?.SiteLevelTarget ?? false));
         MessageBox.Show("Successfully saved Site Item Levels data.");
     }
 
@@ -316,21 +302,21 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IDataSource,
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public void ManageSite()
+    public async Task ManageSite()
     {
-        if (Helios is null || Charon is null || SelectedObject is null) return;
+        if (SelectedObject is null) return;
         var site = ((SiteItemLevelVM)SelectedObject).Site;
         if (site == null) return;
 
         var vm = new SiteManagementVM(this, site);
         var window = new SiteManagementWindow { DataContext = vm };
         if (window.ShowDialog() == true)
-            RefreshData();
+            await RefreshDataAsync();
     }
 
     public void CustomizeLevels()
     {
-        if (Helios is null || Charon is null || SelectedObject is null) return;
+        if (SelectedObject is null) return;
         var siteItemLevel = (SiteItemLevelVM)SelectedObject;
 
         var vm = new LevelManagementVM(this, siteItemLevel);

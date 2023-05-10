@@ -18,11 +18,12 @@ public class SetDateRangeCommand : ICommand
         return VM.MinDate.Date != VM.InitialMin.Date || VM.MaxDate.Date != VM.InitialMax.Date;
     }
 
-    public void Execute(object parameter)
+    public async void Execute(object parameter)
     {
         var w = (Window)parameter;
-        VM.SetDateRange();
+        var task = VM.SetDateRange();
         w.Close();
+        await task;
     }
 
     public event EventHandler CanExecuteChanged

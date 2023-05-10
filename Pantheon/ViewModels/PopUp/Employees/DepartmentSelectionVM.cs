@@ -139,7 +139,7 @@ public class DepartmentSelectionVM : INotifyPropertyChanged, ICreationMode, ISel
 
         // Get departments and make sure that it can be determined if they should be deletable (no employee or department reference broken by removal.
         // Include children should include employees and sub departments without too much overloading (?)
-        Departments = new ObservableCollection<Department>(Helios.StaffReader.Departments(null, EPullType.IncludeChildren).OrderBy(d => d.Name));
+        Departments = new ObservableCollection<Department>(AsyncHelper.RunSync(() => Helios.StaffReader.DepartmentsAsync(null, EPullType.IncludeChildren)).OrderBy(d => d.Name));
         
         ActivateCreationCommand = new ActivateCreationCommand(this);
         CreateCommand = new CreateCommand(this);
@@ -174,7 +174,7 @@ public class DepartmentSelectionVM : INotifyPropertyChanged, ICreationMode, ISel
 
         Departments.Clear();
 
-        var depList = Helios.StaffReader.Departments(null, EPullType.IncludeChildren).OrderBy(d => d.Name);
+        var depList = AsyncHelper.RunSync(() => Helios.StaffReader.DepartmentsAsync(null, EPullType.IncludeChildren)).OrderBy(d => d.Name);
 
         foreach (var department in depList)
         {
@@ -226,7 +226,7 @@ public class DepartmentSelectionVM : INotifyPropertyChanged, ICreationMode, ISel
 
     public void SelectManager()
     {
-        var fullEmployeeList = Helios.StaffReader.Employees().OrderBy(e => e.FullName).Select(e => new EmployeeVM(e, Charon, Helios)).ToList();
+        var fullEmployeeList = AsyncHelper.RunSync(() => Helios.StaffReader.EmployeesAsync()).OrderBy(e => e.FullName).Select(e => new EmployeeVM(e, Charon, Helios)).ToList();
 
         var mangerSelector = new EmployeeSelectionWindow(fullEmployeeList, true, ParentDepartment?.Name);
         mangerSelector.ShowDialog();

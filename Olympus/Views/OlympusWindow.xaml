@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:components="clr-namespace:Olympus.Views.Components"
         xmlns:viewModels="clr-namespace:Olympus.ViewModels"
+        xmlns:controls="clr-namespace:Morpheus.Views.Controls;assembly=Morpheus"
         mc:Ignorable="d"
         Title="Olympus" WindowState="Maximized"
         MinWidth="400"
@@ -52,6 +53,9 @@
                 <MenuItem Header="Change Password"
                           Command="{Binding ChangePasswordCommand}"/>
             </MenuItem>
+            <Button Content="Test"
+                        Click="ButtonBase_OnClick"/>
+            <ProgressBar Name="ProgressBar" Minimum="0" Maximum="100" Value="0" Width="100"></ProgressBar>
         </Menu>
 
         <ToolBarTray DockPanel.Dock="Top" />
@@ -64,29 +68,38 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </ItemsPanelTemplate>
             </StatusBar.ItemsPanel>
+
             <StackPanel Orientation="Horizontal"
                         Margin="5,0"
                         Grid.Column="0">
                 <TextBlock Text="Database: " Foreground="{DynamicResource ForeGradient}"/>
                 <TextBlock Text="{Binding DBManager.DBString}" Foreground="{DynamicResource ForeGradient}"/>
             </StackPanel>
-            <StatusBarItem Grid.Column="1"
+
+            <StatusBarItem Grid.Column="1">
+                <controls:ProgressBarView DataContext="{Binding ProgressBarVM}"/>
+            </StatusBarItem>
+
+            <StatusBarItem Grid.Column="2"
                            HorizontalContentAlignment="Center">
-                <TextBlock Text="{Binding CurrentProject.Project}"
+                <TextBlock Text="{Binding CurrentProject.Project, FallbackValue=''}"
                            Foreground="{DynamicResource ForeGradient}"
                            FontWeight="UltraBold"
                            FontSize="15"
                            FontStretch="UltraExpanded"/>
             </StatusBarItem>
-            <StatusBarItem Grid.Column="2">
+
+            <StatusBarItem Grid.Column="3">
                 <components:UserHandler DataContext="{Binding UserHandlerVM}"/>
             </StatusBarItem>
+
         </StatusBar>
 
         <Grid DockPanel.Dock="Top">

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using Morpheus.ViewModels.Commands;
 using Morpheus.ViewModels.Interfaces;
@@ -18,12 +19,14 @@ using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
-public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector, IDepartments, IRoles, IFilters
+public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector, IDepartments, IRoles, IFilters, IDBInteraction
 {
     private const string ANY_DEP_STR = "<Any>";
 
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
+
+    private readonly string? initialDepartmentName;
 
     public bool UserCanCreate { get; }
 
@@ -162,6 +165,7 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
     public ClearRoleCommand ClearRoleCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
+    public RefreshDataCommand RefreshDataCommand { get; set; }
 
     #endregion
 
@@ -173,25 +177,15 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         UserCanCreate = Charon.CanCreateStaffRole();
         UserCanDelete = Charon.CanDeleteStaffRole();
 
-        FullRoles = Helios.StaffReader.Roles(pullType: EPullType.IncludeChildren).OrderBy(r => r.DepartmentName).ThenBy(r => r.Name).ToList();
+        Roles = new ObservableCollection<Role>();
 
-        Roles = new ObservableCollection<Role>(FullRoles);
-
-        DepartmentNames = new ObservableCollection<string> {ANY_DEP_STR};
-
-        var departments = FullRoles.Select(d => d.DepartmentName).Distinct().OrderBy(n => n);
-
-        foreach (var department in departments)
-        {
-            DepartmentNames.Add(department);
-        }
+        DepartmentNames = new ObservableCollection<string> { ANY_DEP_STR };
+        FullRoles = new List<Role>();
 
         filterString = string.Empty;
         newRoleName = string.Empty;
 
-        if (departmentName is null || DepartmentNames.Contains(departmentName)) SelectedDepartmentName = departmentName;
-
-        ApplyFilters();
+        initialDepartmentName = departmentName;
 
         ActivateCreationCommand = new ActivateCreationCommand(this);
         CreateCommand = new CreateCommand(this);
@@ -203,6 +197,24 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         ClearRoleCommand = new ClearRoleCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
+        RefreshDataCommand = new RefreshDataCommand(this);
+
+        Task.Run(RefreshDataAsync);
+    }
+
+    public async Task RefreshDataAsync()
+    {
+        FullRoles = (await Helios.StaffReader.RolesAsync(pullType: EPullType.IncludeChildren))
+            .OrderBy(r => r.DepartmentName).ThenBy(r => r.Name).ToList();
+
+        var departments = FullRoles.Select(d => d.DepartmentName).Distinct().OrderBy(n => n);
+
+        foreach (var department in departments)
+            DepartmentNames.Add(department);
+        
+        if (initialDepartmentName is null || DepartmentNames.Contains(initialDepartmentName)) SelectedDepartmentName = initialDepartmentName;
+
+        ApplyFilters();
     }
 
     public void ActivateCreation()
@@ -226,7 +238,8 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
 
         // Reset data to include new role.
         Roles.Clear();
-        var roleList = Helios.StaffReader.Roles(pullType: EPullType.IncludeChildren).OrderBy(r => r.DepartmentName)
+        var roleList = AsyncHelper.RunSync(() => Helios.StaffReader.RolesAsync(pullType: EPullType.IncludeChildren))
+            .OrderBy(r => r.DepartmentName)
             .ThenBy(r => r.Name);
         foreach (var role in roleList) Roles.Add(role);
 
@@ -316,9 +329,7 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         Roles.Clear();
 
         foreach (var role in fRoles)
-        {
             Roles.Add(role);
-        }
     }
     
     public event PropertyChangedEventHandler? PropertyChanged;

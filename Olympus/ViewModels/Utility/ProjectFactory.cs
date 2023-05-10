@@ -28,7 +28,7 @@ public static class ProjectFactory
     {
         return project switch
         {
-            EProject.Vulcan => new VulcanPage(),
+            EProject.Vulcan => new VulcanPage(App.Helios),
             EProject.Prometheus => new PrometheusPage(App.Helios, App.Charon),
             EProject.Pantheon => new PantheonPage(App.Charon, App.Helios),
             EProject.Phoenix => new PhoenixPage(),
@@ -41,7 +41,7 @@ public static class ProjectFactory
             EProject.Hades => new HadesPage(App.Helios),
             EProject.Panacea => new PanaceaPage(App.Helios),
             EProject.Quest => new QuestPage(App.Helios, App.Charon),
-            EProject.Deimos => new DeimosPage(App.Helios),
+            EProject.Deimos => new DeimosPage(App.Helios, App.ProgressBar),
             EProject.None => null,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
         };

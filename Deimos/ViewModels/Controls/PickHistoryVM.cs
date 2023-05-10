@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -16,12 +17,11 @@ namespace Deimos.ViewModels.Controls;
 public class PickHistoryVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
     public DeimosVM ParentVM { get; set; }
+    public Helios Helios { get; set; }
 
     public List<PickEvent> AllEvents { get; set; }
 
     #region ParentVM Access
-
-    public Helios Helios => ParentVM.Helios;
 
     public DateTime? StartDate => ParentVM.StartDate;
     public DateTime? EndDate => ParentVM.EndDate;
@@ -48,7 +48,6 @@ public class PickHistoryVM : INotifyPropertyChanged, IDBInteraction, IFilters
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
@@ -58,30 +57,25 @@ public class PickHistoryVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public PickHistoryVM(DeimosVM parentVM)
     {
         ParentVM = parentVM;
+        Helios = parentVM.Helios;
 
         AllEvents = new List<PickEvent>();
         PickEvents = new ObservableCollection<PickEvent>();
         filterString = string.Empty;
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
         if (StartDate is null || EndDate is null)
             AllEvents = new List<PickEvent>();
         else
-            AllEvents = Helios.StaffReader.PickEvents((DateTime) StartDate, (DateTime) EndDate).ToList();
+            AllEvents = (await Helios.StaffReader.PickEventsAsync((DateTime) StartDate, (DateTime) EndDate)).ToList();
 
         ApplyFilters();
-    }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
     }
 
     public void ClearFilters()

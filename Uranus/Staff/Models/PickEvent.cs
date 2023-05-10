@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
 using Uranus.Inventory.Models;
@@ -17,7 +19,7 @@ public class PickEvent : IEquatable<PickEvent>
     [PrimaryKey] public string ID { get; set; } // Example: 6118.2022.11.23.23.09.03 ([OperatorID].[Year].[Month].[Day].[Hour].[Minute].[Second])
     public string TimeStamp { get; set; }
     public DateTime DateTime { get; set; }
-    public DateTime Date { get; set; }
+    [Indexed] public DateTime Date { get; set; }
     [StringLength(4)] public string OperatorDematicID { get; set; }
     public string OperatorRF_ID { get; set; }
     public int Qty { get; set; }
@@ -36,7 +38,7 @@ public class PickEvent : IEquatable<PickEvent>
     public string MissPickID { get; set; }
 
     [ForeignKey(typeof(PickSession))] public string SessionID { get; set; }
-    [ForeignKey(typeof(PickStatisticsByDay))]
+    [ForeignKey(typeof(PickDailyStats))]
     public string StatsID { get; set; }
 
     // Must be set after original creation.
@@ -48,8 +50,8 @@ public class PickEvent : IEquatable<PickEvent>
     public Employee? Operator { get; set; }
     [ManyToOne(nameof(SessionID), nameof(PickSession.PickEvents), CascadeOperations = CascadeOperation.CascadeRead)]
     public PickSession? Session { get; set; }
-    [ManyToOne(nameof(StatsID), nameof(PickStatisticsByDay.PickEvents), CascadeOperations = CascadeOperation.CascadeRead)]
-    public PickStatisticsByDay? PickStats { get; set; }
+    [ManyToOne(nameof(StatsID), nameof(PickDailyStats.PickEvents), CascadeOperations = CascadeOperation.CascadeRead)]
+    public PickDailyStats? PickStats { get; set; }
 
     [OneToOne(nameof(MissPickID), nameof(Models.MissPick.PickEvent), CascadeOperations = CascadeOperation.CascadeRead)]
     public MissPick? MissPick { get; set; }
@@ -102,18 +104,63 @@ public class PickEvent : IEquatable<PickEvent>
         Session?.AssignMissPick(missPick);
     }
 
+    /// <summary>
+    /// Checks given list for potential duplicates, and adjusts timestamps to shift values apart.
+    /// </summary>
+    /// <param name="sampleEvents"></param>
+    /// <returns>Number of values that had to be changed.</returns>
+    public static int HandleDuplicateValues(List<PickEvent> sampleEvents)
+    {
+        var dict = sampleEvents
+            .GroupBy(e => e.ID)
+            .Where(g => g.Count() > 1)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        var count = 0;
+
+        foreach (var (id, events) in dict)
+        {
+            for (var i = 0; i < events.Count; i++)
+            {
+                events[i].ID = $"{id}[{i}]";
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    public static List<PickEvent> GenerateFromRawData(string raw, out List<PickSession> sessions, out List<PickDailyStats> stats, TimeSpan? ptlBreak = null, TimeSpan? rftBreak = null)
+    { 
+        var events = DataConversion.RawStringToPickEvents(raw);
+
+        sessions = GenerateStatisticsFromEvents(events, out stats, ptlBreak, rftBreak); 
+
+        return events;
+    }
+
+    public static List<PickSession> GenerateStatisticsFromEvents(List<PickEvent> events, out List<PickDailyStats> stats,
+        TimeSpan? ptlBreak = null, TimeSpan? rftBreak = null)
+    {
+        HandleDuplicateValues(events);
+
+        var sessions =  PickSession.GeneratePickSessions(events, out stats, ptlBreak, rftBreak);
+
+        return sessions;
+    }
+
     /* Equality Members */
 
     public bool Equals(PickEvent? other)
     {
-        if (ReferenceEquals(null, other)) return false;
+        if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
         return ID == other.ID;
     }
 
     public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
+        if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
         return obj.GetType() == GetType() && Equals((PickEvent) obj);
     }

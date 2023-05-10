@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.ViewModels.Interfaces;
 using Uranus;
@@ -78,7 +79,7 @@ public class AvatarSelectionVM : INotifyPropertyChanged, IImageSelector
         ParentVM = parentVM;
         Helios = ParentVM.Helios;
 
-        avatars = new ObservableCollection<EmployeeAvatar>(Helios.StaffReader.EmployeeAvatars());
+        avatars = new ObservableCollection<EmployeeAvatar>(AsyncHelper.RunSync(() => Helios.StaffReader.EmployeeAvatarsAsync()));
 
         avatarName = string.Empty;
 
@@ -95,13 +96,13 @@ public class AvatarSelectionVM : INotifyPropertyChanged, IImageSelector
                        Avatars.All(i => i.Name != AvatarName);
     }
     
-    public void SaveImageChanges()
+    public async Task SaveImageChangesAsync()
     {
         if (SelectedAvatar is null) return;
 
         var avatar = SelectedAvatar;
 
-        Helios.StaffUpdater.RenameEmployeeAvatar(ref avatar, AvatarName);
+        await Task.Run(() => Helios.StaffUpdater.RenameEmployeeAvatar(ref avatar, AvatarName));
 
         SelectedAvatar = avatar;
     }
@@ -111,7 +112,7 @@ public class AvatarSelectionVM : INotifyPropertyChanged, IImageSelector
         ParentVM.Avatar = SelectedAvatar;
     }
 
-    public void FindNewImage()
+    public async Task FindNewImageAsync()
     {
         var dialog = new OpenFileDialog
         {
@@ -124,7 +125,7 @@ public class AvatarSelectionVM : INotifyPropertyChanged, IImageSelector
 
         if (dialog.ShowDialog() != true) return;
 
-        var icon = Helios.StaffCreator.CreateEmployeeAvatarFromSourceFile(dialog.FileName);
+        var icon = await Helios.StaffCreator.CreateEmployeeAvatarFromSourceFileAsync(dialog.FileName);
 
         if (icon is not null) Avatars.Add(icon);
 

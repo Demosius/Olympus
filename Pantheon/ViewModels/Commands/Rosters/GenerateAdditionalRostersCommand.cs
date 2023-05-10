@@ -15,12 +15,12 @@ public class GenerateAdditionalRostersCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
         if (parameter is not string p) return;
 
         if (p == "Loan")
-            VM.GenerateLoanRosters();
+            await VM.GenerateLoanRosters();
         else 
             VM.GenerateMissingRosters();
     }

@@ -1,6 +1,6 @@
 ﻿using Hydra.ViewModels;
 using Styx;
-using System;
+using System.Threading.Tasks;
 using System.Windows;
 using Uranus;
 using Uranus.Interfaces;
@@ -23,9 +23,9 @@ public partial class HydraPage : IProject
 
     public static bool RequiresUser => false;
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        throw new NotImplementedException();
+        await new Task(() => {});
     }
 
     private void ActionToggle_OnChecked(object sender, RoutedEventArgs e)

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Uranus.Users.Models;
 
 namespace Uranus.Users;
@@ -23,9 +24,10 @@ public class UserCreator
         _ = Chariot.Create(role);
     }
 
-    public void AssureDBManagerRole()
+    public async Task AssureDBManagerRoleAsync()
     {
-        if (Chariot.PullObjectList<Role>().Any(role => role.Name == "DatabaseManager")) return;
+        if ((await Chariot.PullObjectListAsync<Role>()).Any(role => role.Name == "DatabaseManager")) 
+            return;
 
         Role role = new();
         role.SetMaster();

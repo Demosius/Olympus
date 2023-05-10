@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using Serilog;
 using Uranus;
@@ -15,12 +16,12 @@ namespace Pantheon.ViewModels.PopUp.Employees;
 
 public class EmployeeCreationVM : INotifyPropertyChanged
 {
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
-    private readonly Dictionary<int, Employee> employees;
+    private Dictionary<int, Employee> employees;
 
-    private readonly List<Role> allRoles;
+    private List<Role> allRoles;
 
     public Employee? Employee { get; set; }
 
@@ -59,17 +60,8 @@ public class EmployeeCreationVM : INotifyPropertyChanged
             OnPropertyChanged(nameof(ValidID));
         }
     }
-
-    private ObservableCollection<Department> departments;
-    public ObservableCollection<Department> Departments
-    {
-        get => departments;
-        set
-        {
-            departments = value;
-            OnPropertyChanged(nameof(Departments));
-        }
-    }
+    
+    public ObservableCollection<Department> Departments { get; set; }
 
     private Department? selectedDepartment;
     public Department? SelectedDepartment
@@ -83,17 +75,8 @@ public class EmployeeCreationVM : INotifyPropertyChanged
             DetectManager();
         }
     }
-
-    private ObservableCollection<Role> roles;
-    public ObservableCollection<Role> Roles
-    {
-        get => roles;
-        set
-        {
-            roles = value;
-            OnPropertyChanged(nameof(Roles));
-        }
-    }
+    
+    public ObservableCollection<Role> Roles { get; set; }
 
     private Role? selectedRole;
     public Role? SelectedRole
@@ -105,17 +88,8 @@ public class EmployeeCreationVM : INotifyPropertyChanged
             OnPropertyChanged(nameof(SelectedRole));
         }
     }
-
-    private ObservableCollection<Employee> managers;
-    public ObservableCollection<Employee> Managers
-    {
-        get => managers;
-        set
-        {
-            managers = value;
-            OnPropertyChanged(nameof(Managers));
-        }
-    }
+    
+    public ObservableCollection<Employee> Managers { get; set; }
 
     private Employee? selectedManager;
     public Employee? SelectedManager
@@ -139,19 +113,41 @@ public class EmployeeCreationVM : INotifyPropertyChanged
         confirmToolTip = string.Empty;
         idText = string.Empty;
 
+        employees = new Dictionary<int, Employee>();
+        allRoles = new List<Role>();
+        Departments = new ObservableCollection<Department>();
+        Roles = new ObservableCollection<Role>();
+        Managers = new ObservableCollection<Employee>();
+
         ConfirmEmployeeCreationCommand = new ConfirmEmployeeCreationCommand(this);
 
-        employees = Helios.StaffReader.Employees(e => true).ToDictionary(e => e.ID, e => e);
-        managers = new ObservableCollection<Employee>(Helios.StaffReader.GetManagers().OrderBy(m => m.FullName));
-        departments = new ObservableCollection<Department>(Helios.StaffReader.Departments().OrderBy(d => d.Name));
-        allRoles = Helios.StaffReader.Roles().OrderBy(r => r.DepartmentName).ThenBy(r => r.Name).ToList();
+        Task.Run(SetData);
+    }
+
+    private async Task SetData()
+    {
+        var employeeTask = Helios.StaffReader.EmployeesAsync(e => true);
+        var managerTask = Helios.StaffReader.GetManagersAsync();
+        var departmentTask = Helios.StaffReader.DepartmentsAsync();
+        var roleTask = Helios.StaffReader.RolesAsync();
+
+        await Task.WhenAll(employeeTask, managerTask, departmentTask, roleTask);
+
+        employees = (await employeeTask).ToDictionary(e => e.ID, e => e);
+        allRoles = (await roleTask).OrderBy(r => r.DepartmentName).ThenBy(r => r.Name).ToList();
+
         var roleDict = allRoles.ToDictionary(r => r.Name, r => r);
-        foreach (var manager in Managers)
+        
+        foreach (var department in (await departmentTask).OrderBy(d => d.Name))
+            Departments.Add(department);
+
+        foreach (var manager in (await managerTask).OrderBy(m => m.FullName))
         {
+            Managers.Add(manager);
             if (roleDict.TryGetValue(manager.RoleName, out var role))
                 manager.Role = role;
         }
-        roles = new ObservableCollection<Role>();
+
         SetRoles();
     }
 
@@ -209,8 +205,6 @@ public class EmployeeCreationVM : INotifyPropertyChanged
 
     public bool ConfirmEmployeeCreation()
     {
-        if (Helios is null) return false;
-
         var id = CheckIDValidity();
 
         switch (ValidID)

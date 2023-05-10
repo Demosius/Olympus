@@ -25,7 +25,7 @@ public class ClanSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
 
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
-    
+
     public bool UserCanCreate { get; }
     public bool CanCreate => UserCanCreate &&
                              NewClanName.Length > 0 &&
@@ -157,7 +157,7 @@ public class ClanSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         UserCanCreate = Charon.CanCreateClan();
         UserCanDelete = Charon.CanDeleteClan();
 
-        FullClans = Helios.StaffReader.Clans();
+        FullClans = AsyncHelper.RunSync(() => Helios.StaffReader.ClansAsync());
 
         Clans = new ObservableCollection<Clan>(FullClans);
 
@@ -199,7 +199,8 @@ public class ClanSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
 
     public void SelectManager()
     {
-        var fullEmployeeList = Helios.StaffReader.Employees().OrderBy(e => e.FullName).Select(e => new EmployeeVM(e, Charon, Helios)).ToList();
+        var fullEmployeeList = AsyncHelper.RunSync(() => Helios.StaffReader.EmployeesAsync()).OrderBy(e => e.FullName)
+            .Select(e => new EmployeeVM(e, Charon, Helios)).ToList();
 
         var leaderSelector = new EmployeeSelectionWindow(fullEmployeeList, department: ClanDepartment?.Name);
         if (leaderSelector.ShowDialog() != true) return;
@@ -232,8 +233,8 @@ public class ClanSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         Helios.StaffCreator.Clan(newClan);
 
         // Refresh all data.
-        FullClans = Helios.StaffReader.Clans();
-        
+        FullClans = AsyncHelper.RunSync(() => Helios.StaffReader.ClansAsync());
+
         DepartmentNames.Clear();
         DepartmentNames.Add(ANY_DEP_STR);
         foreach (var department in FullClans.Select(c => c.DepartmentName).Distinct())
@@ -278,7 +279,7 @@ public class ClanSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         Clans.Clear();
         foreach (var clan in clans) Clans.Add(clan);
     }
-    
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]

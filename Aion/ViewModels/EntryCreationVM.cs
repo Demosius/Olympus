@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using Uranus;
 using Uranus.Staff.Models;
@@ -259,21 +260,21 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
         Entries.Remove(SelectedEntry);
     }
 
-    public bool CheckDateChange()
+    public async Task<bool> CheckDateChange()
     {
         var result = MessageBox.Show("Changing the working date range will reset the data.\n\n" +
                                      "Would you like to save your changes before you continue.",
             "Caution: Data Reset", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
 
         if (result == MessageBoxResult.Yes)
-            EditorVM.SaveEntryChanges();
+            await EditorVM.SaveEntryChanges();
 
         return result != MessageBoxResult.Cancel;
     }
 
-    public void LaunchDateRangeWindow()
+    public async Task LaunchDateRangeWindowAsync()
     {
-        if (!CheckDateChange()) return;
+        if (!await CheckDateChange()) return;
 
         DateRangeWindow datePicker = new(EditorVM);
 
