@@ -10,8 +10,12 @@ internal class EmploymentToStringConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        var employmentType = (EEmploymentType)value;
-        return employmentType.GetDescription();
+        return value switch
+        {
+            EEmploymentType employmentType => employmentType.GetDescription(),
+            string s => s,
+            _ => string.Empty
+        };
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

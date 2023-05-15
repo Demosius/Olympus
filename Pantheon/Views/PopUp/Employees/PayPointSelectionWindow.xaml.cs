@@ -1,4 +1,6 @@
-﻿using Pantheon.ViewModels.PopUp.Employees;
+﻿using System;
+using System.Windows;
+using Pantheon.ViewModels.PopUp.Employees;
 using Styx;
 using Uranus;
 
@@ -9,12 +11,20 @@ namespace Pantheon.Views.PopUp.Employees;
 /// </summary>
 public partial class PayPointSelectionWindow
 {
-    public PayPointSelectionVM VM { get; set; }
+    public PayPointSelectionVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public PayPointSelectionWindow(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
-        VM = new PayPointSelectionVM(helios, charon);
+    }
+
+    private async void PayPointSelectionWindow_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await PayPointSelectionVM.CreateAsync(Helios, Charon);
         DataContext = VM;
     }
 }

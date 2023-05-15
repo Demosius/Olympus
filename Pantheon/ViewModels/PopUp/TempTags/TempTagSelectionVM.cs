@@ -104,7 +104,7 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
 
     #endregion
 
-    public TempTagSelectionVM(Helios helios, Charon charon)
+    private TempTagSelectionVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
@@ -118,7 +118,6 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
         filterString = string.Empty;
 
         AllTags = new List<TempTagVM>();
-        Task.Run(RefreshDataAsync);
 
         CreateCommand = new CreateCommand(this);
         DeleteCommand = new DeleteCommand(this);
@@ -129,6 +128,18 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
         UnassignTempTagCommand = new UnassignTempTagCommand(this);
         AssignTempTagCommand = new AssignTempTagCommand(this);
         RefreshDataCommand = new RefreshDataCommand(this);
+    }
+
+    private async Task<TempTagSelectionVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<TempTagSelectionVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new TempTagSelectionVM(helios, charon);
+        return ret.InitializeAsync();
     }
 
     public async Task RefreshDataAsync()
@@ -188,7 +199,7 @@ public class TempTagSelectionVM : INotifyPropertyChanged, ISelector, IFilters, I
         if (MessageBox.Show($"Are you sure that you would like to delete the temp tag: {SelectedTag.RF_ID}?",
                 "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
 
-        if (!Helios.StaffDeleter.TempTag(SelectedTag.TempTag))
+        if (Helios.StaffDeleter.TempTag(SelectedTag.TempTag) <= 0)
         {
             MessageBox.Show(
                 "Cannot delete this Temp Tag as it is either currently assigned, or has historic use data that may be still be relevant.",

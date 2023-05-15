@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using Uranus;
+using Uranus.Annotations;
 using Uranus.Staff.Models;
 
 namespace Aion.ViewModels;
@@ -21,21 +23,11 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
     private List<ShiftEntry> deletedEntries = new();
 
     public ShiftEntryPageVM EditorVM { get; set; }
+    
+    public ObservableCollection<Employee> Employees { get; set; }
 
-    private ObservableCollection<Employee> employees;
-    public ObservableCollection<Employee> Employees
-    {
-        get => employees;
-        set
-        {
-            employees = value;
-            OnPropertyChanged(nameof(Employees));
-            SelectedEmployee = employees.FirstOrDefault();
-        }
-    }
-
-    private Employee selectedEmployee;
-    public Employee SelectedEmployee
+    private Employee? selectedEmployee;
+    public Employee? SelectedEmployee
     {
         get => selectedEmployee;
         set
@@ -45,20 +37,11 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
             SetEntries();
         }
     }
+    
+    public ObservableCollection<ShiftEntry> Entries { get; set; }
 
-    private ObservableCollection<ShiftEntry> entries;
-    public ObservableCollection<ShiftEntry> Entries
-    {
-        get => entries;
-        set
-        {
-            entries = value;
-            OnPropertyChanged(nameof(Entries));
-        }
-    }
-
-    private ShiftEntry selectedEntry;
-    public ShiftEntry SelectedEntry
+    private ShiftEntry? selectedEntry;
+    public ShiftEntry? SelectedEntry
     {
         get => selectedEntry;
         set
@@ -68,8 +51,8 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
         }
     }
 
-    private DateTime selectedDate;
-    public DateTime SelectedDate
+    private DateTime? selectedDate;
+    public DateTime? SelectedDate
     {
         get => selectedDate;
         set
@@ -164,27 +147,24 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
     public ConfirmEntryCreationCommand ConfirmEntryCreationCommand { get; set; }
     public LaunchDateRangeCommand LaunchDateRangeCommand { get; set; }
 
-    public EntryCreationVM()
+    public EntryCreationVM(Helios helios, ShiftEntryPageVM editorVM)
     {
+        Helios = helios;
+
         CreateEntryCommand = new CreateEntryCommand(this);
         DeleteEntryCommand = new DeleteEntryCommand(this);
         ConfirmEntryCreationCommand = new ConfirmEntryCreationCommand(this);
         LaunchDateRangeCommand = new LaunchDateRangeCommand(this);
         SelectedEmployee = null;
-    }
 
-    public EntryCreationVM(ShiftEntryPageVM editorVM)
-    {
-        SetEditorSourceVM(editorVM);
-    }
+        Employees = new ObservableCollection<Employee>();
+        Entries = new ObservableCollection<ShiftEntry>();
+        startShiftTime = string.Empty;
+        startLunchTime = string.Empty;
+        endLunchTime = string.Empty;
+        endShiftTime = string.Empty;
+        comment = string.Empty;
 
-    public void SetDataSource(Helios helios)
-    {
-        Helios = helios;
-    }
-
-    public void SetEditorSourceVM(ShiftEntryPageVM editorVM)
-    {
         EditorVM = editorVM;
         MinDate = editorVM.MinDate;
         MaxDate = editorVM.MaxDate;
@@ -193,22 +173,19 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
         SetEntries();
     }
 
-    public void SetData(Helios helios, ShiftEntryPageVM editorVM)
-    {
-        Helios = helios;
-        SetEditorSourceVM(editorVM);
-    }
-
     /// <summary>
     /// Creates the list of entries based on the selected employee.
     /// </summary>
     public void SetEntries()
     {
-        Entries = new ObservableCollection<ShiftEntry>();
-        if (SelectedEmployee is not null && SelectedEmployee.ID != -1)
-            Entries = new ObservableCollection<ShiftEntry>(EditorVM.FullEntries.Where(s => s.EmployeeID == selectedEmployee.ID).OrderBy(s => s.Date));
-        else
-            Entries = new ObservableCollection<ShiftEntry>();
+        Entries.Clear();
+        var entries = SelectedEmployee is not null && SelectedEmployee.ID != -1
+            ? new List<ShiftEntry>(EditorVM.FullEntries.Where(s => s.EmployeeID == SelectedEmployee.ID)
+                .OrderBy(s => s.Date))
+            : new List<ShiftEntry>();
+
+        foreach (var entry in entries)
+            Entries.Add(entry);
 
         newEntries = new List<ShiftEntry>();
         deletedEntries = new List<ShiftEntry>();
@@ -216,18 +193,18 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
 
     public void CreateEntry()
     {
-        if (SelectedEmployee.ID == -1) return;
+        if (SelectedEmployee is null || SelectedEmployee.ID == -1 || SelectedDate is null) return;
 
         // I there already exists an entry for this date, move to the next date that has no entry.
-        if (entries.Any(e => e.Date == SelectedDate.ToString("yyyy-MM-dd")))
+        if (Entries.Any(e => e.Date == ((DateTime)SelectedDate).ToString("yyyy-MM-dd")))
         {
-            SelectedDate = SelectedDate.AddDays(1);
-            while (entries.Any(e => e.Date == SelectedDate.ToString("yyyy-MM-dd")) && SelectedDate < MaxDate)
-                SelectedDate = SelectedDate.AddDays(1);
+            SelectedDate = ((DateTime) SelectedDate).AddDays(1);
+            while (Entries.Any(e => e.Date == ((DateTime)SelectedDate).ToString("yyyy-MM-dd")) && SelectedDate < MaxDate)
+                SelectedDate = ((DateTime)SelectedDate).AddDays(1);
             return;
         }
 
-        ShiftEntry shiftEntry = new(SelectedEmployee, SelectedDate)
+        ShiftEntry shiftEntry = new(SelectedEmployee, ((DateTime)SelectedDate))
         {
             ShiftStartTime = StartShiftTime,
             ShiftEndTime = EndShiftTime,
@@ -237,11 +214,14 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
         };
         shiftEntry.SummarizeShift();
         AddEntry(shiftEntry);
-        Entries = new ObservableCollection<ShiftEntry>(Entries.OrderBy(e => e.Date));
+        var entries = new List<ShiftEntry>(Entries.OrderBy(e => e.Date));
+        Entries.Clear();
+        foreach (var entry in entries)
+            Entries.Add(entry);
 
         // Default to next valid date.
-        while (entries.Any(e => e.Date == SelectedDate.ToString("yyyy-MM-dd")) && SelectedDate < MaxDate)
-            SelectedDate = SelectedDate.AddDays(1);
+        while (Entries.Any(e => e.Date == ((DateTime)SelectedDate).ToString("yyyy-MM-dd")) && SelectedDate < MaxDate)
+            SelectedDate = ((DateTime)SelectedDate).AddDays(1);
     }
 
     public void AddEntry(ShiftEntry shiftEntry)
@@ -253,7 +233,6 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
     public void DeleteSelectedEntry()
     {
         if (SelectedEntry is null) return;
-
         if (!newEntries.Remove(SelectedEntry))
             deletedEntries.Add(SelectedEntry);
 
@@ -297,9 +276,10 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
         SetEntries();
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

@@ -12,7 +12,8 @@
         Background="{StaticResource TooltipBackgroundBrush}"
         Foreground="{StaticResource LightForegroundBrush}"
         FocusManager.FocusedElement="{Binding ElementName=IDBox}"
-        Width="800" Height="600">
+        Width="800" Height="600"
+        Initialized="AvatarSelectionWindow_OnInitialized">
 
     <Window.Resources>
         <ResourceDictionary>

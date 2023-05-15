@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using Morpheus.ViewModels.Commands;
 using Morpheus.ViewModels.Interfaces;
@@ -126,7 +127,7 @@ public class DepartmentSelectionVM : INotifyPropertyChanged, ICreationMode, ISel
 
     #endregion
 
-    public DepartmentSelectionVM(Helios helios, Charon charon)
+    private DepartmentSelectionVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
@@ -139,7 +140,7 @@ public class DepartmentSelectionVM : INotifyPropertyChanged, ICreationMode, ISel
 
         // Get departments and make sure that it can be determined if they should be deletable (no employee or department reference broken by removal.
         // Include children should include employees and sub departments without too much overloading (?)
-        Departments = new ObservableCollection<Department>(AsyncHelper.RunSync(() => Helios.StaffReader.DepartmentsAsync(null, EPullType.IncludeChildren)).OrderBy(d => d.Name));
+        Departments = new ObservableCollection<Department>();
         
         ActivateCreationCommand = new ActivateCreationCommand(this);
         CreateCommand = new CreateCommand(this);
@@ -151,6 +152,24 @@ public class DepartmentSelectionVM : INotifyPropertyChanged, ICreationMode, ISel
         ClearManagerCommand = new ClearManagerCommand(this);
         ClearDepartmentCommand = new ClearDepartmentCommand(this);
         ClearPayPointCommand = new ClearPayPointCommand(this);
+    }
+
+    private async Task<DepartmentSelectionVM> InitializeAsync()
+    {
+
+        var departments =
+            (await Helios.StaffReader.DepartmentsAsync(null, EPullType.IncludeChildren)).OrderBy(d => d.Name);
+
+        foreach (var department in departments)
+            Departments.Add(department);
+
+        return this;
+    }
+
+    public static Task<DepartmentSelectionVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new DepartmentSelectionVM(helios, charon);
+        return ret.InitializeAsync();
     }
 
     public void ActivateCreation()
@@ -214,7 +233,7 @@ public class DepartmentSelectionVM : INotifyPropertyChanged, ICreationMode, ISel
         payPointSelector.ShowDialog();
         
         if (payPointSelector.DialogResult != true) return;
-        if (payPointSelector.VM.SelectedPayPoint is null) return;
+        if (payPointSelector.VM?.SelectedPayPoint is null) return;
 
         PayPoint = payPointSelector.VM.SelectedPayPoint.Name;
     }
@@ -248,7 +267,7 @@ public class DepartmentSelectionVM : INotifyPropertyChanged, ICreationMode, ISel
         departmentSelector.ShowDialog();
 
         if (departmentSelector.DialogResult != true) return;
-        if (departmentSelector.VM.SelectedDepartment is null) return;
+        if (departmentSelector.VM?.SelectedDepartment is null) return;
 
         ParentDepartment = departmentSelector.VM.SelectedDepartment;
     }

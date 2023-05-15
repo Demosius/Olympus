@@ -223,7 +223,7 @@ public class TempTagManagementVM : INotifyPropertyChanged, IFilters, ISelector, 
         if (MessageBox.Show($"Are you sure that you would like to delete the temp tag: {SelectedTag.RF_ID}?",
                 "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
 
-        if (!Helios.StaffDeleter.TempTag(SelectedTag.TempTag))
+        if (Helios.StaffDeleter.TempTag(SelectedTag.TempTag) <= 0)
         {
             MessageBox.Show(
                 "Cannot delete this Temp Tag as it is either currently assigned, or has historic use data that may be still be relevant.",
@@ -238,7 +238,7 @@ public class TempTagManagementVM : INotifyPropertyChanged, IFilters, ISelector, 
 
     public async Task SelectTempTagAsync()
     {
-        await new Task(() => { });
+        await Task.Run(() => { });
     }
 
     public void UnassignTempTag()
@@ -256,7 +256,7 @@ public class TempTagManagementVM : INotifyPropertyChanged, IFilters, ISelector, 
 
     public async Task AssignTempTagAsync()
     {
-        await new Task(() => { });
+        await Task.Run(() => { });
     }
 
     /// <summary>

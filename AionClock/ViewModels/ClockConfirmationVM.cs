@@ -1,6 +1,5 @@
 ﻿using AionClock.ViewModels.Commands;
 using System.ComponentModel;
-using System.Threading.Tasks;
 using Uranus.Staff.Models;
 
 namespace AionClock.ViewModels;

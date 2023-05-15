@@ -1,4 +1,6 @@
-﻿using Styx;
+﻿using System;
+using System.Windows;
+using Styx;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Pantheon.ViewModels.Pages;
@@ -11,12 +13,20 @@ namespace Pantheon.Views.Pages;
 /// </summary>
 public partial class ShiftPage
 {
-    public ShiftPageVM VM { get; set; }
+    public ShiftPageVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public ShiftPage(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
-        VM = new ShiftPageVM(helios, charon);
+    }
+
+    private async void ShiftPage_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await ShiftPageVM.CreateAsync(Helios, Charon);
         DataContext = VM;
     }
 
@@ -45,5 +55,4 @@ public partial class ShiftPage
         // once we've left the TextBox, return the select all behavior
         textBox.LostMouseCapture += TextBox_LostMouseCapture;
     }
-
 }

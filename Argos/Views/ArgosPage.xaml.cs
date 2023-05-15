@@ -23,6 +23,6 @@ public partial class ArgosPage : IProject
 
     public async Task RefreshDataAsync()
     {
-        await new Task(() => {});
+        await Task.Run(() => {});
     }
 }

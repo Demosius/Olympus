@@ -19,8 +19,8 @@ public class RefreshDataCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.RefreshDataAsync();
+        await VM.RefreshDataAsync();
     }
 }

@@ -96,7 +96,7 @@ public static class BarcodeUtility
             dummy = code128Barcode[counter];
             dummy = dummy < 127 ? dummy - 32 : dummy - 100;
             if (counter == 0) checkSum = dummy;
-            checkSum = (checkSum + (counter) * dummy) % 103;
+            checkSum = (checkSum + counter * dummy) % 103;
         }
 
         // Calculation of the checksum ASCII code

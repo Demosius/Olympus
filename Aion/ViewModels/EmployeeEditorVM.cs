@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Morpheus.Views.Windows;
 using Uranus;
+using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
 using Uranus.Staff.Models;
@@ -13,10 +15,11 @@ using Uranus.Staff.Models;
 namespace Aion.ViewModels;
 
 public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
+
 {
     public Helios Helios { get; set; }
 
-    private Employee employee;
+    private readonly Employee employee;
 
     public bool IsNew;
 
@@ -34,72 +37,18 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
             SetReportList();
         }
     }
-
-    private ObservableCollection<string> locations;
-    public ObservableCollection<string> Locations
-    {
-        get => locations;
-        set
-        {
-            locations = value;
-            OnPropertyChanged(nameof(Locations));
-        }
-    }
-
-    private ObservableCollection<Employee> reports;
-    public ObservableCollection<Employee> Reports
-    {
-        get => reports;
-        set
-        {
-            reports = value;
-            OnPropertyChanged(nameof(Reports));
-        }
-    }
-
-    private ObservableCollection<Department> departments;
-    public ObservableCollection<Department> Departments
-    {
-        get => departments;
-        set
-        {
-            departments = value;
-            OnPropertyChanged(nameof(Departments));
-        }
-    }
-
-    private ObservableCollection<string> payPoints;
-    public ObservableCollection<string> PayPoints
-    {
-        get => payPoints;
-        set
-        {
-            payPoints = value;
-            OnPropertyChanged(nameof(PayPoints));
-        }
-    }
-
-    private ObservableCollection<EEmploymentType> employmentTypes;
-    public ObservableCollection<EEmploymentType> EmploymentTypes
-    {
-        get => employmentTypes;
-        set
-        {
-            employmentTypes = value;
-            OnPropertyChanged(nameof(EmploymentTypes));
-        }
-    }
-
-    private ObservableCollection<Role> jobClassifications;
-    public ObservableCollection<Role> JobClassifications
-    {
-        get => jobClassifications;
-        set
-        {
-            jobClassifications = value;
-            OnPropertyChanged(nameof(JobClassifications));
-        }
-    }
+    
+    public ObservableCollection<string> Locations { get; set; }
+    
+    public ObservableCollection<Employee> Reports { get; set; }
+    
+    public ObservableCollection<Department> Departments { get; set; }
+    
+    public ObservableCollection<string> PayPoints { get; set; }
+    
+    public ObservableCollection<EEmploymentType> EmploymentTypes { get; set; }
+    
+    public ObservableCollection<Role> JobClassifications { get; set; }
 
     private int code;
     public int Code
@@ -145,8 +94,8 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
         }
     }
 
-    private Employee reportsTo;
-    public Employee ReportsTo
+    private Employee? reportsTo;
+    public Employee? ReportsTo
     {
         get => reportsTo;
         set
@@ -156,8 +105,8 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
         }
     }
 
-    private Department department;
-    public Department Department
+    private Department? department;
+    public Department? Department
     {
         get => department;
         set
@@ -190,8 +139,8 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
         }
     }
 
-    private Role jobClassification;
-    public Role JobClassification
+    private Role? jobClassification;
+    public Role? JobClassification
     {
         get => jobClassification;
         set
@@ -206,39 +155,60 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
     public AddLocationCommand AddLocationCommand { get; set; }
     public AddPayPointCommand AddPayPointCommand { get; set; }
 
-    public EmployeeEditorVM(Helios helios, Employee employee, bool isNew)
+    private EmployeeEditorVM(Helios helios, Employee employee, bool isNew)
     {
         Helios = helios;
         IsNew = isNew;
+        this.employee = employee;
+
+        employees = new List<Employee>();
+        managerIDs = new List<int>();
+        Locations = new ObservableCollection<string>();
+        Reports = new ObservableCollection<Employee>();
+        Departments = new ObservableCollection<Department>();
+        PayPoints = new ObservableCollection<string>();
+        EmploymentTypes = new ObservableCollection<EEmploymentType>();
+        JobClassifications = new ObservableCollection<Role>();
+        firstName = string.Empty;
+        surname = string.Empty;
+        location = string.Empty;
+        payPoint = string.Empty;
 
         ConfirmEmployeeEditCommand = new ConfirmEmployeeEditCommand(this);
         RefreshDataCommand = new RefreshDataCommand(this);
         AddLocationCommand = new AddLocationCommand(this);
         AddPayPointCommand = new AddPayPointCommand(this);
         UseManagers = true;
-
-        Task.Run(() => SetInitialData(employee));
     }
 
-    public void SetEmployee(Employee newEmployee)
+    private async Task<EmployeeEditorVM> InitializeAsync()
     {
-        employee = newEmployee;
-
-        Code = newEmployee.ID;
-        FirstName = newEmployee.FirstName;
-        Surname = newEmployee.LastName;
-        Location = newEmployee.Location;
-        Department = Departments.FirstOrDefault(d => d.Name == newEmployee.DepartmentName);
-        ReportsTo = employees.FirstOrDefault(e => e.ID == newEmployee.ReportsToID);
-        PayPoint = newEmployee.PayPoint;
-        EmploymentType = newEmployee.EmploymentType;
-        JobClassification = JobClassifications.FirstOrDefault(r => r.Name == newEmployee.RoleName);
+        await SetInitialData();
+        return this;
     }
 
-    private async Task SetInitialData(Employee newEmployee)
+    public static Task<EmployeeEditorVM> CreateAsync(Helios helios, Employee employee, bool isNew)
+    {
+        var ret = new EmployeeEditorVM(helios, employee, isNew);
+        return ret.InitializeAsync();
+    }
+    public void SetEmployee()
+    {
+        Code = employee.ID;
+        FirstName = employee.FirstName;
+        Surname = employee.LastName;
+        Location = employee.Location;
+        Department = Departments.FirstOrDefault(d => d.Name == employee.DepartmentName);
+        ReportsTo = employees.FirstOrDefault(e => e.ID == employee.ReportsToID);
+        PayPoint = employee.PayPoint;
+        EmploymentType = employee.EmploymentType;
+        JobClassification = JobClassifications.FirstOrDefault(r => r.Name == employee.RoleName);
+    }
+
+    private async Task SetInitialData()
     {
         await RefreshDataAsync();
-        await Task.Run(() =>SetEmployee(newEmployee));
+        await Task.Run(SetEmployee);
     }
 
     /// <summary>
@@ -246,8 +216,6 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
     /// </summary>
     public void SetReportList()
     {
-        if (employees is null) { return; }
-
         Reports = useManagers
             ? new ObservableCollection<Employee>(employees.Where(e => managerIDs.Contains(e.ID)).OrderBy(e => e.FullName))
             : new ObservableCollection<Employee>(employees.OrderBy(e => e.FullName));
@@ -276,11 +244,11 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
         employee.FirstName = FirstName;
         employee.LastName = Surname;
         employee.Location = Location;
-        employee.ReportsToID = ReportsTo.ID;
+        employee.ReportsToID = ReportsTo?.ID ?? 0;
         employee.ReportsTo = ReportsTo;
         employee.PayPoint = PayPoint;
         employee.EmploymentType = EmploymentType;
-        employee.RoleName = JobClassification.Name;
+        employee.RoleName = JobClassification?.Name ?? string.Empty;
         employee.Role = JobClassification;
 
         Helios.StaffUpdater.Employee(employee);
@@ -306,9 +274,10 @@ public class EmployeeEditorVM : INotifyPropertyChanged, IDBInteraction
         PayPoint = input.InputText;
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

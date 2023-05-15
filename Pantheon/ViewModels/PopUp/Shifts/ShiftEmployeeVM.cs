@@ -53,7 +53,7 @@ public class ShiftEmployeeVM : INotifyPropertyChanged
 
     public ConfirmEmployeeAssignmentCommand ConfirmEmployeeAssignmentCommand { get; set; }
 
-    public ShiftEmployeeVM(ShiftVM shift)
+    private ShiftEmployeeVM(ShiftVM shift)
     {
         Shift = shift.Shift;
         Department = shift.Department ?? Shift.Department ?? new Department(Shift.ID.Split('|')[0]);
@@ -67,8 +67,18 @@ public class ShiftEmployeeVM : INotifyPropertyChanged
         empShifts = new List<EmployeeShift>();
 
         ConfirmEmployeeAssignmentCommand = new ConfirmEmployeeAssignmentCommand(this);
+    }
 
-        Task.Run(SetData);
+    private async Task<ShiftEmployeeVM> InitializeAsync()
+    {
+        await SetData();
+        return this;
+    }
+
+    public static Task<ShiftEmployeeVM> CreateAsync(ShiftVM shift)
+    {
+        var ret = new ShiftEmployeeVM(shift);
+        return ret.InitializeAsync();
     }
 
     public async Task SetData()

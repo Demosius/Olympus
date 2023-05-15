@@ -16,37 +16,61 @@ public class InventoryCreator
 
     public async Task<int> NAVBinsAsync(List<NAVBin> bins)
     {
-        var lines = await Chariot.ReplaceFullTableAsync(bins);
-        if (lines > 0) 
-            _ = Task.Run(() => Chariot.SetTableUpdateTime(typeof(NAVBin)));
+        var lines = 0;
+        void Action()
+        {
+            lines = Chariot.ReplaceFullTable(bins);
+            if (lines > 0)
+                Chariot.SetTableUpdateTime(typeof(NAVBin));
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action));
         return lines;
     }
 
     public async Task<int> NAVItemsAsync(List<NAVItem> items, DateTime dateTime)
     {
-        var lines = await Chariot.ReplaceFullTableAsync(items);
-        if (lines > 0)
-            _ = Task.Run(() => Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime));
+        var lines = 0;
+
+        void Action()
+        {
+            lines = Chariot.ReplaceFullTable(items);
+            if (lines > 0)
+                Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action));
         return lines;
     }
 
     public async Task<int> NAVUoMsAsync(List<NAVUoM> uomList)
     {
-        var lines = await Chariot.ReplaceFullTableAsync(uomList);
-        if (lines > 0)
-            _ = Task.Run(() => Chariot.SetTableUpdateTime(typeof(NAVUoM)));
+        var lines = 0;
+        void Action()
+        {
+            lines = Chariot.ReplaceFullTable(uomList);
+            if (lines > 0)
+                Chariot.SetTableUpdateTime(typeof(NAVUoM));
+        }
+        await Task.Run(() => Chariot.RunInTransaction(Action));
         return lines;
     }
 
     public async Task<int> NAVStockAsync(List<NAVStock> stock)
     {
-        var lines = await Chariot.ReplaceFullTableAsync(stock);
-        if (lines <= 0) return lines;
+        var lines = 0;
 
-        _ = Task.Run(() => Chariot.EmptyTable<BinContentsUpdate>());
-        _ = Task.Run(() => Chariot.SetTableUpdateTime(typeof(NAVStock)));
-        _ = Chariot.SetStockUpdateTimesAsync(stock);
+        void Action()
+        {
+            lines = Chariot.ReplaceFullTable(stock);
+            if (lines <= 0) return;
 
+            Chariot.EmptyTable<BinContentsUpdate>();
+            Chariot.SetTableUpdateTime(typeof(NAVStock));
+            Chariot.SetStockUpdateTimes(stock);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action));
         return lines;
     }
 

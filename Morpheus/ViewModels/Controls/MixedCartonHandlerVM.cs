@@ -93,7 +93,7 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
         MixedCartons.Clear();
 
         // Get existing Mixed carton data.
-        var (mixedCartons, mcItems, items) = await Helios.InventoryReader.GetMixedCartonData();
+        var (mixedCartons, mcItems, items) = await Helios.InventoryReader.GetMixedCartonDataAsync();
 
         Items = items.ToDictionary(i => i.Number, i => i);
 

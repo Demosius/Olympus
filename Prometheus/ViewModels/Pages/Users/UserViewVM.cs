@@ -19,7 +19,7 @@ using Uranus.Staff.Models;
 
 namespace Prometheus.ViewModels.Pages.Users;
 
-internal class UserViewVM : INotifyPropertyChanged, IDBInteraction, IFilters, ISorting
+public class UserViewVM : INotifyPropertyChanged, IDBInteraction, IFilters, ISorting
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
@@ -88,7 +88,7 @@ internal class UserViewVM : INotifyPropertyChanged, IDBInteraction, IFilters, IS
 
     #endregion
 
-    public UserViewVM(Helios helios, Charon charon)
+    private UserViewVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
@@ -103,10 +103,20 @@ internal class UserViewVM : INotifyPropertyChanged, IDBInteraction, IFilters, IS
         ApplySortingCommand = new ApplySortingCommand(this);
         DeactivateUserCommand = new DeactivateUserCommand(this);
         ChangeUserRoleCommand = new ChangeUserRoleCommand(this);
-
-        Task.Run(RefreshDataAsync);
     }
-    
+
+    private async Task<UserViewVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<UserViewVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new UserViewVM(helios, charon);
+        return ret.InitializeAsync();
+    }
+
     public async Task RefreshDataAsync()
     {
         await GatherUsers();

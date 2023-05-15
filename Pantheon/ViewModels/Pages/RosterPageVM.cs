@@ -146,7 +146,7 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 
     #endregion
 
-    public RosterPageVM(Helios helios, Charon charon)
+    private RosterPageVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
@@ -163,8 +163,18 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         SaveRosterCommand = new SaveRosterCommand(this);
         DeleteRosterCommand = new DeleteRosterCommand(this);
         ExportRosterCommand = new ExportRosterCommand(this);
+    }
 
-        Task.Run(RefreshDataAsync);
+    private async Task<RosterPageVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<RosterPageVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new RosterPageVM(helios, charon);
+        return ret.InitializeAsync();
     }
 
     private void SetRosters()
@@ -187,7 +197,7 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         var rosterCreator = new RosterCreationWindow(SelectedDepartment, Helios, Charon);
         if (rosterCreator.ShowDialog() != true) return;
 
-        var newRoster = rosterCreator.VM.Roster;
+        var newRoster = rosterCreator.VM?.Roster;
 
         if (newRoster is null) return;
 

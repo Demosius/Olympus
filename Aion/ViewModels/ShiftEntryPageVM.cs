@@ -1,5 +1,4 @@
-﻿using Aion.Properties;
-using Aion.View;
+﻿using Aion.View;
 using Aion.ViewModels.Commands;
 using Aion.ViewModels.Interfaces;
 using Aion.ViewModels.Utility;
@@ -82,44 +81,17 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
         }
     }
 
-    private Employee manager;
-    public Employee Manager
-    {
-        get => manager;
-        set
-        {
-            manager = value;
-            OnPropertyChanged(nameof(Manager));
-        }
-    }
+    public Employee Manager { get; }
 
-    private ObservableCollection<string> locations;
-    public ObservableCollection<string> Locations
-    {
-        get => locations;
-        set
-        {
-            locations = value;
-            OnPropertyChanged(nameof(Locations));
-        }
-    }
+    public ObservableCollection<string> Locations { get; set; }
 
     public List<ShiftEntry> FullEntries { get; set; }
     private List<ShiftEntry> DeletedEntries { get; set; }
 
-    private ObservableCollection<ShiftEntry> entries;
-    public ObservableCollection<ShiftEntry> Entries
-    {
-        get => entries;
-        set
-        {
-            entries = value;
-            OnPropertyChanged(nameof(Entries));
-        }
-    }
+    public ObservableCollection<ShiftEntry> Entries { get; set; }
 
-    private ShiftEntry selectedEntry;
-    public ShiftEntry SelectedEntry
+    private ShiftEntry? selectedEntry;
+    public ShiftEntry? SelectedEntry
     {
         get => selectedEntry;
         set
@@ -165,19 +137,10 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
 
     private List<ClockEvent> DeletedClocks { get; set; }
 
-    private ObservableCollection<ClockEvent> clocks;
-    public ObservableCollection<ClockEvent> Clocks
-    {
-        get => clocks;
-        set
-        {
-            clocks = value;
-            OnPropertyChanged(nameof(Clocks));
-        }
-    }
+    public ObservableCollection<ClockEvent> Clocks { get; set; }
 
-    private ClockEvent selectedClock;
-    public ClockEvent SelectedClock
+    private ClockEvent? selectedClock;
+    public ClockEvent? SelectedClock
     {
         get => selectedClock;
         set
@@ -290,7 +253,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
     public ApplySortingCommand ApplySortingCommand { get; set; }
     public RepairDataCommand RepairDataCommand { get; set; }
 
-    public ShiftEntryPageVM(Helios helios, Charon charon)
+    private ShiftEntryPageVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
@@ -300,6 +263,20 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
         sortOption = EEntrySortOption.EmployeeDate;
 
         Entries = new ObservableCollection<ShiftEntry>();
+        Clocks = new ObservableCollection<ClockEvent>();
+        Employees = new List<Employee>();
+        days = new List<Day>();
+        Locations = new ObservableCollection<string>();
+        FullEntries = new List<ShiftEntry>();
+        DeletedEntries = new List<ShiftEntry>();
+        fullClockDictionary = new Dictionary<(int, string), List<ClockEvent>>();
+        DeletedClocks = new List<ClockEvent>();
+
+        ExportString = string.Empty;
+        employeeSearchString = string.Empty;
+        departmentSearchString = string.Empty;
+        commentSearchString = string.Empty;
+        daySearchString = string.Empty;
 
         // Commands
         RefreshDataCommand = new RefreshDataCommand(this);
@@ -319,10 +296,24 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
         ApplySortingCommand = new ApplySortingCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
 
-        Manager = charon.Employee;
+        Manager = charon.Employee!;
 
-        Task.Run(SetEmployeesAsync);
-        Task.Run(SetEntriesAsync);
+    }
+
+    private async Task<ShiftEntryPageVM> InitializeAsync()
+    {
+        var empTask = SetEmployeesAsync();
+        var entryTask = SetEntriesAsync();
+
+        await Task.WhenAll(empTask, entryTask);
+
+        return this;
+    }
+
+    public static Task<ShiftEntryPageVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new ShiftEntryPageVM(helios, charon);
+        return ret.InitializeAsync();
     }
 
     public async Task<bool> CheckDateChange()
@@ -339,7 +330,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
 
     private async Task SetEmployeesAsync()
     {
-        Employees = (await Helios.StaffReader.GetManagedEmployeesAsync(Manager?.ID ?? 0)).ToList();
+        Employees = (await Helios.StaffReader.GetManagedEmployeesAsync(Manager.ID)).ToList();
     }
 
     /// <summary>
@@ -372,7 +363,10 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
 
         FullEntries = await entryTask;
 
-        Locations = new ObservableCollection<string>(FullEntries.Select(e => e.Location).Distinct().Where(e => e is not null or ""));
+        var locations = new List<string>(FullEntries.Select(e => e.Location).Distinct().Where(e => e is not null or ""));
+        Locations.Clear();
+        foreach (var location in locations)
+            Locations.Add(location);
 
         FullClockDictionary = (await fullClockTask).Where(c => c.Status != EClockStatus.Deleted)
             .GroupBy(c => (c.EmployeeID, c.Date))
@@ -433,13 +427,12 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
     /// </summary>
     public void ApplyFilters()
     {
-        if (Manager is null) return;
-
         IEnumerable<ShiftEntry> shiftEntries = FullEntries;
 
         try
         {
             FilterEmployee(ref shiftEntries);
+            // ReSharper disable once PossibleMultipleEnumeration
             FilterDepartment(ref shiftEntries);
             // ReSharper disable once PossibleMultipleEnumeration
             FilterComment(ref shiftEntries);
@@ -461,31 +454,31 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
 
     private void FilterEmployee(ref IEnumerable<ShiftEntry> shiftEntries)
     {
-        if ((employeeSearchString ?? "") == "") return;
+        if (employeeSearchString == "") return;
 
         Regex rex = new(employeeSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        shiftEntries = shiftEntries?.Where(s => rex.IsMatch(s.EmployeeName) || rex.IsMatch(s.EmployeeID.ToString()));
+        shiftEntries = shiftEntries.Where(s => rex.IsMatch(s.EmployeeName) || rex.IsMatch(s.EmployeeID.ToString()));
     }
 
     private void FilterDepartment(ref IEnumerable<ShiftEntry> shiftEntries)
     {
-        if ((departmentSearchString ?? "") == "") return;
+        if (departmentSearchString == "") return;
 
         Regex rex = new(departmentSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        shiftEntries = shiftEntries?.Where(s => rex.IsMatch(s.Department));
+        shiftEntries = shiftEntries.Where(s => rex.IsMatch(s.Department));
     }
 
     private void FilterComment(ref IEnumerable<ShiftEntry> shiftEntries)
     {
-        if ((commentSearchString ?? "") == "") return;
+        if (commentSearchString == "") return;
 
         Regex rex = new(commentSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        shiftEntries = shiftEntries?.Where(s => rex.IsMatch(s.Comments));
+        shiftEntries = shiftEntries.Where(s => rex.IsMatch(s.Comments));
     }
 
     private void FilterDay(ref IEnumerable<ShiftEntry> shiftEntries)
     {
-        shiftEntries = shiftEntries?.Where(e => Days.Where(d => d.InUse).Select(d => d.DayOfWeek).Contains(e.Day));
+        shiftEntries = shiftEntries.Where(e => Days.Where(d => d.InUse).Select(d => d.DayOfWeek).Contains(e.Day));
     }
 
     private void FilterDate(ref IEnumerable<ShiftEntry> shiftEntries)
@@ -493,7 +486,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
         var startString = startDate.ToString("yyyy-MM-dd");
         var endString = endDate.ToString("yyyy-MM-dd");
 
-        shiftEntries = shiftEntries?.Where(e =>
+        shiftEntries = shiftEntries.Where(e =>
             string.CompareOrdinal(e.Date, startString) >= 0 && string.CompareOrdinal(e.Date, endString) <= 0);
     }
 
@@ -595,8 +588,8 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
     public void SetExportString()
     {
         ExportString = StartDate == EndDate
-            ? $"{(Manager?.ID == -1 ? "All" : Manager?.ToString())}_{StartDate:ddMMMyyyy}"
-            : $"{(Manager?.ID == -1 ? "All" : Manager?.ToString())}_{StartDate:ddMMMyyyy}-{EndDate:ddMMMyyyy}";
+            ? $"{(Manager.ID == -1 ? "All" : Manager.ToString())}_{StartDate:ddMMMyyyy}"
+            : $"{(Manager.ID == -1 ? "All" : Manager.ToString())}_{StartDate:ddMMMyyyy}-{EndDate:ddMMMyyyy}";
     }
 
     public async Task RefreshDataAsync()
@@ -631,9 +624,9 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
     public async Task SaveEntryChanges()
     {
         var updateTask = Helios.StaffUpdater.EntriesAndClocksAsync(FullEntries, FullClockDictionary.SelectMany(d => d.Value));
-        var deleteTask =  Helios.StaffDeleter.EntriesAndClocksAsync(DeletedEntries, DeletedClocks);
+        var deleteTask = Helios.StaffDeleter.EntriesAndClocksAsync(DeletedEntries, DeletedClocks);
 
-        await Task.WhenAll(new List<Task> {updateTask, deleteTask});
+        await Task.WhenAll(new List<Task> { updateTask, deleteTask });
 
         await RefreshDataAsync(true);
     }
@@ -648,14 +641,21 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
     /// </summary>
     private void SetClocks()
     {
-        if (selectedEntry is not null && FullClockDictionary.TryGetValue((selectedEntry.EmployeeID, SelectedEntry.Date), out var newClockList))
-            Clocks = new ObservableCollection<ClockEvent>(newClockList.Where(c => c.Status != EClockStatus.Deleted));
-        else
-            Clocks = new ObservableCollection<ClockEvent>();
+        var clocks =
+            selectedEntry is not null && FullClockDictionary.TryGetValue((selectedEntry.EmployeeID, SelectedEntry?.Date ?? ""), out var newClockList) ?
+                new List<ClockEvent>(newClockList.Where(c => c.Status != EClockStatus.Deleted)) :
+                new List<ClockEvent>();
+
+        Clocks.Clear();
+        foreach (var clockEvent in clocks)
+            Clocks.Add(clockEvent);
+
     }
 
     public void DeleteSelectedClock()
     {
+        if (SelectedClock is null) return;
+
         SelectedClock.Status = EClockStatus.Deleted;
         // We will only delete the clock event from the DB if the timestamp does not match the date - denoting that it was not created by a physical clock event (but through the Aion Manager instead).
         // (In practice, actual clock events should remain recorded, for posterity.)
@@ -765,7 +765,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
 
     public void ReSummarizeEntry()
     {
-        SelectedEntry?.ApplyClockTimes(Clocks is null ? new List<ClockEvent>() : Clocks.ToList());
+        SelectedEntry?.ApplyClockTimes(Clocks.ToList());
     }
 
     public void CreateNewClock()
@@ -783,7 +783,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
 
         Clocks = new ObservableCollection<ClockEvent>(Clocks.OrderBy(c => c.Time));
 
-        FullClockDictionary[(SelectedEntry.EmployeeID, selectedEntry.Date)] = new List<ClockEvent>(Clocks);
+        FullClockDictionary[(SelectedEntry.EmployeeID, selectedEntry?.Date ?? "")] = new List<ClockEvent>(Clocks);
     }
 
     /// <summary>
@@ -812,8 +812,8 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
         }
 
         // Set the count based on total clocks with pending status.
-        PendingClockCount = (FullClockDictionary?
-            .SelectMany(d => d.Value) ?? Array.Empty<ClockEvent>())
+        PendingClockCount = FullClockDictionary
+            .SelectMany(d => d.Value)
             .Count(c => c.Status == EClockStatus.Pending);
     }
 
@@ -901,13 +901,6 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
         MissingEntryCount = 0;  // Assume it has worked and there are no more missing shifts.
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
     public async Task LaunchDateRangeWindowAsync()
     {
         if (!await CheckDateChange()) return;
@@ -916,12 +909,20 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepai
 
         datePicker.ShowDialog();
     }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [Uranus.Annotations.NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }
 
 public class Day : INotifyPropertyChanged
 {
     private DayOfWeek dayOfWeek;
-    public DayOfWeek DayOfWeek 
+    public DayOfWeek DayOfWeek
     {
         get => dayOfWeek;
         set
@@ -960,10 +961,11 @@ public class Day : INotifyPropertyChanged
         inUse = isInUse;
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
 
-    [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [Uranus.Annotations.NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

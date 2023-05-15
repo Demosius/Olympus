@@ -5,18 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:components="clr-namespace:Olympus.Views.Components"
         xmlns:viewModels="clr-namespace:Olympus.ViewModels"
-        xmlns:controls="clr-namespace:Morpheus.Views.Controls;assembly=Morpheus"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type viewModels:OlympusVM}, IsDesignTimeCreatable=False}"
         Title="Olympus" WindowState="Maximized"
         MinWidth="400"
         MinHeight="300"
         Background="{DynamicResource BackGroundBrush}"
         Closing="MainWindow_Closing"
-        Loaded="MainWindow_OnLoaded">
-
-    <Window.DataContext>
-        <viewModels:OlympusVM x:Name="VM"/>
-    </Window.DataContext>
+        Initialized="MainWindow_OnInitialized">
 
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -53,9 +49,6 @@
                 <MenuItem Header="Change Password"
                           Command="{Binding ChangePasswordCommand}"/>
             </MenuItem>
-            <Button Content="Test"
-                        Click="ButtonBase_OnClick"/>
-            <ProgressBar Name="ProgressBar" Minimum="0" Maximum="100" Value="0" Width="100"></ProgressBar>
         </Menu>
 
         <ToolBarTray DockPanel.Dock="Top" />
@@ -82,10 +75,6 @@
                 <TextBlock Text="Database: " Foreground="{DynamicResource ForeGradient}"/>
                 <TextBlock Text="{Binding DBManager.DBString}" Foreground="{DynamicResource ForeGradient}"/>
             </StackPanel>
-
-            <StatusBarItem Grid.Column="1">
-                <controls:ProgressBarView DataContext="{Binding ProgressBarVM}"/>
-            </StatusBarItem>
 
             <StatusBarItem Grid.Column="2"
                            HorizontalContentAlignment="Center">

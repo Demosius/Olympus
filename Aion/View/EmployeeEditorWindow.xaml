@@ -9,7 +9,8 @@
         xmlns:viewModels="clr-namespace:Aion.ViewModels"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance {x:Type viewModels:EmployeeEditorVM}, IsDesignTimeCreatable = False}"
-        Title="Edit Employee" Height="500" Width="475">
+        Title="Edit Employee" Height="500" Width="475"
+        Initialized="EmployeeEditorWindow_OnInitialized">
 
     <Window.Resources>
         <ResourceDictionary>

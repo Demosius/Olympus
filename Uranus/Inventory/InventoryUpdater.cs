@@ -19,13 +19,13 @@ public class InventoryUpdater
     {
         var count = 0;
 
-        async void Action()
+        void Action()
         {
-            count = await Chariot.UpdateTableAsync(bins);
+            count = Chariot.UpdateTable(bins);
             if (count > 0) Chariot.SetTableUpdateTime(typeof(NAVBin));
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
         return count;
     }
 
@@ -33,19 +33,17 @@ public class InventoryUpdater
     {
         var count = 0;
 
-        async void Action()
+        void Action()
         {
             var navItems = items as NAVItem[] ?? items.ToArray();
 
-            var itemTask = Chariot.UpdateTableAsync(navItems);
-            var extensionTask = Chariot.UpdateTableAsync(navItems.Select(i => i.Extension));
-
-            count = (await Task.WhenAll(itemTask, extensionTask)).Sum();
+            count += Chariot.UpdateTable(navItems);
+            count += Chariot.UpdateTable(navItems.Select(i => i.Extension));
 
             if (count > 0) Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
         return count;
     }
 
@@ -55,16 +53,16 @@ public class InventoryUpdater
 
         var lines = 0;
 
-        async void Action()
+        void Action()
         {
-            lines += await Chariot.UpdateTableAsync(uomList);
+            lines += Chariot.UpdateTable(uomList);
 
             if (lines == 0) return;
 
             lines += Chariot.SetTableUpdateTime(typeof(NAVUoM));
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
 
         return lines;
     }
@@ -75,17 +73,17 @@ public class InventoryUpdater
 
         var lines = 0;
 
-        async void Action()
+        void Action()
         {
             // Remove from stock table anything with zones equal to what is being put in.
             lines += Chariot.StockZoneDeletes(stock.Select(s => s.ZoneID).Distinct().ToList());
-            lines += await Chariot.InsertIntoTableAsync(stock);
+            lines += Chariot.InsertIntoTable(stock);
 
             lines += Chariot.SetTableUpdateTime(typeof(NAVStock));
-            lines += await Chariot.SetStockUpdateTimesAsync(stock);
+            lines += Chariot.SetStockUpdateTimes(stock);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
 
         return lines;
     }
@@ -97,16 +95,16 @@ public class InventoryUpdater
         zonesToRemove.AddRange(newStock.Select(s => s.ZoneID).Distinct());
         var lines = 0;
 
-        /*Chariot.Database?.RunInTransaction(() =>
-        {*/
+        await Task.Run(() => Chariot.RunInTransaction(() =>
+        {
             // Remove from stock table anything with zones equal to what is being put in.
             lines += Chariot.StockZoneDeletes(zonesToRemove);
 
-            lines += await Chariot.InsertIntoTableAsync(newStock);
+            lines += Chariot.InsertIntoTable(newStock);
 
             lines += Chariot.SetTableUpdateTime(typeof(NAVStock));
-            lines += await Chariot.SetStockUpdateTimesAsync(newStock);
-        /*});*/
+            lines += Chariot.SetStockUpdateTimes(newStock);
+        }));
 
         return lines;
     }
@@ -119,15 +117,13 @@ public class InventoryUpdater
     {
         var count = 0;
 
-        async void Action()
+        void Action()
         {
-            var zoneTask = Chariot.UpdateTableAsync(zones);
-            var extensionTask = Chariot.UpdateTableAsync(zones.Select(z => z.Extension));
-
-            count += (await Task.WhenAll(zoneTask, extensionTask)).Sum();
+            count += Chariot.UpdateTable(zones);
+            count += Chariot.UpdateTable(zones.Select(z => z.Extension));
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
         return count;
     }
 
@@ -151,15 +147,13 @@ public class InventoryUpdater
         var lines = 0;
         var zoneList = newZones.ToList();
 
-        async void Action()
+        void Action()
         {
-            var extensionTask = Chariot.UpdateTableAsync(zoneList.Select(z => z.Extension));
-            var zoneTask = Chariot.ReplaceFullTableAsync(zoneList);
-
-            lines += (await Task.WhenAll(extensionTask, zoneTask)).Sum();
+            lines += Chariot.UpdateTable(zoneList.Select(z => z.Extension));
+            lines += Chariot.ReplaceFullTable(zoneList);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
 
         return lines;
     }
@@ -168,18 +162,16 @@ public class InventoryUpdater
     {
         var lines = 0;
 
-        async void Action()
+        void Action()
         {
             var mcList = mixedCartons.ToList();
             var mcItems = mcList.SelectMany(mc => mc.Items);
 
-            var itemTask = Chariot.ReplaceFullTableAsync(mcItems);
-            var mixCtnTask = Chariot.ReplaceFullTableAsync(mcList);
-
-            lines += (await Task.WhenAll(itemTask, mixCtnTask)).Sum();
+            lines += Chariot.ReplaceFullTable(mcItems);
+            lines += Chariot.ReplaceFullTable(mcList);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
         return lines;
     }
 
@@ -187,16 +179,14 @@ public class InventoryUpdater
     {
         var lines = 0;
 
-        async void Action()
+        void Action()
         {
-            var siteTask = Chariot.UpdateTableAsync(sites);
-            var zoneTask = Chariot.UpdateTableAsync(sites.SelectMany(s => s.Zones));
-            var extenstionTask = Chariot.UpdateTableAsync(sites.SelectMany(s => s.Zones.Select(z => z.Extension)));
-
-            lines += (await Task.WhenAll(siteTask, extenstionTask, zoneTask)).Sum();
+            lines += Chariot.UpdateTable(sites);
+            lines += Chariot.UpdateTable(sites.SelectMany(s => s.Zones));
+            lines += Chariot.UpdateTable(sites.SelectMany(s => s.Zones.Select(z => z.Extension)));
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
         return lines;
     }
 
@@ -204,21 +194,18 @@ public class InventoryUpdater
     {
         var lines = 0;
 
-        async void Action()
+        void Action()
         {
-            var siteTask = Chariot.UpdateTableAsync(sites);
-            var zoneTask = Chariot.UpdateTableAsync(zones);
-            var extensionTask = Chariot.UpdateTableAsync(zones.Select(z => z.Extension));
-
-            lines += (await Task.WhenAll(siteTask, extensionTask, zoneTask)).Sum();
+            lines += Chariot.UpdateTable(sites);
+            lines += Chariot.UpdateTable(zones);
+            lines += Chariot.UpdateTable(zones.Select(z => z.Extension));
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
         return lines;
     }
 
     public async Task<int> SiteItemLevelsAsync(IEnumerable<SiteItemLevel> siteItemLevels) => await Chariot.UpdateTableAsync(siteItemLevels);
 
     public int Site(Site site) => Chariot.Update(site);
-
 }

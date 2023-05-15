@@ -11,6 +11,7 @@
       mc:Ignorable="d" 
       d:DataContext="{d:DesignInstance {x:Type pages:EmployeePageVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="1080" d:DesignWidth="1200"
+      Initialized="EmployeePage_OnInitialized"
       Title="EmployeePage">
 
     <Page.Resources>

@@ -28,7 +28,7 @@ public class BinContentsUpdaterVM : INotifyPropertyChanged, IMultiSelect, IConfi
 
     public bool ZonesMissing => MissingZonesList.Any();
 
-    private readonly List<StringSelectorVM> allZones;
+    private List<StringSelectorVM> allZones;
 
     public int SuccessfulUploadLines { get; set; }
 
@@ -64,22 +64,15 @@ public class BinContentsUpdaterVM : INotifyPropertyChanged, IMultiSelect, IConfi
 
     #endregion
 
-    public BinContentsUpdaterVM(Helios helios, List<NAVStock> newStock)
+    private BinContentsUpdaterVM(Helios helios, List<NAVStock> newStock)
     {
         Helios = helios;
         NewStock = newStock;
+        OldStock = new List<NAVStock>();
+        MissingZonesList = new List<string>();
+        allZones = new List<StringSelectorVM>();
 
-        OldStock = AsyncHelper.RunSync(() => Helios.InventoryReader.NAVAllStockAsync());
-
-        // What Zones are present in old data and not in new?
-        var newZones = NewStock.Select(s => s.ZoneID).Distinct().ToList();
-        var oldZones = OldStock.Select(s => s.ZoneID).Distinct().ToList();
-
-        MissingZonesList =  oldZones.Where(zone => !newZones.Contains(zone)).ToList();
-
-        allZones = MissingZonesList.Select(zone => new StringSelectorVM(zone)).ToList();
         Zones = new ObservableCollection<StringSelectorVM>();
-        
         filterString = string.Empty;
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
@@ -91,8 +84,36 @@ public class BinContentsUpdaterVM : INotifyPropertyChanged, IMultiSelect, IConfi
         SelectFilteredExclusiveCommand = new SelectFilteredExclusiveCommand(this);
         ConfirmCommand = new ConfirmCommand(this);
         ConfirmAndCloseCommand = new ConfirmAndCloseCommand(this);
+    }
 
-        ApplyFilters();
+    private async Task<BinContentsUpdaterVM> InitializeAsync()
+    {
+        await GetDataAsync();
+        return this;
+    }
+
+    public static Task<BinContentsUpdaterVM> CreateAsync(Helios helios, List<NAVStock> newStock)
+    {
+        var ret = new BinContentsUpdaterVM(helios, newStock);
+        return ret.InitializeAsync();
+    }
+
+    private async Task GetDataAsync()
+    {
+        OldStock = await Helios.InventoryReader.NAVAllStockAsync();
+
+        await Task.Run(() =>
+        {
+            // What Zones are present in old data and not in new?
+            var newZones = NewStock.Select(s => s.ZoneID).Distinct().ToList();
+            var oldZones = OldStock.Select(s => s.ZoneID).Distinct().ToList();
+
+            MissingZonesList = oldZones.Where(zone => !newZones.Contains(zone)).ToList();
+
+            allZones = MissingZonesList.Select(zone => new StringSelectorVM(zone)).ToList();
+
+            ApplyFilters();
+        });
     }
 
     public void ClearFilters()

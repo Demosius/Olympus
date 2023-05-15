@@ -207,7 +207,7 @@ public class EmployeeShiftVM : INotifyPropertyChanged
 
     #endregion
 
-    public EmployeeShiftVM(EmployeeVM employee)
+    private EmployeeShiftVM(EmployeeVM employee)
     {
         EmployeeVM = employee;
         Helios = EmployeeVM.Helios;
@@ -226,8 +226,18 @@ public class EmployeeShiftVM : INotifyPropertyChanged
         CancelRuleEditCommand = new CancelRuleEditCommand(this);
         ConfirmShiftAdjustmentsCommand = new ConfirmShiftAdjustmentsCommand(this);
         AddRuleCommand = new AddRuleCommand(this);
+    }
 
-        Task.Run(SetData);
+    private async Task<EmployeeShiftVM> InitializeAsync()
+    {
+        await SetData();
+        return this;
+    }
+
+    public static Task<EmployeeShiftVM> CreateAsync(EmployeeVM employee)
+    {
+        var ret = new EmployeeShiftVM(employee);
+        return ret.InitializeAsync();
     }
 
     private async Task SetData()

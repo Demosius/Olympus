@@ -58,7 +58,7 @@ public class BinVM : INotifyPropertyChanged, IDBInteraction
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
 
-    public BinVM(Helios helios, Charon charon)
+    private BinVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
@@ -69,8 +69,18 @@ public class BinVM : INotifyPropertyChanged, IDBInteraction
         binFilter = string.Empty;
 
         RefreshDataCommand = new RefreshDataCommand(this);
+    }
 
-        Task.Run(RefreshDataAsync);
+    private async Task<BinVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<BinVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new BinVM(helios, charon);
+        return ret.InitializeAsync();
     }
 
     public async Task RefreshDataAsync()

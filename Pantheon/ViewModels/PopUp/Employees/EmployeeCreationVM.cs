@@ -105,7 +105,7 @@ public class EmployeeCreationVM : INotifyPropertyChanged
 
     public ConfirmEmployeeCreationCommand ConfirmEmployeeCreationCommand { get; set; }
 
-    public EmployeeCreationVM(Helios helios, Charon charon)
+    private EmployeeCreationVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
@@ -120,8 +120,18 @@ public class EmployeeCreationVM : INotifyPropertyChanged
         Managers = new ObservableCollection<Employee>();
 
         ConfirmEmployeeCreationCommand = new ConfirmEmployeeCreationCommand(this);
+    }
 
-        Task.Run(SetData);
+    private async Task<EmployeeCreationVM> InitializeAsync()
+    {
+        await SetData();
+        return this;
+    }
+
+    public static Task<EmployeeCreationVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new EmployeeCreationVM(helios, charon);
+        return ret.InitializeAsync();
     }
 
     private async Task SetData()

@@ -1,4 +1,6 @@
-﻿using Pantheon.ViewModels.PopUp.TempTags;
+﻿using System;
+using System.Windows;
+using Pantheon.ViewModels.PopUp.TempTags;
 using Styx;
 using Uranus;
 using Uranus.Staff.Models;
@@ -10,14 +12,22 @@ namespace Pantheon.Views.PopUp.Employees;
 /// </summary>
 public partial class TempTagSelectionWindow
 {
-    public TempTagSelectionVM VM { get; set; }
+    public TempTagSelectionVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
-    public TempTag? TempTag => VM.SelectedTag?.TempTag;
+    public TempTag? TempTag => VM?.SelectedTag?.TempTag;
 
     public TempTagSelectionWindow(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
-        VM = new TempTagSelectionVM(helios, charon);
+    }
+
+    private async void TempTagSelectionWindow_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await TempTagSelectionVM.CreateAsync(Helios, Charon);
         DataContext = VM;
     }
 }

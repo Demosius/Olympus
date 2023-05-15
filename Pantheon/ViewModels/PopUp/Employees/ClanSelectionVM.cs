@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using Morpheus.ViewModels.Commands;
 using Morpheus.ViewModels.Interfaces;
@@ -149,7 +150,7 @@ public class ClanSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
 
     #endregion
 
-    public ClanSelectionVM(Helios helios, Charon charon, string? departmentName = null)
+    private ClanSelectionVM(Helios helios, Charon charon, string? departmentName = null)
     {
         Helios = helios;
         Charon = charon;
@@ -157,17 +158,12 @@ public class ClanSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         UserCanCreate = Charon.CanCreateClan();
         UserCanDelete = Charon.CanDeleteClan();
 
-        FullClans = AsyncHelper.RunSync(() => Helios.StaffReader.ClansAsync());
+        FullClans = new List<Clan>();
 
-        Clans = new ObservableCollection<Clan>(FullClans);
+        DepartmentNames = new ObservableCollection<string>();
+        Clans = new ObservableCollection<Clan>();
 
         filterString = string.Empty;
-
-        DepartmentNames = new ObservableCollection<string> { ANY_DEP_STR };
-        foreach (var department in FullClans.Select(c => c.DepartmentName).Distinct())
-        {
-            DepartmentNames.Add(department);
-        }
 
         selectedDepartmentName = departmentName ?? ANY_DEP_STR;
         newClanName = string.Empty;
@@ -184,12 +180,33 @@ public class ClanSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         ClearManagerCommand = new ClearManagerCommand(this);
     }
 
+    private async Task<ClanSelectionVM> InitializeAsync()
+    {
+        FullClans = await Helios.StaffReader.ClansAsync();
+
+        foreach (var clan in FullClans)
+            Clans.Add(clan);
+
+        DepartmentNames.Add(ANY_DEP_STR);
+
+        foreach (var department in FullClans.Select(c => c.DepartmentName).Distinct())
+            DepartmentNames.Add(department);
+
+        return this;
+    }
+
+    public static Task<ClanSelectionVM> CreateAsync(Helios helios, Charon charon, string? departmentName = null)
+    {
+        var ret = new ClanSelectionVM(helios, charon, departmentName);
+        return ret.InitializeAsync();
+    }
+
     public void SelectDepartment()
     {
         var departmentSelector = new DepartmentSelectionWindow(Helios, Charon);
         if (departmentSelector.ShowDialog() != true) return;
 
-        ClanDepartment = departmentSelector.VM.SelectedDepartment;
+        ClanDepartment = departmentSelector.VM?.SelectedDepartment;
     }
 
     public void ClearDepartment()

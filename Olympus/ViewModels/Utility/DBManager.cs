@@ -6,6 +6,7 @@ using Ookii.Dialogs.Wpf;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace Olympus.ViewModels.Utility;
@@ -83,7 +84,7 @@ public class DBManager : INotifyPropertyChanged
         return path;
     }
 
-    private void SetDatabase(string path)
+    private async Task SetDatabase(string path)
     {
         // Set App settings. 
         Settings.Default.SolLocation = path;
@@ -92,15 +93,15 @@ public class DBManager : INotifyPropertyChanged
         OlympusVM.UserHandlerVM.CheckUser();
         OlympusVM.InventoryUpdaterVM.GetUpdateTimes();
         // This in turn resets the chariots for both helios and charon.
-        OlympusVM.ResetDB();
+        await OlympusVM.ResetDB();
     }
 
-    internal void UseLocalDB()
+    internal async Task UseLocalDB()
     {
-        SetDatabase(App.BaseDirectory());
+        await SetDatabase(App.BaseDirectory());
     }
 
-    public void ChangeDatabase()
+    public async Task ChangeDatabase()
     {
         // TODO: Validate selected folder as existing Sol Location.
 
@@ -109,10 +110,10 @@ public class DBManager : INotifyPropertyChanged
         // Empty string means cancellation or failure to find existing Sol DB.
         if (path == "") return;
 
-        SetDatabase(path);
+        await SetDatabase(path);
     }
 
-    public void NewDatabase()
+    public async Task NewDatabase()
     {
         var path = SelectFolder();
         // Empty string means cancellation.
@@ -121,10 +122,10 @@ public class DBManager : INotifyPropertyChanged
         // Make sure directory exists.
         if (!Directory.Exists(path))
             _ = Directory.CreateDirectory(path);
-        SetDatabase(path);
+        await SetDatabase(path);
     }
 
-    public void CopyDatabase()
+    public async Task CopyDatabase()
     {
         var path = SelectFolder();
         // Empty string means cancellation.
@@ -140,26 +141,23 @@ public class DBManager : INotifyPropertyChanged
         // Get a copy of existing database into chosen path.
         DirectoryCopy(Settings.Default.SolLocation, path);
 
-        SetDatabase(path);
+        await SetDatabase(path);
     }
 
-    public void MoveDatabase()
+    public async Task MoveDatabase()
     {
         var path = SelectFolder();
-        // Empty string means cancellation.
-        if (path == "") return;
+        if (path == "")
+            return;
         if (IsSubDirectory(Settings.Default.SolLocation, path))
         {
-            _ = MessageBox.Show("Cannot move to a subfolder of the current database.",
-                "Failed Database PartialMove",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
+            _ = MessageBox.Show("Cannot move to a subfolder of the current database.", "Failed Database PartialMove",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
-        // Copy existing DB across to new location, and remove from old.
         DirectoryCopy(Settings.Default.SolLocation, path);
         var oldPath = Settings.Default.SolLocation;
-        SetDatabase(path);
+        await SetDatabase(path);
         Directory.Delete(oldPath, true);
     }
 

@@ -79,7 +79,7 @@ public class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
 
     #endregion
 
-    public RosterCreationVM(Department department, Helios helios, Charon charon)
+    private RosterCreationVM(Department department, Helios helios, Charon charon)
     {
         Department = department;
         Helios = helios;
@@ -90,8 +90,18 @@ public class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
 
         RefreshDataCommand = new RefreshDataCommand(this);
         ConfirmDepartmentRosterCreationCommand = new ConfirmDepartmentRosterCreationCommand(this);
+    }
 
-        Task.Run(RefreshDataAsync);
+    private async Task<RosterCreationVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<RosterCreationVM> CreateAsync(Department department, Helios helios, Charon charon)
+    {
+        var ret = new RosterCreationVM(department, helios, charon);
+        return ret.InitializeAsync();
     }
 
     public async Task RefreshDataAsync()

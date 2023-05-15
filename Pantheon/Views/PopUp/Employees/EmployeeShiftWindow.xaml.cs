@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.ViewModels.PopUp.Employees;
@@ -10,12 +12,18 @@ namespace Pantheon.Views.PopUp.Employees;
 /// </summary>
 public partial class EmployeeShiftWindow
 {
-    public EmployeeShiftVM VM { get; set; }
+    public EmployeeShiftVM? VM { get; set; }
+    public EmployeeVM EmployeeVM { get; set; }
 
     public EmployeeShiftWindow(EmployeeVM employee)
     {
+        EmployeeVM = employee;
         InitializeComponent();
-        VM = new EmployeeShiftVM(employee);
+    }
+
+    private async void EmployeeShiftWindow_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await EmployeeShiftVM.CreateAsync(EmployeeVM);
         DataContext = VM;
     }
 

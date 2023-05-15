@@ -1,5 +1,4 @@
-﻿using Aion.Properties;
-using Aion.ViewModels.Commands;
+﻿using Aion.ViewModels.Commands;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -44,16 +43,24 @@ public class InputWindowVM : INotifyPropertyChanged
 
     public InputWindowVM()
     {
-        Title = "Input Window";
-        Prompt = "Enter Text";
+        title = "Input Window";
+        prompt = "Enter Text";
+        input = string.Empty;
 
         ConfirmInputCommand = new ConfirmInputCommand();
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    /*public event PropertyChangedEventHandler PropertyChanged;
 
     [NotifyPropertyChangedInvocator]
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }*/
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [Uranus.Annotations.NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

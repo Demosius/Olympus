@@ -21,17 +21,8 @@ public class IconSelectionVM : INotifyPropertyChanged, IImageSelector
     public Image? SelectedImage => SelectedIcon;
 
     #region Notifiable Properties
-
-    private ObservableCollection<EmployeeIcon> icons;
-    public ObservableCollection<EmployeeIcon> Icons
-    {
-        get => icons;
-        set
-        {
-            icons = value;
-            OnPropertyChanged(nameof(Icons));
-        }
-    }
+    
+    public ObservableCollection<EmployeeIcon> Icons { get; set; }
 
     private EmployeeIcon? selectedIcon;
     public EmployeeIcon? SelectedIcon
@@ -74,18 +65,33 @@ public class IconSelectionVM : INotifyPropertyChanged, IImageSelector
     public SaveImageChangesCommand SaveImageChangesCommand { get; }
     public FindNewImageCommand FindNewImageCommand { get; set; }
 
-    public IconSelectionVM(EmployeeVM parentVM)
+    private IconSelectionVM(EmployeeVM parentVM)
     {
         ParentVM = parentVM;
         Helios = parentVM.Helios;
 
-        icons = new ObservableCollection<EmployeeIcon>(AsyncHelper.RunSync(() => Helios.StaffReader.EmployeeIconsAsync()));
+        Icons = new ObservableCollection<EmployeeIcon>();
 
         iconName = string.Empty;
 
         ConfirmImageSelectionCommand = new ConfirmImageSelectionCommand(this);
         SaveImageChangesCommand = new SaveImageChangesCommand(this);
         FindNewImageCommand = new FindNewImageCommand(this);
+    }
+
+    private async Task<IconSelectionVM> InitializeAsync()
+    {
+        var icons = await Helios.StaffReader.EmployeeIconsAsync();
+        foreach (var icon in icons)
+            Icons.Add(icon);
+
+        return this;
+    }
+
+    public static Task<IconSelectionVM> CreateAsync(EmployeeVM parentVM)
+    {
+        var ret = new IconSelectionVM(parentVM);
+        return ret.InitializeAsync();
     }
 
     private void CheckCanSave()
@@ -102,7 +108,7 @@ public class IconSelectionVM : INotifyPropertyChanged, IImageSelector
 
         var icon = SelectedIcon;
 
-        await Task.Run(() => Helios.StaffUpdater.RenameEmployeeIcon(ref icon, IconName));
+        await Task.Run(() => Helios.StaffUpdater.RenameEmployeeIcon(icon, IconName));
 
         SelectedIcon = icon;
     }

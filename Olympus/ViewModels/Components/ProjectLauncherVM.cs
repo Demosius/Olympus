@@ -35,7 +35,7 @@ public class ProjectLauncherVM : INotifyPropertyChanged
 
     #endregion
 
-    public ProjectLauncherVM(OlympusVM olympusVM)
+    private ProjectLauncherVM(OlympusVM olympusVM)
     {
         OlympusVM = olympusVM;
 
@@ -44,16 +44,26 @@ public class ProjectLauncherVM : INotifyPropertyChanged
         UserProjects = new List<Project>();
         ProjectGroups = new ObservableCollection<ProjectGroupVM>();
         projects = new ProjectGroupVM(this, AllProjects, string.Empty);
+    }
 
-        Task.Run(SetDataAsync);
+    private async Task<ProjectLauncherVM> InitializeAsync()
+    {
+        await SetDataAsync();
+        return this;
+    }
+
+    public static Task<ProjectLauncherVM> CreateAsync(OlympusVM olympusVM)
+    {
+        var ret = new ProjectLauncherVM(olympusVM);
+        return ret.InitializeAsync();
     }
 
     private async Task SetDataAsync()
     {
         var projectTask = App.Helios.StaffReader.ProjectsAsync(pullType: EPullType.FullRecursive);
         var deptTask = App.Helios.StaffReader.DepartmentsAsync(pullType: EPullType.IncludeChildren);
-
-        await Task.WhenAll(projectTask, deptTask).ConfigureAwait(false);
+        
+        await Task.WhenAll(projectTask, deptTask);
 
         Departments = await deptTask.ConfigureAwait(false);
         AllProjects = (await projectTask.ConfigureAwait(false)).ToList();

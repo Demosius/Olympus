@@ -72,7 +72,7 @@ public class ItemSelectionVM : INotifyPropertyChanged, IItemDataVM, ISorting
 
     #endregion
 
-    public ItemSelectionVM(ItemLevelsVM vm)
+    private ItemSelectionVM(ItemLevelsVM vm)
     {
         ItemLevelsVM = vm;
         Helios = vm.Helios;
@@ -95,9 +95,20 @@ public class ItemSelectionVM : INotifyPropertyChanged, IItemDataVM, ISorting
         Task.Run(RefreshDataAsync);
     }
 
+    private async Task<ItemSelectionVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<ItemSelectionVM> CreateAsync(ItemLevelsVM vm)
+    {
+        var ret = new ItemSelectionVM(vm);
+        return ret.InitializeAsync();
+    }
     public async Task RefreshDataAsync()
     {
-        await new Task(() =>
+        await Task.Run(() =>
         {
             AllItems = ItemLevelsVM.AllItems;
             ApplyFilters();

@@ -8,8 +8,8 @@ namespace Prometheus.ViewModels.Pages;
 
 internal class StaffVM : INotifyPropertyChanged
 {
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -17,9 +17,7 @@ internal class StaffVM : INotifyPropertyChanged
 
     #endregion
 
-    public StaffVM() { }
-
-    public void SetDataSources(Helios helios, Charon charon)
+    public StaffVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;

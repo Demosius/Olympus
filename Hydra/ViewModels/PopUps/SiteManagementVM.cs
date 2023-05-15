@@ -73,7 +73,7 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
 
     #endregion
 
-    public SiteManagementVM(ItemLevelsVM parentVM, Site site)
+    private SiteManagementVM(ItemLevelsVM parentVM, Site site)
     {
         ItemLevelsVM = parentVM;
         Helios = ItemLevelsVM.Helios;
@@ -92,14 +92,23 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
         AllItems = new List<SiteItemLevelVM>();
         filterString = string.Empty;
         currentItems = new ObservableCollection<SiteItemLevelVM>();
-
-        Task.Run(RefreshDataAsync);
     }
 
+    private async Task<SiteManagementVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<SiteManagementVM> CreateAsync(ItemLevelsVM parentVM, Site site)
+    {
+        var ret = new SiteManagementVM(parentVM, site);
+        return ret.InitializeAsync();
+    }
 
     public async Task RefreshDataAsync()
     {
-        await new Task(() =>
+        await Task.Run(() =>
         {
             AllItems = ItemLevelsVM.SiteItemLevelVMs.Values
                 .Where(sil => sil.SiteName == Site.Site.Name && (sil.Item?.SiteLevelTarget ?? false))
@@ -190,7 +199,7 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
     public async Task ConfirmSiteChanges()
     {
         var silTask = Helios.InventoryUpdater.SiteItemLevelsAsync(AllItems.Select(vm => vm.SiteItemLevel));
-        var siteTask = new Task(() => Helios.InventoryUpdater.Site(Site.Site));
+        var siteTask = Task.Run(() => Helios.InventoryUpdater.Site(Site.Site));
 
         await Task.WhenAll(siteTask, silTask);
     }

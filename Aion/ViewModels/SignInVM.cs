@@ -1,28 +1,19 @@
 ﻿using Aion.ViewModels.Commands;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Uranus;
+using Uranus.Annotations;
 using Uranus.Staff.Models;
 
 namespace Aion.ViewModels;
 
 public class SignInVM : INotifyPropertyChanged
 {
+    public ObservableCollection<Employee> Managers { get; set; }
 
-
-    private ObservableCollection<Employee> managers;
-    public ObservableCollection<Employee> Managers
-    {
-        get => managers;
-        set
-        {
-            managers = value;
-            OnPropertyChanged(nameof(Managers));
-        }
-    }
-
-    private Employee selectedManager;
-    public Employee SelectedManager
+    private Employee? selectedManager;
+    public Employee? SelectedManager
     {
         get => selectedManager;
         set
@@ -51,6 +42,8 @@ public class SignInVM : INotifyPropertyChanged
     {
         Managers = new ObservableCollection<Employee>(AsyncHelper.RunSync(() => App.Helios.StaffReader.GetManagersAsync()));
         SignInCommand = new SignInCommand(this);
+
+        code = string.Empty;
     }
 
     /// <summary>
@@ -59,14 +52,16 @@ public class SignInVM : INotifyPropertyChanged
     /// <returns>Bool: true if Code is correct, otherwise - false.</returns>
     public bool SignIn()
     {
-        if (SelectedManager is null || Code?.Length <= 0) return false;
+        if (SelectedManager is null || Code.Length <= 0) return false;
         _ = int.TryParse(Code, out var tryID);
         return SelectedManager.ID == tryID;
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

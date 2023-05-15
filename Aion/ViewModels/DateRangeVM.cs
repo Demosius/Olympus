@@ -1,5 +1,4 @@
-﻿using Aion.Properties;
-using Aion.ViewModels.Commands;
+﻿using Aion.ViewModels.Commands;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -9,7 +8,7 @@ namespace Aion.ViewModels;
 
 public class DateRangeVM : INotifyPropertyChanged
 {
-    public ShiftEntryPageVM ShiftEntryPageVM { get; set; }
+    public ShiftEntryPageVM? ShiftEntryPageVM { get; set; }
 
     private DateTime minDate;
     public DateTime MinDate
@@ -66,19 +65,20 @@ public class DateRangeVM : INotifyPropertyChanged
         MaxDate = max;
         InitialMax = max;
     }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
+    
     public async Task SetDateRange()
     {
+        if (ShiftEntryPageVM is null) return;
         ShiftEntryPageVM.MinDate = MinDate;
         ShiftEntryPageVM.MaxDate = MaxDate;
         await ShiftEntryPageVM.RefreshDataAsync(true);
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [Uranus.Annotations.NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

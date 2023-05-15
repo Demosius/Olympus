@@ -9,17 +9,17 @@ public class ImportOldDataCommand : ICommand
 
     public ImportOldDataCommand(AionVM vm) { VM = vm; }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return true;
     }
 
-    public async void Execute(object parameter)
+    public async void Execute(object? parameter)
     {
         await VM.ImportOldData();
     }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;

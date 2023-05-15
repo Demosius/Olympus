@@ -8,6 +8,7 @@
       mc:Ignorable="d" 
       d:DataContext="{d:DesignInstance {x:Type vm:ShiftPageVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="1080" d:DesignWidth="1200"
+      Initialized="ShiftPage_OnInitialized"
       Title="EmployeePage">
 
     <Page.Resources>

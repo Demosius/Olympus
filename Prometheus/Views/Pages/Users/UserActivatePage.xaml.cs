@@ -1,4 +1,6 @@
-﻿using Prometheus.ViewModels.Pages.Users;
+﻿using System;
+using System.Windows;
+using Prometheus.ViewModels.Pages.Users;
 using Styx;
 using Uranus;
 
@@ -9,12 +11,20 @@ namespace Prometheus.Views.Pages.Users;
 /// </summary>
 public partial class UserActivatePage
 {
-    public UserActivateVM VM { get; }
+    public UserActivateVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public UserActivatePage(Helios helios, Charon charon)
     {
-        VM = new UserActivateVM(helios, charon);
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
+    }
+
+    private async void UserActivatePage_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await UserActivateVM.CreateAsync(Helios, Charon);
         DataContext = VM;
     }
 }

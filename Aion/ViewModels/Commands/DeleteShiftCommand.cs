@@ -9,18 +9,18 @@ public class DeleteShiftCommand : ICommand
 
     public DeleteShiftCommand(ShiftEntryPageVM vm) { VM = vm; }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
-        return VM.SelectedEntry != null;
+        return true;
     }
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
         VM.DeleteShift();
     }

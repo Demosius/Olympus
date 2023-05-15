@@ -332,14 +332,14 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
     {
         var iconifer = new IconSelectionWindow(this);
         if (iconifer.ShowDialog() != true) return;
-        Icon = iconifer.VM.SelectedIcon;
+        Icon = iconifer.VM?.SelectedIcon;
     }
 
     public void LaunchAvatarSelector()
     {
         var avatarSelector = new AvatarSelectionWindow(this);
         if (avatarSelector.ShowDialog() != true) return;
-        Avatar = avatarSelector.VM.SelectedAvatar;
+        Avatar = avatarSelector.VM?.SelectedAvatar;
     }
 
     public void SelectLocation()
@@ -347,7 +347,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         var locationSelector = new LocationSelectionWindow(Helios, Charon);
         if (locationSelector.ShowDialog() != true) return;
 
-        var loc = locationSelector.VM.SelectedLocation;
+        var loc = locationSelector.VM?.SelectedLocation;
         if (loc is null) return;
 
         Location = loc.Name;
@@ -363,7 +363,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         var departmentSelector = new DepartmentSelectionWindow(Helios, Charon);
         if (departmentSelector.ShowDialog() != true) return;
 
-        Department = departmentSelector.VM.SelectedDepartment;
+        Department = departmentSelector.VM?.SelectedDepartment;
     }
 
     public void ClearDepartment()
@@ -376,7 +376,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         var roleSelector = new RoleSelectionWindow(Helios, Charon, DepartmentName);
         if (roleSelector.ShowDialog() != true) return;
 
-        Role = roleSelector.VM.SelectedRole;
+        Role = roleSelector.VM?.SelectedRole;
     }
 
     public void ClearRole()
@@ -389,7 +389,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         var clanSelector = new ClanSelectionWindow(Helios, Charon);
         if (clanSelector.ShowDialog() != true) return;
 
-        Clan = clanSelector.VM.SelectedClan;
+        Clan = clanSelector.VM?.SelectedClan;
     }
 
     public void ClearClan()
@@ -402,7 +402,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         var payPointSelector = new PayPointSelectionWindow(Helios, Charon);
         if (payPointSelector.ShowDialog() != true) return;
 
-        var pp = payPointSelector.VM.SelectedPayPoint;
+        var pp = payPointSelector.VM?.SelectedPayPoint;
         if (pp is null) return;
 
         PayPoint = pp.Name;

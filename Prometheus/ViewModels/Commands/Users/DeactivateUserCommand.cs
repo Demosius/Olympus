@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Prometheus.ViewModels.Commands.Users;
 
-internal class DeactivateUserCommand : ICommand
+public class DeactivateUserCommand : ICommand
 {
     public UserViewVM VM { get; set; }
 

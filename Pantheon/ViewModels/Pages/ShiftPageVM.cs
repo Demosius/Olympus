@@ -51,7 +51,9 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction, IShiftManager
         {
             selectedDepartment = value;
             OnPropertyChanged(nameof(SelectedDepartment));
-            ShiftVMs = new ObservableCollection<ShiftVM>(SelectedDepartment?.Shifts.Select(s => new ShiftVM(s, this)) ?? new List<ShiftVM>());
+            ShiftVMs.Clear();
+            foreach (var shift in SelectedDepartment?.Shifts.Select(s => new ShiftVM(s, this)) ?? new List<ShiftVM>())
+                ShiftVMs.Add(shift);
         }
     }
 
@@ -75,7 +77,7 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction, IShiftManager
 
     #endregion
 
-    public ShiftPageVM(Helios helios, Charon charon)
+    private ShiftPageVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
@@ -85,21 +87,28 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction, IShiftManager
 
         RefreshDataCommand = new RefreshDataCommand(this);
         CreateShiftCommand = new CreateShiftCommand(this);
+    }
 
-        Task.Run(RefreshDataAsync);
+    private async Task<ShiftPageVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<ShiftPageVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new ShiftPageVM(helios, charon);
+        return ret.InitializeAsync();
     }
 
     public async Task RefreshDataAsync()
     {
         Departments.Clear();
-        ShiftVMs.Clear();
 
         foreach (var department in await Helios.StaffReader.SubDepartmentsAsync(Charon.Employee?.DepartmentName ?? ""))
             Departments.Add(department);
 
         SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.Employee?.DepartmentName);
-        foreach (var shift in SelectedDepartment?.Shifts.Select(s => new ShiftVM(s, this)) ?? new List<ShiftVM>())
-            ShiftVMs.Add(shift);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

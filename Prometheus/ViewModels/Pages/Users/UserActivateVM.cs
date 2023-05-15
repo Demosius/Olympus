@@ -112,7 +112,7 @@ public class UserActivateVM : INotifyPropertyChanged, IFilters, IDBInteraction, 
 
     #endregion
 
-    public UserActivateVM(Helios helios, Charon charon)
+    private UserActivateVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
@@ -129,10 +129,20 @@ public class UserActivateVM : INotifyPropertyChanged, IFilters, IDBInteraction, 
         ActivateManagersCommand = new ActivateManagersCommand(this);
         ActivateUserCommand = new ActivateUserCommand(this);
         RefreshDataCommand = new RefreshDataCommand(this);
-
-        Task.Run(RefreshDataAsync);
     }
-    
+
+    private async Task<UserActivateVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<UserActivateVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new UserActivateVM(helios, charon);
+        return ret.InitializeAsync();
+    }
+
     public async Task RefreshDataAsync()
     {
         await GatherEmployees();

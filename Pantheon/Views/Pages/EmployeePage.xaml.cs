@@ -1,4 +1,7 @@
-﻿using Pantheon.ViewModels.Pages;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls.Primitives;
+using Pantheon.ViewModels.Pages;
 using Styx;
 using Uranus;
 
@@ -9,12 +12,20 @@ namespace Pantheon.Views.Pages;
 /// </summary>
 public partial class EmployeePage
 {
-    public EmployeePageVM VM { get; set; }
+    public EmployeePageVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
-    public EmployeePage(Charon charon, Helios helios)
+    public EmployeePage(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
-        VM = new EmployeePageVM(helios, charon);
+    }
+
+    private async void EmployeePage_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await EmployeePageVM.CreateAsync(Helios, Charon);
         DataContext = VM;
     }
 }

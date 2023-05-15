@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Morpheus.ViewModels.Commands;
 using Morpheus.ViewModels.Controls;
 using Morpheus.ViewModels.Interfaces;
@@ -52,32 +53,46 @@ public class LocationSelectionVM : INotifyPropertyChanged, ISelector
     #endregion
 
     #region Commands
-    
+
     public CreateCommand CreateCommand { get; set; }
     public DeleteCommand DeleteCommand { get; set; }
     public ConfirmSelectionCommand ConfirmSelectionCommand { get; set; }
 
     #endregion
 
-    public LocationSelectionVM(Helios helios, Charon charon)
+    private LocationSelectionVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
 
-        Locations = new ObservableCollection<StringCountVM>(
-            AsyncHelper.RunSync(() => Helios.StaffReader.EmployeesAsync())
-                .GroupBy(e => e.Location)
-                .ToDictionary(g => g.Key, g => g.Count())
-                .Select(i => new StringCountVM(i.Key, i.Value))
-                .OrderBy(p => p.Name)
-            );
+        Locations = new ObservableCollection<StringCountVM>();
 
         UserCanCreate = Charon.CanCreateEmployee();
         newLocationName = string.Empty;
 
         CreateCommand = new CreateCommand(this);
-        DeleteCommand = new DeleteCommand(this);   
+        DeleteCommand = new DeleteCommand(this);
         ConfirmSelectionCommand = new ConfirmSelectionCommand(this);
+    }
+
+    private async Task<LocationSelectionVM> InitializeAsync()
+    {
+        var loc = (await Helios.StaffReader.EmployeesAsync())
+            .GroupBy(e => e.Location)
+            .ToDictionary(g => g.Key, g => g.Count())
+            .Select(i => new StringCountVM(i.Key, i.Value))
+            .OrderBy(p => p.Name);
+
+        foreach (var location in loc)
+            Locations.Add(location);
+
+        return this;
+    }
+
+    public static Task<LocationSelectionVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new LocationSelectionVM(helios, charon);
+        return ret.InitializeAsync();
     }
 
     public void Create()

@@ -67,7 +67,7 @@ public class MissPickVM : INotifyPropertyChanged
     }
 
     public Task DBUpdate()
-    {
+    { 
         return Task.Run(() => Helios.StaffUpdater.MissPickAsync(MissPick));
     }
 

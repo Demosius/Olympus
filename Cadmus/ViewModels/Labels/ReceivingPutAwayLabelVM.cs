@@ -251,10 +251,10 @@ public class ReceivingPutAwayLabelVM : INotifyPropertyChanged, ILabelVM
             s = $"{CaseQty} CASE ({CaseQty * QtyPerCase})";
 
         if (EachQty > 0)
-            s = $"{(s is null ? "" : $"{s}/n")}{EachQty} EACH ({EachQty})";
+            s = $"{(s is null ? "" : $"{s}\n")}{EachQty} EACH ({EachQty})";
 
         if (PackQty > 0)
-            s = $"{(s is null ? "" : $"{s}/n")}{PackQty} PACK ({PackQty + QtyPerPack})";
+            s = $"{(s is null ? "" : $"{s}\n")}{PackQty} PACK ({PackQty * QtyPerPack})";
 
         TakeDisplayString = s ?? string.Empty;
     }

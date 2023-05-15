@@ -1,6 +1,7 @@
 ﻿using Styx;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
+using Prometheus.ViewModels;
 using Uranus;
 using Uranus.Interfaces;
 using Uranus.Staff;
@@ -12,10 +13,13 @@ namespace Prometheus.Views;
 /// </summary>
 public partial class PrometheusPage : IProject
 {
+    public PrometheusVM VM { get; set; }
+
     public PrometheusPage(Helios helios, Charon charon)
     {
+        VM = new PrometheusVM(helios, charon);
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+        DataContext = VM;
     }
 
     public EProject Project => EProject.Prometheus;
@@ -24,7 +28,7 @@ public partial class PrometheusPage : IProject
 
     public async Task RefreshDataAsync()
     {
-        await new Task(() => {});
+        await Task.Run(() => {});
     }
 
     private void Frame_OnNavigating(object sender, NavigatingCancelEventArgs e)

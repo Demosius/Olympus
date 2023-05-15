@@ -11,7 +11,8 @@
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
-        Foreground="{StaticResource LightForegroundBrush}">
+        Foreground="{StaticResource LightForegroundBrush}"
+        Initialized="RosterCreationWindow_OnInitialized">
 
     <Window.Resources>
         <ResourceDictionary>

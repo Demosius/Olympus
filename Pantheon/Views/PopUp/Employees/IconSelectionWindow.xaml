@@ -11,7 +11,8 @@
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
         Foreground="{StaticResource LightForegroundBrush}"
-        FocusManager.FocusedElement="{Binding ElementName=IDBox}">
+        FocusManager.FocusedElement="{Binding ElementName=IDBox}"
+        Initialized="IconSelectionWindow_OnInitialized">
 
     <Window.Resources>
         <ResourceDictionary>

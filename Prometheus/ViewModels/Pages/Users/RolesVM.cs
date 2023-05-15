@@ -91,7 +91,7 @@ public class RolesVM : INotifyPropertyChanged, IDBInteraction, IFilters, ISortin
 
     #endregion
 
-    public RolesVM(Helios helios, Charon charon)
+    private RolesVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
@@ -106,8 +106,18 @@ public class RolesVM : INotifyPropertyChanged, IDBInteraction, IFilters, ISortin
         ApplySortingCommand = new ApplySortingCommand(this);
         DeleteRoleCommand = new DeleteRoleCommand(this);
         SaveRolesCommand = new SaveRolesCommand(this);
+    }
 
-        Task.Run(RefreshDataAsync);
+    private async Task<RolesVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<RolesVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new RolesVM(helios, charon);
+        return ret.InitializeAsync();
     }
 
     public async Task RefreshDataAsync()
@@ -193,7 +203,7 @@ public class RolesVM : INotifyPropertyChanged, IDBInteraction, IFilters, ISortin
 
     public async Task DeleteRole()
     {
-        if (SelectedRole is null || SelectedRole.Users.Count > 0 || !(Charon.CanDeleteUserRole())) return;
+        if (SelectedRole is null || SelectedRole.Users.Count > 0 || !Charon.CanDeleteUserRole()) return;
 
         // Remove from database.
         if (!await Helios.UserDeleter.RoleAsync(SelectedRole))

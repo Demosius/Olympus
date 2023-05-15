@@ -9,7 +9,8 @@
       mc:Ignorable="d" 
       d:DataContext="{d:DesignInstance {x:Type vm:TempTagPageVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="1080" d:DesignWidth="1200"
-      Title="TempTagPage">
+      Title="TempTagPage"
+      Initialized="TempTagPage_OnInitialized">
 
     <Page.Resources>
         <ResourceDictionary>

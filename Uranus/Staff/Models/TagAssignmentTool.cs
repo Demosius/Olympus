@@ -17,6 +17,16 @@ public class TagAssignmentTool
     public Dictionary<string, Employee> EmployeeRFDict { get; set; }
     public Dictionary<string, TempTag> TagDict { get; set; }
 
+    public TagAssignmentTool()
+    {
+        TempTags = new List<TempTag>();
+        Employees = new List<Employee>();
+        TagHistory = new List<TagUse>();
+        EmployeeDict = new Dictionary<int, Employee>();
+        EmployeeRFDict = new Dictionary<string, Employee>();
+        TagDict = new Dictionary<string, TempTag>();
+    }
+
     public TagAssignmentTool(List<TempTag> tempTags, List<Employee> employees, List<TagUse> tagHistory)
     {
         TempTags = tempTags;

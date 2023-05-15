@@ -22,12 +22,8 @@ public class UserUpdater
         // Make sure that any master or default is set to the correct values.
         foreach (var role in roles) role.CheckStandards();
 
-        var lines = 0;
-
-        async void Action() => lines = await Chariot.UpdateTableAsync(roles);
-
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
-
+        var lines = await Chariot.UpdateTableAsync(roles);
+        
         return lines;
     }
 }

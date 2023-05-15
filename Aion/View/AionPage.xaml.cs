@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Styx;
 using System.Windows.Input;
+using Aion.ViewModels;
 using Uranus;
 using Uranus.Interfaces;
 using Uranus.Staff;
@@ -12,9 +13,15 @@ namespace Aion.View;
 /// </summary>
 public partial class AionPage : IProject
 {
+    public AionVM VM { get; set; }
+
     public AionPage(Helios helios, Charon charon)
     {
+        VM = new AionVM(helios, charon);
+
         InitializeComponent();
+
+        DataContext = VM;
 
         KeyGesture backKeyGesture = null;
         foreach (InputGesture browseBackInputGesture in NavigationCommands.BrowseBack.InputGestures)
@@ -29,8 +36,6 @@ public partial class AionPage : IProject
         {
             NavigationCommands.BrowseBack.InputGestures.Remove(backKeyGesture);
         }
-
-        VM.SetDataSources(helios, charon);
     }
 
     public EProject Project => EProject.Aion;

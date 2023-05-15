@@ -16,7 +16,8 @@
         Background="{StaticResource TooltipBackgroundBrush}"
         Foreground="{StaticResource LightForegroundBrush}"
         FocusManager.FocusedElement="{Binding ElementName=IDBox}"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        Initialized="EmployeeShiftWindow_OnInitialized">
 
     <Window.Resources>
         <ResourceDictionary>

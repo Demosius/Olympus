@@ -84,7 +84,7 @@ public class TempTagPageVM : INotifyPropertyChanged, IDBInteraction, ITempTags, 
 
     #endregion
 
-    public TempTagPageVM(Helios helios, Charon charon)
+    private TempTagPageVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
@@ -102,8 +102,18 @@ public class TempTagPageVM : INotifyPropertyChanged, IDBInteraction, ITempTags, 
         DeleteCommand = new DeleteCommand(this);
         ConfirmSelectionCommand = new ConfirmSelectionCommand(this);
         AssignTempTagCommand = new AssignTempTagCommand(this);
+    }
 
-        Task.Run(RefreshDataAsync);
+    private async Task<TempTagPageVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<TempTagPageVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new TempTagPageVM(helios, charon);
+        return ret.InitializeAsync();
     }
 
     public async Task RefreshDataAsync()
@@ -120,7 +130,7 @@ public class TempTagPageVM : INotifyPropertyChanged, IDBInteraction, ITempTags, 
     
     public async Task SelectTempTagAsync()
     {
-        await new Task(() => { });
+        await Task.Run(() => { });
     }
 
     public void UnassignTempTag()

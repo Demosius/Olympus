@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Morpheus.ViewModels.Commands;
 using Morpheus.ViewModels.Controls;
 using Morpheus.ViewModels.Interfaces;
@@ -59,18 +60,12 @@ public class PayPointSelectionVM : INotifyPropertyChanged, ISelector
 
     #endregion
 
-    public PayPointSelectionVM(Helios helios, Charon charon)
+    private PayPointSelectionVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
 
-        PayPoints = new ObservableCollection<StringCountVM>(
-            AsyncHelper.RunSync(() =>Helios.StaffReader.EmployeesAsync())
-                .GroupBy(e => e.PayPoint)
-                .ToDictionary(g => g.Key, g => g.Count())
-                .Select(i => new StringCountVM(i.Key, i.Value))
-                .OrderBy(p => p.Name)
-            );
+        PayPoints = new ObservableCollection<StringCountVM>();
 
         UserCanCreate = Charon.CanCreateEmployee();
         newPayPointName = string.Empty;
@@ -78,6 +73,26 @@ public class PayPointSelectionVM : INotifyPropertyChanged, ISelector
         CreateCommand = new CreateCommand(this);
         DeleteCommand = new DeleteCommand(this);
         ConfirmSelectionCommand = new ConfirmSelectionCommand(this);
+    }
+
+    private async Task<PayPointSelectionVM> InitializeAsync()
+    {
+        var payPoints = (await Helios.StaffReader.EmployeesAsync())
+                .GroupBy(e => e.PayPoint)
+                .ToDictionary(g => g.Key, g => g.Count())
+                .Select(i => new StringCountVM(i.Key, i.Value))
+                .OrderBy(p => p.Name);
+
+        foreach (var payPoint in payPoints) 
+            PayPoints.Add(payPoint);
+
+        return this;
+    }
+
+    public static Task<PayPointSelectionVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new PayPointSelectionVM(helios, charon);
+        return ret.InitializeAsync();
     }
 
     public void Create()

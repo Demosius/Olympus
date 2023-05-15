@@ -26,6 +26,9 @@ public class InventoryReader
     public async Task<List<NAVBin>> NAVBinsAsync(Expression<Func<NAVBin, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
 
+    public List<NAVBin> NAVBins(Expression<Func<NAVBin, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
     public async Task<List<NAVBin>> NAVBinsAsync(string binCode, EPullType pullType = EPullType.ObjectOnly) =>
         await NAVBinsAsync(b => b.Code == binCode, pullType);
 
@@ -35,6 +38,9 @@ public class InventoryReader
 
     public async Task<List<NAVItem>> NAVItemsAsync(Expression<Func<NAVItem, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+
+    public List<NAVItem> NAVItems(Expression<Func<NAVItem, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     public static DateTime LastItemWriteTime(string itemCSVLocation) => File.GetLastWriteTime(itemCSVLocation);
 
@@ -56,17 +62,12 @@ public class InventoryReader
     public async Task<IEnumerable<NAVZone>> ZonesAsync(Expression<Func<NAVZone, bool>>? filter = null)
     {
         IEnumerable<NAVZone>? returnZones = null;
+        var newExtensions = new List<ZoneExtension>();
 
-        async void Action()
+        void Action()
         {
-            var zoneTask = Chariot.PullObjectListAsync(filter);
-            var extensionTask = Chariot.PullObjectListAsync<ZoneExtension>();
-            var newExtensions = new List<ZoneExtension>();
-
-            await Task.WhenAll(zoneTask, extensionTask);
-
-            var zones = (await zoneTask).ToDictionary(z => z.ID, z => z);
-            var extensions = (await extensionTask).ToDictionary(e => e.ZoneID, e => e);
+            var zones = Chariot.PullObjectList(filter).ToDictionary(z => z.ID, z => z);
+            var extensions = Chariot.PullObjectList<ZoneExtension>().ToDictionary(e => e.ZoneID, e => e);
 
             foreach (var (id, zone) in zones)
             {
@@ -82,11 +83,50 @@ public class InventoryReader
                 }
             }
 
-            _ = Chariot.InsertIntoTableAsync(newExtensions);
             returnZones = zones.Values;
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
+
+        if (newExtensions.Any()) await Chariot.InsertIntoTableAsync(newExtensions);
+
+        returnZones ??= new List<NAVZone>();
+
+        return returnZones;
+    }
+
+    public IEnumerable<NAVZone> Zones(out List<ZoneExtension> createdExtensions, Expression<Func<NAVZone, bool>>? filter = null)
+    {
+        IEnumerable<NAVZone>? returnZones = null;
+        var newExtensions = new List<ZoneExtension>();
+
+        void Action()
+        {
+            var zones = Chariot.PullObjectList(filter).ToDictionary(z => z.ID, z => z);
+            //var zones = new Dictionary<string, NAVZone>();
+            var extensions = Chariot.PullObjectList<ZoneExtension>().ToDictionary(e => e.ZoneID, e => e);
+            //var extensions = new Dictionary<string, ZoneExtension>();
+
+            foreach (var (id, zone) in zones)
+            {
+                if (extensions.TryGetValue(id, out var extension))
+                {
+                    zone.Extension = extension;
+                    extension.Zone = zone;
+                }
+                else
+                {
+                    extension = new ZoneExtension(zone);
+                    newExtensions.Add(extension);
+                }
+            }
+
+            returnZones = zones.Values;
+        }
+
+        Chariot.RunInTransaction(Action);
+
+        createdExtensions = newExtensions;
 
         returnZones ??= new List<NAVZone>();
 
@@ -99,18 +139,13 @@ public class InventoryReader
     /// <returns></returns>
     public async Task<IEnumerable<NAVItem>> ItemsAsync(Expression<Func<NAVItem, bool>>? filter = null)
     {
-        IEnumerable<NAVItem>? returnItems = null;
+        var items = new Dictionary<int, NAVItem>();
 
-        async void Action()
+        void Action()
         {
-            var itemTask = Chariot.PullObjectListAsync(filter);
-            var extensionTask = Chariot.PullObjectListAsync<ItemExtension>();
+            items = Chariot.PullObjectList(filter).ToDictionary(i => i.Number, i => i);
+            var extensions = Chariot.PullObjectList<ItemExtension>().ToDictionary(e => e.ItemNumber, e => e);
             var newExtensions = new List<ItemExtension>();
-
-            await Task.WhenAll(itemTask, extensionTask);
-
-            var items = (await itemTask).ToDictionary(i => i.Number, i => i);
-            var extensions = (await extensionTask).ToDictionary(e => e.ItemNumber, e => e);
 
             foreach (var (no, item) in items)
             {
@@ -126,14 +161,48 @@ public class InventoryReader
                 }
             }
 
-            _ = Chariot.InsertIntoTableAsync(newExtensions);
-            returnItems = items.Values;
+            Chariot.InsertIntoTable(newExtensions);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
-        returnItems ??= new List<NAVItem>();
+        await Task.Run(() => Chariot.RunInTransaction(Action));
 
-        return returnItems;
+        return items.Values;
+    }
+
+    /// <summary>
+    /// Items with matched item-extension objects.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<NAVItem> Items(Expression<Func<NAVItem, bool>>? filter = null)
+    {
+        var items = new Dictionary<int, NAVItem>();
+
+        void Action()
+        {
+            items = Chariot.PullObjectList(filter).ToDictionary(i => i.Number, i => i);
+            var extensions = Chariot.PullObjectList<ItemExtension>().ToDictionary(e => e.ItemNumber, e => e);
+            var newExtensions = new List<ItemExtension>();
+
+            foreach (var (no, item) in items)
+            {
+                if (extensions.TryGetValue(no, out var extension))
+                {
+                    item.Extension = extension;
+                    extension.Item = item;
+                }
+                else
+                {
+                    extension = new ItemExtension(item);
+                    newExtensions.Add(extension);
+                }
+            }
+
+            Chariot.InsertIntoTable(newExtensions);
+        }
+
+        Chariot.RunInTransaction(Action);
+
+        return items.Values;
     }
 
     /// <summary>
@@ -144,18 +213,12 @@ public class InventoryReader
     {
         IEnumerable<NAVBin>? returnBins = null;
 
-        async void Action()
+        void Action()
         {
-            var binTask = Chariot.PullObjectListAsync(filter);
-            var bayTask = Chariot.PullObjectListAsync<Bay>();
-            var extensionTask = Chariot.PullObjectListAsync<BinExtension>();
+            var bins = Chariot.PullObjectList(filter).ToDictionary(i => i.ID, i => i);
+            var bays = Chariot.PullObjectList<Bay>().ToDictionary(b => b.ID, b => b);
+            var extensions = Chariot.PullObjectList<BinExtension>().ToDictionary(e => e.BinID, e => e);
             var newExtensions = new List<BinExtension>();
-
-            await Task.WhenAll(bayTask, extensionTask, binTask);
-
-            var bins = (await binTask).ToDictionary(i => i.ID, i => i);
-            var bays = (await bayTask).ToDictionary(b => b.ID, b => b);
-            var extensions = (await extensionTask).ToDictionary(e => e.BinID, e => e);
 
             foreach (var (no, bin) in bins)
             {
@@ -178,12 +241,59 @@ public class InventoryReader
                 bin.Bay = bay;
             }
 
-            _ = Chariot.InsertIntoTableAsync(newExtensions);
+            Chariot.InsertIntoTable(newExtensions);
             returnBins = bins.Values;
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
         returnBins ??= new List<NAVBin>();
+
+        return returnBins;
+    }
+
+    /// <summary>
+    /// Items with matched item-extension objects.
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<NAVBin> Bins(out List<BinExtension> createdExtensions, Expression<Func<NAVBin, bool>>? filter = null)
+    {
+        IEnumerable<NAVBin>? returnBins = null;
+        var newExtensions = new List<BinExtension>();
+
+        void Action()
+        {
+            var bins = Chariot.PullObjectList(filter).ToDictionary(i => i.ID, i => i);
+            var bays = Chariot.PullObjectList<Bay>().ToDictionary(b => b.ID, b => b);
+            var extensions = Chariot.PullObjectList<BinExtension>().ToDictionary(e => e.BinID, e => e);
+
+            foreach (var (no, bin) in bins)
+            {
+                if (extensions.TryGetValue(no, out var extension))
+                {
+                    bin.Extension = extension;
+                    extension.Bin = bin;
+                }
+                else
+                {
+                    extension = new BinExtension(bin);
+                    newExtensions.Add(extension);
+                }
+
+                if (!bays.TryGetValue(extension.BayID, out var bay)) continue;
+
+                bay.BayBins.Add(extension);
+                bay.Bins.Add(bin);
+                extension.Bay = bay;
+                bin.Bay = bay;
+            }
+
+            returnBins = bins.Values;
+        }
+
+        Chariot.RunInTransaction(Action);
+        returnBins ??= new List<NAVBin>();
+
+        createdExtensions = newExtensions;
 
         return returnBins;
     }
@@ -218,11 +328,14 @@ public class InventoryReader
     public async Task<List<NAVStock>> NAVAllStockAsync(Expression<Func<NAVStock, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
 
+    public List<NAVStock> NAVAllStock(Expression<Func<NAVStock, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
     public List<NAVStock> NAVItemStock(int itemNumber, EPullType pullType = EPullType.ObjectOnly)
     {
         if (pullType == EPullType.ObjectOnly)
-            return Chariot.Database?.Query<NAVStock>("SELECT FROM ? WHERE [ItemNumber] = ?;",
-                Chariot.GetTableName(typeof(NAVZone)), itemNumber) ?? new List<NAVStock>();
+            return Chariot.Query<NAVStock>("SELECT FROM ? WHERE [ItemNumber] = ?;",
+                Chariot.GetTableName(typeof(NAVZone)), itemNumber);
         var recursive = pullType == EPullType.FullRecursive;
         return Chariot.Database.GetAllWithChildren<NAVStock>(stock => stock.ItemNumber == itemNumber, recursive);
     }
@@ -230,8 +343,8 @@ public class InventoryReader
     public List<NAVStock> NAVBinStock(string binCode, EPullType pullType = EPullType.ObjectOnly)
     {
         if (pullType == EPullType.ObjectOnly)
-            return Chariot.Database?.Query<NAVStock>("SELECT FROM ? WHERE [BinCode] = ?;",
-                Chariot.GetTableName(typeof(NAVZone)), binCode) ?? new List<NAVStock>();
+            return Chariot.Query<NAVStock>("SELECT FROM ? WHERE [BinCode] = ?;",
+                Chariot.GetTableName(typeof(NAVZone)), binCode);
         var recursive = pullType == EPullType.FullRecursive;
         return Chariot.Database.GetAllWithChildren<NAVStock>(stock => stock.BinCode == binCode, recursive);
     }
@@ -243,11 +356,14 @@ public class InventoryReader
     public async Task<List<NAVUoM>> NAVUoMsAsync(Expression<Func<NAVUoM, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
 
+    public List<NAVUoM> NAVUoMs(Expression<Func<NAVUoM, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
     public List<NAVUoM> NAVItemUoMs(int itemNumber, EPullType pullType = EPullType.ObjectOnly)
     {
         if (pullType == EPullType.ObjectOnly)
-            return Chariot.Database?.Query<NAVUoM>("SELECT FROM ? WHERE [ItemNumber] = ?;",
-                Chariot.GetTableName(typeof(NAVUoM)), itemNumber) ?? new List<NAVUoM>();
+            return Chariot.Query<NAVUoM>("SELECT FROM ? WHERE [ItemNumber] = ?;",
+                Chariot.GetTableName(typeof(NAVUoM)), itemNumber);
         var recursive = pullType == EPullType.FullRecursive;
         return Chariot.Database.GetAllWithChildren<NAVUoM>(uom => uom.ItemNumber == itemNumber, recursive);
     }
@@ -255,8 +371,8 @@ public class InventoryReader
     public List<NAVUoM> NAVUoMsByCode(string uomCode, EPullType pullType = EPullType.ObjectOnly)
     {
         if (pullType == EPullType.ObjectOnly)
-            return Chariot.Database?.Query<NAVUoM>("SELECT FROM ? WHERE [Code] = ?;",
-                Chariot.GetTableName(typeof(NAVUoM)), uomCode) ?? new List<NAVUoM>();
+            return Chariot.Query<NAVUoM>("SELECT FROM ? WHERE [Code] = ?;",
+                Chariot.GetTableName(typeof(NAVUoM)), uomCode);
         var recursive = pullType == EPullType.FullRecursive;
         return Chariot.Database.GetAllWithChildren<NAVUoM>(uom => uom.Code == uomCode, recursive);
     }
@@ -281,12 +397,18 @@ public class InventoryReader
     public async Task<List<NAVDivision>> NAVDivisionsAsync(Expression<Func<NAVDivision, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
 
+    public List<NAVDivision> NAVDivisions(Expression<Func<NAVDivision, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
     /* CATEGORY */
     public NAVCategory? NAVCategory(int catCode, EPullType pullType = EPullType.ObjectOnly) =>
         Chariot.PullObject<NAVCategory>(catCode, pullType);
 
     public async Task<List<NAVCategory>> NAVCategoriesAsync(Expression<Func<NAVCategory, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+
+    public List<NAVCategory> NAVCategories(Expression<Func<NAVCategory, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     /* Platform */
     public NAVPlatform? NAVPlatform(int pfCode, EPullType pullType = EPullType.ObjectOnly) =>
@@ -295,12 +417,18 @@ public class InventoryReader
     public async Task<List<NAVPlatform>> NAVPlatformsAsync(Expression<Func<NAVPlatform, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
 
+    public List<NAVPlatform> NAVPlatforms(Expression<Func<NAVPlatform, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
     /* GENRE */
     public NAVGenre? NAVGenre(int genCode, EPullType pullType = EPullType.ObjectOnly) =>
         Chariot.PullObject<NAVGenre>(genCode, pullType);
 
     public async Task<List<NAVGenre>> NAVGenresAsync(Expression<Func<NAVGenre, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+
+    public List<NAVGenre> NAVGenres(Expression<Func<NAVGenre, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     /* TABLE UPDATES */
     public DateTime LastTableUpdate(Type type)
@@ -329,9 +457,15 @@ public class InventoryReader
     public async Task<List<NAVTransferOrder>> TOListAsync(Expression<Func<NAVTransferOrder, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
 
+    public List<NAVTransferOrder> TOList(Expression<Func<NAVTransferOrder, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
     /* STORES */
     public async Task<List<Store>> StoresAsync(Expression<Func<Store, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+
+    public List<Store> Stores(Expression<Func<Store, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     /// <summary>
     /// Pulls multiple sets of data from the inventory database and combines them into the SKUMaster data set.
@@ -341,38 +475,34 @@ public class InventoryReader
     {
         IEnumerable<SkuMaster> returnVal = new List<SkuMaster>();
 
-        async void Action()
+        void Action()
         {
-            var itemTask = NAVItemsAsync();
-            var stockTask = NAVAllStockAsync();
-            var uomTask = NAVUoMsAsync();
-            var binTask = NAVBinsAsync();
-            var divisionTask = NAVDivisionsAsync();
-            var categoryTask = NAVCategoriesAsync();
-            var platformTask = NAVPlatformsAsync();
-            var genreTask = NAVGenresAsync();
+            var items = NAVItems();
+            var stockList = NAVAllStock();
+            var uomList = NAVUoMs();
+            var binList = NAVBins();
+            var divisionList = NAVDivisions();
+            var categoryList = NAVCategories();
+            var platformList = NAVPlatforms();
+            var genreList = NAVGenres();
 
-            await Task.WhenAll(itemTask, stockTask, uomTask, binTask, divisionTask, categoryTask, platformTask, genreTask);
-
-            var navItems = await itemTask;
-            var stock = (await stockTask).GroupBy(s => s.ItemNumber)
+            var stock = stockList.GroupBy(s => s.ItemNumber)
                 .ToDictionary(g => g.Key, g => g.ToList());
-            var uomDict = (await uomTask).GroupBy(u => u.ItemNumber)
+            var uomDict = uomList.GroupBy(u => u.ItemNumber)
                 .ToDictionary(g => g.Key, g => g.ToDictionary(u => u.Code, u => u));
-            var bins = (await binTask).ToDictionary(b => b.ID, b => b);
-            var divisions = (await divisionTask).ToDictionary(d => d.Code, d => d.Description);
-            var categories = (await categoryTask).ToDictionary(c => c.Code, c => c.Description);
-            var platforms = (await platformTask).ToDictionary(p => p.Code, p => p.Description);
-            var genres = (await genreTask).ToDictionary(g => g.Code, g => g.Description);
+            var bins = binList.ToDictionary(b => b.ID, b => b);
+            var divisions = divisionList.ToDictionary(d => d.Code, d => d.Description);
+            var categories = categoryList.ToDictionary(c => c.Code, c => c.Description);
+            var platforms = platformList.ToDictionary(p => p.Code, p => p.Description);
+            var genres = genreList.ToDictionary(g => g.Code, g => g.Description);
 
-            returnVal = navItems.Select(item => new SkuMaster(item, stock, uomDict, bins, divisions, categories, platforms, genres));
+            returnVal = items.Select(item => new SkuMaster(item, stock, uomDict, bins, divisions, categories, platforms, genres));
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
 
         return returnVal;
     }
-
     /// <summary>
     /// Pulls multiple sets of data from the inventory database and combines them into the SKUMaster data set.
     /// </summary>
@@ -387,38 +517,62 @@ public class InventoryReader
     /// <returns>Tuple (Sites, Zones)</returns>
     public async Task<(IEnumerable<Site>, IEnumerable<NAVZone>)> SitesAsync()
     {
-        List<NAVZone>? zoneList = null;
-        Dictionary<string, Site>? siteDict = null;
+        var zones = new List<NAVZone>();
+        var siteDict = new Dictionary<string, Site>();
+        var newExtensions = new List<ZoneExtension>();
 
-        async void Action()
+        void Action()
         {
-            var zoneTask = ZonesAsync();
-            var siteTask = Chariot.PullObjectListAsync<Site>();
+            zones = Zones(out newExtensions).ToList();
+            siteDict = Chariot.PullObjectList<Site>().ToDictionary(s => s.Name, s => s);
 
-            await Task.WhenAll(zoneTask, siteTask);
-
-            zoneList = (await zoneTask).ToList();
-            siteDict = (await siteTask).ToDictionary(s => s.Name, s => s);
-        }
-
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
-
-        zoneList ??= new List<NAVZone>();
-        siteDict ??= new Dictionary<string, Site>();
-        var zones = zoneList;
-
-        foreach (var zone in zones.Where(zone => zone.SiteName != ""))
-        {
-            if (!siteDict.TryGetValue(zone.SiteName, out var site))
+            foreach (var zone in zones.Where(zone => zone.SiteName != ""))
             {
-                zone.SiteName = "";
-            }
-            else
-            {
-                site.Zones.Add(zone);
-                zone.Site = site;
+                if (!siteDict.TryGetValue(zone.SiteName, out var site))
+                {
+                    zone.SiteName = "";
+                }
+                else
+                {
+                    site.Zones.Add(zone);
+                    zone.Site = site;
+                }
             }
         }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action));
+        if (newExtensions.Any()) await Chariot.UpdateTableAsync(newExtensions);
+
+        return (siteDict.Values, zones);
+    }
+
+    public (IEnumerable<Site>, IEnumerable<NAVZone>) Sites(out List<ZoneExtension> createdZoneExtensions)
+    {
+        var zones = new List<NAVZone>();
+        var siteDict = new Dictionary<string, Site>();
+        var zoneExtensions = new List<ZoneExtension>();
+
+        void Action()
+        {
+            zones = Zones(out zoneExtensions).ToList();
+            siteDict = Chariot.PullObjectList<Site>().ToDictionary(s => s.Name, s => s);
+
+            foreach (var zone in zones.Where(zone => zone.SiteName != ""))
+            {
+                if (!siteDict.TryGetValue(zone.SiteName, out var site))
+                {
+                    zone.SiteName = "";
+                }
+                else
+                {
+                    site.Zones.Add(zone);
+                    zone.Site = site;
+                }
+            }
+        }
+
+        Chariot.RunInTransaction(Action);
+        createdZoneExtensions = zoneExtensions;
 
         return (siteDict.Values, zones);
     }
@@ -429,27 +583,35 @@ public class InventoryReader
     /// <returns></returns>
     public async Task<FixedBinCheckDataSet?> FixedBinCheckDataSetAsync(List<string> fromZones, List<string> fixedZones)
     {
-        FixedBinCheckDataSet? dataSet = null;
+        var dataSet = new FixedBinCheckDataSet();
+        var newZoneExtensions = new List<ZoneExtension>();
+        var newBinExtensions = new List<BinExtension>();
 
-        var allZones = fromZones.Concat(fixedZones);
-
-        async void Action()
+        void Action()
         {
-            var itemTask = ItemsAsync();
-            var zoneTask = ZonesAsync(zone => allZones.Contains(zone.Code));
-            var stockTask = Chariot.PullObjectListAsync<NAVStock>(stock => allZones.Contains(stock.ZoneCode));
-            var binTask = BinsAsync(bin => allZones.Contains(bin.ZoneCode));
-            var uomTask = NAVUoMsAsync();
+            var allZones = fromZones.Concat(fixedZones);
 
-            await Task.WhenAll(itemTask, zoneTask, stockTask, binTask, uomTask);
+            var items = Items();
+            var zones = Zones(out newZoneExtensions, zone => allZones.Contains(zone.Code));
+            var stock = Chariot.PullObjectList<NAVStock>(stock => allZones.Contains(stock.ZoneCode));
+            var bins = Bins(out newBinExtensions, bin => allZones.Contains(bin.ZoneCode));
+            var navUoMs = NAVUoMs();
 
-            dataSet = new FixedBinCheckDataSet(await itemTask, await zoneTask, await binTask, await stockTask, await uomTask);
+            dataSet = new FixedBinCheckDataSet(items, zones, bins, stock, navUoMs);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
-
-        dataSet ??= new FixedBinCheckDataSet(new List<NAVItem>(), new List<NAVZone>(), new List<NAVBin>(),
-            new List<NAVStock>(), new List<NAVUoM>());
+        await Task.Run(() => Chariot.RunInTransaction(Action));
+        if (newZoneExtensions.Any() || newBinExtensions.Any())
+        {
+            await Task.Run(() =>
+            {
+                Chariot.RunInTransaction(() =>
+                {
+                    Chariot.UpdateTable(newZoneExtensions);
+                    Chariot.UpdateTable(newBinExtensions);
+                });
+            });
+        }
 
         return dataSet;
     }
@@ -460,31 +622,44 @@ public class InventoryReader
     /// <returns>Tuple: (Stock, Bins, UoMs)</returns>
     public async Task<(List<NAVStock>, IEnumerable<NAVBin>, List<NAVUoM>)> HydraStockAsync()
     {
-        List<NAVStock>? stock = null;
-        IEnumerable<NAVBin>? bins = null;
-        List<NAVUoM>? uomList = null;
+        var stock = new List<NAVStock>();
+        var bins = new List<NAVBin>();
+        var uomList = new List<NAVUoM>();
+        var newBinExtensions = new List<BinExtension>();
 
-        async void Action()
+        void Action()
         {
-            var stockTask = Chariot.PullObjectListAsync<NAVStock>();
-            var binTask = BinsAsync();
-            var uomTask = Chariot.PullObjectListAsync<NAVUoM>();
-
-            await Task.WhenAll(stockTask, binTask, uomTask);
-
-            stock = await stockTask;
-            bins = await binTask;
-            uomList = await uomTask;
+            stock = Chariot.PullObjectList<NAVStock>();
+            bins = Bins(out newBinExtensions).ToList();
+            uomList = Chariot.PullObjectList<NAVUoM>();
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
-
-        stock ??= new List<NAVStock>();
-        bins ??= new List<NAVBin>();
-        uomList ??= new List<NAVUoM>();
+        await Task.Run(() => Chariot.RunInTransaction(Action));
+        if (newBinExtensions.Any()) await Chariot.UpdateTableAsync(newBinExtensions);
 
         return (stock, bins, uomList);
     }
+
+    public (List<NAVStock>, IEnumerable<NAVBin>, List<NAVUoM>) HydraStock(out List<BinExtension> createdBinExtensions)
+    {
+        var stock = new List<NAVStock>();
+        var bins = new List<NAVBin>();
+        var uomList = new List<NAVUoM>();
+        var newBinExtensions = new List<BinExtension>();
+
+        void Action()
+        {
+            stock = Chariot.PullObjectList<NAVStock>();
+            bins = Bins(out newBinExtensions).ToList();
+            uomList = Chariot.PullObjectList<NAVUoM>();
+        }
+
+        Chariot.RunInTransaction(Action);
+        createdBinExtensions = newBinExtensions;
+
+        return (stock, bins, uomList);
+    }
+
 
     /// <summary>
     /// Get the full set of data required for standard Hydra functionality.
@@ -492,33 +667,22 @@ public class InventoryReader
     /// <returns></returns>
     public async Task<HydraDataSet?> HydraDataSetAsync(bool includeStock = true)
     {
-        HydraDataSet? dataSet = null;
+        var dataSet = new HydraDataSet();
+        var newZoneExtensions = new List<ZoneExtension>();
+        var newBinExtensions = new List<BinExtension>();
 
-        List<NAVStock> stock;
-        IEnumerable<NAVBin> bins;
-        List<NAVUoM> uomList;
-
-        async void Action()
+        void Action()
         {
-            var stockTask = includeStock
-                ? HydraStockAsync()
-                : new Task<(List<NAVStock> stock, IEnumerable<NAVBin> bins, List<NAVUoM> uomList)>(() =>
-                    (new List<NAVStock>(), new List<NAVBin>(), new List<NAVUoM>()));
-            var itemTask = ItemsAsync();
-            var siteTask = SitesAsync();
-            var levelTask = Chariot.PullObjectListAsync<SiteItemLevel>();
-            var locationTask = Chariot.PullObjectListAsync<NAVLocation>();
+            var (stock, bins, uomList) = includeStock
+                ? HydraStock(out newBinExtensions)
+                : (new List<NAVStock>(), new List<NAVBin>(), new List<NAVUoM>());
 
-            await Task.WhenAll(itemTask, siteTask, levelTask, locationTask, stockTask);
-
-            (stock, bins, uomList) = await stockTask;
-
-            var items = (await itemTask).ToList();
-            var (s, zones) = await siteTask;
+            var (s, zones) = Sites(out newZoneExtensions);
             var sites = s.ToList();
-            var levels = (await levelTask).ToDictionary(l => (l.ItemNumber, l.SiteName), l => l);
+            var items = Items().ToList();
+            var levels = Chariot.PullObjectList<SiteItemLevel>().ToDictionary(l => (l.ItemNumber, l.SiteName), l => l);
             var newLevels = new List<SiteItemLevel>();
-            var locations = await locationTask;
+            var locations = Chariot.PullObjectList<NAVLocation>();
 
             foreach (var item in items)
             {
@@ -542,7 +706,7 @@ public class InventoryReader
             IEnumerable<SiteItemLevel> allLevels;
             if (newLevels.Any())
             {
-                _ = Chariot.InsertIntoTableAsync(newLevels);
+                Chariot.InsertIntoTable(newLevels);
                 allLevels = newLevels.Concat(levels.Values);
             }
             else
@@ -553,148 +717,155 @@ public class InventoryReader
             dataSet = new HydraDataSet(items, sites, zones, allLevels, bins, stock, uomList, locations);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
-
-        dataSet ??= new HydraDataSet(new List<NAVItem>(), new List<Site>(), new List<NAVZone>(),
-            new List<SiteItemLevel>(), new List<NAVBin>(), new List<NAVStock>(), new List<NAVUoM>(),
-            new List<NAVLocation>());
+        await Task.Run(() => Chariot.RunInTransaction(Action));
+        if (newZoneExtensions.Any() || newBinExtensions.Any())
+        {
+            await Task.Run(() =>
+            {
+                Chariot.RunInTransaction(() =>
+                {
+                    Chariot.UpdateTable(newZoneExtensions);
+                    Chariot.UpdateTable(newBinExtensions);
+                });
+            });
+        }
 
         return dataSet;
     }
 
     public async Task<BasicStockDataSet?> BasicStockDataSetAsync(IEnumerable<string> zoneCodes, IEnumerable<string> locations)
     {
-        BasicStockDataSet? dataSet = null;
+        var dataSet = new BasicStockDataSet();
+        var newZoneExtensions = new List<ZoneExtension>();
+        var newBinExtensions = new List<BinExtension>();
 
-        async void Action()
+        void Action()
         {
-            var itemTask = ItemsAsync();
-            var zoneTask = ZonesAsync(zone => zoneCodes.Contains(zone.Code) && locations.Contains(zone.LocationCode));
-            var stockTask = Chariot.PullObjectListAsync<NAVStock>(stock => zoneCodes.Contains(stock.ZoneCode) && locations.Contains(stock.LocationCode));
-            var binTask = BinsAsync(bin => zoneCodes.Contains(bin.ZoneCode) && locations.Contains(bin.LocationCode));
-            var uomTask = NAVUoMsAsync();
+            var items = Items();
+            var zones = Zones(out newZoneExtensions, zone => zoneCodes.Contains(zone.Code) && locations.Contains(zone.LocationCode));
+            var stock = Chariot.PullObjectList<NAVStock>(stock =>
+                zoneCodes.Contains(stock.ZoneCode) && locations.Contains(stock.LocationCode));
+            var bins = Bins(out newBinExtensions, bin => zoneCodes.Contains(bin.ZoneCode) && locations.Contains(bin.LocationCode));
+            var uomList = NAVUoMs();
 
-            await Task.WhenAll(itemTask, zoneTask, stockTask, binTask, uomTask);
-
-            dataSet = new BasicStockDataSet(
-                await itemTask, await zoneTask, await binTask, await stockTask, await uomTask);
+            dataSet = new BasicStockDataSet(items, zones, bins, stock, uomList);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
-
-        dataSet ??= new BasicStockDataSet(new List<NAVItem>(), new List<NAVZone>(), new List<NAVBin>(),
-            new List<NAVStock>(), new List<NAVUoM>());
+        await Task.Run(() => Chariot.RunInTransaction(Action));
+        if (newZoneExtensions.Any() || newBinExtensions.Any())
+        {
+            await Task.Run(() =>
+            {
+                Chariot.RunInTransaction(() =>
+                {
+                    Chariot.UpdateTable(newZoneExtensions);
+                    Chariot.UpdateTable(newBinExtensions);
+                });
+            });
+        }
 
         return dataSet;
     }
 
     public async Task<TOStockDataSet?> TOStockDataSetAsync(IEnumerable<string> zoneCodes, IEnumerable<string> locations)
     {
-        TOStockDataSet? dataSet = null;
+        var dataSet = new TOStockDataSet();
+        var newZoneExtensions = new List<ZoneExtension>();
+        var newBinExtensions = new List<BinExtension>();
 
-        async void Action()
+        void Action()
         {
-            var items = ItemsAsync();
-            var zones = ZonesAsync(zone => zoneCodes.Contains(zone.Code) && locations.Contains(zone.LocationCode));
-            var stock = Chariot.PullObjectListAsync<NAVStock>(stock =>
+            var items = Items();
+            var zones = Zones(out newZoneExtensions, zone => zoneCodes.Contains(zone.Code) && locations.Contains(zone.LocationCode));
+            var stock = Chariot.PullObjectList<NAVStock>(stock =>
                 zoneCodes.Contains(stock.ZoneCode) && locations.Contains(stock.LocationCode));
-            var bins = BinsAsync(bin => zoneCodes.Contains(bin.ZoneCode) && locations.Contains(bin.LocationCode));
-            var uomList = NAVUoMsAsync();
-            var toList = TOListAsync();
-            var stores = StoresAsync();
-            var platforms = NAVPlatformsAsync();
-            var divisions = NAVDivisionsAsync();
-            var categories = NAVCategoriesAsync();
-            var genres = NAVGenresAsync();
+            var bins = Bins(out newBinExtensions, bin => zoneCodes.Contains(bin.ZoneCode) && locations.Contains(bin.LocationCode));
+            var uomList = NAVUoMs();
+            var toList = TOList();
+            var stores = Stores();
+            var platforms = NAVPlatforms();
+            var divisions = NAVDivisions();
+            var categories = NAVCategories();
+            var genres = NAVGenres();
 
-            await Task.WhenAll(items, zones, stock, bins, uomList, toList,
-                stores, platforms, divisions, categories, genres);
-
-            dataSet = new TOStockDataSet(await items, await zones, await bins, await stock, await uomList, await toList,
-                await stores, await platforms, await genres, await categories, await divisions);
+            dataSet = new TOStockDataSet(items, zones, bins, stock, uomList, toList,
+                 stores, platforms, genres, categories, divisions);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
-
-        dataSet ??= new TOStockDataSet(new List<NAVItem>(), new List<NAVZone>(), new List<NAVBin>(),
-            new List<NAVStock>(), new List<NAVUoM>(), new List<NAVTransferOrder>(), new List<Store>(),
-            new List<NAVPlatform>(), new List<NAVGenre>(), new List<NAVCategory>(), new List<NAVDivision>());
+        await Task.Run(() => Chariot.RunInTransaction(Action));
+        if (newZoneExtensions.Any() || newBinExtensions.Any())
+        {
+            await Task.Run(() =>
+            {
+                Chariot.RunInTransaction(() =>
+                {
+                    Chariot.UpdateTable(newZoneExtensions);
+                    Chariot.UpdateTable(newBinExtensions);
+                });
+            });
+        }
 
         return dataSet;
     }
 
-    public int TOLineCount() => Chariot.Database?.ExecuteScalar<int>("SELECT count(*) FROM TOLineBatchAnalysis;") ?? 0;
+    public int TOLineCount() => Chariot.ExecuteScalar<int>("SELECT count(*) FROM TOLineBatchAnalysis;");
 
     public async Task<IEnumerable<MixedCarton>> MixedCartonsAsync(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
         => await Chariot.PullObjectListAsync(filter, pullType);
 
+    public IEnumerable<MixedCarton> MixedCartons(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
+        => Chariot.PullObjectList(filter, pullType);
+
     public async Task<IEnumerable<MixedCartonItem>> MixedCartonItemsAsync(Expression<Func<MixedCartonItem, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
         => await Chariot.PullObjectListAsync(filter, pullType);
 
+    public IEnumerable<MixedCartonItem> MixedCartonItems(Expression<Func<MixedCartonItem, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
+        => Chariot.PullObjectList(filter, pullType);
+
     public async Task<IEnumerable<MixedCarton>> MixedCartonTemplatesAsync(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
     {
-        Dictionary<Guid, MixedCarton>? mixedCartons = null;
-        List<Guid>? ids;
-        IEnumerable<MixedCartonItem>? mcItems = null;
-        IEnumerable<int>? itemNumbers;
-        Dictionary<int, NAVItem>? items = null;
+        var mixedCartons = new Dictionary<Guid, MixedCarton>();
 
-        async void Action()
+        void Action()
         {
-            mixedCartons = (await MixedCartonsAsync(filter, pullType)).ToDictionary(mc => mc.ID, mc => mc);
-            ids = mixedCartons.Keys.ToList();
-            mcItems = await MixedCartonItemsAsync(item => ids.Contains(item.MixedCartonID));
-            itemNumbers = mcItems.Select(item => item.ItemNumber).Distinct();
-            items = (await ItemsAsync(i => itemNumbers.Contains(i.Number))).ToDictionary(i => i.Number, i => i);
-        }
+            mixedCartons = MixedCartons(filter, pullType).ToDictionary(mc => mc.ID, mc => mc);
+            var ids = mixedCartons.Keys.ToList();
+            var mcItems = MixedCartonItems(item => ids.Contains(item.MixedCartonID)).ToList();
+            var itemNumbers = mcItems.Select(item => item.ItemNumber).Distinct();
+            var items = Items(i => itemNumbers.Contains(i.Number)).ToDictionary(i => i.Number, i => i);
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
-
-        mcItems ??= new List<MixedCartonItem>();
-        items ??= new Dictionary<int, NAVItem>();
-        mixedCartons ??= new Dictionary<Guid, MixedCarton>();
-
-        foreach (var mixedCartonItem in mcItems)
-        {
-            if (items.TryGetValue(mixedCartonItem.ItemNumber, out var item))
+            foreach (var mixedCartonItem in mcItems)
             {
-                mixedCartonItem.Item = item;
-                item.MixedCartons.Add(mixedCartonItem);
-            }
+                if (items.TryGetValue(mixedCartonItem.ItemNumber, out var item))
+                {
+                    mixedCartonItem.Item = item;
+                    item.MixedCartons.Add(mixedCartonItem);
+                }
 
-            if (!mixedCartons.TryGetValue(mixedCartonItem.MixedCartonID, out var mixedCarton)) continue;
-            mixedCartonItem.MixedCarton = mixedCarton;
-            mixedCarton.Items.Add(mixedCartonItem);
+                if (!mixedCartons.TryGetValue(mixedCartonItem.MixedCartonID, out var mixedCarton)) continue;
+                mixedCartonItem.MixedCarton = mixedCarton;
+                mixedCarton.Items.Add(mixedCartonItem);
+            }
         }
 
+        await Task.Run(() => Chariot.RunInTransaction(Action));
         return mixedCartons.Values;
     }
 
-    public async Task<(List<MixedCarton>, List<MixedCartonItem>, List<NAVItem>)> GetMixedCartonData()
+    public async Task<(List<MixedCarton>, List<MixedCartonItem>, List<NAVItem>)> GetMixedCartonDataAsync()
     {
-        List<MixedCarton>? mcList = null;
-        List<MixedCartonItem>? mcItems = null;
-        List<NAVItem>? items = null;
+        var items = new List<NAVItem>();
+        var mcList = new List<MixedCarton>();
+        var mcItems = new List<MixedCartonItem>();
 
-        async void Action()
+        void Action()
         {
-            var itemTask = ItemsAsync();
-            var mcTask = MixedCartonsAsync();
-            var mcItemTask = MixedCartonItemsAsync();
-
-            await Task.WhenAll(itemTask, mcTask, mcItemTask);
-
-            items = (await itemTask).ToList();
-            mcList = (await mcTask).ToList();
-            mcItems = (await mcItemTask).ToList();
+            items = Items().ToList();
+            mcList = MixedCartons().ToList();
+            mcItems = MixedCartonItems().ToList();
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
-
-        mcList ??= new List<MixedCarton>();
-        mcItems ??= new List<MixedCartonItem>();
-        items ??= new List<NAVItem>();
-
+        await Task.Run(() => Chariot.RunInTransaction(Action));
         return (mcList, mcItems, items);
     }
 }

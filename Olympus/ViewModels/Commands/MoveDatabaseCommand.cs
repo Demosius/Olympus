@@ -24,8 +24,8 @@ public class MoveDatabaseCommand : ICommand
         return (parameter ?? "null") is string dbLocation && App.Charon.CanMoveDatabase() && dbLocation.ToLower() != "local";
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.MoveDatabase();
+        await VM.MoveDatabase();
     }
 }

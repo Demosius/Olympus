@@ -114,7 +114,7 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IItemFilters
 
     #endregion
 
-    public RunVM(HydraVM hydraVM, Helios helios, Charon charon)
+    private RunVM(HydraVM hydraVM, Helios helios, Charon charon)
     {
         HydraVM = hydraVM;
 
@@ -139,10 +139,24 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IItemFilters
         ExportToExcelCommand = new ExportToExcelCommand(this);
         ExportToLabelsCommand = new ExportToLabelsCommand(this);
         SaveGenerationCommand = new SaveGenerationCommand(this);
-
-        Task.Run(RefreshDataAsync);
     }
-    
+
+    public RunVM(HydraVM hydraVM, Helios helios, Charon charon, IEnumerable<Site> sites) : this(hydraVM, helios, charon)
+    {
+        Sites = new ObservableCollection<SiteVM>(sites.Select(s => new SiteVM(s)));
+    }
+
+    private async Task<RunVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<RunVM> CreateAsync(HydraVM hydraVM, Helios helios, Charon charon)
+    {
+        var ret = new RunVM(hydraVM, helios, charon);
+        return ret.InitializeAsync();
+    }
 
     public async Task RefreshDataAsync()
     {
@@ -257,7 +271,7 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IItemFilters
 
         var filePath = dialog.FileName;
 
-        var chariot = await new Task<HydraChariot>(() => new HydraChariot(filePath));
+        var chariot = await Task.Run(() => new HydraChariot(filePath));
 
         await chariot.SendDataAsync(dataSet, AllMoves.Select(vm => vm.Move));
     }

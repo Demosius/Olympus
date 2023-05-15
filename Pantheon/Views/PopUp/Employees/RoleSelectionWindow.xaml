@@ -11,7 +11,8 @@
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
         Foreground="{StaticResource LightForegroundBrush}"
-        Width="450" Height="650">
+        Width="450" Height="650"
+        Initialized="RoleSelectionWindow_OnInitialized">
 
     <Window.Resources>
         <ResourceDictionary>

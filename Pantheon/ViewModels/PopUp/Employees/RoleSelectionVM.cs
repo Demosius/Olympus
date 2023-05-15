@@ -169,7 +169,7 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
 
     #endregion
 
-    public RoleSelectionVM(Helios helios, Charon charon, string? departmentName = null)
+    private RoleSelectionVM(Helios helios, Charon charon, string? departmentName = null)
     {
         Helios = helios;
         Charon = charon;
@@ -179,7 +179,7 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
 
         Roles = new ObservableCollection<Role>();
 
-        DepartmentNames = new ObservableCollection<string> { ANY_DEP_STR };
+        DepartmentNames = new ObservableCollection<string>();
         FullRoles = new List<Role>();
 
         filterString = string.Empty;
@@ -198,8 +198,18 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         RefreshDataCommand = new RefreshDataCommand(this);
+    }
 
-        Task.Run(RefreshDataAsync);
+    private async Task<RoleSelectionVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<RoleSelectionVM> CreateAsync(Helios helios, Charon charon, string? departmentName = null)
+    {
+        var ret = new RoleSelectionVM(helios, charon, departmentName);
+        return ret.InitializeAsync();
     }
 
     public async Task RefreshDataAsync()
@@ -209,6 +219,8 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
 
         var departments = FullRoles.Select(d => d.DepartmentName).Distinct().OrderBy(n => n);
 
+        DepartmentNames.Clear();
+        DepartmentNames.Add(ANY_DEP_STR);
         foreach (var department in departments)
             DepartmentNames.Add(department);
         
@@ -282,7 +294,7 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
 
         if (departmentSelector.DialogResult != true) return;
 
-        var department = departmentSelector.VM.SelectedDepartment;
+        var department = departmentSelector.VM?.SelectedDepartment;
 
         if (department is null) return;
 
@@ -301,7 +313,7 @@ public class RoleSelectionVM : INotifyPropertyChanged, ICreationMode, ISelector,
 
         if (roleSelector.DialogResult != true) return;
 
-        var role = roleSelector.VM.SelectedRole;
+        var role = roleSelector.VM?.SelectedRole;
 
         if (role is null) return;
 

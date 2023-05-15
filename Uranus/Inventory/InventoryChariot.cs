@@ -51,6 +51,26 @@ public sealed class InventoryChariot : MasterChariot
     /***************************** CREATE Data ****************************/
 
     /*                             Update Times                           */
+    public int SetStockUpdateTimes(List<NAVStock> stock)
+    {
+        var dateTime = DateTime.Now;
+        // Convert stock to list of BCUpdate items.
+        var distinctStockByZone = stock.GroupBy(s => s.ZoneID).Select(g => g.First());
+        var contentsUpdates = distinctStockByZone
+            .Select(
+                s => new BinContentsUpdate
+                {
+                    ZoneID = s.ZoneID,
+                    ZoneCode = s.ZoneCode,
+                    LocationCode = s.LocationCode,
+                    LastUpdate = dateTime
+                })
+            .ToList();
+
+        // Update Database
+        return UpdateTable(contentsUpdates);
+    }
+
     public async Task<int> SetStockUpdateTimesAsync(List<NAVStock> stock)
     {
         var dateTime = DateTime.Now;

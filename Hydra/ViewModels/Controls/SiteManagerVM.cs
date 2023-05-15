@@ -54,7 +54,7 @@ public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction
 
     #endregion
 
-    public SiteManagerVM(HydraVM hydraVM, Helios helios, Charon charon)
+    private SiteManagerVM(HydraVM hydraVM, Helios helios, Charon charon)
     {
         HydraVM = hydraVM;
         Helios = helios;
@@ -69,8 +69,33 @@ public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction
 
         NoSite = new SiteVM(new Site("NoSite"), DeleteSiteCommand);
         noSiteZoneListing = new ZoneListingVM(new List<NAVZone>(), NoSite);
+    }
 
-        Task.Run(RefreshDataAsync);
+    public SiteManagerVM(HydraVM hydraVM, Helios helios, Charon charon, List<NAVZone> zones, List<Site> siteList) : this(hydraVM, helios, charon)
+    {
+        foreach (var site in siteList)
+            Sites.Add(new SiteVM(site, DeleteSiteCommand));
+
+        foreach (var zone in zones) AllZones.Add(zone);
+
+        var noZones = zones.Where(z => z.SiteName == "").ToList();
+        var noSite = new Site("NoSite") { Zones = noZones };
+
+        NoSite = new SiteVM(noSite, DeleteSiteCommand);
+
+        NoSiteZoneListing = NoSite.ZoneListingVM;
+    }
+
+    private async Task<SiteManagerVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<SiteManagerVM> CreateAsync(HydraVM hydraVM, Helios helios, Charon charon)
+    {
+        var ret = new SiteManagerVM(hydraVM, helios, charon);
+        return ret.InitializeAsync();
     }
 
     public async Task RefreshDataAsync()

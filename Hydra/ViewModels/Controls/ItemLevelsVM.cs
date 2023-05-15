@@ -46,17 +46,8 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public List<SiteVM> Sites { get; set; }
 
     #region INotifyPropertyChanged Members
-
-    private ObservableCollection<ItemVM> items;
-    public ObservableCollection<ItemVM> Items
-    {
-        get => items;
-        set
-        {
-            items = value;
-            OnPropertyChanged();
-        }
-    }
+    
+    public ObservableCollection<ItemVM> Items { get; set; }
 
 
     private DataView displayData;
@@ -121,7 +112,7 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     #endregion
 
-    public ItemLevelsVM(HydraVM hydraVM)
+    private ItemLevelsVM(HydraVM hydraVM)
     {
         HydraVM = hydraVM;
 
@@ -130,7 +121,7 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
         DataSet = new HydraDataSet();
         AllItems = new List<ItemVM>();
-        items = new ObservableCollection<ItemVM>();
+        Items = new ObservableCollection<ItemVM>();
         DataTable = new DataTable();
         displayData = new DataView();
         SiteItemLevelVMs = new Dictionary<(string, int), SiteItemLevelVM>();
@@ -144,8 +135,34 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IFilters
         SaveLevelsCommand = new SaveLevelsCommand(this);
         ManageSiteCommand = new ManageSiteCommand(this);
         CustomizeLevelsCommand = new CustomizeLevelsCommand(this);
+    }
 
-        Task.Run(RefreshDataAsync);
+    public ItemLevelsVM(HydraVM hydraVM, HydraDataSet dataSet) : this(hydraVM)
+    {
+        DataSet = dataSet;
+
+        SetVMs();
+
+        var items = new List<ItemVM>(AllItems.Where(i => i.UseLevelTargets));
+        Items.Clear();
+        foreach (var item in items)
+            Items.Add(item);
+
+        SetTables();
+
+        ApplyFilters();
+    }
+
+    private async Task<ItemLevelsVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<ItemLevelsVM> CreateAsync(HydraVM hydraVM)
+    {
+        var ret = new ItemLevelsVM(hydraVM);
+        return ret.InitializeAsync();
     }
 
     public async Task RefreshDataAsync()
@@ -155,7 +172,11 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
         SetVMs();
 
-        Items = new ObservableCollection<ItemVM>(AllItems.Where(i => i.UseLevelTargets));
+        var items = new List<ItemVM>(AllItems.Where(i => i.UseLevelTargets));
+        Items.Clear();
+        foreach (var item in items)
+            Items.Add(item);
+
         SetTables();
 
         ApplyFilters();
@@ -282,7 +303,7 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IFilters
     
     public async Task SelectItems()
     {
-        var vm = new ItemSelectionVM(this);
+        var vm = await ItemSelectionVM.CreateAsync(this);
         var itemWindow = new ItemSelectionWindow(vm);
         if (itemWindow.ShowDialog() == true)
             await RefreshDataAsync();
@@ -308,7 +329,7 @@ public class ItemLevelsVM : INotifyPropertyChanged, IDBInteraction, IFilters
         var site = ((SiteItemLevelVM)SelectedObject).Site;
         if (site == null) return;
 
-        var vm = new SiteManagementVM(this, site);
+        var vm = await SiteManagementVM.CreateAsync(this, site);
         var window = new SiteManagementWindow { DataContext = vm };
         if (window.ShowDialog() == true)
             await RefreshDataAsync();

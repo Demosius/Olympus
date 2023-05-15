@@ -19,6 +19,16 @@ public class BasicStockDataSet
     public List<string> MissingBins = new();
     public List<string> MissingUoMs = new();
 
+    public BasicStockDataSet()
+    {
+        Items = new Dictionary<int, NAVItem>();
+        Zones = new Dictionary<string, NAVZone>();
+        Bins = new Dictionary<string, NAVBin>();
+        UoMs = new List<NAVUoM>();
+        NAVStock = new List<NAVStock>();
+        Stock = new List<Stock>();
+    }
+
     public BasicStockDataSet(IEnumerable<NAVItem> items, IEnumerable<NAVZone> zones, IEnumerable<NAVBin> bins,
         IEnumerable<NAVStock> stock, IEnumerable<NAVUoM> uomList)
     {

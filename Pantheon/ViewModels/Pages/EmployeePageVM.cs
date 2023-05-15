@@ -260,8 +260,8 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     }
 
     // As determined by employee.
-    public bool SensitiveVisibility => SelectedEmployeeVM is not null && (Charon.CanReadEmployeeSensitive(SelectedEmployeeVM.Employee));
-    public bool VerySensitiveVisibility => SelectedEmployeeVM is not null && (Charon.CanReadEmployeeVerySensitive(SelectedEmployeeVM.Employee));
+    public bool SensitiveVisibility => SelectedEmployeeVM is not null && Charon.CanReadEmployeeSensitive(SelectedEmployeeVM.Employee);
+    public bool VerySensitiveVisibility => SelectedEmployeeVM is not null && Charon.CanReadEmployeeVerySensitive(SelectedEmployeeVM.Employee);
 
     #endregion
 
@@ -276,7 +276,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     public FillFullTimeRostersCommand FillFullTimeRostersCommand { get; set; }
     #endregion
 
-    public EmployeePageVM(Helios helios, Charon charon)
+    private EmployeePageVM(Helios helios, Charon charon)
     {
         Helios = helios;
         Charon = charon;
@@ -304,8 +304,18 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         clans = new ObservableCollection<Clan>();
         payPoints = new ObservableCollection<string>();
         roleNames = new ObservableCollection<string>();
+    }
 
-        Task.Run(RefreshDataAsync);
+    private async Task<EmployeePageVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<EmployeePageVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new EmployeePageVM(helios, charon);
+        return ret.InitializeAsync();
     }
 
     public async Task RefreshDataAsync()
@@ -414,7 +424,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         var employeeCreationWindow = new EmployeeCreationWindow(Helios, Charon);
         if (employeeCreationWindow.ShowDialog() != true) return;
 
-        var newEmployee = employeeCreationWindow.VM.Employee;
+        var newEmployee = employeeCreationWindow.VM?.Employee;
 
         if (newEmployee is null) return;
 

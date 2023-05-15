@@ -7,11 +7,9 @@
         xmlns:viewModels="clr-namespace:Aion.ViewModels"
         xmlns:converters="clr-namespace:Aion.ViewModels.Converters"
         mc:Ignorable="d"
-        Title="Create New Employee" Height="350" Width="500">
-
-    <Window.DataContext>
-        <viewModels:EmployeeCreationVM x:Name="VM"/>
-    </Window.DataContext>
+        d:DataContext="{d:DesignInstance {x:Type viewModels:EmployeeCreationVM}, IsDesignTimeCreatable=False}"
+        Title="Create New Employee" Height="350" Width="500"
+        Initialized="EmployeeCreationWindow_OnInitialized">
 
     <Window.Resources>
         <ResourceDictionary>

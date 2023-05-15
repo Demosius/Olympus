@@ -9,18 +9,18 @@ public class LaunchEmployeeEditorCommand : ICommand
 
     public LaunchEmployeeEditorCommand(EmployeePageVM vm) { VM = vm; }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return VM.SelectedEmployee != null;
     }
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
         VM.LaunchEmployeeEditor();
     }

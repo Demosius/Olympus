@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using Uranus.Annotations;
 using Uranus.Staff.Models;
 
 namespace Aion.Models;
@@ -19,10 +21,10 @@ public class DailyEntry : INotifyPropertyChanged
 {
     // Fields for event properties.
     private string location;
-    private ClockTime startShiftClock;
-    private ClockTime startLunchClock;
-    private ClockTime endLunchClock;
-    private ClockTime endShiftClock;
+    private ClockTime? startShiftClock;
+    private ClockTime? startLunchClock;
+    private ClockTime? endLunchClock;
+    private ClockTime? endShiftClock;
     private EShiftTypeAlpha shiftTypeAlpha;
     private string timeTotal;
     private double hoursWorked;
@@ -51,6 +53,7 @@ public class DailyEntry : INotifyPropertyChanged
     public Guid EndLunchClockID { get; set; }
     [ForeignKey(typeof(ClockTime))]
     public Guid EndShiftClockID { get; set; }
+
     public EShiftTypeAlpha ShiftTypeAlpha
     {
         get => shiftTypeAlpha;
@@ -89,44 +92,49 @@ public class DailyEntry : INotifyPropertyChanged
     }
 
     [ManyToOne]
-    public Employee Employee { get; set; }
+    public Employee? Employee { get; set; }
+
     [OneToOne(foreignKey: nameof(StartShiftClockID))]
-    public ClockTime StartShiftClock
+    public ClockTime? StartShiftClock
     {
         get => startShiftClock;
         set
         {
-            StartShiftClockID = SetClock(ref startShiftClock, value);
+            startShiftClock ??= new ClockTime();
+            StartShiftClockID = SetClock(ref startShiftClock, value ?? new ClockTime());
             OnPropertyChanged(nameof(StartShiftClock));
         }
     }
     [OneToOne(foreignKey: nameof(StartLunchClockID))]
-    public ClockTime StartLunchClock
+    public ClockTime? StartLunchClock
     {
         get => startLunchClock;
         set
         {
-            StartLunchClockID = SetClock(ref startLunchClock, value);
+            startLunchClock ??= new ClockTime();
+            StartLunchClockID = SetClock(ref startLunchClock, value ?? new ClockTime());
             OnPropertyChanged(nameof(StartLunchClock));
         }
     }
     [OneToOne(foreignKey: nameof(EndLunchClockID))]
-    public ClockTime EndLunchClock
+    public ClockTime? EndLunchClock
     {
         get => endLunchClock;
         set
         {
-            EndLunchClockID = SetClock(ref endLunchClock, value);
+            endLunchClock ??= new ClockTime();
+            EndLunchClockID = SetClock(ref endLunchClock, value ?? new ClockTime());
             OnPropertyChanged(nameof(EndLunchClock));
         }
     }
     [OneToOne(foreignKey: nameof(EndShiftClockID))]
-    public ClockTime EndShiftClock
+    public ClockTime? EndShiftClock
     {
         get => endShiftClock;
         set
         {
-            EndShiftClockID = SetClock(ref endShiftClock, value);
+            endShiftClock ??= new ClockTime();
+            EndShiftClockID = SetClock(ref endShiftClock, value ?? new ClockTime());
             OnPropertyChanged(nameof(EndShiftClock));
         }
     }
@@ -134,16 +142,28 @@ public class DailyEntry : INotifyPropertyChanged
     [Ignore]
     public List<ClockTime> AdditionalClocks { get; set; }
 
-    public DailyEntry() { }
+    public DailyEntry()
+    {
+        location = string.Empty;
+        timeTotal = string.Empty;
+        comments = string.Empty;
+        Date = string.Empty;
+        Day = string.Empty;
+        AdditionalClocks = new List<ClockTime>();
+    }
 
     public DailyEntry(Employee employee, List<ClockTime> clockTimes)
     {
         ID = Guid.NewGuid();
         EmployeeCode = employee.ID;
-        Location = employee.Location;
+        location = employee.Location;
         var d = clockTimes[0].DtDate;
         Date = d.ToString("yyyy-MM-dd");
         Day = d.ToString("dddd");
+
+        timeTotal = string.Empty;
+        comments = string.Empty;
+        AdditionalClocks = new List<ClockTime>();
 
         AssignClockTimes(clockTimes);
         SummarizeShift();
@@ -153,17 +173,19 @@ public class DailyEntry : INotifyPropertyChanged
     {
         ID = Guid.NewGuid();
         EmployeeCode = employee.ID;
-        Location = employee.Location;
+        location = employee.Location;
         Date = date.ToString("yyyy-MM-dd");
         Day = date.ToString("dddd");
+
+        timeTotal = string.Empty;
+        comments = string.Empty;
+        AdditionalClocks = new List<ClockTime>();
     }
 
     // ReSharper disable once RedundantAssignment
     private static Guid SetClock(ref ClockTime clock, ClockTime newClockValue)
     {
         clock = newClockValue;
-        if (clock is null)
-            return Guid.NewGuid();
         clock.Status = EClockStatus.Approved;
         return clock.ID;
     }
@@ -174,7 +196,7 @@ public class DailyEntry : INotifyPropertyChanged
     /// <returns></returns>
     public List<ClockTime> GetClocks()
     {
-        var returnVal = AdditionalClocks ?? new List<ClockTime>();
+        var returnVal = AdditionalClocks;
 
         if (StartShiftClock is not null) { returnVal.Add(StartShiftClock); }
         if (StartLunchClock is not null) { returnVal.Add(StartLunchClock); }
@@ -367,23 +389,23 @@ public class DailyEntry : INotifyPropertyChanged
         EndShiftClock = newEnd;
         EndShiftClockID = newEnd.ID;
     }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
+    
     public override string ToString()
     {
         return $"{EmployeeCode} - {Employee}: {Day} {Date}";
     }
 
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     /* Equality overloading. */
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is not ClockTime other)
         {
@@ -397,7 +419,7 @@ public class DailyEntry : INotifyPropertyChanged
         return ID == other.ID;
     }
 
-    public bool Equals(DailyEntry other)
+    public bool Equals(DailyEntry? other)
     {
         if (other is null)
         {
@@ -411,7 +433,7 @@ public class DailyEntry : INotifyPropertyChanged
         return ID == other.ID;
     }
 
-    public static bool operator ==(DailyEntry lh, DailyEntry rh)
+    public static bool operator ==(DailyEntry? lh, DailyEntry? rh)
     {
         if (ReferenceEquals(lh, rh))
         {
@@ -421,20 +443,15 @@ public class DailyEntry : INotifyPropertyChanged
         {
             return false;
         }
-        if (rh is null)
-        {
-            return false;
-        }
-
-        return lh.Equals(rh);
+        return rh is not null && lh.Equals(rh);
     }
 
-    public static bool operator !=(DailyEntry lh, DailyEntry rh)
+    public static bool operator !=(DailyEntry? lh, DailyEntry? rh)
     {
         return !(lh == rh);
     }
 
-    public static bool operator >(DailyEntry lh, DailyEntry rh)
+    public static bool operator >(DailyEntry? lh, DailyEntry? rh)
     {
         if (ReferenceEquals(lh, rh))
         {
@@ -452,7 +469,7 @@ public class DailyEntry : INotifyPropertyChanged
         return string.CompareOrdinal(lh.Date, rh.Date) > 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) > 0;
     }
 
-    public static bool operator <(DailyEntry lh, DailyEntry rh)
+    public static bool operator <(DailyEntry? lh, DailyEntry? rh)
     {
         if (ReferenceEquals(lh, rh))
         {
@@ -470,9 +487,9 @@ public class DailyEntry : INotifyPropertyChanged
         return string.CompareOrdinal(lh.Date, rh.Date) < 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) < 0;
     }
 
-    public static bool operator <=(DailyEntry lh, DailyEntry rh) => lh == rh || lh < rh;
+    public static bool operator <=(DailyEntry? lh, DailyEntry? rh) => lh == rh || lh < rh;
 
-    public static bool operator >=(DailyEntry lh, DailyEntry rh) => lh == rh || lh > rh;
+    public static bool operator >=(DailyEntry? lh, DailyEntry? rh) => lh == rh || lh > rh;
 
     // ReSharper disable once NonReadonlyMemberInGetHashCode
     public override int GetHashCode() => ID.GetHashCode();

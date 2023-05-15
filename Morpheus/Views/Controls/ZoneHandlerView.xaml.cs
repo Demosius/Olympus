@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
 using Morpheus.ViewModels.Controls;
 using Styx;
 using Uranus;
@@ -11,10 +13,21 @@ namespace Morpheus.Views.Controls;
 /// </summary>
 public partial class ZoneHandlerView
 {
+    public ZoneHandlerVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon? Charon { get; set; }
+
     public ZoneHandlerView(Helios helios, Charon? charon)
     {
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
-        DataContext = new ZoneHandlerVM(helios, charon!);
+    }
+
+    private async void ZoneHandlerView_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await ZoneHandlerVM.CreateAsync(Helios, Charon);
+        DataContext = VM;
     }
 
     private void DataGrid_OnAutoGeneratingColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)

@@ -6,10 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Uranus;
+using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
 
@@ -20,12 +22,12 @@ public class AionVM : INotifyPropertyChanged, IDBInteraction, IDBRepair
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
 
-    public ShiftEntryPage ShiftEntryPage { get; set; }
-    public EmployeePage EmployeePage { get; set; }
+    public ShiftEntryPage? ShiftEntryPage { get; set; }
+    public EmployeePage? EmployeePage { get; set; }
 
-    private Page currentPage;
+    private Page? currentPage;
 
-    public Page CurrentPage
+    public Page? CurrentPage
     {
         get => currentPage;
         set
@@ -62,24 +64,23 @@ public class AionVM : INotifyPropertyChanged, IDBInteraction, IDBRepair
     public RefreshDataCommand RefreshDataCommand { get; set; }
     public RepairDataCommand RepairDataCommand { get; set; }
 
-    public AionVM()
+    public AionVM(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
+
+        databasePath = string.Empty;
+
         // Commands
         ShowEntriesCommand = new ShowEntriesCommand(this);
         ShowEmployeesCommand = new ShowEmployeesCommand(this);
         ImportOldDataCommand = new ImportOldDataCommand(this);
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
-    }
-
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
 
         SetChecks();
     }
-
+    
     public void ShowEntryPage()
     {
         ShiftEntryPage = new ShiftEntryPage(Helios, Charon);
@@ -114,18 +115,19 @@ public class AionVM : INotifyPropertyChanged, IDBInteraction, IDBRepair
 
     public async Task RefreshDataAsync()
     {
-        var tasks = new List<Task>
-        {
-            EmployeePage?.VM.RefreshDataAsync(),
-            ShiftEntryPage?.VM.RefreshDataAsync(true)
-        };
+        var tasks = new List<Task>();
+
+        if (EmployeePage?.VM is not null) tasks.Add(EmployeePage.VM.RefreshDataAsync());
+        if (ShiftEntryPage?.VM is not null) tasks.Add(ShiftEntryPage.VM.RefreshDataAsync());
 
         await Task.WhenAll(tasks);
     }
 
     public async Task RepairDataAsync()
     {
-        await ShiftEntryPage.VM.RepairDataAsync();
+        if (ShiftEntryPage?.VM is null) return;
+
+        await ShiftEntryPage.VM.RepairDataAsync().ConfigureAwait(false);
     }
 
     public async Task ImportOldData()
@@ -133,7 +135,7 @@ public class AionVM : INotifyPropertyChanged, IDBInteraction, IDBRepair
         try
         {
             var archivedData = OldDataUtil.GetArchivedData();
-            if (archivedData is null || !archivedData.HasData()) return;
+            if (!archivedData.HasData()) return;
 
             var currentData = await Helios.StaffReader.GetAionDataSetAsync();
 
@@ -163,9 +165,10 @@ public class AionVM : INotifyPropertyChanged, IDBInteraction, IDBRepair
         }
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

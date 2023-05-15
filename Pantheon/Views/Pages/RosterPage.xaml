@@ -8,6 +8,7 @@
       mc:Ignorable="d" 
       d:DataContext="{d:DesignInstance {x:Type pages:RosterPageVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="1080" d:DesignWidth="1200"
+      Initialized="RosterPage_OnInitialized"
       Title="EmployeePage">
 
     <Page.Resources>

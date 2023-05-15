@@ -14,12 +14,20 @@ namespace Aion.View;
 /// </summary>
 public partial class EmployeePage
 {
-    public EmployeePageVM VM { get; set; }
+    public EmployeePageVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public EmployeePage(Helios helios, Charon charon)
     {
-        VM = new EmployeePageVM(helios, charon);
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
+    }
+
+    private async void EmployeePage_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await EmployeePageVM.CreateAsync(Helios, Charon);
         DataContext = VM;
     }
 
@@ -39,7 +47,7 @@ public partial class EmployeePage
     /// <param name="e"></param>
     private void Employees_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
     {
-        var headerName = e.Column.Header.ToString();
+        var headerName = e.Column.Header.ToString() ?? string.Empty;
 
         //Cancel the column you don't want to generate
         if (new List<string> { "DisplayName", "PayRate", "RF_ID", "PC_ID", "ReportsToID", "LockerID", "PhoneNumber", "Email", "Email", "Address", "IconName",

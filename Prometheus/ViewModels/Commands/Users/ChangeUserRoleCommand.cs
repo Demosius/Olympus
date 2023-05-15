@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Prometheus.ViewModels.Commands.Users;
 
-internal class ChangeUserRoleCommand : ICommand
+public class ChangeUserRoleCommand : ICommand
 {
     public UserViewVM VM { get; set; }
 

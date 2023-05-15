@@ -74,18 +74,33 @@ public class AvatarSelectionVM : INotifyPropertyChanged, IImageSelector
     public SaveImageChangesCommand SaveImageChangesCommand { get; }
     public FindNewImageCommand FindNewImageCommand { get; set; }
 
-    public AvatarSelectionVM(EmployeeVM parentVM)
+    private AvatarSelectionVM(EmployeeVM parentVM)
     {
         ParentVM = parentVM;
         Helios = ParentVM.Helios;
 
-        avatars = new ObservableCollection<EmployeeAvatar>(AsyncHelper.RunSync(() => Helios.StaffReader.EmployeeAvatarsAsync()));
+        avatars = new ObservableCollection<EmployeeAvatar>();
 
         avatarName = string.Empty;
 
         ConfirmImageSelectionCommand = new ConfirmImageSelectionCommand(this);
         SaveImageChangesCommand = new SaveImageChangesCommand(this);
         FindNewImageCommand = new FindNewImageCommand(this);
+    }
+
+    private async Task<AvatarSelectionVM> InitializeAsync()
+    {
+        var avatarTask = Helios.StaffReader.EmployeeAvatarsAsync();
+        foreach (var employeeAvatar in await avatarTask)
+            avatars.Add(employeeAvatar);
+
+        return this;
+    }
+
+    public static Task<AvatarSelectionVM> CreateAsync(EmployeeVM parentVM)
+    {
+        var ret = new AvatarSelectionVM(parentVM);
+        return ret.InitializeAsync();
     }
 
     private void CheckCanSave()
@@ -102,7 +117,7 @@ public class AvatarSelectionVM : INotifyPropertyChanged, IImageSelector
 
         var avatar = SelectedAvatar;
 
-        await Task.Run(() => Helios.StaffUpdater.RenameEmployeeAvatar(ref avatar, AvatarName));
+        await Task.Run(() => Helios.StaffUpdater.RenameEmployeeAvatar(avatar, AvatarName));
 
         SelectedAvatar = avatar;
     }

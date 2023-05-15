@@ -1,4 +1,6 @@
-﻿using Styx;
+﻿using System;
+using System.Windows;
+using Styx;
 using System.Windows.Controls;
 using Prometheus.ViewModels.Pages.Users;
 using Uranus;
@@ -10,12 +12,20 @@ namespace Prometheus.Views.Pages.Users;
 /// </summary>
 public partial class UserDeactivatePage
 {
-    public RolesVM VM { get; set; }
+    public RolesVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public UserDeactivatePage(Helios helios, Charon charon)
     {
-        VM = new RolesVM(helios, charon);
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
+    }
+
+    private async void UserDeactivatePage_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await RolesVM.CreateAsync(Helios, Charon);
         DataContext = VM;
     }
 

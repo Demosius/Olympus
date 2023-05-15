@@ -1,10 +1,12 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using Olympus.Properties;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Navigation;
+using Olympus.ViewModels;
 
 namespace Olympus.Views;
 
@@ -13,13 +15,15 @@ namespace Olympus.Views;
 /// </summary>
 public partial class MainWindow
 {
+    public OlympusVM? VM { get; set; }
+
     public MainWindow()
     {
         InitializeComponent();
         Thread.CurrentThread.CurrentCulture = new CultureInfo("en-AU");
     }
 
-    private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    private void MainWindow_Closing(object sender, CancelEventArgs e)
     {
         // Saves the settings when closing the App.
         Settings.Default.Save();
@@ -30,8 +34,10 @@ public partial class MainWindow
         if (e.NavigationMode is NavigationMode.Forward or NavigationMode.Back) e.Cancel = true;
     }
 
-    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+    private async void MainWindow_OnInitialized(object? sender, EventArgs e)
     {
+        VM = await OlympusVM.CreateAsync();
+        DataContext = VM;
         VM.UserHandlerVM.LogIn();
     }
 
@@ -39,7 +45,7 @@ public partial class MainWindow
     {
         Task.Run(() =>
         {
-            VM.TestPb();
+            VM?.TestPb();
         });
         /*VM.ProgressBarVM.Activate("Testing", newMax:100, showPercent:true, determinative:false);
         BackgroundWorker worker = new BackgroundWorker();

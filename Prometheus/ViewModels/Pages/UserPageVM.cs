@@ -1,6 +1,5 @@
 ﻿using Prometheus.Views.Pages.Users;
 using Styx;
-using Styx.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -11,7 +10,7 @@ using Uranus.Annotations;
 
 namespace Prometheus.ViewModels.Pages;
 
-internal class UserPageVM : INotifyPropertyChanged, IDataSource
+internal class UserPageVM : INotifyPropertyChanged
 {
     public enum EUserPage
     {
@@ -20,8 +19,8 @@ internal class UserPageVM : INotifyPropertyChanged, IDataSource
         Roles
     }
 
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public Dictionary<EUserPage, Page?> PageDict { get; set; }
 
@@ -56,7 +55,8 @@ internal class UserPageVM : INotifyPropertyChanged, IDataSource
 
     public UserPageVM(Helios helios, Charon charon)
     {
-        SetDataSources(helios, charon);
+        Helios = helios;
+        Charon = charon;
 
         Pages = new ObservableCollection<EUserPage>()
         {
@@ -67,16 +67,10 @@ internal class UserPageVM : INotifyPropertyChanged, IDataSource
 
         PageDict = new Dictionary<EUserPage, Page?>();
     }
-
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
-    }
-
+    
     public void SetPage(EUserPage? page)
     {
-        if (Helios is null || Charon is null || page is null) return;
+        if (page is null) return;
 
         var ePage = (EUserPage)page;
 

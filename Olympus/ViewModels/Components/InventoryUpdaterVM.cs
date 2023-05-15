@@ -151,7 +151,7 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
 
             var newStock = DataConversion.NAVRawStringToStock(General.ClipboardToString());
 
-            var vm = new BinContentsUpdaterVM(App.Helios, newStock);
+            var vm = await BinContentsUpdaterVM.CreateAsync(App.Helios, newStock);
 
             // Check that there are any zones to consider.
             int lines;

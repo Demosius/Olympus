@@ -11,7 +11,8 @@
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
         Foreground="{StaticResource LightForegroundBrush}"
-        Width="400" Height="550">
+        Width="400" Height="550"
+        Initialized="PayPointSelectionWindow_OnInitialized">
 
     <Window.Resources>
         <ResourceDictionary>

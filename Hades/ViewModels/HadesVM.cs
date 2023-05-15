@@ -33,10 +33,9 @@ public class HadesVM : INotifyPropertyChanged, IDBInteraction
 
     public async Task RefreshDataAsync()
     {
-        await new Task(() => { });
+        await Task.Run(() => { });
     }
     
-
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]

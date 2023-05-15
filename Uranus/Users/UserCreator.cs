@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Uranus.Users.Models;
 
 namespace Uranus.Users;
@@ -15,7 +14,7 @@ public class UserCreator
 
     public void AssureDefaultRole()
     {
-        if (Chariot.Database?.ExecuteScalar<int>("SELECT count(*) FROM Role WHERE Name='Default';") > 0) return;
+        if (Chariot.ExecuteScalar<int>("SELECT count(*) FROM Role WHERE Name='Default';") > 0) return;
 
         Role role = new();
 
@@ -26,12 +25,17 @@ public class UserCreator
 
     public async Task AssureDBManagerRoleAsync()
     {
-        if ((await Chariot.PullObjectListAsync<Role>()).Any(role => role.Name == "DatabaseManager")) 
-            return;
+        void Action()
+        {
+            if (Chariot.ExecuteScalar<int>("SELECT count(*) FROM Role WHERE Name='DatabaseManager';") > 0)
+                return;
 
-        Role role = new();
-        role.SetMaster();
-        _ = Chariot.Create(role);
+            Role role = new();
+            role.SetMaster();
+            Chariot.Create(role);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action));
     }
 
     public void Role(Role role, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(role, pushType);

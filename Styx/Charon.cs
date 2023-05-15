@@ -59,7 +59,7 @@ public partial class Charon
         staffChariot = new StaffChariot(solLocation);
         staffReader = new StaffReader(ref staffChariot);
         staffCreator = new StaffCreator(ref staffChariot);
-        staffUpdater = new StaffUpdater(ref staffChariot, staffReader);
+        staffUpdater = new StaffUpdater(ref staffChariot);
         // staffDeleter = new StaffDeleter(ref staffChariot);
     }
 

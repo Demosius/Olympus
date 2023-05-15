@@ -35,7 +35,7 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction
 
     #endregion
 
-    public ZoneHandlerVM(Helios helios, Charon? charon)
+    private ZoneHandlerVM(Helios helios, Charon? charon)
     {
         Helios = helios;
         Charon = charon;
@@ -44,9 +44,19 @@ public class ZoneHandlerVM : INotifyPropertyChanged, IDBInteraction
         RefreshDataCommand = new RefreshDataCommand(this);
         UpdateZonesCommand = new UploadZonesCommand(this);
         SaveZonesCommand = new SaveZonesCommand(this);
-        Task.Run(RefreshDataAsync);
     }
 
+    private async Task<ZoneHandlerVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<ZoneHandlerVM> CreateAsync(Helios helios, Charon? charon)
+    {
+        var ret = new ZoneHandlerVM(helios, charon);
+        return ret.InitializeAsync();
+    }
     public async Task RefreshDataAsync()
     {
         Zones.Clear();

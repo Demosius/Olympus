@@ -9,12 +9,10 @@ namespace Uranus.Staff;
 public class StaffUpdater
 {
     private StaffChariot Chariot { get; }
-    private StaffReader Reader { get; }
 
-    public StaffUpdater(ref StaffChariot chariot, StaffReader reader)
+    public StaffUpdater(ref StaffChariot chariot)
     {
         Chariot = chariot;
-        Reader = reader;
     }
 
     public int ClockEvent(ClockEvent clock) => Chariot.Update(clock);
@@ -23,22 +21,38 @@ public class StaffUpdater
 
     public async Task<int> ClockEventsAsync(IEnumerable<ClockEvent> clocks) => await Chariot.UpdateTableAsync(clocks);
 
+    public int ClockEvents(IEnumerable<ClockEvent> clocks) => Chariot.UpdateTable(clocks);
+
     public async Task<int> ShiftEntryAsync(ShiftEntry shiftEntry) => await Chariot.InsertOrUpdateAsync(shiftEntry);
 
     public async Task<int> ShiftEntriesAsync(IEnumerable<ShiftEntry> shiftEntries) => await Chariot.UpdateTableAsync(shiftEntries);
 
+    public int ShiftEntries(IEnumerable<ShiftEntry> shiftEntries) => Chariot.UpdateTable(shiftEntries);
+
     public async Task<int> EntriesAndClocksAsync(IEnumerable<ShiftEntry> shiftEntries, IEnumerable<ClockEvent> clockEvents)
     {
         var lines = 0;
-        async void Action()
+        void Action()
         {
-            var clockTask = ClockEventsAsync(clockEvents);
-            var shiftTask = ShiftEntriesAsync(shiftEntries);
-            var lineArr = await Task.WhenAll(clockTask, shiftTask);
-            lines = lineArr.Sum();
+            lines += ClockEvents(clockEvents);
+            lines += ShiftEntries(shiftEntries);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
+
+        return lines;
+    }
+
+    public int EntriesAndClocks(IEnumerable<ShiftEntry> shiftEntries, IEnumerable<ClockEvent> clockEvents)
+    {
+        var lines = 0;
+        void Action()
+        {
+            lines += ClockEvents(clockEvents);
+            lines += ShiftEntries(shiftEntries);
+        }
+
+        Chariot.RunInTransaction(Action);
 
         return lines;
     }
@@ -59,7 +73,7 @@ public class StaffUpdater
     /// <param name="employeeID"></param>
     public void SetPending(string date, int employeeID)
     {
-        Chariot.Database?.Execute("UPDATE ClockEvent SET Status = ? WHERE EmployeeID = ? AND Date = ?;",
+        Chariot.Execute("UPDATE ClockEvent SET Status = ? WHERE EmployeeID = ? AND Date = ?;",
             EClockStatus.Pending, employeeID, date);
     }
     /// <summary>
@@ -95,18 +109,15 @@ public class StaffUpdater
     public async Task<int> ApplyPendingClockEventsAsync()
     {
         var lines = 0;
-
-        async void Action()
+        void Action()
         {
             // Get full clocks and shifts.
-            var clockTask = Chariot.PullObjectListAsync<ClockEvent>(c => c.Status != EClockStatus.Deleted);
-            var entryTask = Chariot.PullObjectListAsync<ShiftEntry>();
+            var clockList = Chariot.PullObjectList<ClockEvent>(c => c.Status != EClockStatus.Deleted);
+            var entryList = Chariot.PullObjectList<ShiftEntry>();
 
-            await Task.WhenAll(clockTask, entryTask);
-
-            var clockDict = (await clockTask).GroupBy(c => (c.EmployeeID, c.Date))
+            var clockDict = clockList.GroupBy(c => (c.EmployeeID, c.Date))
                 .ToDictionary(g => g.Key, g => g.ToList());
-            var entryDict = (await entryTask).ToDictionary(e => (e.EmployeeID, e.Date), e => e);
+            var entryDict = entryList.ToDictionary(e => (e.EmployeeID, e.Date), e => e);
 
             // Get list of dates and employee IDs for pending clock events.
             var checkList = clockDict.SelectMany(d => d.Value)
@@ -120,9 +131,11 @@ public class StaffUpdater
             // Iterate through the check list to identify what clock groups and entries we need to modify.
             foreach (var valueTuple in checkList)
             {
-                if (!clockDict.TryGetValue(valueTuple, out var clocks)) continue; // This should not occur, as the date and employee ID tuples are based on existing clocks, but let us be sure.
+                if (!clockDict.TryGetValue(valueTuple, out var clocks))
+                    continue; // This should not occur, as the date and employee ID tuples are based on existing clocks, but let us be sure.
 
-                if (!entryDict.TryGetValue(valueTuple, out var entry)) entry = new ShiftEntry {Date = valueTuple.Date, EmployeeID = valueTuple.EmployeeID};
+                if (!entryDict.TryGetValue(valueTuple, out var entry))
+                    entry = new ShiftEntry { Date = valueTuple.Date, EmployeeID = valueTuple.EmployeeID };
 
                 entry.ApplyClockTimes(clocks);
 
@@ -131,10 +144,10 @@ public class StaffUpdater
             }
 
             // Apply changed object updates to the database.
-            lines += await EntriesAndClocksAsync(updatedEntries, updatedClockEvents);
+            lines += EntriesAndClocks(updatedEntries, updatedClockEvents);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
 
         return lines;
     }
@@ -148,17 +161,17 @@ public class StaffUpdater
     {
         var returnValue = 0;
 
-        Chariot.Database?.RunInTransaction(() =>
+        Chariot.RunInTransaction(() =>
         {
             // Remove duplicate values.
             returnValue += RemoveDuplicateShiftEntries();
 
             //Remove any entries without an employee or date value
             returnValue +=
-                Chariot.Database.Execute("DELETE FROM ShiftEntry WHERE Location is NULL or EmployeeID is NULL");
+                Chariot.Execute("DELETE FROM ShiftEntry WHERE Location is NULL or EmployeeID is NULL");
 
             // Make sure location is not null - use employeeID
-            returnValue += Chariot.Database.Execute("UPDATE ShiftEntry " +
+            returnValue += Chariot.Execute("UPDATE ShiftEntry " +
                                                     "SET Location = (SELECT Employee.Location FROM Employee WHERE ShiftEntry.EmployeeID = Employee.ID) " +
                                                     "WHERE EXISTS " +
                                                     "(SELECT * FROM Employee " +
@@ -166,14 +179,14 @@ public class StaffUpdater
                                                     "AND ShiftEntry.Location is NULL;");
 
             // Get the shift entries to check and modify.
-            IEnumerable<ShiftEntry> shiftEntries = Chariot.Database.Table<ShiftEntry>();
+            IEnumerable<ShiftEntry> shiftEntries = Chariot.PullObjectList<ShiftEntry>();
             // Change the Day to match the date, as appropriate, and insert the data back into the database.
             foreach (var shiftEntry in shiftEntries)
             {
                 var day = DateTime.Parse(shiftEntry.Date).DayOfWeek;
                 if (shiftEntry.Day == day) continue;
                 shiftEntry.Day = day;
-                returnValue += Chariot.Database.InsertOrReplace(shiftEntry);
+                returnValue +=Chariot.InsertOrReplace(shiftEntry);
             }
         });
 
@@ -186,8 +199,8 @@ public class StaffUpdater
     /// <returns>The number of rows removed.</returns>
     public int RemoveDuplicateShiftEntries()
     {
-        return Chariot.Database?.Execute("DELETE FROM ShiftEntry WHERE ID NOT IN " +
-                                        "(SELECT MIN(ID) FROM ShiftEntry GROUP BY EmployeeID, Date)") ?? 0;
+        return Chariot.Execute("DELETE FROM ShiftEntry WHERE ID NOT IN " +
+                                        "(SELECT MIN(ID) FROM ShiftEntry GROUP BY EmployeeID, Date)");
     }
 
     /// <summary>
@@ -195,15 +208,9 @@ public class StaffUpdater
     /// </summary>
     /// <param name="employees"></param>
     /// <returns>Number of DB rows affected</returns>
-    public int Employees(IEnumerable<Employee> employees)
-    {
-        var returnVal = 0;
-        Chariot.Database?.RunInTransaction(() =>
-        {
-            returnVal = employees.Sum(employee => Chariot.Database.InsertOrReplace(employee));
-        });
-        return returnVal;
-    }
+    public int Employees(IEnumerable<Employee> employees) => Chariot.UpdateTable(employees);
+
+    public async Task<int> EmployeesAsync(IEnumerable<Employee> employees) => await Chariot.UpdateTableAsync(employees);
 
     public int EmployeeIcon(EmployeeIcon icon) => Chariot.Update(icon);
     public int EmployeeAvatar(EmployeeAvatar avatar) => Chariot.Update(avatar);
@@ -215,40 +222,45 @@ public class StaffUpdater
     /// </summary>
     /// <param name="icon"></param>
     /// <param name="newName"></param>
-    public void RenameEmployeeIcon(ref EmployeeIcon icon, string newName)
+    public void RenameEmployeeIcon(EmployeeIcon icon, string newName)
     {
-        var oldName = icon.Name;
-        Chariot.Delete(icon);
-        icon.Name = newName;
-        Chariot.Create(icon);
-        Chariot.Database?.Execute("UPDATE Employee SET IconName = ? WHERE IconName = ?;", newName, oldName);
-
+        Chariot.RunInTransaction(() =>
+        {
+            var oldName = icon.Name;
+            Chariot.Delete(icon);
+            icon.Name = newName;
+            Chariot.Create(icon);
+            Chariot.Execute("UPDATE Employee SET IconName = ? WHERE IconName = ?;", newName, oldName);
+        });
     }
     /// <summary>
     /// Renames an Employee Avatar by removing it and creating a new one.
     /// </summary>
     /// <param name="avatar"></param>
     /// <param name="newName"></param>
-    public void RenameEmployeeAvatar(ref EmployeeAvatar avatar, string newName)
+    public void RenameEmployeeAvatar(EmployeeAvatar avatar, string newName)
     {
-        var oldName = avatar.Name;
-        Chariot.Delete(avatar);
-        avatar.Name = newName;
-        Chariot.Create(avatar);
-        Chariot.Database?.Execute("UPDATE Employee SET AvatarName = ? WHERE AvatarName = ?;", newName, oldName);
+        Chariot.RunInTransaction(() =>
+        {
+            var oldName = avatar.Name;
+            Chariot.Delete(avatar);
+            avatar.Name = newName;
+            Chariot.Create(avatar);
+            Chariot.Execute("UPDATE Employee SET AvatarName = ? WHERE AvatarName = ?;", newName, oldName);
+        });
 
     }
     public int Shift(Shift shift)
     {
         var lines = 0;
-        Chariot.Database?.RunInTransaction(() =>
+        Chariot.RunInTransaction(() =>
         {
             lines += shift.Breaks.Sum(shiftBreak => Chariot.Update(shiftBreak));
             lines += Chariot.Update(shift);
 
             if (shift.Default)
             {
-                Chariot.Database.Execute("UPDATE Shift SET \"Default\" = FALSE WHERE DepartmentName = ? AND Name != ?;",
+                Chariot.Execute("UPDATE Shift SET \"Default\" = FALSE WHERE DepartmentName = ? AND Name != ?;",
                     shift.DepartmentName, shift.Name);
             }
         });
@@ -264,17 +276,17 @@ public class StaffUpdater
     public int EmployeeToShiftConnections(IEnumerable<EmployeeShift> empShifts)
     {
         var lines = 0;
-        Chariot.Database?.RunInTransaction(() =>
+        Chariot.RunInTransaction(() =>
         {
             foreach (var employeeShift in empShifts)
             {
                 switch (employeeShift.Active)
                 {
                     case true when !employeeShift.Original:
-                        lines += Chariot.Database.Insert(employeeShift);
+                        lines += Chariot.Insert(employeeShift);
                         break;
                     case false when employeeShift.Original:
-                        lines += Chariot.Database.Execute("DELETE FROM EmployeeShift WHERE EmployeeID = ? AND ShiftID = ?;", employeeShift.EmployeeID, employeeShift.ShiftID);
+                        lines += Chariot.Execute("DELETE FROM EmployeeShift WHERE EmployeeID = ? AND ShiftID = ?;", employeeShift.EmployeeID, employeeShift.ShiftID);
                         break;
                 }
             }
@@ -294,35 +306,27 @@ public class StaffUpdater
         var id = departmentRoster.ID;
         var lines = 0;
 
-        async void Action()
+        void Action()
         {
-            var tasks = new List<Task<int>>();
-
-            var dailyRosterTask = Chariot.PullObjectListAsync<DailyRoster>(r => r.DepartmentRosterID == id);
-            tasks.Add(Chariot.ExecuteAsync("DELETE FROM Roster WHERE DepartmentRosterID = ?;", id));
-            tasks.Add(Chariot.ExecuteAsync("DELETE FROM DailyRoster WHERE DepartmentRosterID = ?;", id));
-            tasks.Add(Chariot.ExecuteAsync("DELETE FROM EmployeeRoster WHERE DepartmentRosterID = ?;", id));
-            tasks.Add(Chariot.ExecuteAsync("DELETE FROM WeeklyShiftCounter WHERE RosterID = ?;", id));
-
             // Get Daily Roster IDs, to use to remove Daily Shift Counters, before deleting them.
-            var dailyIDs = (await dailyRosterTask).Select(roster => roster.ID);
+            var dailyIDs = Chariot.PullObjectList<DailyRoster>(r => r.DepartmentRosterID == id).Select(roster => roster.ID);
 
-            tasks.Add(Chariot.ExecuteAsync($"DELETE FROM DailyShiftCounter WHERE RosterID in ('{string.Join("', '", dailyIDs)}');"));
+            lines += Chariot.Execute("DELETE FROM Roster WHERE DepartmentRosterID = ?;", id);
+            lines += Chariot.Execute("DELETE FROM DailyRoster WHERE DepartmentRosterID = ?;", id);
+            lines += Chariot.Execute("DELETE FROM EmployeeRoster WHERE DepartmentRosterID = ?;", id);
+            lines += Chariot.Execute("DELETE FROM WeeklyShiftCounter WHERE RosterID = ?;", id);
 
-            // Wait for deletes to finish before adding new data.
-            await Task.WhenAll(tasks);
+            lines += Chariot.Execute($"DELETE FROM DailyShiftCounter WHERE RosterID in ('{string.Join("', '", dailyIDs)}');");
 
-            tasks.Add(Chariot.InsertIntoTableAsync(departmentRoster.Rosters));
-            tasks.Add(Chariot.InsertIntoTableAsync(departmentRoster.DailyRosters()));
-            tasks.Add(Chariot.InsertIntoTableAsync(departmentRoster.EmployeeRosters));
-            tasks.Add(Chariot.InsertIntoTableAsync(departmentRoster.ShiftCounters));
-            tasks.Add(Chariot.InsertIntoTableAsync(departmentRoster.DailyShiftCounters()));
-            tasks.Add(Chariot.UpdateAsync(departmentRoster));
-
-            lines += (await Task.WhenAll(tasks)).Sum();
+            lines += Chariot.InsertIntoTable(departmentRoster.Rosters);
+            lines += Chariot.InsertIntoTable(departmentRoster.DailyRosters());
+            lines += Chariot.InsertIntoTable(departmentRoster.EmployeeRosters);
+            lines += Chariot.InsertIntoTable(departmentRoster.ShiftCounters);
+            lines += Chariot.InsertIntoTable(departmentRoster.DailyShiftCounters());
+            lines += Chariot.Update(departmentRoster);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
 
         return lines;
     }
@@ -332,7 +336,7 @@ public class StaffUpdater
     /// </summary>
     /// <param name="employeeID"></param>
     /// <returns>True if successful.</returns>
-    public bool DeactivateUser(int employeeID) => Chariot.Database?.Execute("UPDATE Employee SET IsUser = false WHERE ID = ?;", employeeID) > 0;
+    public bool DeactivateUser(int employeeID) => Chariot.Execute("UPDATE Employee SET IsUser = false WHERE ID = ?;", employeeID) > 0;
 
     public int ShiftRuleSingle(ShiftRuleSingle shiftRule) => Chariot.Update(shiftRule);
 
@@ -366,16 +370,14 @@ public class StaffUpdater
         if (!pickEvents.Any()) return 0;
         var lines = 0;
 
-        async void Action()
+        void Action()
         {
-            var employeeTask = Chariot.PullObjectListAsync<Employee>();
-
             // get relevant dates.
             var dates = pickEvents.Select(e => e.Date).Distinct().ToList();
 
             // Get ID reference dictionary to match employee ID key.
             var idDict = new Dictionary<string, int>();
-            foreach (var employee in await employeeTask)
+            foreach (var employee in Chariot.PullObjectList<Employee>())
             {
                 if (employee.DematicID != string.Empty && employee.DematicID != "0000" && !idDict.ContainsKey(employee.DematicID)) idDict.Add(employee.DematicID, employee.ID);
                 if (employee.RF_ID != string.Empty && !idDict.ContainsKey(employee.RF_ID)) idDict.Add(employee.RF_ID, employee.ID);
@@ -390,27 +392,20 @@ public class StaffUpdater
             }
 
             // Remove existing database lines that may cause conflicts (they have been pulled out, so we should never lose any).
-            var tasks = new List<Task<int>>();
             foreach (var date in dates.Select(d => d.Ticks))
             {
-                tasks.Add(new Task<int>(() => Chariot.Database.Execute("DELETE FROM PickEvent WHERE Date = ?;", date)));
-                tasks.Add(new Task<int>(() => Chariot.Database.Execute("DELETE FROM PickSession WHERE Date = ?;", date)));
-                tasks.Add(new Task<int>(() => Chariot.Database.Execute("DELETE FROM PickDailyStats WHERE Date = ?;", date)));
+                lines += Chariot.Execute("DELETE FROM PickEvent WHERE Date = ?;", date);
+                lines += Chariot.Execute("DELETE FROM PickSession WHERE Date = ?;", date);
+                lines += Chariot.Execute("DELETE FROM PickDailyStats WHERE Date = ?;", date);
             }
 
-            await Task.WhenAll(tasks);
-
             // Enter new lines as appropriate.
-            var eventTask = Chariot.InsertIntoTableAsync(pickEvents);
-            var sessionTask = Chariot.InsertIntoTableAsync(sessions);
-            var statTask = Chariot.InsertIntoTableAsync(dailyStats);
-            await Task.WhenAll(eventTask, sessionTask, statTask);
-            lines += await eventTask;
-            lines += await sessionTask;
-            lines += await statTask;
+            lines += Chariot.InsertIntoTable(pickEvents);
+            lines += Chariot.InsertIntoTable(sessions);
+            lines += Chariot.InsertIntoTable(dailyStats);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
 
         return lines;
     }
@@ -426,20 +421,14 @@ public class StaffUpdater
     {
         var lines = 0;
 
-        async void Action()
+        void Action()
         {
-            var tasks = new List<Task<int>>();
-
-            tasks.AddRange(events.Select(pickEvent => Chariot.InsertOrUpdateAsync(pickEvent)));
-            tasks.AddRange(sessions.Select(session => Chariot.InsertOrUpdateAsync(session)));
-            tasks.AddRange(stats.Select(dailyStats => Chariot.InsertOrUpdateAsync(dailyStats)));
-
-            var taskLines = await Task.WhenAll(tasks);
-
-            lines += taskLines.Sum();
+            lines += Chariot.UpdateTable(events);
+            lines += Chariot.UpdateTable(sessions);
+            lines += Chariot.UpdateTable(stats);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
 
         return lines;
     }
@@ -450,11 +439,9 @@ public class StaffUpdater
         var lines = 0;
         lines += UnassignTempTag(tag);
 
-        async void Action()
+        void Action()
         {
-            var tasks = new List<Task<int>>();
-
-            var usage = await Reader.GetValidUsageAsync(employee, tag, DateTime.Today);
+            var usage = Chariot.GetValidUsage(employee, tag, DateTime.Today);
             if (usage is null)
             {
                 usage = tag.SetEmployee(employee, true);
@@ -466,18 +453,14 @@ public class StaffUpdater
                 tag.SetEmployee(employee);
                 tag.TagUse.Add(usage);
                 employee.TagUse.Add(usage);
-                tasks.Add(Chariot.InsertOrUpdateAsync(usage));
+                lines += Chariot.InsertOrUpdate(usage);
             }
 
-            tasks.Add(Chariot.InsertOrUpdateAsync(tag));
-            tasks.Add(Chariot.InsertOrUpdateAsync(employee));
-
-            var taskLines = await Task.WhenAll(tasks);
-
-            lines += taskLines.Sum();
+            lines += Chariot.InsertOrUpdate(tag);
+            lines += Chariot.InsertOrUpdate(employee);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
 
         return lines;
     }
@@ -490,13 +473,13 @@ public class StaffUpdater
         tempTag.Unassign();
 
         var lines = 0;
-        Chariot.Database?.RunInTransaction(() =>
+        Chariot.RunInTransaction(() =>
         {
-            lines += Chariot.Database.Execute(
+            lines += Chariot.Execute(
                 "UPDATE TagUse SET EndDate = ? WHERE EmployeeID = ? AND TempTagRF_ID = ? AND EndDate is null;",
                 DateTime.Today, employeeID, tempTag.RF_ID);
 
-            lines += Chariot.Database.Execute("UPDATE Employee SET TempTagRF_ID = ? WHERE ID = ?;", null, employeeID);
+            lines += Chariot.Execute("UPDATE Employee SET TempTagRF_ID = ? WHERE ID = ?;", null, employeeID);
 
             lines += Chariot.Update(tempTag);
         });
@@ -515,13 +498,13 @@ public class StaffUpdater
         // Removing all tag use for the given tag is almost certainly incorrect!
         var lines = 0;
 
-        async void Action()
+        void Action()
         {
-            lines += Chariot.Database.Execute("DELETE FROM TagUse WHERE TempTagRF_ID = ?;", tag.RF_ID);
-            lines += await Chariot.InsertIntoTableAsync(tag.TagUse);
+            lines += Chariot.Execute("DELETE FROM TagUse WHERE TempTagRF_ID = ?;", tag.RF_ID);
+            lines += Chariot.InsertIntoTable(tag.TagUse);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
 
         return lines;
     }
@@ -551,33 +534,25 @@ public class StaffUpdater
 
         dates = dates.Distinct().ToList();
 
-        async void Action()
+        void Action()
         {
             // Remove existing data.
-            var deleteTasks = new List<Task<int>>();
             foreach (var date in dates)
             {
-                deleteTasks.Add(new Task<int>(() => Chariot.Database.Execute("DELETE FROM PickEvent WHERE Date = ?;", date)));
-                deleteTasks.Add(new Task<int>(() => Chariot.Database.Execute("DELETE FROM PickSession WHERE Date = ?;", date)));
-                deleteTasks.Add(new Task<int>(() => Chariot.Database.Execute("DELETE FROM PickDailyStats WHERE Date = ?;", date)));
-                deleteTasks.Add(new Task<int>(() => Chariot.Database.Execute("DELETE FROM MissPick WHERE ShipmentDate = ?;", date)));
+                Chariot.Execute("DELETE FROM PickEvent WHERE Date = ?;", date);
+                Chariot.Execute("DELETE FROM PickSession WHERE Date = ?;", date);
+                Chariot.Execute("DELETE FROM PickDailyStats WHERE Date = ?;", date);
+                Chariot.Execute("DELETE FROM MissPick WHERE ShipmentDate = ?;", date);
             }
 
-            await Task.WhenAll(deleteTasks);
-
             // Insert new data.
-            var missPickTask = Chariot.InsertIntoTableAsync(missPicks);
-            var eventTask = Chariot.InsertIntoTableAsync(pickEvents);
-            var sessionTask = Chariot.InsertIntoTableAsync(pickSessions);
-            var statTask = Chariot.InsertIntoTableAsync(stats);
-            await Task.WhenAll(eventTask, sessionTask, statTask, missPickTask);
-            lines += await missPickTask;
-            lines += await eventTask;
-            lines += await sessionTask;
-            lines += await statTask;
+            lines += Chariot.InsertIntoTable(missPicks);
+            lines += Chariot.InsertIntoTable(pickEvents);
+            lines += Chariot.InsertIntoTable(pickSessions);
+            lines += Chariot.InsertIntoTable(stats);
         }
 
-        await new Task(() => Chariot.Database?.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action));
 
         return lines;
     }

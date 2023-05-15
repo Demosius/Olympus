@@ -6,13 +6,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:Aion.ViewModels"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type viewModels:EntryCreationVM}, IsDesignTimeCreatable=False}"
         Title="Simple Shift Creator" Height="800" Width="560" 
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen">
-
-    <Window.DataContext>
-        <viewModels:EntryCreationVM x:Name="VM"/>
-    </Window.DataContext>
 
     <Window.Resources>
         <ResourceDictionary>

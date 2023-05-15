@@ -46,7 +46,7 @@ public class Helios
         staffChariot = new StaffChariot(solLocation);
         StaffCreator = new StaffCreator(ref staffChariot);
         StaffReader = new StaffReader(ref staffChariot);
-        StaffUpdater = new StaffUpdater(ref staffChariot, StaffReader);
+        StaffUpdater = new StaffUpdater(ref staffChariot);
         StaffDeleter = new StaffDeleter(ref staffChariot);
 
         equipmentChariot = new EquipmentChariot(solLocation);

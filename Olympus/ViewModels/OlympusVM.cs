@@ -8,6 +8,7 @@ using ServiceStack.Text;
 using SQLite;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -41,7 +42,7 @@ public class OlympusVM : INotifyPropertyChanged
     /* Sub ViewModels - Components */
     public DBManager DBManager { get; set; }
     public InventoryUpdaterVM InventoryUpdaterVM { get; set; }
-    public ProjectLauncherVM ProjectLauncherVM { get; set; }
+    public ProjectLauncherVM ProjectLauncherVM { get; set; } = null!;
     public UserHandlerVM UserHandlerVM { get; set; }
     public ProgressBarVM ProgressBarVM { get; set; }
 
@@ -50,7 +51,7 @@ public class OlympusVM : INotifyPropertyChanged
     public ChangePasswordCommand ChangePasswordCommand { get; set; }
 
     /* Constructor(s) */
-    public OlympusVM()
+    private OlympusVM()
     {
         RunningProjects = new Dictionary<EProject, IProject>();
 
@@ -58,13 +59,24 @@ public class OlympusVM : INotifyPropertyChanged
 
         DBManager = new DBManager(this);
         UserHandlerVM = new UserHandlerVM(this);
-        ProjectLauncherVM = new ProjectLauncherVM(this);
         InventoryUpdaterVM = new InventoryUpdaterVM(this);
         ProgressBarVM = App.ProgressBar;
         ProgressBarVM.IsActive = true;
 
         GenerateMasterSkuListCommand = new GenerateMasterSkuListCommand(this);
         ChangePasswordCommand = new ChangePasswordCommand(this);
+    }
+
+    private async Task<OlympusVM> InitializeAsync()
+    {
+        ProjectLauncherVM = await ProjectLauncherVM.CreateAsync(this);
+        return this;
+    }
+
+    public static Task<OlympusVM> CreateAsync()
+    {
+        var ret = new OlympusVM();
+        return ret.InitializeAsync();
     }
 
     public void TestPb()
@@ -86,7 +98,7 @@ public class OlympusVM : INotifyPropertyChanged
         await Task.WhenAll(tasks);
     }
 
-    internal void ResetDB()
+    internal async Task ResetDB()
     {
         App.Helios.ResetChariots(Settings.Default.SolLocation);
         App.Charon.DatabaseReset(Settings.Default.SolLocation);
@@ -94,7 +106,7 @@ public class OlympusVM : INotifyPropertyChanged
         EstablishInitialProjectIcons();
 
         UserHandlerVM.CheckUser();
-        ProjectLauncherVM = new ProjectLauncherVM(this);
+        ProjectLauncherVM = await ProjectLauncherVM.CreateAsync(this);
         InventoryUpdaterVM = new InventoryUpdaterVM(this);
 
         OnPropertyChanged(nameof(ProjectLauncherVM));
@@ -165,8 +177,8 @@ public class OlympusVM : INotifyPropertyChanged
 
     public static async Task GenerateMasterSkuList()
     {
-        var masters = await App.Helios.InventoryReader.GetMastersAsync();
-
+        var masters = (await App.Helios.InventoryReader.GetMastersAsync()).ToList();
+        
         // Make sure the target destination exists.
         var dirPath = Path.Combine(App.BaseDirectory(), "SKUMasterExports");
 
@@ -178,7 +190,7 @@ public class OlympusVM : INotifyPropertyChanged
         //var sqlTask = Task.Run(() => ExportMasterSkuIntoSqLite(masters, dirPath));
         Task.WaitAll(csvTask, jsonTask, xmlTask);//, sqlTask);
 
-        _ = MessageBox.Show("Files exported.");
+        MessageBox.Show($"Files exported to {dirPath}.");
     }
 
     public static void ExportMasterSkuAsCSV(IEnumerable<SkuMaster> masters, string dirPath)

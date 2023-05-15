@@ -144,7 +144,7 @@ public class ShiftRuleRoster : ShiftRule
     /// <returns></returns>
     public bool? Day(DayOfWeek dayOfWeek)
     {
-        return (dayOfWeek) switch
+        return dayOfWeek switch
         {
             DayOfWeek.Sunday => Sunday,
             DayOfWeek.Monday => Monday,

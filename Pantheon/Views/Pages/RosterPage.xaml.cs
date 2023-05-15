@@ -1,4 +1,6 @@
-﻿using Styx;
+﻿using System;
+using System.Windows;
+using Styx;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Pantheon.ViewModels.Pages;
@@ -11,12 +13,20 @@ namespace Pantheon.Views.Pages;
 /// </summary>
 public partial class RosterPage
 {
-    public RosterPageVM VM { get; set; }
+    public RosterPageVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public RosterPage(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
-        VM = new RosterPageVM(helios, charon);
+    }
+
+    private async void RosterPage_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await RosterPageVM.CreateAsync(Helios, Charon);
         DataContext = VM;
     }
 

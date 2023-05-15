@@ -31,7 +31,7 @@ internal class AppVM : INotifyPropertyChanged
     {
         Helios = helios;
         Charon = charon;
-        PantheonPage = new PantheonPage(charon, helios);
+        PantheonPage = new PantheonPage(helios, charon);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
