@@ -1,10 +1,10 @@
-﻿using Pantheon.ViewModels.PopUp.Employees;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.PopUp.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-internal class EditShiftRuleCommand : ICommand
+public class EditShiftRuleCommand : ICommand
 {
     public EmployeeShiftVM VM { get; set; }
 
@@ -12,8 +12,7 @@ internal class EditShiftRuleCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon is not null && VM.SelectedRule is not null && VM.Employee is not null &&
-               VM.Charon.CanUpdateEmployee(VM.Employee);
+        return VM.SelectedRule is not null && VM.Charon.CanUpdateEmployee(VM.Employee);
     }
 
     public void Execute(object? parameter)

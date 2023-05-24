@@ -1,0 +1,163 @@
+﻿<Page x:Class="Pantheon.Views.Pages.TempTagPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:vm="clr-namespace:Pantheon.ViewModels.Pages"
+      xmlns:employees="clr-namespace:Pantheon.Views.Controls.Employees"
+      xmlns:tempTags="clr-namespace:Pantheon.Views.Controls.TempTags"
+      mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type vm:TempTagPageVM}, IsDesignTimeCreatable=False}"
+      d:DesignHeight="1080" d:DesignWidth="1200"
+      Title="TempTagPage"
+      Initialized="TempTagPage_OnInitialized">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Dark Theme -->
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Master/MSControls.Core.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <DockPanel>
+        <DockPanel.Resources>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        </DockPanel.Resources>
+
+        <!-- Top Menu -->
+        <Border DockPanel.Dock="Top"
+                BorderBrush="{StaticResource Brush03}"
+                BorderThickness="1">
+            <StackPanel Orientation="Horizontal">
+                <Button VerticalAlignment="Center"
+                    Margin="5">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../../Resources/save.png"
+                           Width="25"
+                           Height="25"
+                           Margin="5,0"/>
+                        <TextBlock Text="Save Changes"
+                               VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Border>
+
+        <!-- Action Menu -->
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Selected Tag -->
+
+            <Border Grid.Column="0"
+                    BorderBrush="{StaticResource ForegroundBrush}"
+                    BorderThickness=".5"
+                            Margin="10,5">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="RF ID:"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding ManagementVM.SelectedTag.RF_ID, FallbackValue=NoTag}"
+                                FontWeight="Bold"
+                                FontSize="16"
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource ForegroundBrush}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Assigned To:"
+                           Foreground="Gold"/>
+                        <Label Content="{Binding ManagementVM.SelectedTag.Employee.FullName, FallbackValue=Unassigned}"
+                           Foreground="Gold"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- (Dis/)Connection Buttons -->
+            <Button Grid.Column="1"
+                    ToolTip="Unlink this Tag and Employee"
+                    Width="50"
+                    Height="50"
+                    Command="{Binding UnassignTempTagCommand}"
+                    Visibility="{Binding CanUnassign, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Button.Style>
+
+                    <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+                        <Setter Property="Content">
+                            <Setter.Value>
+                                <Image Source="../../Resources/link.png"/>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="Button.IsMouseOver" Value="True">
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <Image Source="../../Resources/broken-link.png"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+            <Button Grid.Column="1"
+                    ToolTip="Link this Tag to this Employee"
+                    Width="50"
+                    Height="50"
+                    Command="{Binding AssignTempTagCommand}"
+                    Visibility="{Binding CanAssign, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Button.Style>
+
+                    <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+                        <Setter Property="Content">
+                            <Setter.Value>
+                                <Image Source="../../Resources/broken-link.png"/>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="Button.IsMouseOver" Value="True">
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <Image Source="../../Resources/link.png"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+            <!-- Selected Employee -->
+            <Border Grid.Column="2"
+                    BorderBrush="{StaticResource ForegroundBrush}"
+                    BorderThickness=".5"
+                    Margin="10,5"
+                    Padding="5">
+                <tempTags:TempTagEmployeeItemView DataContext="{Binding TagEmployeeVM.SelectedEmployee}"/>
+            </Border>
+        </Grid>
+
+        <!-- Tag and Employee management -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <tempTags:TempTagManagementView Grid.Column="0"
+                                            DataContext="{Binding ManagementVM}"/>
+
+            <GridSplitter Grid.Column="0"/>
+            <tempTags:TempTagEmployeeView Grid.Column="1"
+                                          DataContext="{Binding TagEmployeeVM}"/>
+        </Grid>
+
+    </DockPanel>
+</Page>

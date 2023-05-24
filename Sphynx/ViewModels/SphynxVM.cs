@@ -1,8 +1,7 @@
 ﻿using Styx;
-using Styx.Interfaces;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -10,10 +9,10 @@ using Uranus.Interfaces;
 
 namespace Sphynx.ViewModels;
 
-public class SphynxVM : INotifyPropertyChanged, IDBInteraction, IDataSource
+public class SphynxVM : INotifyPropertyChanged, IDBInteraction
 {
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     #region INotififyPropertyChanged Members
 
@@ -24,32 +23,20 @@ public class SphynxVM : INotifyPropertyChanged, IDBInteraction, IDataSource
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
 
     #endregion
 
     public SphynxVM(Helios helios, Charon charon)
     {
-        SetDataSources(helios, charon);
-
-        RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
-    }
-
-    public void RefreshData()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void SetDataSources(Helios helios, Charon charon)
-    {
         Helios = helios;
         Charon = charon;
+
+        RefreshDataCommand = new RefreshDataCommand(this);
+    }
+
+    public async Task RefreshDataAsync()
+    {
+        await Task.Run(() => { });
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

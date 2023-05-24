@@ -26,7 +26,7 @@
                 </StackPanel>
                 
                 <Button Content="Run"
-                        Command="{Binding RunIWMBChecksCommand}"
+                        Command="{Binding RunChecksCommand}"
                         Width="100"
                         HorizontalAlignment="Left"
                         Margin="2"/>

@@ -1,22 +1,22 @@
 ﻿using Microsoft.Win32;
-using Pantheon.Annotations;
 using Pantheon.ViewModels.Commands.Employees;
-using Pantheon.ViewModels.Interface;
-using Pantheon.ViewModels.Pages;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using Pantheon.ViewModels.Controls.Employees;
+using Pantheon.ViewModels.Interfaces;
 using Uranus;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.PopUp.Employees;
 
-internal class AvatarSelectionVM : INotifyPropertyChanged, IImageSelector
+public class AvatarSelectionVM : INotifyPropertyChanged, IImageSelector
 {
-    public EmployeePageVM? ParentVM { get; set; }
-    public Helios? Helios { get; set; }
+    public EmployeeVM ParentVM { get; set; }
+    public Helios Helios { get; set; }
 
     public Image? SelectedImage => SelectedAvatar;
 
@@ -74,13 +74,33 @@ internal class AvatarSelectionVM : INotifyPropertyChanged, IImageSelector
     public SaveImageChangesCommand SaveImageChangesCommand { get; }
     public FindNewImageCommand FindNewImageCommand { get; set; }
 
-    public AvatarSelectionVM()
+    private AvatarSelectionVM(EmployeeVM parentVM)
     {
+        ParentVM = parentVM;
+        Helios = ParentVM.Helios;
+
         avatars = new ObservableCollection<EmployeeAvatar>();
+
         avatarName = string.Empty;
+
         ConfirmImageSelectionCommand = new ConfirmImageSelectionCommand(this);
         SaveImageChangesCommand = new SaveImageChangesCommand(this);
         FindNewImageCommand = new FindNewImageCommand(this);
+    }
+
+    private async Task<AvatarSelectionVM> InitializeAsync()
+    {
+        var avatarTask = Helios.StaffReader.EmployeeAvatarsAsync();
+        foreach (var employeeAvatar in await avatarTask)
+            avatars.Add(employeeAvatar);
+
+        return this;
+    }
+
+    public static Task<AvatarSelectionVM> CreateAsync(EmployeeVM parentVM)
+    {
+        var ret = new AvatarSelectionVM(parentVM);
+        return ret.InitializeAsync();
     }
 
     private void CheckCanSave()
@@ -90,32 +110,25 @@ internal class AvatarSelectionVM : INotifyPropertyChanged, IImageSelector
                        !SelectedAvatar.Employees.Any() &&
                        Avatars.All(i => i.Name != AvatarName);
     }
-
-    public void SetDataSource(EmployeePageVM employeePageVM)
+    
+    public async Task SaveImageChangesAsync()
     {
-        ParentVM = employeePageVM;
-        Helios = ParentVM.Helios;
-        if (ParentVM?.EmployeeDataSet is not null)
-            Avatars = new ObservableCollection<EmployeeAvatar>(ParentVM.EmployeeDataSet.EmployeeAvatars.Values);
-    }
-    public void SaveImageChanges()
-    {
-        if (SelectedAvatar is null || Helios is null) return;
+        if (SelectedAvatar is null) return;
 
-        SelectedAvatar.Name = AvatarName;
-        Helios.StaffUpdater.EmployeeAvatar(SelectedAvatar);
+        var avatar = SelectedAvatar;
+
+        await Task.Run(() => Helios.StaffUpdater.RenameEmployeeAvatar(avatar, AvatarName));
+
+        SelectedAvatar = avatar;
     }
 
     public void ConfirmImageSelection()
     {
-        if (ParentVM?.SelectedEmployee is null) return;
-        ParentVM.SelectedEmployee.Avatar = SelectedAvatar;
+        ParentVM.Avatar = SelectedAvatar;
     }
 
-    public void FindNewImage()
+    public async Task FindNewImageAsync()
     {
-        if (Helios is null) return;
-
         var dialog = new OpenFileDialog
         {
             InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
@@ -127,7 +140,7 @@ internal class AvatarSelectionVM : INotifyPropertyChanged, IImageSelector
 
         if (dialog.ShowDialog() != true) return;
 
-        var icon = Helios.StaffCreator.CreateEmployeeAvatarFromSourceFile(dialog.FileName);
+        var icon = await Helios.StaffCreator.CreateEmployeeAvatarFromSourceFileAsync(dialog.FileName);
 
         if (icon is not null) Avatars.Add(icon);
 

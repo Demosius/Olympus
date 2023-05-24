@@ -2,6 +2,7 @@
 using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Uranus.Annotations;
@@ -35,156 +36,51 @@ public static class EmploymentTypeExtension
     }
 }
 
-public class Employee : INotifyPropertyChanged
+public class Employee
 {
-    #region Fields
-
-    private string location;
-    private string payPoint;
-    private string firstName;
-    private string lastName;
-    private EEmploymentType employmentType;
-    private Department? department;
-    private Role? role;
-    private Clan? clan;
-    private EmployeeIcon? icon;
-    private EmployeeAvatar? avatar;
-    private bool isUser;
-
-    #endregion
-
     [PrimaryKey] public int ID { get; set; } // Employee number (e.g. 60853)
-    public string FirstName
-    {
-        get => firstName;
-        set
-        {
-            firstName = value;
-            OnPropertyChanged(nameof(FirstName));
-            OnPropertyChanged(nameof(FullName));
-        }
-    }
-    public string LastName
-    {
-        get => lastName;
-        set
-        {
-            lastName = value;
-            OnPropertyChanged(nameof(LastName));
-            OnPropertyChanged(nameof(FullName));
-        }
-    }
+
     [SQLite.NotNull] public string DisplayName { get; set; }
+
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
     public decimal? PayRate { get; set; }
-    public string RF_ID { get; set; }
-    public string PC_ID { get; set; }
-    public string Location
-    {
-        get => location;
-        set
-        {
-            location = value;
-            OnPropertyChanged(nameof(Location));
-        }
-    }
+    [Indexed] public string RF_ID { get; set; }
+    [Indexed] public string PC_ID { get; set; }
+    [Indexed, StringLength(4)] public string DematicID { get; set; }
+    public string Location { get; set; }
+    public string PayPoint { get; set; }
+    public EEmploymentType EmploymentType { get; set; }
+    public string PhoneNumber { get; set; }
+    public string Email { get; set; }
+    public string Address { get; set; }
+
     [ForeignKey(typeof(Department))] public string DepartmentName { get; set; }
     [ForeignKey(typeof(Role))] public string RoleName { get; set; }    // Also known as Job Classification.
     [ForeignKey(typeof(Employee))] public int ReportsToID { get; set; }    // Specific Employee this employee reports to, bypassing Role and RoleReports.
     [ForeignKey(typeof(Clan))] public string ClanName { get; set; }
     [ForeignKey(typeof(Shift))] public string DefaultShiftID { get; set; }
-    public string PayPoint
-    {
-        get => payPoint;
-        set
-        {
-            payPoint = value;
-            OnPropertyChanged(nameof(PayPoint));
-        }
-    }
-    public EEmploymentType EmploymentType
-    {
-        get => employmentType;
-        set
-        {
-            employmentType = value;
-            OnPropertyChanged(nameof(EmploymentType));
-        }
-    }
     [ForeignKey(typeof(Locker))] public string LockerID { get; set; }
-    public string PhoneNumber { get; set; }
-    public string Email { get; set; }
-    public string Address { get; set; }
     [ForeignKey(typeof(EmployeeIcon))] public string IconName { get; set; }
     [ForeignKey(typeof(EmployeeAvatar))] public string AvatarName { get; set; }
     [ForeignKey(typeof(Licence))] public string LicenceNumber { get; set; }
-    [DefaultValue(false)]
-    public bool IsUser
-    {
-        get => isUser;
-        set
-        {
-            isUser = value;
-            OnPropertyChanged();
-        }
-    }
+    [ForeignKey(typeof(TempTag))] public string TempTagRF_ID { get; set; }
+
+    [DefaultValue(false)] public bool IsUser { get; set; }
     [DefaultValue(true)] public bool IsActive { get; set; }     // Employees are de-activated instead of deleted.
 
-    [ManyToOne(nameof(DepartmentName), nameof(Models.Department.Employees),
-        CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Department? Department
-    {
-        get => department;
-        set
-        {
-            department = value;
-            OnPropertyChanged(nameof(Department));
-        }
-    }
-    [ManyToOne(nameof(RoleName), nameof(Models.Role.Employees),
-        CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Role? Role
-    {
-        get => role;
-        set
-        {
-            role = value;
-            OnPropertyChanged(nameof(Role));
-        }
-    }
+    [ManyToOne(nameof(DepartmentName), nameof(Models.Department.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public Department? Department { get; set; }
+    [ManyToOne(nameof(RoleName), nameof(Models.Role.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public Role? Role { get; set; }
     [ManyToOne(nameof(ReportsToID), nameof(Reports), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Employee? ReportsTo { get; set; }
     [ManyToOne(nameof(AvatarName), nameof(EmployeeAvatar.Employees), CascadeOperations = CascadeOperation.CascadeRead)]
-    public EmployeeAvatar? Avatar
-    {
-        get => avatar;
-        set
-        {
-            avatar = value;
-            OnPropertyChanged(nameof(Avatar));
-        }
-    }
-    [ManyToOne(nameof(ClanName), nameof(Models.Clan.Employees),
-        CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public Clan? Clan
-    {
-        get => clan;
-        set
-        {
-            clan = value;
-            OnPropertyChanged(nameof(Clan));
-        }
-    }
-    [ManyToOne(nameof(IconName), nameof(EmployeeIcon.Employees),
-        CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public EmployeeIcon? Icon
-    {
-        get => icon;
-        set
-        {
-            icon = value;
-            OnPropertyChanged(nameof(Icon));
-        }
-    }
+    public EmployeeAvatar? Avatar { get; set; }
+    [ManyToOne(nameof(ClanName), nameof(Models.Clan.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public Clan? Clan { get; set; }
+    [ManyToOne(nameof(IconName), nameof(EmployeeIcon.Employees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public EmployeeIcon? Icon { get; set; }
     [ManyToOne(nameof(DefaultShiftID), nameof(Shift.DefaultEmployees), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Shift? DefaultShift { get; set; }
 
@@ -192,6 +88,8 @@ public class Employee : INotifyPropertyChanged
     public Locker? Locker { get; set; }
     [OneToOne(nameof(LicenceNumber), nameof(Models.Licence.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Licence? Licence { get; set; }
+    [OneToOne(nameof(TempTagRF_ID), nameof(Models.TempTag.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public TempTag? TempTag { get; set; }
 
     [ManyToMany(typeof(EmployeeVehicle), nameof(EmployeeVehicle.EmployeeID), nameof(Vehicle.Owners), CascadeOperations = CascadeOperation.All)]
     public List<Vehicle> Vehicles { get; set; }
@@ -220,11 +118,18 @@ public class Employee : INotifyPropertyChanged
     public List<EmployeeRoster> EmployeeRosters { get; set; }
     [OneToMany(nameof(ClockEvent.EmployeeID), nameof(ClockEvent.Employee), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<ClockEvent> ClockEvents { get; set; }
-    [OneToMany(nameof(Models.TagUse.TempTagRFID), nameof(Models.TagUse.TempTag), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [OneToMany(nameof(Models.TagUse.TempTagRF_ID), nameof(Models.TagUse.TempTag), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<TagUse> TagUse { get; set; }
+    [OneToMany(nameof(PickEvent.OperatorID), nameof(PickEvent.Operator), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<PickEvent> PickEvents { get; set; }
+    [OneToMany(nameof(PickSession.OperatorID), nameof(PickSession.Operator), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<PickSession> PickSessions { get; set; }
+    [OneToMany(nameof(PickDailyStats.OperatorID), nameof(PickDailyStats.Operator), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<PickDailyStats> PickStatistics { get; set; }
 
     [Ignore] public string FullName => $"{FirstName} {LastName}";
     [Ignore] public string ReportsToName => ReportsTo?.FullName ?? "";
+
 
     [Ignore]
     public List<ShiftRule> ShiftRules =>
@@ -232,17 +137,18 @@ public class Employee : INotifyPropertyChanged
 
     public Employee()
     {
-        firstName = string.Empty;
-        lastName = string.Empty;
+        FirstName = string.Empty;
+        LastName = string.Empty;
         DisplayName = string.Empty;
         RF_ID = string.Empty;
         PC_ID = string.Empty;
-        location = string.Empty;
+        DematicID = string.Empty;
+        Location = string.Empty;
         DepartmentName = string.Empty;
         RoleName = string.Empty;
         ClanName = string.Empty;
         DefaultShiftID = string.Empty;
-        payPoint = string.Empty;
+        PayPoint = string.Empty;
         LockerID = string.Empty;
         LicenceNumber = string.Empty;
         PhoneNumber = string.Empty;
@@ -250,6 +156,7 @@ public class Employee : INotifyPropertyChanged
         Address = string.Empty;
         IconName = string.Empty;
         AvatarName = string.Empty;
+        TempTagRF_ID = string.Empty;
         Vehicles = new List<Vehicle>();
         Shifts = new List<Shift>();
         DepartmentsCanWorkIn = new List<Department>();
@@ -264,6 +171,9 @@ public class Employee : INotifyPropertyChanged
         EmployeeRosters = new List<EmployeeRoster>();
         ClockEvents = new List<ClockEvent>();
         TagUse = new List<TagUse>();
+        PickEvents = new List<PickEvent>();
+        PickSessions = new List<PickSession>();
+        PickStatistics = new List<PickDailyStats>();
     }
 
     public Employee(int id) : this()
@@ -302,14 +212,6 @@ public class Employee : INotifyPropertyChanged
     public static bool operator ==(Employee? lhs, Employee? rhs) => lhs?.Equals(rhs) ?? rhs is null;
 
     public static bool operator !=(Employee? lhs, Employee? rhs) => !(lhs == rhs);
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 
     /// <summary>
     /// Sets the employee object up for deletion by removing it as a reference from other related objects.
@@ -360,5 +262,13 @@ public class Employee : INotifyPropertyChanged
         LicenceNumber = Licence?.Number ?? LicenceNumber;
         IconName = Icon?.Name ?? IconName;
         AvatarName = Avatar?.Name ?? AvatarName;
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

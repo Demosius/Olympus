@@ -1,7 +1,7 @@
 ﻿using Panacea.ViewModels.Components;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -19,6 +19,7 @@ public class PanaceaVM : INotifyPropertyChanged, IDBInteraction
     public PurgeVM PurgeVM { get; set; }
     public NegativeCheckerVM NegativeCheckerVM { get; set; }
     public PotentialNegativeVM PotentialNegativeVM { get; set; }
+    public ItemsWithNoPickBinVM ItemsWithNoPickBinVM { get; set; }
 
     #region INotifyProprtyChanged Members
 
@@ -29,7 +30,6 @@ public class PanaceaVM : INotifyPropertyChanged, IDBInteraction
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
 
     #endregion
 
@@ -43,19 +43,14 @@ public class PanaceaVM : INotifyPropertyChanged, IDBInteraction
         PurgeVM = new PurgeVM(helios);
         NegativeCheckerVM = new NegativeCheckerVM(helios);
         PotentialNegativeVM = new PotentialNegativeVM(helios);
+        ItemsWithNoPickBinVM = new ItemsWithNoPickBinVM(helios);
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        throw new NotImplementedException();
-    }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
+        await Task.Run(() => { });
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

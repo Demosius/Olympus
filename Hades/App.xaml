@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:Hades"
              StartupUri="Views/HadesWindow.xaml">
     <Application.Resources>
-         
+         <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Hades/MSControls.Core.Implicit.xaml"></ResourceDictionary>
     </Application.Resources>
 </Application>

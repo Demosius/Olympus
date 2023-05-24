@@ -3,27 +3,31 @@ using Aion.ViewModels.Commands;
 using Aion.ViewModels.Utility;
 using Styx;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Uranus;
+using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
 
 namespace Aion.ViewModels;
 
-public class AionVM : INotifyPropertyChanged, IDBInteraction
+public class AionVM : INotifyPropertyChanged, IDBInteraction, IDBRepair
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
 
-    public ShiftEntryPage ShiftEntryPage { get; set; }
-    public EmployeePage EmployeePage { get; set; }
+    public ShiftEntryPage? ShiftEntryPage { get; set; }
+    public EmployeePage? EmployeePage { get; set; }
 
-    private Page currentPage;
+    private Page? currentPage;
 
-    public Page CurrentPage
+    public Page? CurrentPage
     {
         get => currentPage;
         set
@@ -60,24 +64,23 @@ public class AionVM : INotifyPropertyChanged, IDBInteraction
     public RefreshDataCommand RefreshDataCommand { get; set; }
     public RepairDataCommand RepairDataCommand { get; set; }
 
-    public AionVM()
+    public AionVM(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
+
+        databasePath = string.Empty;
+
         // Commands
         ShowEntriesCommand = new ShowEntriesCommand(this);
         ShowEmployeesCommand = new ShowEmployeesCommand(this);
         ImportOldDataCommand = new ImportOldDataCommand(this);
         RefreshDataCommand = new RefreshDataCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
-    }
-
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
 
         SetChecks();
     }
-
+    
     public void ShowEntryPage()
     {
         ShiftEntryPage = new ShiftEntryPage(Helios, Charon);
@@ -110,26 +113,31 @@ public class AionVM : INotifyPropertyChanged, IDBInteraction
         IsEntry = EntryView || EntryEdit;
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        EmployeePage?.VM.RefreshData();
-        ShiftEntryPage?.VM.RefreshData(true);
+        var tasks = new List<Task>();
+
+        if (EmployeePage?.VM is not null) tasks.Add(EmployeePage.VM.RefreshDataAsync());
+        if (ShiftEntryPage?.VM is not null) tasks.Add(ShiftEntryPage.VM.RefreshDataAsync());
+
+        await Task.WhenAll(tasks);
     }
 
-    public void RepairData()
+    public async Task RepairDataAsync()
     {
-        EmployeePage?.VM.RepairData();
-        ShiftEntryPage?.VM.RepairData();
+        if (ShiftEntryPage?.VM is null) return;
+
+        await ShiftEntryPage.VM.RepairDataAsync().ConfigureAwait(false);
     }
 
-    public void ImportOldData()
+    public async Task ImportOldData()
     {
         try
         {
             var archivedData = OldDataUtil.GetArchivedData();
-            if (archivedData is null || !archivedData.HasData()) return;
+            if (!archivedData.HasData()) return;
 
-            var currentData = Helios.StaffReader.GetAionDataSet();
+            var currentData = await Helios.StaffReader.GetAionDataSetAsync();
 
             // Remove non-unique data - where keys or specific unique combinations already exist.
             if (archivedData.HasEmployees())
@@ -144,9 +152,9 @@ public class AionVM : INotifyPropertyChanged, IDBInteraction
                                 !currentData.ShiftEntries.Select(d => d.Value).ToDictionary(se => (se.EmployeeID, se.Date)).ContainsKey((e.EmployeeID, e.Date)))
                     .ToDictionary(e => e.ID, e => e);
 
-            var lines = Helios.StaffCreator.AionDataSet(archivedData);
+            var lines = await Helios.StaffCreator.AionDataSetAsync(archivedData);
 
-            Helios.StaffUpdater.ApplyPendingClockEvents();
+            await Helios.StaffUpdater.ApplyPendingClockEventsAsync();
 
             MessageBox.Show($"Successfully converted and added {lines} new line of data.", "Update Successful", MessageBoxButton.OK);
         }
@@ -157,9 +165,10 @@ public class AionVM : INotifyPropertyChanged, IDBInteraction
         }
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

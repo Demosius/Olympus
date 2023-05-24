@@ -6,22 +6,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:shifts="clr-namespace:Pantheon.ViewModels.PopUp.Shifts"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type shifts:ShiftEmployeeVM}, IsDesignTimeCreatable=False}"
         Title="Employee Assignment" 
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
         Foreground="{StaticResource LightForegroundBrush}"
-        FocusManager.FocusedElement="{Binding ElementName=IDBox}">
-
-    <Window.DataContext>
-        <shifts:ShiftEmployeeVM x:Name="VM"/>
-    </Window.DataContext>
+        FocusManager.FocusedElement="{Binding ElementName=IDBox}"
+        Initialized="ShiftEmployeeWindow_OnInitialized">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml" />
-                <ResourceDictionary Source="../../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml" />
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Master/MSControls.Core.Implicit.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>

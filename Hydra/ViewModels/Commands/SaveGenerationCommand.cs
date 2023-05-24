@@ -17,9 +17,9 @@ public class SaveGenerationCommand : ICommand
         return VM.CurrentMoves.Any();
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.SaveGeneration();
+        await VM.SaveGeneration();
     }
 
     public event EventHandler? CanExecuteChanged

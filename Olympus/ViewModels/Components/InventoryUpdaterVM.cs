@@ -5,8 +5,12 @@ using Olympus.ViewModels.Commands;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Olympus.ViewModels.Windows;
+using Olympus.Views.Windows;
+using Serilog;
 using Uranus;
 using Uranus.Inventory;
 using Uranus.Inventory.Models;
@@ -138,14 +142,66 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         ItemUpdateTime = App.Helios.InventoryReader.LastTableUpdate(typeof(NAVItem));
     }
 
-    public void UpdateStock()
+    public async Task UpdateStock()
     {
+        BinContentsUpdaterWindow? window = null;
+        try
+        {
+            Mouse.OverrideCursor = Cursors.Wait;
 
+            var newStock = DataConversion.NAVRawStringToStock(General.ClipboardToString());
+
+            var vm = await BinContentsUpdaterVM.CreateAsync(App.Helios, newStock);
+
+            // Check that there are any zones to consider.
+            int lines;
+            if (vm.ZonesMissing)
+            {
+                window = new BinContentsUpdaterWindow(vm);
+
+                Mouse.OverrideCursor = Cursors.Arrow;
+
+                if (window.ShowDialog() != true) return;
+                lines = window.UploadedLines;
+            }
+            else
+            {
+                lines = await App.Helios.InventoryUpdater.NAVStockAsync(newStock);
+                Mouse.OverrideCursor = Cursors.Arrow;
+            }
+
+            if (lines > 0)
+            {
+                GetUpdateTimes();
+                MessageBox.Show("Update successful.", "Success", MessageBoxButton.OK);
+            }
+        }
+        catch (InvalidDataException ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                "An unexpected error has occurred:\n\n" +
+                $"\t{ex.Message}\n\n" +
+                "Please notify Olympus Development when possible.",
+                "Unexpected Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            Log.Error(ex, "Occurred when uploading Bin Contents data.");
+        }
+        window?.Close();
+
+        Mouse.OverrideCursor = Cursors.Arrow;
+    }
+
+    public async Task UpdateBins()
+    {
         Mouse.OverrideCursor = Cursors.Wait;
 
         try
         {
-            if (App.Helios.InventoryUpdater.NAVStock(DataConversion.NAVRawStringToStock(General.ClipboardToString())))
+            if (await App.Helios.InventoryUpdater.NAVBinsAsync(
+                    DataConversion.NAVRawStringToBins(General.ClipboardToString())) > 0)
             {
                 GetUpdateTimes();
                 MessageBox.Show("Update successful.", "Success", MessageBoxButton.OK);
@@ -167,13 +223,14 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         Mouse.OverrideCursor = Cursors.Arrow;
     }
 
-    public void UpdateBins()
+    public async Task UpdateUoM()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
         try
         {
-            if (App.Helios.InventoryUpdater.NAVBins(DataConversion.NAVRawStringToBins(General.ClipboardToString())) > 0)
+            if (await App.Helios.InventoryUpdater.NAVUoMsAsync(
+                    DataConversion.NAVRawStringToUoMs(General.ClipboardToString())) > 0)
             {
                 GetUpdateTimes();
                 MessageBox.Show("Update successful.", "Success", MessageBoxButton.OK);
@@ -195,42 +252,14 @@ public class InventoryUpdaterVM : INotifyPropertyChanged
         Mouse.OverrideCursor = Cursors.Arrow;
     }
 
-    public void UpdateUoM()
+    public async Task UpdateItems()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
         try
         {
-            if (App.Helios.InventoryUpdater.NAVUoMs(DataConversion.NAVRawStringToUoMs(General.ClipboardToString())))
-            {
-                GetUpdateTimes();
-                MessageBox.Show("Update successful.", "Success", MessageBoxButton.OK);
-            }
-        }
-        catch (InvalidDataException ex)
-        {
-            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(
-                "An unexpected error has occurred:\n\n" +
-                $"\t{ex.Message}\n\n" +
-                "Please notify Olympus Development when possible.",
-                "Unexpected Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-
-        Mouse.OverrideCursor = Cursors.Arrow;
-    }
-
-    public void UpdateItems()
-    {
-        Mouse.OverrideCursor = Cursors.Wait;
-
-        try
-        {
-            if (App.Helios.InventoryCreator.NAVItems(DataConversion.NAV_CSVToItems(Settings.Default.ItemCSVLocation),
-                    InventoryReader.LastItemWriteTime(Settings.Default.ItemCSVLocation)))
+            if (await App.Helios.InventoryCreator.NAVItemsAsync(DataConversion.NAV_CSVToItems(Settings.Default.ItemCSVLocation),
+                    InventoryReader.LastItemWriteTime(Settings.Default.ItemCSVLocation)) > 0)
             {
                 GetUpdateTimes();
                 MessageBox.Show("Update successful.", "Success", MessageBoxButton.OK);

@@ -1,7 +1,6 @@
 ﻿using Prometheus.ViewModels.Commands.Users;
 using Prometheus.Views.PopUp.Users;
 using Styx;
-using Styx.Interfaces;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -11,27 +10,27 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Prometheus.ViewModels.Controls;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
 using Uranus.Staff.Models;
-using Uranus.Users.Models;
 
 namespace Prometheus.ViewModels.Pages.Users;
 
-internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IFilters
+public class UserViewVM : INotifyPropertyChanged, IDBInteraction, IFilters, ISorting
 {
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
-    private readonly List<User> fullUserList;
+    private readonly List<UserVM> fullUserList;
     private EmployeeDataSet? employeeDataSet;
 
     #region INotifyPropertyChanged Members
 
-    private ObservableCollection<User> users;
-    public ObservableCollection<User> Users
+    private ObservableCollection<UserVM> users;
+    public ObservableCollection<UserVM> Users
     {
         get => users;
         set
@@ -41,8 +40,8 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
         }
     }
 
-    private User? selectedUser;
-    public User? SelectedUser
+    private UserVM? selectedUser;
+    public UserVM? SelectedUser
     {
         get => selectedUser;
         set
@@ -81,7 +80,6 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public ApplySortingCommand ApplySortingCommand { get; set; }
@@ -90,48 +88,53 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
 
     #endregion
 
-    public UserViewVM(Helios helios, Charon charon)
+    private UserViewVM(Helios helios, Charon charon)
     {
-        fullUserList = new List<User>();
-        users = new ObservableCollection<User>();
+        Helios = helios;
+        Charon = charon;
+
+        fullUserList = new List<UserVM>();
+        users = new ObservableCollection<UserVM>();
         filterString = string.Empty;
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
         DeactivateUserCommand = new DeactivateUserCommand(this);
         ChangeUserRoleCommand = new ChangeUserRoleCommand(this);
-
-        Task.Run(() => SetDataSources(helios, charon));
     }
 
-    public void SetDataSources(Helios helios, Charon charon)
+    private async Task<UserViewVM> InitializeAsync()
     {
-        Helios = helios;
-        Charon = charon;
-
-        RefreshData();
+        await RefreshDataAsync();
+        return this;
     }
 
-    public void RefreshData()
+    public static Task<UserViewVM> CreateAsync(Helios helios, Charon charon)
     {
-        if (Helios is null || Charon is null) return;
+        var ret = new UserViewVM(helios, charon);
+        return ret.InitializeAsync();
+    }
 
-        GatherUsers();
-
+    public async Task RefreshDataAsync()
+    {
+        await GatherUsers();
         ApplyFilters();
     }
 
-    private void GatherUsers()
+    private async Task GatherUsers()
     {
-        if (Helios is null || Charon is null) return;
+        var dataTask = Helios.StaffReader.EmployeeDataSetAsync();
 
-        employeeDataSet = Helios.StaffReader.EmployeeDataSet();
+        var userTask = Helios.UserReader.UsersAsync();
+        var roleTask = Helios.UserReader.RolesAsync();
 
-        var userList = Helios.UserReader.Users();
-        var roles = Helios.UserReader.Roles().ToDictionary(r => r.Name, r => r);
+        await Task.WhenAll(dataTask, userTask, roleTask);
+
+        employeeDataSet = await dataTask;
+        var userList = await userTask;
+        var roles = (await roleTask).ToDictionary(r => r.Name, r => r);
 
         fullUserList.Clear();
         foreach (var user in userList)
@@ -139,7 +142,8 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
             if (roles.TryGetValue(user.RoleName, out var role)) user.Role = role;
             if (!employeeDataSet.Employees.TryGetValue(user.ID, out var employee)) continue;
             user.Employee = employee;
-            fullUserList.Add(user);
+            var uvm = new UserVM(user);
+            fullUserList.Add(uvm);
         }
     }
 
@@ -151,7 +155,7 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
 
     public void ApplyFilters()
     {
-        IEnumerable<User> userList = fullUserList;
+        IEnumerable<UserVM> userList = fullUserList;
 
         if (FilterString != "")
         {
@@ -167,7 +171,7 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
         ApplySorting(fullUserList);
     }
 
-    public void ApplySorting(IEnumerable<User> userList)
+    public void ApplySorting(IEnumerable<UserVM> userList)
     {
         userList = SelectedSortMethod switch
         {
@@ -186,23 +190,27 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
             _ => userList.OrderBy(user => user.Employee?.EmploymentType)
                 .ThenBy(user => user.Employee?.FullName ?? "")
         };
-        Users = new ObservableCollection<User>(userList);
+        Users.Clear();
+        foreach (var userVM in userList)
+        {
+            Users.Add(userVM);
+        }
     }
 
-    public void ChangeUserRole()
+    public async Task ChangeUserRole()
     {
-        if (Helios is null || Charon is null || SelectedUser is null) return;
+        if (SelectedUser is null) return;
 
         var roleWindow = new SetUserRoleView(Helios, Charon, SelectedUser);
 
         roleWindow.ShowDialog();
 
-        RefreshData();
+        await RefreshDataAsync();
     }
 
-    public void DeactivateUser()
+    public async Task DeactivateUser()
     {
-        if (Helios is null || Charon is null || SelectedUser is null) return;
+        if (SelectedUser is null) return;
 
         if (MessageBox.Show(
                 $"Are you sure you want to deactivate the user: {SelectedUser.Employee?.FullName ?? SelectedUser.ID.ToString()}?",
@@ -211,7 +219,7 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
 
 
         Mouse.OverrideCursor = Cursors.Wait;
-        if (!Charon.DeactivateUser(SelectedUser))
+        if (!await Charon.DeactivateUserAsync(SelectedUser.User))
         {
             Mouse.OverrideCursor = Cursors.Arrow;
             MessageBox.Show(
@@ -229,12 +237,7 @@ internal class UserViewVM : INotifyPropertyChanged, IDataSource, IDBInteraction,
         ApplyFilters();
 
     }
-
-    public void RepairData()
-    {
-        throw new System.NotImplementedException();
-    }
-
+    
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]

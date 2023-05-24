@@ -1,11 +1,10 @@
-﻿using Pantheon.Annotations;
-using Pantheon.ViewModels.Commands.Rosters;
+﻿using Pantheon.ViewModels.Commands.Rosters;
 using Styx;
 using System;
 using System.ComponentModel;
-using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using Uranus;
 using Uranus.Commands;
@@ -15,11 +14,11 @@ using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.PopUp.Rosters;
 
-internal class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
+public class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
 {
-    public Department? Department { get; set; }
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Department Department { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public DepartmentRoster? Roster { get; set; }
 
@@ -76,43 +75,46 @@ internal class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ConfirmDepartmentRosterCreationCommand ConfirmDepartmentRosterCreationCommand { get; set; }
 
     #endregion
 
-    public RosterCreationVM()
-    {
-        startDate = DateTime.Today.AddDays(DayOfWeek.Monday - DateTime.Today.DayOfWeek + 7);
-        rosterName = $"{startDate.FiscalWeek()} ({startDate.Year})";
-
-        RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
-        ConfirmDepartmentRosterCreationCommand = new ConfirmDepartmentRosterCreationCommand(this);
-    }
-
-    public void SetDataSources(Department department, Helios helios, Charon charon)
+    private RosterCreationVM(Department department, Helios helios, Charon charon)
     {
         Department = department;
         Helios = helios;
         Charon = charon;
 
-        RefreshData();
+        startDate = DateTime.Today.AddDays(DayOfWeek.Monday - DateTime.Today.DayOfWeek + 7);
+        rosterName = $"{startDate.FiscalWeek()} ({startDate.Year})";
+
+        RefreshDataCommand = new RefreshDataCommand(this);
+        ConfirmDepartmentRosterCreationCommand = new ConfirmDepartmentRosterCreationCommand(this);
     }
 
-    public void RefreshData()
+    private async Task<RosterCreationVM> InitializeAsync()
     {
-        if (Department is null) throw new DataException("Department not set in RosterCreation.");
-
-        if (Department.DepartmentRosters.Any())
-            StartDate = Department.DepartmentRosters.Select(dr => dr.StartDate).Max().AddDays(7);
+        await RefreshDataAsync();
+        return this;
     }
 
-    public bool ConfirmDepartmentRosterCreation()
+    public static Task<RosterCreationVM> CreateAsync(Department department, Helios helios, Charon charon)
     {
-        if (Helios is null) return false;
-        if (Department is null) throw new DataException("Department not set in RosterCreation.");
+        var ret = new RosterCreationVM(department, helios, charon);
+        return ret.InitializeAsync();
+    }
 
+    public async Task RefreshDataAsync()
+    {
+        await Task.Run(() =>
+        {
+            if (Department.DepartmentRosters.Any())
+                StartDate = Department.DepartmentRosters.Select(dr => dr.StartDate).Max().AddDays(7);
+        });
+    }
+
+    public async Task<bool> ConfirmDepartmentRosterCreation()
+    {
         Roster = new DepartmentRoster(RosterName, StartDate, UseSaturdays, UseSundays, Department);
 
         // Check name.
@@ -125,14 +127,10 @@ internal class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
                 return false;
         }
 
-        Helios.StaffCreator.DepartmentRoster(Roster);
+        await Helios.StaffCreator.DepartmentRosterAsync(Roster);
         return true;
     }
 
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]

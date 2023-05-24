@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Prometheus.ViewModels.Commands.Users;
 
-internal class ActivateManagersCommand : ICommand
+public class ActivateManagersCommand : ICommand
 {
     public UserActivateVM VM { get; set; }
 
@@ -15,9 +15,9 @@ internal class ActivateManagersCommand : ICommand
         return VM.CanMassCreate;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.ActivateManagers();
+        await VM.ActivateManagers();
     }
 
     public event EventHandler? CanExecuteChanged

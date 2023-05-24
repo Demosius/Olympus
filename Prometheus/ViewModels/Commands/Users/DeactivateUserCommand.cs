@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Prometheus.ViewModels.Commands.Users;
 
-internal class DeactivateUserCommand : ICommand
+public class DeactivateUserCommand : ICommand
 {
     public UserViewVM VM { get; set; }
 
@@ -12,13 +12,13 @@ internal class DeactivateUserCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedUser?.Employee is not null && VM.Charon is not null &&
+        return VM.SelectedUser?.Employee is not null &&
                VM.Charon.CanDeleteUser(VM.SelectedUser.Employee);
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.DeactivateUser();
+        await VM.DeactivateUser();
     }
 
     public event EventHandler? CanExecuteChanged

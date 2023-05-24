@@ -8,9 +8,12 @@ namespace Aion.View;
 /// </summary>
 public partial class EntryCreationWindow
 {
+    public EntryCreationVM VM { get; set; }
+
     public EntryCreationWindow(Helios helios, ShiftEntryPageVM editorVM)
     {
+        VM = new EntryCreationVM(helios, editorVM);
         InitializeComponent();
-        VM.SetData(helios, editorVM);
+        DataContext = VM;
     }
 }

@@ -29,4 +29,9 @@ public class NAVDivision
         Categories = categories;
         Items = items;
     }
+
+    public override string ToString()
+    {
+        return $"{Code} - {Description}";
+    }
 }

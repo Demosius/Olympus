@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Uranus.Inventory.Models;
 
 namespace Uranus.Inventory;
@@ -16,12 +17,13 @@ public sealed class InventoryChariot : MasterChariot
 
     public override Type[] Tables { get; } =
     {
-        typeof(Batch), typeof(BatchGroup), typeof(BatchGroupLink), typeof(Bay), typeof(BayZone),
-        typeof(BinContentsUpdate), typeof(BinExtension), typeof(Move), typeof(NAVBin), typeof(NAVCategory),
-        typeof(NAVDivision), typeof(NAVGenre), typeof(NAVItem), typeof(NAVLocation), typeof(NAVMoveLine),
-        typeof(NAVPlatform), typeof(NAVStock), typeof(NAVTransferOrder), typeof(NAVUoM), typeof(NAVZone), typeof(Stock),
-        typeof(Store), typeof(SubStock), typeof(TableUpdate), typeof(ZoneExtension), typeof(ItemExtension),
-        typeof(Site), typeof(SiteItemLevel)
+        typeof(Batch), typeof(BatchGroup), typeof(BatchGroupLink), typeof(Bay), typeof(BayZone), typeof(BinContentsUpdate),
+        typeof(BinExtension), typeof(Move), typeof(NAVBin), typeof(NAVCategory),
+        typeof(NAVDivision), typeof(NAVGenre), typeof(NAVItem), typeof(NAVLocation),
+        typeof(NAVMoveLine), typeof(NAVPlatform), typeof(NAVStock), typeof(NAVTransferOrder),
+        typeof(NAVUoM), typeof(NAVZone), typeof(Stock), typeof(Store),
+        typeof(SubStock), typeof(TableUpdate), typeof(ZoneExtension), typeof(ItemExtension),
+        typeof(Site), typeof(SiteItemLevel), typeof(MixedCarton), typeof(MixedCartonItem)
     };
 
     /*************************** Constructors ****************************/
@@ -49,30 +51,47 @@ public sealed class InventoryChariot : MasterChariot
     /***************************** CREATE Data ****************************/
 
     /*                             Update Times                           */
-    public bool SetStockUpdateTimes(List<NAVStock> stock)
+    public int SetStockUpdateTimes(List<NAVStock> stock)
     {
         var dateTime = DateTime.Now;
         // Convert stock to list of BCUpdate items.
-        var distinctStockByZone = stock.GroupBy(s => s.ZoneID).Select(g => g.First()).ToList();
-        List<BinContentsUpdate> contentsUpdates = new();
-        foreach (var s in distinctStockByZone)
-        {
-            contentsUpdates.Add(new BinContentsUpdate
-            {
-                ZoneID = s.ZoneID,
-                ZoneCode = s.ZoneCode,
-                LocationCode = s.LocationCode,
-                LastUpdate = dateTime
-            });
-        }
+        var distinctStockByZone = stock.GroupBy(s => s.ZoneID).Select(g => g.First());
+        var contentsUpdates = distinctStockByZone
+            .Select(
+                s => new BinContentsUpdate
+                {
+                    ZoneID = s.ZoneID,
+                    ZoneCode = s.ZoneCode,
+                    LocationCode = s.LocationCode,
+                    LastUpdate = dateTime
+                })
+            .ToList();
 
         // Update Database
-        _ = UpdateTable(contentsUpdates);
-
-        return true;
+        return UpdateTable(contentsUpdates);
     }
 
-    public bool SetTableUpdateTime(Type type, DateTime dateTime = new())
+    public async Task<int> SetStockUpdateTimesAsync(List<NAVStock> stock)
+    {
+        var dateTime = DateTime.Now;
+        // Convert stock to list of BCUpdate items.
+        var distinctStockByZone = stock.GroupBy(s => s.ZoneID).Select(g => g.First());
+        var contentsUpdates = distinctStockByZone
+            .Select(
+                s => new BinContentsUpdate
+                {
+                    ZoneID = s.ZoneID, 
+                    ZoneCode = s.ZoneCode, 
+                    LocationCode = s.LocationCode, 
+                    LastUpdate = dateTime
+                })
+            .ToList();
+
+        // Update Database
+        return await UpdateTableAsync(contentsUpdates);
+    }
+
+    public int SetTableUpdateTime(Type type, DateTime dateTime = new())
     {
         if (dateTime == new DateTime()) dateTime = DateTime.Now;
         TableUpdate update = new()
@@ -80,8 +99,8 @@ public sealed class InventoryChariot : MasterChariot
             TableName = Database?.GetMapping(type).TableName ?? type.ToString(),
             LastUpdate = dateTime
         };
-        _ = Database?.InsertOrReplace(update);
-        return true;
+
+        return Database?.InsertOrReplace(update) ?? 0;
     }
 
     /***************************** READ Data ******************************/
@@ -91,16 +110,17 @@ public sealed class InventoryChariot : MasterChariot
     /***************************** DELETE Data ****************************/
     /* Stock */
     // Used by more than just deleter.
-    public void StockZoneDeletes(List<string> zoneIDs)
+    public int StockZoneDeletes(List<string> zoneIDs)
     {
-        Database?.RunInTransaction(() =>
-        {
-            foreach (var zoneID in zoneIDs)
-            {
-                var tableName = GetTableName(typeof(NAVStock));
-                _ = Database.Execute($"DELETE FROM [{tableName}] WHERE [ZoneID]=?;", zoneID);
-            }
-        });
+        var lines = 0;
+
+        if (Database is null) return 0;
+
+        var tableName = GetTableName(typeof(NAVStock));
+        var zoneString = string.Join("','", zoneIDs);
+        lines += Database.Execute($"DELETE FROM [{tableName}] WHERE [ZoneID] IN ('{zoneString}');");
+        
+        return lines;
     }
 
     /* UOM */

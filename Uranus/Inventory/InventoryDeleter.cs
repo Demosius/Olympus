@@ -15,5 +15,5 @@ public class InventoryDeleter
     // Deletes stock where zones are in the given list.
     public void StockZoneDeletes(List<string> zoneIDs) => Chariot.StockZoneDeletes(zoneIDs);
 
-    public bool Site(Site site) => Chariot.Delete(site);
+    public int Site(Site site) => Chariot.Delete(site);
 }

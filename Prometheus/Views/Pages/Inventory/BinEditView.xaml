@@ -12,7 +12,7 @@
     </Window.DataContext>
 
     <Window.Resources>
-        <ResourceDictionary Source="../../../Themes/MSControls.Core.Implicit.xaml"/>
+        <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Orange/MSControls.Core.Implicit.xaml" />
     </Window.Resources>
 
     <Grid />

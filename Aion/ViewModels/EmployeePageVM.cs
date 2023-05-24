@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using Uranus;
+using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
 using Uranus.Staff.Models;
@@ -27,26 +29,17 @@ public enum EEmployeeSortOption
     JobClassification
 }
 
-public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
+public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction, ISorting
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
 
     private List<Employee> allEmployees;
+    
+    public ObservableCollection<Employee> Employees { get; set; }
 
-    private ObservableCollection<Employee> employees;
-    public ObservableCollection<Employee> Employees
-    {
-        get => employees;
-        set
-        {
-            employees = value;
-            OnPropertyChanged(nameof(Employees));
-        }
-    }
-
-    private Employee selectedEmployee;
-    public Employee SelectedEmployee
+    private Employee? selectedEmployee;
+    public Employee? SelectedEmployee
     {
         get => selectedEmployee;
         set
@@ -56,8 +49,8 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
         }
     }
 
-    private Employee selectedReport;
-    public Employee SelectedReport
+    private Employee? selectedReport;
+    public Employee? SelectedReport
     {
         get => selectedReport;
         set
@@ -131,10 +124,20 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
     public RefreshDataCommand RefreshDataCommand { get; set; }
     public ApplySortingCommand ApplySortingCommand { get; set; }
     public GoToEmployeeCommand GoToEmployeeCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
 
-    public EmployeePageVM()
+    private EmployeePageVM(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
+
+        allEmployees = new List<Employee>();
+        Employees = new ObservableCollection<Employee>();
+
+        employeeSearchString = string.Empty;
+        departmentSearchString = string.Empty;
+        reportSearchString = string.Empty;
+        roleSearchString = string.Empty;
+
         // Commands
         LaunchEmployeeEditorCommand = new LaunchEmployeeEditorCommand(this);
         LaunchEmployeeCreatorCommand = new LaunchEmployeeCreatorCommand(this);
@@ -144,15 +147,18 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
         RefreshDataCommand = new RefreshDataCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
         GoToEmployeeCommand = new GoToEmployeeCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
     }
 
-    public void SetDataSources(Helios helios, Charon charon)
+    private async Task<EmployeePageVM> InitializeAsync()
     {
-        Helios = helios;
-        Charon = charon;
-        allEmployees ??= new List<Employee>(Helios.StaffReader.GetManagedEmployees(Charon.Employee!.ID));
-        Task.Run(RefreshData);
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<EmployeePageVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new EmployeePageVM(helios, charon);
+        return ret.InitializeAsync();
     }
 
     /// <summary>
@@ -162,15 +168,13 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
     {
         if (Charon.User is null) return;
 
-        IEnumerable<Employee> employeeBase = allEmployees;
+        var employeeBase = allEmployees;
 
         try
         {
             FilterName(ref employeeBase);
             FilterDepartment(ref employeeBase);
-            // ReSharper disable once PossibleMultipleEnumeration
             FilterReports(ref employeeBase);
-            // ReSharper disable once PossibleMultipleEnumeration
             FilterRole(ref employeeBase);
         }
         catch (RegexParseException ex)
@@ -183,36 +187,36 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
         ApplySorting(employeeBase);
     }
 
-    private void FilterName(ref IEnumerable<Employee> employeeGroup)
+    private void FilterName(ref List<Employee> employeeGroup)
     {
-        if ((employeeSearchString ?? "") == "") return;
+        if (employeeSearchString == "") return;
 
         Regex rex = new(employeeSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        employeeGroup = employeeGroup?.Where(employee => rex.IsMatch(employee.FullName) || rex.IsMatch(employee.ID.ToString()));
+        employeeGroup = employeeGroup.Where(employee => rex.IsMatch(employee.FullName) || rex.IsMatch(employee.ID.ToString())).ToList();
     }
 
-    private void FilterDepartment(ref IEnumerable<Employee> employeeGroup)
+    private void FilterDepartment(ref List<Employee> employeeGroup)
     {
-        if ((departmentSearchString ?? "") == "") return;
+        if (departmentSearchString == "") return;
 
         Regex rex = new(departmentSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        employeeGroup = employeeGroup?.Where(employee => rex.IsMatch(employee.DepartmentName));
+        employeeGroup = employeeGroup.Where(employee => rex.IsMatch(employee.DepartmentName)).ToList();
     }
 
-    private void FilterReports(ref IEnumerable<Employee> employeeGroup)
+    private void FilterReports(ref List<Employee> employeeGroup)
     {
-        if ((reportSearchString ?? "") == "") return;
+        if (reportSearchString == "") return;
 
         Regex rex = new(reportSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        employeeGroup = employeeGroup?.Where(employee => rex.IsMatch(employee.ReportsTo?.FullName ?? "") || rex.IsMatch(employee.ReportsTo?.ID.ToString() ?? ""));
+        employeeGroup = employeeGroup.Where(employee => rex.IsMatch(employee.ReportsTo?.FullName ?? "") || rex.IsMatch(employee.ReportsTo?.ID.ToString() ?? "")).ToList();
     }
 
-    private void FilterRole(ref IEnumerable<Employee> employeeGroup)
+    private void FilterRole(ref List<Employee> employeeGroup)
     {
-        if ((roleSearchString ?? "") == "") return;
+        if (roleSearchString == "") return;
 
         Regex rex = new(roleSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        employeeGroup = employeeGroup?.Where(employee => rex.IsMatch(employee.RoleName));
+        employeeGroup = employeeGroup.Where(employee => rex.IsMatch(employee.RoleName)).ToList();
     }
 
     /// <summary>
@@ -256,25 +260,26 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
         };
     }
 
-    internal void LaunchEmployeeCreator()
+    internal async Task LaunchEmployeeCreator()
     {
         EmployeeCreationWindow creator = new(Helios);
         if (creator.ShowDialog() != true) return;
 
-        EmployeeEditorWindow editor = new(Helios, creator.VM.NewEmployee, true);
+        EmployeeEditorWindow editor = new(Helios, creator.VM!.NewEmployee, true);
         if (editor.ShowDialog() == true)
-            RefreshData();
+            await RefreshDataAsync();
     }
 
     internal void LaunchEmployeeEditor()
     {
+        if (SelectedEmployee is null) return;
+
         EmployeeEditorWindow editorWindow = new(Helios, SelectedEmployee, false);
         editorWindow.ShowDialog();
     }
 
     internal void DeleteEmployee()
     {
-        if (SelectedEmployee is null) { return; }
         MessageBox.Show("This feature is not yet implemented", "Feature Missing", MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 
@@ -282,10 +287,10 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
     {
         if (SelectedReport is null) return;
 
-        if (allEmployees.All(e => e.ID != selectedReport.ID))
+        if (allEmployees.All(e => e.ID != SelectedReport.ID))
         {
             MessageBox.Show(
-                $"ERROR: Selected report employee, {SelectedReport.FullName}, (reports to {SelectedEmployee.FullName}) was not found in the primary employee list.",
+                $"ERROR: Selected report employee, {SelectedReport.FullName}, (reports to {SelectedEmployee!.FullName}) was not found in the primary employee list.",
                 "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
@@ -301,20 +306,16 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction
         ApplyFilters();
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        allEmployees = new List<Employee>(Helios.StaffReader.GetManagedEmployees(Charon.Employee?.ID ?? 0));
+        allEmployees = new List<Employee>(await Helios.StaffReader.GetManagedEmployeesAsync(Charon.Employee?.ID ?? 0));
         ClearFilters();
     }
 
-    public void RepairData()
-    {
-        throw new System.NotImplementedException();
-    }
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

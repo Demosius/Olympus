@@ -1,6 +1,8 @@
-﻿using Styx;
-using System;
+﻿using System;
+using Styx;
+using System.Threading.Tasks;
 using System.Windows.Navigation;
+using Pantheon.ViewModels;
 using Uranus;
 using Uranus.Interfaces;
 using Uranus.Staff;
@@ -12,19 +14,30 @@ namespace Pantheon.Views;
 /// </summary>
 public partial class PantheonPage : IProject
 {
-    public PantheonPage(Charon charon, Helios helios)
+    public PantheonVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
+
+    public PantheonPage(Helios helios,Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
-        VM.SetDataSources(charon, helios);
+    }
+
+    private async void PantheonPage_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await PantheonVM.CreateAsync(Helios, Charon);
+        DataContext = VM;
     }
 
     public EProject Project => EProject.Pantheon;
 
     public static bool RequiresUser => true;
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        throw new NotImplementedException();
+        await new Task(() => {});
     }
 
     private void Frame_OnNavigating(object sender, NavigatingCancelEventArgs e)

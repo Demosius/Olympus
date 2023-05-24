@@ -22,6 +22,7 @@
     <None Remove="Resources\Images\Icons\castle.ico" />
     <None Remove="Resources\Images\Icons\chaos-white.ico" />
     <None Remove="Resources\Images\Icons\chaos.ico" />
+    <None Remove="Resources\Images\Icons\deimos.ico" />
     <None Remove="Resources\Images\Icons\dredd.ico" />
     <None Remove="Resources\Images\Icons\fixedBin.ico" />
     <None Remove="Resources\Images\Icons\forge.ico" />
@@ -40,6 +41,7 @@
     <None Remove="Resources\Images\Icons\pantheon.ico" />
     <None Remove="Resources\Images\Icons\phoenix.ico" />
     <None Remove="Resources\Images\Icons\prometheus.ico" />
+    <None Remove="Resources\Images\Icons\quest.ico" />
     <None Remove="Resources\Images\Icons\Sphynx.ico" />
     <None Remove="Resources\Images\Icons\sword-smithing.ico" />
     <None Remove="Resources\Images\Icons\torch.ico" />
@@ -80,6 +82,9 @@
     <Content Include="Resources\Images\Icons\cadmus.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\Images\Icons\deimos.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\Images\Icons\fixedBin.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -105,6 +110,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\prometheus.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Images\Icons\quest.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\Images\Icons\Sphynx.ico">
@@ -153,6 +161,7 @@
     <ProjectReference Include="..\Aion\Aion.csproj" />
     <ProjectReference Include="..\Argos\Argos.csproj" />
     <ProjectReference Include="..\Cadmus\Cadmus.csproj" />
+    <ProjectReference Include="..\Deimos\Deimos.csproj" />
     <ProjectReference Include="..\Hades\Hades.csproj" />
     <ProjectReference Include="..\Hydra\Hydra.csproj" />
     <ProjectReference Include="..\Khaos\Khaos.csproj" />
@@ -160,6 +169,7 @@
     <ProjectReference Include="..\Pantheon\Pantheon.csproj" />
     <ProjectReference Include="..\Phoenix\Phoenix.csproj" />
     <ProjectReference Include="..\Prometheus\Prometheus.csproj" />
+    <ProjectReference Include="..\Quest\Quest.csproj" />
     <ProjectReference Include="..\Sphynx\Sphynx.csproj" />
     <ProjectReference Include="..\Styx\Styx.csproj" />
     <ProjectReference Include="..\Uranus\Uranus.csproj" />
@@ -244,64 +254,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Themes\Metro\Dark\MetroDark.MSControls.Core.Implicit.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Metro\Dark\MetroDark.MSControls.Toolkit.Implicit.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Metro\Dark\Styles.Shared.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Metro\Dark\Styles.WPF.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Metro\Dark\Theme.Colors.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Metro\Light\Metro.MSControls.Core.Implicit.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Metro\Light\Metro.MSControls.Toolkit.Implicit.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Metro\Light\Styles.Shared.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Metro\Light\Styles.WPF.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Metro\Light\Theme.Colors.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Olympus\MSControls.Core.Implicit.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Olympus\Styles.Shared.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Themes\Olympus\Styles.WPF.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Themes\Olympus\Theme.Colors.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Update="Views\AlphaRegistrationWindow.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>

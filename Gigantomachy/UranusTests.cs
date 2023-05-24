@@ -4,13 +4,41 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Morpheus;
+using Uranus;
 using Uranus.Extensions;
+// ReSharper disable StringLiteralTypo
 
 namespace Gigantomachy;
 
 [TestClass]
 public class UranusTests
 {
+    [TestMethod]
+    public async Task EventTracking()
+    {
+        var raw = General.ClipboardToString();
+
+        Assert.AreNotEqual("",raw);
+
+        var helios = new Helios("\\\\ausefpdfs01ns\\Shares\\Public\\DC_Data\\Olympus\\QA\\Sol");
+
+        /*
+        var lines = helios.StaffUpdater.UploadPickEvents(raw);
+
+        Assert.AreNotEqual(0, lines);*/
+
+        var stats = (await helios.StaffReader.PickStatsAsync(new DateTime(2020, 1, 1), DateTime.Today, true)).ToList();
+        Assert.AreEqual(126, stats.Count);
+
+        var sessions = stats.SelectMany(s => s.PickSessions).ToList();
+        Assert.AreEqual(529, sessions.Count);
+
+        var events = stats.SelectMany(s => s.PickEvents).ToList();
+        Assert.AreEqual(64008, events.Count);
+    }
+
     [TestMethod]
     public void FiscalWeekTesting()
     {
@@ -29,7 +57,6 @@ public class UranusTests
             Console.WriteLine($"{date:d} = {date.FiscalWeek()}");
             date = date.AddDays(1);
         }
-
 
         // Assert
         Assert.AreEqual("Jan-Wk2", date1.FiscalWeek(), $"{date1} did not give the correct result.");

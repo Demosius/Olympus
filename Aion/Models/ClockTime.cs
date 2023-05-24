@@ -2,6 +2,8 @@
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Uranus.Annotations;
 using Uranus.Staff.Models;
 
 namespace Aion.Models;
@@ -19,26 +21,26 @@ public class ClockTime : IEquatable<ClockTime>, INotifyPropertyChanged
     public Guid ID { get; set; }
     [ForeignKey(typeof(Employee))]
     public int EmployeeCode { get; set; }
-    public string Timestamp { get; set; }
+    public string? Timestamp { get; set; }
 
-    private string date;
+    private string? date;
     public string Date
     {
-        get => date ??= DateTime.Parse(Timestamp).ToString("yyyy-MM-dd");
+        get => date ??= DateTime.Parse(Timestamp ?? string.Empty).ToString("yyyy-MM-dd");
         set => date = value;
     }
 
-    private string time;
+    private string? time;
     public string Time
     {
-        get => time ??= DateTime.Parse(Timestamp).ToString("HH:mm:ss");
+        get => time ??= DateTime.Parse(Timestamp ?? string.Empty).ToString("HH:mm:ss");
         set => time = value;
     }
 
     public EClockStatus Status { get; set; }
 
     [ManyToOne(inverseProperty: "ClockTimes")]
-    public Employee Employee { get; set; }
+    public Employee? Employee { get; set; }
 
     [Ignore]
     public DateTime DtDate => DateTime.Parse(Date).Date;
@@ -87,7 +89,7 @@ public class ClockTime : IEquatable<ClockTime>, INotifyPropertyChanged
 
     /* Equality overloading. */
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is not ClockTime other)
         {
@@ -101,7 +103,7 @@ public class ClockTime : IEquatable<ClockTime>, INotifyPropertyChanged
         return string.CompareOrdinal(Timestamp, other.Timestamp) == 0;
     }
 
-    public bool Equals(ClockTime other)
+    public bool Equals(ClockTime? other)
     {
         if (other is null)
         {
@@ -115,7 +117,7 @@ public class ClockTime : IEquatable<ClockTime>, INotifyPropertyChanged
         return Date == other.Date && Time == other.Time;
     }
 
-    public static bool operator ==(ClockTime lh, ClockTime rh)
+    public static bool operator ==(ClockTime? lh, ClockTime? rh)
     {
         if (ReferenceEquals(lh, rh))
         {
@@ -125,12 +127,7 @@ public class ClockTime : IEquatable<ClockTime>, INotifyPropertyChanged
         {
             return false;
         }
-        if (rh is null)
-        {
-            return false;
-        }
-
-        return lh.Equals(rh);
+        return rh is not null && lh.Equals(rh);
     }
 
     public static bool operator !=(ClockTime lh, ClockTime rh)
@@ -138,7 +135,7 @@ public class ClockTime : IEquatable<ClockTime>, INotifyPropertyChanged
         return !(lh == rh);
     }
 
-    public static bool operator >(ClockTime lh, ClockTime rh)
+    public static bool operator >(ClockTime? lh, ClockTime? rh)
     {
         if (ReferenceEquals(lh, rh))
         {
@@ -156,7 +153,7 @@ public class ClockTime : IEquatable<ClockTime>, INotifyPropertyChanged
         return string.CompareOrdinal(lh.Date, rh.Date) > 0 || lh.Date == rh.Date && string.CompareOrdinal(lh.Date, rh.Date) > 0;
     }
 
-    public static bool operator <(ClockTime lh, ClockTime rh)
+    public static bool operator <(ClockTime? lh, ClockTime? rh)
     {
         if (ReferenceEquals(lh, rh))
         {
@@ -181,12 +178,11 @@ public class ClockTime : IEquatable<ClockTime>, INotifyPropertyChanged
     // ReSharper disable once NonReadonlyMemberInGetHashCode
     public override int GetHashCode() => ID.GetHashCode();
 
-    // Property changed event handling.
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Uranus.Inventory.Models;
 
 namespace Uranus.Inventory;
@@ -14,123 +15,198 @@ public class InventoryUpdater
         Chariot = chariot;
     }
 
-    public int NAVBins(List<NAVBin> bins)
+    public async Task<int> NAVBinsAsync(List<NAVBin> bins)
     {
         var count = 0;
-        Chariot.Database?.RunInTransaction(() =>
+
+        void Action()
         {
             count = Chariot.UpdateTable(bins);
             if (count > 0) Chariot.SetTableUpdateTime(typeof(NAVBin));
-        });
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return count;
     }
 
-    public int NAVItems(IEnumerable<NAVItem> items, DateTime dateTime)
+    public async Task<int> NAVItemsAsync(IEnumerable<NAVItem> items, DateTime dateTime)
     {
         var count = 0;
-        Chariot.Database?.RunInTransaction(() =>
+
+        void Action()
         {
             var navItems = items as NAVItem[] ?? items.ToArray();
-            count = Chariot.UpdateTable(navItems);
+
+            count += Chariot.UpdateTable(navItems);
             count += Chariot.UpdateTable(navItems.Select(i => i.Extension));
+
             if (count > 0) Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime);
-        });
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return count;
     }
 
-    public bool NAVUoMs(List<NAVUoM> uomList)
+    public async Task<int> NAVUoMsAsync(List<NAVUoM> uomList)
     {
-        if (uomList.Count == 0) return false;
-        // Remove previous data with relevant UoMCode 
-        // (Expect for ease/speed updates will happen one UoMCode at a time)
-        Chariot.UoMCodeDelete(uomList.Select(s => s.Code).Distinct().ToList());
+        if (uomList.Count == 0) return 0;
 
-        if (Chariot.InsertIntoTable(uomList) == 0) return false;
+        var lines = 0;
 
-        _ = Chariot.SetTableUpdateTime(typeof(NAVUoM));
-        return true;
+        void Action()
+        {
+            lines += Chariot.UpdateTable(uomList);
+
+            if (lines == 0) return;
+
+            lines += Chariot.SetTableUpdateTime(typeof(NAVUoM));
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return lines;
     }
 
-    public bool NAVStock(List<NAVStock> stock)
+    public async Task<int> NAVStockAsync(List<NAVStock> stock)
     {
-        if (stock.Count == 0) return false;
-        // Remove from stock table anything with zones equal to what is being put in.
-        Chariot.StockZoneDeletes(stock.Select(s => s.ZoneID).Distinct().ToList());
-        if (Chariot.InsertIntoTable(stock) <= 0) return false;
+        if (stock.Count == 0) return 0;
 
-        _ = Chariot.SetTableUpdateTime(typeof(NAVStock));
-        _ = Chariot.SetStockUpdateTimes(stock);
-        return true;
+        var lines = 0;
+
+        void Action()
+        {
+            // Remove from stock table anything with zones equal to what is being put in.
+            lines += Chariot.StockZoneDeletes(stock.Select(s => s.ZoneID).Distinct().ToList());
+            lines += Chariot.InsertIntoTable(stock);
+
+            lines += Chariot.SetTableUpdateTime(typeof(NAVStock));
+            lines += Chariot.SetStockUpdateTimes(stock);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return lines;
     }
 
-    public int NAVZones(List<NAVZone> zones) => Chariot.UpdateTable(zones);
+    public async Task<int> NAVStockAsync(List<NAVStock> newStock, List<string> zonesToRemove)
+    {
+        if (newStock.Count == 0) return 0;
 
-    public int Zones(IEnumerable<NAVZone> zones)
+        zonesToRemove.AddRange(newStock.Select(s => s.ZoneID).Distinct());
+        var lines = 0;
+
+        await Task.Run(() => Chariot.RunInTransaction(() =>
+        {
+            // Remove from stock table anything with zones equal to what is being put in.
+            lines += Chariot.StockZoneDeletes(zonesToRemove);
+
+            lines += Chariot.InsertIntoTable(newStock);
+
+            lines += Chariot.SetTableUpdateTime(typeof(NAVStock));
+            lines += Chariot.SetStockUpdateTimes(newStock);
+        })).ConfigureAwait(false);
+
+        return lines;
+    }
+
+    public async Task<int> NAVZonesAsync(List<NAVZone> zones) => await Chariot.UpdateTableAsync(zones).ConfigureAwait(false);
+
+    public async Task<int> NAVTransferOrdersAsync(IEnumerable<NAVTransferOrder> transferOrders) => await Chariot.UpdateTableAsync(transferOrders).ConfigureAwait(false);
+
+    public async Task<int> ZonesAsync(List<NAVZone> zones)
     {
         var count = 0;
-        Chariot.Database?.RunInTransaction(() =>
+
+        void Action()
         {
-            var list = zones as NAVZone[] ?? zones.ToArray();
-            count += Chariot.UpdateTable(list);
-            count += Chariot.UpdateTable(list.Select(z => z.Extension));
-        });
+            count += Chariot.UpdateTable(zones);
+            count += Chariot.UpdateTable(zones.Select(z => z.Extension));
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return count;
     }
 
-    public int NAVLocation(List<NAVLocation> locations) => Chariot.UpdateTable(locations);
+    public async Task<int> NAVLocationAsync(List<NAVLocation> locations) => await Chariot.UpdateTableAsync(locations).ConfigureAwait(false);
 
-    public int NAVDivision(List<NAVDivision> divs) => Chariot.UpdateTable(divs);
+    public async Task<int> NAVDivisionAsync(List<NAVDivision> divs) => await Chariot.UpdateTableAsync(divs).ConfigureAwait(false);
 
-    public int NAVCategory(List<NAVCategory> cats) => Chariot.UpdateTable(cats);
+    public async Task<int> NAVCategoryAsync(List<NAVCategory> cats) => await Chariot.UpdateTableAsync(cats).ConfigureAwait(false);
 
-    public int NAVPlatform(List<NAVPlatform> pfs) => Chariot.UpdateTable(pfs);
+    public async Task<int> NAVPlatformAsync(List<NAVPlatform> pfs) => await Chariot.UpdateTableAsync(pfs).ConfigureAwait(false);
 
-    public int NAVGenre(List<NAVGenre> gens) => Chariot.UpdateTable(gens);
+    public async Task<int> NAVGenre(List<NAVGenre> gens) => await Chariot.UpdateTableAsync(gens).ConfigureAwait(false);
 
     /// <summary>
     /// Replaces the current data with all new data, and updates connected zoneExtensions as applicable.
     /// </summary>
     /// <param name="newZones"></param>
     /// <returns></returns>
-    public int ReplaceZones(IEnumerable<NAVZone> newZones)
+    public async Task<int> ReplaceZonesAsync(IEnumerable<NAVZone> newZones)
     {
         var lines = 0;
-        Chariot.Database?.RunInTransaction(() =>
+        var zoneList = newZones.ToList();
+
+        void Action()
         {
-            var list = newZones as NAVZone[] ?? newZones.ToArray();
-            lines += Chariot.UpdateTable(list.Select(z => z.Extension));
-            lines += Chariot.ReplaceFullTable(list);
-        });
+            lines += Chariot.UpdateTable(zoneList.Select(z => z.Extension));
+            lines += Chariot.ReplaceFullTable(zoneList);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
         return lines;
     }
 
-    public int Sites(IEnumerable<Site> sites)
+    public async Task<int> ReplaceMixedCartonsAsync(IEnumerable<MixedCarton> mixedCartons)
     {
         var lines = 0;
-        Chariot.Database?.RunInTransaction(() =>
+
+        void Action()
         {
-            var list = sites as Site[] ?? sites.ToArray();
-            lines += Chariot.UpdateTable(list);
-            lines += Chariot.UpdateTable(list.SelectMany(s => s.Zones));
-            lines += Chariot.UpdateTable(list.SelectMany(s => s.Zones.Select(z => z.Extension)));
-        });
+            var mcList = mixedCartons.ToList();
+            var mcItems = mcList.SelectMany(mc => mc.Items);
+
+            lines += Chariot.ReplaceFullTable(mcItems);
+            lines += Chariot.ReplaceFullTable(mcList);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return lines;
     }
 
-    public int Sites(IEnumerable<Site> sites, IEnumerable<NAVZone> zones)
+    public async Task<int> SitesAsync(List<Site> sites)
     {
         var lines = 0;
-        Chariot.Database?.RunInTransaction(() =>
+
+        void Action()
         {
-            var zoneArray = zones as NAVZone[] ?? zones.ToArray();
             lines += Chariot.UpdateTable(sites);
-            lines += Chariot.UpdateTable(zoneArray);
-            lines += Chariot.UpdateTable(zoneArray.Select(z => z.Extension));
-        });
+            lines += Chariot.UpdateTable(sites.SelectMany(s => s.Zones));
+            lines += Chariot.UpdateTable(sites.SelectMany(s => s.Zones.Select(z => z.Extension)));
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return lines;
     }
 
-    public int SiteItemLevels(IEnumerable<SiteItemLevel> siteItemLevels) => Chariot.UpdateTable(siteItemLevels);
+    public async Task<int> SitesAsync(IEnumerable<Site> sites, List<NAVZone> zones)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            lines += Chariot.UpdateTable(sites);
+            lines += Chariot.UpdateTable(zones);
+            lines += Chariot.UpdateTable(zones.Select(z => z.Extension));
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
+    }
+
+    public async Task<int> SiteItemLevelsAsync(IEnumerable<SiteItemLevel> siteItemLevels) =>
+        await Chariot.UpdateTableAsync(siteItemLevels).ConfigureAwait(false);
 
     public int Site(Site site) => Chariot.Update(site);
 }

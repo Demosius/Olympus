@@ -39,4 +39,9 @@ public class NAVCategory
         Division = division;
         Items = items;
     }
+
+    public override string ToString()
+    {
+        return $"{Code} - {Description}";
+    }
 }

@@ -1,5 +1,8 @@
-﻿using Uranus.Interfaces;
+﻿using System.Threading.Tasks;
+using Uranus;
+using Uranus.Interfaces;
 using Uranus.Staff;
+using Vulcan.ViewModels;
 
 namespace Vulcan.Views;
 
@@ -8,17 +11,18 @@ namespace Vulcan.Views;
 /// </summary>
 public partial class VulcanPage : IProject
 {
-    public VulcanPage()
+    public VulcanVM VM { get; set; }
+
+    public VulcanPage(Helios helios)
     {
+        VM = new VulcanVM(helios);
         InitializeComponent();
+        DataContext = VM;
     }
 
     public EProject Project => EProject.Vulcan;
 
     public static bool RequiresUser => false;
 
-    public void RefreshData()
-    {
-        VM.RefreshData();
-    }
+    public async Task RefreshDataAsync() => await VM.RefreshDataAsync();
 }

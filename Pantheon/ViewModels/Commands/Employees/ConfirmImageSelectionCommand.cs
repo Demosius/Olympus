@@ -1,11 +1,11 @@
-﻿using Pantheon.ViewModels.Interface;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using Pantheon.ViewModels.Interfaces;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-internal class ConfirmImageSelectionCommand : ICommand
+public class ConfirmImageSelectionCommand : ICommand
 {
     public IImageSelector VM { get; set; }
 

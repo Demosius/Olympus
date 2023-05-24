@@ -1,6 +1,6 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -11,6 +11,7 @@ namespace Hades.ViewModels;
 public class HadesVM : INotifyPropertyChanged, IDBInteraction
 {
     public Helios Helios { get; set; }
+
     #region INotifyPropertyChanged properties
 
 
@@ -20,7 +21,6 @@ public class HadesVM : INotifyPropertyChanged, IDBInteraction
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
 
     #endregion
 
@@ -29,19 +29,13 @@ public class HadesVM : INotifyPropertyChanged, IDBInteraction
         Helios = helios;
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        throw new NotImplementedException();
+        await Task.Run(() => { });
     }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]

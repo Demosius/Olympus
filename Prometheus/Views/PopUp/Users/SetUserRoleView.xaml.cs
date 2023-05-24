@@ -1,6 +1,7 @@
-﻿using Styx;
+﻿using Prometheus.ViewModels.Controls;
+using Prometheus.ViewModels.PopUp.Users;
+using Styx;
 using Uranus;
-using Uranus.Users.Models;
 
 namespace Prometheus.Views.PopUp.Users;
 
@@ -9,9 +10,12 @@ namespace Prometheus.Views.PopUp.Users;
 /// </summary>
 public partial class SetUserRoleView
 {
-    public SetUserRoleView(Helios helios, Charon charon, User user)
+    public SetUserRoleVM VM { get; set; }
+
+    public SetUserRoleView(Helios helios, Charon charon, UserVM user)
     {
+        VM = new SetUserRoleVM(helios, charon, user);
         InitializeComponent();
-        VM.SetDataSources(helios, charon, user);
+        DataContext = VM;
     }
 }

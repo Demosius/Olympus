@@ -13,7 +13,7 @@
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Themes/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Lilac/MSControls.Core.Implicit.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
@@ -38,13 +38,13 @@
             <TabItem Header="Potential Negatives">
                 <components:PotentialNegatives DataContext="{Binding PotentialNegativeVM}"/>
             </TabItem>
+            <TabItem Header="Items With No Pick Bin">
+                <components:ItemsWithNoPickBin DataContext="{Binding ItemsWithNoPickBinVM}"/>
+            </TabItem>
             <TabItem Header="Find Similar Sku Issues">
 
             </TabItem>
             <TabItem Header="Missing Pack Lines">
-
-            </TabItem>
-            <TabItem Header="Items With No Pick Bin">
 
             </TabItem>
             <TabItem Header="Max Fix">

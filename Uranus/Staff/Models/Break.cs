@@ -82,6 +82,14 @@ public class Break : IComparable
         Length = length;
     }
 
+    /// <summary>
+    /// Remove itself from the associated shift.
+    /// </summary>
+    public void Remove()
+    {
+        Shift?.Breaks.Remove(this);
+    }
+
     public int CompareTo(object? obj)
     {
         if (obj is not Break otherBreak) return -1;

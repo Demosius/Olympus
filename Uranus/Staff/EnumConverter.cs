@@ -15,6 +15,8 @@ public enum EProject
     Argos,
     Hades,
     Panacea,
+    Quest,
+    Deimos,
 }
 
 public enum ELicence
@@ -45,6 +47,8 @@ public static class EnumConverter
             "ARGOS" => EProject.Argos,
             "HADES" => EProject.Hades,
             "PANACEA" => EProject.Panacea,
+            "QUEST" => EProject.Quest,
+            "DEIMOS" => EProject.Deimos,
             _ => EProject.None
         };
     }

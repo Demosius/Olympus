@@ -17,10 +17,10 @@ public class DeleteSiteCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
         if (parameter is not SiteVM siteVM) throw new DataException("No appropriate parameter passed to delete.");
-        VM.DeleteSite(siteVM);
+        await VM.DeleteSite(siteVM);
     }
 
     public event EventHandler? CanExecuteChanged

@@ -23,6 +23,7 @@
     <None Remove="Resources\repair.png" />
     <None Remove="Resources\save.png" />
     <None Remove="Resources\sort.png" />
+    <None Remove="Resources\user.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -72,6 +73,7 @@
     <Resource Include="Resources\repair.png" />
     <Resource Include="Resources\save.png" />
     <Resource Include="Resources\sort.png" />
+    <Resource Include="Resources\user.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -105,24 +107,6 @@
     <Page Update="Resources\Fonts.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\MSControls.Core.Implicit.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
-    <Page Update="Themes\MSControls.Toolkit.Implicit.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
-    <Page Update="Themes\Styles.Shared.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Themes\Styles.WPF.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Themes\Theme.Colors.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="Views\Pages\Inventory\BatchView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>

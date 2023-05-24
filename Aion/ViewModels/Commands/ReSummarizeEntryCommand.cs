@@ -9,17 +9,17 @@ public class ReSummarizeEntryCommand : ICommand
 
     public ReSummarizeEntryCommand(ShiftEntryPageVM vm) { VM = vm; }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
-        return VM.SelectedEntry is not null;
+        return true;
     }
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
         VM.ReSummarizeEntry();
     }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;

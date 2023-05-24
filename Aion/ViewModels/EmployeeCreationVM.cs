@@ -1,7 +1,9 @@
 ﻿using Aion.ViewModels.Commands;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Uranus;
+using Uranus.Annotations;
 using Uranus.Staff.Models;
 
 namespace Aion.ViewModels;
@@ -10,9 +12,9 @@ public class EmployeeCreationVM : INotifyPropertyChanged
 {
     public Helios Helios { get; set; }
 
-    public Employee NewEmployee { get; set; }
+    public Employee? NewEmployee { get; set; }
 
-    private List<int> existingCodes;
+    private readonly List<int> existingCodes;
 
     private string newCode;
     public string NewCode
@@ -61,17 +63,15 @@ public class EmployeeCreationVM : INotifyPropertyChanged
 
     public ConfirmEmployeeCreationCommand ConfirmEmployeeCreationCommand { get; set; }
 
-    public EmployeeCreationVM()
-    {
-        ConfirmEmployeeCreationCommand = new ConfirmEmployeeCreationCommand(this);
-    }
-
-    public void SetDataSource(Helios helios)
+    public EmployeeCreationVM(Helios helios)
     {
         Helios = helios;
         existingCodes = Helios.StaffReader.EmployeeIDs();
-    }
+        ConfirmEmployeeCreationCommand = new ConfirmEmployeeCreationCommand(this);
 
+        newCode = string.Empty;
+    }
+    
     private void CheckCode()
     {
         IsFiveChars = NewCode.Length == 5;
@@ -84,9 +84,10 @@ public class EmployeeCreationVM : INotifyPropertyChanged
         NewEmployee = new Employee { ID = int.Parse(NewCode) };
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

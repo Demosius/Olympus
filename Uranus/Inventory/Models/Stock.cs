@@ -35,6 +35,9 @@ public class Stock : IEnumerable
     [Ignore] public Bay? Bay => Bin?.Bay;
     [Ignore] public Site? Site => Zone?.Site;
 
+    [Ignore] public string ZoneCode => Zone?.Code ?? ZoneID.Split(":")[1];
+    [Ignore] public string BinCode => Bin?.Code ?? BinID.Split(":")[2];
+
     [Ignore] public int EachQty => Eaches?.Qty ?? 0;
     [Ignore] public int PackQty => Packs?.Qty ?? 0;
     [Ignore] public int CaseQty => Cases?.Qty ?? 0;

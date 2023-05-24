@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Uranus.Inventory.Models;
 
 namespace Uranus.Inventory;
@@ -13,47 +14,79 @@ public class InventoryCreator
         Chariot = chariot;
     }
 
-    public bool NAVBins(List<NAVBin> bins)
+    public async Task<int> NAVBinsAsync(List<NAVBin> bins)
     {
-        if (Chariot.ReplaceFullTable(bins) <= 0) return false;
-        _ = Chariot.SetTableUpdateTime(typeof(NAVBin));
-        return true;
+        var lines = 0;
+        void Action()
+        {
+            lines = Chariot.ReplaceFullTable(bins);
+            if (lines > 0)
+                Chariot.SetTableUpdateTime(typeof(NAVBin));
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
     }
 
-    public bool NAVItems(List<NAVItem> items, DateTime dateTime)
+    public async Task<int> NAVItemsAsync(List<NAVItem> items, DateTime dateTime)
     {
-        if (Chariot.ReplaceFullTable(items) <= 0) return false;
-        _ = Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime);
-        return true;
+        var lines = 0;
+
+        void Action()
+        {
+            lines = Chariot.ReplaceFullTable(items);
+            if (lines > 0)
+                Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
     }
 
-    public bool NAVUoMs(List<NAVUoM> uomList)
+    public async Task<int> NAVUoMsAsync(List<NAVUoM> uomList)
     {
-        if (Chariot.ReplaceFullTable(uomList) <= 0) return false;
-        _ = Chariot.SetTableUpdateTime(typeof(NAVUoM));
-        return true;
+        var lines = 0;
+        void Action()
+        {
+            lines = Chariot.ReplaceFullTable(uomList);
+            if (lines > 0)
+                Chariot.SetTableUpdateTime(typeof(NAVUoM));
+        }
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
     }
 
-    public bool NAVStock(List<NAVStock> stock)
+    public async Task<int> NAVStockAsync(List<NAVStock> stock)
     {
-        if (Chariot.ReplaceFullTable(stock) <= 0) return false;
-        _ = Chariot.EmptyTable<BinContentsUpdate>();
-        _ = Chariot.SetTableUpdateTime(typeof(NAVStock));
-        _ = Chariot.SetStockUpdateTimes(stock);
-        return true;
+        var lines = 0;
+
+        void Action()
+        {
+            lines = Chariot.ReplaceFullTable(stock);
+            if (lines <= 0) return;
+
+            Chariot.EmptyTable<BinContentsUpdate>();
+            Chariot.SetTableUpdateTime(typeof(NAVStock));
+            Chariot.SetStockUpdateTimes(stock);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
     }
 
-    public int NAVZone(List<NAVZone> zones) => Chariot.ReplaceFullTable(zones);
+    public async Task<int> NAVTransferOrdersAsync(IEnumerable<NAVTransferOrder> transferOrders) => await Chariot.ReplaceFullTableAsync(transferOrders).ConfigureAwait(false);
 
-    public int NAVLocation(List<NAVLocation> locations) => Chariot.ReplaceFullTable(locations);
+    public async Task<int> NAVZoneAsync(List<NAVZone> zones) => await Chariot.ReplaceFullTableAsync(zones).ConfigureAwait(false);
 
-    public int NAVDivision(List<NAVDivision> divs) => Chariot.ReplaceFullTable(divs);
+    public async Task<int> NAVLocation(List<NAVLocation> locations) => await Chariot.ReplaceFullTableAsync(locations).ConfigureAwait(false);
 
-    public int NAVCategory(List<NAVCategory> cats) => Chariot.ReplaceFullTable(cats);
+    public async Task<int> NAVDivision(List<NAVDivision> divs) => await Chariot.ReplaceFullTableAsync(divs).ConfigureAwait(false);
 
-    public int NAVPlatform(List<NAVPlatform> pfs) => Chariot.ReplaceFullTable(pfs);
+    public async Task<int> NAVCategory(List<NAVCategory> cats) => await Chariot.ReplaceFullTableAsync(cats).ConfigureAwait(false);
 
-    public int NAVGenre(List<NAVGenre> gens) => Chariot.ReplaceFullTable(gens);
+    public async Task<int> NAVPlatform(List<NAVPlatform> pfs) => await Chariot.ReplaceFullTableAsync(pfs).ConfigureAwait(false);
 
-    public int Site(Site site) => Chariot.InsertOrUpdate(site);
+    public async Task<int> NAVGenre(List<NAVGenre> gens) => await Chariot.ReplaceFullTableAsync(gens).ConfigureAwait(false);
+
+    public async Task<int> SiteAsync(Site site) => await Chariot.InsertOrUpdateAsync(site).ConfigureAwait(false);
 }

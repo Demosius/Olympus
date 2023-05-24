@@ -1,19 +1,24 @@
-﻿using Panacea.Models;
+﻿using System;
+using Panacea.Models;
 using Panacea.Properties;
 using Panacea.ViewModels.Commands;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Panacea.Interfaces;
+using Serilog;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Inventory;
+using Uranus.Inventory.Models;
 
 namespace Panacea.ViewModels.Components;
 
-public class PotentialNegativeVM : INotifyPropertyChanged
+public class PotentialNegativeVM : INotifyPropertyChanged, IChecker
 {
     public Helios Helios { get; set; }
     public List<PotentNegCheckResult> ShortPickResults { get; set; }
@@ -37,11 +42,24 @@ public class PotentialNegativeVM : INotifyPropertyChanged
         }
     }
 
+    private string checkLocString;
+    public string CheckLocString
+    {
+        get => checkLocString;
+        set
+        {
+            checkLocString = value;
+            OnPropertyChanged();
+            Settings.Default.PotentNegLocations = value;
+            Settings.Default.Save();
+        }
+    }
+
     #endregion
 
     #region Commands
 
-    public RunPotentialNegativesCheckCommand RunPotentialNegativesCheckCommand { get; set; }
+    public RunChecksCommand RunChecksCommand { get; set; }
 
     #endregion
 
@@ -50,16 +68,17 @@ public class PotentialNegativeVM : INotifyPropertyChanged
         Helios = helios;
 
         checkZoneString = Settings.Default.PotentNegZones;
+        checkLocString = Settings.Default.PotentNegLocations;
         ShortPickResults = new List<PotentNegCheckResult>();
         ReplenResults = new List<PotentNegCheckResult>();
 
         ShortPickVM = new PotentNegResultListVM("Short Pick signs if not enough.");
         ReplenishmentVM = new PotentNegResultListVM("Organize Replenishment if not enough.");
 
-        RunPotentialNegativesCheckCommand = new RunPotentialNegativesCheckCommand(this);
+        RunChecksCommand = new RunChecksCommand(this);
     }
 
-    public void RunPotentialNegativesCheck()
+    public async Task RunChecksAsync()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
@@ -67,9 +86,21 @@ public class PotentialNegativeVM : INotifyPropertyChanged
         ReplenResults.Clear();
 
         var zones = checkZoneString.ToUpper().Split(',', '|').ToList();
+        var locations = checkLocString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones);
+        BasicStockDataSet? dataSet;
+        try
+        {
+            dataSet = await Helios.InventoryReader.BasicStockDataSetAsync(zones, locations);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Missing Data");
+            Log.Error(ex, "Error pulling data for purge.");
+            Mouse.OverrideCursor = Cursors.Arrow;
+            return;
+        }
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");

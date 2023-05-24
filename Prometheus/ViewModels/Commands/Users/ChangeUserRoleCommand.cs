@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Prometheus.ViewModels.Commands.Users;
 
-internal class ChangeUserRoleCommand : ICommand
+public class ChangeUserRoleCommand : ICommand
 {
     public UserViewVM VM { get; set; }
 
@@ -15,9 +15,9 @@ internal class ChangeUserRoleCommand : ICommand
         return VM.SelectedUser is not null && VM.Charon is not null && VM.Charon.CanAssignUserRole();
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.ChangeUserRole();
+        await VM.ChangeUserRole();
     }
 
     public event EventHandler? CanExecuteChanged

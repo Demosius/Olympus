@@ -1,18 +1,18 @@
-﻿using Pantheon.ViewModels.Pages;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.Controls.Employees;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
 public class LaunchAvatarSelectorCommand : ICommand
 {
-    public EmployeePageVM VM { get; set; }
+    public EmployeeVM VM { get; set; }
 
-    public LaunchAvatarSelectorCommand(EmployeePageVM vm) { VM = vm; }
+    public LaunchAvatarSelectorCommand(EmployeeVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedEmployee is not null;
+        return true;
     }
 
     public void Execute(object? parameter)

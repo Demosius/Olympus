@@ -9,17 +9,20 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Serilog;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
 using Uranus.Inventory;
+using Uranus.Inventory.Models;
 
 namespace Panacea.ViewModels.Components;
 
-public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemData
+public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemData, IChecker
 {
     public Helios Helios { get; set; }
     public List<IWMBCheckResult> CheckResults { get; set; }
@@ -35,6 +38,19 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
             checkZoneString = value;
             OnPropertyChanged();
             Settings.Default.IWMBZones = value;
+            Settings.Default.Save();
+        }
+    }
+
+    private string checkLocString;
+    public string CheckLocString
+    {
+        get => checkLocString;
+        set
+        {
+            checkLocString = value;
+            OnPropertyChanged();
+            Settings.Default.IWMBLocations = value;
             Settings.Default.Save();
         }
     }
@@ -96,9 +112,8 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
-    public RunIWMBChecksCommand RunIWMBChecksCommand { get; set; }
     public ItemsToClipboardCommand ItemsToClipboardCommand { get; set; }
+    public RunChecksCommand RunChecksCommand { get; set; }
 
     #endregion
 
@@ -108,6 +123,7 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
         Helios = helios;
 
         checkZoneString = Settings.Default.IWMBZones;
+        checkLocString = Settings.Default.IWMBLocations;
         allowSeparatedUoMs = Settings.Default.IWMBAllowSeparateUoMs;
 
         CheckResults = new List<IWMBCheckResult>();
@@ -118,21 +134,32 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
-        RunIWMBChecksCommand = new RunIWMBChecksCommand(this);
         ItemsToClipboardCommand = new ItemsToClipboardCommand(this);
+        RunChecksCommand = new RunChecksCommand(this);
     }
 
-    public void RunIWMBChecks()
+    public async Task RunChecksAsync()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
         CheckResults.Clear();
 
         var zones = checkZoneString.ToUpper().Split(',', '|').ToList();
+        var locations = checkLocString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones);
+        BasicStockDataSet? dataSet;
+        try
+        {
+            dataSet = await Helios.InventoryReader.BasicStockDataSetAsync(zones, locations);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Missing Data");
+            Log.Error(ex, "Error pulling data for purge.");
+            Mouse.OverrideCursor = Cursors.Arrow;
+            return;
+        }
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");
@@ -179,12 +206,7 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
 
         FilteredCheckResults = new ObservableCollection<IWMBCheckResult>(results);
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void ItemsToClipboard()
     {
         var itemList = FilteredCheckResults.Select(checkResult => checkResult.Item.Number.ToString()).ToList();

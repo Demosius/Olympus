@@ -130,5 +130,89 @@ namespace Panacea.Properties {
                 this["FBCFixedZones"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PK|SP PK|PO PK|BLK PK|SUP PK|BLK SS|CP|HR|PR|OS|PARK|REFURB|MC")]
+        public string PickBinCheckZones {
+            get {
+                return ((string)(this["PickBinCheckZones"]));
+            }
+            set {
+                this["PickBinCheckZones"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9600")]
+        public string PickBinCheckLocations {
+            get {
+                return ((string)(this["PickBinCheckLocations"]));
+            }
+            set {
+                this["PickBinCheckLocations"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9600")]
+        public string BWMILocations {
+            get {
+                return ((string)(this["BWMILocations"]));
+            }
+            set {
+                this["BWMILocations"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9600")]
+        public string IWMBLocations {
+            get {
+                return ((string)(this["IWMBLocations"]));
+            }
+            set {
+                this["IWMBLocations"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9600")]
+        public string NegativeLocations {
+            get {
+                return ((string)(this["NegativeLocations"]));
+            }
+            set {
+                this["NegativeLocations"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9600")]
+        public string PotentNegLocations {
+            get {
+                return ((string)(this["PotentNegLocations"]));
+            }
+            set {
+                this["PotentNegLocations"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9600")]
+        public string PurgeLocations {
+            get {
+                return ((string)(this["PurgeLocations"]));
+            }
+            set {
+                this["PurgeLocations"] = value;
+            }
+        }
     }
 }

@@ -14,7 +14,7 @@ public partial class UserPage
     public UserPage(Helios helios, Charon charon)
     {
         InitializeComponent();
-        DataContext = new UserVM(helios, charon);
+        DataContext = new UserPageVM(helios, charon);
     }
 
     public override EDataCategory DataCategory => EDataCategory.Users;

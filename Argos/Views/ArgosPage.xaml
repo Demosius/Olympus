@@ -7,12 +7,12 @@
       mc:Ignorable="d" 
       d:DataContext="{d:DesignInstance {x:Type vm:ArgosVM}, IsDesignTimeCreatable = False}"
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="HadesPage">
+      Title="ArgosPage">
 
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Themes/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Aqua/MSControls.Core.Implicit.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Aion.ViewModels;
 using Uranus;
 
 namespace Aion.View;
@@ -13,10 +14,21 @@ namespace Aion.View;
 /// </summary>
 public partial class EmployeePage
 {
+    public EmployeePageVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
+
     public EmployeePage(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+    }
+
+    private async void EmployeePage_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await EmployeePageVM.CreateAsync(Helios, Charon);
+        DataContext = VM;
     }
 
     private readonly Style centerStyle = new()
@@ -35,7 +47,7 @@ public partial class EmployeePage
     /// <param name="e"></param>
     private void Employees_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
     {
-        var headerName = e.Column.Header.ToString();
+        var headerName = e.Column.Header.ToString() ?? string.Empty;
 
         //Cancel the column you don't want to generate
         if (new List<string> { "DisplayName", "PayRate", "RF_ID", "PC_ID", "ReportsToID", "LockerID", "PhoneNumber", "Email", "Email", "Address", "IconName",

@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Windows;
+using Serilog;
 
 namespace Morpheus;
 
@@ -95,7 +96,7 @@ public static class BarcodeUtility
             dummy = code128Barcode[counter];
             dummy = dummy < 127 ? dummy - 32 : dummy - 100;
             if (counter == 0) checkSum = dummy;
-            checkSum = (checkSum + (counter) * dummy) % 103;
+            checkSum = (checkSum + counter * dummy) % 103;
         }
 
         // Calculation of the checksum ASCII code
@@ -132,17 +133,27 @@ public static class General
     // Gets raw string data from the clipboard.
     public static string ClipboardToString()
     {
-        var rawData = "";
-        Thread thread = new(delegate ()
+        try
         {
-            rawData = Clipboard.GetText(TextDataFormat.Text);
-        });
+            var rawData = "";
 
-        thread.SetApartmentState(ApartmentState.STA);
-        thread.Start();
-        thread.Join();
+            Thread thread = new(delegate ()
+            {
+                rawData = Clipboard.GetText(TextDataFormat.Text);
+            });
 
-        return rawData;
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
+
+            return rawData;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex.Message);
+            MessageBox.Show(ex.Message, "Bad Clipboard Data", MessageBoxButton.OK, MessageBoxImage.Error);
+            return string.Empty;
+        }
     }
 }
 
@@ -190,5 +201,32 @@ public static class Utility
     public static List<string> ValidateTableData(DataTable data, List<string> columns)
     {
         return columns.Where(column => !data.Columns.Contains(column)).ToList();
+    }
+
+    /// <summary>
+    /// Find highest common factor among a set of integers.
+    /// </summary>
+    /// <param name="numbers"></param>
+    /// <returns></returns>
+    public static int HCF(IEnumerable<int> numbers)
+    {
+        return numbers.Aggregate(HCF);
+    }
+
+    /// <summary>
+    /// Find Highest Common Factor of two integers.
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static int HCF(int a, int b)
+    {
+        while (true)
+        {
+            if (b == 0) return a;
+            var a1 = a;
+            a = b;
+            b = a1 % b;
+        }
     }
 }

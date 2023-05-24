@@ -5,20 +5,17 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:viewModels="clr-namespace:Pantheon.ViewModels"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type viewModels:PantheonVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="PantheonPage"
+      Initialized="PantheonPage_OnInitialized"
       Background="#111">
-
-    <Page.DataContext>
-        <viewModels:PantheonVM x:Name="VM"/>
-    </Page.DataContext>
 
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <!-- Dark Theme -->
-                <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml" />
-                <ResourceDictionary Source="../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml" />
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Master/MSControls.Core.Implicit.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
@@ -31,6 +28,8 @@
                     Command="{Binding ShowShiftPageCommand}"/>
             <Button Content="Roster Management"
                     Command="{Binding ShowRosterPageCommand}"/>
+            <Button Content="Temp Tags"
+                    Command="{Binding ShowTempTagPageCommand}"/>
             <Button Margin="5"
                     Command="{Binding RefreshPageCommand}">
                 <StackPanel Orientation="Horizontal">

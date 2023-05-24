@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using Uranus;
 
 namespace Olympus.ViewModels.Commands;
 
@@ -25,7 +26,7 @@ public class LogInCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        if (VM.LogIn())
+        if (AsyncHelper.RunSync(() => VM.LogIn()))
         {
             var window = parameter as Window;
             window?.Close();
