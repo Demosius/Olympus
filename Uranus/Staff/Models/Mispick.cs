@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
 
 namespace Uranus.Staff.Models;
 
-public class MissPick : IEquatable<MissPick>
+public class Mispick : IEquatable<Mispick>
 {
     [PrimaryKey] public string ID { get; set; } // e.g. 8292418:215854 => [CartonID]:[ItemNumber]
     public DateTime ShipmentDate { get; set; }
@@ -28,7 +29,7 @@ public class MissPick : IEquatable<MissPick>
     public bool NoMatch { get; set; }   // Has Item and Carton, but could not be adequately assigned with available information.
     public bool MultiMatch { get; set; }// Has multiple potential culprits.
 
-    // MissPick Assignment Data
+    // Mispick Assignment Data
     [ForeignKey(typeof(PickEvent))] public string PickEventID { get; set; }
     [ForeignKey(typeof(PickSession))] public string PickSessionID { get; set; }
     [ForeignKey(typeof(PickDailyStats))] public string PickStatsID { get; set; }
@@ -43,11 +44,11 @@ public class MissPick : IEquatable<MissPick>
         NoItem ? "No Item" :
         NoMatch ? "No Match" : "Unassigned";
 
-    [OneToOne(nameof(PickEventID), nameof(Models.PickEvent.MissPick), CascadeOperations = CascadeOperation.CascadeRead)]
+    [OneToOne(nameof(PickEventID), nameof(Models.PickEvent.Mispick), CascadeOperations = CascadeOperation.CascadeRead)]
     public PickEvent? PickEvent { get; set; }
-    [ManyToOne(nameof(PickSessionID), nameof(Models.PickSession.MissPicks), CascadeOperations = CascadeOperation.CascadeRead)]
+    [ManyToOne(nameof(PickSessionID), nameof(Models.PickSession.Mispicks), CascadeOperations = CascadeOperation.CascadeRead)]
     public PickSession? PickSession { get; set; }
-    [ManyToOne(nameof(PickStatsID), nameof(PickDailyStats.MissPicks), CascadeOperations = CascadeOperation.CascadeRead)]
+    [ManyToOne(nameof(PickStatsID), nameof(PickDailyStats.Mispicks), CascadeOperations = CascadeOperation.CascadeRead)]
     public PickDailyStats? PickStats { get; set; }
 
     [Ignore] public Employee? Employee { get; set; }
@@ -56,7 +57,7 @@ public class MissPick : IEquatable<MissPick>
     public bool IsAssigned => Checked && !NoCarton && !NoItem &&
                               (AssignedDematicID != string.Empty || AssignedRF_ID != string.Empty);
 
-    public MissPick()
+    public Mispick()
     {
         // Use temporary unique value for ID before appropriate assignment.
         ID = Guid.NewGuid().ToString();
@@ -72,7 +73,7 @@ public class MissPick : IEquatable<MissPick>
         AssignedDematicID = string.Empty;
     }
 
-    // Use when you can pinpoint a specific pick event to be tied to this miss pick.
+    // Use when you can pinpoint a specific pick event to be tied to this mispick.
     public void AssignPickEvent(PickEvent pickEvent)
     {
         PickEventID = pickEvent.ID;
@@ -86,12 +87,12 @@ public class MissPick : IEquatable<MissPick>
         AssignedDematicID = pickEvent.OperatorDematicID;
         TechType = pickEvent.TechType;
 
-        PickEvent.MissPickID = ID;
-        PickEvent.MissPick = this;
-        PickSession?.MissPicks.Add(this);
-        PickStats?.MissPicks.Add(this);
+        PickEvent.MispickID = ID;
+        PickEvent.Mispick = this;
+        PickSession?.Mispicks.Add(this);
+        PickStats?.Mispicks.Add(this);
     }
-    // Use when it can be determined that the miss pick happened in a specific session (by a specific operator) - but cannot be tied to a specific pick event.
+    // Use when it can be determined that the mispick happened in a specific session (by a specific operator) - but cannot be tied to a specific pick event.
     public void AssignPickSession(PickSession pickSession)
     {
         PickSessionID = pickSession.ID;
@@ -103,10 +104,10 @@ public class MissPick : IEquatable<MissPick>
         AssignedDematicID = pickSession.OperatorDematicID;
         TechType = pickSession.TechType;
 
-        PickSession.MissPicks.Add(this);
-        PickStats?.MissPicks.Add(this);
+        PickSession.Mispicks.Add(this);
+        PickStats?.Mispicks.Add(this);
     }
-    // Use when it can only be determined that the miss pick was made by a specific operator on a given date.
+    // Use when it can only be determined that the mispick was made by a specific operator on a given date.
     public void AssignPickStats(PickDailyStats pickStats, ETechType tech)
     {
         PickStatsID = pickStats.ID;
@@ -116,21 +117,21 @@ public class MissPick : IEquatable<MissPick>
         AssignedDematicID = pickStats.OperatorDematicID;
         TechType = tech;
 
-        PickStats.MissPicks.Add(this);
+        PickStats.Mispicks.Add(this);
     }
 
     /// <summary>
-    /// Use when assigning a cross-matching miss pick.
+    /// Use when assigning a cross-matching mispick.
     /// </summary>
-    /// <param name="assignedMissPick">Another miss pick that has already been assigned.</param>
-    public void AssignMatchingMissPick(MissPick assignedMissPick)
+    /// <param name="assignedMispick">Another mispick that has already been assigned.</param>
+    public void AssignMatchingMispick(Mispick assignedMispick)
     {
-        if (assignedMissPick.PickEvent is not null) 
-            AssignPickEvent(assignedMissPick.PickEvent);
-        else if (assignedMissPick.PickSession is not null)
-            AssignPickSession(assignedMissPick.PickSession);
-        else if (assignedMissPick.PickStats is not null)
-            AssignPickStats(assignedMissPick.PickStats, TechType);
+        if (assignedMispick.PickEvent is not null) 
+            AssignPickEvent(assignedMispick.PickEvent);
+        else if (assignedMispick.PickSession is not null)
+            AssignPickSession(assignedMispick.PickSession);
+        else if (assignedMispick.PickStats is not null)
+            AssignPickStats(assignedMispick.PickStats, TechType);
     }
 
     // Assumes no relevant picker/event found. Makes sure data is clear.
@@ -148,43 +149,54 @@ public class MissPick : IEquatable<MissPick>
         Employee = null;
     }
 
+    public void ClearMultiAssignComments()
+    {
+        // Clear old MA comments.
+        Comments = Regex.Replace(Comments, "\\(MA:\\(.*\\)\\) ", "");
+    }
+
     public void MultiAssign(IEnumerable<string> potentialIDMatches)
     {
         MultiMatch = true;
-        // Clear old MA comments.
-        Regex.Replace(Comments, "\\(MA:\\(.*\\)\\) ", "");
+
+        ClearMultiAssignComments();
 
         Comments = $"(MA:({string.Join("|", potentialIDMatches)})) {Comments}";
     }
 
-    public static string GetMissPickID(string cartonID, int itemNo) => $"{cartonID}:{itemNo}";
-
-    public bool Equals(MissPick? x, MissPick? y)
+    public static string GetMispickID(string cartonID, int itemNo) => $"{cartonID}:{itemNo}";
+    
+    public static void HandleDuplicateValues(ref List<Mispick> mispicks)
+    {
+        // Remove duplicates.
+        mispicks = mispicks.DistinctBy(e => e.ID).ToList();
+    }
+    public static bool Equals(Mispick? x, Mispick? y)
     {
         if (ReferenceEquals(x, y)) return true;
-        if (ReferenceEquals(x, null)) return false;
-        if (ReferenceEquals(y, null)) return false;
+        if (x is null) return false;
+        if (y is null) return false;
         if (x.GetType() != y.GetType()) return false;
         return x.ID == y.ID;
     }
 
-    public int GetHashCode(MissPick obj)
+    public static int GetHashCode(Mispick obj)
     {
         return obj.ID.GetHashCode();
     }
 
-    public bool Equals(MissPick? other)
+    public bool Equals(Mispick? other)
     {
-        if (ReferenceEquals(null, other)) return false;
+        if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
         return ID == other.ID;
     }
 
     public override bool Equals(object? obj)
     {
-        if (ReferenceEquals(null, obj)) return false;
+        if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        return obj.GetType() == GetType() && Equals((MissPick) obj);
+        return obj.GetType() == GetType() && Equals((Mispick) obj);
     }
 
     public override int GetHashCode()

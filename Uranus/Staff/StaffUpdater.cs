@@ -19,13 +19,13 @@ public class StaffUpdater
 
     public int Employee(Employee employee) => Chariot.Update(employee);
 
-    public async Task<int> ClockEventsAsync(IEnumerable<ClockEvent> clocks) => await Chariot.UpdateTableAsync(clocks);
+    public async Task<int> ClockEventsAsync(IEnumerable<ClockEvent> clocks) => await Chariot.UpdateTableAsync(clocks).ConfigureAwait(false);
 
     public int ClockEvents(IEnumerable<ClockEvent> clocks) => Chariot.UpdateTable(clocks);
 
-    public async Task<int> ShiftEntryAsync(ShiftEntry shiftEntry) => await Chariot.InsertOrUpdateAsync(shiftEntry);
+    public async Task<int> ShiftEntryAsync(ShiftEntry shiftEntry) => await Chariot.InsertOrUpdateAsync(shiftEntry).ConfigureAwait(false);
 
-    public async Task<int> ShiftEntriesAsync(IEnumerable<ShiftEntry> shiftEntries) => await Chariot.UpdateTableAsync(shiftEntries);
+    public async Task<int> ShiftEntriesAsync(IEnumerable<ShiftEntry> shiftEntries) => await Chariot.UpdateTableAsync(shiftEntries).ConfigureAwait(false);
 
     public int ShiftEntries(IEnumerable<ShiftEntry> shiftEntries) => Chariot.UpdateTable(shiftEntries);
 
@@ -38,7 +38,7 @@ public class StaffUpdater
             lines += ShiftEntries(shiftEntries);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return lines;
     }
@@ -147,7 +147,7 @@ public class StaffUpdater
             lines += EntriesAndClocks(updatedEntries, updatedClockEvents);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return lines;
     }
@@ -210,7 +210,7 @@ public class StaffUpdater
     /// <returns>Number of DB rows affected</returns>
     public int Employees(IEnumerable<Employee> employees) => Chariot.UpdateTable(employees);
 
-    public async Task<int> EmployeesAsync(IEnumerable<Employee> employees) => await Chariot.UpdateTableAsync(employees);
+    public async Task<int> EmployeesAsync(IEnumerable<Employee> employees) => await Chariot.UpdateTableAsync(employees).ConfigureAwait(false);
 
     public int EmployeeIcon(EmployeeIcon icon) => Chariot.Update(icon);
     public int EmployeeAvatar(EmployeeAvatar avatar) => Chariot.Update(avatar);
@@ -326,7 +326,7 @@ public class StaffUpdater
             lines += Chariot.Update(departmentRoster);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return lines;
     }
@@ -355,7 +355,7 @@ public class StaffUpdater
     {
         var events = PickEvent.GenerateFromRawData(rawData, out var sessions, out var stats, ptlBreak, rftBreak);
 
-        return await UploadPickHistoryDataAsync(events, sessions, stats);
+        return await UploadPickHistoryDataAsync(events, sessions, stats).ConfigureAwait(false);
     }
 
     /// <summary>
@@ -405,16 +405,18 @@ public class StaffUpdater
             lines += Chariot.InsertIntoTable(dailyStats);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return lines;
     }
 
-    public async Task<int> PickEventsAsync(IEnumerable<PickEvent> pickEvents) => await Chariot.UpdateTableAsync(pickEvents);
+    public async Task<int> PickEventsAsync(IEnumerable<PickEvent> pickEvents) => await Chariot.UpdateTableAsync(pickEvents).ConfigureAwait(false);
 
-    public async Task<int> PickSessionsAsync(IEnumerable<PickSession> sessions) => await Chariot.UpdateTableAsync(sessions);
+    public int PickEvents(IEnumerable<PickEvent> pickEvents) => Chariot.UpdateTable(pickEvents);
 
-    public async Task<int> PickDailyStatsAsync(IEnumerable<PickDailyStats> stats) => await Chariot.UpdateTableAsync(stats);
+    public async Task<int> PickSessionsAsync(IEnumerable<PickSession> sessions) => await Chariot.UpdateTableAsync(sessions).ConfigureAwait(false);
+
+    public async Task<int> PickDailyStatsAsync(IEnumerable<PickDailyStats> stats) => await Chariot.UpdateTableAsync(stats).ConfigureAwait(false);
 
     public async Task<int> PickStatsAsync(IEnumerable<PickEvent> events, IEnumerable<PickSession> sessions,
         IEnumerable<PickDailyStats> stats)
@@ -428,7 +430,7 @@ public class StaffUpdater
             lines += Chariot.UpdateTable(stats);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return lines;
     }
@@ -460,7 +462,7 @@ public class StaffUpdater
             lines += Chariot.InsertOrUpdate(employee);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return lines;
     }
@@ -504,32 +506,32 @@ public class StaffUpdater
             lines += Chariot.InsertIntoTable(tag.TagUse);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return lines;
     }
 
-    public async Task<int> TagUsageAsync(TagUse use) => await Chariot.InsertOrUpdateAsync(use);
+    public async Task<int> TagUsageAsync(TagUse use) => await Chariot.InsertOrUpdateAsync(use).ConfigureAwait(false);
 
-    public async Task<int> MissPickAsync(MissPick missPick) => await Chariot.InsertOrUpdateAsync(missPick);
+    public async Task<int> MispickAsync(Mispick mispick) => await Chariot.InsertOrUpdateAsync(mispick).ConfigureAwait(false);
 
     /// <summary>
-    /// Update pick data and miss pick data.
+    /// Update pick data and mispick data.
     /// Intended for use after error assignment.
     ///
     /// WARNING: Assumes data present represents all data for these days.
     /// </summary>
-    /// <param name="missPicks"></param>
+    /// <param name="mispicks"></param>
     /// <param name="pickEvents"></param>
     /// <param name="pickSessions"></param>
     /// <param name="stats"></param>
     /// <returns>The number of rows modified in the database as a result of this execution.</returns>
-    public async Task<int> ErrorAssignmentAsync(List<MissPick> missPicks, List<PickEvent> pickEvents, List<PickSession> pickSessions, List<PickDailyStats> stats)
+    public async Task<int> ErrorAssignmentAsync(List<Mispick> mispicks, List<PickEvent> pickEvents, List<PickSession> pickSessions, List<PickDailyStats> stats)
     {
         var lines = 0;
 
         // get dates
-        var dates = missPicks.Select(m => m.ShipmentDate).ToList();
+        var dates = mispicks.Select(m => m.ShipmentDate).ToList();
         dates.AddRange(pickEvents.Select(e => e.Date));
 
         dates = dates.Distinct().ToList();
@@ -542,18 +544,63 @@ public class StaffUpdater
                 Chariot.Execute("DELETE FROM PickEvent WHERE Date = ?;", date);
                 Chariot.Execute("DELETE FROM PickSession WHERE Date = ?;", date);
                 Chariot.Execute("DELETE FROM PickDailyStats WHERE Date = ?;", date);
-                Chariot.Execute("DELETE FROM MissPick WHERE ShipmentDate = ?;", date);
+                Chariot.Execute("DELETE FROM Mispick WHERE ShipmentDate = ?;", date);
             }
 
             // Insert new data.
-            lines += Chariot.InsertIntoTable(missPicks);
+            lines += Chariot.InsertIntoTable(mispicks);
             lines += Chariot.InsertIntoTable(pickEvents);
             lines += Chariot.InsertIntoTable(pickSessions);
             lines += Chariot.InsertIntoTable(stats);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return lines;
+    }
+
+    /// <summary>
+    /// Fixes pick history data for the give dates.
+    /// Uses existing Pick Events to create and overwrite sessions and daily stats.
+    /// </summary>
+    /// <param name="dates">Dates to address within the database.</param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<(int eventCount, int sessionCount, int statCount)> FixEventHistoryAsync(List<DateTime> dates)
+    {
+        var eventCount = 0;
+        var sessionCount = 0;
+        var statCount = 0;
+
+        void Action()
+        {
+            foreach (var date in dates)
+            {
+                // Get core events
+                var events = Chariot.PullObjectList<PickEvent>(e => e.Date == date);
+    
+                // Remove all current data for this date.
+                Chariot.Execute("DELETE FROM PickEvent WHERE Date = ?;", date);
+                Chariot.Execute("DELETE FROM PickSession WHERE Date = ?;", date);
+                Chariot.Execute("DELETE FROM PickDailyStats WHERE Date = ?;", date);
+
+                // Create sessions and stats - while removing/renaming duplicates.
+                var sessions = PickEvent.GenerateStatisticsFromEvents(ref events, out var stats);
+
+                // Chart counts.
+                eventCount += events.Count;
+                sessionCount += sessions.Count;
+                statCount += stats.Count;
+
+                // Update/(insert) pick history data.
+                Chariot.InsertIntoTable(events);
+                Chariot.InsertIntoTable(sessions);
+                Chariot.InsertIntoTable(stats);
+            }
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return (eventCount, sessionCount, statCount);
     }
 }

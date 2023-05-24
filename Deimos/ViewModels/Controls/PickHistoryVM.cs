@@ -30,6 +30,18 @@ public class PickHistoryVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     #region InotifyPropertyChanged Members
 
+    private DateTime? date;
+    public DateTime? Date
+    {
+        get => date;
+        set
+        {
+            date = value;
+            OnPropertyChanged();
+            _ = RefreshDataAsync();
+        }
+    }
+
     public ObservableCollection<PickEvent> PickEvents { get; set; }
 
     private string filterString;
@@ -70,10 +82,9 @@ public class PickHistoryVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     public async Task RefreshDataAsync()
     {
-        if (StartDate is null || EndDate is null)
-            AllEvents = new List<PickEvent>();
-        else
-            AllEvents = (await Helios.StaffReader.PickEventsAsync((DateTime) StartDate, (DateTime) EndDate)).ToList();
+        PickEvents.Clear();
+
+        AllEvents = Date is null ? new List<PickEvent>() : (await Helios.StaffReader.PickEventsAsync((DateTime) Date)).ToList();
 
         ApplyFilters();
     }

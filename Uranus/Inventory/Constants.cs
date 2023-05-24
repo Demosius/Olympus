@@ -227,7 +227,7 @@ public static class Constants
         {"Cluster Ref", -1 },
     };
 
-    public static Dictionary<string, int> DematicMissPickColumns = new()
+    public static Dictionary<string, int> DematicMispickColumns = new()
     {
         {"Actual Shipment Date", -1},
         {"Actual Received Date", -1},
@@ -790,7 +790,7 @@ public class PickEventIndices : IColumnIndexer
     }.Max();
 }
 
-public class MissPickIndices : IColumnIndexer
+public class MispickIndices : IColumnIndexer
 {
     public int ShipDate { get; set; }
     public int ReceiveDate { get; set; }
@@ -803,7 +803,7 @@ public class MissPickIndices : IColumnIndexer
     public int VarianceQty { get; set; }
     public int PostDate { get; set; }
 
-    public MissPickIndices(string[] headers)
+    public MispickIndices(string[] headers)
     {
         SetIndices(headers);
         CheckMissingHeaders();

@@ -25,7 +25,7 @@ public class InventoryUpdater
             if (count > 0) Chariot.SetTableUpdateTime(typeof(NAVBin));
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return count;
     }
 
@@ -43,7 +43,7 @@ public class InventoryUpdater
             if (count > 0) Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return count;
     }
 
@@ -62,7 +62,7 @@ public class InventoryUpdater
             lines += Chariot.SetTableUpdateTime(typeof(NAVUoM));
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return lines;
     }
@@ -83,7 +83,7 @@ public class InventoryUpdater
             lines += Chariot.SetStockUpdateTimes(stock);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return lines;
     }
@@ -104,14 +104,14 @@ public class InventoryUpdater
 
             lines += Chariot.SetTableUpdateTime(typeof(NAVStock));
             lines += Chariot.SetStockUpdateTimes(newStock);
-        }));
+        })).ConfigureAwait(false);
 
         return lines;
     }
 
-    public async Task<int> NAVZonesAsync(List<NAVZone> zones) => await Chariot.UpdateTableAsync(zones);
+    public async Task<int> NAVZonesAsync(List<NAVZone> zones) => await Chariot.UpdateTableAsync(zones).ConfigureAwait(false);
 
-    public async Task<int> NAVTransferOrdersAsync(IEnumerable<NAVTransferOrder> transferOrders) => await Chariot.UpdateTableAsync(transferOrders);
+    public async Task<int> NAVTransferOrdersAsync(IEnumerable<NAVTransferOrder> transferOrders) => await Chariot.UpdateTableAsync(transferOrders).ConfigureAwait(false);
 
     public async Task<int> ZonesAsync(List<NAVZone> zones)
     {
@@ -123,19 +123,19 @@ public class InventoryUpdater
             count += Chariot.UpdateTable(zones.Select(z => z.Extension));
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return count;
     }
 
-    public async Task<int> NAVLocationAsync(List<NAVLocation> locations) => await Chariot.UpdateTableAsync(locations);
+    public async Task<int> NAVLocationAsync(List<NAVLocation> locations) => await Chariot.UpdateTableAsync(locations).ConfigureAwait(false);
 
-    public async Task<int> NAVDivisionAsync(List<NAVDivision> divs) => await Chariot.UpdateTableAsync(divs);
+    public async Task<int> NAVDivisionAsync(List<NAVDivision> divs) => await Chariot.UpdateTableAsync(divs).ConfigureAwait(false);
 
-    public async Task<int> NAVCategoryAsync(List<NAVCategory> cats) => await Chariot.UpdateTableAsync(cats);
+    public async Task<int> NAVCategoryAsync(List<NAVCategory> cats) => await Chariot.UpdateTableAsync(cats).ConfigureAwait(false);
 
-    public async Task<int> NAVPlatformAsync(List<NAVPlatform> pfs) => await Chariot.UpdateTableAsync(pfs);
+    public async Task<int> NAVPlatformAsync(List<NAVPlatform> pfs) => await Chariot.UpdateTableAsync(pfs).ConfigureAwait(false);
 
-    public async Task<int> NAVGenre(List<NAVGenre> gens) => await Chariot.UpdateTableAsync(gens);
+    public async Task<int> NAVGenre(List<NAVGenre> gens) => await Chariot.UpdateTableAsync(gens).ConfigureAwait(false);
 
     /// <summary>
     /// Replaces the current data with all new data, and updates connected zoneExtensions as applicable.
@@ -153,7 +153,7 @@ public class InventoryUpdater
             lines += Chariot.ReplaceFullTable(zoneList);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return lines;
     }
@@ -171,7 +171,7 @@ public class InventoryUpdater
             lines += Chariot.ReplaceFullTable(mcList);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return lines;
     }
 
@@ -186,7 +186,7 @@ public class InventoryUpdater
             lines += Chariot.UpdateTable(sites.SelectMany(s => s.Zones.Select(z => z.Extension)));
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return lines;
     }
 
@@ -201,11 +201,12 @@ public class InventoryUpdater
             lines += Chariot.UpdateTable(zones.Select(z => z.Extension));
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return lines;
     }
 
-    public async Task<int> SiteItemLevelsAsync(IEnumerable<SiteItemLevel> siteItemLevels) => await Chariot.UpdateTableAsync(siteItemLevels);
+    public async Task<int> SiteItemLevelsAsync(IEnumerable<SiteItemLevel> siteItemLevels) =>
+        await Chariot.UpdateTableAsync(siteItemLevels).ConfigureAwait(false);
 
     public int Site(Site site) => Chariot.Update(site);
 }

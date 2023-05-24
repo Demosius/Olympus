@@ -35,7 +35,7 @@ public class UserCreator
             Chariot.Create(role);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
     }
 
     public void Role(Role role, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(role, pushType);

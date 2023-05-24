@@ -24,20 +24,20 @@ public class InventoryReader
         Chariot.PullObject<NAVBin>(binID, pullType);
 
     public async Task<List<NAVBin>> NAVBinsAsync(Expression<Func<NAVBin, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public List<NAVBin> NAVBins(Expression<Func<NAVBin, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     public async Task<List<NAVBin>> NAVBinsAsync(string binCode, EPullType pullType = EPullType.ObjectOnly) =>
-        await NAVBinsAsync(b => b.Code == binCode, pullType);
+        await NAVBinsAsync(b => b.Code == binCode, pullType).ConfigureAwait(false);
 
     /* ITEMS */
     public NAVItem? NAVItem(int itemNumber, EPullType pullType = EPullType.ObjectOnly) =>
         Chariot.PullObject<NAVItem>(itemNumber, pullType);
 
     public async Task<List<NAVItem>> NAVItemsAsync(Expression<Func<NAVItem, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public List<NAVItem> NAVItems(Expression<Func<NAVItem, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
@@ -50,10 +50,10 @@ public class InventoryReader
         Chariot.PullObject<NAVZone>(zoneID, pullType);
 
     public async Task<List<NAVZone>> NAVZonesAsync(Expression<Func<NAVZone, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public async Task<List<NAVZone>> NAVZonesAsync(string zoneCode, EPullType pullType = EPullType.ObjectOnly) =>
-        await NAVZonesAsync(z => z.Code == zoneCode, pullType);
+        await NAVZonesAsync(z => z.Code == zoneCode, pullType).ConfigureAwait(false);
 
     /// <summary>
     /// Zones with matched zone-extension objects.
@@ -86,7 +86,7 @@ public class InventoryReader
             returnZones = zones.Values;
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         if (newExtensions.Any()) await Chariot.InsertIntoTableAsync(newExtensions);
 
@@ -164,7 +164,7 @@ public class InventoryReader
             Chariot.InsertIntoTable(newExtensions);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return items.Values;
     }
@@ -245,7 +245,7 @@ public class InventoryReader
             returnBins = bins.Values;
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         returnBins ??= new List<NAVBin>();
 
         return returnBins;
@@ -326,7 +326,7 @@ public class InventoryReader
         NAVStock(string.Join(":", locationCode, zoneCode, binCode, itemNumber, uomCode), pullType);
 
     public async Task<List<NAVStock>> NAVAllStockAsync(Expression<Func<NAVStock, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public List<NAVStock> NAVAllStock(Expression<Func<NAVStock, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
@@ -354,7 +354,7 @@ public class InventoryReader
         Chariot.PullObject<NAVUoM>(uomID, pullType);
 
     public async Task<List<NAVUoM>> NAVUoMsAsync(Expression<Func<NAVUoM, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public List<NAVUoM> NAVUoMs(Expression<Func<NAVUoM, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
@@ -388,14 +388,14 @@ public class InventoryReader
         Chariot.PullObject<NAVLocation>(locationCode, pullType);
 
     public async Task<List<NAVLocation>> NAVLocationsAsync(Expression<Func<NAVLocation, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     /* DIVISION */
     public NAVDivision? NAVDivision(int divCode, EPullType pullType = EPullType.ObjectOnly) =>
         Chariot.PullObject<NAVDivision>(divCode, pullType);
 
     public async Task<List<NAVDivision>> NAVDivisionsAsync(Expression<Func<NAVDivision, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public List<NAVDivision> NAVDivisions(Expression<Func<NAVDivision, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
@@ -405,7 +405,7 @@ public class InventoryReader
         Chariot.PullObject<NAVCategory>(catCode, pullType);
 
     public async Task<List<NAVCategory>> NAVCategoriesAsync(Expression<Func<NAVCategory, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public List<NAVCategory> NAVCategories(Expression<Func<NAVCategory, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
@@ -415,7 +415,7 @@ public class InventoryReader
         Chariot.PullObject<NAVPlatform>(pfCode, pullType);
 
     public async Task<List<NAVPlatform>> NAVPlatformsAsync(Expression<Func<NAVPlatform, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public List<NAVPlatform> NAVPlatforms(Expression<Func<NAVPlatform, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
@@ -425,7 +425,7 @@ public class InventoryReader
         Chariot.PullObject<NAVGenre>(genCode, pullType);
 
     public async Task<List<NAVGenre>> NAVGenresAsync(Expression<Func<NAVGenre, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public List<NAVGenre> NAVGenres(Expression<Func<NAVGenre, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
@@ -455,14 +455,14 @@ public class InventoryReader
 
     /* Transfer Order Lines */
     public async Task<List<NAVTransferOrder>> TOListAsync(Expression<Func<NAVTransferOrder, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public List<NAVTransferOrder> TOList(Expression<Func<NAVTransferOrder, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
     /* STORES */
     public async Task<List<Store>> StoresAsync(Expression<Func<Store, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public List<Store> Stores(Expression<Func<Store, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
@@ -499,7 +499,7 @@ public class InventoryReader
             returnVal = items.Select(item => new SkuMaster(item, stock, uomDict, bins, divisions, categories, platforms, genres));
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return returnVal;
     }
@@ -508,7 +508,7 @@ public class InventoryReader
     /// </summary>
     /// <returns></returns>
     public async Task<IEnumerable<SkuMaster>> ImplicitGetMastersAsync() =>
-        (await NAVItemsAsync(pullType: EPullType.IncludeChildren)).Select(i => new SkuMaster(i));
+        (await NAVItemsAsync(pullType: EPullType.IncludeChildren).ConfigureAwait(false)).Select(i => new SkuMaster(i));
 
 
     /// <summary>
@@ -540,8 +540,8 @@ public class InventoryReader
             }
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
-        if (newExtensions.Any()) await Chariot.UpdateTableAsync(newExtensions);
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        if (newExtensions.Any()) await Chariot.UpdateTableAsync(newExtensions).ConfigureAwait(false);
 
         return (siteDict.Values, zones);
     }
@@ -600,7 +600,7 @@ public class InventoryReader
             dataSet = new FixedBinCheckDataSet(items, zones, bins, stock, navUoMs);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         if (newZoneExtensions.Any() || newBinExtensions.Any())
         {
             await Task.Run(() =>
@@ -610,7 +610,7 @@ public class InventoryReader
                     Chariot.UpdateTable(newZoneExtensions);
                     Chariot.UpdateTable(newBinExtensions);
                 });
-            });
+            }).ConfigureAwait(false);
         }
 
         return dataSet;
@@ -634,7 +634,7 @@ public class InventoryReader
             uomList = Chariot.PullObjectList<NAVUoM>();
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         if (newBinExtensions.Any()) await Chariot.UpdateTableAsync(newBinExtensions);
 
         return (stock, bins, uomList);
@@ -717,7 +717,7 @@ public class InventoryReader
             dataSet = new HydraDataSet(items, sites, zones, allLevels, bins, stock, uomList, locations);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         if (newZoneExtensions.Any() || newBinExtensions.Any())
         {
             await Task.Run(() =>
@@ -727,7 +727,7 @@ public class InventoryReader
                     Chariot.UpdateTable(newZoneExtensions);
                     Chariot.UpdateTable(newBinExtensions);
                 });
-            });
+            }).ConfigureAwait(false);
         }
 
         return dataSet;
@@ -751,7 +751,7 @@ public class InventoryReader
             dataSet = new BasicStockDataSet(items, zones, bins, stock, uomList);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         if (newZoneExtensions.Any() || newBinExtensions.Any())
         {
             await Task.Run(() =>
@@ -761,7 +761,7 @@ public class InventoryReader
                     Chariot.UpdateTable(newZoneExtensions);
                     Chariot.UpdateTable(newBinExtensions);
                 });
-            });
+            }).ConfigureAwait(false);
         }
 
         return dataSet;
@@ -792,7 +792,7 @@ public class InventoryReader
                  stores, platforms, genres, categories, divisions);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         if (newZoneExtensions.Any() || newBinExtensions.Any())
         {
             await Task.Run(() =>
@@ -802,7 +802,7 @@ public class InventoryReader
                     Chariot.UpdateTable(newZoneExtensions);
                     Chariot.UpdateTable(newBinExtensions);
                 });
-            });
+            }).ConfigureAwait(false);
         }
 
         return dataSet;
@@ -811,13 +811,13 @@ public class InventoryReader
     public int TOLineCount() => Chariot.ExecuteScalar<int>("SELECT count(*) FROM TOLineBatchAnalysis;");
 
     public async Task<IEnumerable<MixedCarton>> MixedCartonsAsync(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
-        => await Chariot.PullObjectListAsync(filter, pullType);
+        => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public IEnumerable<MixedCarton> MixedCartons(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
         => Chariot.PullObjectList(filter, pullType);
 
     public async Task<IEnumerable<MixedCartonItem>> MixedCartonItemsAsync(Expression<Func<MixedCartonItem, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
-        => await Chariot.PullObjectListAsync(filter, pullType);
+        => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public IEnumerable<MixedCartonItem> MixedCartonItems(Expression<Func<MixedCartonItem, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
         => Chariot.PullObjectList(filter, pullType);
@@ -848,7 +848,7 @@ public class InventoryReader
             }
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return mixedCartons.Values;
     }
 
@@ -865,7 +865,7 @@ public class InventoryReader
             mcItems = MixedCartonItems().ToList();
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return (mcList, mcItems, items);
     }
 }

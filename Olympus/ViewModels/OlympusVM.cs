@@ -8,11 +8,9 @@ using ServiceStack.Text;
 using SQLite;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -61,7 +59,6 @@ public class OlympusVM : INotifyPropertyChanged
         UserHandlerVM = new UserHandlerVM(this);
         InventoryUpdaterVM = new InventoryUpdaterVM(this);
         ProgressBarVM = App.ProgressBar;
-        ProgressBarVM.IsActive = true;
 
         GenerateMasterSkuListCommand = new GenerateMasterSkuListCommand(this);
         ChangePasswordCommand = new ChangePasswordCommand(this);
@@ -77,19 +74,6 @@ public class OlympusVM : INotifyPropertyChanged
     {
         var ret = new OlympusVM();
         return ret.InitializeAsync();
-    }
-
-    public void TestPb()
-    {
-        ProgressBarVM.Activate("Testing", "Iteration 0", newMax: 100, showPercent: true);
-
-        for (var i = 0; i < 100; i++)
-        {
-            ProgressBarVM.NewAction($"Iteration {i}", true);
-            Thread.Sleep(100);
-        }
-
-        ProgressBarVM.Deactivate();
     }
 
     internal async Task RefreshData()

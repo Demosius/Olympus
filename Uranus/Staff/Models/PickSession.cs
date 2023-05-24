@@ -45,8 +45,8 @@ public class PickSession
 
     [OneToMany(nameof(PickEvent.SessionID), nameof(PickEvent.Session), CascadeOperations = CascadeOperation.CascadeRead)]
     public List<PickEvent> PickEvents { get; set; }
-    [OneToMany(nameof(MissPick.PickSessionID), nameof(MissPick.PickSession), CascadeOperations = CascadeOperation.CascadeRead)]
-    public List<MissPick> MissPicks { get; set; }
+    [OneToMany(nameof(Mispick.PickSessionID), nameof(Mispick.PickSession), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<Mispick> Mispicks { get; set; }
 
     [Ignore] public int Hits => EventCount;
     [Ignore] public int Units => Qty;
@@ -66,7 +66,7 @@ public class PickSession
         StatsID = string.Empty;
 
         PickEvents = new List<PickEvent>();
-        MissPicks = new List<MissPick>();
+        Mispicks = new List<Mispick>();
     }
 
     // Assume all given events do indeed form a valid pick session, and are in the correct order.
@@ -111,25 +111,25 @@ public class PickSession
             pickEvent.StatsID = StatsID;
         }
 
-        MissPicks = new List<MissPick>();
-        foreach (var missPick in PickEvents.Select(e => e.MissPick))
+        Mispicks = new List<Mispick>();
+        foreach (var mispick in PickEvents.Select(e => e.Mispick))
         {
-            if (missPick is null) continue;
+            if (mispick is null) continue;
 
-            MissPicks.Add(missPick);
-            missPick.PickSessionID = ID;
-            missPick.PickSession = this;
+            Mispicks.Add(mispick);
+            mispick.PickSessionID = ID;
+            mispick.PickSession = this;
         }
     }
 
-    public void AssignMissPick(MissPick missPick)
+    public void AssignMispick(Mispick mispick)
     {
-        MissPicks.Add(missPick);
+        Mispicks.Add(mispick);
 
-        missPick.PickSessionID = ID;
-        missPick.PickSession = this;
+        mispick.PickSessionID = ID;
+        mispick.PickSession = this;
 
-        PickStats?.AssignMissPick(missPick);
+        PickStats?.AssignMispick(mispick);
     }
 
     public static string GetSessionID(string dematicID, DateTime dateTime) => $"{dematicID}.{dateTime:yyyy.MM.dd.hh.mm.ss}";

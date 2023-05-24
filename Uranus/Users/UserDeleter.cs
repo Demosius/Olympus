@@ -34,7 +34,7 @@ public class UserDeleter
     }
 
     // Roles
-    public async Task<bool> RoleAsync(Role role) => await RoleAsync(role.Name);
+    public async Task<bool> RoleAsync(Role role) => await RoleAsync(role.Name).ConfigureAwait(false);
 
     public async Task<bool> RoleAsync(string roleName)
     {
@@ -47,7 +47,7 @@ public class UserDeleter
             result = userCount <= 0 && Chariot.DeleteByKey<Role>(roleName);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return result;
     }

@@ -60,12 +60,12 @@ public class StaffReader
             }
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return employees;
     }
 
-    public async Task<Employee?> RoleStackEmployeeAsync(int id) => (await EmployeeRoleStackAsync()).FirstOrDefault(e => e.ID == id);
+    public async Task<Employee?> RoleStackEmployeeAsync(int id) => (await EmployeeRoleStackAsync().ConfigureAwait(false)).FirstOrDefault(e => e.ID == id);
 
     /// <summary>
     /// Gets the employee with all appropriate relationships loaded.
@@ -74,12 +74,12 @@ public class StaffReader
     /// <returns></returns>
     public async Task<Employee?> EmployeeLogInAsync(int id)
     {
-        (await EmployeeDataSetAsync()).Employees.TryGetValue(id, out var employee);
+        (await EmployeeDataSetAsync().ConfigureAwait(false)).Employees.TryGetValue(id, out var employee);
         return employee;
     }
 
     public async Task<List<Employee>> EmployeesAsync(Expression<Func<Employee, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
-        => await Chariot.PullObjectListAsync(filter ?? (e => e.IsActive), pullType);
+        => await Chariot.PullObjectListAsync(filter ?? (e => e.IsActive), pullType).ConfigureAwait(false);
 
     public List<Employee> Employees(Expression<Func<Employee, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
         => Chariot.PullObjectList(filter ?? (e => e.IsActive), pullType);
@@ -91,10 +91,10 @@ public class StaffReader
     public Role? Role(string roleName, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Role>(roleName, pullType);
 
     public async Task<IEnumerable<Role>> RolesAsync(Expression<Func<Role, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public async Task<List<ClockEvent>> ClockEventsAsync(Expression<Func<ClockEvent, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public List<ClockEvent> ClockEvents(Expression<Func<ClockEvent, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
@@ -118,7 +118,7 @@ public class StaffReader
     }
 
     public async Task<List<ShiftEntry>> ShiftEntriesAsync(Expression<Func<ShiftEntry, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public List<ShiftEntry> ShiftEntries(Expression<Func<ShiftEntry, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
@@ -152,7 +152,7 @@ public class StaffReader
             payPoints = employees.Select(e => e.PayPoint).Distinct();
             employmentTypes = employees.Select(e => e.EmploymentType).Distinct();
         }
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         managerIDList ??= new List<int>();
         employees ??= new List<Employee>();
@@ -171,7 +171,7 @@ public class StaffReader
 
     public async Task<IEnumerable<Employee>> GetManagedEmployeesAsync(int managerID)
     {
-        var fullEmployees = (await EmployeesRecursiveReportsAsync()).ToDictionary(e => e.ID, e => e);
+        var fullEmployees = (await EmployeesRecursiveReportsAsync().ConfigureAwait(false)).ToDictionary(e => e.ID, e => e);
 
         if (!fullEmployees.TryGetValue(managerID, out var manager)) return new List<Employee>();
 
@@ -241,7 +241,7 @@ public class StaffReader
                 dataSet = new EmployeeDataSet(empTask, depTask, depRosterTask, clanTask, roleTask, iconTask,
                     avatarTask, shiftTask, breakTask, sglRuleTask, recRuleTask, rstRuleTask, tagTask, useTask);
             }
-            await Task.Run(() => Chariot.RunInTransaction(Action));
+            await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
             return dataSet;
         }
@@ -302,7 +302,7 @@ public class StaffReader
         => Chariot.Query<DepartmentRoster>("SELECT * FROM DepartmentRoster WHERE DepartmentName = ?;", departmentName);
 
     public async Task<IEnumerable<DepartmentRoster>> DepartmentRostersAsync(Expression<Func<DepartmentRoster, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
-        => await Chariot.PullObjectListAsync(filter, pullType);
+        => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public async Task FillDepartmentRoster(DepartmentRoster departmentRoster)
     {
@@ -339,7 +339,7 @@ public class StaffReader
                     singleRules, recurringRules, rosterRules, weeklyShiftCounters, dailyShiftCounters);
             }
 
-            await Task.Run(() => Chariot.RunInTransaction(Action));
+            await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -381,7 +381,7 @@ public class StaffReader
                     shifts, breaks, empShifts, singleRules, recRules, rosterRules, dailyCounters, weeklyCounters);
             }
 
-            await Task.Run(() => Chariot.RunInTransaction(Action));
+            await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
             return dataSet;
         }
@@ -406,14 +406,14 @@ public class StaffReader
             employees = Chariot.PullObjectList<Employee>(e => employeeIDs.Contains(e.ID));
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return employees ?? Enumerable.Empty<Employee>();
     }
 
     public async Task<IEnumerable<EmployeeIcon>> EmployeeIconsAsync()
     {
-        var icons = await Chariot.PullObjectListAsync<EmployeeIcon>();
+        var icons = await Chariot.PullObjectListAsync<EmployeeIcon>().ConfigureAwait(false);
         foreach (var icon in icons)
             icon.SetDirectory(EmployeeIconDirectory);
 
@@ -431,7 +431,7 @@ public class StaffReader
 
     public async Task<IEnumerable<EmployeeAvatar>> EmployeeAvatarsAsync()
     {
-        var avatars = await Chariot.PullObjectListAsync<EmployeeAvatar>();
+        var avatars = await Chariot.PullObjectListAsync<EmployeeAvatar>().ConfigureAwait(false);
         foreach (var avatar in avatars)
             avatar.SetDirectory(EmployeeAvatarDirectory);
 
@@ -454,7 +454,7 @@ public class StaffReader
     /// <returns></returns>
     public async Task<IEnumerable<Employee>> GetReportsByRole(Role headRole)
     {
-        var roles = await GetReportingRolesAsync(headRole);
+        var roles = await GetReportingRolesAsync(headRole).ConfigureAwait(false);
         var employees = roles.SelectMany(r => r.Employees);
 
         return employees;
@@ -482,7 +482,7 @@ public class StaffReader
                     .ToDictionary(g => g.Key, g => g.ToList());
             }
 
-            await Task.Run(() => Chariot.RunInTransaction(Action));
+            await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -531,12 +531,7 @@ public class StaffReader
 
     public async Task<IEnumerable<Employee>> EmployeesRecursiveReportsAsync()
     {
-        var fullEmployees = await Task.Run(() =>
-        {
-            return Chariot.Database?.Table<Employee>()
-                .Where(e => e.IsActive)
-                .ToDictionary(e => e.ID, e => e) ?? new Dictionary<int, Employee>();
-        });
+        var fullEmployees = await Task.Run(() => { return Chariot.Database?.Table<Employee>().Where(e => e.IsActive).ToDictionary(e => e.ID, e => e) ?? new Dictionary<int, Employee>(); }).ConfigureAwait(false);
 
 
         foreach (var (_, employee) in fullEmployees)
@@ -582,7 +577,7 @@ public class StaffReader
                     startString, endString).ToList();
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         employees ??= new Dictionary<int, Employee>();
         entries ??= new List<ShiftEntry>();
@@ -597,7 +592,7 @@ public class StaffReader
     }
     public async Task<List<ShiftEntry>> GetFilteredEntriesAsync(DateTime minDate, DateTime maxDate, Employee manager)
     {
-        return await GetFilteredEntriesAsync(minDate, maxDate, manager.ID);
+        return await GetFilteredEntriesAsync(minDate, maxDate, manager.ID).ConfigureAwait(false);
     }
     public async Task<List<ShiftEntry>> GetFilteredEntriesAsync(DateTime minDate, DateTime maxDate, int managerID)
     {
@@ -617,7 +612,7 @@ public class StaffReader
                     "AND Date BETWEEN ? AND ?;", startString, endString).ToList();
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         employees ??= new Dictionary<int, Employee>();
         entries ??= new List<ShiftEntry>();
@@ -666,7 +661,7 @@ public class StaffReader
             managers = Chariot.Query<Employee>($"SELECT * FROM Employee WHERE ID IN ({string.Join(", ", managerIDs)});");
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
         return managers ?? new List<Employee>();
     }
@@ -697,21 +692,21 @@ public class StaffReader
     /// <param name="employee"></param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public async Task<IEnumerable<Shift>> ShiftsAsync(Employee employee) => await Chariot.PullObjectListAsync<Shift>(s => s.DepartmentName == employee.DepartmentName);
+    public async Task<IEnumerable<Shift>> ShiftsAsync(Employee employee) => await Chariot.PullObjectListAsync<Shift>(s => s.DepartmentName == employee.DepartmentName).ConfigureAwait(false);
 
-    public async Task<IEnumerable<EmployeeShift>> EmployeeShiftsAsync(Employee employee) => await Chariot.PullObjectListAsync<EmployeeShift>(es => es.EmployeeID == employee.ID);
+    public async Task<IEnumerable<EmployeeShift>> EmployeeShiftsAsync(Employee employee) => await Chariot.PullObjectListAsync<EmployeeShift>(es => es.EmployeeID == employee.ID).ConfigureAwait(false);
 
-    public async Task<IEnumerable<EmployeeShift>> EmployeeShiftsAsync(Shift shift) => await Chariot.PullObjectListAsync<EmployeeShift>(es => es.ShiftID == shift.ID);
+    public async Task<IEnumerable<EmployeeShift>> EmployeeShiftsAsync(Shift shift) => await Chariot.PullObjectListAsync<EmployeeShift>(es => es.ShiftID == shift.ID).ConfigureAwait(false);
 
     public async Task<IEnumerable<EmployeeIcon>> IconsAsync(Expression<Func<EmployeeIcon, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     /* DEPARTMENTS */
     public async Task<List<Department>> DepartmentsAsync(Expression<Func<Department, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public async Task<List<Clan>> ClansAsync(Expression<Func<Clan, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public Department? Department(string departmentName, EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObject<Department>(departmentName, pullType);
 
@@ -742,7 +737,7 @@ public class StaffReader
                     .ToDictionary(g => g.Key, g => g.ToList());
             }
 
-            await Task.Run(() => RunInTransaction(Action));
+            await Task.Run(() => RunInTransaction(Action)).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -816,7 +811,7 @@ public class StaffReader
             newSet.ShiftEntries = shiftEntries.ToDictionary(e => e.ID, e => e);
         }
 
-        await Task.Run(() => RunInTransaction(Action));
+        await Task.Run(() => RunInTransaction(Action)).ConfigureAwait(false);
         return newSet;
     }
 
@@ -837,8 +832,8 @@ public class StaffReader
             tagDict = tags.ToDictionary(e => e.RF_ID, e => e);
             employeeDict = employees.ToDictionary(e => e.ID, e => e);
         }
-        
-        await Task.Run(() => RunInTransaction(Action));
+
+        await Task.Run(() => RunInTransaction(Action)).ConfigureAwait(false);
 
         foreach (var tempTag in tags)
             if (tempTag.EmployeeID != 0 && employeeDict.TryGetValue(tempTag.EmployeeID, out var employee))
@@ -878,51 +873,37 @@ public class StaffReader
             tool = new TagAssignmentTool(tags, employees, tagsUse);
         }
 
-        await Task.Run(() => RunInTransaction(Action));
+        await Task.Run(() => RunInTransaction(Action)).ConfigureAwait(false);
 
         return tool;
     }
 
-    public async Task<Employee?> TagUserAsync(TempTag tempTag, DateTime date) => await TagUserAsync(tempTag.RF_ID, date);
+    public async Task<Employee?> TagUserAsync(TempTag tempTag, DateTime date) => await TagUserAsync(tempTag.RF_ID, date).ConfigureAwait(false);
 
-    public async Task<Employee?> TagUserAsync(string tempTagRF, DateTime date) => Employee(await TagUserIDAsync(tempTagRF, date));
+    public async Task<Employee?> TagUserAsync(string tempTagRF, DateTime date) => Employee(await TagUserIDAsync(tempTagRF, date).ConfigureAwait(false));
 
-    public async Task<int> TagUserIDAsync(TempTag tempTag, DateTime date) => await TagUserIDAsync(tempTag.RF_ID, date);
+    public async Task<int> TagUserIDAsync(TempTag tempTag, DateTime date) => await TagUserIDAsync(tempTag.RF_ID, date).ConfigureAwait(false);
 
     public async Task<int> TagUserIDAsync(string tempTagRF, DateTime date)
     {
         var id = 0;
-        await Task.Run(async () =>
-        {
-            var usage = await Chariot.PullObjectListAsync<TagUse>(u =>
-                u.TempTagRF_ID == tempTagRF &&
-                u.StartDate <= date &&
-                (u.EndDate == null || u.EndDate >= date));
-            if (!usage.Any()) return;
-
-            if (usage.Count == 1)
-            {
-                id = usage.First().EmployeeID;
-                return;
-            }
-
-            if (usage.Any(u => u.EndDate is null)) usage = usage.Where(u => u.EndDate is null).ToList();
-            id = usage.OrderBy(u => u.StartDate).First().EmployeeID;
-
-        });
+        await Task.Run(async () => { var usage = await Chariot.PullObjectListAsync<TagUse>(u => u.TempTagRF_ID == tempTagRF && u.StartDate <= date && (u.EndDate == null || u.EndDate >= date)).ConfigureAwait(false); if (!usage.Any()) return; if (usage.Count == 1) { id = usage.First().EmployeeID; return; } if (usage.Any(u => u.EndDate is null)) usage = usage.Where(u => u.EndDate is null).ToList(); id = usage.OrderBy(u => u.StartDate).First().EmployeeID; }).ConfigureAwait(false);
         return id;
     }
 
     /* Pick Event Tracking */
 
-    public async Task<IEnumerable<PickEvent>> RawPickEventsAsync(DateTime startDate, DateTime endDate) => await Chariot.PullObjectListAsync<PickEvent>(e => e.Date >= startDate.Date && e.Date <= endDate.Date);
+    public async Task<List<PickEvent>> RawPickEventsAsync(DateTime startDate, DateTime endDate) => await Chariot.PullObjectListAsync<PickEvent>(e => e.Date >= startDate.Date && e.Date <= endDate.Date).ConfigureAwait(false);
 
-    public async Task<IEnumerable<MissPick>> RawMissPicksAsync(DateTime startDate, DateTime endDate) =>
-        await Chariot.PullObjectListAsync<MissPick>(mp => mp.ShipmentDate >= startDate.Date && mp.ShipmentDate <= endDate.Date);
+    public async Task<List<Mispick>> RawMispicksAsync(DateTime startDate, DateTime endDate) =>
+        await Chariot.PullObjectListAsync<Mispick>(mp => mp.ShipmentDate >= startDate.Date && mp.ShipmentDate <= endDate.Date).ConfigureAwait(false);
 
-    public async Task<IEnumerable<PickEvent>> PickEventsAsync(DateTime startDate, DateTime endDate, bool includeEmployees = false)
+    public List<Mispick> RawMispicks(DateTime startDate, DateTime endDate) =>
+        Chariot.PullObjectList<Mispick>(mp => mp.ShipmentDate >= startDate.Date && mp.ShipmentDate <= endDate.Date);
+
+    public async Task<List<PickEvent>> PickEventsAsync(DateTime startDate, DateTime endDate, bool includeEmployees = false)
     {
-        IEnumerable<PickEvent>? events = null;
+        var events = new List<PickEvent>();
 
         void Action()
         {
@@ -958,7 +939,7 @@ public class StaffReader
             }
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
 
 
         events ??= new List<PickEvent>();
@@ -966,76 +947,195 @@ public class StaffReader
         return events;
     }
 
-    public async Task<IEnumerable<PickEvent>> PickEventsAsync(DateTime date, bool includeEmployees = false) =>
-        await PickEventsAsync(date, date, includeEmployees);
+    public async Task<List<PickEvent>> PickEventsAsync(DateTime date, bool includeEmployees = false) =>
+        await PickEventsAsync(date, date, includeEmployees).ConfigureAwait(false);
 
-    public async Task<IEnumerable<PickSession>> PickSessionsAsync(DateTime startDate, DateTime endDate, bool includeEmployees = false)
+    public List<PickEvent> PickEvents(DateTime startDate, DateTime endDate, bool includeEmployees = false)
+    {
+        var events = new List<PickEvent>();
+
+        void Action()
+        {
+            events = Chariot.PullObjectList<PickEvent>(e => e.Date >= startDate.Date && e.Date <= endDate.Date);
+
+            if (!includeEmployees) return;
+
+            var employees = Employees();
+            var empDict = employees.ToDictionary(e => e.ID, e => e);
+
+            // Get ID Mapping dictionary to use for reference between RF/Dematic ID to employee ID.
+            Dictionary<string, int> idDict = new();
+            foreach (var employee in employees)
+            {
+                if (employee.DematicID != string.Empty && employee.DematicID != "0000" && !idDict.ContainsKey(employee.DematicID)) idDict.Add(employee.DematicID, employee.ID);
+                if (employee.RF_ID != string.Empty && !idDict.ContainsKey(employee.RF_ID)) idDict.Add(employee.RF_ID, employee.ID);
+            }
+
+            // Assign actual OperatorID.
+            foreach (var pickEvent in events)
+            {
+                if (pickEvent.OperatorID == 0)
+                {
+                    if (idDict.TryGetValue(pickEvent.OperatorDematicID, out var id))
+                        pickEvent.OperatorID = id;
+                    else if (idDict.TryGetValue(pickEvent.OperatorRF_ID, out id)) pickEvent.OperatorID = id;
+                }
+
+                if (!empDict.TryGetValue(pickEvent.OperatorID, out var employee)) continue;
+
+                employee.PickEvents.Add(pickEvent);
+                pickEvent.Operator = employee;
+            }
+        }
+
+        Chariot.RunInTransaction(Action);
+
+        events ??= new List<PickEvent>();
+
+        return events;
+    }
+
+    public List<PickEvent> PickEvents(DateTime date, bool includeEmployees = false) =>
+        PickEvents(date, date, includeEmployees);
+
+    public async Task<List<PickSession>> PickSessionsAsync(DateTime startDate, DateTime endDate, bool includeEmployees = false)
     {
         var eventTask = PickEventsAsync(startDate, endDate, includeEmployees);
 
         var sessionTask = Chariot.PullObjectListAsync<PickSession>(s =>
             s.Date >= startDate.Date && s.Date <= endDate.Date);
 
-        await Task.WhenAll(sessionTask, eventTask);
+        await Task.WhenAll(sessionTask, eventTask).ConfigureAwait(false);
 
         var events = await eventTask;
         var sessions = await sessionTask;
 
-        await Task.Run(() =>
-        {
-            var sessionDict = sessions.ToDictionary(s => s.ID, s => s);
-
-            foreach (var pickEvent in events)
-            {
-                if (!sessionDict.TryGetValue(pickEvent.SessionID, out var session)) continue;
-
-                session.PickEvents.Add(pickEvent);
-                pickEvent.Session = session;
-
-                if (!includeEmployees) continue;
-
-                session.Operator = pickEvent.Operator;
-                session.Operator?.PickSessions.Add(session);
-            }
-        });
+        await Task.Run(() => { var sessionDict = sessions.ToDictionary(s => s.ID, s => s); foreach (var pickEvent in events) { if (!sessionDict.TryGetValue(pickEvent.SessionID, out var session)) continue; session.PickEvents.Add(pickEvent); pickEvent.Session = session; if (!includeEmployees) continue; session.Operator = pickEvent.Operator; session.Operator?.PickSessions.Add(session); } }).ConfigureAwait(false);
 
         return sessions;
     }
 
-    public async Task<IEnumerable<PickSession>> PickSessionsAsync(DateTime date, bool includeEmployees = false) => await
-        PickSessionsAsync(date, date, includeEmployees);
+    public async Task<List<PickSession>> PickSessionsAsync(DateTime date, bool includeEmployees = false) => await
+        PickSessionsAsync(date, date, includeEmployees).ConfigureAwait(false);
 
-    public async Task<IEnumerable<PickDailyStats>> PickStatsAsync(DateTime startDate, DateTime endDate,
+    public List<PickSession> PickSessions(DateTime startDate, DateTime endDate, bool includeEmployees = false)
+    {
+        var events = new List<PickEvent>();
+        var sessions = new List<PickSession>();
+
+        void Action()
+        {
+            events = PickEvents(startDate, endDate, includeEmployees).ToList();
+            sessions = Chariot.PullObjectList<PickSession>(s =>
+                s.Date >= startDate.Date && s.Date <= endDate.Date);
+        }
+
+        RunInTransaction(Action);
+
+        var sessionDict = sessions.ToDictionary(s => s.ID, s => s);
+
+        foreach (var pickEvent in events)
+        {
+            if (!sessionDict.TryGetValue(pickEvent.SessionID, out var session)) continue;
+
+            session.PickEvents.Add(pickEvent);
+            pickEvent.Session = session;
+
+            if (!includeEmployees) continue;
+
+            session.Operator = pickEvent.Operator;
+            session.Operator?.PickSessions.Add(session);
+        }
+
+        return sessions;
+    }
+
+    public List<PickSession> PickSessions(DateTime date, bool includeEmployees = false) =>
+        PickSessions(date, date, includeEmployees);
+
+    public async Task<List<PickDailyStats>> PickStatsAsync(DateTime startDate, DateTime endDate,
         bool includeEmployees = false)
     {
-        var sessionTask = PickSessionsAsync(startDate, endDate, includeEmployees);
-        var statTask = Chariot.PullObjectListAsync<PickDailyStats>(s => s.Date >= startDate.Date && s.Date <= endDate.Date);
+        var sessions = new List<PickSession>();
+        var stats = new List<PickDailyStats>();
 
-        await Task.WhenAll(sessionTask, statTask);
-
-        var sessions = await sessionTask;
-        var stats = await statTask;
-
-        await Task.Run(() =>
+        void Action()
         {
-            var statDict = stats.ToDictionary(s => s.ID, s => s);
+            sessions = PickSessions(startDate, endDate, includeEmployees).ToList();
+            stats = Chariot.PullObjectList<PickDailyStats>(s => s.Date >= startDate.Date && s.Date <= endDate.Date);
+        }
 
-            foreach (var pickSession in sessions)
-            {
-                if (!statDict.TryGetValue(pickSession.StatsID, out var statistics)) continue;
+        await Task.Run(() => RunInTransaction(Action)).ConfigureAwait(false);
 
-                statistics.AddSession(pickSession);
-
-                if (!includeEmployees) continue;
-
-                statistics.Operator = pickSession.Operator;
-                statistics.Operator?.PickStatistics.Add(statistics);
-            }
-        });
+        await Task.Run(() => { var statDict = stats.ToDictionary(s => s.ID, s => s); foreach (var pickSession in sessions) { if (!statDict.TryGetValue(pickSession.StatsID, out var statistics)) continue; statistics.AddSession(pickSession); if (!includeEmployees) continue; statistics.Operator = pickSession.Operator; statistics.Operator?.PickStatistics.Add(statistics); } }).ConfigureAwait(false);
 
         return stats;
     }
 
     public async Task<IEnumerable<PickDailyStats>> PickStatsAsync(DateTime date, bool includeEmployees = false) =>
-        await PickStatsAsync(date, date, includeEmployees);
+        await PickStatsAsync(date, date, includeEmployees).ConfigureAwait(false);
+
+    public List<PickDailyStats> PickStats(DateTime startDate, DateTime endDate,
+        bool includeEmployees = false)
+    {
+        var sessions = new List<PickSession>();
+        var stats = new List<PickDailyStats>();
+
+        void Action()
+        {
+            sessions = PickSessions(startDate, endDate, includeEmployees).ToList();
+            stats = Chariot.PullObjectList<PickDailyStats>(s => s.Date >= startDate.Date && s.Date <= endDate.Date);
+        }
+
+        RunInTransaction(Action);
+
+        var statDict = stats.ToDictionary(s => s.ID, s => s);
+
+        foreach (var pickSession in sessions)
+        {
+            if (!statDict.TryGetValue(pickSession.StatsID, out var statistics)) continue;
+
+            statistics.AddSession(pickSession);
+
+            if (!includeEmployees) continue;
+
+            statistics.Operator = pickSession.Operator;
+            statistics.Operator?.PickStatistics.Add(statistics);
+        }
+
+        return stats;
+    }
+
+    public List<PickDailyStats> PickStats(DateTime date, bool includeEmployees = false) =>
+        PickStats(date, date, includeEmployees);
+
+    public async Task<Dictionary<DateTime, int>> PickEventLineCountByDate(DateTime startDate, DateTime endDate)
+    {
+        var items = await Chariot.QueryAsync<(DateTime, int)>("SELECT Date, COUNT(*) as Lines FROM PickEvent WHERE Date >= ? AND Date <= ? GROUP BY Date;", startDate.Ticks, endDate.Ticks).ConfigureAwait(false);
+
+        return items.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
+    }
+
+    public async Task<Dictionary<DateTime, int>> MispickLineCountByDate(DateTime startDate, DateTime endDate)
+    {
+        var items = await Chariot.QueryAsync<(DateTime, int)>("SELECT ShipmentDate, COUNT(*) as Lines FROM Mispick WHERE ShipmentDate >= ? AND ShipmentDate <= ? GROUP BY ShipmentDate;", startDate.Ticks, endDate.Ticks).ConfigureAwait(false);
+
+        return items.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
+    }
+
+    public async Task<(List<PickDailyStats>, List<Mispick>)> ErrorAssignmentDataAsync(DateTime fromDate, DateTime toDate)
+    {
+        var stats = new List<PickDailyStats>();
+        var mispicks = new List<Mispick>();
+
+        void Action()
+        {
+            mispicks = RawMispicks(fromDate, toDate);
+            stats = mispicks.Any() ? PickStats(fromDate, toDate) : stats;
+        }
+
+        await Task.Run(() => RunInTransaction(Action)).ConfigureAwait(false);
+
+        return (stats, mispicks);
+    }
 }

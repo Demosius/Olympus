@@ -24,7 +24,7 @@ public class InventoryCreator
                 Chariot.SetTableUpdateTime(typeof(NAVBin));
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return lines;
     }
 
@@ -39,7 +39,7 @@ public class InventoryCreator
                 Chariot.SetTableUpdateTime(typeof(NAVItem), dateTime);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return lines;
     }
 
@@ -52,7 +52,7 @@ public class InventoryCreator
             if (lines > 0)
                 Chariot.SetTableUpdateTime(typeof(NAVUoM));
         }
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return lines;
     }
 
@@ -70,23 +70,23 @@ public class InventoryCreator
             Chariot.SetStockUpdateTimes(stock);
         }
 
-        await Task.Run(() => Chariot.RunInTransaction(Action));
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return lines;
     }
 
-    public async Task<int> NAVTransferOrdersAsync(IEnumerable<NAVTransferOrder> transferOrders) => await Chariot.ReplaceFullTableAsync(transferOrders);
+    public async Task<int> NAVTransferOrdersAsync(IEnumerable<NAVTransferOrder> transferOrders) => await Chariot.ReplaceFullTableAsync(transferOrders).ConfigureAwait(false);
 
-    public async Task<int> NAVZoneAsync(List<NAVZone> zones) => await Chariot.ReplaceFullTableAsync(zones);
+    public async Task<int> NAVZoneAsync(List<NAVZone> zones) => await Chariot.ReplaceFullTableAsync(zones).ConfigureAwait(false);
 
-    public async Task<int> NAVLocation(List<NAVLocation> locations) => await Chariot.ReplaceFullTableAsync(locations);
+    public async Task<int> NAVLocation(List<NAVLocation> locations) => await Chariot.ReplaceFullTableAsync(locations).ConfigureAwait(false);
 
-    public async Task<int> NAVDivision(List<NAVDivision> divs) => await Chariot.ReplaceFullTableAsync(divs);
+    public async Task<int> NAVDivision(List<NAVDivision> divs) => await Chariot.ReplaceFullTableAsync(divs).ConfigureAwait(false);
 
-    public async Task<int> NAVCategory(List<NAVCategory> cats) => await Chariot.ReplaceFullTableAsync(cats);
+    public async Task<int> NAVCategory(List<NAVCategory> cats) => await Chariot.ReplaceFullTableAsync(cats).ConfigureAwait(false);
 
-    public async Task<int> NAVPlatform(List<NAVPlatform> pfs) => await Chariot.ReplaceFullTableAsync(pfs);
+    public async Task<int> NAVPlatform(List<NAVPlatform> pfs) => await Chariot.ReplaceFullTableAsync(pfs).ConfigureAwait(false);
 
-    public async Task<int> NAVGenre(List<NAVGenre> gens) => await Chariot.ReplaceFullTableAsync(gens);
+    public async Task<int> NAVGenre(List<NAVGenre> gens) => await Chariot.ReplaceFullTableAsync(gens).ConfigureAwait(false);
 
-    public async Task<int> SiteAsync(Site site) => await Chariot.InsertOrUpdateAsync(site);
+    public async Task<int> SiteAsync(Site site) => await Chariot.InsertOrUpdateAsync(site).ConfigureAwait(false);
 }

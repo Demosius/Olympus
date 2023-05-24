@@ -22,7 +22,7 @@ public class UserUpdater
         // Make sure that any master or default is set to the correct values.
         foreach (var role in roles) role.CheckStandards();
 
-        var lines = await Chariot.UpdateTableAsync(roles);
+        var lines = await Chariot.UpdateTableAsync(roles).ConfigureAwait(false);
         
         return lines;
     }

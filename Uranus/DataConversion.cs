@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CsvHelper;
 using ExcelDataReader;
 using Serilog;
 using Uranus.Inventory;
@@ -1059,22 +1060,22 @@ public static class DataConversion
     {
         List<PickEvent> events = new();
         IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+
         using StreamReader reader = new(File.OpenRead(csvPath));
 
         var headArr = (await reader.ReadLineAsync())?.Trim('"').Split(',', '"') ?? Array.Empty<string>();
         var col = new PickEventIndices(headArr);
+        var colMax = col.Max();
 
         var line = await reader.ReadLineAsync();
-
-        var colMax = col.Max();
 
         while (line != null)
         {
             var row = line.Trim('"').Split(',', '"');
 
-            var pickEvent = ArrayToPickEvent(row, col, colMax, provider);
+            var mispick = ArrayToPickEvent(row, col, colMax, provider);
 
-            if (pickEvent is not null) events.Add(pickEvent);
+            if (mispick is not null) events.Add(mispick);
 
             line = await reader.ReadLineAsync();
         }
@@ -1133,7 +1134,7 @@ public static class DataConversion
     public static Dictionary<string, DataColumn> GetColumnDictionary(DataTable table) =>
         table.Columns.Cast<DataColumn>().ToDictionary(tableColumn => tableColumn.ColumnName);
 
-    private static MissPick? ArrayToMissPick(IReadOnlyList<string> row, MissPickIndices col, int colMax,
+    private static Mispick? ArrayToMispick(IReadOnlyList<string> row, MispickIndices col, int colMax,
         IFormatProvider provider)
     {
         if (colMax >= row.Count) return null;
@@ -1153,9 +1154,9 @@ public static class DataConversion
                 out var varianceQty)) varianceQty = 0;
         if (!DateTime.TryParse(row[col.PostDate], out var postedDate)) postedDate = DateTime.Today;
 
-        var missPick = new MissPick
+        var mispick = new Mispick
         {
-            ID = MissPick.GetMissPickID(cartonID, itemNo),
+            ID = Mispick.GetMispickID(cartonID, itemNo),
             ShipmentDate = shipDate,
             ReceivedDate = recDate,
             CartonID = cartonID,
@@ -1167,10 +1168,10 @@ public static class DataConversion
             VarianceQty = varianceQty,
             PostedDate = postedDate,
         };
-        return missPick;
+        return mispick;
     }
 
-    private static MissPick DataRowToMissPick(DataRow row, MissPickIndices col, IFormatProvider provider)
+    private static Mispick DataRowToMispick(DataRow row, MispickIndices col, IFormatProvider provider)
     {
         if (!DateTime.TryParse(row[col.ShipDate].ToString(), out var shipDate)) shipDate = DateTime.Today;
         if (!DateTime.TryParse(row[col.ReceiveDate].ToString(), out var recDate)) recDate = DateTime.Today;
@@ -1187,9 +1188,9 @@ public static class DataConversion
                 out var varianceQty)) varianceQty = 0;
         if (!DateTime.TryParse(row[col.PostDate].ToString()!, out var postedDate)) postedDate = DateTime.Today;
 
-        var missPick = new MissPick
+        var mispick = new Mispick
         {
-            ID = MissPick.GetMissPickID(cartonID, itemNo),
+            ID = Mispick.GetMispickID(cartonID, itemNo),
             ShipmentDate = shipDate,
             ReceivedDate = recDate,
             CartonID = cartonID,
@@ -1201,24 +1202,24 @@ public static class DataConversion
             VarianceQty = varianceQty,
             PostedDate = postedDate,
         };
-        return missPick;
+        return mispick;
     }
 
-    public static List<MissPick> RawStringToMissPicks(string rawData)
+    public static List<Mispick> RawStringToMispicks(string rawData)
     {
-        if (string.IsNullOrEmpty(rawData)) _ = new MissPickIndices(new string[] { });
+        if (string.IsNullOrEmpty(rawData)) _ = new MispickIndices(new string[] { });
         // Start memory stream from which to read.
         var byteArray = Encoding.UTF8.GetBytes(rawData);
         MemoryStream stream = new(byteArray);
         // Start Reading from stream.
-        var missPicks = StreamToMissPicks(stream);
+        var mispicks = StreamToMispicks(stream);
 
-        return missPicks;
+        return mispicks;
     }
 
-    private static List<MissPick> StreamToMissPicks(Stream stream)
+    private static List<Mispick> StreamToMispicks(Stream stream)
     {
-        List<MissPick> missPicks = new();
+        List<Mispick> mispicks = new();
 
         IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
 
@@ -1226,7 +1227,7 @@ public static class DataConversion
         // First set the headers.
         var line = reader.ReadLine();
         var headArr = line?.Split('\t') ?? Array.Empty<string>();
-        var col = new MissPickIndices(headArr);
+        var col = new MispickIndices(headArr);
 
         // Get highest column value to make sure that any given data line isn't cut short.
         var colMax = col.Max();
@@ -1237,34 +1238,45 @@ public static class DataConversion
         {
             var row = line.Split('\t');
 
-            var missPick = ArrayToMissPick(row, col, colMax, provider);
+            var mispick = ArrayToMispick(row, col, colMax, provider);
 
-            if (missPick is not null) missPicks.Add(missPick);
+            if (mispick is not null) mispicks.Add(mispick);
 
             line = reader.ReadLine();
         }
 
-        return missPicks;
+        return mispicks;
     }
 
-    public static List<MissPick> FileToMissPicks(string filePath)
+    public static List<Mispick> FileToMispicks(string filePath)
     {
-        if (Path.GetExtension(filePath) == ".csv") return CSVToMissPicks(filePath);
+        if (Path.GetExtension(filePath) == ".csv") return CSVToMispicks(filePath);
 
         return Regex.IsMatch(Path.GetExtension(filePath), "\\.xls\\w?") ?
-            ExcelToMissPicks(filePath) :
-            new List<MissPick>();
+            ExcelToMispicks(filePath) :
+            new List<Mispick>();
     }
 
-    public static List<MissPick> CSVToMissPicks(string csvPath)
+    public static async Task<List<Mispick>> FileToMispicksAsync(string filePath)
     {
-        List<MissPick> missPicks = new();
+        var extension = Path.GetExtension(filePath);
+
+        if (extension == ".csv") 
+            return await CSVToMispicksAsync(filePath).ConfigureAwait(false);
+        if (Regex.IsMatch(extension, "\\.xls\\w?"))
+            return await ExcelToMispicksAsync(filePath).ConfigureAwait(false);
+        return new List<Mispick>();
+    }
+
+    public static List<Mispick> CSVToMispicks(string csvPath)
+    {
+        List<Mispick> mispicks = new();
         IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
 
         using StreamReader reader = new(File.OpenRead(csvPath));
 
         var headArr = reader.ReadLine()?.Trim('"').Split(',', '"') ?? Array.Empty<string>();
-        var col = new MissPickIndices(headArr);
+        var col = new MispickIndices(headArr);
         var colMax = col.Max();
 
         var line = reader.ReadLine();
@@ -1273,17 +1285,39 @@ public static class DataConversion
         {
             var row = line.Trim('"').Split(',', '"');
 
-            var missPick = ArrayToMissPick(row, col, colMax, provider);
+            var mispick = ArrayToMispick(row, col, colMax, provider);
 
-            if (missPick is not null) missPicks.Add(missPick);
+            if (mispick is not null) mispicks.Add(mispick);
 
             line = reader.ReadLine();
         }
 
-        return missPicks;
+        return mispicks;
     }
-    
-    public static List<MissPick> ExcelToMissPicks(string excelPath)
+
+    public static async Task<List<Mispick>> CSVToMispicksAsync(string csvPath)
+    {
+        List<Mispick> mispicks = new();
+
+        using var reader = new StreamReader(File.OpenRead(csvPath));
+        using var csvReader = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+        await csvReader.ReadAsync();
+        csvReader.ReadHeader();
+
+        while (await csvReader.ReadAsync())
+        {
+            var mispick = csvReader.GetRecord<Mispick>();
+            if (mispick != null)
+            {
+                mispicks.Add(mispick);
+            }
+        }
+
+        return mispicks;
+    }
+
+    public static List<Mispick> ExcelToMispicks(string excelPath)
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         using var stream = File.Open(excelPath, FileMode.Open, FileAccess.Read);
@@ -1299,30 +1333,54 @@ public static class DataConversion
             }
         });
 
-        var missPicks = new List<MissPick>();
+        var mispicks = new List<Mispick>();
 
         foreach (DataTable table in dataSet.Tables)
-            missPicks.AddRange(DataTableToMissPicks(table));
+            mispicks.AddRange(DataTableToMispicks(table));
 
         // Check for duplicates.
-        missPicks = missPicks.Distinct().ToList();
+        mispicks = mispicks.Distinct().ToList();
 
-        return missPicks;
+        return mispicks;
     }
 
-    public static List<MissPick> DataTableToMissPicks(DataTable dataTable)
+    public static async Task<List<Mispick>> ExcelToMispicksAsync(string excelPath)
+    {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        await using var stream = new FileStream(excelPath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan);
+        using var reader = ExcelReaderFactory.CreateReader(stream);
+
+        var dataSet = reader.AsDataSet(new ExcelDataSetConfiguration
+        {
+            UseColumnDataType = true,
+            ConfigureDataTable = _ => new ExcelDataTableConfiguration
+            {
+                EmptyColumnNamePrefix = "Col",
+                UseHeaderRow = true
+            }
+        });
+
+        var mispicks = dataSet.Tables.Cast<DataTable>().SelectMany(DataTableToMispicks).ToList();
+
+        // Check for duplicates.
+        mispicks = mispicks.Distinct().ToList();
+
+        return mispicks;
+    }
+
+    public static List<Mispick> DataTableToMispicks(DataTable dataTable)
     {
         IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
 
-        MissPickIndices col;
+        MispickIndices col;
         // Check headers.
         try
         {
-            col = new MissPickIndices(GetTableHeaders(dataTable));
+            col = new MispickIndices(GetTableHeaders(dataTable));
         }
         catch (InvalidDataException)
         {
-            return new List<MissPick>();
+            return new List<Mispick>();
         }
         catch (Exception e)
         {
@@ -1331,6 +1389,6 @@ public static class DataConversion
         }
 
         // Iterate through rows.
-        return (from DataRow row in dataTable.Rows select DataRowToMissPick(row, col, provider)).ToList();
+        return (from DataRow row in dataTable.Rows select DataRowToMispick(row, col, provider)).ToList();
     }
 }

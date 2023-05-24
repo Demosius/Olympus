@@ -12,7 +12,7 @@ internal class DataCompColourConverter : IValueConverter
     {
         if (value is not DataDateComparison comp) return new SolidColorBrush(Colors.Orange);
         return !comp.HasPickEvents ? new SolidColorBrush(Colors.Red) :
-            !comp.HasMissPicks ? new SolidColorBrush(Colors.Yellow) : 
+            !comp.HasMispicks ? new SolidColorBrush(Colors.Yellow) : 
             new SolidColorBrush(Colors.AliceBlue);
     }
 

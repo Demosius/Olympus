@@ -13,11 +13,11 @@ using Uranus.Interfaces;
 
 namespace Deimos.ViewModels.Controls;
 
-public class MissPickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
+public class MispickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
     public DeimosVM ParentVM { get; set; }
     public Helios Helios { get; set; }
-    public List<MissPickVM> AllMissPicks { get; set; }
+    public List<MispickVM> AllMispicks { get; set; }
 
     #region ParentVM Access
 
@@ -28,7 +28,7 @@ public class MissPickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     #region INotifyPropertyChanged Members
 
-    public ObservableCollection<MissPickVM> MissPicks { get; set; }
+    public ObservableCollection<MispickVM> Mispicks { get; set; }
 
     private string filterString;
     public string FilterString
@@ -51,16 +51,16 @@ public class MissPickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     #endregion
 
-    public MissPickDataVM(DeimosVM parentVM)
+    public MispickDataVM(DeimosVM parentVM)
     {
         ParentVM = parentVM;
         Helios = parentVM.Helios;
 
         filterString = string.Empty;
 
-        AllMissPicks = new List<MissPickVM>();
+        AllMispicks = new List<MispickVM>();
 
-        MissPicks = new ObservableCollection<MissPickVM>();
+        Mispicks = new ObservableCollection<MispickVM>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
@@ -70,9 +70,9 @@ public class MissPickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public async Task RefreshDataAsync()
     {
         if (StartDate is null || EndDate is null)
-            AllMissPicks = new List<MissPickVM>();
+            AllMispicks = new List<MispickVM>();
         else
-            AllMissPicks = (await Helios.StaffReader.RawMissPicksAsync((DateTime) StartDate, (DateTime) EndDate)).Select(mp => new MissPickVM(mp, Helios)).ToList();
+            AllMispicks = (await Helios.StaffReader.RawMispicksAsync((DateTime) StartDate, (DateTime) EndDate)).Select(mp => new MispickVM(mp, Helios)).ToList();
 
         ApplyFilters();
     }
@@ -85,14 +85,14 @@ public class MissPickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     public void ApplyFilters()
     {
-        var events = AllMissPicks.Where(missPick =>
-            Regex.IsMatch(missPick.AssignedRF_ID, FilterString, RegexOptions.IgnoreCase) ||
-            Regex.IsMatch(missPick.ActionNotes, FilterString, RegexOptions.IgnoreCase) ||
-            Regex.IsMatch(missPick.Comments, FilterString, RegexOptions.IgnoreCase) ||
-            Regex.IsMatch(missPick.ItemDescription, FilterString, RegexOptions.IgnoreCase));
+        var events = AllMispicks.Where(mispick =>
+            Regex.IsMatch(mispick.AssignedRF_ID, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(mispick.ActionNotes, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(mispick.Comments, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(mispick.ItemDescription, FilterString, RegexOptions.IgnoreCase));
 
-        MissPicks.Clear();
-        foreach (var pickEvent in events) MissPicks.Add(pickEvent);
+        Mispicks.Clear();
+        foreach (var pickEvent in events) Mispicks.Add(pickEvent);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

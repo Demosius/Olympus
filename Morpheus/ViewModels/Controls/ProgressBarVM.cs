@@ -1,4 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Uranus.Annotations;
 
@@ -6,6 +9,10 @@ namespace Morpheus.ViewModels.Controls;
 
 public class ProgressBarVM : INotifyPropertyChanged
 {
+    public Progress<ProgressTaskVM> Progress { get; }
+
+    public int Tasks { get; set; }
+
     #region INotifyPropertyChanged Members
 
     private string title;
@@ -38,7 +45,6 @@ public class ProgressBarVM : INotifyPropertyChanged
         {
             min = value;
             OnPropertyChanged();
-            SetPercent();
         }
     }
 
@@ -50,7 +56,28 @@ public class ProgressBarVM : INotifyPropertyChanged
         {
             max = value;
             OnPropertyChanged();
-            SetPercent();
+        }
+    }
+
+    private int val;
+    public int Val
+    {
+        get => val;
+        set
+        {
+            val = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private string pct;
+    public string Pct
+    {
+        get => pct;
+        set
+        {
+            pct = value;
+            OnPropertyChanged();
         }
     }
 
@@ -65,44 +92,10 @@ public class ProgressBarVM : INotifyPropertyChanged
         }
     }
 
-    private int val;
-    public int Val
-    {
-        get => val;
-        set
-        {
-            val = value;
-            OnPropertyChanged();
-            SetPercent();
-        }
-    }
-
-    private bool isActive;
-    public bool IsActive
-    {
-        get => isActive;
-        set
-        {
-            isActive = value;
-            OnPropertyChanged();
-        }
-    }
-
-    private double pct;
-    public double Pct
-    {
-        get => pct;
-        set
-        {
-            pct = value;
-            OnPropertyChanged();
-        }
-    }
-
     private bool showPct;
     public bool ShowPct
     {
-        get => showPct && !isIndeterminate;
+        get => showPct;
         set
         {
             showPct = value;
@@ -110,69 +103,53 @@ public class ProgressBarVM : INotifyPropertyChanged
         }
     }
 
+    public bool IsActive => Tasks > 0;
+
     #endregion
 
     public ProgressBarVM()
     {
+        Tasks = 0;
+        Progress = new Progress<ProgressTaskVM>(ReportProgress);
+
         title = string.Empty;
         action = string.Empty;
     }
 
-    public void Activate(string newTitle = "", string newAction = "", bool determinative = false, int newMin = 0, int newMax = 0,
-        int newVal = 0, bool showPercent = false)
+    public IProgress<ProgressTaskVM> StartTask(string newTitle, string newAction = "", int newMin = 0, int newMax = 0, int newVal = 0)
     {
-        IsActive = true;
-        Title = newTitle;
-        Action = newAction;
-        IsIndeterminate = determinative;
-        Min = newMin;
-        Max = newMax;
-        Val = newVal;
-        ShowPct = showPercent;
+        Tasks++;
+
+        OnPropertyChanged(nameof(IsActive));
+
+        ((IProgress<ProgressTaskVM>)Progress).Report(new ProgressTaskVM(newTitle, newAction, newMin, newMax, newVal));
+
+        return Progress;
     }
 
-    public void NewTitle(string newTitle, string newAction = "", bool inc = false)
+    public void EndTask()
     {
-        Title = newTitle;
-        Action = newAction;
-        if (inc && Max > 0) Inc();
+        Tasks--;
+
+        if (Tasks < 0) Tasks = 0;
+
+        OnPropertyChanged(nameof(IsActive));
     }
 
-    public void NewAction(string newAction, bool inc = false)
+    private void ReportProgress(ProgressTaskVM task)
     {
-        Action = newAction;
-        if (inc && Max > 0) Inc();
-    }
+        Title = task.Title ?? Title;
+        Action = task.Action ?? Action;
+        Min = task.Min ?? Min;
+        Max = task.Max ?? Max;
+        Val = task.Val ?? Val;
 
-    public void Deactivate() => Clear();
+        IsIndeterminate = Max == 0;
+        ShowPct = !IsIndeterminate;
 
-    public void Inc(int i = 1)
-    {
-        Val += i;
-    }
+        var pctVal = IsIndeterminate ? 0 : (double)(Val - Min) / (Max - Min);
 
-    private void SetPercent()
-    {
-        var tMax = Max - Min;
-        var tVal = Val - Min;
-        Pct = tVal / (tMax == 0 ? 1 : tMax) * 100;
-    }
-
-    public void SetIndeterminate(bool isNowIndeterminate = true)
-    {
-        IsIndeterminate = isNowIndeterminate;
-    }
-
-    public void Clear()
-    {
-        Min = 0;
-        Max = 0;
-        Val = 0;
-        Title = string.Empty;
-        Action = string.Empty;
-        IsIndeterminate = false;
-        IsActive = false;
-        ShowPct = false;
+        Pct = $"{pctVal * 100:#0.0#}%";
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

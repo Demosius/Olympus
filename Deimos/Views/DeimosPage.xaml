@@ -31,8 +31,8 @@
                     Content="Upload Pick Events"
                     Command="{Binding UploadPickEventsCommand}"/>
             <Button Margin="5"
-                    Content="Upload MissPick Data"
-                    Command="{Binding UploadMissPickDataCommand}"/>
+                    Content="Upload Mispick Data"
+                    Command="{Binding UploadMispickDataCommand}"/>
         </StackPanel>
 
         <!-- Top menu/header settings and functions -->
@@ -88,14 +88,15 @@
                         <TextBlock Text="{Binding DatesWithoutEvents}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <Label Content="W/o MissPicks:"/>
-                        <TextBlock Text="{Binding DatesWithoutMissPicks}"/>
+                        <Label Content="W/o Mispicks:"/>
+                        <TextBlock Text="{Binding DatesWithoutMispicks}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
 
             <ListView Grid.Row="1"
                       ItemsSource="{Binding DataComps}"
+                      SelectedItem="{Binding SelectedDateComp}"
                       d:ItemsSource="{d:SampleData ItemCount=5}"
                       SelectionMode="Single" 
                       BorderThickness="1,1,1,2"
@@ -107,7 +108,7 @@
                         <Run>: PE (</Run>
                         <Run Text="{Binding PickEventLines}"/>
                         <Run>) - MP (</Run>
-                        <Run Text="{Binding MissPickLines}"/>
+                        <Run Text="{Binding MispickLines}"/>
                         <Run>)</Run>
                         </TextBlock>
                     </DataTemplate>
@@ -120,11 +121,11 @@
             <TabItem Header="Pick Event History">
                 <controls:PickHistoryView DataContext="{Binding PickHistoryVM}"/>
             </TabItem>
-            <TabItem Header="MissPick Data">
-                <controls:MissPickDataView DataContext="{Binding MissPickDataVM}"/>
+            <TabItem Header="Mispick Data">
+                <controls:MispickDataView DataContext="{Binding MispickDataVM}"/>
             </TabItem>
-            <TabItem Header="Employee MissPicks">
-                <controls:EmployeeMissPickView DataContext="{Binding EmployeeMissPickVM}"/>
+            <TabItem Header="Employee Mispicks">
+                <controls:EmployeeMispickView DataContext="{Binding EmployeeMispickVM}"/>
             </TabItem>
         </TabControl>
 

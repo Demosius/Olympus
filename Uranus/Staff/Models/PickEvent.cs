@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
 using Uranus.Inventory.Models;
@@ -35,7 +36,7 @@ public class PickEvent : IEquatable<PickEvent>
     public string ItemDescription { get; set; }
     public string ClusterReference { get; set; }
 
-    public string MissPickID { get; set; }
+    public string MispickID { get; set; }
 
     [ForeignKey(typeof(PickSession))] public string SessionID { get; set; }
     [ForeignKey(typeof(PickDailyStats))]
@@ -53,8 +54,8 @@ public class PickEvent : IEquatable<PickEvent>
     [ManyToOne(nameof(StatsID), nameof(PickDailyStats.PickEvents), CascadeOperations = CascadeOperation.CascadeRead)]
     public PickDailyStats? PickStats { get; set; }
 
-    [OneToOne(nameof(MissPickID), nameof(Models.MissPick.PickEvent), CascadeOperations = CascadeOperation.CascadeRead)]
-    public MissPick? MissPick { get; set; }
+    [OneToOne(nameof(MispickID), nameof(Models.Mispick.PickEvent), CascadeOperations = CascadeOperation.CascadeRead)]
+    public Mispick? Mispick { get; set; }
 
     // Cannot be tied to items directly, as they belong to a separate database.
     [Ignore] public NAVItem? Item { get; set; }
@@ -79,29 +80,34 @@ public class PickEvent : IEquatable<PickEvent>
         SessionID = string.Empty;
         StatsID = string.Empty;
 
-        MissPickID = string.Empty;
+        MispickID = string.Empty;
     }
 
     public static string GetEventID(string dematicID, DateTime dateTime) => $"{dematicID}.{dateTime:yyyy.MM.dd.hh.mm.ss}";
-    
+
+    private void ResetID()
+    {
+        ID = GetEventID(OperatorDematicID, DateTime);
+    }
+
     public static ETechType GetTechType(string techString)
     {
         _ = Enum.TryParse<ETechType>(techString, true, out var tt);
         return tt;
     }
 
-    public void AssignMissPick(MissPick missPick)
+    public void AssignMispick(Mispick mispick)
     {
-        MissPickID = missPick.ID;
-        MissPick = missPick;
+        MispickID = mispick.ID;
+        Mispick = mispick;
 
-        MissPick.PickEventID = ID;
-        MissPick.PickEvent = this;
+        Mispick.PickEventID = ID;
+        Mispick.PickEvent = this;
 
-        MissPick.AssignedRF_ID = OperatorRF_ID;
-        MissPick.AssignedDematicID = OperatorDematicID;
-        
-        Session?.AssignMissPick(missPick);
+        Mispick.AssignedRF_ID = OperatorRF_ID;
+        Mispick.AssignedDematicID = OperatorDematicID;
+
+        Session?.AssignMispick(mispick);
     }
 
     /// <summary>
@@ -109,8 +115,15 @@ public class PickEvent : IEquatable<PickEvent>
     /// </summary>
     /// <param name="sampleEvents"></param>
     /// <returns>Number of values that had to be changed.</returns>
-    public static int HandleDuplicateValues(List<PickEvent> sampleEvents)
+    public static int HandleDuplicateValues(ref List<PickEvent> sampleEvents)
     {
+        // Set pure ID.
+        foreach (var pickEvent in sampleEvents)
+            pickEvent.ResetID();
+
+        // Remove genuine duplicates.
+        sampleEvents = sampleEvents.DistinctBy(e => $"{e.ID}{e.ItemNumber}{e.Qty}").ToList();
+
         var dict = sampleEvents
             .GroupBy(e => e.ID)
             .Where(g => g.Count() > 1)
@@ -131,22 +144,38 @@ public class PickEvent : IEquatable<PickEvent>
     }
 
     public static List<PickEvent> GenerateFromRawData(string raw, out List<PickSession> sessions, out List<PickDailyStats> stats, TimeSpan? ptlBreak = null, TimeSpan? rftBreak = null)
-    { 
+    {
         var events = DataConversion.RawStringToPickEvents(raw);
 
-        sessions = GenerateStatisticsFromEvents(events, out stats, ptlBreak, rftBreak); 
+        sessions = GenerateStatisticsFromEvents(ref events, out stats, ptlBreak, rftBreak);
 
         return events;
     }
 
-    public static List<PickSession> GenerateStatisticsFromEvents(List<PickEvent> events, out List<PickDailyStats> stats,
+    public static List<PickSession> GenerateStatisticsFromEvents(ref List<PickEvent> events, out List<PickDailyStats> stats,
         TimeSpan? ptlBreak = null, TimeSpan? rftBreak = null)
     {
-        HandleDuplicateValues(events);
+        HandleDuplicateValues(ref events);
 
-        var sessions =  PickSession.GeneratePickSessions(events, out stats, ptlBreak, rftBreak);
+        var sessions = PickSession.GeneratePickSessions(events, out stats, ptlBreak, rftBreak);
 
         return sessions;
+    }
+
+    /* Async Methods */
+
+    public static async Task<(List<PickEvent> events, List<PickSession> sessions, List<PickDailyStats> stats)> GenerateStatisticsFromEventsAsync(List<PickEvent> events, TimeSpan? ptlBreak = null, TimeSpan? rftBreak = null)
+    {
+        var sessions = new List<PickSession>();
+        var stats = new List<PickDailyStats>();
+
+        await Task.Run(() =>
+        {
+            HandleDuplicateValues(ref events);
+            sessions = PickSession.GeneratePickSessions(events, out stats, ptlBreak, rftBreak);
+        });
+
+        return (events, sessions, stats);
     }
 
     /* Equality Members */
@@ -162,7 +191,7 @@ public class PickEvent : IEquatable<PickEvent>
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        return obj.GetType() == GetType() && Equals((PickEvent) obj);
+        return obj.GetType() == GetType() && Equals((PickEvent)obj);
     }
 
     public override int GetHashCode()

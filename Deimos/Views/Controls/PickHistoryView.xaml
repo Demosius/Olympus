@@ -8,16 +8,8 @@
              d:DataContext="{d:DesignInstance {x:Type vm:PickHistoryVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
     <DockPanel>
+
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
-            <Button Command="{Binding RefreshDataCommand}"
-                    Width="30"
-                    Height="30"
-                    Margin="2"
-                    Padding="5"
-                    ToolTip="Refresh">
-                <Image Source="../../Resources/img/refresh.png"/>
-            </Button>
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
             <TextBox Margin="2"
                      MinWidth="120"
                      Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>

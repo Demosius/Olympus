@@ -57,7 +57,7 @@ public class StaffDeleter
                     ClockEvent(deletedClock);
                 }
             });
-        });
+        }).ConfigureAwait(false);
     }
 
     /// <summary>

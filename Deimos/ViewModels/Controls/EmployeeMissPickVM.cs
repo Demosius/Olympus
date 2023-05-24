@@ -14,7 +14,7 @@ using Uranus.Interfaces;
 
 namespace Deimos.ViewModels.Controls;
 
-public class EmployeeMissPickVM : INotifyPropertyChanged, IDBInteraction, IFilters
+public class EmployeeMispickVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
     public DeimosVM ParentVM { get; set; }
     public Helios Helios { get; set; }
@@ -53,7 +53,7 @@ public class EmployeeMissPickVM : INotifyPropertyChanged, IDBInteraction, IFilte
 
     #endregion
 
-    public EmployeeMissPickVM(DeimosVM parentVM)
+    public EmployeeMispickVM(DeimosVM parentVM)
     {
         ParentVM = parentVM;
         Helios = parentVM.Helios;
@@ -74,15 +74,15 @@ public class EmployeeMissPickVM : INotifyPropertyChanged, IDBInteraction, IFilte
             AllErrors = new List<ErrorGroup>();
         else
         {
-            var missPickTask = Helios.StaffReader.RawMissPicksAsync((DateTime)StartDate, (DateTime)EndDate);
+            var mispickTask = Helios.StaffReader.RawMispicksAsync((DateTime)StartDate, (DateTime)EndDate);
             var tagAssignToolTask = Helios.StaffReader.TagAssignmentToolAsync();
 
-            await Task.WhenAll(missPickTask, tagAssignToolTask);
+            await Task.WhenAll(mispickTask, tagAssignToolTask);
 
-            var missPicks = (await missPickTask).ToList();
+            var mispicks = (await mispickTask).ToList();
             var tagAssignTool = await tagAssignToolTask;
 
-            AllErrors = ErrorGroup.GenerateErrorGroups(missPicks).OrderBy(e => e.Date).ToList();
+            AllErrors = ErrorGroup.GenerateErrorGroups(mispicks).OrderBy(e => e.Date).ToList();
             foreach (var errorGroup in AllErrors)
                 errorGroup.Employee = tagAssignTool.Employee(errorGroup.Date, errorGroup.AssignedRF_ID);
         }
@@ -92,15 +92,15 @@ public class EmployeeMissPickVM : INotifyPropertyChanged, IDBInteraction, IFilte
     
     public void ClearFilters()
     {
-        filterString = string.Empty;
+        FilterString = string.Empty;
         ApplyFilters();
     }
 
     public void ApplyFilters()
     {
-        var events = AllErrors.Where(missPick =>
-            Regex.IsMatch(missPick.AssignedRF_ID, FilterString, RegexOptions.IgnoreCase) ||
-            Regex.IsMatch(missPick.Employee?.FullName ?? "", FilterString, RegexOptions.IgnoreCase));
+        var events = AllErrors.Where(mispick =>
+            Regex.IsMatch(mispick.AssignedRF_ID, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(mispick.Employee?.FullName ?? "", FilterString, RegexOptions.IgnoreCase));
 
         Errors.Clear();
         foreach (var pickEvent in events) Errors.Add(pickEvent);

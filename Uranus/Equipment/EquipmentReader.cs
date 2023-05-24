@@ -18,16 +18,16 @@ public class EquipmentReader
 
     /* Machines */
     public async Task<List<Machine>> MachinesAsync(Expression<Func<Machine, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) =>
-        await Chariot.PullObjectListAsync(filter, pullType);
+        await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public async Task<Dictionary<string, List<Machine>>> MachineDictionary(Expression<Func<Machine, bool>>? filter = null, EPullType pullType = EPullType.IncludeChildren)
     {
-        return (await MachinesAsync(filter, pullType))
+        return (await MachinesAsync(filter, pullType).ConfigureAwait(false))
             .GroupBy(m => m.TypeCode)
             .ToDictionary(g => g.Key, g => g.ToList());
     }
 
     public async Task<List<Machine>> MachinesAsync(string machineTypeCode, EPullType pullType = EPullType.ObjectOnly)
-    => await MachinesAsync(m => m.TypeCode == machineTypeCode, pullType);
+    => await MachinesAsync(m => m.TypeCode == machineTypeCode, pullType).ConfigureAwait(false);
 
 }

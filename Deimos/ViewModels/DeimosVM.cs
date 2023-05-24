@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -29,14 +30,26 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
     public ProgressBarVM ProgressBar { get; set; }
 
     public PickHistoryVM PickHistoryVM { get; }
-    public MissPickDataVM MissPickDataVM { get; }
-    public EmployeeMissPickVM EmployeeMissPickVM { get; }
+    public MispickDataVM MispickDataVM { get; }
+    public EmployeeMispickVM EmployeeMispickVM { get; }
 
     #region INotifyPropertChanged Members
 
     public bool CanRun => StartDate is not null && EndDate is not null;
 
     public ObservableCollection<DataDateComparison> DataComps { get; set; }
+
+    private DataDateComparison? selectedDateComp;
+    public DataDateComparison? SelectedDateComp
+    {
+        get => selectedDateComp;
+        set
+        {
+            selectedDateComp = value;
+            OnPropertyChanged();
+            PickHistoryVM.Date = selectedDateComp?.Date;
+        }
+    }
 
     private DateTime? startDate;
     public DateTime? StartDate
@@ -61,7 +74,7 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         get => endDate;
         set
         {
-            endDate = value; 
+            endDate = value;
             if (startDate > endDate)
             {
                 startDate = value;
@@ -105,13 +118,13 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         }
     }
 
-    private int datesWithoutMissPicks;
-    public int DatesWithoutMissPicks
+    private int datesWithoutMispicks;
+    public int DatesWithoutMispicks
     {
-        get => datesWithoutMissPicks;
+        get => datesWithoutMispicks;
         set
         {
-            datesWithoutMissPicks = value;
+            datesWithoutMispicks = value;
             OnPropertyChanged();
         }
     }
@@ -134,7 +147,7 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
     public RefreshDataCommand RefreshDataCommand { get; set; }
     public RunCommand RunCommand { get; set; }
     public UploadPickEventsCommand UploadPickEventsCommand { get; set; }
-    public UploadMissPickDataCommand UploadMissPickDataCommand { get; set; }
+    public UploadMispickDataCommand UploadMispickDataCommand { get; set; }
 
     #endregion
 
@@ -144,25 +157,27 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         ProgressBar = progressBar;
 
         PickHistoryVM = new PickHistoryVM(this);
-        MissPickDataVM = new MissPickDataVM(this);
-        EmployeeMissPickVM = new EmployeeMissPickVM(this);
+        MispickDataVM = new MispickDataVM(this);
+        EmployeeMispickVM = new EmployeeMispickVM(this);
 
         DataComps = new ObservableCollection<DataDateComparison>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
         RunCommand = new RunCommand(this);
         UploadPickEventsCommand = new UploadPickEventsCommand(this);
-        UploadMissPickDataCommand = new UploadMissPickDataCommand(this);
+        UploadMispickDataCommand = new UploadMispickDataCommand(this);
     }
 
     public async Task UploadPickEvents()
     {
         var lines = 0;
-        Mouse.OverrideCursor = Cursors.Wait;
+
         try
         {
             // First check the clipboard for relevant data.
+            ProgressBar.StartTask("Uploading Pick Events from Clipboard...");
             lines += await Helios.StaffUpdater.UploadPickHistoryDataAsync(General.ClipboardToString());
+            ProgressBar.EndTask();
             if (lines > 0)
             {
                 Mouse.OverrideCursor = Cursors.Arrow;
@@ -180,17 +195,29 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         // Clipboard data not accurate. Offer to check for excel/csv files instead.
         catch (InvalidDataException dataException)
         {
+            ProgressBar.EndTask();
             Mouse.OverrideCursor = Cursors.Arrow;
             if (MessageBox.Show(
-                    "Could not recognise data on clipboard. Would you like to search for the appropriate file(s)?\n\n\n" +
-                    $"{{{{\nMissing Columns:\n{string.Join(" || ", dataException.MissingColumns)}\n}}}}",
+                    $"Could not recognize data on clipboard. Would you like to search for the appropriate file(s)?\n\nMissing Columns:\n{string.Join(" || ", dataException.MissingColumns)}",
                     "File Load", MessageBoxButton.YesNoCancel, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                lines += await PDU.PickEventFileLoadAsync(Helios);
+                var progress = ProgressBar.StartTask("Pick Event File Load...");
+                try
+                {
+                    lines += await Task.Run(async () => await PDU.PickEventFileLoadAsync(Helios, progress).ConfigureAwait(false));
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e, "Failed to upload pick events from file(s).");
+                    MessageBox.Show($"Failed to upload pick events from file(s):\n\n{e}", "Upload Failed",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                ProgressBar.EndTask();
             }
         }
         catch (Exception ex)
         {
+            ProgressBar.EndTask();
             Mouse.OverrideCursor = Cursors.Arrow;
             Log.Error(ex, "Failed to upload pick events.");
             MessageBox.Show($"Unexpected Error:\n\n{ex}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -199,46 +226,58 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         if (lines > 0) _ = RefreshDataAsync();
     }
 
-    public async Task UploadMissPickData()
+    public async Task UploadMispickData()
     {
         var lines = 0;
         Mouse.OverrideCursor = Cursors.Wait;
+
         try
         {
-            lines += await Helios.StaffCreator.UploadMissPickDataAsync(General.ClipboardToString());
+            ProgressBar.StartTask("Uploading Mispick data from clipboard...");
+            var clipboardData = General.ClipboardToString();
+            lines += await Helios.StaffCreator.UploadMispickDataAsync(clipboardData);
+            ProgressBar.EndTask();
+
+            Mouse.OverrideCursor = Cursors.Arrow;
+
             if (lines > 0)
             {
-                Mouse.OverrideCursor = Cursors.Arrow;
                 MessageBox.Show($"{lines} lines affected.", "Upload Success", MessageBoxButton.OK,
                     MessageBoxImage.Information);
             }
             else
             {
-                Mouse.OverrideCursor = Cursors.Arrow;
-                MessageBox.Show("No miss-pick data uploaded. It data is valid, it is possible that the database already contains matching miss-picks.", "Upload Failed",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(
+                    "No mispick data uploaded. If the data is valid, it is possible that the database already contains matching mispicks.",
+                    "Upload Failed", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
-        // Clipboard data not accurate. Offer to check for excel/csv files instead.
         catch (InvalidDataException dataException)
         {
             Mouse.OverrideCursor = Cursors.Arrow;
+            ProgressBar.EndTask();
             if (MessageBox.Show(
-                    "Could not recognise data on clipboard. Would you like to search for the appropriate file(s)?\n\n\n" +
-                    $"{{{{\nMissing Columns:\n{string.Join(" || ", dataException.MissingColumns)}\n}}}}",
+                    $"Could not recognize data on clipboard. Would you like to search for the appropriate file(s)?\n\nMissing Columns:\n{string.Join(" || ", dataException.MissingColumns)}",
                     "File Load", MessageBoxButton.YesNoCancel, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                lines += await PDU.MissPickFileLoad(Helios);
+                var progress = ProgressBar.StartTask("Mispick File Load...");
+                lines += await Task.Run(async () => await PDU.MispickFileLoadAsync(Helios, progress).ConfigureAwait(false));
+                ProgressBar.EndTask();
             }
         }
         catch (Exception ex)
         {
             Mouse.OverrideCursor = Cursors.Arrow;
-            Log.Error(ex, "Failed to upload miss pick data.");
+            ProgressBar.EndTask();
+            Log.Error(ex, "Failed to upload mispick data.");
             MessageBox.Show($"Unexpected Error:\n\n{ex}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        if (lines > 0) await RefreshDataAsync();
+        if (lines > 0)
+        {
+            await RefreshDataAsync();
+        }
+
         Mouse.OverrideCursor = Cursors.Arrow;
     }
 
@@ -255,15 +294,15 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
 
         Mouse.OverrideCursor = Cursors.Wait;
 
-        var eventTask = Helios.StaffReader.RawPickEventsAsync((DateTime)StartDate, (DateTime)EndDate);
-        var missPickTask = Helios.StaffReader.RawMissPicksAsync((DateTime) StartDate, (DateTime) EndDate);
+        var eventTask = Helios.StaffReader.PickEventLineCountByDate((DateTime)StartDate, (DateTime)EndDate);
+        var mispickTask = Helios.StaffReader.MispickLineCountByDate((DateTime)StartDate, (DateTime)EndDate);
 
-        await Task.WhenAll(eventTask, missPickTask);
+        await Task.WhenAll(eventTask, mispickTask);
 
-        var events = (await eventTask).ToList();
-        var missPicks = (await missPickTask).ToList();
+        var events = await eventTask.ConfigureAwait(false);
+        var mispicks = await mispickTask.ConfigureAwait(false);
 
-        var comps = DataDateComparison.GetDateComparisons(events, missPicks).OrderBy(d => d.Date);
+        var comps = DataDateComparison.GetDateComparisons(events, mispicks).OrderBy(d => d.Date);
 
         foreach (var comp in comps)
             DataComps.Add(comp);
@@ -280,18 +319,18 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
             DateRange = 0;
             DatesWithoutData = 0;
             DatesWithoutEvents = 0;
-            DatesWithoutMissPicks = 0;
+            DatesWithoutMispicks = 0;
             return;
         }
 
         var sd = (DateTime)StartDate;
         var ed = (DateTime)EndDate;
 
-        DateRange = ed.Subtract(sd).Days;
+        DateRange = ed.Subtract(sd).Days + 1;
 
         DatesWithoutData = DateRange - DataComps.Count;
         DatesWithoutEvents = DataComps.Count(d => !d.HasPickEvents);
-        DatesWithoutMissPicks = DataComps.Count(d => !d.HasMissPicks);
+        DatesWithoutMispicks = DataComps.Count(d => !d.HasMispicks);
     }
 
     public async Task Run()
@@ -304,14 +343,33 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         }
 
         Mouse.OverrideCursor = Cursors.Wait;
-        var errorTool = new ErrorAssignmentTool(Helios, (DateTime) StartDate, (DateTime) EndDate, Overwrite);
+        var errorTool = new ErrorAssignmentTool(Helios, (DateTime)StartDate, (DateTime)EndDate, Overwrite);
 
-        if (await errorTool.AssignErrors())
+        var sw = new Stopwatch();
+        sw.Start();
+        var progress = ProgressBar.StartTask("Assigning errors...");
+        bool success;
+        try
+        {
+            success = await errorTool.AssignErrorsAsync(progress);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Failed to assign errors.");
+            MessageBox.Show($"Failed to complete error assignment.\n\nUnknown Error Occurred\n\n{ex}", "Failure", MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            return;
+        } 
+        ProgressBar.EndTask();
+        sw.Stop();
+
+        if (success)
         {
             Mouse.OverrideCursor = Cursors.Arrow;
             MessageBox.Show("Error assignment complete.\n\n" +
                             $"Assigned: {errorTool.AssignedCount} - {errorTool.AssignedUnits}\n" +
-                            $"Unassigned: {errorTool.UnassignedCount} - {errorTool.UnassignedUnits}", 
+                            $"Unassigned: {errorTool.UnassignedCount} - {errorTool.UnassignedUnits}\n\n" +
+                            $"Time: {sw.Elapsed}",
                 "Success", MessageBoxButton.OK);
         }
         else

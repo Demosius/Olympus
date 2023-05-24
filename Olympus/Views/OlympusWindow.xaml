@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:components="clr-namespace:Olympus.Views.Components"
         xmlns:viewModels="clr-namespace:Olympus.ViewModels"
+        xmlns:controls="clr-namespace:Morpheus.Views.Controls;assembly=Morpheus"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance {x:Type viewModels:OlympusVM}, IsDesignTimeCreatable=False}"
         Title="Olympus" WindowState="Maximized"
@@ -61,8 +62,8 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                     </Grid>
@@ -76,7 +77,11 @@
                 <TextBlock Text="{Binding DBManager.DBString}" Foreground="{DynamicResource ForeGradient}"/>
             </StackPanel>
 
-            <StatusBarItem Grid.Column="2"
+            <StatusBarItem Grid.Column="2">
+                <controls:ProgressBarView DataContext="{Binding ProgressBarVM}"/>
+            </StatusBarItem>
+
+            <StatusBarItem Grid.Column="1"
                            HorizontalContentAlignment="Center">
                 <TextBlock Text="{Binding CurrentProject.Project, FallbackValue=''}"
                            Foreground="{DynamicResource ForeGradient}"

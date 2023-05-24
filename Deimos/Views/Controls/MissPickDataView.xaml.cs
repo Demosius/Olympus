@@ -1,11 +1,11 @@
 ﻿namespace Deimos.Views.Controls;
 
 /// <summary>
-/// Interaction logic for MissPickDataView.xaml
+/// Interaction logic for MispickDataView.xaml
 /// </summary>
-public partial class MissPickDataView
+public partial class MispickDataView
 {
-    public MissPickDataView()
+    public MispickDataView()
     {
         InitializeComponent();
     }
