@@ -7,6 +7,12 @@ public class BatchGroupLink
     [ForeignKey(typeof(Batch))] public string BatchID { get; set; }
     [ForeignKey(typeof(BatchGroup))] public string GroupName { get; set; }
 
+    public BatchGroupLink()
+    {
+        BatchID = string.Empty;
+        GroupName = string.Empty;
+    }
+
     public BatchGroupLink(string batchID, string groupName)
     {
         BatchID = batchID;
@@ -15,7 +21,6 @@ public class BatchGroupLink
 
     public BatchGroupLink(Batch batch, BatchGroup group) : this(batch.ID, group.Name)
     {
-        batch.Groups.Add(group);
-        group.Batches.Add(batch);
+        group.AddBatch(batch);
     }
 }

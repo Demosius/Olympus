@@ -1,22 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Argos.ViewModels.Components;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
+using Uranus.Inventory.Models;
 
-namespace Argos.ViewModels;
+namespace Argos.ViewModels.Components;
 
-public class ArgosVM : INotifyPropertyChanged, IDBInteraction
+public class MainBatchVM : INotifyPropertyChanged, IDBInteraction
 {
     public Helios Helios { get; set; }
 
-    public MainBatchVM MainBatchVM { get; set; }
-
     #region INotifyPropertyChanged Members
+
+    public ObservableCollection<BatchVM> Batches { get; set; }
+    public ObservableCollection<BatchGroupVM> BatchGroups { get; set; }
 
     private DateTime date;
     public DateTime Date
@@ -37,32 +41,43 @@ public class ArgosVM : INotifyPropertyChanged, IDBInteraction
 
     #endregion
 
-    private ArgosVM(Helios helios)
+    private MainBatchVM(Helios helios)
     {
         Helios = helios;
-        MainBatchVM = MainBatchVM.CreateEmpty(Helios);
+
+        Date = DateTime.Today;
+
+        Batches = new ObservableCollection<BatchVM>();
+        BatchGroups = new ObservableCollection<BatchGroupVM>();
+
         RefreshDataCommand = new RefreshDataCommand(this);
     }
 
-    private async Task<ArgosVM> InitializeAsync()
+    private async Task<MainBatchVM> InitializeAsync()
     {
-        MainBatchVM = await MainBatchVM.CreateAsync(Helios);
+        await RefreshDataAsync();
         return this;
     }
 
-    public static Task<ArgosVM> CreateAsync(Helios helios)
+    public static Task<MainBatchVM> CreateAsync(Helios helios)
     {
-        var ret = new ArgosVM(helios);
+        var ret = new MainBatchVM(helios);
         return ret.InitializeAsync();
     }
 
-    public static ArgosVM CreateEmpty(Helios helios) => new(helios);
+    public static MainBatchVM CreateEmpty(Helios helios) => new(helios);
 
     public async Task RefreshDataAsync()
     {
-        await MainBatchVM.RefreshDataAsync();
+        Batches.Clear();
+        BatchGroups.Clear();
+
+        var batches = await Helios.InventoryReader.BatchesAsync(Date);
+
+        foreach (var batch in batches)
+            Batches.Add(new BatchVM(batch));
     }
-    
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]
@@ -70,5 +85,4 @@ public class ArgosVM : INotifyPropertyChanged, IDBInteraction
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-
 }

@@ -868,4 +868,39 @@ public class InventoryReader
         await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return (mcList, mcItems, items);
     }
+
+    public async Task<List<Batch>> BatchesAsync(DateTime date) =>
+        await Chariot.PullObjectListAsync<Batch>(b => b.CreatedOn == date);
+
+    public async Task<(List<BatchGroup> groups, List<Batch> batches)> BatchGroupsAsync(DateTime date)
+    {
+        // TODO: Rework this whole thing when we figure out how to manage Groups (particularly M vs VM).
+        var groups = new List<BatchGroup>();
+        var batches = new List<Batch>();
+        var links = new List<BatchGroupLink>();
+
+        void Action()
+        {
+            groups = Chariot.PullObjectList<BatchGroup>(g => g.StartDate <= date && g.EndDate >= date);
+            links = Chariot.PullObjectList<BatchGroupLink>(l => groups.Select(g => g.Name).Contains(l.GroupName));
+            var batchIDs = links.Select(l => l.BatchID);
+            batches = Chariot.PullObjectList<Batch>(b =>
+                b.CreatedOn == date || b.LastTimeCartonizedDate == date || batchIDs.Contains(b.ID));
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        var groupDict = groups.ToDictionary(g => g.Name, g => g);
+        var batchDict = batches.ToDictionary(b => b.ID, b => b);
+
+        foreach (var link in links)
+        {
+            if (!groupDict.TryGetValue(link.GroupName, out var group)) continue;
+            if (!batchDict.TryGetValue(link.BatchID, out var batch)) continue;
+
+            group.AddBatch(batch);
+        }
+
+        return (groups, batches);
+    }
 }
