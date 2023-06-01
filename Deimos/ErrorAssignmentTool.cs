@@ -21,7 +21,7 @@ public class ErrorAssignmentTool
     public List<PickDailyStats> Stats { get; set; }
     public List<PickSession> PickSessions { get; set; }
     public List<PickEvent> PickEvents { get; set; }
-    public Dictionary<DateTime, Dictionary<string, Dictionary<int, List<PickEvent>>>> PickEventDictionary { get; set; }   // Date => Container => Item
+    public Dictionary<string, Dictionary<int, List<PickEvent>>> PickEventDictionary { get; set; }   // Container => Item
     public Dictionary<string, List<PickEvent>> CartonDictionary { get; set; }
     public Dictionary<(int, DateTime), List<PickEvent>> ItemDictionary { get; set; }
     public Dictionary<string, List<PickEvent>> ClusterDictionary { get; set; }
@@ -48,7 +48,7 @@ public class ErrorAssignmentTool
         Stats = new List<PickDailyStats>();
         PickSessions = new List<PickSession>();
         PickEvents = new List<PickEvent>();
-        PickEventDictionary = new Dictionary<DateTime, Dictionary<string, Dictionary<int, List<PickEvent>>>>();
+        PickEventDictionary = new Dictionary<string, Dictionary<int, List<PickEvent>>>();
         CartonDictionary = new Dictionary<string, List<PickEvent>>();
         ItemDictionary = new Dictionary<(int, DateTime), List<PickEvent>>();
         ClusterDictionary = new Dictionary<string, List<PickEvent>>();
@@ -67,10 +67,8 @@ public class ErrorAssignmentTool
 
         PickSessions = Stats.SelectMany(stats => stats.PickSessions).ToList();
         PickEvents = PickSessions.SelectMany(session => session.PickEvents).ToList();
-        PickEventDictionary = PickEvents
-            .GroupBy(e => e.Date).ToDictionary(dateGroup => dateGroup.Key, dateGroup => dateGroup
-                .GroupBy(e => e.ContainerID).ToDictionary(cartonGroup => cartonGroup.Key, cartonGroup => cartonGroup
-                    .GroupBy(e => e.ItemNumber).ToDictionary(itemGroup => itemGroup.Key, itemGroup => itemGroup.ToList())));
+        PickEventDictionary = PickEvents.GroupBy(e => e.ContainerID).ToDictionary(cartonGroup => cartonGroup.Key, cartonGroup => cartonGroup
+                    .GroupBy(e => e.ItemNumber).ToDictionary(itemGroup => itemGroup.Key, itemGroup => itemGroup.ToList()));
         CartonDictionary = PickEvents.GroupBy(e => e.ContainerID).ToDictionary(g => g.Key, g => g.ToList());
         ItemDictionary = PickEvents.GroupBy(e => (e.ItemNumber, e.Date)).ToDictionary(g => g.Key, g => g.ToList());
         ClusterDictionary = PickEvents.GroupBy(e => e.ClusterReference).ToDictionary(g => g.Key, g => g.ToList());
@@ -93,7 +91,7 @@ public class ErrorAssignmentTool
 
         foreach (var mispick in mispicks)
         {
-            progress?.Report(new ProgressTaskVM($"Assigning mispicks ({fromDate:dd/MM/yyyy} to {toDate:dd/MM/yyyy}...", $"{count} / {total}", 0, total, count));
+            progress?.Report(new ProgressTaskVM($"Assigning mispicks ({fromDate:dd/MM/yyyy} to {toDate:dd/MM/yyyy})...", $"{count} / {total}", 0, total, count));
             
             // At this point, whatever the result, the mispick has been checked.
             mispick.Checked = true;
@@ -159,7 +157,7 @@ public class ErrorAssignmentTool
 
         var diff = (EndDate - StartDate).Days;
         if (diff < 1) diff = 1;
-        var days = 30;
+        var days = 28;  // Denotes number of dates of mispicks to look up. 7 more days of Pick events will be included.
         var intervals = (diff + days - 1) / days;
         days = (diff + intervals - 1) / intervals;
 
@@ -197,15 +195,13 @@ public class ErrorAssignmentTool
 
     private bool CheckBasic(Mispick mispick)
     {
-        if (!PickEventDictionary.TryGetValue(mispick.ShipmentDate, out var cartonDictionary)) return false;
+        if (!PickEventDictionary.TryGetValue(mispick.CartonID, out var cartonDictionary)) return false;
 
-        if (!cartonDictionary.TryGetValue(mispick.CartonID, out var itemDictionary)) return false;
+        if (!cartonDictionary.TryGetValue(mispick.ItemNumber, out var itemEvents)) return false;
 
-        if (!itemDictionary.TryGetValue(mispick.ItemNumber, out var events)) return false;
+        if (itemEvents.Count == 0) return false;
 
-        if (events.Count == 0) return false;
-
-        events.First().AssignMispick(mispick);
+        itemEvents.First().AssignMispick(mispick);
 
         return true;
     }
@@ -220,16 +216,18 @@ public class ErrorAssignmentTool
     /// <returns>True if successfully found responsible session/stats. Otherwise, false</returns>
     private bool CheckZoneMatching(Mispick mispick)
     {
+        // Get list of zones relevant to both the carton and the item.
         var cartonZones = GetCartonZones(mispick.CartonID);
         var itemZones = GetItemZones(mispick.ShipmentDate, mispick.ItemNumber)?.ToList();
         if (cartonZones is null || itemZones is null) return false;
 
+        // Find intersecting zones.
         var sharedZones = cartonZones.Intersect(itemZones).ToList();
 
         if (!sharedZones.Any()) return CheckItemZone(mispick, itemZones);
 
+        // Figure out potential event culprits based on the carton and zone.
         if (!CartonDictionary.TryGetValue(mispick.CartonID, out var cartonEvents)) return false;
-
         var potentialEvents = cartonEvents.Where(e => sharedZones.Contains(e.ZoneID)).ToList();
 
         var dematicIDs = potentialEvents.Select(e => e.OperatorDematicID).Distinct().ToList();
@@ -253,7 +251,7 @@ public class ErrorAssignmentTool
         if (!CartonDictionary.TryGetValue(mispick.CartonID, out var cartonEvents)) return false;
 
         // Check if any clusters are applicable to this carton.
-        var clusters = cartonEvents.Select(e => e.ClusterReference).Distinct().ToList();
+        var clusters = cartonEvents.Where(e => e.ClusterReference != string.Empty).Select(e => e.ClusterReference).Distinct().ToList();
         if (!clusters.Any() || clusters.Count == 1 && clusters.First() == string.Empty) return false;
 
         // Gather pick events of clusters.

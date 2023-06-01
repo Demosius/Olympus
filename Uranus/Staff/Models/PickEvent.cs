@@ -12,7 +12,8 @@ namespace Uranus.Staff.Models;
 public enum ETechType
 {
     PTL,
-    RFT
+    RFT,
+    All
 }
 
 public class PickEvent : IEquatable<PickEvent>
@@ -38,12 +39,22 @@ public class PickEvent : IEquatable<PickEvent>
 
     public string MispickID { get; set; }
 
-    [ForeignKey(typeof(PickSession))] public string SessionID { get; set; }
-    [ForeignKey(typeof(PickDailyStats))]
+
+    /*
+     * Foreign Keys set up column indexes, but there is typically no reason to pull data using these values.
+     * So remove them for improved write performance. Typically data will be pulled by date, and then within
+     * that separated and joined to Sessions and Stats.
+     */
+
+
+    //[ForeignKey(typeof(PickSession))]
+    public string SessionID { get; set; }
+    //[ForeignKey(typeof(PickDailyStats))]
     public string StatsID { get; set; }
 
     // Must be set after original creation.
-    [ForeignKey(typeof(Employee))] public int OperatorID { get; set; }
+    //[ForeignKey(typeof(Employee))] 
+    public int OperatorID { get; set; }
 
     [Ignore] public TimeSpan Time => DateTime.TimeOfDay;
 
@@ -106,6 +117,10 @@ public class PickEvent : IEquatable<PickEvent>
 
         Mispick.AssignedRF_ID = OperatorRF_ID;
         Mispick.AssignedDematicID = OperatorDematicID;
+
+        Mispick.TechType = TechType;
+
+        Mispick.ErrorDate = Date;
 
         Session?.AssignMispick(mispick);
     }

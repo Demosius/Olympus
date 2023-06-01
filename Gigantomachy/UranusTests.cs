@@ -54,17 +54,17 @@ public class UranusTests
         var date = new DateTime(2020, 1, 1);
         while (date < new DateTime(2022, 2, 1))
         {
-            Console.WriteLine($"{date:d} = {date.FiscalWeek()}");
+            Console.WriteLine($"{date:d} = {date.EBFiscalWeek()}");
             date = date.AddDays(1);
         }
 
         // Assert
-        Assert.AreEqual("Jan-Wk2", date1.FiscalWeek(), $"{date1} did not give the correct result.");
-        Assert.AreEqual("Apr-Wk2", date2.FiscalWeek(), $"{date2} did not give the correct result.");
-        Assert.AreEqual("Apr-Wk4", date3.FiscalWeek(), $"{date3} did not give the correct result.");
-        Assert.AreEqual("Aug-Wk1", date4.FiscalWeek(), $"{date4} did not give the correct result.");
-        Assert.AreEqual("Sep-Wk1", date5.FiscalWeek(), $"{date5} did not give the correct result.");
-        Assert.AreEqual("Dec-Wk5", date6.FiscalWeek(), $"{date6} did not give the correct result.");
+        Assert.AreEqual("Jan-Wk2", date1.EBFiscalWeek(), $"{date1} did not give the correct result.");
+        Assert.AreEqual("Apr-Wk2", date2.EBFiscalWeek(), $"{date2} did not give the correct result.");
+        Assert.AreEqual("Apr-Wk4", date3.EBFiscalWeek(), $"{date3} did not give the correct result.");
+        Assert.AreEqual("Aug-Wk1", date4.EBFiscalWeek(), $"{date4} did not give the correct result.");
+        Assert.AreEqual("Sep-Wk1", date5.EBFiscalWeek(), $"{date5} did not give the correct result.");
+        Assert.AreEqual("Dec-Wk5", date6.EBFiscalWeek(), $"{date6} did not give the correct result.");
 
     }
 

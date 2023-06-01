@@ -1105,15 +1105,33 @@ public static class DataConversion
         foreach (DataTable table in dataSet.Tables)
             events.AddRange(DataTableToPickEvents(table));
 
+        // If no mispicks, throw invalid data error.
+        if (events.Count == 0)
+            throw new InvalidDataException("No valid pick event data found from file.", new List<string>());
+
         return events;
     }
 
     public static List<PickEvent> DataTableToPickEvents(DataTable dataTable)
     {
         IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
-
+        
+        PickEventIndices col;
         // Check headers.
-        var col = new PickEventIndices(GetTableHeaders(dataTable));
+        try
+        {
+            col = new PickEventIndices(GetTableHeaders(dataTable), true);
+        }
+        catch (InvalidDataException)
+        {
+            // This may represent a single page across many in a workbook. Do not throw the error.
+            return new List<PickEvent>();
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Unknown error when reading excel data.");
+            throw;
+        }
 
         // Iterate through rows.
         return (from DataRow row in dataTable.Rows select DataRowToPickEvent(row, col, provider)).ToList();
@@ -1167,6 +1185,7 @@ public static class DataConversion
             ReceivedQty = receivedQty,
             VarianceQty = varianceQty,
             PostedDate = postedDate,
+            ErrorDate = shipDate,
         };
         return mispick;
     }
@@ -1201,6 +1220,7 @@ public static class DataConversion
             ReceivedQty = receivedQty,
             VarianceQty = varianceQty,
             PostedDate = postedDate,
+            ErrorDate = shipDate,
         };
         return mispick;
     }
@@ -1276,7 +1296,7 @@ public static class DataConversion
         using StreamReader reader = new(File.OpenRead(csvPath));
 
         var headArr = reader.ReadLine()?.Trim('"').Split(',', '"') ?? Array.Empty<string>();
-        var col = new MispickIndices(headArr);
+        var col = new MispickIndices(headArr, true);
         var colMax = col.Max();
 
         var line = reader.ReadLine();
@@ -1338,6 +1358,10 @@ public static class DataConversion
         foreach (DataTable table in dataSet.Tables)
             mispicks.AddRange(DataTableToMispicks(table));
 
+        // If no mispicks, throw invalid data error.
+        if (mispicks.Count > 0)
+            throw new InvalidDataException("No valid mispick data found from file.", new List<string>());
+
         // Check for duplicates.
         mispicks = mispicks.Distinct().ToList();
 
@@ -1361,6 +1385,10 @@ public static class DataConversion
         });
 
         var mispicks = dataSet.Tables.Cast<DataTable>().SelectMany(DataTableToMispicks).ToList();
+        
+        // If there is no data, throw invalid data exception.
+        if (mispicks.Count == 0)
+            throw new InvalidDataException($"Failed to pull valid mispick data from {excelPath}.", new List<string>());
 
         // Check for duplicates.
         mispicks = mispicks.Distinct().ToList();
@@ -1376,10 +1404,11 @@ public static class DataConversion
         // Check headers.
         try
         {
-            col = new MispickIndices(GetTableHeaders(dataTable));
+            col = new MispickIndices(GetTableHeaders(dataTable), true);
         }
         catch (InvalidDataException)
         {
+            // This may represent a single page across many in a workbook. Do not throw the error.
             return new List<Mispick>();
         }
         catch (Exception e)

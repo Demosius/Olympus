@@ -92,7 +92,7 @@ public static class Constants
     public const string PostDate = "Posted Date";
     public const string Q = "Qty";
     public const string ItemDesc = "Item Description";
-    
+
     #endregion
 
     public static readonly Dictionary<string, int> NAVStockColumns = new()
@@ -345,7 +345,7 @@ public class NAVDivPFGenIndices : IColumnIndexer
         if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for Bin Contents conversion.", missingHeaders);
     }
 
-    public int Max() => new List<int> {Code, Description}.Max();
+    public int Max() => new List<int> { Code, Description }.Max();
 }
 
 public class NAVCategoryIndices : IColumnIndexer
@@ -372,7 +372,7 @@ public class NAVCategoryIndices : IColumnIndexer
         if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for Bin Contents conversion.", missingHeaders);
     }
 
-    public int Max() => new List<int>{ Code, Description, ItemDivCode}.Max();
+    public int Max() => new List<int> { Code, Description, ItemDivCode }.Max();
 }
 
 public class NAVLocationIndices : IColumnIndexer
@@ -437,7 +437,7 @@ public class NAVZoneIndices : IColumnIndexer
 
         if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for Bin Contents conversion.", missingHeaders);
     }
-    public int Max() => new List<int>{ Location, Code, Description, Rank}.Max();
+    public int Max() => new List<int> { Location, Code, Description, Rank }.Max();
 }
 
 public class NAVItemIndices : IColumnIndexer
@@ -717,7 +717,7 @@ public class NAVMoveIndices : IColumnIndexer
         if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for Bin Contents conversion.", missingHeaders);
     }
 
-    public int Max() => new List<int> {Action, ItemNumber, ZoneCode, BinCode, Qty, UoMCode}.Max();
+    public int Max() => new List<int> { Action, ItemNumber, ZoneCode, BinCode, Qty, UoMCode }.Max();
 }
 
 public class PickEventIndices : IColumnIndexer
@@ -737,10 +737,13 @@ public class PickEventIndices : IColumnIndexer
     public int SkuDescription { get; set; }
     public int Cluster { get; set; }
 
-    public PickEventIndices(string[] headers)
+    public PickEventIndices(string[] headers, bool softCheck = false)
     {
         SetIndices(headers);
-        CheckMissingHeaders();
+        if (softCheck)
+            CheckMissingHeadersSoft();
+        else
+            CheckMissingHeaders();
     }
 
     public void SetIndices(string[] headers)
@@ -748,15 +751,20 @@ public class PickEventIndices : IColumnIndexer
         Timestamp = Array.IndexOf(headers, Constants.Timestamp);
         OperatorID = Array.IndexOf(headers, Constants.OperatorID);
         OperatorName = Array.IndexOf(headers, Constants.OperatorName);
+        if (OperatorName == -1) OperatorName = Array.IndexOf(headers, "Picker");
         Qty = Array.IndexOf(headers, Constants.Q);
         Container = Array.IndexOf(headers, Constants.Container);
+        if (Container == -1) Container = Array.IndexOf(headers, "CCN");
         Tech = Array.IndexOf(headers, Constants.Tech);
+        if (Tech == -1) Tech = Array.IndexOf(headers, "Tech");
         ZoneID = Array.IndexOf(headers, Constants.ZoneID);
+        if (ZoneID == -1) ZoneID = Array.IndexOf(headers, "Zone");
         WaveID = Array.IndexOf(headers, Constants.WaveID);
         WorkAssignment = Array.IndexOf(headers, Constants.WorkAssignment);
         Store = Array.IndexOf(headers, Constants.Store);
         DeviceID = Array.IndexOf(headers, Constants.DeviceID);
         SkuID = Array.IndexOf(headers, Constants.SkuID);
+        if (SkuID == -1) SkuID = Array.IndexOf(headers, "SKU");
         SkuDescription = Array.IndexOf(headers, Constants.SkuDesc);
         Cluster = Array.IndexOf(headers, Constants.Cluster);
     }
@@ -780,7 +788,35 @@ public class PickEventIndices : IColumnIndexer
         if (SkuDescription == -1) missingHeaders.Add(Constants.SkuDesc);
         if (Cluster == -1) missingHeaders.Add(Constants.Cluster);
 
-        if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for Bin Contents conversion.", missingHeaders);
+        if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for Pick Event conversion.", missingHeaders);
+    }
+
+    public void CheckMissingHeadersSoft()
+    {
+        var missingHeaders = new List<string>();
+
+        if (Cluster == -1) Cluster = Container;
+        if (WaveID == -1) WaveID = Cluster;
+        if (WorkAssignment == -1) WorkAssignment = Container;
+        if (Store == -1) Store = Container;
+        if (DeviceID == -1) DeviceID = OperatorID;
+
+        if (Timestamp == -1) missingHeaders.Add(Constants.Timestamp);
+        if (OperatorID == -1) missingHeaders.Add(Constants.OperatorID);
+        if (OperatorName == -1) missingHeaders.Add(Constants.OperatorName);
+        if (Qty == -1) missingHeaders.Add(Constants.Q);
+        if (Container == -1) missingHeaders.Add(Constants.Container);
+        if (Tech == -1) missingHeaders.Add(Constants.Tech);
+        if (ZoneID == -1) missingHeaders.Add(Constants.ZoneID);
+        if (WaveID == -1) missingHeaders.Add(Constants.WaveID);
+        if (WorkAssignment == -1) missingHeaders.Add(Constants.WorkAssignment);
+        if (Store == -1) missingHeaders.Add(Constants.Store);
+        if (DeviceID == -1) missingHeaders.Add(Constants.DeviceID);
+        if (SkuID == -1) missingHeaders.Add(Constants.SkuID);
+        if (SkuDescription == -1) missingHeaders.Add(Constants.SkuDesc);
+        if (Cluster == -1) missingHeaders.Add(Constants.Cluster);
+
+        if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for Pick Event conversion.", missingHeaders);
     }
 
     public int Max() => new List<int>
@@ -803,24 +839,38 @@ public class MispickIndices : IColumnIndexer
     public int VarianceQty { get; set; }
     public int PostDate { get; set; }
 
-    public MispickIndices(string[] headers)
+    // Use as potential place holder.
+    public int Date { get; set; }
+
+    public MispickIndices(string[] headers, bool softCheck = false)
     {
         SetIndices(headers);
-        CheckMissingHeaders();
+
+        if (softCheck)
+            CheckMissingHeadersSoft();
+        else
+
+            CheckMissingHeaders();
     }
 
     public void SetIndices(string[] headers)
     {
         ShipDate = Array.IndexOf(headers, Constants.ShipDate);
+        if (ShipDate == -1) ShipDate = Array.IndexOf(headers, "Ship Date");
         ReceiveDate = Array.IndexOf(headers, Constants.ReceiveDate);
         CartonID = Array.IndexOf(headers, Constants.CartonID);
         ItemNumber = Array.IndexOf(headers, Constants.ItemNumber);
         ItemDesc = Array.IndexOf(headers, Constants.ItemDesc);
         ActionNotes = Array.IndexOf(headers, Constants.ActionNotes);
         OriginalQty = Array.IndexOf(headers, Constants.OriginalQty);
+        if (OriginalQty == -1) OriginalQty = Array.IndexOf(headers, "Orig");
         ReceiveQty = Array.IndexOf(headers, Constants.ReceiveQty);
         VarianceQty = Array.IndexOf(headers, Constants.VarianceQty);
+        if (VarianceQty == -1) VarianceQty = Array.IndexOf(headers, "Adj");
         PostDate = Array.IndexOf(headers, Constants.PostDate);
+
+        Date = Array.IndexOf(headers, "Date");
+        if (Date == -1) Date = Array.IndexOf(headers, "DATE");
     }
 
     public void CheckMissingHeaders()
@@ -838,8 +888,36 @@ public class MispickIndices : IColumnIndexer
         if (VarianceQty == -1) missingHeaders.Add(Constants.VarianceQty);
         if (PostDate == -1) missingHeaders.Add(Constants.PostDate);
 
+        if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for Mispick conversion.", missingHeaders);
+    }
 
-        if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for Bin Contents conversion.", missingHeaders);
+    public void CheckMissingHeadersSoft()
+    {
+        var missingHeaders = new List<string>();
+
+        if (ShipDate == -1) ShipDate = Date;
+        if (ReceiveDate == -1) ReceiveDate = ShipDate;
+        if (PostDate == -1) PostDate = ShipDate;
+
+        // Some old data only has a variance qty. Use that to fill in missing original and receive.
+        if (OriginalQty == -1) OriginalQty = VarianceQty;
+        if (ReceiveQty == -1) ReceiveQty = VarianceQty;
+
+        // Don't worry about not having action notes column. Use variance as fill in.
+        if (ActionNotes == -1) ActionNotes = VarianceQty;
+
+        if (ShipDate == -1) missingHeaders.Add(Constants.ShipDate);
+        if (ReceiveDate == -1) missingHeaders.Add(Constants.ReceiveDate);
+        if (CartonID == -1) missingHeaders.Add(Constants.CartonID);
+        if (ItemNumber == -1) missingHeaders.Add(Constants.ItemNumber);
+        if (ItemDesc == -1) missingHeaders.Add(Constants.ItemDesc);
+        if (ActionNotes == -1) missingHeaders.Add(Constants.ActionNotes);
+        if (OriginalQty == -1) missingHeaders.Add(Constants.OriginalQty);
+        if (ReceiveQty == -1) missingHeaders.Add(Constants.ReceiveQty);
+        if (VarianceQty == -1) missingHeaders.Add(Constants.VarianceQty);
+        if (PostDate == -1) missingHeaders.Add(Constants.PostDate);
+
+        if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for Mispick conversion.", missingHeaders);
     }
 
     public int Max() => new List<int>

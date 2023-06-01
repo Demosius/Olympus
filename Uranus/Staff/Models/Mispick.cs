@@ -7,6 +7,12 @@ using SQLiteNetExtensions.Attributes;
 
 namespace Uranus.Staff.Models;
 
+public enum EErrorMethod
+{
+    ErrorDiscovered,
+    ErrorMade
+}
+
 public class Mispick : IEquatable<Mispick>
 {
     [PrimaryKey] public string ID { get; set; } // e.g. 8292418:215854 => [CartonID]:[ItemNumber]
@@ -22,6 +28,7 @@ public class Mispick : IEquatable<Mispick>
     public int VarianceQty { get; set; }
 
     public string Comments { get; set; }
+    public DateTime ErrorDate { get; set; } // This should represent the date of the actual error. 99+% of the time this will match ShipmentDate, and will default to that.
 
     public bool Checked { get; set; }
     public bool NoCarton { get; set; }  // No appropriate carton found when checking pick events.
@@ -87,6 +94,8 @@ public class Mispick : IEquatable<Mispick>
         AssignedDematicID = pickEvent.OperatorDematicID;
         TechType = pickEvent.TechType;
 
+        ErrorDate = pickEvent.Date;
+
         PickEvent.MispickID = ID;
         PickEvent.Mispick = this;
         PickSession?.Mispicks.Add(this);
@@ -104,6 +113,8 @@ public class Mispick : IEquatable<Mispick>
         AssignedDematicID = pickSession.OperatorDematicID;
         TechType = pickSession.TechType;
 
+        ErrorDate = pickSession.Date;
+
         PickSession.Mispicks.Add(this);
         PickStats?.Mispicks.Add(this);
     }
@@ -116,6 +127,8 @@ public class Mispick : IEquatable<Mispick>
         AssignedRF_ID = pickStats.OperatorRF_ID;
         AssignedDematicID = pickStats.OperatorDematicID;
         TechType = tech;
+
+        ErrorDate = pickStats.Date;
 
         PickStats.Mispicks.Add(this);
     }

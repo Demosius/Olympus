@@ -3,9 +3,9 @@
 /// <summary>
 /// Interaction logic for EmployeeMispickView.xaml
 /// </summary>
-public partial class EmployeeMispickView
+public partial class ErrorsDiscoveredView
 {
-    public EmployeeMispickView()
+    public ErrorsDiscoveredView()
     {
         InitializeComponent();
     }

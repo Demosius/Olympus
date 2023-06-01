@@ -124,8 +124,17 @@
             <TabItem Header="Mispick Data">
                 <controls:MispickDataView DataContext="{Binding MispickDataVM}"/>
             </TabItem>
-            <TabItem Header="Employee Mispicks">
-                <controls:EmployeeMispickView DataContext="{Binding EmployeeMispickVM}"/>
+            <TabItem Header="Errors Made">
+                <controls:ErrorsMadeView DataContext="{Binding ErrorsMadeVM}"/>
+            </TabItem>
+            <TabItem Header="Errors Discovered">
+                <controls:ErrorsDiscoveredView DataContext="{Binding ErrorsDiscoveredVM}"/>
+            </TabItem>
+            <TabItem Header="Reports">
+                <controls:StatisticsReportView DataContext="{Binding StatisticsReportVM}"/>
+            </TabItem>
+            <TabItem Header="By-Week Report Data">
+                <controls:ReportByWeekView DataContext="{Binding ReportByWeekVM}"/>
             </TabItem>
         </TabControl>
 

@@ -878,6 +878,28 @@ public class StaffReader
         return tool;
     }
 
+    /// <summary>
+    /// A dictionary that assigns Employee objects according to their RF ID - and also takes into account Temp Tags.
+    /// </summary>
+    /// <returns></returns>
+    public TagAssignmentTool TagAssignmentTool()
+    {
+        var tool = new TagAssignmentTool();
+
+        void Action()
+        {
+            var tags = Chariot.PullObjectList<TempTag>();
+            var tagsUse = Chariot.PullObjectList<TagUse>();
+            var employees = Chariot.PullObjectList<Employee>();
+
+            tool = new TagAssignmentTool(tags, employees, tagsUse);
+        }
+
+        RunInTransaction(Action);
+
+        return tool;
+    }
+
     public async Task<Employee?> TagUserAsync(TempTag tempTag, DateTime date) => await TagUserAsync(tempTag.RF_ID, date).ConfigureAwait(false);
 
     public async Task<Employee?> TagUserAsync(string tempTagRF, DateTime date) => Employee(await TagUserIDAsync(tempTagRF, date).ConfigureAwait(false));
@@ -898,8 +920,14 @@ public class StaffReader
     public async Task<List<Mispick>> RawMispicksAsync(DateTime startDate, DateTime endDate) =>
         await Chariot.PullObjectListAsync<Mispick>(mp => mp.ShipmentDate >= startDate.Date && mp.ShipmentDate <= endDate.Date).ConfigureAwait(false);
 
-    public List<Mispick> RawMispicks(DateTime startDate, DateTime endDate) =>
+    public List<Mispick> MispicksByErrorDate(DateTime startDate, DateTime endDate) =>
+        Chariot.PullObjectList<Mispick>(mp => mp.ErrorDate >= startDate.Date && mp.ErrorDate <= endDate.Date);
+
+    public List<Mispick> MispicksByShipDate(DateTime startDate, DateTime endDate) =>
         Chariot.PullObjectList<Mispick>(mp => mp.ShipmentDate >= startDate.Date && mp.ShipmentDate <= endDate.Date);
+
+    public List<Mispick> MispicksByPostedDate(DateTime startDate, DateTime endDate) =>
+        Chariot.PullObjectList<Mispick>(mp => mp.PostedDate >= startDate.Date && mp.PostedDate <= endDate.Date);
 
     public async Task<List<PickEvent>> PickEventsAsync(DateTime startDate, DateTime endDate, bool includeEmployees = false)
     {
@@ -1130,12 +1158,32 @@ public class StaffReader
 
         void Action()
         {
-            mispicks = RawMispicks(fromDate, toDate);
-            stats = mispicks.Any() ? PickStats(fromDate, toDate) : stats;
+            // It is possible for cartons to be delayed up to 7 days, 
+            // so gather pick data from 7 days earlier than the mispicks.
+            mispicks = MispicksByErrorDate(fromDate, toDate);
+            stats = mispicks.Any() ? PickStats(fromDate.AddDays(-7), toDate) : stats;
         }
 
         await Task.Run(() => RunInTransaction(Action)).ConfigureAwait(false);
 
         return (stats, mispicks);
+    }
+
+    public async Task<(List<Mispick> mispicks, List<PickSession> sessions, TagAssignmentTool tagTool)> StatisticReportsAsync(DateTime fromDate, DateTime toDate, bool usePosted = false)
+    {
+        var mispicks = new List<Mispick>();
+        var sessions = new List<PickSession>();
+        var tagTool = new TagAssignmentTool();
+
+        void Action()
+        {
+            mispicks = usePosted ? MispicksByPostedDate(fromDate, toDate) : MispicksByErrorDate(fromDate, toDate);
+            sessions = Chariot.PullObjectList<PickSession>(s => s.Date >= fromDate && s.Date <= toDate);
+            tagTool = TagAssignmentTool();
+        }
+
+        await Task.Run(() => RunInTransaction(Action)).ConfigureAwait(false);
+
+        return (mispicks, sessions, tagTool);
     }
 }
