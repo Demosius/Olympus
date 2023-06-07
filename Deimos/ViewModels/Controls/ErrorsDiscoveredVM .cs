@@ -14,7 +14,7 @@ using Uranus.Interfaces;
 
 namespace Deimos.ViewModels.Controls;
 
-public class EmployeeMispickVM : INotifyPropertyChanged, IDBInteraction, IFilters
+public class ErrorsDiscoveredVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
     public DeimosVM ParentVM { get; set; }
     public Helios Helios { get; set; }
@@ -40,6 +40,7 @@ public class EmployeeMispickVM : INotifyPropertyChanged, IDBInteraction, IFilter
         {
             filterString = value;
             OnPropertyChanged();
+            ApplyFilters();
         }
     }
 
@@ -53,7 +54,7 @@ public class EmployeeMispickVM : INotifyPropertyChanged, IDBInteraction, IFilter
 
     #endregion
 
-    public EmployeeMispickVM(DeimosVM parentVM)
+    public ErrorsDiscoveredVM(DeimosVM parentVM)
     {
         ParentVM = parentVM;
         Helios = parentVM.Helios;
@@ -82,7 +83,7 @@ public class EmployeeMispickVM : INotifyPropertyChanged, IDBInteraction, IFilter
             var mispicks = (await mispickTask).ToList();
             var tagAssignTool = await tagAssignToolTask;
 
-            AllErrors = ErrorGroup.GenerateErrorGroups(mispicks).OrderBy(e => e.Date).ToList();
+            AllErrors = ErrorGroup.GenerateErrorGroupsPosted(mispicks).OrderBy(e => e.Date).ToList();
             foreach (var errorGroup in AllErrors)
                 errorGroup.Employee = tagAssignTool.Employee(errorGroup.Date, errorGroup.AssignedRF_ID);
         }
@@ -93,7 +94,6 @@ public class EmployeeMispickVM : INotifyPropertyChanged, IDBInteraction, IFilter
     public void ClearFilters()
     {
         FilterString = string.Empty;
-        ApplyFilters();
     }
 
     public void ApplyFilters()

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Deimos.Models;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -13,22 +14,23 @@ using Uranus.Interfaces;
 
 namespace Deimos.ViewModels.Controls;
 
-public class MispickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
+public class ErrorsMadeVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
     public DeimosVM ParentVM { get; set; }
     public Helios Helios { get; set; }
-    public List<MispickVM> AllMispicks { get; set; }
+
+    public List<ErrorGroup> AllErrors { get; set; }
 
     #region ParentVM Access
-
+    
     public DateTime? StartDate => ParentVM.StartDate;
     public DateTime? EndDate => ParentVM.EndDate;
-     
+
     #endregion
 
     #region INotifyPropertyChanged Members
 
-    public ObservableCollection<MispickVM> Mispicks { get; set; }
+    public ObservableCollection<ErrorGroup> Errors { get; set; }
 
     private string filterString;
     public string FilterString
@@ -38,6 +40,7 @@ public class MispickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
         {
             filterString = value;
             OnPropertyChanged();
+            ApplyFilters();
         }
     }
 
@@ -51,16 +54,15 @@ public class MispickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     #endregion
 
-    public MispickDataVM(DeimosVM parentVM)
+    public ErrorsMadeVM(DeimosVM parentVM)
     {
         ParentVM = parentVM;
         Helios = parentVM.Helios;
 
         filterString = string.Empty;
 
-        AllMispicks = new List<MispickVM>();
-
-        Mispicks = new ObservableCollection<MispickVM>();
+        AllErrors = new List<ErrorGroup>();
+        Errors = new ObservableCollection<ErrorGroup>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
@@ -70,31 +72,38 @@ public class MispickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public async Task RefreshDataAsync()
     {
         if (StartDate is null || EndDate is null)
-            AllMispicks = new List<MispickVM>();
+            AllErrors = new List<ErrorGroup>();
         else
-            AllMispicks = (await Helios.StaffReader.RawMispicksAsync((DateTime) StartDate, (DateTime) EndDate)).Select(mp => new MispickVM(mp, Helios)).ToList();
+        {
+            var mispickTask = Helios.StaffReader.RawMispicksAsync((DateTime)StartDate, (DateTime)EndDate);
+            var tagAssignToolTask = Helios.StaffReader.TagAssignmentToolAsync();
+
+            await Task.WhenAll(mispickTask, tagAssignToolTask);
+
+            var mispicks = (await mispickTask).ToList();
+            var tagAssignTool = await tagAssignToolTask;
+
+            AllErrors = ErrorGroup.GenerateErrorGroups(mispicks).OrderBy(e => e.Date).ToList();
+            foreach (var errorGroup in AllErrors)
+                errorGroup.Employee = tagAssignTool.Employee(errorGroup.Date, errorGroup.AssignedRF_ID);
+        }
 
         ApplyFilters();
     }
-
+    
     public void ClearFilters()
     {
         FilterString = string.Empty;
-        ApplyFilters();
     }
 
     public void ApplyFilters()
     {
-        var events = AllMispicks.Where(mispick =>
+        var events = AllErrors.Where(mispick =>
             Regex.IsMatch(mispick.AssignedRF_ID, FilterString, RegexOptions.IgnoreCase) ||
-            Regex.IsMatch(mispick.ActionNotes, FilterString, RegexOptions.IgnoreCase) ||
-            Regex.IsMatch(mispick.Comments, FilterString, RegexOptions.IgnoreCase) ||
-            Regex.IsMatch(mispick.ItemDescription, FilterString, RegexOptions.IgnoreCase) ||
-            Regex.IsMatch(mispick.ItemNumber.ToString(), FilterString, RegexOptions.IgnoreCase) ||
-            Regex.IsMatch(mispick.CartonID, FilterString, RegexOptions.IgnoreCase));
+            Regex.IsMatch(mispick.Employee?.FullName ?? "", FilterString, RegexOptions.IgnoreCase));
 
-        Mispicks.Clear();
-        foreach (var pickEvent in events) Mispicks.Add(pickEvent);
+        Errors.Clear();
+        foreach (var pickEvent in events) Errors.Add(pickEvent);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -67,14 +67,34 @@ public class TagAssignmentTool
     {
         if (!TagDict.TryGetValue(rfID, out var tag))
             return EmployeeByRF(rfID);
-        
+
         var tagUse = tag.TagUse.FirstOrDefault(u => u.StartDate <= date && (u.EndDate is null || u.EndDate >= date));
-        
-        return tagUse?.Employee ?? EmployeeByRF(rfID); 
+
+        return tagUse?.Employee ?? EmployeeByRF(rfID);
     }
 
     public Employee? EmployeeByRF(string rfID)
     {
         return !EmployeeRFDict.TryGetValue(rfID, out var employee) ? null : employee;
+    }
+
+    public void SetSessionPicker(PickSession session)
+    {
+        var picker = Employee(session.Date, session.OperatorRF_ID);
+        
+        session.Operator = picker;
+
+        if (picker is null) return;
+
+        session.OperatorRF_ID = picker.RF_ID;
+        session.OperatorID = picker.ID;
+    }
+
+    public void SetMispickOperator(Mispick mispick)
+    {
+        var picker = Employee(mispick.ErrorDate, mispick.AssignedRF_ID);
+
+        mispick.Employee = picker;
+        mispick.AssignedRF_ID = picker?.RF_ID ?? mispick.AssignedRF_ID;
     }
 }

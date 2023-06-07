@@ -52,7 +52,7 @@ public class PickSession
     [Ignore] public int Units => Qty;
     [Ignore] public double HitsPerMinute => Hits / (Duration.Seconds / 60.0);
     [Ignore] public double UnitsPerMinute => Units / (Duration.Seconds / 60.0);
-
+    
     public PickSession()
     {
         ID = Guid.NewGuid().ToString(); // This should be immediately overwritten, but automatically should be unique so as not to cause potential issues.
@@ -128,6 +128,8 @@ public class PickSession
 
         mispick.PickSessionID = ID;
         mispick.PickSession = this;
+        mispick.ErrorDate = Date;
+        mispick.TechType = TechType;
 
         PickStats?.AssignMispick(mispick);
     }

@@ -123,6 +123,7 @@ public class PickDailyStats
     {
         mispick.PickStatsID = ID;
         mispick.PickStats = this;
+        mispick.ErrorDate = Date;
 
         Mispicks.Add(mispick);
     }

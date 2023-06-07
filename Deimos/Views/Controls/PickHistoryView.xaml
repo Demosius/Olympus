@@ -41,7 +41,7 @@
                   CanUserReorderColumns="True">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="TimeStamp"
-                                    Binding="{Binding TimeStamp}"/>
+                                    Binding="{Binding DateTime, StringFormat=dd/MM/yyyy h:mm:ss tt}"/>
                 <DataGridTextColumn Header="Dematic ID"
                                     Binding="{Binding OperatorDematicID}"/>
                 <DataGridTextColumn Header="RF ID"

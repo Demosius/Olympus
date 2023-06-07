@@ -1,0 +1,126 @@
+﻿<UserControl x:Class="Deimos.Views.Controls.ReportByWeekView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Deimos.ViewModels.Controls"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:model="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:ReportByWeekVM}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="ErrorMethods"
+                            MethodName="GetValues" 
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="model:EErrorMethod"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+    <DockPanel>
+
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <ComboBox ItemsSource="{Binding Source={StaticResource ErrorMethods}}"
+                      SelectedValue="{Binding SelectedErrorMethod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Margin="2"/>
+            <Button Command="{Binding RefreshDataCommand}"
+                    MinWidth="30"
+                    Height="30"
+                    Margin="2"
+                    Padding="5"
+                    ToolTip="Generate Report">
+                Generate Report
+            </Button>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+            <TextBox Margin="2"
+                     MinWidth="120"
+                     Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <!--<Button Command="{Binding ApplyFiltersCommand}"
+                    Width="30"
+                    Height="30"
+                    Margin="2"
+                    Padding="5"
+                    ToolTip="Apply Filter">
+                <Image Source="../../Resources/img/search.png"></Image>
+            </Button>-->
+            <Button Command="{Binding ClearFiltersCommand}"
+                    Width="30"
+                    Height="30"
+                    Margin="2"
+                    Padding="5"
+                    ToolTip="Clear Filter">
+                <Image Source="../../Resources/img/cross.png"></Image>
+            </Button>
+        </StackPanel>
+
+        <DataGrid ItemsSource="{Binding Reports}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  CanUserResizeRows="False"
+                  CanUserResizeColumns="True"
+                  CanUserSortColumns="True"
+                  CanUserReorderColumns="True">
+
+            <DataGrid.Columns>
+                <!--<DataGridTextColumn Header="Date Range"
+                                    Binding="{Binding DateRange}"
+                                    IsReadOnly="True"/>-->
+                <DataGridTextColumn Header="Year"
+                                    Binding="{Binding FiscalYear}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Quarter"
+                                    Binding="{Binding FiscalQuarter}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Month"
+                                    Binding="{Binding FiscalMonth}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Week"
+                                    Binding="{Binding MonthWeek}"
+                                    IsReadOnly="True"/>
+                <!--<DataGridTextColumn Header="F-Week"
+                                    Binding="{Binding FiscalWeek}"
+                                    IsReadOnly="True"/>-->
+                <DataGridTextColumn Header="Clan"
+                                    Binding="{Binding Clan}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Name"
+                                    Binding="{Binding EmployeeName}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="User ID"
+                                    Binding="{Binding RFID}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Tech."
+                                    Binding="{Binding TechType}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Time Taken"
+                                    Binding="{Binding TimeTaken}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Loc."
+                                    Binding="{Binding Hits}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Loc. P/H"
+                                    Binding="{Binding HitsPerHour, StringFormat='#,##0.0#'}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Qty Picked"
+                                    Binding="{Binding Units}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Qty P/H"
+                                    Binding="{Binding UnitsPerHour, StringFormat='#,##0.0#'}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Errors (Count)"
+                                    Binding="{Binding ErrorCount}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Errors (Units)"
+                                    Binding="{Binding UnitErrors}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Accuracy"
+                                    Binding="{Binding Accuracy, StringFormat='#0.0#%'}"
+                                    IsReadOnly="True"/>
+            </DataGrid.Columns>
+
+        </DataGrid>
+    </DockPanel>
+</UserControl>

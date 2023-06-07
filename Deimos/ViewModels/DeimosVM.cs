@@ -31,7 +31,10 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
 
     public PickHistoryVM PickHistoryVM { get; }
     public MispickDataVM MispickDataVM { get; }
-    public EmployeeMispickVM EmployeeMispickVM { get; }
+    public ErrorsMadeVM ErrorsMadeVM { get; }
+    public ErrorsDiscoveredVM ErrorsDiscoveredVM { get; set; }
+    public StatisticsReportVM StatisticsReportVM { get; set; }
+    public ReportByWeekVM ReportByWeekVM { get; set; }
 
     #region INotifyPropertChanged Members
 
@@ -58,9 +61,9 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         set
         {
             startDate = value;
-            if (endDate < startDate)
+            if (startDate is not null && (endDate < startDate || endDate is null))
             {
-                endDate = value;
+                endDate = ((DateTime)startDate).AddDays(6);
                 OnPropertyChanged(nameof(endDate));
             }
             OnPropertyChanged();
@@ -158,7 +161,10 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
 
         PickHistoryVM = new PickHistoryVM(this);
         MispickDataVM = new MispickDataVM(this);
-        EmployeeMispickVM = new EmployeeMispickVM(this);
+        ErrorsMadeVM = new ErrorsMadeVM(this);
+        ErrorsDiscoveredVM = new ErrorsDiscoveredVM(this);
+        StatisticsReportVM = new StatisticsReportVM(this);
+        ReportByWeekVM = new ReportByWeekVM(this);
 
         DataComps = new ObservableCollection<DataDateComparison>();
 
@@ -351,13 +357,14 @@ public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun
         bool success;
         try
         {
-            success = await errorTool.AssignErrorsAsync(progress);
+            success = await Task.Run(async () => await errorTool.AssignErrorsAsync(progress));
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Failed to assign errors.");
             MessageBox.Show($"Failed to complete error assignment.\n\nUnknown Error Occurred\n\n{ex}", "Failure", MessageBoxButton.OK,
                 MessageBoxImage.Error);
+            ProgressBar.EndTask();
             return;
         } 
         ProgressBar.EndTask();

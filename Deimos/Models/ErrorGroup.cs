@@ -18,17 +18,12 @@ public class ErrorGroup
 
     public Employee? Employee { get; set; }
 
-    public ErrorGroup(DateTime date, string assignedRF_ID, IEnumerable<Mispick> mispicks)
+    public ErrorGroup(DateTime date, string assignedRF_ID, List<Mispick> mispicks)
     {
         Date = date;
         AssignedRF_ID = assignedRF_ID == string.Empty ? "Unassigned" : assignedRF_ID;
-
-        // Given list should contain only relevant mispicks, but we will make sure of that here.
-        Mispicks = mispicks.Where(mp => 
-            mp.ShipmentDate == date && 
-            (mp.AssignmentString == assignedRF_ID ||
-             (assignedRF_ID == "Unassigned" && mp.AssignmentString == string.Empty)))
-            .ToList();
+        
+        Mispicks = mispicks;
 
         ErrorCount = Mispicks.Count;
         ErrorSum = Mispicks.Sum(mp => Math.Abs(mp.VarianceQty));
@@ -45,6 +40,20 @@ public class ErrorGroup
         foreach (var (key, value) in dict)
             if (value.Any()) groups.Add(new ErrorGroup(key.ShipmentDate, key.AssignmentString, value));
         
+        return groups;
+    }
+
+    public static List<ErrorGroup> GenerateErrorGroupsPosted(IEnumerable<Mispick> mispicks)
+    {
+        var dict = mispicks
+            .GroupBy(mp => (mp.PostedDate, mp.AssignmentString))
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        var groups = new List<ErrorGroup>();
+
+        foreach (var (key, value) in dict)
+            if (value.Any()) groups.Add(new ErrorGroup(key.PostedDate, key.AssignmentString, value));
+
         return groups;
     }
 }

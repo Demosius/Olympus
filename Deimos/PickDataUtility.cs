@@ -17,6 +17,8 @@ namespace Deimos;
 
 public static class PickDataUtility
 {
+    #region Failed file load strings.
+    
     public static List<string> BadFileReadsMP = new();
     public static List<string> LockedFilesMP = new();
     public static List<string> NoMPData = new();
@@ -25,12 +27,38 @@ public static class PickDataUtility
     public static List<string> LockedFilesPE = new();
     public static List<string> NoPEData = new();
 
-    private static string BadMispickReads() => BadFileReadsMP.Count > 0 ? $"\n\nBad File Reads:\n\t{string.Join("\n\t", BadFileReadsMP)}" : "";
-    private static string LockedMispickFiles() => LockedFilesMP.Count > 0 ? $"\n\nLocked Files:\n\t{string.Join("\n\t", LockedFilesMP)}" : "";
-    private static string NoMissPickData() => NoMPData.Count > 0 ? $"\n\nNo Data Found:\n\t{string.Join("\n\t", NoMPData)}" : "";
-    private static string BadPickEventReads() => BadFileReadsPE.Count > 0 ? $"\n\nBad File Reads:\n\t{string.Join("\n\t", BadFileReadsPE)}" : "";
-    private static string LockedPickEventFiles() => LockedFilesPE.Count > 0 ? $"\n\nLocked Files:\n\t{string.Join("\n\t", LockedFilesPE)}" : "";
-    private static string NoPickEventData() => NoPEData.Count > 0 ? $"\n\nNo Data Found:\n\t{string.Join("\n\t", NoPEData)}" : "";
+    private static string MPBadReadFileString() => BadFileReadsMP.Count > 8
+        ? $"{BadFileReadsMP[0]}\n\t{BadFileReadsMP[1]}\n\t{BadFileReadsMP[2]}\n\t...\n\t+{BadFileReadsMP.Count - 3}"
+        : string.Join("\n\t", BadFileReadsMP);
+
+    private static string MPLockedFileString() => LockedFilesMP.Count > 8
+        ? $"{LockedFilesMP[0]}\n\t{LockedFilesMP[1]}\n\t{LockedFilesMP[2]}\n\t...\n\t+{LockedFilesMP.Count - 3}"
+        : string.Join("\n\t", LockedFilesMP);
+
+    private static string MPNoDataString() => NoMPData.Count > 8
+        ? $"{NoMPData[0]}\n\t{NoMPData[1]}\n\t{NoMPData[2]}\n\t...\n\t+{NoMPData.Count - 3}"
+        : string.Join("\n\t", NoMPData);
+
+    private static string PEBadReadFileString() => BadFileReadsPE.Count > 8
+        ? $"{BadFileReadsPE[0]}\n\t{BadFileReadsPE[1]}\n\t{BadFileReadsPE[2]}\n\t...\n\t+{BadFileReadsPE.Count - 3}"
+        : string.Join("\n\t", BadFileReadsPE);
+
+    private static string PELockedFileString() => LockedFilesPE.Count > 8
+        ? $"{LockedFilesPE[0]}\n\t{LockedFilesPE[1]}\n\t{LockedFilesPE[2]}\n\t...\n\t+{LockedFilesPE.Count - 3}"
+        : string.Join("\n\t", LockedFilesPE);
+
+    private static string PENoDataString() => NoPEData.Count > 8
+        ? $"{NoPEData[0]}\n\t{NoPEData[1]}\n\t{NoPEData[2]}\n\t...\n\t+{NoPEData.Count - 3}"
+        : string.Join("\n\t", NoPEData);
+
+    private static string BadMispickReads() => BadFileReadsMP.Count > 0 ? $"\n\nBad File Reads:\n\t{MPBadReadFileString()}" : "";
+    private static string LockedMispickFiles() => LockedFilesMP.Count > 0 ? $"\n\nLocked Files:\n\t{MPLockedFileString()}" : "";
+    private static string NoMissPickData() => NoMPData.Count > 0 ? $"\n\nNo Data Found:\n\t{MPNoDataString()}" : "";
+    private static string BadPickEventReads() => BadFileReadsPE.Count > 0 ? $"\n\nBad File Reads:\n\t{PEBadReadFileString()}" : "";
+    private static string LockedPickEventFiles() => LockedFilesPE.Count > 0 ? $"\n\nLocked Files:\n\t{PELockedFileString()}" : "";
+    private static string NoPickEventData() => NoPEData.Count > 0 ? $"\n\nNo Data Found:\n\t{PENoDataString()}" : "";
+
+    #endregion
 
     public static void ResetMPFileData()
     {
