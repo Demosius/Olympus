@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="Cadmus.Views.Controls.MixedCartonSOHView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Cadmus.ViewModels.Controls"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:MixedCartonSOH_VM}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="1000">
+
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+            <Button Margin="5">Generate Report</Button>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+            <Label Content="Check Zones: " 
+                   VerticalAlignment="Center"/>
+            <TextBox Text="{Binding ZoneString}"
+                     Margin="5"
+                     MinWidth="75"/>
+            <Label Content="Platform: " 
+                   VerticalAlignment="Center"/>
+            <TextBox Text="{Binding PlatformString}"
+                     Margin="5"
+                     MinWidth="75"/>
+            <Label Content="Category: " 
+                   VerticalAlignment="Center"/>
+            <TextBox Text="{Binding CategoryString}"
+                     Margin="5"
+                     MinWidth="75"/>
+            <Label Content="Division: " 
+                   VerticalAlignment="Center"/>
+            <TextBox Text="{Binding DivisionString}"
+                     Margin="5"
+                     MinWidth="75"/>
+            <Button Command="{Binding ClearFiltersCommand}"
+                    Width="30"
+                    Height="30"
+                    Margin="2"
+                    Padding="5"
+                    ToolTip="Apply Filter">
+                <Image Source="../../Resources/Images/search.png"/>
+            </Button>
+            <Button Command="{Binding ClearFiltersCommand}"
+                    Width="30"
+                    Height="30"
+                    Margin="2"
+                    Padding="5"
+                    ToolTip="Clear Filter">
+                <Image Source="../../Resources/Images/cross.png"/>
+            </Button>
+        </StackPanel>
+
+        <DataGrid></DataGrid>
+    </DockPanel>
+</UserControl>

@@ -153,10 +153,38 @@ public class NAVBin
     // Takes examples of NAVStock and creates Stock versions.
     public void ConvertStock()
     {
-        foreach (var stock in NAVStock.Select(ns => new Stock(ns)))
+        Stock = Models.Stock.FromNAVStock(NAVStock).ToDictionary(s => s.ItemNumber, s => s);
+    }
+
+    /// <summary>
+    /// Converts bin contents stock to Mixed Carton stock, if applicable.
+    /// </summary>
+    /// <param name="mcIDTool">MixedCarton Identification tool, used to match and identify mixed cartons.</param>
+    /// <param name="createNewMixedCartons">If true will create a new Mixed carton template if one is apparent in data.</param>
+    /// <returns></returns>
+    public bool MixedCartonStockConversion(MixedCartonIdentificationTool mcIDTool, bool createNewMixedCartons = false)
+    {
+        // Get potentially relevant stock lines.
+        var invalidStock = new List<Stock>();
+        var allStock = Stock.Values.ToList();
+        var validStock = createNewMixedCartons ? allStock : mcIDTool.GetValidStock(allStock, out invalidStock);
+
+        var mixedCarton = mcIDTool.GetMixedCartonFromStock(validStock, createNewMixedCartons);
+
+        while (mixedCarton is not null)
         {
-            Stock.Add(stock.ItemNumber, stock);
+            var mcStock = mixedCarton.GetValidStock(ref validStock);
+
+            invalidStock.Add(new MixedCartonStock(mixedCarton, ref mcStock));
+
+            if (mcStock.Any()) validStock.AddRange(mcStock);
+
+            mixedCarton = mcIDTool.GetMixedCartonFromStock(validStock, createNewMixedCartons);
         }
+
+        invalidStock.AddRange(validStock);
+        // TODO: Finish.
+        Stock = invalidStock.ToDictionary()
     }
 
     // Returns true if the given move represents the full quantity of the bin's contents.

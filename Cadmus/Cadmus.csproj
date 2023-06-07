@@ -17,7 +17,9 @@
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
     <None Remove="Resources\Fonts\DIN Medium.ttf" />
     <None Remove="Resources\Fonts\DIN.ttf" />
+    <None Remove="Resources\Images\cross.png" />
     <None Remove="Resources\Images\printer.png" />
+    <None Remove="Resources\Images\search.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,7 +56,9 @@
     <Content Include="Resources\Fonts\DIN.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\Images\cross.png" />
     <Resource Include="Resources\Images\printer.png" />
+    <Resource Include="Resources\Images\search.png" />
   </ItemGroup>
 
   <ItemGroup>

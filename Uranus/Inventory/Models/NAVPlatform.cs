@@ -31,6 +31,12 @@ public class NAVPlatform
         Items = items;
     }
 
+    public void AddItem(NAVItem item)
+    {
+        item.Platform = this;
+        Items.Add(item);
+    }
+
     public override string ToString()
     {
         return $"{Code} - {Description}";

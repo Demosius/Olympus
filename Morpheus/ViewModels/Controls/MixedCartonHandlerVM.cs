@@ -52,7 +52,7 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
             OnPropertyChanged();
         }
     }
-
+    
     #endregion
 
     #region Commands

@@ -180,6 +180,24 @@ public class InventoryReader
         void Action()
         {
             items = Chariot.PullObjectList(filter).ToDictionary(i => i.Number, i => i);
+
+            var platformDict = Chariot.PullObjectList<NAVPlatform>().ToDictionary(p => p.Code, p => p);
+            var categoryDict = Chariot.PullObjectList<NAVCategory>().ToDictionary(p => p.Code, p => p);
+            var divDict = Chariot.PullObjectList<NAVDivision>().ToDictionary(p => p.Code, p => p);
+            var genreDict = Chariot.PullObjectList<NAVGenre>().ToDictionary(p => p.Code, p => p);
+
+            foreach (var (_, item) in items)
+            {
+                if (platformDict.TryGetValue(item.PlatformCode, out var platform))
+                    platform.AddItem(item);
+                if (categoryDict.TryGetValue(item.CategoryCode, out var category))
+                    category.AddItem(item);
+                if (divDict.TryGetValue(item.DivisionCode, out var division))
+                    division.AddItem(item);
+                if (genreDict.TryGetValue(item.GenreCode, out var genre))
+                    genre.AddItem(item);
+            }
+
             var extensions = Chariot.PullObjectList<ItemExtension>().ToDictionary(e => e.ItemNumber, e => e);
             var newExtensions = new List<ItemExtension>();
 
@@ -767,6 +785,37 @@ public class InventoryReader
         return dataSet;
     }
 
+    public BasicStockDataSet BasicStockDataSet(IEnumerable<string> zoneCodes, IEnumerable<string> locations)
+    {
+        var dataSet = new BasicStockDataSet();
+        var newZoneExtensions = new List<ZoneExtension>();
+        var newBinExtensions = new List<BinExtension>();
+
+        void Action()
+        {
+            var items = Items();
+            var zones = Zones(out newZoneExtensions, zone => zoneCodes.Contains(zone.Code) && locations.Contains(zone.LocationCode));
+            var stock = Chariot.PullObjectList<NAVStock>(stock =>
+                zoneCodes.Contains(stock.ZoneCode) && locations.Contains(stock.LocationCode));
+            var bins = Bins(out newBinExtensions, bin => zoneCodes.Contains(bin.ZoneCode) && locations.Contains(bin.LocationCode));
+            var uomList = NAVUoMs();
+
+            dataSet = new BasicStockDataSet(items, zones, bins, stock, uomList);
+        }
+
+        Chariot.RunInTransaction(Action);
+        if (newZoneExtensions.Any() || newBinExtensions.Any())
+        {
+            Chariot.RunInTransaction(() =>
+            {
+                Chariot.UpdateTable(newZoneExtensions);
+                Chariot.UpdateTable(newBinExtensions);
+            });
+        }
+
+        return dataSet;
+    }
+
     public async Task<TOStockDataSet?> TOStockDataSetAsync(IEnumerable<string> zoneCodes, IEnumerable<string> locations)
     {
         var dataSet = new TOStockDataSet();
@@ -855,17 +904,51 @@ public class InventoryReader
     public async Task<(List<MixedCarton>, List<MixedCartonItem>, List<NAVItem>)> GetMixedCartonDataAsync()
     {
         var items = new List<NAVItem>();
-        var mcList = new List<MixedCarton>();
+        var mixedCartons = new List<MixedCarton>();
         var mcItems = new List<MixedCartonItem>();
 
         void Action()
         {
             items = Items().ToList();
-            mcList = MixedCartons().ToList();
+            mixedCartons = MixedCartons().ToList();
             mcItems = MixedCartonItems().ToList();
         }
 
         await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
-        return (mcList, mcItems, items);
+        return (mixedCartons, mcItems, items);
+    }
+
+    public async
+        Task<(List<MixedCarton> mixedCartons, List<MixedCartonItem> mcItems, List<NAVItem> items, BasicStockDataSet)>
+        MixedCartonStockAsync(IEnumerable<string> zoneCodes, IEnumerable<string> locations)
+    {
+        // TODO: Figure out what needs to be returned, and complete function.
+        var mcItems = new List<MixedCartonItem>();
+        var stockData = new BasicStockDataSet();
+
+        void Action()
+        {
+            stockData = BasicStockDataSet(zoneCodes, locations);
+            mcItems = MixedCartonItems().ToList();
+            var mixedCartons = MixedCartons().ToDictionary(mc => mc.ID, mc => mc);
+
+            var items = stockData.Items;
+
+            foreach (var mixedCartonItem in mcItems)
+            {
+                if (items.TryGetValue(mixedCartonItem.ItemNumber, out var item))
+                {
+                    mixedCartonItem.Item = item;
+                    item.MixedCartons.Add(mixedCartonItem);
+                }
+
+                if (!mixedCartons.TryGetValue(mixedCartonItem.MixedCartonID, out var mixedCarton)) continue;
+                mixedCartonItem.MixedCarton = mixedCarton;
+                mixedCarton.Items.Add(mixedCartonItem);
+            }
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return (mixedCartons, mcItems, items, stockData);
     }
 }

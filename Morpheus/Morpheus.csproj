@@ -74,6 +74,7 @@
     <None Remove="Resources\img\repair.png" />
     <None Remove="Resources\img\save.png" />
     <None Remove="Resources\img\screwdriver.png" />
+    <None Remove="Resources\img\search.png" />
     <None Remove="Resources\img\sort.png" />
     <None Remove="Resources\img\wand--arrow.png" />
     <None Remove="Resources\img\wrench-screwdriver.png" />
@@ -220,6 +221,7 @@
     <Resource Include="Resources\img\repair.png" />
     <Resource Include="Resources\img\save.png" />
     <Resource Include="Resources\img\screwdriver.png" />
+    <Resource Include="Resources\img\search.png" />
     <Resource Include="Resources\img\sort.png" />
     <Resource Include="Resources\img\wand--arrow.png" />
     <Resource Include="Resources\img\wrench-screwdriver.png" />

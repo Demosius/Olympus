@@ -3,6 +3,7 @@ using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Uranus.Inventory.Models;
 
@@ -41,6 +42,8 @@ public class Stock : IEnumerable
     [Ignore] public int EachQty => Eaches?.Qty ?? 0;
     [Ignore] public int PackQty => Packs?.Qty ?? 0;
     [Ignore] public int CaseQty => Cases?.Qty ?? 0;
+
+    [Ignore] public bool EachesOnly => EachQty > 0 && PackQty == 0 && CaseQty == 0;
 
     [Ignore] public int UnitsInPacks => (Packs?.Qty ?? 0) * (Item?.QtyPerPack ?? 1);
     [Ignore] public int UnitsInCases => (Cases?.Qty ?? 0) * (Item?.QtyPerCase ?? 1);
@@ -478,6 +481,28 @@ public class Stock : IEnumerable
         if (Packs is not null) list.Add("PACK");
 
         return $"{Bin?.Code} ({string.Join(",", list)})";
+    }
+
+    public static List<Stock> FromNAVStock(List<NAVStock> navStock)
+    {
+        var stock = new List<Stock>();
+        var stockDict = navStock
+            .Select(ns => new Stock(ns))
+            .GroupBy(s => s.ItemNumber)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        foreach (var (itemNumber, stockList) in stockDict)
+        {
+            var first = stockList.First();
+            if (stockList.Count > 1)
+            {
+                for (var i = 1; i < stockList.Count; i++)
+                    first.Add(stockList[i]);
+            }
+            stock.Add(first);
+        }
+
+        return stock;
     }
 
     public IEnumerator GetEnumerator()
