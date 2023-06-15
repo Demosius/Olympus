@@ -903,4 +903,59 @@ public class InventoryReader
 
         return (groups, batches);
     }
+
+    /*************************************** BATCHES & TO LINES ********************************************/
+    public async Task<List<BatchTOGroup>> BatchTOLineDataAsync(Expression<Func<BatchTOLine, bool>>? filter = null)
+    {
+        var groups = new List<BatchTOGroup>();
+
+        void Action()
+        {
+            // By default, pull lines that have not been finalized.
+            var lines = filter is null ? 
+                Chariot.PullObjectList<BatchTOLine>(l => !l.IsFinalised) : 
+                Chariot.PullObjectList(filter);
+
+            var batches = Chariot.PullObjectList<Batch>().ToDictionary(b => b.ID, b => b);
+
+            var groupIDs = lines.Select(l => l.GroupID).Distinct();
+
+            var groupDict = Chariot.PullObjectList<BatchTOGroup>(g => groupIDs.Contains(g.ID)).ToDictionary(group => group.ID, group => group);
+            var newGroups = new List<BatchTOGroup>();
+
+            foreach (var line in lines)
+            {
+                if (!groupDict.TryGetValue(line.GroupID, out var group))
+                {
+                    group = new BatchTOGroup
+                    {
+                        ID = line.GroupID
+                    };
+                    newGroups.Add(group);
+                    groupDict.Add(line.GroupID, group);
+                }
+
+                group.Lines.Add(line);
+
+                if (!batches.TryGetValue(line.BatchID, out  var batch)) continue;
+
+                batch.TOLines.Add(line);
+                line.Batch = batch;
+            }
+
+            foreach (var newGroup in newGroups)
+            {
+                newGroup.SetData();
+                groups.Add(newGroup);
+            }
+
+            Chariot.InsertIntoTable(newGroups);
+
+            groups.AddRange(groupDict.Values);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return groups;
+    }
 }

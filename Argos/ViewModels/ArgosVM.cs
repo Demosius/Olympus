@@ -15,6 +15,7 @@ public class ArgosVM : INotifyPropertyChanged, IDBInteraction
     public Helios Helios { get; set; }
 
     public MainBatchVM MainBatchVM { get; set; }
+    public CCNCommandVM CCNCommandVM { get; set; }
 
     #region INotifyPropertyChanged Members
 
@@ -41,12 +42,14 @@ public class ArgosVM : INotifyPropertyChanged, IDBInteraction
     {
         Helios = helios;
         MainBatchVM = MainBatchVM.CreateEmpty(Helios);
+        CCNCommandVM = CCNCommandVM.CreateEmptyVM(Helios);
         RefreshDataCommand = new RefreshDataCommand(this);
     }
 
     private async Task<ArgosVM> InitializeAsync()
     {
         MainBatchVM = await MainBatchVM.CreateAsync(Helios);
+        CCNCommandVM = await CCNCommandVM.CreateAsync(Helios);
         return this;
     }
 
@@ -61,6 +64,7 @@ public class ArgosVM : INotifyPropertyChanged, IDBInteraction
     public async Task RefreshDataAsync()
     {
         await MainBatchVM.RefreshDataAsync();
+        await CCNCommandVM.RefreshDataAsync();
     }
     
     public event PropertyChangedEventHandler? PropertyChanged;

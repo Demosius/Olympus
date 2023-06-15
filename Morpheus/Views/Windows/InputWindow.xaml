@@ -24,6 +24,7 @@
         <!-- Prompt -->
         <Label Grid.Row="0"
                VerticalAlignment="Center"
+               HorizontalContentAlignment="Left"
                Content="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}"
                Margin="5"/>
 

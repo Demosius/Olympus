@@ -24,6 +24,8 @@ public class Batch
 
     [OneToMany(nameof(Move.BatchID), nameof(Move.Batch), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Move> Moves { get; set; }
+    [OneToMany(nameof(BatchTOLine.BatchID), nameof(BatchTOLine.Batch), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<BatchTOLine> TOLines { get; set; }
 
     [ManyToMany(typeof(BatchGroupLink), nameof(BatchGroupLink.BatchID), nameof(BatchGroup.Batches), CascadeOperations = CascadeOperation.CascadeRead)]
     public List<BatchGroup> Groups { get; set; }
@@ -39,18 +41,18 @@ public class Batch
         Groups = new List<BatchGroup>();
         Moves = new List<Move>();
         Tags = new List<string>();
+        TOLines = new List<BatchTOLine>();
     }
 
-    public Batch(string id, int priority, List<Move> moves)
+    public Batch(string id) : this()
     {
         ID = id;
-        Description = string.Empty;
-        CreatedBy = string.Empty;
-        TagString = string.Empty;
+    }
+
+    public Batch(string id, int priority, List<Move> moves) : this(id)
+    {
         Priority = priority;
         Moves = moves;
-        Groups = new List<BatchGroup>();
-        Tags = new List<string>();
     }
 
 }

@@ -1,4 +1,5 @@
-﻿using Uranus.Equipment;
+﻿using System.IO;
+using Uranus.Equipment;
 using Uranus.Inventory;
 using Uranus.Staff;
 using Uranus.Users;
@@ -32,10 +33,13 @@ public class Helios
     public UserDeleter UserDeleter { get; set; }
 
     public string SolLocation { get; }
+    public string BatchFileBackupDirectory => Path.Combine(SolLocation, "BatchFileBackups");
 
     public Helios(string solLocation)
     {
         SolLocation = solLocation;
+        // Make sure that the appropriate backup location exists.
+        Directory.CreateDirectory(BatchFileBackupDirectory);
 
         inventoryChariot = new InventoryChariot(solLocation);
         InventoryCreator = new InventoryCreator(ref inventoryChariot);

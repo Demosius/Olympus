@@ -24,6 +24,9 @@
         <TabItem Header="Main View">
             <components:MainBatchView DataContext="{Binding MainBatchVM}"/>
         </TabItem>
+        <TabItem Header="CCN Command">
+            <components:CCNCommandView DataContext="{Binding CCNCommandVM}"/>
+        </TabItem>
 
     </TabControl>
 </Page>

@@ -34,5 +34,77 @@ namespace Argos.Properties {
                 this["SolLocation"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\ausefpdfs01ns\\Shares\\FreightShare\\RUBY\\NAV Batch Import Files")]
+        public string BatchLoadDirectory {
+            get {
+                return ((string)(this["BatchLoadDirectory"]));
+            }
+            set {
+                this["BatchLoadDirectory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\ausefpdfs01ns\\Shares\\Public\\DCOperations\\Lantech\\Orders\\New Orders")]
+        public string LanTechExportDirectory {
+            get {
+                return ((string)(this["LanTechExportDirectory"]));
+            }
+            set {
+                this["LanTechExportDirectory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\ausefpdfs01ns\\Shares\\FreightShare\\RUBY\\NAV Batch Import Files")]
+        public string BatchSaveDirectory {
+            get {
+                return ((string)(this["BatchSaveDirectory"]));
+            }
+            set {
+                this["BatchSaveDirectory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoSplitZone {
+            get {
+                return ((bool)(this["AutoSplitZone"]));
+            }
+            set {
+                this["AutoSplitZone"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoSplitCartons {
+            get {
+                return ((bool)(this["AutoSplitCartons"]));
+            }
+            set {
+                this["AutoSplitCartons"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("A,B")]
+        public string CartonSplitString {
+            get {
+                return ((string)(this["CartonSplitString"]));
+            }
+            set {
+                this["CartonSplitString"] = value;
+            }
+        }
     }
 }

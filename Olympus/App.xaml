@@ -1,8 +1,8 @@
 ﻿<Application x:Class="Olympus.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             DispatcherUnhandledException="Application_DispatcherUnhandledException"
              StartupUri="Views/OlympusWindow.xaml">
+             <!--DispatcherUnhandledException="Application_DispatcherUnhandledException"-->
 
     <Application.Resources>
         <ResourceDictionary>

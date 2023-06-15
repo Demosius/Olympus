@@ -1,0 +1,115 @@
+﻿<UserControl x:Class="Argos.Views.Components.ProcessedBatchDataView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Argos.ViewModels.Components"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:ProcessedBatchDataVM}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Orange/MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+
+    <DockPanel Background="{StaticResource ButtonBackgroundBrush}">
+        <DockPanel Background="{StaticResource ButtonBackgroundBrush}">
+            <StackPanel DockPanel.Dock="Top"
+                        Orientation="Horizontal">
+                <Button Margin="5"
+                        Command="{Binding RefreshDataCommand}"
+                        Width="20"
+                        Height="20"
+                        Padding="5"
+                        ToolTip="Refresh Data">
+                    <Image Source="../../Resources/refresh.png"/>
+                </Button>
+                <DatePicker SelectedDate="{Binding StartDate}"
+                            Margin="5,2"/>
+                <DatePicker SelectedDate="{Binding EndDate}"
+                            Margin="5,2"/>
+                <Label Content="Zone:"
+                       Margin="5,2"
+                       VerticalAlignment="Center"/>
+                <TextBox Text="{Binding ZoneFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="5,2"
+                         MinWidth="50"/>
+                <Label Content="Start Bay:"
+                       Margin="5,2"
+                       VerticalAlignment="Center"/>
+                <TextBox Text="{Binding BayFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="5,2"
+                         MinWidth="50"/>
+                <Label Content="Batch:"
+                       Margin="5,2"
+                       VerticalAlignment="Center"/>
+                <TextBox Text="{Binding BatchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="5,2"
+                         MinWidth="50"/>
+                <Label Content="Carton Size:"
+                       Margin="5,2"
+                       VerticalAlignment="Center"/>
+                <TextBox Text="{Binding CtnSizeFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="5,2"
+                         MinWidth="50"/>
+                <Button Command="{Binding ClearFiltersCommand, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        Width="30" Height="30"
+                        Padding="3">
+                    <Image Source="../../Resources/cross.png"
+                           ToolTip="Clear Filters"/>
+                </Button>
+            </StackPanel>
+
+            <DataGrid Name="CartonGroupGrid"
+                      SelectionChanged="CartonGroupGrid_OnSelectionChanged"
+                      ItemsSource="{Binding Groups}"
+                      SelectedItem="{Binding SelectedGroup}"
+                      d:ItemsSource="{d:SampleData ItemCount=5}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      CanUserResizeRows="False"
+                      CanUserResizeColumns="True"
+                      CanUserSortColumns="True"
+                      CanUserReorderColumns="True">
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Recover Original File"
+                                  Command="{Binding RecoverOriginalFileCommand}"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Initialization DateTime"
+                                        Binding="{Binding InitializationDateTime, StringFormat='dd-MMM-yyyy hh:mm:ss'}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Original File Name"
+                                        Binding="{Binding OriginalFileName}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Batch"
+                                        Binding="{Binding BatchString}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Zones"
+                                        Binding="{Binding ZoneString}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Start Picking Bays"
+                                        Binding="{Binding StartBays}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Cartons"
+                                        Binding="{Binding CartonSizes}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Finalization DateTime"
+                                        Binding="{Binding FinalizationDateTime, StringFormat='dd-MMM-yyyy hh:mm:ss'}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Label Output File Name"
+                                        Binding="{Binding LabelFileName}"
+                                        IsReadOnly="True"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+    </DockPanel>
+</UserControl>

@@ -92,6 +92,21 @@ public static class Constants
     public const string PostDate = "Posted Date";
     public const string Q = "Qty";
     public const string ItemDesc = "Item Description";
+    public const string StoreNo = "Store No.";
+    public const string Ctns = "CTNS";
+    public const string Weight_Kg = "Weight kg";
+    public const string CubeM = "Cube m3";
+    public const string CCN = "CCN";
+    public const string CtnType = "Carton Type";
+    public const string StartZone = "Starting Pick Zone";
+    public const string EndZone = "Ending Pick Zone";
+    public const string StartBin = "Starting Pick Bin";
+    public const string EndBin = "Ending Pick Bin";
+    public const string BatchNo = "TO Batch No.";
+    public const string Date = "Date";
+    public const string BaseUnits = "Total Units (Base)";
+    public const string Wave = "Wave Number";
+
 
     #endregion
 
@@ -924,5 +939,75 @@ public class MispickIndices : IColumnIndexer
     {
         ShipDate, ReceiveDate, CartonID, ItemNumber, ItemDesc, ActionNotes, OriginalQty, ReceiveQty, VarianceQty,
         PostDate
+    }.Max();
+}
+
+public class BatchTOLineIndices : IColumnIndexer
+{
+    public int StoreNo { get; set; }
+    public int Ctns { get; set; }
+    public int Weight { get; set; }
+    public int Cube { get; set; }
+    public int CCN { get; set; }
+    public int CtnType { get; set; }
+    public int StartZone { get; set; }
+    public int EndZone { get; set; }
+    public int StartBin { get; set; }
+    public int EndBin { get; set; }
+    public int BatchNo { get; set; }
+    public int Date { get; set; }
+    public int BaseUnits { get; set; }
+    public int Wave { get; set; }
+
+    public BatchTOLineIndices(string[] headers, bool softCheck = false)
+    {
+        SetIndices(headers);
+
+        CheckMissingHeaders();
+    }
+
+    public void SetIndices(string[] headers)
+    {
+        StoreNo = Array.IndexOf(headers, Constants.StoreNo);
+        Ctns = Array.IndexOf(headers, Constants.Ctns);
+        Weight = Array.IndexOf(headers, Constants.Weight_Kg);
+        Cube = Array.IndexOf(headers, Constants.CubeM);
+        CCN = Array.IndexOf(headers, Constants.CCN);
+        CtnType = Array.IndexOf(headers, Constants.CtnType);
+        StartZone = Array.IndexOf(headers, Constants.StartZone);
+        EndZone = Array.IndexOf(headers, Constants.EndZone);
+        StartBin = Array.IndexOf(headers, Constants.StartBin);
+        EndBin = Array.IndexOf(headers, Constants.EndBin);
+        BatchNo = Array.IndexOf(headers, Constants.BatchNo);
+        Date = Array.IndexOf(headers, Constants.Date);
+        BaseUnits = Array.IndexOf(headers, Constants.BaseUnits);
+        Wave = Array.IndexOf(headers, Constants.Wave);
+    }
+
+    public void CheckMissingHeaders()
+    {
+        var missingHeaders = new List<string>();
+
+        if (StoreNo == -1) missingHeaders.Add(Constants.StoreNo);
+        if (Ctns == -1) missingHeaders.Add(Constants.Ctns);
+        if (Weight == -1) missingHeaders.Add(Constants.Weight_Kg);
+        if (Cube == -1) missingHeaders.Add(Constants.CubeM);
+        if (CCN == -1) missingHeaders.Add(Constants.CCN);
+        if (CtnType == -1) missingHeaders.Add(Constants.CtnType);
+        if (StartZone == -1) missingHeaders.Add(Constants.StartZone);
+        if (EndZone == -1) missingHeaders.Add(Constants.EndZone);
+        if (StartBin == -1) missingHeaders.Add(Constants.StartBin);
+        if (EndBin == -1) missingHeaders.Add(Constants.EndBin);
+        if (BatchNo == -1) missingHeaders.Add(Constants.BatchNo);
+        if (Date == -1) missingHeaders.Add(Constants.Date);
+        if (BaseUnits == -1) missingHeaders.Add(Constants.BaseUnits);
+        if (Wave == -1) missingHeaders.Add(Constants.Wave);
+
+        if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for Batch TO Lines.", missingHeaders);
+    }
+
+    public int Max() => new List<int>
+    {
+        StoreNo, Ctns, Weight, Cube, CCN, CtnType, StartZone, EndZone, StartBin, EndBin, BatchNo, Date, BaseUnits, Wave
     }.Max();
 }

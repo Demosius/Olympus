@@ -209,4 +209,39 @@ public class InventoryUpdater
         await Chariot.UpdateTableAsync(siteItemLevels).ConfigureAwait(false);
 
     public int Site(Site site) => Chariot.Update(site);
+
+    public async Task<int> BatchTOCartonDataAsync(List<BatchTOGroup> groups)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            var cartonLines = groups.SelectMany(g => g.Lines).ToList();
+            List<Batch> batches = cartonLines.Select(l => l.Batch).Where(b => b is not null).Distinct().ToList()!;
+
+            lines += Chariot.UpdateTable(groups);
+            lines += Chariot.UpdateTable(cartonLines);
+            lines += Chariot.UpdateTable(batches);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
+    }
+
+    public async Task<int> BatchTOCartonDataAsync(BatchTOGroup group)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            List<Batch> batches = group.Lines.Select(l => l.Batch).Where(b => b is not null).Distinct().ToList()!;
+
+            lines += Chariot.Update(group);
+            lines += Chariot.UpdateTable(group.Lines);
+            lines += Chariot.UpdateTable(batches);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
+    }
 }

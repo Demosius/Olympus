@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
-using Uranus.Inventory.Models;
 
 namespace Argos.ViewModels.Components;
 

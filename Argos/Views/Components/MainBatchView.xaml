@@ -14,7 +14,9 @@
             <DatePicker SelectedDate="{Binding Date}"
                         Margin="2"/>
         </StackPanel>
-        <DataGrid ItemsSource="{Binding Batches}"></DataGrid>
+        <DataGrid ItemsSource="{Binding Batches}">
+
+        </DataGrid>
     </DockPanel>
 
 </UserControl>

@@ -24,6 +24,7 @@
     <None Remove="Resources\document-excel-table.png" />
     <None Remove="Resources\document-horizontal-text.png" />
     <None Remove="Resources\document-pdf.png" />
+    <None Remove="Resources\folder--arrow.png" />
     <None Remove="Resources\Fonts\code128.ttf" />
     <None Remove="Resources\Fonts\DIN Black.ttf" />
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
@@ -56,6 +57,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="EPPlus" Version="4.5.3.3" />
+    <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Resources\application--arrow.png" />
     <Resource Include="Resources\arrow-transition-090.png" />
     <Resource Include="Resources\arrow-transition-270.png" />
@@ -71,6 +77,7 @@
     <Resource Include="Resources\document-excel-table.png" />
     <Resource Include="Resources\document-horizontal-text.png" />
     <Resource Include="Resources\document-pdf.png" />
+    <Resource Include="Resources\folder--arrow.png" />
     <Resource Include="Resources\Fonts\code128.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

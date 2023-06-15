@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Uranus.Inventory.Models;
 
@@ -89,4 +90,28 @@ public class InventoryCreator
     public async Task<int> NAVGenre(List<NAVGenre> gens) => await Chariot.ReplaceFullTableAsync(gens).ConfigureAwait(false);
 
     public async Task<int> SiteAsync(Site site) => await Chariot.InsertOrUpdateAsync(site).ConfigureAwait(false);
+
+    public async Task<int> BatchTODataAsync(List<BatchTOGroup> newGroups)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            var batchTOLines = newGroups.SelectMany(g => g.Lines).ToList();
+            // Get Batch IDs.
+            var batchIDs = batchTOLines.Select(l => l.BatchID).Distinct();
+            // See if there are any batches that do not already exist.
+            var batchDict = Chariot.PullObjectList<Batch>().ToDictionary(b => b.ID, b => b);
+            batchIDs = batchIDs.Where(id => !batchDict.ContainsKey(id));
+
+            var newBatches = batchIDs.Select(id => new Batch(id));
+
+            lines += Chariot.InsertIntoTable(newGroups);
+            lines += Chariot.InsertIntoTable(newBatches);
+            lines += Chariot.InsertIntoTable(batchTOLines);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
+    }
 }

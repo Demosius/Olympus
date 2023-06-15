@@ -914,6 +914,7 @@ public static class DataConversion
         }
     }
 
+    /****************************************** PICK EVENTS AND MISPICK DATA *****************************************/
     private static PickEvent? ArrayToPickEvent(IReadOnlyList<string> row, PickEventIndices col, int colMax, IFormatProvider provider)
     {
         if (colMax >= row.Count) return null;
@@ -1050,9 +1051,9 @@ public static class DataConversion
     public static async Task<List<PickEvent>> FileToPickEventsAsync(string filePath)
     {
         if (Path.GetExtension(filePath) == ".csv") return await CSVToPickEventsAsync(filePath);
-        
+
         return Regex.IsMatch(Path.GetExtension(filePath), "\\.xls\\w?") ?
-            await ExcelToPickEventsAsync(filePath) : 
+            await ExcelToPickEventsAsync(filePath) :
             new List<PickEvent>();
     }
 
@@ -1073,9 +1074,9 @@ public static class DataConversion
         {
             var row = line.Trim('"').Split(',', '"');
 
-            var mispick = ArrayToPickEvent(row, col, colMax, provider);
+            var pickEvent = ArrayToPickEvent(row, col, colMax, provider);
 
-            if (mispick is not null) events.Add(mispick);
+            if (pickEvent is not null) events.Add(pickEvent);
 
             line = await reader.ReadLineAsync();
         }
@@ -1115,7 +1116,7 @@ public static class DataConversion
     public static List<PickEvent> DataTableToPickEvents(DataTable dataTable)
     {
         IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
-        
+
         PickEventIndices col;
         // Check headers.
         try
@@ -1281,7 +1282,7 @@ public static class DataConversion
     {
         var extension = Path.GetExtension(filePath);
 
-        if (extension == ".csv") 
+        if (extension == ".csv")
             return await CSVToMispicksAsync(filePath).ConfigureAwait(false);
         if (Regex.IsMatch(extension, "\\.xls\\w?"))
             return await ExcelToMispicksAsync(filePath).ConfigureAwait(false);
@@ -1385,7 +1386,7 @@ public static class DataConversion
         });
 
         var mispicks = dataSet.Tables.Cast<DataTable>().SelectMany(DataTableToMispicks).ToList();
-        
+
         // If there is no data, throw invalid data exception.
         if (mispicks.Count == 0)
             throw new InvalidDataException($"Failed to pull valid mispick data from {excelPath}.", new List<string>());
@@ -1420,4 +1421,188 @@ public static class DataConversion
         // Iterate through rows.
         return (from DataRow row in dataTable.Rows select DataRowToMispick(row, col, provider)).ToList();
     }
+
+    /******************************** TOs AND BATCHES ******************************************/
+    private static BatchTOLine? ArrayToBatchTOLine(IReadOnlyList<string> row, BatchTOLineIndices col, int colMax, IFormatProvider provider)
+    {
+        if (colMax >= row.Count) return null;
+
+        var storeNo = row[col.StoreNo];
+        if (!int.TryParse(row[col.Ctns], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var ctns)) ctns = 0;
+        if (!double.TryParse(row[col.Weight], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var weight)) weight = 0;
+        if (!double.TryParse(row[col.Cube], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var cube)) cube = 0;
+        var ccn = row[col.CCN];
+        var ctnType = row[col.CtnType];
+        var startZone = row[col.StartZone];
+        var endZone = row[col.EndZone];
+        var startBin = row[col.StartBin];
+        var endBin = row[col.EndBin];
+        var batchNo = row[col.BatchNo];
+        var dateString = row[col.Date];
+        if (!DateTime.TryParse(dateString, out var date)) date = DateTime.Today;
+        if (!int.TryParse(row[col.BaseUnits], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var baseUnits)) baseUnits = 0;
+        var wave = row[col.Wave];
+
+        var batchTOLine = new BatchTOLine
+        {
+            StoreNo = storeNo,
+            Cartons = ctns,
+            Weight = weight,
+            Cube = cube,
+            CCN = ccn,
+            CartonType = ctnType,
+            StartZone = startZone,
+            EndZone = endZone,
+            StartBin = startBin,
+            EndBin = endBin,
+            BatchID = batchNo,
+            Date = date,
+            UnitsBase = baseUnits,
+            WaveNo = wave,
+        };
+
+        return batchTOLine;
+    }
+
+    public static async Task<List<BatchTOLine>> FileToBatchTOLinesAsync(string filePath)
+    {
+        List<BatchTOLine> lines;
+        if (Path.GetExtension(filePath) == ".csv")
+            lines = await CSVToBatchTOLinesAsync(filePath);
+        else
+            lines = Regex.IsMatch(Path.GetExtension(filePath), "\\.xls\\w?")
+                ? await ExcelToBatchTOLinesAsync(filePath)
+                : new List<BatchTOLine>();
+
+        var fileName = Path.GetFileName(filePath);
+        foreach (var batchTOLine in lines)
+        {
+            batchTOLine.OriginalFileDirectory = Path.GetDirectoryName(filePath) ?? string.Empty;
+            batchTOLine.OriginalFileName = fileName;
+            batchTOLine.SetBays();
+        }
+
+        return lines;
+    }
+
+    public static async Task<List<BatchTOLine>> CSVToBatchTOLinesAsync(string csvPath)
+    {
+        List<BatchTOLine> lines = new();
+        IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+
+        using StreamReader reader = new(File.OpenRead(csvPath));
+
+        var headArr = (await reader.ReadLineAsync())?.Trim('"').Split(',', '"') ?? Array.Empty<string>();
+        var col = new BatchTOLineIndices(headArr);
+        var colMax = col.Max();
+
+        var line = await reader.ReadLineAsync();
+
+        while (line != null)
+        {
+            var row = line.Trim('"').Split(',', '"');
+
+            var batchLine = ArrayToBatchTOLine(row, col, colMax, provider);
+
+            if (batchLine is not null) lines.Add(batchLine);
+
+            line = await reader.ReadLineAsync();
+        }
+
+        return lines;
+    }
+
+    public static async Task<List<BatchTOLine>> ExcelToBatchTOLinesAsync(string excelPath)
+    {
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+        await using var stream = File.Open(excelPath, FileMode.Open, FileAccess.Read);
+        using var reader = ExcelReaderFactory.CreateReader(stream);
+
+        var dataSet = reader.AsDataSet(new ExcelDataSetConfiguration
+        {
+            UseColumnDataType = true,
+            ConfigureDataTable = _ => new ExcelDataTableConfiguration
+            {
+                EmptyColumnNamePrefix = "Col",
+                UseHeaderRow = true
+            }
+        });
+
+        var lines = new List<BatchTOLine>();
+
+        foreach (DataTable table in dataSet.Tables)
+            lines.AddRange(DataTableToBatchTOLines(table));
+
+        // If no mispicks, throw invalid data error.
+        if (lines.Count == 0)
+            throw new InvalidDataException("No valid pick event data found from file.", new List<string>());
+
+        return lines;
+    }
+
+    public static List<BatchTOLine> DataTableToBatchTOLines(DataTable dataTable)
+    {
+        IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+
+        BatchTOLineIndices col;
+        // Check headers.
+        try
+        {
+            col = new BatchTOLineIndices(GetTableHeaders(dataTable));
+        }
+        catch (InvalidDataException)
+        {
+            // This may represent a single page across many in a workbook. Do not throw the error.
+            return new List<BatchTOLine>();
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Unknown error when reading excel data.");
+            throw;
+        }
+
+        // Iterate through rows.
+        return (from DataRow row in dataTable.Rows select DataRowToBatchTOLine(row, col, provider)).ToList();
+    }
+
+    private static BatchTOLine DataRowToBatchTOLine(DataRow row, BatchTOLineIndices col, IFormatProvider provider)
+    {
+        var storeNo = row[col.StoreNo].ToString()!;
+        if (!int.TryParse(row[col.Ctns].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var ctns)) ctns = 0;
+        if (!double.TryParse(row[col.Weight].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var weight)) weight = 0;
+        if (!double.TryParse(row[col.Cube].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var cube)) cube = 0;
+        var ccn = row[col.CCN].ToString()!;
+        var ctnType = row[col.CtnType].ToString()!;
+        var startZone = row[col.StartZone].ToString()!;
+        var endZone = row[col.EndZone].ToString()!;
+        var startBin = row[col.StartBin].ToString()!;
+        var endBin = row[col.EndBin].ToString()!;
+        var batchNo = row[col.BatchNo].ToString()!;
+        var dateString = row[col.Date].ToString()!;
+        if (!DateTime.TryParse(dateString, out var date)) date = DateTime.Today;
+        if (!int.TryParse(row[col.BaseUnits].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var baseUnits)) baseUnits = 0;
+        var wave = row[col.Wave].ToString()!;
+
+        var batchTOLine = new BatchTOLine
+        {
+            StoreNo = storeNo,
+            Cartons = ctns,
+            Weight = weight,
+            Cube = cube,
+            CCN = ccn,
+            CartonType = ctnType,
+            StartZone = startZone,
+            EndZone = endZone,
+            StartBin = startBin,
+            EndBin = endBin,
+            BatchID = batchNo,
+            Date = date,
+            UnitsBase = baseUnits,
+            WaveNo = wave,
+        };
+
+        return batchTOLine;
+    }
+
 }
