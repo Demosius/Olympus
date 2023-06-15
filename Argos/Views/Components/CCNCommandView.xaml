@@ -10,8 +10,19 @@
              d:DesignHeight="450" d:DesignWidth="1000">
 
     <UserControl.Resources>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Yellow/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary>
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </UserControl.InputBindings>
 
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" 
@@ -160,6 +171,12 @@
                                     <CheckBox Visibility="{Binding CanSendToLanTech, Converter={StaticResource BooleanToVisibilityConverter}}"
                                               IsChecked="{Binding SendToLanTech}"
                                               Content="Create Carton Erector File"/>
+                                    <Label Content="{Binding BatchDescription}"
+                                           FontSize="16"
+                                           FontWeight="Bold"
+                                           VerticalContentAlignment="Center"
+                                           Margin="15,0"
+                                           Foreground="{StaticResource Brush00}"/>
                                 </StackPanel>
                                 <DataGrid d:ItemsSource="{d:SampleData ItemCount=5}"
                                   ItemsSource="{Binding ObservableLines}"

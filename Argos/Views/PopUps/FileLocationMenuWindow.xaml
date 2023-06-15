@@ -45,7 +45,8 @@
                Background="{StaticResource Brush05}"
                Content="{Binding BatchLoadPath}"
                MinWidth="300"
-               FontSize="20"
+               FontSize="16"
+               VerticalContentAlignment="Center"
                FontFamily="CourierNew"
                Margin="5"/>
         <Button Grid.Row="1" Grid.Column="1"
@@ -66,7 +67,8 @@
                Background="{StaticResource Brush05}"
                Content="{Binding BatchSavePath}"
                MinWidth="300"
-               FontSize="20"
+               FontSize="16"
+               VerticalContentAlignment="Center"
                FontFamily="CourierNew"
                Margin="5"/>
         <Button Grid.Row="3" Grid.Column="1"
@@ -87,7 +89,8 @@
                Background="{StaticResource Brush05}"
                Content="{Binding LanTechPath}"
                MinWidth="300"
-               FontSize="20"
+               FontSize="16"
+               VerticalContentAlignment="Center"
                FontFamily="CourierNew"
                Margin="5"/>
         <Button Grid.Row="5" Grid.Column="1"

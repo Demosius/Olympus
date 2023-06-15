@@ -1570,8 +1570,8 @@ public static class DataConversion
     {
         var storeNo = row[col.StoreNo].ToString()!;
         if (!int.TryParse(row[col.Ctns].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var ctns)) ctns = 0;
-        if (!double.TryParse(row[col.Weight].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var weight)) weight = 0;
-        if (!double.TryParse(row[col.Cube].ToString(), NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var cube)) cube = 0;
+        if (!double.TryParse(row[col.Weight].ToString(), NumberStyles.Float | NumberStyles.AllowThousands, provider, out var weight)) weight = 0;
+        if (!double.TryParse(row[col.Cube].ToString(), NumberStyles.Float | NumberStyles.AllowThousands, provider, out var cube)) cube = 0;
         var ccn = row[col.CCN].ToString()!;
         var ctnType = row[col.CtnType].ToString()!;
         var startZone = row[col.StartZone].ToString()!;

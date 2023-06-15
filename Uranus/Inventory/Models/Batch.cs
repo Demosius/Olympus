@@ -55,4 +55,8 @@ public class Batch
         Moves = moves;
     }
 
+    public override string ToString()
+    {
+        return $"{ID}{(Description == "" ? "" : " - ")}{Description}";
+    }
 }

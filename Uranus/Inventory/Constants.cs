@@ -959,7 +959,7 @@ public class BatchTOLineIndices : IColumnIndexer
     public int BaseUnits { get; set; }
     public int Wave { get; set; }
 
-    public BatchTOLineIndices(string[] headers, bool softCheck = false)
+    public BatchTOLineIndices(string[] headers)
     {
         SetIndices(headers);
 

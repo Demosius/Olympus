@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using Argos.Interfaces;
 using Argos.ViewModels.Commands;
 using Uranus;
@@ -120,6 +121,18 @@ public class ProcessedBatchDataVM : INotifyPropertyChanged, IFilters, IBatchTOGr
         }
     }
 
+    private bool? fileFilter;
+    public bool? FileFilter
+    {
+        get => fileFilter;
+        set
+        {
+            fileFilter = value;
+            OnPropertyChanged();
+            ApplyFilters();
+        }
+    }
+
     #endregion
 
     #region Commands
@@ -150,6 +163,7 @@ public class ProcessedBatchDataVM : INotifyPropertyChanged, IFilters, IBatchTOGr
         bayFilter = string.Empty;
         ctnSizeFilter = string.Empty;
         batchFilter = string.Empty;
+        fileFilter = true;
 
         RefreshDataCommand = new RefreshDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
@@ -179,9 +193,9 @@ public class ProcessedBatchDataVM : INotifyPropertyChanged, IFilters, IBatchTOGr
     public async Task RefreshDataAsync()
     {
         // Checking against time value that may be partially through the date (and therefore larger than the raw date value.
-        var checkEnd = EndDate.AddDays(1);  
+        var checkEnd = EndDate.AddDays(1);
         var groups = await Helios.InventoryReader.BatchTOLineDataAsync(l =>
-            l.IsFinalised && 
+            l.IsFinalised &&
             l.FinalProcessingTime >= StartDate &&
             l.FinalProcessingTime <= checkEnd);
         AllGroups = groups.Select(group => new BatchTOGroupVM(group, Helios, this)).ToList();
@@ -207,6 +221,7 @@ public class ProcessedBatchDataVM : INotifyPropertyChanged, IFilters, IBatchTOGr
 
         var groups = AllGroups.Where(g =>
                 g.EndDate >= StartDate && g.StartDate <= EndDate &&
+                (FileFilter is null || g.LabelFileExists == FileFilter) &&
                 Regex.IsMatch(g.ZoneString, ZoneFilter, RegexOptions.IgnoreCase) &&
                 Regex.IsMatch(g.StartBays, BayFilter, RegexOptions.IgnoreCase) &&
                 Regex.IsMatch(g.CartonSizes, CtnSizeFilter, RegexOptions.IgnoreCase) &&
@@ -249,6 +264,12 @@ public class ProcessedBatchDataVM : INotifyPropertyChanged, IFilters, IBatchTOGr
     {
         if (SelectedGroup is null) return;
 
+        if (MessageBox.Show(
+                $"Are you sure that you want to restore the original file ({SelectedGroup.OriginalFileName})?\n\n" +
+                "This will remove all relevant data from the database and remove any label output files.",
+                "Confirm File Restoration", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+            return;
+
         await SelectedGroup.RecoverOriginalFile();
 
         await RefreshDataAsync();
@@ -261,5 +282,5 @@ public class ProcessedBatchDataVM : INotifyPropertyChanged, IFilters, IBatchTOGr
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-    
+
 }

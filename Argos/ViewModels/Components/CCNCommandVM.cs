@@ -7,12 +7,14 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using Argos.Interfaces;
 using Argos.Properties;
 using Argos.ViewModels.Commands;
 using Argos.Views.PopUps;
 using Microsoft.Win32;
 using Morpheus.Views.Windows;
+using Serilog;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -235,11 +237,12 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
 
     public async Task RefreshDataAsync()
     {
+        var selectedID = SelectedGroup?.ID;
         var groups = await Helios.InventoryReader.BatchTOLineDataAsync();
         AllGroups = groups.Select(group => new BatchTOGroupVM(group, Helios, this)).ToList();
         foreach (var group in AllGroups)
             await group.SetObservableLinesAsync();
-        
+
         if (AllGroups.Any())
         {
             var lowestDate = AllGroups.Min(g => g.StartDate);
@@ -257,6 +260,8 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
             }
         }
         ApplyFilters();
+        if (selectedID is not null)
+            SelectedGroup = Groups.FirstOrDefault(g => g.ID == selectedID);
     }
 
     public void ClearFilters()
@@ -318,15 +323,24 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
         // Generate all data from files.
         foreach (var filePath in files)
         {
-            var newLines = await DataConversion.FileToBatchTOLinesAsync(filePath);
-            if (!newLines.Any()) continue;
+            try
+            {
+                var newLines = await DataConversion.FileToBatchTOLinesAsync(filePath);
+                if (!newLines.Any()) continue;
 
-            lines.Add(newLines);
+                lines.Add(newLines);
 
-            // Move file to backup location.
-            var fileName = Path.GetFileName(filePath);
-            var destinationPath = Path.Join(Helios.BatchFileBackupDirectory, fileName);
-            File.Move(filePath, destinationPath);
+                // Move file to backup location.
+                var fileName = Path.GetFileName(filePath);
+                var destinationPath = Path.Join(Helios.BatchFileBackupDirectory, fileName);
+                File.Move(filePath, destinationPath);
+            }
+            catch (IOException e)
+            {
+                MessageBox.Show(e.Message, "File Load Failure", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                Log.Error(e, "Batch File loading.");
+            }
         }
 
         // Create groups to hold the data - one for each batch.
@@ -416,6 +430,12 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
     public async Task RecoverOriginalFile()
     {
         if (SelectedGroup is null) return;
+
+        if (MessageBox.Show(
+                $"Are you sure that you want to restore the original file ({SelectedGroup.OriginalFileName})?\n\n" +
+                "This will remove all relevant data from the database and remove any label output files.",
+                "Confirm File Restoration", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
+            return;
 
         await SelectedGroup.RecoverOriginalFile();
 

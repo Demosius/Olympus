@@ -16,6 +16,9 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </UserControl.InputBindings>
 
     <DockPanel Background="{StaticResource ButtonBackgroundBrush}">
         <DockPanel Background="{StaticResource ButtonBackgroundBrush}">
@@ -33,6 +36,11 @@
                             Margin="5,2"/>
                 <DatePicker SelectedDate="{Binding EndDate}"
                             Margin="5,2"/>
+                <CheckBox IsChecked="{Binding FileFilter}"
+                          IsThreeState="True"
+                          Content="File Pending"
+                          Margin="5,2"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
                 <Label Content="Zone:"
                        Margin="5,2"
                        VerticalAlignment="Center"/>
@@ -84,6 +92,9 @@
                     </ContextMenu>
                 </DataGrid.ContextMenu>
                 <DataGrid.Columns>
+                    <DataGridTextColumn Header="Batch Date"
+                                        Binding="{Binding StartDate, StringFormat='dd-MMM-yyyy'}"
+                                        IsReadOnly="True"/>
                     <DataGridTextColumn Header="Initialization DateTime"
                                         Binding="{Binding InitializationDateTime, StringFormat='dd-MMM-yyyy hh:mm:ss'}"
                                         IsReadOnly="True"/>
@@ -108,6 +119,9 @@
                     <DataGridTextColumn Header="Label Output File Name"
                                         Binding="{Binding LabelFileName}"
                                         IsReadOnly="True"/>
+                    <DataGridCheckBoxColumn Header="Output File Exists"
+                                            Binding="{Binding LabelFileExists, Mode=OneWay}"
+                                            IsReadOnly="True"/>
                 </DataGrid.Columns>
             </DataGrid>
         </DockPanel>

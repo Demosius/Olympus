@@ -26,6 +26,8 @@ public class BatchTOGroupVM : INotifyPropertyChanged
     public BatchTOGroup Group { get; set; }
     public IBatchTOGroupHandler ParentVM { get; set; }
 
+    public bool LabelFileExists { get; }
+
     #region Group Object Access
 
     public Guid ID => Group.ID;
@@ -35,6 +37,8 @@ public class BatchTOGroupVM : INotifyPropertyChanged
     public DateTime EndDate => Group.EndDate;
     public string BatchString => Group.BatchString;
     public string ZoneString => Group.ZoneString;
+
+    public string BatchDescription => Group.Lines.First().Batch?.ToString() ?? BatchString;
 
     public BatchTOLine? FirstLine => Group.Lines.FirstOrDefault();
 
@@ -90,7 +94,7 @@ public class BatchTOGroupVM : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-
+    
     #endregion
 
     #region Commands
@@ -104,6 +108,7 @@ public class BatchTOGroupVM : INotifyPropertyChanged
         Helios = helios;
         Group = group;
         ParentVM = parentVM;
+        LabelFileExists = Group.IsFinalised && File.Exists(Path.Join(LabelFileDirectory, LabelFileName));
     }
 
     public async Task ProcessLabelsAsync()
@@ -134,10 +139,11 @@ public class BatchTOGroupVM : INotifyPropertyChanged
         CreateExcelFile(path);
 
         // Create carton file for LanTech.
-        await GenerateLanTechCartonFileAsync().ConfigureAwait(false);
+        if (SendToLanTech)
+            await GenerateLanTechCartonFileAsync().ConfigureAwait(false);
 
         // Update database.
-        await Helios.InventoryUpdater.BatchTOCartonDataAsync(Group);
+        await Helios.InventoryUpdater.BatchTOCartonDataAsync(Group).ConfigureAwait(false);
     }
 
     // Get Appropriate Carton Label based on carton size list.
@@ -225,7 +231,7 @@ public class BatchTOGroupVM : INotifyPropertyChanged
         }
 
         // Create file.
-        await using var fs = File.Create(ctnFileName);
+        await using var fs = File.Create(Path.Join(Settings.Default.LanTechExportDirectory, ctnFileName));
         // Add some text to file    
         var cartons = new UTF8Encoding(true).GetBytes($"{cartonLetter}|{LineCount}");
         fs.Write(cartons, 0, cartons.Length);
@@ -327,8 +333,9 @@ public class BatchTOGroupVM : INotifyPropertyChanged
     }
 
     public ObservableCollection<BatchTOLineVM> GetObservableLines() => new((ReverseSort
-            ? Lines.OrderByDescending(l => l.StartBin).ThenByDescending(l => l.EndBin)
-            : Lines.OrderBy(l => l.StartBin).ThenByDescending(l => l.EndBin)).Select(l => new BatchTOLineVM(l))
+            ? Lines.OrderBy(l => l.CartonType).ThenByDescending(l => l.StartBin).ThenByDescending(l => l.EndBin)
+            : Lines.OrderBy(l => l.CartonType).ThenBy(l => l.StartBin).ThenByDescending(l => l.EndBin))
+        .Select(l => new BatchTOLineVM(l))
         .ToList());
 
     public async Task<ObservableCollection<BatchTOLineVM>> GetObservableLinesAsync() => await Task.Run(GetObservableLines);
