@@ -154,7 +154,7 @@ public class BatchTOLineVM : INotifyPropertyChanged
 
     public string Description
     {
-        get => Line.Description;
+        get => Line.Description == "" ? $"{CCN} {BatchID} FX" : Line.Description;
         set
         {
             Line.Description = value;
@@ -220,6 +220,16 @@ public class BatchTOLineVM : INotifyPropertyChanged
             Line.FinalProcessingTime = value;
             OnPropertyChanged();
         }
+    }
+
+    public string Region
+    {
+         get => Line.FreightRegion;
+         set
+         {
+             Line.FreightRegion = value;
+             OnPropertyChanged();
+         }
     }
 
     #endregion

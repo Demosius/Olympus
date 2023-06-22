@@ -17,7 +17,7 @@ public class CartonSplitCommand : ICommand
 
     public async void Execute(object? parameter)
     {
-        await VM.CartonSplit();
+        await VM.CartonSplitAsync();
     }
 
     public event EventHandler? CanExecuteChanged

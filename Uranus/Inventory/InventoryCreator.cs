@@ -99,19 +99,82 @@ public class InventoryCreator
         {
             var batchTOLines = newGroups.SelectMany(g => g.Lines).ToList();
             // Get Batch IDs.
-            var batchIDs = batchTOLines.Select(l => l.BatchID).Distinct();
+            var batchDates = batchTOLines.Select(l => (l.BatchID, l.Date)).Distinct().ToList();
             // See if there are any batches that do not already exist.
             var batchDict = Chariot.PullObjectList<Batch>().ToDictionary(b => b.ID, b => b);
-            batchIDs = batchIDs.Where(id => !batchDict.ContainsKey(id));
+            batchDates = batchDates.Where(v => !batchDict.ContainsKey(v.BatchID)).ToList();
 
-            var newBatches = batchIDs.Select(id => new Batch(id));
+            var newBatches = batchDates.Select(v => new Batch(v.BatchID)
+                {Progress = EBatchProgress.DataUploaded, CreatedOn = v.Date, LastTimeCartonizedDate = v.Date});
+
+            // Get updateable batches.
+            var batchUpdates = new List<Batch>();
+            foreach (var (batchID, _) in batchDates)
+            {
+                if (!batchDict.TryGetValue(batchID, out var batch)) continue;
+                if (batch.UpdateBatchProgress(EBatchProgress.DataUploaded))
+                    batchUpdates.Add(batch);
+            }
 
             lines += Chariot.InsertIntoTable(newGroups);
             lines += Chariot.InsertIntoTable(newBatches);
             lines += Chariot.InsertIntoTable(batchTOLines);
+            lines += Chariot.UpdateTable(batchUpdates);
         }
 
         await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return lines;
     }
+
+    public async Task<int> PickLinesAsync(List<PickLine> pickLines)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            // Handle related batches.
+            var batchDict = Chariot.PullObjectList<Batch>().ToDictionary(b => b.ID, b => b);
+
+            var batchDates = pickLines
+                .Where(l => l.BatchID != string.Empty).GroupBy(l => l.BatchID)
+                .ToDictionary(g => g.Key, g => g.Max(l => l.DueDate));
+
+            var newBatches = new List<Batch>(); 
+
+            var updateableBatches = new List<Batch>();
+            var lineDict = pickLines
+                .Where(l => l.BatchID != string.Empty)
+                .GroupBy(l => l.BatchID)
+                .ToDictionary(g => g.Key, g => g.ToList());    
+            foreach (var (batchID, date) in batchDates)
+            {
+                if (!lineDict.TryGetValue(batchID, out var lineGroup)) continue;
+                var isNew = !batchDict.TryGetValue(batchID, out var batch);
+                if (isNew) batch = new Batch(batchID) {CreatedOn = date, LastTimeCartonizedDate = date}; 
+                if (batch is null) continue;
+
+                batch.UpdateBatchProgress(EBatchProgress.AutoRun);
+                batch.PickLines = lineGroup;
+                batch.CalculateHits();
+                updateableBatches.Add(batch);
+
+                if (isNew)
+                    newBatches.Add(batch);
+                else
+                    updateableBatches.Add(batch);
+            }
+
+            // Update database.
+            lines += Chariot.UpdateTable(pickLines);
+            lines += Chariot.InsertIntoTable(newBatches);
+            lines += Chariot.UpdateTable(updateableBatches);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
+    }
+
+    public async Task<int> StoresAsync(List<Store> stores) => await Chariot.ReplaceFullTableAsync(stores);
+
+    public async Task<bool> StoreAsync(Store newStore) => await Task.Run(() => Chariot.Create(newStore));
 }

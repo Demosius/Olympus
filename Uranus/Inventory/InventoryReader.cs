@@ -916,6 +916,8 @@ public class InventoryReader
                 Chariot.PullObjectList<BatchTOLine>(l => !l.IsFinalised) : 
                 Chariot.PullObjectList(filter);
 
+            var stores = Chariot.PullObjectList<Store>().ToDictionary(s => s.Number, s => s);
+
             var batches = Chariot.PullObjectList<Batch>().ToDictionary(b => b.ID, b => b);
 
             var groupIDs = lines.Select(l => l.GroupID).Distinct();
@@ -925,6 +927,8 @@ public class InventoryReader
 
             foreach (var line in lines)
             {
+                if (stores.TryGetValue(line.StoreNo, out var store)) store.AddTOLine(line);
+
                 if (!groupDict.TryGetValue(line.GroupID, out var group))
                 {
                     group = new BatchTOGroup
@@ -958,4 +962,30 @@ public class InventoryReader
 
         return groups;
     }
+
+    public async Task<List<Batch>> BatchesAsync(Expression<Func<Batch, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly)
+    {
+        var batches = new List<Batch>();
+
+        void Action()
+        {
+            batches = Chariot.PullObjectList(filter, pullType);
+            var batchIDs = batches.Select(b => b.ID);
+            var pickLines = Chariot.PullObjectList<PickLine>(l => batchIDs.Contains(l.BatchID))
+                .GroupBy(l => l.BatchID)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var batch in batches)
+            {
+                if (!pickLines.TryGetValue(batch.ID, out var lines)) continue;
+                batch.PickLines = lines;
+            }
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return batches;
+    }
+
+    public async Task<Batch?> BatchAsync(string batchID) => await Task.Run(() => Chariot.PullObject<Batch>(batchID));
 }

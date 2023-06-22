@@ -1,19 +1,33 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using Argos.ViewModels.Commands;
+using Argos.Views.PopUps;
+using Morpheus.Views.Windows;
+using Uranus;
 using Uranus.Annotations;
+using Uranus.Commands;
+using Uranus.Interfaces;
+using Uranus.Inventory;
 using Uranus.Inventory.Models;
 
 namespace Argos.ViewModels.Components;
 
-public class BatchVM : INotifyPropertyChanged
+public class BatchVM : INotifyPropertyChanged, IDBInteraction
 {
-    private Batch Batch { get; }
+    public Batch Batch { get; private set; }
+    public Helios Helios { get; set; }
 
     public string ID => Batch.ID;
 
-    #region INotifyPropertyChanged Members
+    public bool IsWeb => Tags.Contains("WEB", StringComparer.OrdinalIgnoreCase);
+    public bool IsMakeBulk => Tags.Contains("MB", StringComparer.OrdinalIgnoreCase);
 
+    #region Direct Batch Access
 
     public string Description
     {
@@ -22,6 +36,7 @@ public class BatchVM : INotifyPropertyChanged
         {
             Batch.Description = value;
             OnPropertyChanged();
+            _ = Save();
         }
     }
 
@@ -32,6 +47,7 @@ public class BatchVM : INotifyPropertyChanged
         {
             Batch.CreatedOn = value;
             OnPropertyChanged();
+            _ = Save();
         }
     }
 
@@ -42,6 +58,7 @@ public class BatchVM : INotifyPropertyChanged
         {
             Batch.CreatedBy = value;
             OnPropertyChanged();
+            _ = Save();
         }
     }
 
@@ -52,6 +69,7 @@ public class BatchVM : INotifyPropertyChanged
         {
             Batch.LastTimeCartonizedDate = value;
             OnPropertyChanged();
+            _ = Save();
         }
     }
 
@@ -62,6 +80,7 @@ public class BatchVM : INotifyPropertyChanged
         {
             Batch.LastTimeCartonizedTime = value;
             OnPropertyChanged();
+            _ = Save();
         }
     }
 
@@ -72,6 +91,7 @@ public class BatchVM : INotifyPropertyChanged
         {
             Batch.Cartons = value;
             OnPropertyChanged();
+            _ = Save();
         }
     }
 
@@ -82,46 +102,51 @@ public class BatchVM : INotifyPropertyChanged
         {
             Batch.Units = value;
             OnPropertyChanged();
+            _ = Save();
         }
     }
 
     public int Hits
     {
-        get => Batch.Hits; 
+        get => Batch.Hits;
         set
         {
             Batch.Hits = value;
             OnPropertyChanged();
+            _ = Save();
         }
     }
 
     public int BulkHits
     {
-        get => Batch.BulkHits; 
+        get => Batch.BulkHits;
         set
         {
             Batch.BulkHits = value;
             OnPropertyChanged();
+            _ = Save();
         }
     }
 
     public int PKHits
     {
-        get => Batch.PKHits; 
+        get => Batch.PKHits;
         set
         {
             Batch.PKHits = value;
             OnPropertyChanged();
+            _ = Save();
         }
     }
 
     public int SP01Hits
     {
-        get => Batch.SP01Hits; 
+        get => Batch.SP01Hits;
         set
         {
             Batch.SP01Hits = value;
             OnPropertyChanged();
+            _ = Save();
         }
     }
 
@@ -132,14 +157,182 @@ public class BatchVM : INotifyPropertyChanged
         {
             Batch.Priority = value;
             OnPropertyChanged();
+            _ = Save();
+        }
+    }
+
+    public EBatchProgress BatchProgress
+    {
+        get => Batch.Progress;
+        set
+        {
+            Batch.Progress = value;
+            OnPropertyChanged();
+            _ = Save();
+        }
+    }
+
+    public EBatchFillProgress BatchFillProgress
+    {
+        get => Batch.FillProgress;
+        set
+        {
+            Batch.FillProgress = value;
+            OnPropertyChanged();
+            _ = Save();
+        }
+    }
+
+    public bool Persist
+    {
+        get => Batch.Persist;
+        set
+        {
+            Batch.Persist = value;
+            OnPropertyChanged();
+            _ = Save();
+        }
+    }
+
+    public string TagString
+    {
+        get => Batch.TagString;
+        set
+        {
+            Batch.TagString = value;
+            Batch.Tags = TagString.Split(',').ToList();
+            Tags = new ObservableCollection<string>(Batch.Tags);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(Tags));
+            _ = Save();
         }
     }
 
     #endregion
-        
-    public BatchVM(Batch batch)
+
+    #region INotifyPropertyChanged Members
+
+    public ObservableCollection<PickLine> PickLines { get; set; }
+    public ObservableCollection<string> Tags { get; set; }
+
+    private string? selectedTag;
+    public string? SelectedTag
     {
+        get => selectedTag;
+        set
+        {
+            selectedTag = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private int lineCount;
+    public int LineCount
+    {
+        get => lineCount;
+        set
+        {
+            lineCount = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private int calculatedUnits;
+    public int CalculatedUnits
+    {
+        get => calculatedUnits;
+        set
+        {
+            calculatedUnits = value;
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
+
+    #region Commands
+
+    public RefreshDataCommand RefreshDataCommand { get; set; }
+    public DeleteTagCommand DeleteTagCommand { get; set; }
+    public ShowPickLinesCommand ShowPickLinesCommand { get; set; }
+    public AddTagCommand AddTagCommand { get; set; }
+
+    #endregion
+
+    public BatchVM(Batch batch, Helios helios)
+    {
+        Helios = helios;
         Batch = batch;
+        Batch.SetTags();
+
+        PickLines = new ObservableCollection<PickLine>(Batch.PickLines);
+        Tags = new ObservableCollection<string>(Batch.Tags);
+
+        lineCount = PickLines.Count;
+        calculatedUnits = PickLines.Where(l => l.ActionType == EAction.Take).Sum(l => l.BaseQty);
+
+        RefreshDataCommand = new RefreshDataCommand(this);
+        DeleteTagCommand = new DeleteTagCommand(this);
+        ShowPickLinesCommand = new ShowPickLinesCommand(this);
+        AddTagCommand = new AddTagCommand(this);
+    }
+
+    public async Task<int> Save() => await Helios.InventoryUpdater.BatchAsync(Batch);
+
+    public async Task RefreshDataAsync()
+    {
+        Batch = await Helios.InventoryReader.BatchAsync(Batch.ID) ?? Batch;
+    }
+
+    public async Task CalculateHits()
+    {
+        Batch.CalculateHits();
+        OnPropertyChanged(nameof(Hits));
+        OnPropertyChanged(nameof(PKHits));
+        OnPropertyChanged(nameof(BulkHits));
+        OnPropertyChanged(nameof(SP01Hits));
+        await Save();
+    }
+
+    public async Task DeleteTagAsync()
+    {
+        if (SelectedTag is null) return;
+        RemoveTag(SelectedTag);
+        await Save();
+    }
+
+    public void RemoveTag(string tag)
+    {
+        if (!Tags.Remove(tag)) return;
+        Batch.TagString = string.Join(',', Tags);
+        Batch.Tags = new List<string>(Tags);
+        OnPropertyChanged(nameof(TagString));
+    }
+
+    public async Task AddTagAsync()
+    {
+        var inputWindow = new InputWindow("Enter Tag", "New Tag");
+        if (inputWindow.ShowDialog() != true) return;
+        var newTag = inputWindow.InputText;
+
+        AddTag(newTag);
+
+        await Save();
+    }
+
+    public void AddTag(string newTag)
+    {
+        if (Tags.Contains(newTag)) return;
+        Tags.Add(newTag);
+        Batch.Tags = new List<string>(Tags);
+        Batch.TagString = string.Join(',', Tags);
+        OnPropertyChanged(nameof(TagString));
+    }
+
+    public void ShowPickLines()
+    {
+        var pickWindow = new PickLineWindow(PickLines);
+        pickWindow.ShowDialog();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -148,5 +341,10 @@ public class BatchVM : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public override string ToString()
+    {
+        return Batch.ToString();
     }
 }

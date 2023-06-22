@@ -110,8 +110,11 @@
                     <DataGridTextColumn Header="Start Picking Bays"
                                         Binding="{Binding StartBays}"
                                         IsReadOnly="True"/>
-                    <DataGridTextColumn Header="Cartons"
+                    <DataGridTextColumn Header="Carton Types"
                                         Binding="{Binding CartonSizes}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Carton Count"
+                                        Binding="{Binding LineCount}"
                                         IsReadOnly="True"/>
                     <DataGridTextColumn Header="Finalization DateTime"
                                         Binding="{Binding FinalizationDateTime, StringFormat='dd-MMM-yyyy hh:mm:ss'}"

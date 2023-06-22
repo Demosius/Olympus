@@ -22,7 +22,7 @@ public interface IBatchTOGroupHandler : IDBInteraction
     public RecoverOriginalFileCommand RecoverOriginalFileCommand { get; set; }
 
     Task ZoneSplit();
-    Task CartonSplit();
+    Task CartonSplitAsync();
     Task BaySplit();
     Task CountSplit();
     Task Merge();

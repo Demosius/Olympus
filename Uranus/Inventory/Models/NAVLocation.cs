@@ -7,7 +7,7 @@ namespace Uranus.Inventory.Models;
 [Table("LocationList")]
 public class NAVLocation
 {
-    [PrimaryKey] public string Code { get; set; }
+    [PrimaryKey, ForeignKey(typeof(Store))] public string Code { get; set; }
     public string Name { get; set; }
     public string CompanyCode { get; set; }
     public bool IsWarehouse { get; set; }
@@ -20,8 +20,11 @@ public class NAVLocation
     public List<NAVMoveLine> MoveLines { get; set; }
     [OneToMany(nameof(Models.NAVStock.LocationCode), nameof(Models.NAVStock.Location), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVStock> NAVStock { get; set; }
-    [OneToMany(nameof(Store.Number), nameof(Store.Location), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public List<Store> Stores { get; set; }
+    [OneToMany(nameof(PickLine.CartonID), nameof(PickLine.BatchTOLine), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<PickLine> PickLines { get; set; }
+
+    [OneToOne(nameof(Code), nameof(Models.Store.Location), CascadeOperations = CascadeOperation.CascadeRead)]
+    public Store? Store { get; set; }
 
     [Ignore] public Dictionary<int, Stock> Stock { get; set; }
 
@@ -36,8 +39,8 @@ public class NAVLocation
         Zones = new List<NAVZone>();
         MoveLines = new List<NAVMoveLine>();
         NAVStock = new List<NAVStock>();
-        Stores = new List<Store>();
         Stock = new Dictionary<int, Stock>();
+        PickLines = new List<PickLine>();
     }
 
     public NAVLocation(string code, string name)
@@ -48,25 +51,8 @@ public class NAVLocation
         Zones = new List<NAVZone>();
         MoveLines = new List<NAVMoveLine>();
         NAVStock = new List<NAVStock>();
-        Stores = new List<Store>();
         Stock = new Dictionary<int, Stock>();
-    }
-
-    public NAVLocation(string code, string name, string companyCode, bool isWarehouse, bool isStore,
-        bool activeForReplenishment, List<NAVZone> zones, List<NAVMoveLine> moveLines, List<NAVStock> navStock,
-        List<Store> stores)
-    {
-        Code = code;
-        Name = name;
-        CompanyCode = companyCode;
-        IsWarehouse = isWarehouse;
-        IsStore = isStore;
-        ActiveForReplenishment = activeForReplenishment;
-        Zones = zones;
-        MoveLines = moveLines;
-        NAVStock = navStock;
-        Stores = stores;
-        Stock = new Dictionary<int, Stock>();
+        PickLines = new List<PickLine>();
     }
 
     public void AddStock(Stock newStock)

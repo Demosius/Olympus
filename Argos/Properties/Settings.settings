@@ -23,5 +23,11 @@
     <Setting Name="CartonSplitString" Type="System.String" Scope="User">
       <Value Profile="(Default)">A,B</Value>
     </Setting>
+    <Setting Name="UseRegionColumn" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="LinkUp" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

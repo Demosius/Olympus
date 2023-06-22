@@ -25,81 +25,87 @@
     </UserControl.InputBindings>
 
     <DockPanel>
-        <StackPanel DockPanel.Dock="Top" 
-                    Orientation="Horizontal">
-            <Button Content="Gather Batch Data"
-                    Margin="5"
-                    Command="{Binding GatherBatchDataCommand}"/>
-            <CheckBox IsChecked="{Binding AutoSplitZone}"
-                      Content="Auto-Split Zones"/>
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
-                       Margin="5,2"/>
-            <CheckBox IsChecked="{Binding AutoSplitCartons}"
-                      Content="Auto-Split Cartons"/>
-            <TextBox Margin="5"
-                     ToolTip="Carton split: e.g. 'A,B' "
-                     MinWidth="75"
-                     Text="{Binding CartonSplitString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     IsEnabled="{Binding AutoSplitCartons}"/>
-        </StackPanel>
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal">
+                <Button Content="Gather Batch Data"
+                        Margin="5"
+                        Command="{Binding GatherBatchDataCommand}"/>
+                <CheckBox IsChecked="{Binding AutoSplitZone}"
+                          Content="Auto-Split Zones"
+                          Margin="2"/>
+                <CheckBox IsChecked="{Binding LinkUp}"
+                          Visibility="{Binding AutoSplitZone, Converter={StaticResource BooleanToVisibilityConverter}}"
+                          Content="Link SP PK &amp; PO PK"
+                          Margin="2"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+                           Margin="5,2"/>
+                <CheckBox IsChecked="{Binding AutoSplitCartons}"
+                          Content="Auto-Split Cartons"
+                          Margin="2"/>
+                <TextBox Margin="5"
+                         ToolTip="Carton split: e.g. 'A,B' "
+                         MinWidth="75"
+                         Text="{Binding CartonSplitString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         IsEnabled="{Binding AutoSplitCartons}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal">
+                <CheckBox IsChecked="{Binding UseRegion}"
+                          Content="Use Region Column"
+                          Margin="5"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+                           Margin="5,2,2,2"/>
+                <Button Content="Manage File Locations" 
+                        Command="{Binding LaunchFileLocationMenuCommand}"
+                        Margin="5"/>
+            </StackPanel>
+        </Grid>
         <TabControl>
             <TabItem Header="Current Batch Data View">
                 <DockPanel Background="{StaticResource ButtonBackgroundBrush}">
-                    <Grid DockPanel.Dock="Top">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0"
-                                    Orientation="Horizontal">
-                            <DatePicker SelectedDate="{Binding StartDate}"
+                    <StackPanel DockPanel.Dock="Top"
+                                Orientation="Horizontal">
+                        <DatePicker SelectedDate="{Binding StartDate}"
                                     Margin="5,2"/>
-                            <DatePicker SelectedDate="{Binding EndDate}"
+                        <DatePicker SelectedDate="{Binding EndDate}"
                                     Margin="5,2"/>
-                            <Label Content="Zone:"
+                        <Label Content="Zone:"
                                Margin="5,2"
                                VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding ZoneFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        <TextBox Text="{Binding ZoneFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  Margin="5,2"
                                  MinWidth="50"/>
-                            <Label Content="Start Bay:"
+                        <Label Content="Start Bay:"
                                Margin="5,2"
                                VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding BayFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        <TextBox Text="{Binding BayFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  Margin="5,2"
                                  MinWidth="50"/>
-                            <Label Content="Batch:"
+                        <Label Content="Batch:"
                                Margin="5,2"
                                VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding BatchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        <TextBox Text="{Binding BatchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  Margin="5,2"
                                  MinWidth="50"/>
-                            <Label Content="Carton Size:"
+                        <Label Content="Carton Size:"
                                Margin="5,2"
                                VerticalAlignment="Center"/>
-                            <TextBox Text="{Binding CtnSizeFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        <TextBox Text="{Binding CtnSizeFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  Margin="5,2"
                                  MinWidth="50"/>
-                            <Button Command="{Binding ClearFiltersCommand, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        <Button Command="{Binding ClearFiltersCommand, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                 Width="30" Height="30"
                                 Padding="3">
-                                <Image Source="../../Resources/cross.png"
+                            <Image Source="../../Resources/cross.png"
                                    ToolTip="Clear Filters"/>
-                            </Button>
-                        </StackPanel>
-                        <ToggleButton Grid.Column="2" x:Name="TogglePopupButton" HorizontalAlignment="Left"
-                                      Padding="5,0" Margin="5,5" Content="☰"/>
-
-                        <Popup Grid.Column="1" IsOpen="{Binding IsChecked, ElementName=TogglePopupButton}">
-                            <Border BorderThickness="1" BorderBrush="{StaticResource CheckBoxBorderBrush}">
-                                <StackPanel Orientation="Vertical">
-                                    <Button Content="Manage File Locations"
-                                            Command="{Binding LaunchFileLocationMenuCommand}"/>
-                                </StackPanel>
-                            </Border>
-                        </Popup>
-                    </Grid>
+                        </Button>
+                    </StackPanel>
                     <StackPanel DockPanel.Dock="Bottom"
                                 Orientation="Horizontal">
                         <Button Content="Process"
@@ -130,6 +136,8 @@
                                               Command="{Binding BaySplitCommand}"/>
                                     <MenuItem Header="Split By Count"
                                               Command="{Binding CountSplitCommand}"/>
+                                    <MenuItem Header="Split By Wave"
+                                              Command="{Binding WaveSplitCommand}"/>
                                     <Separator/>
                                     <MenuItem Header="Merge"
                                               Command="{Binding MergeCommand}"/>
@@ -150,6 +158,9 @@
                                                     IsReadOnly="True"/>
                                 <DataGridTextColumn Header="Cartons"
                                                     Binding="{Binding CartonSizes}"
+                                                    IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Waves"
+                                                    Binding="{Binding WaveString}"
                                                     IsReadOnly="True"/>
                                 <DataGridTextColumn Header="Date"
                                                     Binding="{Binding StartDate, StringFormat=dd-MMM-yyyy}"
@@ -189,47 +200,56 @@
                                   CanUserReorderColumns="True">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="CCN"
-                                                Binding="{Binding CCN}"
-                                                IsReadOnly="True"/>
+                                                            Binding="{Binding CCN}"
+                                                            IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Store No."
-                                                    Binding="{Binding StoreNo}"
-                                                    IsReadOnly="True"/>
+                                                            Binding="{Binding StoreNo}"
+                                                            IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Cartons"
-                                                    Binding="{Binding Cartons}"
-                                                    IsReadOnly="True"/>
+                                                            Binding="{Binding Cartons}"
+                                                            IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Weight"
-                                                    Binding="{Binding Weight}"
-                                                    IsReadOnly="True"/>
+                                                            Binding="{Binding Weight}"
+                                                            IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Cube"
-                                                    Binding="{Binding Cube}"
-                                                    IsReadOnly="True"/>
+                                                            Binding="{Binding Cube}"
+                                                            IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Carton Type"
-                                                    Binding="{Binding CartonType}"
-                                                    IsReadOnly="True"/>
+                                                            Binding="{Binding CartonType}"
+                                                            IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Starting Pick Zone"
-                                                    Binding="{Binding StartingPickZone}"
-                                                    IsReadOnly="True"/>
+                                                            Binding="{Binding StartingPickZone}"
+                                                            IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Ending Pick Zone"
-                                                    Binding="{Binding EndingPickZone}"
-                                                    IsReadOnly="True"/>
+                                                            Binding="{Binding EndingPickZone}"
+                                                            IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Starting Pick Bin"
-                                                    Binding="{Binding StartingPickBin}"
-                                                    IsReadOnly="True"/>
+                                                            Binding="{Binding StartingPickBin}"
+                                                            IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Ending Pick Bin"
-                                                    Binding="{Binding EndingPickBin}"
-                                                    IsReadOnly="True"/>
+                                                            Binding="{Binding EndingPickBin}"
+                                                            IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Batch ID"
-                                                    Binding="{Binding BatchID}"
-                                                    IsReadOnly="True"/>
+                                                            Binding="{Binding BatchID}"
+                                                            IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Date"
-                                                    Binding="{Binding Date, StringFormat='dd/MM/yyyy'}"
-                                                    IsReadOnly="True"/>
+                                                            Binding="{Binding Date, StringFormat='dd/MM/yyyy'}"
+                                                            IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Base Units"
-                                                    Binding="{Binding UnitsBase}"
-                                                    IsReadOnly="True"/>
+                                                            Binding="{Binding UnitsBase}"
+                                                            IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Wave"
-                                                    Binding="{Binding WaveNo}"
-                                                    IsReadOnly="True"/>
+                                                            Binding="{Binding WaveNo}"
+                                                            IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Item"
+                                                            Binding="{Binding ItemNumber}"
+                                                            IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Description"
+                                                            Binding="{Binding Description}"
+                                                            IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Region"
+                                                            Binding="{Binding Region}"
+                                                            IsReadOnly="True"/>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </DockPanel>

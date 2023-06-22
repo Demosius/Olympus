@@ -28,6 +28,8 @@ public class BatchTOGroupVM : INotifyPropertyChanged
 
     public bool LabelFileExists { get; }
 
+    public bool UseRegion { get; set; }
+
     #region Group Object Access
 
     public Guid ID => Group.ID;
@@ -37,6 +39,9 @@ public class BatchTOGroupVM : INotifyPropertyChanged
     public DateTime EndDate => Group.EndDate;
     public string BatchString => Group.BatchString;
     public string ZoneString => Group.ZoneString;
+    public string WaveString => Group.WaveString;
+
+    public string StartBayString => StartBays == "SP01-SP01" ? "SP01" : StartBays;
 
     public string BatchDescription => Group.Lines.First().Batch?.ToString() ?? BatchString;
 
@@ -54,6 +59,12 @@ public class BatchTOGroupVM : INotifyPropertyChanged
 
     public string ActualCartonSizes => Group.ActualCartonSizes;
     public string ActualStartBays => Group.ActualStartBays;
+
+    public int FileNumber
+    {
+        get => Group.FileNumber;
+        set => Group.FileNumber = value;
+    }
 
     #endregion
 
@@ -94,7 +105,7 @@ public class BatchTOGroupVM : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-    
+
     #endregion
 
     #region Commands
@@ -111,17 +122,35 @@ public class BatchTOGroupVM : INotifyPropertyChanged
         LabelFileExists = Group.IsFinalised && File.Exists(Path.Join(LabelFileDirectory, LabelFileName));
     }
 
+    public static int GetBatchFileNumber(string batchID, string directory)
+    {
+        var files = Directory.EnumerateFiles(directory, $"*{batchID}*").ToList();
+        var total = files.Count;
+        var numbers = (from file in files from Match match in Regex.Matches(Path.GetFileName(file), @"F(\d+)") select int.Parse(match.Groups[1].Value)).ToList();
+        numbers.Add(total);
+        return numbers.Max() + 1;
+    }
+
     public async Task ProcessLabelsAsync()
     {
         // Generate recommended file name.
-        var fileName = $"{BatchString}_{StartBays}_{CartonLabel()}_(Reformatted).xls";
         var dir = Settings.Default.BatchSaveDirectory;
+
+        // Make sure file name is unique.
+        FileNumber = GetBatchFileNumber(BatchString, dir);
+        var fileName = $"{BatchString}_{StartBayString}_{CartonLabel()}_F{FileNumber}_(Reformatted).xls";
+        while (File.Exists(Path.Join(dir, fileName)))
+        {
+            fileName = $"{BatchString}_{StartBayString}_{CartonLabel()}_{FileNumber}_(Reformatted).xls";
+            FileNumber++;
+        }
 
         // Confirm save location with saveFileDialog window.
         var saveDialog = new SaveFileDialog
         {
             InitialDirectory = dir,
-            FileName = Path.Join(dir, fileName)
+            FileName = fileName,
+            DefaultExt = "xls"
         };
 
         if (saveDialog.ShowDialog() != true) return;
@@ -136,7 +165,7 @@ public class BatchTOGroupVM : INotifyPropertyChanged
         Group.Finalise(path);
 
         // Create file.
-        CreateExcelFile(path);
+        await CreateExcelFile(path);
 
         // Create carton file for LanTech.
         if (SendToLanTech)
@@ -149,8 +178,20 @@ public class BatchTOGroupVM : INotifyPropertyChanged
     // Get Appropriate Carton Label based on carton size list.
     private string CartonLabel() => Regex.Replace(CartonSizes, ",", "");
 
-    private void CreateExcelFile(string path)
+    private async Task CreateExcelFile(string path)
     {
+        // Handle group and line data.
+        UseRegion = Settings.Default.UseRegionColumn;
+        var stores  = new Dictionary<string, Store>();
+        if (UseRegion) stores = (await Helios.InventoryReader.StoresAsync()).ToDictionary(s => s.Number, s => s);
+        foreach (var line in Lines)
+        {
+            line.ItemNumber = 111111;
+            line.Description = $"{line.CCN} {line.BatchID} F{FileNumber}";
+            if (UseRegion && stores.TryGetValue(line.StoreNo, out var store))
+                line.FreightRegion = store.CCNRegion;
+        }
+
         // Create workbook and sheet.
         using var package = new ExcelPackage();
 
@@ -172,9 +213,14 @@ public class BatchTOGroupVM : INotifyPropertyChanged
         sheet.Cells[1, 12].Value = "Date";
         sheet.Cells[1, 13].Value = "Total Units (Base)";
         sheet.Cells[1, 14].Value = "Wave Number";
+        sheet.Cells[1, 15].Value = "Item";
+        sheet.Cells[1, 16].Value = "Description";
+        if (UseRegion)
+            sheet.Cells[1, 17].Value = "Region"; 
+
 
         // Format Headers
-        using (var range = sheet.Cells[1, 1, 1, 14])
+        using (var range = sheet.Cells[1, 1, 1, UseRegion ? 17 : 16])
         {
             range.Style.Font.Bold = true;
             range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
@@ -199,6 +245,11 @@ public class BatchTOGroupVM : INotifyPropertyChanged
             sheet.Cells[row, 12].Value = line.Date.ToString("dd/MM/yy");
             sheet.Cells[row, 13].Value = line.UnitsBase;
             sheet.Cells[row, 14].Value = line.WaveNo;
+            sheet.Cells[row, 15].Value = line.ItemNumber;
+            sheet.Cells[row, 16].Value = line.Description;
+            if (UseRegion)
+                sheet.Cells[row, 17].Value = line.FreightRegion;
+
         }
 
         var xlFile = new FileInfo(path);
@@ -252,7 +303,7 @@ public class BatchTOGroupVM : INotifyPropertyChanged
 
     public async Task SplitByZoneAsync()
     {
-        var groups = Group.SplitByZone();
+        var groups = Group.SplitByZone(Settings.Default.LinkUp);
         await UpdateGroupsAsync(groups);
     }
 
@@ -265,6 +316,12 @@ public class BatchTOGroupVM : INotifyPropertyChanged
     public async Task SplitByStartBaysAsync(string split)
     {
         var groups = Group.SplitByStartBay(split);
+        await UpdateGroupsAsync(groups);
+    }
+
+    public async Task SplitByWaveAsync(string split)
+    {
+        var groups = Group.SplitByWave(split);
         await UpdateGroupsAsync(groups);
     }
 

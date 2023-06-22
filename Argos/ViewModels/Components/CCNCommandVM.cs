@@ -62,6 +62,17 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
         }
     }
 
+    public bool LinkUp
+    {
+        get => Settings.Default.LinkUp;
+        set
+        {
+            Settings.Default.LinkUp = value;
+            OnPropertyChanged();
+            Settings.Default.Save();
+        }
+    }
+
     public bool AutoSplitCartons
     {
         get => Settings.Default.AutoSplitCartons;
@@ -79,6 +90,17 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
         set
         {
             Settings.Default.CartonSplitString = value;
+            OnPropertyChanged();
+            Settings.Default.Save();
+        }
+    }
+
+    public bool UseRegion
+    {
+        get => Settings.Default.UseRegionColumn;
+        set
+        {
+            Settings.Default.UseRegionColumn = value;
             OnPropertyChanged();
             Settings.Default.Save();
         }
@@ -186,6 +208,7 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
     public MergeCommand MergeCommand { get; set; }
     public LaunchFileLocationMenuCommand LaunchFileLocationMenuCommand { get; set; }
     public RecoverOriginalFileCommand RecoverOriginalFileCommand { get; set; }
+    public WaveSplitCommand WaveSplitCommand { get; set; }
 
     #endregion
 
@@ -218,6 +241,7 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
         MergeCommand = new MergeCommand(this);
         LaunchFileLocationMenuCommand = new LaunchFileLocationMenuCommand(this);
         RecoverOriginalFileCommand = new RecoverOriginalFileCommand(this);
+        WaveSplitCommand = new WaveSplitCommand(this);
     }
 
     private async Task<CCNCommandVM> InitializeAsync()
@@ -349,7 +373,7 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
         // Split groups based on selected options.
         if (AutoSplitZone)
         {
-            var zoneGroups = newGroups.SelectMany(g => g.SplitByZone()).ToList();
+            var zoneGroups = newGroups.SelectMany(g => g.SplitByZone(LinkUp)).ToList();
             newGroups.AddRange(zoneGroups);
         }
         if (AutoSplitCartons)
@@ -372,18 +396,22 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
     {
         if (SelectedGroup is null) return;
 
+        var batchIDs = SelectedGroup.Lines.Select(l => l.BatchID).Distinct().ToList();
+
         await SelectedGroup.ProcessLabelsAsync();
         await RefreshDataAsync();
+        await Helios.InventoryUpdater.BatchProgressCheck(batchIDs);
     }
 
     public async Task ZoneSplit()
     {
-        SelectedGroup?.SplitByZoneAsync();
+        if (SelectedGroup is null) return;
+        await SelectedGroup.SplitByZoneAsync();
 
         await RefreshDataAsync();
     }
 
-    public async Task CartonSplit()
+    public async Task CartonSplitAsync()
     {
         if (SelectedGroup is null) return;
         var prompt = new InputWindow("Enter carton split:", "Carton Split");
@@ -412,6 +440,17 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
         if (prompt.ShowDialog() != true) return;
         var split = prompt.InputText;
         await SelectedGroup.SplitByCountAsync(split);
+
+        await RefreshDataAsync();
+    }
+
+    public async Task WaveSplitAsync()
+    {
+        if (SelectedGroup is null) return;
+        var prompt = new InputWindow("Enter Wave Split:\n\n(e.g. 'W01..W03|W07|W09..W20')", "Wave Split");
+        if (prompt.ShowDialog() != true) return;
+        var split = prompt.InputText.ToUpper();
+        await SelectedGroup.SplitByWaveAsync(split);
 
         await RefreshDataAsync();
     }

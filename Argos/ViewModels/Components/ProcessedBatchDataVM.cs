@@ -200,6 +200,8 @@ public class ProcessedBatchDataVM : INotifyPropertyChanged, IFilters, IBatchTOGr
             l.FinalProcessingTime <= checkEnd);
         AllGroups = groups.Select(group => new BatchTOGroupVM(group, Helios, this)).ToList();
         ApplyFilters();
+        var batchIDs = AllGroups.Where(g => !g.LabelFileExists).Select(g => g.BatchString).Distinct().ToList();
+        await Helios.InventoryUpdater.BatchProgressCheck(batchIDs);
     }
 
     public void ClearFilters()
@@ -220,7 +222,6 @@ public class ProcessedBatchDataVM : INotifyPropertyChanged, IFilters, IBatchTOGr
         Groups.Clear();
 
         var groups = AllGroups.Where(g =>
-                g.EndDate >= StartDate && g.StartDate <= EndDate &&
                 (FileFilter is null || g.LabelFileExists == FileFilter) &&
                 Regex.IsMatch(g.ZoneString, ZoneFilter, RegexOptions.IgnoreCase) &&
                 Regex.IsMatch(g.StartBays, BayFilter, RegexOptions.IgnoreCase) &&
@@ -240,7 +241,7 @@ public class ProcessedBatchDataVM : INotifyPropertyChanged, IFilters, IBatchTOGr
         throw new NotImplementedException();
     }
 
-    public Task CartonSplit()
+    public Task CartonSplitAsync()
     {
         throw new NotImplementedException();
     }

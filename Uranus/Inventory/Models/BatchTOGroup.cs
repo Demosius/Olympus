@@ -21,8 +21,10 @@ public class BatchTOGroup
     public DateTime EndDate { get; set; }
     public string BatchString { get; set; }
     public string ZoneString { get; set; }
+    public string WaveString { get; set; }
     public string LabelFileName { get; set; }
     public string LabelFileDirectory { get; set; }
+    public int FileNumber { get; set; }
     public bool IsFinalised { get; set; }
 
     [OneToMany(nameof(BatchTOLine.GroupID), nameof(BatchTOLine.Group), CascadeOperations = CascadeOperation.CascadeRead)]
@@ -42,6 +44,7 @@ public class BatchTOGroup
         StartBays = string.Empty;
         BatchString = string.Empty;
         ZoneString = string.Empty;
+        WaveString = string.Empty;
         LabelFileName = string.Empty;
         LabelFileDirectory = string.Empty;
     }
@@ -53,7 +56,8 @@ public class BatchTOGroup
         SetData();
     }
 
-    public BatchTOGroup(ref List<BatchTOLine> lines, List<string>? cartonSizes = null, string? startBays = null, List<string>? startZones = null, int? lineCount = null) : this()
+    public BatchTOGroup(ref List<BatchTOLine> lines, List<string>? cartonSizes = null, string? startBays = null,
+        List<string>? startZones = null, int? lineCount = null, string? waveCheck = null) : this()
     {
         var sBay = Regex.Match(startBays ?? string.Empty, @"^\w+").Value;
         var eBay = Regex.Match(startBays ?? string.Empty, @"\w+$").Value;
@@ -63,8 +67,9 @@ public class BatchTOGroup
         var relevantLines = lines.Where(line =>
             (cartonSizes is null || cartonSizes.Contains(line.CartonType.ToUpper())) &&
             (startZones is null || startZones.Contains(line.StartZone)) &&
+            (waveCheck is null || WaveMatch(line.WaveNo, waveCheck)) &&
             (startBays is null ||
-              (string.Compare(line.StartBay, sBay, StringComparison.OrdinalIgnoreCase) >= 0 &&
+             (string.Compare(line.StartBay, sBay, StringComparison.OrdinalIgnoreCase) >= 0 &&
               string.Compare(line.StartBay, eBay, StringComparison.OrdinalIgnoreCase) <= 0)));
 
         foreach (var line in relevantLines)
@@ -75,8 +80,26 @@ public class BatchTOGroup
 
         foreach (var line in Lines)
             lines.Remove(line);
-        
+
         SetData();
+    }
+
+    public static bool WaveMatch(string wave, string waveCheck)
+    {
+        wave = wave.ToUpper();
+        waveCheck = waveCheck.ToUpper();
+
+        // See if we are looking at a range.
+        var matches = Regex.Matches(waveCheck, @"^(W\d\d)..(W\d\d)$");
+        var useRange = matches.Count > 0;
+        var (startWave, endWave) = (matches[0].Groups[1].Value, matches[0].Groups[2].Value);
+
+        if (useRange)
+        {
+            return string.Compare(wave, startWave, StringComparison.Ordinal) >= 0 &&
+                   string.Compare(wave, endWave, StringComparison.Ordinal) <= 0;
+        }
+        return wave == waveCheck;
     }
 
     public void Finalise(string filePath)
@@ -106,6 +129,40 @@ public class BatchTOGroup
         EndDate = Lines.Max(l => l.Date);
         BatchString = string.Join(',', Lines.Select(l => l.BatchID).Distinct().OrderBy(s => s));
         ZoneString = string.Join(',', Lines.Select(l => l.StartZone).Distinct().OrderBy(s => s));
+        WaveString = GetWaveString(Lines.Select(l => l.WaveNo).Distinct().OrderBy(w => w).ToList());
+    }
+
+    public static string GetWaveString(IReadOnlyList<string> waves)
+    {
+        var waveChecks = new List<string>();
+
+        // assume they are already in order.
+        for (var i = 0; i < waves.Count; i++)
+        {
+            var startWave = waves[i];
+            
+            if (!int.TryParse(startWave.AsSpan(1,2), out var startNo) || i == waveChecks.Count - 1)
+            {
+                waveChecks.Add(startWave);
+                continue;
+            }
+
+            var no = startNo;
+            var endWave = startWave;
+            for (var j = i + 1; j < waves.Count; j++)
+            {
+                var jWave = waves[j];
+                if (!int.TryParse(jWave.AsSpan(1, 2), out var endNo) || endNo > no + 1) break;
+
+                endWave = jWave;
+                no = endNo;
+                i = j;
+            }
+
+            waveChecks.Add(endWave == startWave ? startWave : $"{startWave}..{endWave}");
+        }
+
+        return string.Join('|', waveChecks);
     }
 
     public void AddLine(BatchTOLine line)
@@ -180,13 +237,20 @@ public class BatchTOGroup
 
     public List<BatchTOGroup> SplitByCartonSize() => SplitByCartonSize(CartonSizes.Split(',').ToList());
 
-    public List<BatchTOGroup> SplitByZone()
+    public List<BatchTOGroup> SplitByZone(bool linkUp)
     {
         var lines = Lines;
 
         var zones = lines.Select(l => l.StartZone).Distinct().ToList();
 
-        var groups = zones.Select(zone => new List<string> { zone }).Select(zoneList => new BatchTOGroup(ref lines, startZones: zoneList)).ToList();
+        if (linkUp && zones.Contains("PO PK") && zones.Contains("SP PK"))
+        {
+            zones.Add("SP PK,PO PK");
+            zones.Remove("PO PK");
+            zones.Remove("SP PK");
+        }
+
+        var groups = zones.Select(zone => zone.Split(',').ToList()).Select(zoneList => new BatchTOGroup(ref lines, startZones: zoneList)).ToList();
 
         Lines = lines;
         if (Lines.Count <= 0) return groups;
@@ -223,7 +287,7 @@ public class BatchTOGroup
 
     public List<BatchTOGroup> SplitByRatio(List<int> ratioList) => SplitByCount(GetCountFromRatio(ratioList));
 
-    private List<int> GetCountFromRatio(List<int> ratioList)
+    private List<int> GetCountFromRatio(IReadOnlyCollection<int> ratioList)
     {
         var ratSum = (double) ratioList.Sum();
         var countList = ratioList.Select(rat => (int) Math.Round(rat / ratSum * Lines.Count)).ToList();
@@ -292,6 +356,20 @@ public class BatchTOGroup
 
         SetData();
 
+        return groups;
+    }
+
+    public List<BatchTOGroup> SplitByWave(string split)
+    {
+        var lines = Lines;
+        var waveChecks = split.Split('|');
+
+        var groups = waveChecks.Select(w => new BatchTOGroup(ref lines, waveCheck: w)).ToList();
+
+        Lines = lines;
+        if (Lines.Count <= 0) return groups;
+
+        SetData();
         return groups;
     }
 }

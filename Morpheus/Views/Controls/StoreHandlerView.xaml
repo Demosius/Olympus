@@ -1,0 +1,135 @@
+﻿<UserControl x:Class="Morpheus.Views.Controls.StoreHandlerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Morpheus.ViewModels.Controls"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:model="clr-namespace:Uranus.Inventory.Models;assembly=Uranus"
+             xmlns:inventory="clr-namespace:Uranus.Inventory;assembly=Uranus"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:StoreHandlerVM}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800"
+             Initialized="StoreHandlerView_OnInitialized">
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </UserControl.InputBindings>
+
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="StoreType"
+                            MethodName="GetValues" 
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="model:EStoreType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="Volume"
+                            MethodName="GetValues" 
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="inventory:EVolume"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+    <DockPanel>
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Button Content="Upload Store Data"
+                        Margin="5"
+                        Command="{Binding UploadDataCommand}"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+                           Margin="5"/>
+                <Button Content="Add New Store"
+                        Margin="5"
+                        Command="{Binding CreateNewItemCommand}"/>
+                <Button Content="Delete Store"
+                        Margin="5"
+                        Command="{Binding DeleteSelectedItemCommand}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal">
+                <Button Content="Pull From File" Margin="5"
+                        Command="{Binding DataFromFileCommand}"/>
+                <Label BorderThickness="1"
+                       BorderBrush="{StaticResource Brush01}"
+                       Margin="5"
+                       MinWidth="80"
+                       Content="{Binding DataFile}"/>
+                <Button Margin="5"
+                        Padding="0"
+                        Command="{Binding SetDataFileCommand}">
+                    <Image Source="../../Resources/img/folder--arrow.png"
+                           MaxHeight="20"
+                           MaxWidth="20"
+                           Margin="5"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+            <Label Content="Filter:"
+                   VerticalAlignment="Center"/>
+            <TextBox Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="5"
+                     MinWidth="100"/>
+        </StackPanel>
+        <DataGrid ItemsSource="{Binding Stores}"
+                  SelectedItem="{Binding SelectedItem}"
+                  d:ItemsSource="{d:SampleData ItemCount=5}"
+                  SelectionMode="Extended"
+                  SelectionUnit="CellOrRowHeader"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  CanUserResizeRows="False"
+                  CanUserResizeColumns="True"
+                  CanUserSortColumns="True"
+                  CanUserReorderColumns="True"
+                  RowHeaderWidth="15">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Store"
+                                        Binding="{Binding Number}"
+                                        IsReadOnly="True"/>
+                <DataGridTextColumn Header="Wave"
+                                        Binding="{Binding Wave}"
+                                        IsReadOnly="False"/>
+                <DataGridTextColumn Header="CCN Region"
+                                        Binding="{Binding CCNRegion}"
+                                        IsReadOnly="False"/>
+                <DataGridTextColumn Header="Road CCN"
+                                        Binding="{Binding RoadCCN}"
+                                        IsReadOnly="False"/>
+                <DataGridTextColumn Header="Transit Days"
+                                        Binding="{Binding TransitDays}"
+                                        IsReadOnly="False"/>
+                <DataGridTextColumn Header="MB Region"
+                                        Binding="{Binding MBRegion}"
+                                        IsReadOnly="False"/>
+                <DataGridTextColumn Header="Road Region"
+                                        Binding="{Binding RoadRegion}"
+                                        IsReadOnly="False"/>
+                <DataGridTextColumn Header="Sorting Lane"
+                                        Binding="{Binding SortingLane}"
+                                        IsReadOnly="False"/>
+                <DataGridTextColumn Header="State"
+                                        Binding="{Binding State}"
+                                        IsReadOnly="False"/>
+                <DataGridTextColumn Header="Region"
+                                        Binding="{Binding Region}"
+                                        IsReadOnly="False"/>
+                <DataGridComboBoxColumn Header="Store Type"
+                                            SelectedItemBinding="{Binding Type}"
+                                            ItemsSource="{Binding Source={StaticResource StoreType}}"/>
+                <DataGridComboBoxColumn Header="Volume"
+                                            SelectedItemBinding="{Binding Volume}"
+                                            ItemsSource="{Binding Source={StaticResource Volume}}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</UserControl>

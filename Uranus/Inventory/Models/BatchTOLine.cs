@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
-using Uranus.Annotations;
 
 namespace Uranus.Inventory.Models;
 
@@ -22,13 +22,14 @@ public class BatchTOLine
     public DateTime Date { get; set; }
     public int UnitsBase { get; set; }
     public string WaveNo { get; set; }
+    public string FreightRegion { get; set; }
 
     // Calculated from Zone and Bin, used for many checks.
     public string StartBay { get; set; }
     public string EndBay { get; set; }
 
     // Used for x cartons.
-    public int ItemNumber { get; set; }
+    public int ItemNumber { get; set; } = 111111;
     public string Description { get; set; } // Item description for x Carton, [CCN] [BatchID] F[file number] for others.
 
     // Used to track file locations and process for dispatch and label printing.
@@ -50,6 +51,11 @@ public class BatchTOLine
     public Batch? Batch { get; set; }
     [ManyToOne(nameof(GroupID), nameof(BatchTOGroup.Lines), CascadeOperations = CascadeOperation.CascadeRead)]
     public BatchTOGroup? Group { get; set; }
+    [ManyToOne(nameof(StoreNo), nameof(Models.Store.BatchTOLines), CascadeOperations = CascadeOperation.CascadeRead)]
+    public Store? Store { get; set; }
+
+    [OneToMany(nameof(PickLine.CartonID), nameof(PickLine.BatchTOLine), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<PickLine> PickLines { get; set; }
 
     public BatchTOLine()
     {
@@ -71,6 +77,9 @@ public class BatchTOLine
         FinalProcessingTime = null;
         StartBay = string.Empty;
         EndBay = string.Empty;
+        FreightRegion = string.Empty;
+
+        PickLines = new List<PickLine>();
     }
 
     public void Finalise(string fileDirectory, string fileName)
@@ -97,4 +106,10 @@ public class BatchTOLine
         bin.Length > 0 ? bin[..1] : 
         string.Empty;
 
+    public void SetStore(Store store)
+    {
+        Store = store;
+        StoreNo = store.Number;
+        FreightRegion = Store.CCNRegion;
+    }
 }

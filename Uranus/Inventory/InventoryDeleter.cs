@@ -53,6 +53,10 @@ public class InventoryDeleter
             var lines = Chariot.PullObjectList<BatchTOLine>(l =>
                 l.OriginalFileDirectory == ogDir && l.OriginalFileName == ogFileName);
 
+            // Change batch progress to AutoRun (level before data upload)
+            foreach (var batchID in lines.Select(l => l.BatchID).Distinct())
+                Chariot.Execute("UPDATE Batch SET Progress = ? WHERE ID = ?;", EBatchProgress.AutoRun, batchID);
+
             // Get group IDs
             var groupIDs = lines.Select(l => l.GroupID).Distinct().ToList();
             
@@ -77,4 +81,6 @@ public class InventoryDeleter
 
         return files.Distinct().ToList();
     }
+
+    public async Task StoreAsync(Store store) => await Task.Run(() => Chariot.Delete(store));
 }

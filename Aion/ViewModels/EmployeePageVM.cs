@@ -264,6 +264,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction, 
     {
         EmployeeCreationWindow creator = new(Helios);
         if (creator.ShowDialog() != true) return;
+        if (creator.VM?.NewEmployee is null) return;
 
         EmployeeEditorWindow editor = new(Helios, creator.VM!.NewEmployee, true);
         if (editor.ShowDialog() == true)
@@ -278,7 +279,7 @@ public class EmployeePageVM : INotifyPropertyChanged, IFilters, IDBInteraction, 
         editorWindow.ShowDialog();
     }
 
-    internal void DeleteEmployee()
+    internal static void DeleteEmployee()
     {
         MessageBox.Show("This feature is not yet implemented", "Feature Missing", MessageBoxButton.OK, MessageBoxImage.Warning);
     }

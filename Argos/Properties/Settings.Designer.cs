@@ -106,5 +106,29 @@ namespace Argos.Properties {
                 this["CartonSplitString"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseRegionColumn {
+            get {
+                return ((bool)(this["UseRegionColumn"]));
+            }
+            set {
+                this["UseRegionColumn"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool LinkUp {
+            get {
+                return ((bool)(this["LinkUp"]));
+            }
+            set {
+                this["LinkUp"] = value;
+            }
+        }
     }
 }
