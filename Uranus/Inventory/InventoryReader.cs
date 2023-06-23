@@ -964,6 +964,9 @@ public class InventoryReader
     }
 
     public async Task<List<Batch>> BatchesAsync(Expression<Func<Batch, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+
+    public async Task<List<Batch>> BatchesWithPickLinesAsync(Expression<Func<Batch, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly)
     {
         var batches = new List<Batch>();
@@ -988,4 +991,7 @@ public class InventoryReader
     }
 
     public async Task<Batch?> BatchAsync(string batchID) => await Task.Run(() => Chariot.PullObject<Batch>(batchID));
+
+    public async Task<List<PickLine>> PickLinesAsync(Expression<Func<PickLine, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 }

@@ -24,6 +24,7 @@ public static class Constants
     public const string BinCode = "Bin Code";
     public const string BinRanking = "Bin Ranking";
     public const string CartonID = "Carton ID";
+    public const string Cartonized = "Cartonized";
     public const string Cartons = "No. of Cartons";
     public const string CatCode = "CategoryCode";
     public const string CCN = "CCN";
@@ -52,6 +53,7 @@ public static class Constants
     public const string EndZone = "Ending Pick Zone";
     public const string ExcludeCtn = "Exclude Cartonization";
     public const string Fixed = "Fixed";
+    public const string FullyShipped = "Fully Shipped";
     public const string GenCode = "GenreCode";
     public const string Height = "Height";
     public const string HeightCM = "Height (CM)";
@@ -83,10 +85,10 @@ public static class Constants
     public const string PFCode = "PlatformCode";
     public const string PickerID = "Picker ID";
     public const string PickQty = "Pick Qty.";
-    public const string PTLFileCreated = "PTL File Created";
     public const string PosQty = "Pos. Adjmt. Qty.";
     public const string PostDate = "Posted Date";
     public const string PrimaryBarcode = "PrimaryBarcode";
+    public const string PTLFileCreated = "PTL File Created";
     public const string PutAwayQty = "Put-away Qty.";
     public const string Qty = "Qty";
     public const string QtyBase = "Qty. (Base)";
@@ -101,6 +103,7 @@ public static class Constants
     public const string RoadCCN = "Prm > Road CCN";
     public const string RoadRegion = "Road Regions";
     public const string ShipDate = "Actual Shipment Date";
+    public const string ShipmentCreated = "Shipment Created";
     public const string ShippingDays = "Shipping Days";
     public const string SkuDesc = "SKU Description";
     public const string SkuID = "SKU ID";
@@ -1051,6 +1054,9 @@ public class BatchIndices : IColumnIndexer
     public int Cartons { get; set; }
     public int Units { get; set; }
     public int PTLFileCreated { get; set; }
+    public int Cartonized { get; set; }
+    public int ShipmentCreated { get; set; }
+    public int FullyShipped { get; set; }
 
     public BatchIndices(string[] headers)
     {
@@ -1070,6 +1076,9 @@ public class BatchIndices : IColumnIndexer
         Cartons = Array.IndexOf(headers, Constants.Cartons);
         Units = Array.IndexOf(headers, Constants.Units);
         PTLFileCreated = Array.IndexOf(headers, Constants.PTLFileCreated);
+        Cartonized = Array.IndexOf(headers, Constants.Cartonized);
+        ShipmentCreated = Array.IndexOf(headers, Constants.ShipmentCreated);
+        FullyShipped = Array.IndexOf(headers, Constants.FullyShipped);
     }
 
     public void CheckMissingHeaders()
@@ -1085,6 +1094,9 @@ public class BatchIndices : IColumnIndexer
         if (Cartons == -1) missingHeaders.Add(Constants.Cartons);
         if (Units == -1) missingHeaders.Add(Constants.Units);
         if (PTLFileCreated == -1) missingHeaders.Add(Constants.PTLFileCreated);
+        if (Cartonized == -1) missingHeaders.Add(Constants.Cartonized);
+        if (ShipmentCreated == -1) missingHeaders.Add(Constants.ShipmentCreated);
+        if (FullyShipped == -1) missingHeaders.Add(Constants.FullyShipped);
 
         if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for Batch TO Lines.", missingHeaders);
     }

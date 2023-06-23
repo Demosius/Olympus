@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using Argos.ViewModels.Commands;
+using Argos.Views.PopUps;
 using Morpheus;
 using Morpheus.Views.Windows;
 using Serilog;
@@ -24,13 +25,14 @@ public class MainBatchVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public Helios Helios { get; set; }
 
     public List<BatchVM> AllBatches { get; set; }
+    public bool RefreshNonComplete { get; set; }
 
     #region INotifyPropertyChanged Members
 
     public ObservableCollection<BatchVM> Batches { get; set; }
     public ObservableCollection<BatchVM> SelectedBatches { get; set; }
     public ObservableCollection<BatchGroupVM> BatchGroups { get; set; }
-    
+
     private DateTime startDate;
     public DateTime StartDate
     {
@@ -44,6 +46,7 @@ public class MainBatchVM : INotifyPropertyChanged, IDBInteraction, IFilters
                 OnPropertyChanged(nameof(EndDate));
             }
             OnPropertyChanged();
+            RefreshNonComplete = false;
             _ = RefreshDataAsync();
         }
     }
@@ -55,9 +58,13 @@ public class MainBatchVM : INotifyPropertyChanged, IDBInteraction, IFilters
         set
         {
             endDate = value;
-            startDate = value;
+            if (startDate > endDate)
+            {
+                startDate = value;
+                OnPropertyChanged(nameof(StartDate));
+            }
             OnPropertyChanged();
-            OnPropertyChanged(nameof(StartDate));
+            RefreshNonComplete = false;
             _ = RefreshDataAsync();
         }
     }
@@ -178,6 +185,10 @@ public class MainBatchVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public MultiAddTagCommand MultiAddTagCommand { get; set; }
     public MultiRemoveTagCommand MultiRemoveTagCommand { get; set; }
+    public SetPriorityFillProgressCommand SetPriorityFillProgressCommand { get; set; }
+    public MultiSetProgressCommand MultiSetProgressCommand { get; set; }
+    public MultiSetFillProgressCommand MultiSetFillProgressCommand { get; set; }
+    public LoadNonCompleteBatchesCommand LoadNonCompleteBatchesCommand { get; set; }
 
     #endregion
 
@@ -203,6 +214,10 @@ public class MainBatchVM : INotifyPropertyChanged, IDBInteraction, IFilters
         ClearFiltersCommand = new ClearFiltersCommand(this);
         MultiAddTagCommand = new MultiAddTagCommand(this);
         MultiRemoveTagCommand = new MultiRemoveTagCommand(this);
+        SetPriorityFillProgressCommand = new SetPriorityFillProgressCommand(this);
+        MultiSetProgressCommand = new MultiSetProgressCommand(this);
+        MultiSetFillProgressCommand = new MultiSetFillProgressCommand(this);
+        LoadNonCompleteBatchesCommand = new LoadNonCompleteBatchesCommand(this);
     }
 
     private async Task<MainBatchVM> InitializeAsync()
@@ -225,16 +240,43 @@ public class MainBatchVM : INotifyPropertyChanged, IDBInteraction, IFilters
         Batches.Clear();
         BatchGroups.Clear();
 
-        AllBatches = (await Helios.InventoryReader.BatchesAsync(b =>
-            b.Persist || (b.CreatedOn >= StartDate && b.CreatedOn <= EndDate) ||
-            (b.LastTimeCartonizedDate >= StartDate && b.LastTimeCartonizedDate <= EndDate))).OrderBy(b => b.ID)
-            .Select(b => new BatchVM(b, Helios))
-            .ToList();
+        if (RefreshNonComplete)
+        {
+            AllBatches = (await Helios.InventoryReader.BatchesAsync(b => b.Progress != EBatchProgress.Completed))
+                .Select(b => new BatchVM(b, Helios)).ToList();
+            SetDatesFromBatches();
+        }
+        else
+        {
+            AllBatches = (await Helios.InventoryReader.BatchesAsync(b =>
+                    b.Persist || (b.CreatedOn >= StartDate && b.CreatedOn <= EndDate) ||
+                    (b.LastTimeCartonizedDate >= StartDate && b.LastTimeCartonizedDate <= EndDate))).OrderBy(b => b.ID)
+                .Select(b => new BatchVM(b, Helios))
+                .ToList();
+        }
 
         ApplyFilters();
         SelectedBatch = Batches.FirstOrDefault(b => b.ID == currentSelected?.ID);
     }
-    
+
+    private void SetDatesFromBatches()
+    {
+        // Set dates based on date ranges of current batches.
+        var dates = AllBatches.Select(b => b.CreatedOn).ToList();
+        dates.AddRange(AllBatches.Select(b => b.LastTimeCartonizedDate));
+        dates = dates.Where(d => d != DateTime.MinValue && d != DateTime.MaxValue).ToList();
+        startDate = dates.Min();
+        endDate = dates.Max();
+        OnPropertyChanged(nameof(StartDate));
+        OnPropertyChanged(nameof(EndDate));
+    }
+
+    public async Task LoadNonCompleteBatches()
+    {
+        RefreshNonComplete = true;
+        await RefreshDataAsync();
+    }
+
     public async Task UploadBatchesAsync()
     {
         List<Batch> newBatches;
@@ -269,7 +311,24 @@ public class MainBatchVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public async Task CalculateHitsAsync()
     {
         if (SelectedBatch is null) return;
-        await SelectedBatch.CalculateHits();
+        if (SelectedBatches.Count == 1) 
+            await SelectedBatch.CalculateHits();
+        else
+        {
+            var batchIDs = SelectedBatches.Select(b => b.ID).ToList();
+            var pickLineDict = (await Helios.InventoryReader.PickLinesAsync(l => batchIDs.Contains(l.BatchID)))
+                .GroupBy(l => l.BatchID)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var batches = SelectedBatches.ToList();
+            foreach (var batch in batches)
+            {
+                if (!pickLineDict.TryGetValue(batch.ID, out var pickLines)) continue;
+                batch.CalculateHits(pickLines);
+            }
+
+            await Helios.InventoryUpdater.BatchesAsync(batches.Select(b => b.Batch).ToList());
+        }
         CheckSums();
     }
 
@@ -308,7 +367,7 @@ public class MainBatchVM : INotifyPropertyChanged, IDBInteraction, IFilters
     {
         Batches.Clear();
 
-        var batches = AllBatches.Where(b => 
+        var batches = AllBatches.Where(b =>
             (ShowWeb || !b.IsWeb) &&
             (ShowMB || !b.IsMakeBulk) &&
             (Regex.IsMatch(b.Description, FilterString, RegexOptions.IgnoreCase) ||
@@ -340,6 +399,49 @@ public class MainBatchVM : INotifyPropertyChanged, IDBInteraction, IFilters
         foreach (var batchVM in SelectedBatches) batchVM.RemoveTag(tag);
 
         await Helios.InventoryUpdater.BatchesAsync(SelectedBatches.Select(b => b.Batch).ToList());
+    }
+
+    public async Task SetPriorityFillProgressAsync()
+    {
+        if (SelectedBatch is null) return;
+        var priority = SelectedBatch.Priority;
+
+        var fps = new FillProgressSelectionWindow($"Select replen progress for priority {priority}.");
+        if (fps.ShowDialog() != true) return;
+
+        var progress = fps.Progress;
+
+        var pBatches = AllBatches.Where(b => b.Priority == priority).ToList();
+        foreach (var batch in pBatches) batch.SetBatchFillProgress(progress);
+        await Helios.InventoryUpdater.BatchesAsync(pBatches.Select(b => b.Batch).ToList());
+    }
+
+    public async Task MultiSetProgressAsync()
+    {
+        if (SelectedBatches.Count <= 1) return;
+
+        var ps = new ProgressSelectionWindow("Select restock progress for selected batches.");
+        if (ps.ShowDialog() != true) return;
+
+        var progress = ps.Progress;
+
+        var batches = SelectedBatches.ToList();
+        foreach (var batch in batches) batch.SetBatchProgress(progress);
+        await Helios.InventoryUpdater.BatchesAsync(batches.Select(b => b.Batch).ToList());
+    }
+
+    public async Task MultiSetFillProgressAsync()
+    {
+        if (SelectedBatches.Count <= 1) return;
+
+        var fps = new FillProgressSelectionWindow("Select replen progress for selected batches.");
+        if (fps.ShowDialog() != true) return;
+
+        var progress = fps.Progress;
+
+        var batches = SelectedBatches.ToList();
+        foreach (var batch in batches) batch.SetBatchFillProgress(progress);
+        await Helios.InventoryUpdater.BatchesAsync(batches.Select(b => b.Batch).ToList());
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

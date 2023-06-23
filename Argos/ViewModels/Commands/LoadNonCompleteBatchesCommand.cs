@@ -4,11 +4,11 @@ using Argos.ViewModels.Components;
 
 namespace Argos.ViewModels.Commands;
 
-public class ShowPickLinesCommand : ICommand
+public class LoadNonCompleteBatchesCommand : ICommand
 {
-    public BatchVM VM { get; set; }
+    public MainBatchVM VM { get; set; }
 
-    public ShowPickLinesCommand(BatchVM vm) { VM = vm; }
+    public LoadNonCompleteBatchesCommand(MainBatchVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -17,7 +17,7 @@ public class ShowPickLinesCommand : ICommand
 
     public async void Execute(object? parameter)
     {
-        await VM.ShowPickLinesAsync();
+        await VM.LoadNonCompleteBatches();
     }
 
     public event EventHandler? CanExecuteChanged

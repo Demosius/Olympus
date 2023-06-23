@@ -1648,8 +1648,10 @@ public static class DataConversion
                 if (!DateTime.TryParse(row[col.LastTimeCartonizedTime], out var ctnTime)) ctnTime = DateTime.Now;
                 if (!int.TryParse(row[col.Cartons], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var cartons)) cartons = 0;
                 if (!int.TryParse(row[col.Units], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var units)) units = 0;
-                var ptlString = row[col.PTLFileCreated];
-                var ptlCreated = ptlString.ToUpper() == "YES";
+                var ptlCreated = row[col.PTLFileCreated].ToUpper() == "YES";
+                var cartonized = row[col.Cartonized].ToUpper() == "YES";
+                var shipmentCreated = row[col.ShipmentCreated].ToUpper() == "YES";
+                var fullyShipped = row[col.FullyShipped].ToUpper() == "YES";
 
                 var batch = new Batch
                 {
@@ -1663,7 +1665,11 @@ public static class DataConversion
                     Units = units,
                     Priority = Batch.DetectPriority(desc),
                     TagString = string.Join(',', Batch.DetectTags(desc, batchNo).OrderBy(s => s)),
-                    Progress = ptlCreated ? EBatchProgress.SentToPick : cartons == 0 ? EBatchProgress.Created : EBatchProgress.AutoRun
+                    Progress = fullyShipped ? EBatchProgress.Completed : 
+                        ptlCreated ? EBatchProgress.SentToPick : 
+                        shipmentCreated ? EBatchProgress.AutoRun :
+                        cartonized ? EBatchProgress.Cartonized : 
+                        EBatchProgress.Created,
                 };
                 batches.Add(batch);
             }

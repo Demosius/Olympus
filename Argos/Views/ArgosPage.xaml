@@ -21,7 +21,7 @@
     </Page.Resources>
 
     <TabControl Background="{StaticResource Brush05}">
-        <TabItem Header="Main View">
+        <TabItem Header="Batch Manager">
             <components:MainBatchView DataContext="{Binding MainBatchVM}"/>
         </TabItem>
         <TabItem Header="CCN Command">

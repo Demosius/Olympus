@@ -4,20 +4,20 @@ using Argos.ViewModels.Components;
 
 namespace Argos.ViewModels.Commands;
 
-public class ShowPickLinesCommand : ICommand
+public class MultiSetProgressCommand : ICommand
 {
-    public BatchVM VM { get; set; }
+    public MainBatchVM VM { get; set; }
 
-    public ShowPickLinesCommand(BatchVM vm) { VM = vm; }
+    public MultiSetProgressCommand(MainBatchVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return true;
+        return VM.SelectedBatches.Count > 1;
     }
 
     public async void Execute(object? parameter)
     {
-        await VM.ShowPickLinesAsync();
+        await VM.MultiSetProgressAsync();
     }
 
     public event EventHandler? CanExecuteChanged

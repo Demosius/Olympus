@@ -12,7 +12,6 @@ using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
-using Uranus.Inventory;
 using Uranus.Inventory.Models;
 
 namespace Argos.ViewModels.Components;
@@ -207,6 +206,26 @@ public class BatchVM : INotifyPropertyChanged, IDBInteraction
             _ = Save();
         }
     }
+    
+    public int LineCount
+    {
+        get => Batch.LineCount;
+        set
+        {
+            Batch.LineCount = value;
+            OnPropertyChanged();
+        }
+    }
+    
+    public int CalculatedUnits
+    {
+        get => Batch.CalculatedUnits;
+        set
+        {
+            Batch.CalculatedUnits = value;
+            OnPropertyChanged();
+        }
+    }
 
     #endregion
 
@@ -222,28 +241,6 @@ public class BatchVM : INotifyPropertyChanged, IDBInteraction
         set
         {
             selectedTag = value;
-            OnPropertyChanged();
-        }
-    }
-
-    private int lineCount;
-    public int LineCount
-    {
-        get => lineCount;
-        set
-        {
-            lineCount = value;
-            OnPropertyChanged();
-        }
-    }
-
-    private int calculatedUnits;
-    public int CalculatedUnits
-    {
-        get => calculatedUnits;
-        set
-        {
-            calculatedUnits = value;
             OnPropertyChanged();
         }
     }
@@ -267,10 +264,7 @@ public class BatchVM : INotifyPropertyChanged, IDBInteraction
 
         PickLines = new ObservableCollection<PickLine>(Batch.PickLines);
         Tags = new ObservableCollection<string>(Batch.Tags);
-
-        lineCount = PickLines.Count;
-        calculatedUnits = PickLines.Where(l => l.ActionType == EAction.Take).Sum(l => l.BaseQty);
-
+        
         RefreshDataCommand = new RefreshDataCommand(this);
         DeleteTagCommand = new DeleteTagCommand(this);
         ShowPickLinesCommand = new ShowPickLinesCommand(this);
@@ -286,12 +280,20 @@ public class BatchVM : INotifyPropertyChanged, IDBInteraction
 
     public async Task CalculateHits()
     {
-        Batch.CalculateHits();
+        var pickLines = await Helios.InventoryReader.PickLinesAsync(l => l.BatchID == ID);
+        CalculateHits(pickLines);
+        await Save();
+    }
+
+    public void CalculateHits(List<PickLine> pickLines)
+    {
+        Batch.CalculateHits(pickLines);
         OnPropertyChanged(nameof(Hits));
         OnPropertyChanged(nameof(PKHits));
         OnPropertyChanged(nameof(BulkHits));
         OnPropertyChanged(nameof(SP01Hits));
-        await Save();
+        OnPropertyChanged(nameof(LineCount));
+        OnPropertyChanged(nameof(CalculatedUnits));
     }
 
     public async Task DeleteTagAsync()
@@ -329,10 +331,23 @@ public class BatchVM : INotifyPropertyChanged, IDBInteraction
         OnPropertyChanged(nameof(TagString));
     }
 
-    public void ShowPickLines()
+    public async Task ShowPickLinesAsync()
     {
-        var pickWindow = new PickLineWindow(PickLines);
+        var pickLines = await Helios.InventoryReader.PickLinesAsync(l => l.BatchID == ID);
+        var pickWindow = new PickLineWindow(pickLines);
         pickWindow.ShowDialog();
+    }
+
+    public void SetBatchFillProgress(EBatchFillProgress progress)
+    {
+        Batch.FillProgress = progress;
+        OnPropertyChanged(nameof(BatchFillProgress));
+    }
+
+    public void SetBatchProgress(EBatchProgress progress)
+    {
+        Batch.Progress = progress;
+        OnPropertyChanged(nameof(BatchProgress));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

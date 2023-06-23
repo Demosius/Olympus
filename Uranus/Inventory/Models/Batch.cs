@@ -10,6 +10,7 @@ namespace Uranus.Inventory.Models;
 public enum EBatchProgress
 {
     Created,
+    Cartonized,
     AutoRun,
     FileExported,
     DataUploaded,
@@ -47,6 +48,8 @@ public class Batch
     public EBatchProgress Progress { get; set; }
     public EBatchFillProgress FillProgress { get; set; }
     public bool Persist { get; set; }
+    public int LineCount { get; set; }
+    public int CalculatedUnits { get; set; }
 
     [OneToMany(nameof(Move.BatchID), nameof(Move.Batch), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Move> Moves { get; set; }
@@ -157,6 +160,18 @@ public class Batch
         BulkHits = PickLines.Count(l => l.ActionType == EAction.Take && Regex.IsMatch(l.ZoneCode, "^BLK", RegexOptions.IgnoreCase));
         PKHits = PickLines.Count(l => l.ActionType == EAction.Take && l.ZoneCode == "PK");
         SP01Hits = PickLines.Count(l => l.ActionType == EAction.Take && l.ZoneCode is "PO PK" or "SP PK" or "SUP PK");
+        LineCount = PickLines.Count;
+        CalculatedUnits = PickLines.Where(l => l.ActionType == EAction.Take).Sum(l => l.BaseQty);
+    }
+
+    public void CalculateHits(List<PickLine> pickLines)
+    {
+        Hits = pickLines.Count(l => l.ActionType == EAction.Take);
+        BulkHits = pickLines.Count(l => l.ActionType == EAction.Take && Regex.IsMatch(l.ZoneCode, "^BLK", RegexOptions.IgnoreCase));
+        PKHits = pickLines.Count(l => l.ActionType == EAction.Take && l.ZoneCode == "PK");
+        SP01Hits = pickLines.Count(l => l.ActionType == EAction.Take && l.ZoneCode is "PO PK" or "SP PK" or "SUP PK");
+        LineCount = pickLines.Count;
+        CalculatedUnits = pickLines.Where(l => l.ActionType == EAction.Take).Sum(l => l.BaseQty);
     }
 
     public void SetTags()
