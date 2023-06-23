@@ -17,7 +17,7 @@ public class DeleteEmployeeCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.DeleteEmployee();
+        EmployeePageVM.DeleteEmployee();
     }
 
     public event EventHandler? CanExecuteChanged

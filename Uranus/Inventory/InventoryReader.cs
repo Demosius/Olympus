@@ -951,4 +951,130 @@ public class InventoryReader
         await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return (mixedCartons, mcItems, items, stockData);
     }
+
+    public async Task<List<Batch>> BatchesAsync(DateTime date) =>
+        await Chariot.PullObjectListAsync<Batch>(b => b.CreatedOn == date);
+
+    public async Task<(List<BatchGroup> groups, List<Batch> batches)> BatchGroupsAsync(DateTime date)
+    {
+        // TODO: Rework this whole thing when we figure out how to manage Groups (particularly M vs VM).
+        var groups = new List<BatchGroup>();
+        var batches = new List<Batch>();
+        var links = new List<BatchGroupLink>();
+
+        void Action()
+        {
+            groups = Chariot.PullObjectList<BatchGroup>(g => g.StartDate <= date && g.EndDate >= date);
+            links = Chariot.PullObjectList<BatchGroupLink>(l => groups.Select(g => g.Name).Contains(l.GroupName));
+            var batchIDs = links.Select(l => l.BatchID);
+            batches = Chariot.PullObjectList<Batch>(b =>
+                b.CreatedOn == date || b.LastTimeCartonizedDate == date || batchIDs.Contains(b.ID));
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        var groupDict = groups.ToDictionary(g => g.Name, g => g);
+        var batchDict = batches.ToDictionary(b => b.ID, b => b);
+
+        foreach (var link in links)
+        {
+            if (!groupDict.TryGetValue(link.GroupName, out var group)) continue;
+            if (!batchDict.TryGetValue(link.BatchID, out var batch)) continue;
+
+            group.AddBatch(batch);
+        }
+
+        return (groups, batches);
+    }
+
+    /*************************************** BATCHES & TO LINES ********************************************/
+    public async Task<List<BatchTOGroup>> BatchTOLineDataAsync(Expression<Func<BatchTOLine, bool>>? filter = null)
+    {
+        var groups = new List<BatchTOGroup>();
+
+        void Action()
+        {
+            // By default, pull lines that have not been finalized.
+            var lines = filter is null ? 
+                Chariot.PullObjectList<BatchTOLine>(l => !l.IsFinalised) : 
+                Chariot.PullObjectList(filter);
+
+            var stores = Chariot.PullObjectList<Store>().ToDictionary(s => s.Number, s => s);
+
+            var batches = Chariot.PullObjectList<Batch>().ToDictionary(b => b.ID, b => b);
+
+            var groupIDs = lines.Select(l => l.GroupID).Distinct();
+
+            var groupDict = Chariot.PullObjectList<BatchTOGroup>(g => groupIDs.Contains(g.ID)).ToDictionary(group => group.ID, group => group);
+            var newGroups = new List<BatchTOGroup>();
+
+            foreach (var line in lines)
+            {
+                if (stores.TryGetValue(line.StoreNo, out var store)) store.AddTOLine(line);
+
+                if (!groupDict.TryGetValue(line.GroupID, out var group))
+                {
+                    group = new BatchTOGroup
+                    {
+                        ID = line.GroupID
+                    };
+                    newGroups.Add(group);
+                    groupDict.Add(line.GroupID, group);
+                }
+
+                group.Lines.Add(line);
+
+                if (!batches.TryGetValue(line.BatchID, out  var batch)) continue;
+
+                batch.TOLines.Add(line);
+                line.Batch = batch;
+            }
+
+            foreach (var newGroup in newGroups)
+            {
+                newGroup.SetData();
+                groups.Add(newGroup);
+            }
+
+            Chariot.InsertIntoTable(newGroups);
+
+            groups.AddRange(groupDict.Values);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return groups;
+    }
+
+    public async Task<List<Batch>> BatchesAsync(Expression<Func<Batch, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType);
+
+    public async Task<List<Batch>> BatchesWithPickLinesAsync(Expression<Func<Batch, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly)
+    {
+        var batches = new List<Batch>();
+
+        void Action()
+        {
+            batches = Chariot.PullObjectList(filter, pullType);
+            var batchIDs = batches.Select(b => b.ID);
+            var pickLines = Chariot.PullObjectList<PickLine>(l => batchIDs.Contains(l.BatchID))
+                .GroupBy(l => l.BatchID)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var batch in batches)
+            {
+                if (!pickLines.TryGetValue(batch.ID, out var lines)) continue;
+                batch.PickLines = lines;
+            }
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return batches;
+    }
+
+    public async Task<Batch?> BatchAsync(string batchID) => await Task.Run(() => Chariot.PullObject<Batch>(batchID));
+
+    public async Task<List<PickLine>> PickLinesAsync(Expression<Func<PickLine, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 }

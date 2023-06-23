@@ -66,6 +66,7 @@
     <None Remove="Resources\img\document-pdf.png" />
     <None Remove="Resources\img\dog.jpg" />
     <None Remove="Resources\img\edit.png" />
+    <None Remove="Resources\img\folder--arrow.png" />
     <None Remove="Resources\img\fox.png" />
     <None Remove="Resources\img\plus-circle-frame.png" />
     <None Remove="Resources\img\plus-small.png" />
@@ -145,6 +146,7 @@
     <Resource Include="Resources\img\dog.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\img\folder--arrow.png" />
     <Resource Include="Resources\img\fox.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

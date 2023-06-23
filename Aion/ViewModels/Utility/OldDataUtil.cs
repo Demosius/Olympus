@@ -57,7 +57,7 @@ public static class OldDataUtil
 
     public static Employee ConvertEmployee(BrokeEmployee employee)
     {
-        Enum.TryParse(typeof(EEmploymentType), (employee.EmploymentType ?? "CA")[..2], true, out var result);
+        Enum.TryParse(typeof(EEmploymentType), employee.EmploymentType[..2], true, out var result);
         var eType = (EEmploymentType)(result ?? EEmploymentType.CA.ToString());
         return new Employee
         {
@@ -99,21 +99,21 @@ public static class OldDataUtil
         {
             ID = clock.ID,
             EmployeeID = clock.EmployeeCode,
-            Timestamp = clock.Timestamp,
+            Timestamp = clock.Timestamp ?? string.Empty,
             Date = clock.Date,
             Time = clock.Time,
             Status = (EClockStatus)clock.Status
         };
     }
 
-    public static AionDataSet GetArchivedData()
+    public static AionDataSet? GetArchivedData()
     {
         var dbPath = GetAionDB();
         if (dbPath is null or "") return new AionDataSet();
 
         if (!InitializeDatabase(dbPath)) return new AionDataSet();
 
-        AionDataSet newSet = null;
+        AionDataSet? newSet = null;
 
         new SQLiteConnection(dbPath).RunInTransaction(() =>
         {

@@ -29,7 +29,7 @@ public class ObsoleteDBUtil
         InitializeDatabase(BaseDataDirectory);
     }
 
-    public static void InitializeDatabase([Uranus.Annotations.NotNull] string directory)
+    public static void InitializeDatabase(string directory)
     {
         var tables = new[]
         {
@@ -60,7 +60,7 @@ public class ObsoleteDBUtil
         return Conn(BaseDataDirectory);
     }
 
-    public static SQLiteConnection Conn([Uranus.Annotations.NotNull] string dbDirectory)
+    public static SQLiteConnection Conn(string dbDirectory)
     {
         try
         {
@@ -282,7 +282,7 @@ public class ObsoleteDBUtil
         catch
         {
             _ = MessageBox.Show("Unexpected Error. DBUtil - GetManagers");
-            return null;
+            return new List<Employee>();
         }
     }
 
@@ -295,7 +295,7 @@ public class ObsoleteDBUtil
         catch
         {
             _ = MessageBox.Show("Unexpected Error. DBUtil - GetManagerIDs");
-            return null;
+            return new List<int>();
         }
     }
 
@@ -351,7 +351,7 @@ public class ObsoleteDBUtil
         catch
         {
             _ = MessageBox.Show("Unexpected Error. DBUtil - GetManagerIDs");
-            return null;
+            return new List<DailyEntry>();
         }
     }
 
@@ -370,7 +370,7 @@ public class ObsoleteDBUtil
         catch
         {
             _ = MessageBox.Show("Unexpected Error. DBUtil - GetManagedEmployees");
-            return null;
+            return new List<Employee>();
         }
     }
 
@@ -388,7 +388,7 @@ public class ObsoleteDBUtil
         catch
         {
             _ = MessageBox.Show("Unexpected Error. DBUtil - GetEmployeeCodes");
-            return null;
+            return new List<int>();
         }
     }
 
@@ -401,7 +401,7 @@ public class ObsoleteDBUtil
         catch
         {
             _ = MessageBox.Show("Unexpected Error. DBUtil - GetEmployeeCodes");
-            return null;
+            return new List<string>();
         }
     }
 
@@ -414,7 +414,7 @@ public class ObsoleteDBUtil
         catch
         {
             _ = MessageBox.Show("Unexpected Error. DBUtil - GetEmploymentTypes");
-            return null;
+            return new List<EEmploymentType>();
         }
     }
 
@@ -427,7 +427,7 @@ public class ObsoleteDBUtil
         catch
         {
             _ = MessageBox.Show("Unexpected Error. DBUtil - GetJobClassifications");
-            return null;
+            return new List<string>();
         }
     }
 

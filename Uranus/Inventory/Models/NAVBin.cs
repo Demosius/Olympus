@@ -36,6 +36,8 @@ public class NAVBin
     public List<Move> ToMoves { get; set; }
     [OneToMany(nameof(NAVMoveLine.BinID), nameof(NAVMoveLine.Bin), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVMoveLine> MoveLines { get; set; }
+    [OneToMany(nameof(PickLine.CartonID), nameof(PickLine.BatchTOLine), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<PickLine> PickLines { get; set; }
 
     [OneToOne(nameof(ID), nameof(BinExtension.BinID), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public BinExtension? Extension { get; set; }
@@ -77,6 +79,7 @@ public class NAVBin
         FromMoves = new List<Move>();
         ToMoves = new List<Move>();
         MoveLines = new List<NAVMoveLine>();
+        PickLines = new List<PickLine>();
     }
 
     public NAVBin(string code, NAVZone zone)
@@ -95,33 +98,7 @@ public class NAVBin
         FromMoves = new List<Move>();
         ToMoves = new List<Move>();
         MoveLines = new List<NAVMoveLine>();
-    }
-
-    public NAVBin(string id, string zoneID, string locationCode, string zoneCode, string code, string description,
-        bool empty, bool assigned, int ranking, double usedCube, double maxCube, DateTime lastCcDate,
-        DateTime lastPiDate, NAVZone zone, List<NAVStock> navStock, Dictionary<int, Stock> stock, List<Move> fromMoves,
-        List<Move> toMoves, List<NAVMoveLine> moveLines, BinExtension extension)
-    {
-        ID = id;
-        ZoneID = zoneID;
-        LocationCode = locationCode;
-        ZoneCode = zoneCode;
-        Code = code;
-        Description = description;
-        Empty = empty;
-        Assigned = assigned;
-        Ranking = ranking;
-        UsedCube = usedCube;
-        MaxCube = maxCube;
-        LastCCDate = lastCcDate;
-        LastPIDate = lastPiDate;
-        Zone = zone;
-        NAVStock = navStock;
-        Stock = stock;
-        FromMoves = fromMoves;
-        ToMoves = toMoves;
-        MoveLines = moveLines;
-        Extension = extension;
+        PickLines = new List<PickLine>();
     }
 
     /// <summary>

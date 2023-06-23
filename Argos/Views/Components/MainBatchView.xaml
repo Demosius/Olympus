@@ -1,0 +1,357 @@
+﻿<UserControl x:Class="Argos.Views.Components.MainBatchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:Argos.ViewModels.Components"
+             xmlns:model="clr-namespace:Uranus.Inventory.Models;assembly=Uranus"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:MainBatchVM}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </UserControl.InputBindings>
+
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="BatchProgress"
+                            MethodName="GetValues" 
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="model:EBatchProgress"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="BatchFillProgress"
+                            MethodName="GetValues" 
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="model:EBatchFillProgress"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <StackPanel Orientation="Horizontal"
+                    DockPanel.Dock="Top">
+            <Button Margin="5"
+                    Content="Upload Batch Data"
+                    Command="{Binding UploadBatchesCommand}"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal"
+                    DockPanel.Dock="Top">
+            <Button Content="Load All Non-Complete"
+                    Margin="5"
+                    Command="{Binding LoadNonCompleteBatchesCommand}"/>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+                       Margin="5"/>
+            <DatePicker SelectedDate="{Binding StartDate}"
+                        Margin="5,2"/>
+            <DatePicker SelectedDate="{Binding EndDate}"
+                        Margin="5,2"/>
+            <CheckBox Content="Show Web"
+                      IsChecked="{Binding ShowWeb}"/>
+            <CheckBox Content="Show MB"
+                      IsChecked="{Binding ShowMB}"/>
+            <TextBox Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="15,5,5,5"
+                     MinWidth="80"
+                     ToolTip="Filter/Search"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal"
+                    DockPanel.Dock="Bottom">
+            <Label Content="SUM:"
+                   VerticalContentAlignment="Center"
+                   FontWeight="Bold"/>
+            <StackPanel Orientation="Vertical">
+                <Label Content="UNITS"
+                       HorizontalAlignment="Center"
+                       FontSize="8"
+                       Margin="5,5,5,0"
+                       Padding="0"
+                       FontWeight="Bold"/>
+                <Label Content="{Binding UnitSum}"
+                       HorizontalAlignment="Center"
+                       Padding="0"
+                       Margin="5,0,5,5"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Label Content="HITS"
+                       HorizontalAlignment="Center"
+                       FontSize="8"
+                       Margin="5,5,5,0"
+                       Padding="0"
+                       FontWeight="Bold"/>
+                <Label Content="{Binding HitSum}"
+                       HorizontalAlignment="Center"
+                       Padding="0"
+                       Margin="5,0,5,5"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Label Content="BULK HITS"
+                       HorizontalAlignment="Center"
+                       FontSize="8"
+                       Margin="5,5,5,0"
+                       Padding="0"
+                       FontWeight="Bold"/>
+                <Label Content="{Binding BlkSum}"
+                       HorizontalAlignment="Center"
+                       Padding="0"
+                       Margin="5,0,5,5"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Label Content="PK HITS"
+                       HorizontalAlignment="Center"
+                       FontSize="8"
+                       Margin="5,5,5,0"
+                       Padding="0"
+                       FontWeight="Bold"/>
+                <Label Content="{Binding PKSum}"
+                       HorizontalAlignment="Center"
+                       Padding="0"
+                       Margin="5,0,5,5"/>
+            </StackPanel>
+            <StackPanel Orientation="Vertical">
+                <Label Content="SP01 HITS"
+                       HorizontalAlignment="Center"
+                       FontSize="8"
+                       Margin="5,5,5,0"
+                       Padding="0"
+                       FontWeight="Bold"/>
+                <Label Content="{Binding SPSum}"
+                       HorizontalAlignment="Center"
+                       Padding="0"
+                       Margin="5,0,5,5"/>
+            </StackPanel>
+        </StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <DataGrid Grid.Column="0"
+                      Name="BatchGrid"
+                      SelectionChanged="BatchGrid_OnSelectionChanged"
+                      ItemsSource="{Binding Batches}"
+                      SelectedItem="{Binding SelectedBatch}"
+                      d:ItemsSource="{d:SampleData ItemCount=5}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      CanUserResizeRows="False"
+                      CanUserResizeColumns="True"
+                      CanUserSortColumns="True"
+                      CanUserReorderColumns="True"
+                      Margin="0,0,5,0">
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Set Priority Fill Progress"
+                                  Command="{Binding SetPriorityFillProgressCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="Set Restock Progress (Multi)"
+                                  Command="{Binding MultiSetProgressCommand}"/>
+                        <MenuItem Header="Set Replen Progress (Multi)"
+                                  Command="{Binding MultiSetFillProgressCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="Add Tag (Multi)"
+                                  Command="{Binding MultiAddTagCommand}"/>
+                        <MenuItem Header="Remove Tag (Multi)"
+                                  Command="{Binding MultiRemoveTagCommand}"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="Persist"
+                                            Binding="{Binding Persist}"
+                                            IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Batch No."
+                                        Binding="{Binding ID}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Description"
+                                        Binding="{Binding Description}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Created On"
+                                        Binding="{Binding CreatedOn, StringFormat='dd-MMM-yyyy'}"
+                                        IsReadOnly="False"/>
+                    <!--<DataGridTextColumn Header="Created By"
+                                        Binding="{Binding CreatedBy}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Last Cartonized Date"
+                                        Binding="{Binding LastTimeCartonizedDate, StringFormat='dd-MMM-yyyy'}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Last Cartonized Time"
+                                        Binding="{Binding LastTimeCartonizedTime, StringFormat='HH:mm:ss'}"
+                                        IsReadOnly="False"/>-->
+                    <DataGridTextColumn Header="Cartons"
+                                        Binding="{Binding Cartons}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Units"
+                                        Binding="{Binding Units}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Hits"
+                                        Binding="{Binding Hits}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Bulk Hits"
+                                        Binding="{Binding BulkHits}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="PK Hits"
+                                        Binding="{Binding PKHits}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="SP01 Hits"
+                                        Binding="{Binding SP01Hits}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Priority"
+                                        Binding="{Binding Priority}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Tags"
+                                        Binding="{Binding TagString}"
+                                        IsReadOnly="True"/>
+                    <DataGridComboBoxColumn Header="Restock Progress"
+                                            SelectedItemBinding="{Binding BatchProgress}"
+                                            ItemsSource="{Binding Source={StaticResource BatchProgress}}"/>
+                    <DataGridComboBoxColumn Header="Replen Progress"
+                                            SelectedItemBinding="{Binding BatchFillProgress}"
+                                            ItemsSource="{Binding Source={StaticResource BatchFillProgress}}"/>
+
+                </DataGrid.Columns>
+            </DataGrid>
+            <GridSplitter Grid.Column="0"/>
+            <Border Grid.Column="1"
+                    BorderThickness="1"
+                    BorderBrush="{StaticResource Brush01}">
+                <DockPanel>
+                    <StackPanel Orientation="Horizontal"
+                                DockPanel.Dock="Top">
+                        <Button Margin="5"
+                                Padding="2,0,5,0"
+                                Command="{Binding UploadPickLinesCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../../Resources/arrow-transition-270.png"
+                                       MaxWidth="20"
+                                       MaxHeight="20"
+                                       Margin="2"/>
+                                <Label Content="Insert Pick Lines"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Margin="5"
+                                Padding="2,0,5,0"
+                                Command="{Binding CalculateHitsCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../../Resources/calculator-gray.png"
+                                       MaxWidth="20"
+                                       MaxHeight="20"
+                                       Margin="2"/>
+                                <Label Content="Calculate Hits"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                    <DockPanel DataContext="{Binding SelectedBatch}">
+                        <Label DockPanel.Dock="Top" 
+                               Content="{Binding}"
+                               FontSize="16" FontWeight="Bold"
+                               Margin="0"
+                               Padding="0"
+                               HorizontalAlignment="Center"
+                               Foreground="{StaticResource Brush01}"/>
+                        <StackPanel DockPanel.Dock="Top"
+                                    Orientation="Horizontal">
+                            <Label Content="TAGS:"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   VerticalContentAlignment="Center"/>
+                            <ListView ItemsSource="{Binding Tags, Mode=OneWay}"
+                                      SelectedValue="{Binding SelectedTag, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Margin="2,2,0,2"
+                                      MinWidth="80">
+                                <ListView.InputBindings>
+                                    <KeyBinding Command="{Binding DeleteTagCommand}" Key="Delete"/>
+                                </ListView.InputBindings>
+                                <ListView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel />
+                                    </ItemsPanelTemplate>
+                                </ListView.ItemsPanel>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="Magenta"
+                                                Background="#303"
+                                                BorderThickness="1"
+                                                Margin="2"
+                                                Padding="5,2"
+                                                CornerRadius="10">
+                                            <TextBlock Text="{Binding}"
+                                                       FontSize="10" FontWeight="Bold"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                            <Button Padding="2"
+                                    Margin="0,2,2,2"
+                                    ToolTip="Add Tag"
+                                    Command="{Binding AddTagCommand}">
+                                <Image Source="../../Resources/plus.png"
+                                       MaxWidth="25"
+                                       MaxHeight="25"/>
+                            </Button>
+                        </StackPanel>
+
+                        <!-- Pick Line Data -->
+                        <StackPanel DockPanel.Dock="Top"
+                                    Orientation="Horizontal"> 
+                            <Button Margin="5"
+                                    Padding="2,0,5,0"
+                                    Command="{Binding ShowPickLinesCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="../../Resources/application-search-result.png"
+                                           MaxWidth="20"
+                                           MaxHeight="20"
+                                           Margin="2"/>
+                                    <Label Content="View Pick Lines"/>
+                                </StackPanel>
+                            </Button>
+                            <StackPanel Orientation="Vertical">
+                                <Label Content="Line Count"
+                                       HorizontalAlignment="Center"
+                                       FontSize="8"
+                                       Margin="5,5,5,0"
+                                       Padding="0"
+                                       FontWeight="Bold"/>
+                                <Label Content="{Binding LineCount}"
+                                       HorizontalAlignment="Center"
+                                       Padding="0"
+                                       Margin="5,0,5,5"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical">
+                                <Label Content="Calc. Units"
+                                       HorizontalAlignment="Center"
+                                       FontSize="8"
+                                       Margin="5,5,5,0"
+                                       Padding="0"
+                                       FontWeight="Bold"/>
+                                <Label Content="{Binding CalculatedUnits}"
+                                       HorizontalAlignment="Center"
+                                       Padding="0"
+                                       Margin="5,0,5,5"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical">
+                                <Label Content="Hits"
+                                       HorizontalAlignment="Center"
+                                       FontSize="8"
+                                       Margin="5,5,5,0"
+                                       Padding="0"
+                                       FontWeight="Bold"/>
+                                <Label Content="{Binding Hits}"
+                                       HorizontalAlignment="Center"
+                                       Padding="0"
+                                       Margin="5,0,5,5"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <DataGrid>
+                            
+                        </DataGrid>
+                    </DockPanel>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </DockPanel>
+
+</UserControl>

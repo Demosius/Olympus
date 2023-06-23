@@ -17,13 +17,14 @@ public sealed class InventoryChariot : MasterChariot
 
     public override Type[] Tables { get; } =
     {
-        typeof(Batch), typeof(Bay), typeof(BayZone), typeof(BinContentsUpdate),
+        typeof(Batch), typeof(BatchGroup), typeof(BatchGroupLink), typeof(Bay), typeof(BayZone), typeof(BinContentsUpdate),
         typeof(BinExtension), typeof(Move), typeof(NAVBin), typeof(NAVCategory),
         typeof(NAVDivision), typeof(NAVGenre), typeof(NAVItem), typeof(NAVLocation),
         typeof(NAVMoveLine), typeof(NAVPlatform), typeof(NAVStock), typeof(NAVTransferOrder),
         typeof(NAVUoM), typeof(NAVZone), typeof(Stock), typeof(Store),
         typeof(SubStock), typeof(TableUpdate), typeof(ZoneExtension), typeof(ItemExtension),
-        typeof(Site), typeof(SiteItemLevel), typeof(MixedCarton), typeof(MixedCartonItem)
+        typeof(Site), typeof(SiteItemLevel), typeof(MixedCarton), typeof(MixedCartonItem),
+        typeof(BatchTOLine), typeof(BatchTOGroup), typeof(PickLine),
     };
 
     /*************************** Constructors ****************************/

@@ -12,6 +12,14 @@
         FocusManager.FocusedElement="{Binding ElementName=Input}"
         WindowStartupLocation="CenterOwner">
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Master/MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Grid Background="{StaticResource Brush04}">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
@@ -24,6 +32,7 @@
         <!-- Prompt -->
         <Label Grid.Row="0"
                VerticalAlignment="Center"
+               HorizontalContentAlignment="Left"
                Content="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}"
                Margin="5"/>
 

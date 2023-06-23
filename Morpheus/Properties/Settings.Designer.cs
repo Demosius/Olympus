@@ -22,5 +22,18 @@ namespace Morpheus.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\ausefpdfs01ns\\Shares\\Public\\Lachlan Matthews\\Consigning\\Universal Wave Layout.x" +
+            "lsm")]
+        public string StoreFile {
+            get {
+                return ((string)(this["StoreFile"]));
+            }
+            set {
+                this["StoreFile"] = value;
+            }
+        }
     }
 }

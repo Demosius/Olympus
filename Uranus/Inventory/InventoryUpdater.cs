@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Uranus.Inventory.Models;
@@ -209,4 +210,133 @@ public class InventoryUpdater
         await Chariot.UpdateTableAsync(siteItemLevels).ConfigureAwait(false);
 
     public int Site(Site site) => Chariot.Update(site);
+
+    public async Task<int> BatchTOCartonDataAsync(List<BatchTOGroup> groups)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            var cartonLines = groups.SelectMany(g => g.Lines).ToList();
+            List<Batch> batches = cartonLines.Select(l => l.Batch).Where(b => b is not null).Distinct().ToList()!;
+
+            lines += Chariot.UpdateTable(groups);
+            lines += Chariot.UpdateTable(cartonLines);
+            lines += Chariot.UpdateTable(batches);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
+    }
+
+    public async Task<int> BatchTOCartonDataAsync(BatchTOGroup group)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            List<Batch> batches = group.Lines.Select(l => l.Batch).Where(b => b is not null).Distinct().ToList()!;
+
+            lines += Chariot.Update(group);
+            lines += Chariot.UpdateTable(group.Lines);
+            lines += Chariot.UpdateTable(batches);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
+    }
+
+    /// <summary>
+    /// Check batches of given IDs to determine if their progress should be updated.
+    ///
+    /// Update from DataUploaded (or below) to label files created if all lines have been processed.
+    /// Update from Files Created to Labels Printed if all listed output files do not exist.
+    /// </summary>
+    /// <param name="batchIDs"></param>
+    /// <returns></returns>
+    public async Task<int> BatchProgressCheck(List<string> batchIDs)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            var toLines = Chariot.PullObjectList<BatchTOLine>(l => batchIDs.Contains(l.BatchID))
+                .GroupBy(l => l.BatchID)
+                .ToDictionary(g => g.Key, g => g.ToList());
+            var batches = Chariot.PullObjectList<Batch>(batch => batchIDs.Contains(batch.ID));
+
+            var updateableBatches = new List<Batch>();
+
+            foreach (var batch in batches)
+            {
+                if (!toLines.TryGetValue(batch.ID, out var batchLines)) continue;
+                switch (batch.Progress)
+                {
+                    // Figure out which check we want to run.
+                    case <= EBatchProgress.DataUploaded:
+                        if (!batchLines.All(l => l.IsFinalised)) continue;
+                        batch.Progress = EBatchProgress.LabelFilesCreated;
+                        updateableBatches.Add(batch);
+                        break;
+
+                    case EBatchProgress.LabelFilesCreated:
+                        var files = batchLines.Select(l => Path.Join(l.FinalFileDirectory, l.FinalFileName))
+                            .Distinct()
+                            .ToList();
+                        if (files.Any(File.Exists)) continue;
+                        batch.Progress = EBatchProgress.LabelsPrinted;
+                        updateableBatches.Add(batch);
+                        break;
+
+                }
+            }
+
+            lines += Chariot.UpdateTable(updateableBatches);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
+    }
+
+    /// <summary>
+    /// Update using raw data from NAV, comparing new and old data to update relevant details
+    /// leaving current updated data.
+    /// </summary>
+    /// <param name="rawBatches"></param>
+    /// <returns></returns>
+    public async Task<int> RawBatchesAsync(List<Batch> rawBatches)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            var ids = rawBatches.Select(b => b.ID);
+            var currentBatches = Chariot.PullObjectList<Batch>(b => ids.Contains(b.ID)).ToDictionary(b => b.ID, b => b);
+            var batches = new List<Batch>();
+
+            foreach (var batch in rawBatches)
+            {
+                if (currentBatches.TryGetValue(batch.ID, out var currentBatch))
+                {
+                    currentBatch.MergeRaw(batch);
+                    batches.Add(currentBatch);
+                }
+                else
+                {
+                    batches.Add(batch);
+                }
+            }
+
+            lines += Chariot.UpdateTable(batches);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
+    }
+
+    public async Task<int> BatchAsync(Batch batch) => await Chariot.UpdateAsync(batch);
+
+    public async Task<int> StoreAsync(Store store) => await Chariot.UpdateAsync(store);
+
+    public async Task BatchesAsync(List<Batch> batches) => await Chariot.UpdateTableAsync(batches);
 }

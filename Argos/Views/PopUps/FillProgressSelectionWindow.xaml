@@ -1,0 +1,61 @@
+﻿<Window x:Class="Argos.Views.PopUps.FillProgressSelectionWindow"
+        Name="FillProgressSelectWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:Argos.ViewModels.PopUps"
+        xmlns:model="clr-namespace:Uranus.Inventory.Models;assembly=Uranus"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type vm:FillProgressSelectionVM}, IsDesignTimeCreatable=False}"
+        Title="Replen Progress Selection" 
+        Background="{StaticResource Brush05}"
+        SizeToContent="Height"
+        MinWidth="200" MaxWidth="300">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Yellow/MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <ObjectDataProvider x:Key="BatchFillProgress"
+                                MethodName="GetValues" 
+                                ObjectType="{x:Type sys:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="model:EBatchFillProgress"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <DockPanel>
+        <TextBlock Text="{Binding PromptString}"
+                   MaxWidth="250"
+                   TextWrapping="Wrap"
+                   DockPanel.Dock="Top"
+                   Margin="18,12"
+                   Foreground="{StaticResource ForegroundBrush}"
+                   FontSize="14"/>
+        <StackPanel DockPanel.Dock="Bottom"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,10,0,0">
+            <Button MinWidth="80"
+                    IsCancel="True"
+                    Content="Cancel"
+                    Margin="0,10,5,10"/>
+            <Button MinWidth="80"
+                    IsDefault="True"
+                    Command="{Binding ConfirmAndCloseCommand}"
+                    CommandParameter="{Binding ElementName=FillProgressSelectWindow}"
+                    Content="Confirm"
+                    Margin="5,10"/>
+        </StackPanel>
+        <ComboBox ItemsSource="{Binding Source={StaticResource BatchFillProgress}}"
+                  SelectedItem="{Binding FillProgress}"
+                  Margin="15,0"/>
+
+    </DockPanel>
+
+</Window>
