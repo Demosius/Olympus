@@ -142,6 +142,7 @@ public class NAVBin
     public bool MixedCartonStockConversion(MixedCartonIdentificationTool mcIDTool, bool createNewMixedCartons = false)
     {
         // Get potentially relevant stock lines.
+        var createdMC = false;
         var invalidStock = new List<Stock>();
         var allStock = Stock.Values.ToList();
         var validStock = createNewMixedCartons ? allStock : mcIDTool.GetValidStock(allStock, out invalidStock);
@@ -150,6 +151,7 @@ public class NAVBin
 
         while (mixedCarton is not null)
         {
+            createdMC = true;
             var mcStock = mixedCarton.GetValidStock(ref validStock);
 
             invalidStock.Add(new MixedCartonStock(mixedCarton, ref mcStock));
@@ -160,8 +162,10 @@ public class NAVBin
         }
 
         invalidStock.AddRange(validStock);
-        // TODO: Finish.
-        Stock = invalidStock.ToDictionary()
+
+        Stock = invalidStock.ToDictionary(s => s.ItemNumber, s => s);
+
+        return createdMC;
     }
 
     // Returns true if the given move represents the full quantity of the bin's contents.

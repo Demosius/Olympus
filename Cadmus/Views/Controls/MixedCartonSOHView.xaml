@@ -8,32 +8,60 @@
              d:DataContext="{d:DesignInstance {x:Type vm:MixedCartonSOH_VM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="1000">
 
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </UserControl.InputBindings>
+
     <DockPanel>
         <StackPanel DockPanel.Dock="Top"
                     Orientation="Horizontal">
-            <Button Margin="5">Generate Report</Button>
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
-            <Label Content="Check Zones: " 
+            <Button Margin="5"
+                    Content="Generate Report"
+                    Command="{Binding RefreshDataCommand}"/>
+            <CheckBox Content="Auto-Detect"
+                      ToolTip="Leave unchecked to use only established mixed cartons."
+                      IsChecked="{Binding AutoDetect}"/>
+
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+                       Margin="5"/>
+
+            <Label Content="Zone(s): " 
                    VerticalAlignment="Center"/>
             <TextBox Text="{Binding ZoneString}"
                      Margin="5"
                      MinWidth="75"/>
+            <Label Content="Location(s): " 
+                   VerticalAlignment="Center"/>
+            <TextBox Text="{Binding LocationString}"
+                     Margin="5"
+                     MinWidth="75"/>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+            <Label Content="FILTERS:"
+                   VerticalAlignment="Center"
+                   FontWeight="Bold"/>
+            <Label Content="Zone: " 
+                   VerticalAlignment="Center"/>
+            <TextBox Text="{Binding ZoneFilter}"
+                     Margin="5"
+                     MinWidth="75"/>
             <Label Content="Platform: " 
                    VerticalAlignment="Center"/>
-            <TextBox Text="{Binding PlatformString}"
+            <TextBox Text="{Binding PlatformFilter}"
                      Margin="5"
                      MinWidth="75"/>
             <Label Content="Category: " 
                    VerticalAlignment="Center"/>
-            <TextBox Text="{Binding CategoryString}"
+            <TextBox Text="{Binding CategoryFilter}"
                      Margin="5"
                      MinWidth="75"/>
             <Label Content="Division: " 
                    VerticalAlignment="Center"/>
-            <TextBox Text="{Binding DivisionString}"
+            <TextBox Text="{Binding DivisionFilter}"
                      Margin="5"
                      MinWidth="75"/>
-            <Button Command="{Binding ClearFiltersCommand}"
+            <Button Command="{Binding ApplyFiltersCommand}"
                     Width="30"
                     Height="30"
                     Margin="2"
@@ -51,6 +79,9 @@
             </Button>
         </StackPanel>
 
-        <DataGrid></DataGrid>
+        <DataGrid>
+
+        </DataGrid>
+
     </DockPanel>
 </UserControl>

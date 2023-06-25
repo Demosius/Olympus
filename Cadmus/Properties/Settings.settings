@@ -5,5 +5,11 @@
     <Setting Name="SolLocation" Type="System.String" Scope="User">
       <Value Profile="(Default)">\\ausefpdfs01ns\Shares\Public\DC_Data\Olympus\QA\Sol</Value>
     </Setting>
+    <Setting Name="MCZoneString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">MC</Value>
+    </Setting>
+    <Setting Name="MCLocationString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">9600</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -859,16 +859,16 @@ public class InventoryReader
 
     public int TOLineCount() => Chariot.ExecuteScalar<int>("SELECT count(*) FROM TOLineBatchAnalysis;");
 
-    public async Task<IEnumerable<MixedCarton>> MixedCartonsAsync(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
+    public async Task<List<MixedCarton>> MixedCartonsAsync(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
         => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
-    public IEnumerable<MixedCarton> MixedCartons(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
+    public List<MixedCarton> MixedCartons(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
         => Chariot.PullObjectList(filter, pullType);
 
-    public async Task<IEnumerable<MixedCartonItem>> MixedCartonItemsAsync(Expression<Func<MixedCartonItem, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
+    public async Task<List<MixedCartonItem>> MixedCartonItemsAsync(Expression<Func<MixedCartonItem, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
         => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
-    public IEnumerable<MixedCartonItem> MixedCartonItems(Expression<Func<MixedCartonItem, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
+    public List<MixedCartonItem> MixedCartonItems(Expression<Func<MixedCartonItem, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
         => Chariot.PullObjectList(filter, pullType);
 
     public async Task<IEnumerable<MixedCarton>> MixedCartonTemplatesAsync(Expression<Func<MixedCarton, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
@@ -919,18 +919,19 @@ public class InventoryReader
     }
 
     public async
-        Task<(List<MixedCarton> mixedCartons, List<MixedCartonItem> mcItems, List<NAVItem> items, BasicStockDataSet)>
+        Task<(List<MixedCarton> mixedCartons, List<MixedCartonItem> mcItems, BasicStockDataSet)>
         MixedCartonStockAsync(IEnumerable<string> zoneCodes, IEnumerable<string> locations)
     {
         // TODO: Figure out what needs to be returned, and complete function.
+        var mixedCartons = new List<MixedCarton>();
         var mcItems = new List<MixedCartonItem>();
         var stockData = new BasicStockDataSet();
 
         void Action()
         {
             stockData = BasicStockDataSet(zoneCodes, locations);
-            mcItems = MixedCartonItems().ToList();
-            var mixedCartons = MixedCartons().ToDictionary(mc => mc.ID, mc => mc);
+            mcItems = MixedCartonItems();
+            var mcDict = MixedCartons().ToDictionary(mc => mc.ID, mc => mc);
 
             var items = stockData.Items;
 
@@ -942,14 +943,14 @@ public class InventoryReader
                     item.MixedCartons.Add(mixedCartonItem);
                 }
 
-                if (!mixedCartons.TryGetValue(mixedCartonItem.MixedCartonID, out var mixedCarton)) continue;
+                if (!mcDict.TryGetValue(mixedCartonItem.MixedCartonID, out var mixedCarton)) continue;
                 mixedCartonItem.MixedCarton = mixedCarton;
                 mixedCarton.Items.Add(mixedCartonItem);
             }
         }
 
         await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
-        return (mixedCartons, mcItems, items, stockData);
+        return (mixedCartons, mcItems, stockData);
     }
 
     public async Task<List<Batch>> BatchesAsync(DateTime date) =>
