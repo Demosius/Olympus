@@ -226,9 +226,12 @@ public class BatchTOGroupVM : INotifyPropertyChanged
             range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
+        // Get data in the correct sort order.
+        var lines = GetSortedLines;
+
         // Fill remaining data
         var row = 1;
-        foreach (var line in Lines)
+        foreach (var line in lines)
         {
             row++;
             sheet.Cells[row, 1].Value = line.StoreNo;
@@ -384,18 +387,17 @@ public class BatchTOGroupVM : INotifyPropertyChanged
         File.Move(backUpFilePath, Path.Join(ogDir, ogFileName));
     }
 
-    public async Task SetObservableLinesAsync()
-    {
-        ObservableLines = await GetObservableLinesAsync();
-    }
-
-    public ObservableCollection<BatchTOLineVM> GetObservableLines() => new((ReverseSort
-            ? Lines.OrderBy(l => l.CartonType).ThenByDescending(l => l.StartBin).ThenByDescending(l => l.EndBin)
-            : Lines.OrderBy(l => l.CartonType).ThenBy(l => l.StartBin).ThenByDescending(l => l.EndBin))
-        .Select(l => new BatchTOLineVM(l))
-        .ToList());
+    public async Task SetObservableLinesAsync() => ObservableLines = await GetObservableLinesAsync();
 
     public async Task<ObservableCollection<BatchTOLineVM>> GetObservableLinesAsync() => await Task.Run(GetObservableLines);
+
+    public ObservableCollection<BatchTOLineVM> GetObservableLines() => new(GetSortedLineVMs);
+
+    public List<BatchTOLineVM> GetSortedLineVMs => GetSortedLines.Select(l => new BatchTOLineVM(l)).ToList();
+
+    public IEnumerable<BatchTOLine> GetSortedLines => ReverseSort
+        ? Lines.OrderBy(l => l.CartonType).ThenByDescending(l => l.StartBin).ThenByDescending(l => l.EndBin)
+        : Lines.OrderBy(l => l.CartonType).ThenBy(l => l.StartBin).ThenByDescending(l => l.EndBin);
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
