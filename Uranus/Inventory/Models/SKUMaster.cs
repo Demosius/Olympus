@@ -329,7 +329,7 @@ public class SkuMaster
                     TotalEachesOnHand += s.Qty;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(uom), "Unexpected UoM value.");
+                    throw new ArgumentOutOfRangeException(nameof(uom), @"Unexpected UoM value.");
             }
             BaseUnitsOnHand += s.GetBaseQty();
             TotalWeight += s.GetWeight();

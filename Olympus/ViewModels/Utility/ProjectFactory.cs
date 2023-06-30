@@ -35,7 +35,7 @@ public static class ProjectFactory
             EProject.Khaos => new KhaosPage(),
             EProject.Aion => new AionPage(App.Helios, App.Charon),
             EProject.Hydra => new HydraPage(App.Helios, App.Charon),
-            EProject.Cadmus => new CadmusPage(App.Helios),
+            EProject.Cadmus => new CadmusPage(App.Helios, App.ProgressBar),
             EProject.Sphynx => new SphynxPage(App.Helios, App.Charon),
             EProject.Argos => new ArgosPage(App.Helios),
             EProject.Hades => new HadesPage(App.Helios),

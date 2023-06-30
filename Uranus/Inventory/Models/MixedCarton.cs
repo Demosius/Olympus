@@ -57,11 +57,38 @@ public class MixedCarton
         set => signature = value;
     }
 
+    private string? platform;
+    [Ignore]
+    public string Platform
+    {
+        get => platform ??= string.Join('|', Items.Select(i => i.Platform).Distinct());
+        set => platform = value;
+    }
+
+    private string? category;
+    [Ignore]
+    public string Category
+    {
+        get => category ??= string.Join('|', Items.Select(i => i.Category).Distinct());
+        set => category = value;
+    }
+
+    private string? division;
+    [Ignore]
+    public string Division
+    {
+        get => division ??= string.Join('|', Items.Select(i => i.Division).Distinct());
+        set => division = value;
+    }
+
+    [Ignore] public List<NAVBin> Bins { get; set; }
+
     public MixedCarton()
     {
         ID = Guid.NewGuid();
         Name = string.Empty;
         Items = new List<MixedCartonItem>();
+        Bins = new List<NAVBin>();
     }
 
     public MixedCartonItem? Item(int itemNumber)

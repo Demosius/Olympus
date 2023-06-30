@@ -1,25 +1,23 @@
-﻿using Hydra.ViewModels.Controls;
-using System;
-using System.Linq;
+﻿using System;
 using System.Windows.Input;
+using Cadmus.Interfaces;
 
-namespace Hydra.ViewModels.Commands;
-
+namespace Cadmus.ViewModels.Commands;
 
 public class ExportToExcelCommand : ICommand
 {
-    public RunVM VM { get; set; }
+    public IExport VM { get; set; }
 
-    public ExportToExcelCommand(RunVM vm) { VM = vm; }
+    public ExportToExcelCommand(IExport vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.CurrentMoves.Any();
+        return VM.CanExport;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.ExportToExcel();
+        await VM.ExportToExcel();
     }
 
     public event EventHandler? CanExecuteChanged

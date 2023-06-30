@@ -43,8 +43,10 @@
             </StackPanel>
         </Grid>
         <DataGrid ItemsSource="{Binding FilteredItems}"
+                  Name="ItemGrid"
                   d:ItemsSource="{d:SampleData ItemCount=5}"
-                  SelectionMode="Single"
+                  SelectionMode="{Binding SelectionMode}"
+                  SelectionChanged="Selector_OnSelectionChanged"
                   SelectionUnit="FullRow"
                   SelectedItem="{Binding SelectedItem}"
                   AutoGenerateColumns="True"

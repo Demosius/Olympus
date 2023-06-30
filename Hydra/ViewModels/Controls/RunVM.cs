@@ -20,7 +20,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Cadmus.Helpers;
+using Cadmus.Interfaces;
 using Cadmus.Models;
+using Cadmus.ViewModels.Commands;
 using Cadmus.ViewModels.Labels;
 using Uranus;
 using Uranus.Annotations;
@@ -30,7 +32,7 @@ using Uranus.Inventory.Models;
 
 namespace Hydra.ViewModels.Controls;
 
-public class RunVM : INotifyPropertyChanged, IDBInteraction, IItemFilters
+public class RunVM : INotifyPropertyChanged, IDBInteraction, IItemFilters, IExport
 {
     public HydraVM HydraVM { get; set; }
     public Helios Helios { get; set; }
@@ -45,6 +47,8 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IItemFilters
     // Track whether the current data is old data that has been loaded which likely
     // includes different core data (bin contents) than the current database holds.
     public bool OldLoaded { get; set; }
+
+    public bool CanExport => CurrentMoves.Any();
 
     #region InotifyPropertyChanged Members
 
@@ -165,7 +169,7 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IItemFilters
         foreach (var site in sites)
             Sites.Add(new SiteVM(site));
     }
-    
+
     public void ClearFilters()
     {
         itemFilterString = string.Empty;
@@ -188,7 +192,7 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IItemFilters
             fromRegex.IsMatch(m.TakeSiteName) &&
             toRegex.IsMatch(m.PlaceSiteName)));
     }
-    
+
     public void FilterItemsFromClipboard()
     {
         Mouse.OverrideCursor = Cursors.Wait;
@@ -237,7 +241,7 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IItemFilters
         ItemFilterString = string.Join("|", numbers.Select(n => n.ToString("000000")).Take(x));
         Mouse.OverrideCursor = Cursors.Arrow;
     }
-    
+
     public async Task GenerateMoves()
     {
         Mouse.OverrideCursor = Cursors.Wait;
@@ -276,50 +280,56 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IItemFilters
         await chariot.SendDataAsync(dataSet, AllMoves.Select(vm => vm.Move));
     }
 
-    public void ExportToLabels()
+    public async Task ExportToLabels()
     {
-        // Convert to LabelVM
-        var labels = new List<ReceivingPutAwayLabelVM>();
-
-        foreach (var moveVM in CurrentMoves)
+        await Task.Run(() =>
         {
-            var move = moveVM.Move;
-            var labelCount = new List<int> {move.TakeCases + move.TakePacks + move.TakeEaches, 4}.AsQueryable().Min();
+            // Convert to LabelVM
+            var labels = new List<ReceivingPutAwayLabelVM>();
 
-            for (var i = 0; i < labelCount; i++)
+            foreach (var moveVM in CurrentMoves)
             {
-                var label = new ReceivingPutAwayLabel(move) {LabelTotal = labelCount, LabelNumber = i+1};
-                var labelVM = new ReceivingPutAwayLabelVM(label);
-                labels.Add(labelVM);
+                var move = moveVM.Move;
+                var labelCount = new List<int> { move.TakeCases + move.TakePacks + move.TakeEaches, 4 }.AsQueryable().Min();
+
+                for (var i = 0; i < labelCount; i++)
+                {
+                    var label = new ReceivingPutAwayLabel(move) { LabelTotal = labelCount, LabelNumber = i + 1 };
+                    var labelVM = new ReceivingPutAwayLabelVM(label);
+                    labels.Add(labelVM);
+                }
             }
-        }
 
-        PrintUtility.PrintLabels(labels, null);
+            PrintUtility.PrintLabels(labels, null);
+        });
     }
 
-    public void ExportToExcel()
+    public async Task ExportToExcel()
     {
-        Output.DataTableToExcel(CurrentMoveDataTable(), DefaultExportString);
+        await Task.Run(() => Output.DataTableToExcel(CurrentMoveDataTable(), DefaultExportString));
     }
 
-    public void ExportToPDF()
+    public async Task ExportToPDF()
     {
-        Output.MovesToPDF(CurrentMoves
-            .Select(vm => vm.Move)
-            .GroupBy(m => m.TakeSite?.Name ?? "")
-            .ToDictionary(g => g.Key, g => g.OrderBy(move => move.TakeBin?.Code ?? "").ToList()), DefaultExportString);
+        await Task.Run(() =>
+        {
+            Output.MovesToPDF(CurrentMoves
+                    .Select(vm => vm.Move)
+                    .GroupBy(m => m.TakeSite?.Name ?? "")
+                    .ToDictionary(g => g.Key, g => g.OrderBy(move => move.TakeBin?.Code ?? "").ToList()),
+                DefaultExportString);
+        });
     }
 
-    public void ExportToCSV()
+    public async Task ExportToCSV()
     {
-        Output.DataTableToCSV(CurrentMoveDataTable(), DefaultExportString);
+        await Task.Run(() => Output.DataTableToCSV(CurrentMoveDataTable(), DefaultExportString));
     }
 
     private static string DefaultExportString => $"hydra_export_{DateTime.Now:yyyyMMddTHHmmss}";
 
     private DataTable CurrentMoveDataTable()
     {
-
         var dt = new DataTable();
 
         dt.Columns.Add(new DataColumn("Item Number"));

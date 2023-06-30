@@ -84,6 +84,15 @@ public class MixedCartonStock : Stock
         SuccessfullyGenerated = true;
     }
 
+    public int CaseMode()
+    {
+        if (!UnevenStockLevels) return CaseQty;
+
+        var list = Stock.Select(s => MixedCarton.Cartons(s));
+        
+        return list.GroupBy(v => v).OrderByDescending(g => g.Count()).First().Key;
+    }
+
     /// <summary>
     /// Checks that a given list of stock is valid.
     /// Must have more than one item. Only eaches. Matching bin locations.

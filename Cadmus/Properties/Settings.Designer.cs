@@ -58,5 +58,17 @@ namespace Cadmus.Properties {
                 this["MCLocationString"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\ausefpdfs01ns\\Shares\\Public\\DC_Data\\Olympus")]
+        public string MixedCartonSoHSaveDirectory {
+            get {
+                return ((string)(this["MixedCartonSoHSaveDirectory"]));
+            }
+            set {
+                this["MixedCartonSoHSaveDirectory"] = value;
+            }
+        }
     }
 }

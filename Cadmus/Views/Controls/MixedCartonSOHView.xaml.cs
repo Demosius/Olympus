@@ -1,28 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using Cadmus.ViewModels.Controls;
+using Morpheus.ViewModels.Controls;
+using Uranus;
 
-namespace Cadmus.Views.Controls
+namespace Cadmus.Views.Controls;
+
+/// <summary>
+/// Interaction logic for MixedCartonSOHView.xaml
+/// </summary>
+public partial class MixedCartonSOHView
 {
-    /// <summary>
-    /// Interaction logic for MixedCartonSOHView.xaml
-    /// </summary>
-    public partial class MixedCartonSOHView : UserControl
+    public MixedCartonSOH_VM VM { get; set; }
+
+    public MixedCartonSOHView(Helios helios, ProgressBarVM progressBar)
     {
-        public MixedCartonSOHView()
-        {
-            InitializeComponent();
-        }
+        VM = new MixedCartonSOH_VM(helios, progressBar);
+        InitializeComponent();
+        DataContext = VM;
     }
 }

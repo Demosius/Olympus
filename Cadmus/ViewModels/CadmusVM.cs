@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
 using Cadmus.Views.Controls;
+using Morpheus.ViewModels.Controls;
 using Uranus;
 
 namespace Cadmus.ViewModels;
@@ -15,11 +16,14 @@ public enum EPrintable
     ReceivingPutAwayLabels,
     [Description("Replen Labels")]
     ReplenLabels,
+    [Description("Mixed Carton Stock Report")]
+    MCStockReport,
 }
 
 public class CadmusVM : INotifyPropertyChanged
 {
     public Helios Helios { get; set; }
+    public ProgressBarVM ProgressBar { get; set; }
 
     public Dictionary<EPrintable, Control> Controls { get; set; }
 
@@ -52,9 +56,10 @@ public class CadmusVM : INotifyPropertyChanged
 
     #endregion
 
-    public CadmusVM(Helios helios)
+    public CadmusVM(Helios helios, ProgressBarVM progressBar)
     {
         Helios = helios;
+        ProgressBar = progressBar;
 
         Controls = new Dictionary<EPrintable, Control>();
     }
@@ -71,6 +76,7 @@ public class CadmusVM : INotifyPropertyChanged
             {
                 EPrintable.ReceivingPutAwayLabels => new ReceivingPutAway(),
                 EPrintable.ReplenLabels => new RefOrgeDisplayView(Helios),
+                EPrintable.MCStockReport => new MixedCartonSOHView(Helios, ProgressBar),
                 _ => throw new ArgumentOutOfRangeException()
             };
 

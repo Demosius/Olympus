@@ -24,7 +24,7 @@ public sealed class InventoryChariot : MasterChariot
         typeof(NAVUoM), typeof(NAVZone), typeof(Stock), typeof(Store),
         typeof(SubStock), typeof(TableUpdate), typeof(ZoneExtension), typeof(ItemExtension),
         typeof(Site), typeof(SiteItemLevel), typeof(MixedCarton), typeof(MixedCartonItem),
-        typeof(BatchTOLine), typeof(BatchTOGroup), typeof(PickLine),
+        typeof(BatchTOLine), typeof(BatchTOGroup), typeof(PickLine), typeof(StockNote),
     };
 
     /*************************** Constructors ****************************/

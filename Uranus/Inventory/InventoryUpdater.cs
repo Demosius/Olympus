@@ -339,4 +339,12 @@ public class InventoryUpdater
     public async Task<int> StoreAsync(Store store) => await Chariot.UpdateAsync(store);
 
     public async Task BatchesAsync(List<Batch> batches) => await Chariot.UpdateTableAsync(batches);
+
+    public async Task StockNoteAsync(StockNote stockNote)
+    {
+        if (stockNote.Comment == string.Empty)
+            await Task.Run(() => Chariot.Delete(stockNote));
+        else
+            await Chariot.InsertOrUpdateAsync(stockNote);
+    }
 }

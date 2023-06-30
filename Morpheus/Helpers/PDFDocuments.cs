@@ -72,7 +72,7 @@ public static class PDFDocuments
                     EUoM.EACH => move.TakeEaches,
                     EUoM.PACK => move.TakePacks,
                     EUoM.CASE => move.TakeCases,
-                    _ => throw new ArgumentOutOfRangeException(nameof(uom), "UoM value outside of expected value range.")
+                    _ => throw new ArgumentOutOfRangeException(nameof(uom), @"UoM value outside of expected value range.")
                 };
                 if (qty <= 0) continue;
 
@@ -94,7 +94,7 @@ public static class PDFDocuments
                     EUoM.EACH => 1,
                     EUoM.PACK => move.Item?.QtyPerPack,
                     EUoM.CASE => move.Item?.QtyPerCase,
-                    _ => throw new ArgumentOutOfRangeException(nameof(uom), "UoM value outside of expected value range.")
+                    _ => throw new ArgumentOutOfRangeException(nameof(uom), @"UoM value outside of expected value range.")
                 } ?? 1;
 
                 table.AddCell(CreateCell(CreateParagraph(priority.ToString(), font, underline: underline), TextAlignment.CENTER).SetBorder(null));

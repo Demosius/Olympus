@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Morpheus.ViewModels.Commands;
 using Morpheus.Views.Windows;
@@ -52,7 +53,7 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
             OnPropertyChanged();
         }
     }
-    
+
     #endregion
 
     #region Commands
@@ -178,7 +179,7 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
         // Set item objects against stock.
         foreach (var navStock in stock.SelectMany(s => s.Value))
             if (Items.TryGetValue(navStock.ItemNumber, out var item)) navStock.Item = item;
-        
+
 
         foreach (var (_, stockList) in stock)
         {
@@ -229,15 +230,14 @@ public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
     {
         if (SelectedMixedCarton is null) return;
 
-        var itemSelection = new ItemSelectionWindow(Items.Values.ToList());
+        var itemSelection = new ItemSelectionWindow(Items.Values.ToList(), SelectionMode.Extended);
         if (itemSelection.ShowDialog() != true) return;
 
-        var item = itemSelection.Item;
-        if (item is null) return;
+        var items = itemSelection.Items;
+        if (items.Count <= 0) return;
 
-        var mci = new MixedCartonItem(SelectedMixedCarton, item);
-
-        MCItems.Add(mci);
+        foreach (var mci in items.Select(item => new MixedCartonItem(SelectedMixedCarton, item)))
+            MCItems.Add(mci);
     }
 
     public void DeleteMixCtnItem()

@@ -919,19 +919,20 @@ public class InventoryReader
     }
 
     public async
-        Task<(List<MixedCarton> mixedCartons, List<MixedCartonItem> mcItems, BasicStockDataSet)>
+        Task<(List<MixedCarton> mixedCartons, BasicStockDataSet dataSet, List<StockNote> stockNotes)>
         MixedCartonStockAsync(IEnumerable<string> zoneCodes, IEnumerable<string> locations)
     {
-        // TODO: Figure out what needs to be returned, and complete function.
         var mixedCartons = new List<MixedCarton>();
-        var mcItems = new List<MixedCartonItem>();
         var stockData = new BasicStockDataSet();
+        var stockNotes = new List<StockNote>();
 
         void Action()
         {
             stockData = BasicStockDataSet(zoneCodes, locations);
-            mcItems = MixedCartonItems();
-            var mcDict = MixedCartons().ToDictionary(mc => mc.ID, mc => mc);
+            var mcItems = MixedCartonItems();
+            mixedCartons = MixedCartons();
+            var mcDict = mixedCartons.ToDictionary(mc => mc.ID, mc => mc);
+            stockNotes = Chariot.PullObjectList<StockNote>();
 
             var items = stockData.Items;
 
@@ -950,7 +951,7 @@ public class InventoryReader
         }
 
         await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
-        return (mixedCartons, mcItems, stockData);
+        return (mixedCartons, stockData, stockNotes);
     }
 
     public async Task<List<Batch>> BatchesAsync(DateTime date) =>

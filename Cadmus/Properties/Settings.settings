@@ -11,5 +11,8 @@
     <Setting Name="MCLocationString" Type="System.String" Scope="User">
       <Value Profile="(Default)">9600</Value>
     </Setting>
+    <Setting Name="MixedCartonSoHSaveDirectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\ausefpdfs01ns\Shares\Public\DC_Data\Olympus</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

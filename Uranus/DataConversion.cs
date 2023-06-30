@@ -1941,16 +1941,16 @@ public static class DataConversion
             }
         });
 
-        var events = new List<Store>();
+        var stores = new List<Store>();
 
         foreach (DataTable table in dataSet.Tables)
-            events.AddRange(DataTableToStores(table));
+            stores.AddRange(DataTableToStores(table));
 
         // If no mispicks, throw invalid data error.
-        if (events.Count == 0)
+        if (stores.Count == 0)
             throw new InvalidDataException("No valid store data found from file.", new List<string>());
 
-        return events;
+        return stores;
     }
 
     public static List<Store> DataTableToStores(DataTable dataTable)

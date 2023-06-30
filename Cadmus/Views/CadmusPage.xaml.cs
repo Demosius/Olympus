@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Cadmus.ViewModels;
+using Morpheus.ViewModels.Controls;
 using Uranus;
 using Uranus.Interfaces;
 using Uranus.Staff;
@@ -11,10 +12,10 @@ namespace Cadmus.Views;
 /// </summary>
 public partial class CadmusPage : IProject
 {
-    public CadmusPage(Helios helios)
+    public CadmusPage(Helios helios, ProgressBarVM progressBar)
     {
         InitializeComponent();
-        DataContext = new CadmusVM(helios);
+        DataContext = new CadmusVM(helios, progressBar);
     }
 
     public EProject Project => EProject.Cadmus;

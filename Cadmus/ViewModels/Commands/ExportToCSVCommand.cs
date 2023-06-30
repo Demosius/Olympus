@@ -1,24 +1,23 @@
-﻿using Hydra.ViewModels.Controls;
-using System;
-using System.Linq;
+﻿using System;
 using System.Windows.Input;
+using Cadmus.Interfaces;
 
-namespace Hydra.ViewModels.Commands;
+namespace Cadmus.ViewModels.Commands;
 
 public class ExportToCSVCommand : ICommand
 {
-    public RunVM VM { get; set; }
+    public IExport VM { get; set; }
 
-    public ExportToCSVCommand(RunVM vm) { VM = vm; }
+    public ExportToCSVCommand(IExport vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.CurrentMoves.Any();
+        return VM.CanExport;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.ExportToCSV();
+        await VM.ExportToCSV();
     }
 
     public event EventHandler? CanExecuteChanged

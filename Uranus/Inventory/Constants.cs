@@ -44,6 +44,7 @@ public static class Constants
     public const string Date = "Date";
     public const string DateCreated = "Date Created";
     public const string Description = "Description";
+    public const string Design = "Design";
     public const string DeviceID = "Device ID";
     public const string DivCode = "DivisionCode";
     public const string DocNo = "Document No.";
@@ -58,6 +59,7 @@ public static class Constants
     public const string Height = "Height";
     public const string HeightCM = "Height (CM)";
     public const string InnerPack = "Inner Pack";
+    public const string Item_Name = "Item Name";
     public const string ItemBarcode = "ItemBarcode";
     public const string ItemCode = "ItemCode";
     public const string ItemDesc = "Item Description";
@@ -82,6 +84,7 @@ public static class Constants
     public const string OperatorID = "Operator ID";
     public const string OperatorName = "Operator Name";
     public const string OriginalQty = "Original Qty.";
+    public const string OtherNotes = "OTHER NOTES";
     public const string PFCode = "PlatformCode";
     public const string PickerID = "Picker ID";
     public const string PickQty = "Pick Qty.";
@@ -93,10 +96,13 @@ public static class Constants
     public const string Qty = "Qty";
     public const string QtyBase = "Qty. (Base)";
     public const string QtyHandled = "Qty. Handled";
+    public const string QtyInLocation = "QTY IN THIS LOCATION";
     public const string QtyOutstanding = "Qty. Outstanding";
+    public const string QtyPerPack = "QTY PER PACK";
     public const string QtyPerUoM = "Qty. per Unit of Measure";
     public const string QtyToHandle = "Qty. to Handle";
     public const string Quantity = "Quantity";
+    public const string RackLocation = "RACK LOCATION";
     public const string ReceiveDate = "Actual Received Date";
     public const string ReceiveQty = "Received Qty.";
     public const string Region = "Region";
@@ -104,7 +110,9 @@ public static class Constants
     public const string RoadRegion = "Road Regions";
     public const string ShipDate = "Actual Shipment Date";
     public const string ShipmentCreated = "Shipment Created";
+    public const string ShippablePack = "SHIPPABLE PACK";
     public const string ShippingDays = "Shipping Days";
+    public const string Sku = "SKU";
     public const string SkuDesc = "SKU Description";
     public const string SkuID = "SKU ID";
     public const string SortingLane = "Sorting Lane Regions";
@@ -273,7 +281,7 @@ public static class Constants
         {"Cluster Ref", -1 },
     };
 
-    public static Dictionary<string, int> DematicMispickColumns = new()
+    public static readonly Dictionary<string, int> DematicMispickColumns = new()
     {
         {"Actual Shipment Date", -1},
         {"Actual Received Date", -1},
@@ -1330,4 +1338,96 @@ public class StoreIndices : IColumnIndexer
     {
         Store, CCNRegion, Wave, RoadCCN, ShippingDays, MBRegion, RoadRegion, SortingLane, State, Region, StoreType
     }.Max();
+}
+
+public class MixedPackIndices : IColumnIndexer
+{
+    public int RackLocation { get; set; }
+    public int Sku { get; set; }
+    public int Item_Name { get; set; }
+    public int Design { get; set; }
+    public int QtyInLocation { get; set; }
+    public int ShippablePack { get; set; }
+    public int QtyPerPack { get; set; }
+    public int OtherNotes { get; set; }
+
+    // Blank header, used for notes.
+    public int BlankNotes { get; set; }
+
+    public MixedPackIndices(string[] headers)
+    {
+        SetIndices(headers);
+
+        CheckMissingHeaders();
+    }
+
+    public void SetIndices(string[] headers)
+    {
+        RackLocation = Array.IndexOf(headers, Constants.RackLocation);
+        Sku = Array.IndexOf(headers, Constants.Sku);
+        Item_Name = Array.IndexOf(headers, Constants.Item_Name);
+        Design = Array.IndexOf(headers, Constants.Design);
+        QtyInLocation = Array.IndexOf(headers, Constants.QtyInLocation);
+        ShippablePack = Array.IndexOf(headers, Constants.ShippablePack);
+        QtyPerPack = Array.IndexOf(headers, Constants.QtyPerPack);
+        OtherNotes = Array.IndexOf(headers, Constants.OtherNotes);
+    }
+
+    public void CheckMissingHeaders()
+    {
+        var missingHeaders = new List<string>();
+
+        if (RackLocation == -1) missingHeaders.Add(Constants.RackLocation);
+        if (Sku == -1) missingHeaders.Add(Constants.Sku);
+        if (Item_Name == -1) missingHeaders.Add(Constants.Item_Name);
+        if (Design == -1) missingHeaders.Add(Constants.Design);
+        if (QtyInLocation == -1) missingHeaders.Add(Constants.QtyInLocation);
+        if (ShippablePack == -1) missingHeaders.Add(Constants.ShippablePack);
+        if (QtyPerPack == -1) missingHeaders.Add(Constants.QtyPerPack);
+        if (OtherNotes == -1) missingHeaders.Add(Constants.OtherNotes);
+
+        if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for Store conversion.", missingHeaders);
+    }
+
+    public static bool HasHeaders(string[] headers)
+    {
+        return Array.IndexOf(headers, Constants.RackLocation) != -1 &&
+               Array.IndexOf(headers, Constants.Sku) != -1 &&
+               Array.IndexOf(headers, Constants.Item_Name) != -1 &&
+               Array.IndexOf(headers, Constants.Design) != -1 &&
+               Array.IndexOf(headers, Constants.QtyInLocation) != -1 &&
+               Array.IndexOf(headers, Constants.ShippablePack) != -1 &&
+               Array.IndexOf(headers, Constants.QtyPerPack) != -1 &&
+               Array.IndexOf(headers, Constants.OtherNotes) != -1;
+    }
+
+    public void IncrementColumns()
+    {
+        RackLocation += 1;
+        Sku +=1;
+        Item_Name += 1;
+        Design += 1;
+        QtyInLocation += 1;
+        ShippablePack += 1;
+        QtyPerPack += 1;
+        OtherNotes += 1;
+    }
+
+    public void SetBlank()
+    {
+        var columns = ColumnNumbers();
+        for (var i = 1; i < 10; i++)
+        {
+            if (columns.Contains(i)) continue;
+            BlankNotes = i;
+            break;
+        }
+    }
+
+    public List<int> ColumnNumbers() => new()
+    {
+        RackLocation, Sku, Item_Name, Design, QtyInLocation, ShippablePack, QtyPerPack, OtherNotes
+    };
+
+    public int Max() => ColumnNumbers().Max();
 }

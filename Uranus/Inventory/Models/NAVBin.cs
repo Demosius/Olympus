@@ -44,6 +44,8 @@ public class NAVBin
 
     [Ignore] public BinExtension? Dimensions => Extension;
 
+    [Ignore] public List<MixedCarton> MixedCartons { get; set; }
+
     [Ignore]
     public Bay? Bay
     {
@@ -80,6 +82,7 @@ public class NAVBin
         ToMoves = new List<Move>();
         MoveLines = new List<NAVMoveLine>();
         PickLines = new List<PickLine>();
+        MixedCartons = new List<MixedCarton>();
     }
 
     public NAVBin(string code, NAVZone zone)
@@ -99,6 +102,7 @@ public class NAVBin
         ToMoves = new List<Move>();
         MoveLines = new List<NAVMoveLine>();
         PickLines = new List<PickLine>();
+        MixedCartons = new List<MixedCarton>();
     }
 
     /// <summary>
@@ -151,6 +155,9 @@ public class NAVBin
 
         while (mixedCarton is not null)
         {
+            mixedCarton.Bins.Add(this);
+            MixedCartons.Add(mixedCarton);
+
             createdMC = true;
             var mcStock = mixedCarton.GetValidStock(ref validStock);
 
