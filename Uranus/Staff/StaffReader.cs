@@ -1038,7 +1038,19 @@ public class StaffReader
         var events = await eventTask;
         var sessions = await sessionTask;
 
-        await Task.Run(() => { var sessionDict = sessions.ToDictionary(s => s.ID, s => s); foreach (var pickEvent in events) { if (!sessionDict.TryGetValue(pickEvent.SessionID, out var session)) continue; session.PickEvents.Add(pickEvent); pickEvent.Session = session; if (!includeEmployees) continue; session.Operator = pickEvent.Operator; session.Operator?.PickSessions.Add(session); } }).ConfigureAwait(false);
+        await Task.Run(() =>
+        {
+            var sessionDict = sessions.ToDictionary(s => s.ID, s => s);
+            foreach (var pickEvent in events)
+            {
+                if (!sessionDict.TryGetValue(pickEvent.SessionID, out var session)) continue;
+                session.PickEvents.Add(pickEvent);
+                pickEvent.Session = session;
+                if (!includeEmployees) continue;
+                session.Operator = pickEvent.Operator;
+                session.Operator?.PickSessions.Add(session);
+            }
+        }).ConfigureAwait(false);
 
         return sessions;
     }

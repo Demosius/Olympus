@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Windows.Input;
+using Deimos.Interfaces;
 
 namespace Deimos.ViewModels.Commands;
 
 public class UploadMispickDataCommand : ICommand
 {
-    public DeimosVM VM { get; set; }
+    public IMispickData VM { get; set; }
 
-    public UploadMispickDataCommand(DeimosVM vm) { VM = vm; }
+    public UploadMispickDataCommand(IMispickData vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {

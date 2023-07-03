@@ -40,7 +40,7 @@ public static class ProjectFactory
             EProject.Argos => new ArgosPage(App.Helios),
             EProject.Hades => new HadesPage(App.Helios),
             EProject.Panacea => new PanaceaPage(App.Helios),
-            EProject.Quest => new QuestPage(App.Helios, App.Charon),
+            EProject.Quest => new QuestPage(App.Helios, App.Charon, App.ProgressBar),
             EProject.Deimos => new DeimosPage(App.Helios, App.ProgressBar),
             EProject.None => null,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)

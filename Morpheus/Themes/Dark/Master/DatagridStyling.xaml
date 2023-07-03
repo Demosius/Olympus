@@ -56,7 +56,7 @@
         <!-- Place holder. -->
     </Style>
 
-    <!-- ********************************* DataGrid Row Style ********************************** -->
+    <!-- ********************************* DataGrid Row Header Style ********************************** -->
     <Style TargetType="{x:Type DataGridRowHeader}" x:Key="DataGridRowHeaderStyle">
         <Setter Property="Background" Value="{DynamicResource RowHeaderBackground}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource RowHeaderBorder}"/>

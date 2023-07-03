@@ -101,6 +101,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- ID -->
@@ -151,9 +152,14 @@
                            Content="RF ID: "/>
                 <TextBox Grid.Column="1" Grid.Row="6"
                              Text="{Binding RF_ID, FallbackValue=''}"/>
+                <!-- Dematic ID -->
+                <Label Grid.Column="0" Grid.Row="7"
+                       Content="Dematic ID: "/>
+                <TextBox Grid.Column="1" Grid.Row="7"
+                         Text="{Binding DematicID, FallbackValue=''}"/>
 
                 <!-- Temp Tag -->
-                <Button Grid.Column="1" Grid.Row="7"
+                <Button Grid.Column="1" Grid.Row="8"
                         Visibility="{Binding HasTempTag, Converter={StaticResource VisibilityConverter}}"
                         Command="{Binding UnassignTempTagCommand}">
                     <TextBlock>
@@ -163,15 +169,15 @@
                         <Run>Unassign Tag</Run>
                     </TextBlock>
                 </Button>
-                <Button Grid.Column="1" Grid.Row="7"
+                <Button Grid.Column="1" Grid.Row="8"
                         Content="Assign Temp Tag"
                         Command="{Binding SelectTempTagCommand}"
                         Visibility="{Binding HasNoTempTag, Converter={StaticResource VisibilityConverter}}"/>
 
                 <!-- Location -->
-                <Label Grid.Column="0" Grid.Row="8"
+                <Label Grid.Column="0" Grid.Row="9"
                            Content="Location: "/>
-                <Grid Grid.Column="1" Grid.Row="8">
+                <Grid Grid.Column="1" Grid.Row="9">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -194,10 +200,10 @@
                     </Button>
                 </Grid>
                 <!-- Department -->
-                <Label Grid.Column="0" Grid.Row="9"
+                <Label Grid.Column="0" Grid.Row="10"
                            Content="Department: "/>
 
-                <Grid Grid.Column="1" Grid.Row="9">
+                <Grid Grid.Column="1" Grid.Row="10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -220,9 +226,9 @@
                     </Button>
                 </Grid>
                 <!-- Role -->
-                <Label Grid.Column="0" Grid.Row="10"
+                <Label Grid.Column="0" Grid.Row="11"
                            Content="Role: "/>
-                <Grid Grid.Column="1" Grid.Row="10">
+                <Grid Grid.Column="1" Grid.Row="11">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -245,9 +251,9 @@
                     </Button>
                 </Grid>
                 <!-- Reports To -->
-                <Label Grid.Column="0" Grid.Row="11"
+                <Label Grid.Column="0" Grid.Row="12"
                            Content="Reports To: "/>
-                <Grid Grid.Column="1" Grid.Row="11">
+                <Grid Grid.Column="1" Grid.Row="12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -270,9 +276,9 @@
                     </Button>
                 </Grid>
                 <!-- Clan -->
-                <Label Grid.Column="0" Grid.Row="12"
+                <Label Grid.Column="0" Grid.Row="13"
                            Content="Clan: "/>
-                <Grid Grid.Column="1" Grid.Row="12">
+                <Grid Grid.Column="1" Grid.Row="13">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -295,9 +301,9 @@
                     </Button>
                 </Grid>
                 <!-- Pay Point -->
-                <Label Grid.Column="0" Grid.Row="13"
+                <Label Grid.Column="0" Grid.Row="14"
                            Content="Pay Point: "/>
-                <Grid Grid.Column="1" Grid.Row="13">
+                <Grid Grid.Column="1" Grid.Row="14">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -320,9 +326,9 @@
                     </Button>
                 </Grid>
                 <!-- Employment Type -->
-                <Label Grid.Column="0" Grid.Row="14"
+                <Label Grid.Column="0" Grid.Row="15"
                            Content="Employment Type: "/>
-                <ComboBox Grid.Column="1" Grid.Row="14"
+                <ComboBox Grid.Column="1" Grid.Row="15"
                           ItemsSource="{Binding Source={StaticResource EmploymentTypes}}"
                           SelectedValue="{Binding EmploymentType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <ComboBox.ItemTemplate>
@@ -332,53 +338,53 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
                 <!-- Phone Number -->
-                <Label Grid.Column="0" Grid.Row="15"
+                <Label Grid.Column="0" Grid.Row="16"
                        Content="Phone: "
                        Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
-                <TextBox Grid.Column="1" Grid.Row="15"
+                <TextBox Grid.Column="1" Grid.Row="16"
                          Text="{Binding PhoneNumber, FallbackValue=''}"
                          Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                 <!-- Email -->
-                <Label Grid.Column="0" Grid.Row="16"
+                <Label Grid.Column="0" Grid.Row="17"
                        Content="Email: "
                        Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
-                <TextBox Grid.Column="1" Grid.Row="16"
+                <TextBox Grid.Column="1" Grid.Row="17"
                          Text="{Binding Email, FallbackValue=''}"
                          Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                 <!-- Address -->
-                <Label Grid.Column="0" Grid.Row="17"
+                <Label Grid.Column="0" Grid.Row="18"
                        Content="Address: "
                        Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
-                <TextBox Grid.Column="1" Grid.Row="17"
+                <TextBox Grid.Column="1" Grid.Row="18"
                          Text="{Binding Address, FallbackValue=''}"
                          Visibility="{Binding SensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
                 <!-- Pay Rate -->
-                <Label Grid.Column="0" Grid.Row="18"
+                <Label Grid.Column="0" Grid.Row="19"
                        Content="Pay Rate: "
                        Visibility="{Binding VerySensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
-                <TextBox Grid.Column="1" Grid.Row="18"
+                <TextBox Grid.Column="1" Grid.Row="19"
                          Text="{Binding PayRate, FallbackValue=''}"
                          Visibility="{Binding VerySensitiveVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibilityConverter}}"/>
 
                 <!-- Shift Rules -->
-                <Button Grid.Column="0" Grid.Row="19" Grid.ColumnSpan="2"
+                <Button Grid.Column="0" Grid.Row="20" Grid.ColumnSpan="2"
                         Content="Manage Shift Rules"
                         Command="{Binding LaunchEmployeeShiftWindowCommand}"/>
 
                 <!-- Licensing -->
-                <Button Grid.Column="0" Grid.Row="20" Grid.ColumnSpan="2"
+                <Button Grid.Column="0" Grid.Row="21" Grid.ColumnSpan="2"
                         Content="Manage Licenses"
                         IsEnabled="False"
                         ToolTip="Not Yet Implemented"/>
 
                 <!-- Vehicles -->
-                <Button Grid.Column="0" Grid.Row="21" Grid.ColumnSpan="2"
+                <Button Grid.Column="0" Grid.Row="22" Grid.ColumnSpan="2"
                         Content="Manage Vehicles"
                         IsEnabled="False"
                         ToolTip="Not Yet Implemented"/>
 
                 <!-- Lockers -->
-                <Button Grid.Column="0" Grid.Row="22" Grid.ColumnSpan="2"
+                <Button Grid.Column="0" Grid.Row="23" Grid.ColumnSpan="2"
                         Content="Manage Locker"
                         IsEnabled="False"
                         ToolTip="Not Yet Implemented"/>
