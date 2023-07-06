@@ -98,7 +98,7 @@ public static class DateExtensions
 
     public static DateTime WeekStartSunday(this DateTime date)
     {
-        return date.AddDays(((int) DayOfWeek.Monday - ((int) date.DayOfWeek + 1)) % 7).Date;
+        return date.AddDays(((int)DayOfWeek.Monday - ((int)date.DayOfWeek + 1)) % 7).Date;
     }
 
     public static DateTime WeekEndSaturday(this DateTime date)
@@ -114,7 +114,7 @@ public static class DateExtensions
         int fiscalYear;
         var calenderYear = date.Year;
 
-        if (fiscalMonth is not 1 and not 12) 
+        if (fiscalMonth is not 1 and not 12)
             fiscalYear = calenderYear;
         else switch (fiscalMonth)
         {
@@ -135,7 +135,7 @@ public static class DateExtensions
     public static (DateTime sunday, int year, string qtr, string month, string week) GetEBFiscalData(this DateTime date)
     {
         var week = date.EB_ISOWeek();
-        
+
         var quarter = (int)Math.Ceiling((double)week / 13);
 
         if (quarter > 4) quarter = 4;
@@ -149,9 +149,9 @@ public static class DateExtensions
         var month = (int)((quarter - 1) * 3 + monthInQuarter);
 
         var fiscalMonthString = DateTimeFormatInfo.CurrentInfo.GetAbbreviatedMonthName(month);
-        
+
         // +10 is the same as -2 for our purposes, except that % doesn't handle negative numbers strictly correctly.
-        var fiscalMonthOffset = (month +10) % 12 + 1;
+        var fiscalMonthOffset = (month + 10) % 12 + 1;
 
         var fiscalQuarter = (int)Math.Ceiling((double)fiscalMonthOffset / 3);
         var quarterString = $"Q{fiscalQuarter}";
@@ -163,4 +163,8 @@ public static class DateExtensions
 
         return (sunday, date.EBFiscalYear(), quarterString, fiscalMonthString, fiscalWeek);
     }
+
+    public static bool IsBetween(this DateTime dateTime, DateTime fromDateTime, DateTime toDateTime) =>
+        dateTime >= fromDateTime && dateTime <= toDateTime;
+
 }

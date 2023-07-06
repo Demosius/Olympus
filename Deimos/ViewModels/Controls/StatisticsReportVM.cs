@@ -18,10 +18,11 @@ namespace Deimos.ViewModels.Controls;
 public class StatisticsReportVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
     public Helios Helios { get; set; }
-    public DeimosVM DeimosVM { get; set; }
+    public DeimosVM Deimos { get; set; }
+    public ErrorAllocationVM ParentVM { get; set; }
 
-    public DateTime? StartDate => DeimosVM.StartDate;
-    public DateTime? EndDate => DeimosVM.EndDate;
+    public DateTime? StartDate => ParentVM.StartDate;
+    public DateTime? EndDate => ParentVM.EndDate;
 
     public List<EmployeeStatisticsReport> ReportList { get; set; }
 
@@ -73,10 +74,11 @@ public class StatisticsReportVM : INotifyPropertyChanged, IDBInteraction, IFilte
 
     #endregion
 
-    public StatisticsReportVM(DeimosVM deimosVM)
+    public StatisticsReportVM(ErrorAllocationVM parentVM)
     {
-        DeimosVM = deimosVM;
-        Helios = DeimosVM.Helios;
+        ParentVM = parentVM;
+        Helios = ParentVM.Helios;
+        Deimos = ParentVM.ParentVM;
         
         ReportList = new List<EmployeeStatisticsReport>();
         Reports = new ObservableCollection<EmployeeStatisticsReport>();

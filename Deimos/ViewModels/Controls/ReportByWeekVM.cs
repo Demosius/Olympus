@@ -19,10 +19,11 @@ namespace Deimos.ViewModels.Controls;
 public class ReportByWeekVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
     public Helios Helios { get; set; }
-    public DeimosVM DeimosVM { get; set; }
+    public ErrorAllocationVM ParentVM { get; set; }
+    public DeimosVM Deimos { get; set; }
 
-    public DateTime? StartDate => DeimosVM.StartDate;
-    public DateTime? EndDate => DeimosVM.EndDate;
+    public DateTime? StartDate => ParentVM.StartDate;
+    public DateTime? EndDate => ParentVM.EndDate;
 
     public List<WeeklyStatisticReport> ReportList { get; set; }
 
@@ -63,10 +64,11 @@ public class ReportByWeekVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     #endregion
 
-    public ReportByWeekVM(DeimosVM deimos)
+    public ReportByWeekVM(ErrorAllocationVM parent)
     {
-        DeimosVM = deimos;
-        Helios = DeimosVM.Helios;
+        ParentVM = parent;
+        Helios = ParentVM.Helios;
+        Deimos = ParentVM.ParentVM;
 
         ReportList = new List<WeeklyStatisticReport>();
         Reports = new ObservableCollection<WeeklyStatisticReport>();

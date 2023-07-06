@@ -16,7 +16,8 @@ namespace Deimos.ViewModels.Controls;
 
 public class ErrorsDiscoveredVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
-    public DeimosVM ParentVM { get; set; }
+    public DeimosVM Deimos { get; set; }
+    public ErrorAllocationVM ParentVM { get; set; }
     public Helios Helios { get; set; }
 
     public List<ErrorGroup> AllErrors { get; set; }
@@ -54,9 +55,10 @@ public class ErrorsDiscoveredVM : INotifyPropertyChanged, IDBInteraction, IFilte
 
     #endregion
 
-    public ErrorsDiscoveredVM(DeimosVM parentVM)
+    public ErrorsDiscoveredVM(ErrorAllocationVM parentVM)
     {
         ParentVM = parentVM;
+        Deimos = ParentVM.ParentVM;
         Helios = parentVM.Helios;
 
         filterString = string.Empty;

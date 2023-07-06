@@ -23,7 +23,7 @@ public class StaffUpdater
 
     public int ClockEvents(IEnumerable<ClockEvent> clocks) => Chariot.UpdateTable(clocks);
 
-    public async Task<int> ShiftEntryAsync(ShiftEntry shiftEntry) => await Chariot.InsertOrUpdateAsync(shiftEntry).ConfigureAwait(false);
+    public async Task<int> ShiftEntryAsync(ShiftEntry shiftEntry) => await Chariot.InsertOrReplaceAsync(shiftEntry).ConfigureAwait(false);
 
     public async Task<int> ShiftEntriesAsync(IEnumerable<ShiftEntry> shiftEntries) => await Chariot.UpdateTableAsync(shiftEntries).ConfigureAwait(false);
 
@@ -186,7 +186,7 @@ public class StaffUpdater
                 var day = DateTime.Parse(shiftEntry.Date).DayOfWeek;
                 if (shiftEntry.Day == day) continue;
                 shiftEntry.Day = day;
-                returnValue +=Chariot.InsertOrReplace(shiftEntry);
+                returnValue +=Chariot.InsertOrReplace((object?) shiftEntry);
             }
         });
 
@@ -455,11 +455,11 @@ public class StaffUpdater
                 tag.SetEmployee(employee);
                 tag.TagUse.Add(usage);
                 employee.TagUse.Add(usage);
-                lines += Chariot.InsertOrUpdate(usage);
+                lines += Chariot.InsertOrReplace(usage);
             }
 
-            lines += Chariot.InsertOrUpdate(tag);
-            lines += Chariot.InsertOrUpdate(employee);
+            lines += Chariot.InsertOrReplace(tag);
+            lines += Chariot.InsertOrReplace(employee);
         }
 
         await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
@@ -511,9 +511,9 @@ public class StaffUpdater
         return lines;
     }
 
-    public async Task<int> TagUsageAsync(TagUse use) => await Chariot.InsertOrUpdateAsync(use).ConfigureAwait(false);
+    public async Task<int> TagUsageAsync(TagUse use) => await Chariot.InsertOrReplaceAsync(use).ConfigureAwait(false);
 
-    public async Task<int> MispickAsync(Mispick mispick) => await Chariot.InsertOrUpdateAsync(mispick).ConfigureAwait(false);
+    public async Task<int> MispickAsync(Mispick mispick) => await Chariot.InsertOrReplaceAsync(mispick).ConfigureAwait(false);
 
     /// <summary>
     /// Update pick data and mispick data.
@@ -603,4 +603,8 @@ public class StaffUpdater
 
         return (eventCount, sessionCount, statCount);
     }
+
+    public async Task<int> QALineAsync(QALine qaLine) => await Chariot.InsertOrReplaceAsync(qaLine);
+
+    public async Task<int> QALinesAsync(List<QALine> qaLines) => await Chariot.UpdateTableAsync(qaLines);
 }

@@ -188,4 +188,6 @@ public class StaffDeleter
 
         return lines;
     }
+
+    public async Task<int> MispickAsync(Mispick mispick) => await Task.Run(() => Chariot.Delete(mispick)).ConfigureAwait(false);
 }

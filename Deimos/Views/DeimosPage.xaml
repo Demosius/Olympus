@@ -15,9 +15,6 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Morpheus;component/Themes/Dark/DullOrange/MSControls.Core.Implicit.xaml"/>
-                <ResourceDictionary>
-                    <converters:DataCompColourConverter x:Key="CompColourConverter"/>
-                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
@@ -33,110 +30,21 @@
             <Button Margin="5"
                     Content="Upload Mispick Data"
                     Command="{Binding UploadMispickDataCommand}"/>
+            <Button Margin="5"
+                    Content="Upload QA Cartons"
+                    Command="{Binding UploadQACartonsCommand}"/>
+            <Button Margin="5"
+                    Content="Upload QA Lines"
+                    Command="{Binding UploadQALinesCommand}"/>
         </StackPanel>
 
-        <!-- Top menu/header settings and functions -->
-        <StackPanel DockPanel.Dock="Top"
-                    Orientation="Horizontal">
-            <DatePicker Margin="5" 
-                        SelectedDate="{Binding StartDate}"/>
-            <Label Content="to"
-                   VerticalAlignment="Center"></Label>
-            <DatePicker Margin="5"
-                        SelectedDate="{Binding EndDate}"/>
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
-            <Label Content="Overwrite Existing Assignments"
-                   VerticalAlignment="Center"/>
-            <CheckBox IsChecked="{Binding Overwrite, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
-            <Button Content="RUN"
-                    Command="{Binding RunCommand}"
-                    Margin="5"
-                    Foreground="{StaticResource Brush01}"
-                    FontWeight="Bold"
-                    FontSize="20"
-                    MinWidth="100"/>
-        </StackPanel>
-
-        <!-- Data checking view -->
-        <Grid DockPanel.Dock="Left">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
-            <Border Grid.Row="0" BorderBrush="{StaticResource Brush01}" BorderThickness="1,1,1,.5"
-                    Padding="0,0,5,0">
-                <StackPanel Orientation="Vertical">
-                    <StackPanel.Resources>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Foreground" Value="{StaticResource Brush01}"/>
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="FontWeight" Value="Bold"></Setter>
-                        </Style>
-                    </StackPanel.Resources>
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="Total Dates:"/>
-                        <TextBlock Text="{Binding DateRange}"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="Dates w/o Data:"/>
-                        <TextBlock Text="{Binding DatesWithoutData}"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="W/o Pick Events:"/>
-                        <TextBlock Text="{Binding DatesWithoutEvents}"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="W/o Mispicks:"/>
-                        <TextBlock Text="{Binding DatesWithoutMispicks}"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-
-            <ListView Grid.Row="1"
-                      ItemsSource="{Binding DataComps}"
-                      SelectedItem="{Binding SelectedDateComp}"
-                      d:ItemsSource="{d:SampleData ItemCount=5}"
-                      SelectionMode="Single" 
-                      BorderThickness="1,1,1,2"
-                      BorderBrush="{StaticResource Brush01}">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Foreground="{Binding Converter={StaticResource CompColourConverter}}">
-                        <Run Text="{Binding Date, StringFormat=dd-MMM-yyyy}"/>
-                        <Run>: PE (</Run>
-                        <Run Text="{Binding PickEventLines}"/>
-                        <Run>) - MP (</Run>
-                        <Run Text="{Binding MispickLines}"/>
-                        <Run>)</Run>
-                        </TextBlock>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </Grid>
-        
-        <!-- Data/Results Viewer -->
-        <TabControl BorderThickness=".5,1,1,2" BorderBrush="{StaticResource Brush01}">
-            <TabItem Header="Pick Event History">
-                <controls:PickHistoryView DataContext="{Binding PickHistoryVM}"/>
+        <TabControl Background="{StaticResource ButtonBackgroundBrush}">
+            <TabItem Header="Error Allocation">
+                <controls:ErrorAllocationView DataContext="{Binding ErrorAllocationVM}"/>
             </TabItem>
-            <TabItem Header="Mispick Data">
-                <controls:MispickDataView DataContext="{Binding MispickDataVM}"/>
-            </TabItem>
-            <TabItem Header="Errors Made">
-                <controls:ErrorsMadeView DataContext="{Binding ErrorsMadeVM}"/>
-            </TabItem>
-            <TabItem Header="Errors Discovered">
-                <controls:ErrorsDiscoveredView DataContext="{Binding ErrorsDiscoveredVM}"/>
-            </TabItem>
-            <TabItem Header="Reports">
-                <controls:StatisticsReportView DataContext="{Binding StatisticsReportVM}"/>
-            </TabItem>
-            <TabItem Header="By-Week Report Data">
-                <controls:ReportByWeekView DataContext="{Binding ReportByWeekVM}"/>
+            <TabItem Header="QA Tool">
+                <controls:QAToolView DataContext="{Binding QAToolVM}"/>
             </TabItem>
         </TabControl>
-
     </DockPanel>
 </Page>

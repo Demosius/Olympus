@@ -51,7 +51,7 @@ public class StaffCreator
             entry.ApplyClockTimes(clocks);
 
             lines += Chariot.UpdateTable(clocks);
-            lines += Chariot.InsertOrUpdate(entry);
+            lines += Chariot.InsertOrReplace(entry);
         }
 
         await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
@@ -69,8 +69,8 @@ public class StaffCreator
         {
             foreach (var project in newProjects)
             {
-                Chariot.InsertOrReplace(project);
-                Chariot.InsertOrReplace(project.Icon);
+                Chariot.InsertOrReplace((object?) project);
+                Chariot.InsertOrReplace((object?) project.Icon);
             }
         });
     }
@@ -263,4 +263,84 @@ public class StaffCreator
     public int PickSessions(List<PickSession> sessions) => Chariot.Database?.InsertAll(sessions) ?? 0;
 
     public int PickStats(List<PickDailyStats> pickStats) => Chariot.Database?.InsertAll(pickStats) ?? 0;
+
+    /* QA Stats */
+    /// <summary>
+    /// Upload new QA Carton Data.
+    /// Aligns to matching QA Lines and adjusts the dates of those to match with this data.
+    /// </summary>
+    /// <param name="qaCartons"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<int> QACartonsAsync(List<QACarton> qaCartons)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            var cartonIDs = qaCartons.Select(c => c.ID);
+            var qaLineDict = Chariot.PullObjectList<QALine>(l => cartonIDs.Contains(l.CartonID))
+                .GroupBy(l => l.CartonID)
+                .ToDictionary(g => g.Key, g => g.ToList());
+            var qaLines = new List<QALine>();
+
+            // Update QALine dates.
+            foreach (var qaCarton in qaCartons)
+            {
+                if (!qaLineDict.TryGetValue(qaCarton.ID, out var qaLineGroup)) continue;
+                foreach (var qaLine in qaLineGroup)
+                {
+                    qaLine.Date = qaCarton.Date;
+                    qaLines.Add(qaLine);
+                }
+            }
+
+            lines += Chariot.UpdateTable(qaCartons);
+            lines += Chariot.UpdateTable(qaLines);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return lines;
+    }
+
+    /// <summary>
+    /// Upload new QA Line Data.
+    /// Align to matching QA Cartons to set the day.
+    /// Creates mispick data where appropriate.
+    /// </summary>
+    /// <param name="qaLines"></param>
+    /// <returns></returns>
+    public async Task<int> QALinesAsync(List<QALine> qaLines)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            var qaLineDict = qaLines.GroupBy(l => l.CartonID).ToDictionary(g => g.Key, g => g.ToList());
+            var cartonIDs = qaLineDict.Keys.ToList();
+            var qaCartons = Chariot.PullObjectList<QACarton>(c => cartonIDs.Contains(c.ID));
+
+            // Update QALine dates.
+            foreach (var qaCarton in qaCartons)
+            {
+                if (!qaLineDict.TryGetValue(qaCarton.ID, out var qaLineGroup)) continue;
+                foreach (var qaLine in qaLineGroup)
+                {
+                    qaLine.Date = qaCarton.Date;
+                    qaLines.Add(qaLine);
+                }
+            }
+
+            // Get mispick data.
+            var mispicks = qaLines.Select(qaLine => qaLine.GenerateMispick()).Where(mispick => mispick is not null).ToList();
+
+            lines += Chariot.UpdateTable(qaLines);
+            lines += Chariot.UpdateTable(mispicks);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return lines;
+    }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Uranus.Extensions;
 using Uranus.Staff.Models;
 
 namespace Uranus.Staff;
@@ -1186,4 +1187,100 @@ public class StaffReader
 
         return (mispicks, sessions, tagTool);
     }
+
+    /* QA Stats */
+    public async Task<List<QALine>> QAErrorLines(DateTime startDate, DateTime endDate)
+    {
+        var qaLines = new List<QALine>();
+
+        void Action()
+        {
+            qaLines = Chariot.PullObjectList<QALine>(l =>
+                !(l.QAStatus == EQAStatus.OK || l.QAStatus == EQAStatus.ShortPick) && l.Date >= startDate && l.Date <= endDate);
+            var mispickIDs = qaLines.Where(l => l.AtFault).Select(l => l.MispickID).Distinct();
+            var cartonIDs = qaLines.Select(l => l.CartonID).Distinct();
+            var pickerIDs = qaLines.Select(l => l.PickerRFID)
+                .Where(s => s != string.Empty)
+                .Distinct();
+
+            var mispicks = Chariot
+                .PullObjectList<Mispick>(m => mispickIDs.Contains(m.ID))
+                .ToDictionary(m => m.ID, m => m);
+            var cartons = Chariot
+                .PullObjectList<QACarton>(c => cartonIDs.Contains(c.ID))
+                .ToDictionary(c => c.ID, c => c);
+            var pickers = Chariot
+                .PullObjectList<Employee>(e => pickerIDs.Contains(e.RF_ID))
+                .DistinctBy(e => e.RF_ID)
+                .ToDictionary(e => e.RF_ID, e => e);
+
+            var nonErrorLines = new List<QALine>();
+            var newMispicks = new List<Mispick>();
+
+            foreach (var line in qaLines)
+            {
+                if (cartons.TryGetValue(line.CartonID, out var carton))
+                    carton.AddQALine(line);
+
+                if (pickers.TryGetValue(line.PickerRFID, out var picker))
+                    line.Picker = picker;
+
+                if (!mispicks.TryGetValue(line.MispickID, out var mispick))
+                {
+                    mispick = line.GenerateMispick();
+                    if (mispick is not null)
+                        newMispicks.Add(mispick);
+                    else
+                    {
+                        nonErrorLines.Add(line);
+                        continue;
+                    }
+                }
+
+                line.Mispick = mispick;
+            }
+
+            if (nonErrorLines.Any()) Chariot.UpdateTable(nonErrorLines);
+            if (newMispicks.Any()) Chariot.UpdateTable(mispicks);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return qaLines;
+    }
+
+    public async Task<QALine?> QALineAsync(string id)
+    {
+        QALine? qaLine = null;
+
+        void Action()
+        {
+            qaLine = Chariot.PullObject<QALine>(id);
+            if (qaLine is null) return;
+
+            if (qaLine.AtFault)
+            {
+                qaLine.Mispick = Chariot.PullObject<Mispick>(qaLine.MispickID);
+                if (qaLine.Mispick is null)
+                {
+                    qaLine.GenerateMispick();
+                    if (qaLine.Mispick is not null)
+                        Chariot.Insert(qaLine.Mispick);
+                }
+            }
+
+            qaLine.QACarton = Chariot.PullObject<QACarton>(qaLine.CartonID);
+            if (qaLine.QACarton is not null)
+                qaLine.QACarton.Employee = Chariot.PullObject<Employee>(qaLine.QACarton.EmployeeID);
+            
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return qaLine;
+    }
+
+    public async Task<Employee?> EmployeeFromRFAsync(string pickerRFID) =>
+        (await Chariot.PullObjectListAsync<Employee>(e => e.RF_ID == pickerRFID).ConfigureAwait(false))
+        .FirstOrDefault();
 }

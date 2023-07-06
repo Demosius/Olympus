@@ -8,6 +8,10 @@
              d:DataContext="{d:DesignInstance {x:Type vm:ErrorsDiscoveredVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
 
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </UserControl.InputBindings>
+
     <DockPanel>
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <Button Command="{Binding RefreshDataCommand}"

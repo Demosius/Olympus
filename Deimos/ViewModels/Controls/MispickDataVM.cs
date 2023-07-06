@@ -15,7 +15,8 @@ namespace Deimos.ViewModels.Controls;
 
 public class MispickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
-    public DeimosVM ParentVM { get; set; }
+    public DeimosVM Deimos { get; set; }
+    public ErrorAllocationVM ParentVM { get; set; }
     public Helios Helios { get; set; }
     public List<MispickVM> AllMispicks { get; set; }
 
@@ -51,9 +52,10 @@ public class MispickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     #endregion
 
-    public MispickDataVM(DeimosVM parentVM)
+    public MispickDataVM(ErrorAllocationVM parentVM)
     {
         ParentVM = parentVM;
+        Deimos = ParentVM.ParentVM;
         Helios = parentVM.Helios;
 
         filterString = string.Empty;
