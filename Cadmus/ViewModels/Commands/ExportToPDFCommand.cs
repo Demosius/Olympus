@@ -1,26 +1,23 @@
-﻿using Hydra.ViewModels.Controls;
-using System;
-using System.Linq;
+﻿using System;
 using System.Windows.Input;
+using Cadmus.Interfaces;
 
-
-namespace Hydra.ViewModels.Commands;
-
+namespace Cadmus.ViewModels.Commands;
 
 public class ExportToPDFCommand : ICommand
 {
-    public RunVM VM { get; set; }
+    public IExport VM { get; set; }
 
-    public ExportToPDFCommand(RunVM vm) { VM = vm; }
+    public ExportToPDFCommand(IExport vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.CurrentMoves.Any();
+        return VM.CanExport;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.ExportToPDF();
+        await VM.ExportToPDF();
     }
 
     public event EventHandler? CanExecuteChanged

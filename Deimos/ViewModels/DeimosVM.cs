@@ -4,6 +4,8 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Deimos.Interfaces;
+using Deimos.Models;
 using Deimos.ViewModels.Commands;
 using Deimos.ViewModels.Controls;
 using Morpheus;
@@ -23,7 +25,7 @@ public enum EQAView
     Reports
 }
 
-public class DeimosVM : INotifyPropertyChanged
+public class DeimosVM : INotifyPropertyChanged, IDBInteraction, IRun, IPickEvents, IMispickData
 {
     public Helios Helios { get; set; }
     public ProgressBarVM ProgressBar { get; set; }

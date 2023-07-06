@@ -82,16 +82,16 @@
     <SolidColorBrush x:Key="ListBoxBorderBrush" Color="{StaticResource Color006}" />
     <SolidColorBrush x:Key="ListBoxItemHoverBackgroundBrush" Color="{StaticResource Color006}" />
     <SolidColorBrush x:Key="ListBoxItemHoverBorderBrush" Color="{StaticResource Color004}" />
-    <SolidColorBrush x:Key="ListBoxItemPressedBackgroundBrush" Color="{StaticResource Color024}" />
-    <SolidColorBrush x:Key="ListBoxItemPressedBorderBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="ListBoxItemPressedBackgroundBrush" Color="{StaticResource Color027}" />
+    <SolidColorBrush x:Key="ListBoxItemPressedBorderBrush" Color="{StaticResource Color026}" />
 
     <SolidColorBrush x:Key="ListBoxItemBackgroundBrush" Color="{StaticResource Color016}" />
     <!-- Need to change color or delete -->
     <SolidColorBrush x:Key="ListBoxItemBorderBrush" Color="{StaticResource Color016}" />
     <!-- Need to change color or delete -->
-    <SolidColorBrush x:Key="ListBoxItemSelectedBackgroundBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="ListBoxItemSelectedBackgroundBrush" Color="{StaticResource Color027}" />
     <!-- Need to change color or delete -->
-    <SolidColorBrush x:Key="ListBoxItemSelectedBorderBrush" Color="{StaticResource Color024}" />
+    <SolidColorBrush x:Key="ListBoxItemSelectedBorderBrush" Color="{StaticResource Color027}" />
     <!-- Need to change color or delete -->
 
     <!-- CheckBox Brushes -->
@@ -554,7 +554,7 @@
                         <ContentControl x:Name="contentControl1" Visibility="Collapsed" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Margin="{TemplateBinding Padding}" Foreground="{StaticResource ForegroundBrush}">
                             <ContentPresenter x:Name="contentPresenter1" />
                         </ContentControl>
-                        <Rectangle x:Name="FocusedVisualElement" IsHitTestVisible="False" Visibility="Collapsed" Stroke="{StaticResource ListBoxItemPressedBorderBrush}" StrokeThickness="2" />
+                        <Rectangle x:Name="FocusedVisualElement" IsHitTestVisible="False" Visibility="Collapsed" Stroke="{StaticResource ListBoxItemPressedBorderBrush}" StrokeThickness="1" />
                         <Rectangle x:Name="DisabledVisualElement" Fill="{StaticResource DisabledVisualElement}" Visibility="Collapsed" />
                     </Grid>
                 </ControlTemplate>

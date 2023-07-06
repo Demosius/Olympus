@@ -1,25 +1,23 @@
-﻿using Hydra.ViewModels.Controls;
-using System;
-using System.Linq;
+﻿using System;
 using System.Windows.Input;
+using Cadmus.Interfaces;
 
-namespace Hydra.ViewModels.Commands;
-
+namespace Cadmus.ViewModels.Commands;
 
 public class ExportToLabelsCommand : ICommand
 {
-    public RunVM VM { get; set; }
+    public IExport VM { get; set; }
 
-    public ExportToLabelsCommand(RunVM vm) { VM = vm; }
+    public ExportToLabelsCommand(IExport vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.CurrentMoves.Any();
+        return VM.CanExport;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.ExportToLabels();
+        await VM.ExportToLabels();
     }
 
     public event EventHandler? CanExecuteChanged

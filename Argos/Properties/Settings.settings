@@ -5,5 +5,29 @@
     <Setting Name="SolLocation" Type="System.String" Scope="User">
       <Value Profile="(Default)">\ausefpdfs01ns\Shares\Public\DC_Data\Olympus\QA\Sol</Value>
     </Setting>
+    <Setting Name="BatchLoadDirectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\ausefpdfs01ns\Shares\FreightShare\RUBY\NAV Batch Import Files</Value>
+    </Setting>
+    <Setting Name="LanTechExportDirectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\ausefpdfs01ns\Shares\Public\DCOperations\Lantech\Orders\New Orders</Value>
+    </Setting>
+    <Setting Name="BatchSaveDirectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\ausefpdfs01ns\Shares\FreightShare\RUBY\NAV Batch Import Files</Value>
+    </Setting>
+    <Setting Name="AutoSplitZone" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AutoSplitCartons" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="CartonSplitString" Type="System.String" Scope="User">
+      <Value Profile="(Default)">A,B</Value>
+    </Setting>
+    <Setting Name="UseRegionColumn" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="LinkUp" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -914,6 +914,7 @@ public static class DataConversion
         }
     }
 
+    /****************************************** PICK EVENTS AND MISPICK DATA *****************************************/
     private static PickEvent? ArrayToPickEvent(IReadOnlyList<string> row, PickEventIndices col, int colMax, IFormatProvider provider)
     {
         if (colMax >= row.Count) return null;
@@ -1050,9 +1051,9 @@ public static class DataConversion
     public static async Task<List<PickEvent>> FileToPickEventsAsync(string filePath)
     {
         if (Path.GetExtension(filePath) == ".csv") return await CSVToPickEventsAsync(filePath);
-        
+
         return Regex.IsMatch(Path.GetExtension(filePath), "\\.xls\\w?") ?
-            await ExcelToPickEventsAsync(filePath) : 
+            await ExcelToPickEventsAsync(filePath) :
             new List<PickEvent>();
     }
 
@@ -1073,9 +1074,9 @@ public static class DataConversion
         {
             var row = line.Trim('"').Split(',', '"');
 
-            var mispick = ArrayToPickEvent(row, col, colMax, provider);
+            var pickEvent = ArrayToPickEvent(row, col, colMax, provider);
 
-            if (mispick is not null) events.Add(mispick);
+            if (pickEvent is not null) events.Add(pickEvent);
 
             line = await reader.ReadLineAsync();
         }
@@ -1115,7 +1116,7 @@ public static class DataConversion
     public static List<PickEvent> DataTableToPickEvents(DataTable dataTable)
     {
         IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
-        
+
         PickEventIndices col;
         // Check headers.
         try
@@ -1281,7 +1282,7 @@ public static class DataConversion
     {
         var extension = Path.GetExtension(filePath);
 
-        if (extension == ".csv") 
+        if (extension == ".csv")
             return await CSVToMispicksAsync(filePath).ConfigureAwait(false);
         if (Regex.IsMatch(extension, "\\.xls\\w?"))
             return await ExcelToMispicksAsync(filePath).ConfigureAwait(false);
@@ -1385,7 +1386,7 @@ public static class DataConversion
         });
 
         var mispicks = dataSet.Tables.Cast<DataTable>().SelectMany(DataTableToMispicks).ToList();
-        
+
         // If there is no data, throw invalid data exception.
         if (mispicks.Count == 0)
             throw new InvalidDataException($"Failed to pull valid mispick data from {excelPath}.", new List<string>());

@@ -23,6 +23,10 @@ public class MixedCartonItem
     [Ignore] public double Width => Item?.Width ?? 0;
     [Ignore] public double Height => Item?.Height ?? 0;
     [Ignore] public string ItemSignature => $"{ItemNumber}[{QtyPerCarton}]";
+    [Ignore] public string Platform => $"{Item?.Platform}";
+    [Ignore] public string Category => $"{Item?.Category}";
+    [Ignore] public string Genre => $"{Item?.Genre}";
+    [Ignore] public string Division => $"{Item?.Division}";
 
     public MixedCartonItem()
     {

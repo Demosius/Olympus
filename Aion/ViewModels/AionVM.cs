@@ -135,7 +135,7 @@ public class AionVM : INotifyPropertyChanged, IDBInteraction, IDBRepair
         try
         {
             var archivedData = OldDataUtil.GetArchivedData();
-            if (!archivedData.HasData()) return;
+            if (archivedData is null || !archivedData.HasData()) return;
 
             var currentData = await Helios.StaffReader.GetAionDataSetAsync();
 

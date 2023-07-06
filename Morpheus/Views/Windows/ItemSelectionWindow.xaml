@@ -4,16 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Morpheus.ViewModels.Windows"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance {x:Type vm:ItemSelectionVM}, IsDesignTimeCreatable=False}"
         Title="ItemSelectionWindow" Height="450" Width="800"
         Name="Window">
 
     <Window.Resources>
-        <Style BasedOn="{StaticResource ButtonStyle}" TargetType="{x:Type Button}">
-            <Setter Property="Margin" Value="10,0,0,0"/>
-            <Setter Property="MinWidth" Value="75"/>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/DullOrange/MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
 
     <DockPanel Background="{StaticResource CheckBoxBackgroundBrush}">
@@ -30,15 +32,21 @@
                         HorizontalAlignment="Right"
                         Margin="5">
                 <Button IsCancel="True"
-                        Content="Cancel"/>
+                        Content="Cancel"
+                        MinWidth="75"/>
                 <Button IsDefault="True"
                         Content="Okay"
                         Command="{Binding ConfirmInputCommand}"
-                        CommandParameter="{Binding ElementName=Window}"/>
+                        CommandParameter="{Binding ElementName=Window}"
+                        Margin="10,0,0,0"
+                        MinWidth="75"/>
             </StackPanel>
         </Grid>
         <DataGrid ItemsSource="{Binding FilteredItems}"
-                  SelectionMode="Single"
+                  Name="ItemGrid"
+                  d:ItemsSource="{d:SampleData ItemCount=5}"
+                  SelectionMode="{Binding SelectionMode}"
+                  SelectionChanged="Selector_OnSelectionChanged"
                   SelectionUnit="FullRow"
                   SelectedItem="{Binding SelectedItem}"
                   AutoGenerateColumns="True"

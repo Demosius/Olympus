@@ -1,4 +1,5 @@
-﻿using Argos.ViewModels;
+﻿using System;
+using Argos.ViewModels;
 using System.Threading.Tasks;
 using Uranus;
 using Uranus.Interfaces;
@@ -11,10 +12,21 @@ namespace Argos.Views;
 /// </summary>
 public partial class ArgosPage : IProject
 {
+    public ArgosVM VM { get; set; }
+    public Helios Helios { get; set; }
+
     public ArgosPage(Helios helios)
     {
+        Helios = helios;
         InitializeComponent();
-        DataContext = new ArgosVM(helios);
+        VM = ArgosVM.CreateEmpty(helios);
+        DataContext = VM;
+    }
+
+    private async void ArgosPage_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await ArgosVM.CreateAsync(Helios);
+        DataContext = VM;
     }
 
     public EProject Project => EProject.Argos;

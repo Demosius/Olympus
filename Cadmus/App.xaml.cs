@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Cadmus.Properties;
+using Morpheus.ViewModels.Controls;
 using Uranus;
 
 namespace Cadmus;
@@ -11,6 +12,7 @@ namespace Cadmus;
 public partial class App
 {
     public static Helios Helios { get; set; } = new(Settings.Default.SolLocation);
+    public static ProgressBarVM ProgressBar { get; set; } = new();
 
     public static string BaseDirectory()
     {

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Windows.Controls;
 using Morpheus.ViewModels.Commands;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -15,19 +16,11 @@ namespace Morpheus.ViewModels.Windows;
 public class ItemSelectionVM : INotifyPropertyChanged, IFilters
 {
     public List<NAVItem> Items { get; set; }
+    public List<NAVItem> SelectedItems { get; set; }
     
     #region INotifyPropertyChanged Members
-
-    private ObservableCollection<NAVItem> filteredItems;
-    public ObservableCollection<NAVItem> FilteredItems
-    {
-        get => filteredItems;
-        set
-        {
-            filteredItems = value;
-            OnPropertyChanged();
-        }
-    }
+    
+    public ObservableCollection<NAVItem> FilteredItems { get; set; }
 
     private string itemFilter;
     public string ItemFilter
@@ -52,6 +45,16 @@ public class ItemSelectionVM : INotifyPropertyChanged, IFilters
         }
     }
 
+    private SelectionMode selectionMode;
+    public SelectionMode SelectionMode
+    {
+        get => selectionMode;
+        set
+        {
+            selectionMode = value;
+            OnPropertyChanged();
+        }
+    }
 
     #endregion
 
@@ -63,10 +66,12 @@ public class ItemSelectionVM : INotifyPropertyChanged, IFilters
 
     #endregion
 
-    public ItemSelectionVM(List<NAVItem> items)
+    public ItemSelectionVM(List<NAVItem> items, SelectionMode selectMode = SelectionMode.Single)
     {
         Items = items;
-        filteredItems = new ObservableCollection<NAVItem>(Items);
+        SelectionMode = selectMode;
+        FilteredItems = new ObservableCollection<NAVItem>(Items);
+        SelectedItems = new List<NAVItem>();
         itemFilter = string.Empty;
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
@@ -82,8 +87,12 @@ public class ItemSelectionVM : INotifyPropertyChanged, IFilters
 
     public void ApplyFilters()
     {
-        var regex = new Regex(ItemFilter);
-        FilteredItems = new ObservableCollection<NAVItem>(Items.Where(i => regex.IsMatch(i.Number.ToString(format: "000000"))));
+        var items = Items.Where(i =>
+            Regex.IsMatch(i.Number.ToString(format: "000000"), ItemFilter, RegexOptions.IgnoreCase));
+
+        FilteredItems.Clear();
+        foreach (var item in items)
+            FilteredItems.Add(item);
     }
     
     public event PropertyChangedEventHandler? PropertyChanged;

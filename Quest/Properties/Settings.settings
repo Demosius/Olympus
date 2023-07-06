@@ -5,5 +5,11 @@
     <Setting Name="SolLocation" Type="System.String" Scope="User">
       <Value Profile="(Default)">\ausefpdfs01ns\Shares\Public\DC_Data\Olympus\PROD\Sol</Value>
     </Setting>
+    <Setting Name="PTLBreak" Type="System.TimeSpan" Scope="User">
+      <Value Profile="(Default)">00:02:00</Value>
+    </Setting>
+    <Setting Name="RFTBreak" Type="System.TimeSpan" Scope="User">
+      <Value Profile="(Default)">00:05:00</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

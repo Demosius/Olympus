@@ -21,6 +21,7 @@ using Uranus;
 using Uranus.Commands;
 using Uranus.Extensions;
 using Uranus.Interfaces;
+using Uranus.Inventory;
 using Uranus.Inventory.Models;
 using Settings = Cadmus.Properties.Settings;
 

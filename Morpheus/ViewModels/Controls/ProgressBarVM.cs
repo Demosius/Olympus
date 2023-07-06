@@ -114,6 +114,7 @@ public class ProgressBarVM : INotifyPropertyChanged
 
         title = string.Empty;
         action = string.Empty;
+        pct = string.Empty;
     }
 
     public IProgress<ProgressTaskVM> StartTask(string newTitle, string newAction = "", int newMin = 0, int newMax = 0, int newVal = 0)

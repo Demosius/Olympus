@@ -49,11 +49,11 @@
     <Color x:Key="Color022">#66E2E2E2</Color>
 
     <!--Theme Accent colors -->
-    <Color x:Key="Color023">#FFDDC0AB</Color>
-    <Color x:Key="Color024">#FFEEDABC</Color>
-    <Color x:Key="Color025">#FFFFEBCD</Color>
-    <Color x:Key="Color026">#FFFFFCDE</Color>
-    <Color x:Key="Color027">#26DDC9AB</Color>
+    <Color x:Key="Color023">#FF990000</Color>
+    <Color x:Key="Color024">#FFBA2222</Color>
+    <Color x:Key="Color025">#FFDD4444</Color>
+    <Color x:Key="Color026">#FFEE6666</Color>
+    <Color x:Key="Color027">#26FF8888</Color>
 
     <!--Theme Error colors -->
     <Color x:Key="Color028">#FFD0284C</Color>

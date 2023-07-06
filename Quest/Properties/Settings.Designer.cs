@@ -34,5 +34,29 @@ namespace Quest.Properties {
                 this["SolLocation"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:02:00")]
+        public global::System.TimeSpan PTLBreak {
+            get {
+                return ((global::System.TimeSpan)(this["PTLBreak"]));
+            }
+            set {
+                this["PTLBreak"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00:05:00")]
+        public global::System.TimeSpan RFTBreak {
+            get {
+                return ((global::System.TimeSpan)(this["RFTBreak"]));
+            }
+            set {
+                this["RFTBreak"] = value;
+            }
+        }
     }
 }

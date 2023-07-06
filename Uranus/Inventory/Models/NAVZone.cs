@@ -23,6 +23,8 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
     public List<NAVMoveLine> MoveLines { get; set; }
     [OneToMany(nameof(Models.NAVStock.ZoneID), nameof(Models.NAVStock.Zone), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVStock> NAVStock { get; set; }
+    [OneToMany(nameof(PickLine.CartonID), nameof(PickLine.BatchTOLine), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<PickLine> PickLines { get; set; }
 
     [ManyToMany(typeof(BayZone), nameof(BayZone.ZoneID), nameof(Bay.Zones), CascadeOperations = CascadeOperation.All)]
     public List<Bay> Bays { get; set; }
@@ -75,6 +77,7 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
         NAVStock = new List<NAVStock>();
         Bays = new List<Bay>();
         Stock = new Dictionary<int, Stock>();
+        PickLines = new List<PickLine>();
     }
 
     public NAVZone(string zoneCode, NAVLocation location)
@@ -90,6 +93,7 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
         MoveLines = new List<NAVMoveLine>();
         NAVStock = new List<NAVStock>();
         Stock = new Dictionary<int, Stock>();
+        PickLines = new List<PickLine>();
     }
 
     public NAVZone(string id, string code, string locationCode, string description, int ranking, NAVLocation location,
@@ -107,6 +111,7 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
         Bays = bays;
         Extension = extension;
         Stock = new Dictionary<int, Stock>();
+        PickLines = new List<PickLine>();
     }
 
     public NAVZone(string zoneID)
@@ -121,6 +126,7 @@ public class NAVZone : IComparable<NAVZone>, IEquatable<NAVZone>
         NAVStock = new List<NAVStock>();
         Bays = new List<Bay>();
         Stock = new Dictionary<int, Stock>();
+        PickLines = new List<PickLine>();
     }
 
     public int CompareTo(NAVZone? other)

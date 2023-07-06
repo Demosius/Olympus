@@ -69,13 +69,13 @@ internal class InventoryVM : INotifyPropertyChanged
 
         Controls = new ObservableCollection<EInventoryControl>
         {
+            EInventoryControl.Stores,
             EInventoryControl.Bays,
             EInventoryControl.Categories,
             EInventoryControl.Divisions,
             EInventoryControl.Platforms,
             EInventoryControl.Genres,
             EInventoryControl.Sites,
-            EInventoryControl.Stores,
             EInventoryControl.TransferOrders,
             EInventoryControl.Bins,
             EInventoryControl.Zones,
@@ -104,7 +104,7 @@ internal class InventoryVM : INotifyPropertyChanged
                 EInventoryControl.Platforms => currentControl,
                 EInventoryControl.Sites => currentControl,
                 EInventoryControl.Stock => CurrentControl,
-                EInventoryControl.Stores => currentControl,
+                EInventoryControl.Stores => new StoreHandlerView(Helios),
                 EInventoryControl.TransferOrders => currentControl,
                 EInventoryControl.Zones => new ZoneHandlerView(Helios, null),
                 EInventoryControl.MixedCartons => new MixedCartonHandlerView(Helios),

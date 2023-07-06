@@ -23,7 +23,7 @@ public partial class AionPage : IProject
 
         DataContext = VM;
 
-        KeyGesture backKeyGesture = null;
+        KeyGesture? backKeyGesture = null;
         foreach (InputGesture browseBackInputGesture in NavigationCommands.BrowseBack.InputGestures)
         {
             if (browseBackInputGesture is KeyGesture { Key: Key.Back, Modifiers: ModifierKeys.None } keyGesture)

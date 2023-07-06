@@ -26,6 +26,7 @@
         <GradientStop Offset="0.0" Color="{DynamicResource Color023}"/>
         <GradientStop Offset="1" Color="{DynamicResource Color009}"/>
     </RadialGradientBrush>
+    <SolidColorBrush x:Key="AlternatingRowBrush" Color="{DynamicResource Color026}"/>
 
     <!-- ***************************  DataGrid Column Header Style  **************************** -->
     <Style x:Key="DataGridColumnHeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
@@ -42,7 +43,7 @@
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"			     
                                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                               SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
-                                              TextBlock.Foreground="{DynamicResource Brush00}"
+                                              TextBlock.Foreground="{DynamicResource Brush05}"
                                               Margin="2"/>
                         </Border>
                     </Grid>
@@ -56,7 +57,7 @@
         <!-- Place holder. -->
     </Style>
 
-    <!-- ********************************* DataGrid Row Style ********************************** -->
+    <!-- ********************************* DataGrid Row Header Style ********************************** -->
     <Style TargetType="{x:Type DataGridRowHeader}" x:Key="DataGridRowHeaderStyle">
         <Setter Property="Background" Value="{DynamicResource RowHeaderBackground}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource RowHeaderBorder}"/>
@@ -65,7 +66,7 @@
 
     <!-- ********************************* DataGrid Cell Style ********************************* -->
     <Style TargetType="{x:Type DataGridCell}" x:Key="DataGridCellStyle">
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource Brush00}"/>
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource Brush05}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type DataGridCell}">
@@ -113,7 +114,7 @@
     </Style>
 
     <Style x:Key="DataGridStyle" TargetType="{x:Type DataGrid}">
-        <Setter Property="Background" Value="{DynamicResource Brush05}"/>
+        <Setter Property="Background" Value="{DynamicResource Brush03}"/>
         <Setter Property="Foreground" Value="{DynamicResource Brush01}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
@@ -127,8 +128,8 @@
         <Setter Property="RowHeaderStyle" Value="{DynamicResource DataGridRowHeaderStyle}"/>
         <Setter Property="FontFamily" Value="{StaticResource DIN}"/>
         <Setter Property="AlternationCount" Value="2"/>
-        <Setter Property="RowBackground" Value="{DynamicResource Brush05}"/>
-        <Setter Property="AlternatingRowBackground" Value="{DynamicResource Brush04}"/>
+        <Setter Property="RowBackground" Value="{DynamicResource Brush02}"/>
+        <Setter Property="AlternatingRowBackground" Value="{DynamicResource AlternatingRowBrush}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type DataGrid}">

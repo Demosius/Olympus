@@ -9,6 +9,7 @@ public class EmployeeStatisticsReport
 {
     public Employee? Employee { get; set; }
     public string EmployeeName => Employee?.FullName ?? string.Empty;
+    public string DisplayName => Employee?.FullName ?? RFID;
     public string RFID { get; set; }
     public ETechType TechType { get; set; }
     public TimeSpan TimeTaken { get; set; }
@@ -26,6 +27,20 @@ public class EmployeeStatisticsReport
 
     public List<PickSession> PickSessions { get; set; }
     public List<Mispick> Mispicks { get; set; }
+
+    private int? ptlHits;
+    public int PTLHits => ptlHits ??= PickSessions.Where(s => s.PickLocation == EPickLocation.PTL).Sum(s => s.Hits);
+    private int? spo01Hits;
+    public int SP01Hits => spo01Hits ??= PickSessions.Where(s => s.PickLocation == EPickLocation.SP01).Sum(s => s.Hits);
+    private int? aBulkHits;
+    public int ABulkHits => aBulkHits ??= PickSessions.Where(s => s.PickLocation == EPickLocation.ABULK).Sum(s => s.Hits);
+
+    private double? ptlHitsPerHour;
+    public double PTLHitsPerHour => ptlHitsPerHour ??= PTLHits / TimeTaken.TotalHours;
+    private double? sp01HitsPerHour;
+    public double SP01HitsPerHour => sp01HitsPerHour ??= SP01Hits / TimeTaken.TotalHours;
+    private double? aBulkHitsPerHour;
+    public double ABulkHitsPerHour => aBulkHitsPerHour ??= ABulkHits / TimeTaken.TotalHours;
 
     public EmployeeStatisticsReport(Employee? employee, string rfID, List<PickSession> pickSessions, DateTime? start, DateTime? end)
     {

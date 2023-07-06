@@ -1,24 +1,23 @@
-﻿using Hydra.ViewModels.Controls;
-using System;
-using System.Linq;
+﻿using System;
 using System.Windows.Input;
+using Morpheus.ViewModels.Interfaces;
 
-namespace Hydra.ViewModels.Commands;
+namespace Morpheus.ViewModels.Commands;
 
-public class ExportToCSVCommand : ICommand
+public class SetDataFileCommand : ICommand
 {
-    public RunVM VM { get; set; }
+    public IFileUpload VM { get; set; }
 
-    public ExportToCSVCommand(RunVM vm) { VM = vm; }
+    public SetDataFileCommand(IFileUpload vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
-        return VM.CurrentMoves.Any();
+        return true;
     }
 
     public void Execute(object? parameter)
     {
-        VM.ExportToCSV();
+        VM.SetDataFile();
     }
 
     public event EventHandler? CanExecuteChanged

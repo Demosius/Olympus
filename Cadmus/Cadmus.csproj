@@ -17,7 +17,16 @@
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
     <None Remove="Resources\Fonts\DIN Medium.ttf" />
     <None Remove="Resources\Fonts\DIN.ttf" />
+    <None Remove="Resources\Images\arrow-090-medium.png" />
+    <None Remove="Resources\Images\arrow-270-medium.png" />
+    <None Remove="Resources\Images\cross.png" />
+    <None Remove="Resources\Images\csv.png" />
+    <None Remove="Resources\Images\disk--arrow.png" />
+    <None Remove="Resources\Images\document-break.png" />
+    <None Remove="Resources\Images\document-excel-table.png" />
+    <None Remove="Resources\Images\document-pdf.png" />
     <None Remove="Resources\Images\printer.png" />
+    <None Remove="Resources\Images\search.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,7 +63,16 @@
     <Content Include="Resources\Fonts\DIN.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\Images\arrow-090-medium.png" />
+    <Resource Include="Resources\Images\arrow-270-medium.png" />
+    <Resource Include="Resources\Images\cross.png" />
+    <Resource Include="Resources\Images\csv.png" />
+    <Resource Include="Resources\Images\disk--arrow.png" />
+    <Resource Include="Resources\Images\document-break.png" />
+    <Resource Include="Resources\Images\document-excel-table.png" />
+    <Resource Include="Resources\Images\document-pdf.png" />
     <Resource Include="Resources\Images\printer.png" />
+    <Resource Include="Resources\Images\search.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -91,6 +109,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="EPPlus" Version="4.5.3.3" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <PackageReference Include="System.Management" Version="7.0.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
