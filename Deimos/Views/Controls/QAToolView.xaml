@@ -1,0 +1,50 @@
+﻿<UserControl x:Class="Deimos.Views.Controls.QAToolView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Deimos.ViewModels.Controls"
+             xmlns:converters="clr-namespace:Deimos.ViewModels.Converters"
+             xmlns:controls="clr-namespace:Deimos.Views.Controls"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:viewModels="clr-namespace:Deimos.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:QAToolVM}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </UserControl.InputBindings>
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/DullOrange/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary>
+                    <ObjectDataProvider x:Key="QAViews"
+                                        MethodName="GetValues"
+                                        ObjectType="{x:Type sys:Enum}">
+                        <ObjectDataProvider.MethodParameters>
+                            <x:Type TypeName="viewModels:EQAView"/>
+                        </ObjectDataProvider.MethodParameters>
+                    </ObjectDataProvider>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <DockPanel Background="{StaticResource ButtonBackgroundBrush}">
+        <ListView DockPanel.Dock="Left" 
+                  ItemsSource="{Binding Source={StaticResource QAViews}}"
+                  SelectedValue="{Binding SelectedView, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  MinWidth="80">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <UserControl Content="{Binding CurrentControl}"
+                     Background="{StaticResource ButtonBackgroundBrush}"/>
+    </DockPanel>
+</UserControl>
