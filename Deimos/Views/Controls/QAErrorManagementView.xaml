@@ -208,7 +208,7 @@
                                     Binding="{Binding ErrorType}"
                                     IsReadOnly="False"/>
                 <DataGridTextColumn Header="Date"
-                                    Binding="{Binding Date}"
+                                    Binding="{Binding Date, StringFormat='dd-MMM-yyyy'}"
                                     IsReadOnly="True"/>
                 <DataGridCheckBoxColumn Header="At Fault"
                                     Binding="{Binding AtFault, Mode=OneWay}"

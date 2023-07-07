@@ -265,6 +265,12 @@ public class Employee
         AvatarName = Avatar?.Name ?? AvatarName;
     }
 
+    public void AddQACarton(QACarton carton)
+    {
+        QACartons.Add(carton);
+        carton.QAOperator = this;
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]

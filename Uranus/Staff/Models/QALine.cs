@@ -40,7 +40,7 @@ public class QALine
     
     [Ignore] public Employee? Picker { get; set; }
     [Ignore] public string PickerName => Picker?.FullName ?? string.Empty;
-    [Ignore] public Employee? QABy => QACarton?.Employee;
+    [Ignore] public Employee? QABy => QACarton?.QAOperator;
     [Ignore] public Mispick? Mispick { get; set; }
 
     [ManyToOne(nameof(CartonID), nameof(Models.QACarton.QALines), CascadeOperations = CascadeOperation.CascadeRead)]

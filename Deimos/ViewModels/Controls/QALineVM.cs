@@ -27,7 +27,7 @@ public class QALineVM : INotifyPropertyChanged, IDBInteraction
 
     public QACarton? Carton => QALine.QACarton;
 
-    public Employee? QAOperator => Carton?.Employee;
+    public Employee? QAOperator => Carton?.QAOperator;
 
     public Mispick? Mispick => QALine.Mispick;
 
@@ -109,13 +109,12 @@ public class QALineVM : INotifyPropertyChanged, IDBInteraction
         }
     }
 
-    public string Date
+    public DateTime Date
     {
-        get => QALine.Date.ToString("dd-MMM-yyyy");
+        get => QALine.Date;
         set
         {
-            if (!DateTime.TryParse(value, out var date)) return;
-            QALine.Date = date;
+            QALine.Date = value;
             OnPropertyChanged();
             _ = SaveAsync();
         }

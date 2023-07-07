@@ -21,6 +21,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Morpheus;component/Themes/Dark/DullOrange/MSControls.Core.Implicit.xaml"/>
                 <ResourceDictionary>
+                    <converters:QAViewConverter x:Key="QAViewConverter"/>
                     <ObjectDataProvider x:Key="QAViews"
                                         MethodName="GetValues"
                                         ObjectType="{x:Type sys:Enum}">
@@ -40,7 +41,7 @@
                   MinWidth="80">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding}"/>
+                    <TextBlock Text="{Binding Converter={StaticResource QAViewConverter}}"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

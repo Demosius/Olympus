@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Deimos.ViewModels.Commands;
 using Morpheus.ViewModels.Controls;
+using Morpheus.ViewModels.Interfaces;
 using Serilog;
 using Uranus;
 using Uranus.Annotations;
@@ -16,7 +17,7 @@ using Uranus.Interfaces;
 
 namespace Deimos.ViewModels.Controls;
 
-public class QAErrorManagementVM : INotifyPropertyChanged, IDBInteraction, IFilters
+public class QAErrorManagementVM : INotifyPropertyChanged, IDBInteraction, IFilters, IRefreshingControl
 {
     public Helios Helios { get; set; }
     public ProgressBarVM ProgressBar { get; set; }

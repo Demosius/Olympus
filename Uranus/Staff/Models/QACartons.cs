@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
 
@@ -21,7 +22,7 @@ public class QACarton
     public string ShipmentNumber { get; set; }
     public string WarehouseCode { get; set; }
     public string CartonType { get; set; }
-    public string EmployeeID { get; set; }
+    public int EmployeeID { get; set; }
     public DateTime Date { get; set; }
     public TimeSpan Time { get; set; }
     public bool Pass { get; set; }
@@ -35,11 +36,28 @@ public class QACarton
     public double CurrentWeight { get; set; }
     public double CurrentCube { get; set; }
 
-    [Ignore] public string QABy => EmployeeID;
-    [Ignore] public Employee? Employee { get; set; }
+    [Ignore] public int QABy => EmployeeID;
+    [Ignore] public Employee? QAOperator { get; set; }
 
     [OneToMany(nameof(QALine.CartonID), nameof(QALine.QACarton), CascadeOperations = CascadeOperation.CascadeRead)]
     public List<QALine> QALines { get; set; }
+
+    [Ignore] public DateTime DateTime => Date.AddTicks(Time.Ticks);
+    private QACarton? nextCarton;
+    [Ignore] public QACarton? NextCarton
+    {
+        get => nextCarton;
+        set
+        {
+            nextCarton = value;
+            QATime = NextCarton is null ? TimeSpan.Zero : NextCarton.DateTime.Subtract(DateTime);
+        }
+    }
+
+    [Ignore] public TimeSpan QATime { get; set; }
+
+    [Ignore] public int QAScans => QALines.Sum(l => l.QAQty);
+    [Ignore] public int QAUnits => QALines.Sum(l => l.PickQtyBase);
 
     public QACarton()
     {
@@ -49,7 +67,6 @@ public class QACarton
         ShipmentNumber = string.Empty;
         WarehouseCode = string.Empty;
         CartonType = string.Empty;
-        EmployeeID = string.Empty;
         QAStatus = string.Empty;
         BatchID = string.Empty;
 

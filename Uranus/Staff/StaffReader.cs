@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Uranus.Extensions;
 using Uranus.Staff.Models;
 
 namespace Uranus.Staff;
@@ -1283,8 +1282,8 @@ public class StaffReader
 
             qaLine.QACarton = Chariot.PullObject<QACarton>(qaLine.CartonID);
             if (qaLine.QACarton is not null)
-                qaLine.QACarton.Employee = Chariot.PullObject<Employee>(qaLine.QACarton.EmployeeID);
-            
+                qaLine.QACarton.QAOperator = Chariot.PullObject<Employee>(qaLine.QACarton.EmployeeID);
+
         }
 
         await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
@@ -1295,4 +1294,47 @@ public class StaffReader
     public async Task<Employee?> EmployeeFromRFAsync(string pickerRFID) =>
         (await Chariot.PullObjectListAsync<Employee>(e => e.RF_ID == pickerRFID).ConfigureAwait(false))
         .FirstOrDefault();
+
+    public async Task<List<QACarton>> QACartonsAsync(DateTime fromDate, DateTime toDate) =>
+        await Chariot.PullObjectListAsync<QACarton>(c => c.Date >= fromDate && c.Date <= toDate);
+
+    public async Task<List<Employee>> QAOperatorStatisticsAsync(DateTime fromDate, DateTime toDate)
+    {
+        var operators = new List<Employee>();
+
+        void Action()
+        {
+            var cartonDict = Chariot.PullObjectList<QACarton>(c => c.Date >= fromDate && c.Date <= toDate).ToDictionary(c => c.ID, c => c);
+            var lineDict = Chariot.PullObjectList<QALine>(l => cartonDict.ContainsKey(l.CartonID))
+                .GroupBy(l => l.CartonID)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var employeeIDs = cartonDict.Values.Select(c => c.EmployeeID).ToHashSet();
+            var employeeDict = Chariot.PullObjectList<Employee>(e => employeeIDs.Contains(e.ID)).ToDictionary(e => e.ID, e => e);
+
+            foreach (var (cartonID, carton) in cartonDict)
+            {
+                if (lineDict.TryGetValue(cartonID, out var lines))
+                {
+                    carton.QALines = lines;
+                    foreach (var line in lines) line.QACarton = carton;
+                }
+
+                if (!employeeDict.TryGetValue(carton.EmployeeID, out var qaOperator))
+                {
+                    qaOperator = new Employee(carton.EmployeeID)
+                    {
+                        RF_ID = $"RF_E{carton.EmployeeID}",
+                        FirstName = carton.EmployeeID.ToString(),
+                        LastName = $"Mc{carton.EmployeeID}"
+                    };
+                }
+                qaOperator.AddQACarton(carton);
+                operators.Add(qaOperator);
+            }
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return operators;
+    }
 }

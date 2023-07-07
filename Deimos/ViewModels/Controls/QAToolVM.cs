@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using Deimos.Views.Controls;
 using Morpheus.ViewModels.Controls;
+using Morpheus.ViewModels.Interfaces;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -19,12 +19,12 @@ public class QAToolVM : INotifyPropertyChanged, IDBInteraction
     public Helios Helios { get; set; }
     public ProgressBarVM ProgressBar { get; set; }
 
-    public Dictionary<EQAView, UserControl> Controls { get; set; }
+    public Dictionary<EQAView, IRefreshingControl> Controls { get; set; }
 
     #region INotifyPropertyChanged Members
 
-    private UserControl? currentControl;
-    public UserControl? CurrentControl
+    private IRefreshingControl? currentControl;
+    public IRefreshingControl? CurrentControl
     {
         get => currentControl;
         set
@@ -60,17 +60,15 @@ public class QAToolVM : INotifyPropertyChanged, IDBInteraction
         Helios = ParentVM.Helios;
         ProgressBar = ParentVM.ProgressBar;
         
-        Controls = new Dictionary<EQAView, UserControl>();
+        Controls = new Dictionary<EQAView, IRefreshingControl>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
     }
 
     public async Task RefreshDataAsync()
     {
-        if (!Controls.TryGetValue(EQAView.Errors, out var control)) return;
-        var errorManagementVM = control as QAErrorManagementVM;
-        if (errorManagementVM == null) return;
-        await ((QAErrorManagementVM)errorManagementVM).RefreshDataAsync();
+        if (!Controls.TryGetValue(EQAView.Errors, out var errorManagementView)) return;
+        await ((QAErrorManagementView)errorManagementView).RefreshDataAsync();
     }
 
     private void SetControl()
@@ -84,8 +82,8 @@ public class QAToolVM : INotifyPropertyChanged, IDBInteraction
             newControl = view switch
             {
                 EQAView.Errors => new QAErrorManagementView(Helios, ProgressBar),
-                EQAView.Stats => new QAErrorManagementView(Helios, ProgressBar),
-                EQAView.Reports => new QAErrorManagementView(Helios, ProgressBar),
+                EQAView.Stats => new QAOperatorStatsView(this),
+                EQAView.Reports => new QAStatReportsView(this),
                 _ => throw new ArgumentOutOfRangeException()
             };
 
