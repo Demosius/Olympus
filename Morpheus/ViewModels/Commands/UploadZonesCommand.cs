@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Morpheus.ViewModels.Controls;
+using System;
 using System.Windows.Input;
 
 namespace Morpheus.ViewModels.Commands;
@@ -14,9 +15,9 @@ public class UploadZonesCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.UploadZones();
+        await VM.UploadZones();
     }
 
     public event EventHandler? CanExecuteChanged

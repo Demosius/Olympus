@@ -9,10 +9,12 @@ using SQLite;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Morpheus.ViewModels.Controls;
 using Uranus.Interfaces;
 using Uranus.Inventory.Models;
 using Uranus.Staff;
@@ -38,15 +40,16 @@ public class OlympusVM : INotifyPropertyChanged
     /* Sub ViewModels - Components */
     public DBManager DBManager { get; set; }
     public InventoryUpdaterVM InventoryUpdaterVM { get; set; }
-    public ProjectLauncherVM ProjectLauncherVM { get; set; }
+    public ProjectLauncherVM ProjectLauncherVM { get; set; } = null!;
     public UserHandlerVM UserHandlerVM { get; set; }
+    public ProgressBarVM ProgressBarVM { get; set; }
 
     /* Commands */
     public GenerateMasterSkuListCommand GenerateMasterSkuListCommand { get; set; }
     public ChangePasswordCommand ChangePasswordCommand { get; set; }
 
     /* Constructor(s) */
-    public OlympusVM()
+    private OlympusVM()
     {
         RunningProjects = new Dictionary<EProject, IProject>();
 
@@ -54,22 +57,32 @@ public class OlympusVM : INotifyPropertyChanged
 
         DBManager = new DBManager(this);
         UserHandlerVM = new UserHandlerVM(this);
-        ProjectLauncherVM = new ProjectLauncherVM(this);
         InventoryUpdaterVM = new InventoryUpdaterVM(this);
+        ProgressBarVM = App.ProgressBar;
 
         GenerateMasterSkuListCommand = new GenerateMasterSkuListCommand(this);
         ChangePasswordCommand = new ChangePasswordCommand(this);
     }
 
-    internal void RefreshData()
+    private async Task<OlympusVM> InitializeAsync()
     {
-        foreach (var project in RunningProjects)
-        {
-            project.Value.RefreshData();
-        }
+        ProjectLauncherVM = await ProjectLauncherVM.CreateAsync(this);
+        return this;
     }
 
-    internal void ResetDB()
+    public static Task<OlympusVM> CreateAsync()
+    {
+        var ret = new OlympusVM();
+        return ret.InitializeAsync();
+    }
+
+    internal async Task RefreshData()
+    {
+        var tasks = RunningProjects.Select(project => project.Value.RefreshDataAsync()).ToList();
+        await Task.WhenAll(tasks);
+    }
+
+    internal async Task ResetDB()
     {
         App.Helios.ResetChariots(Settings.Default.SolLocation);
         App.Charon.DatabaseReset(Settings.Default.SolLocation);
@@ -77,7 +90,7 @@ public class OlympusVM : INotifyPropertyChanged
         EstablishInitialProjectIcons();
 
         UserHandlerVM.CheckUser();
-        ProjectLauncherVM = new ProjectLauncherVM(this);
+        ProjectLauncherVM = await ProjectLauncherVM.CreateAsync(this);
         InventoryUpdaterVM = new InventoryUpdaterVM(this);
 
         OnPropertyChanged(nameof(ProjectLauncherVM));
@@ -135,20 +148,21 @@ public class OlympusVM : INotifyPropertyChanged
             new Project(EProject.Hydra, "Hydra.ico", App.Helios.StaffReader, "Manage stock levels between different facilities."),
             new Project(EProject.Cadmus, "cadmus.ico", App.Helios.StaffReader, "Manages document creation and printing."),
             new Project(EProject.Sphynx, "Sphynx.ico", App.Helios.StaffReader, "Product Investigation: Countables and Product Search Sheet"),
-            new Project(EProject.Argos, "UBC.ico", App.Helios.StaffReader, "UBC: Unified Batch Checker - for cross-department batch progress reports."),
+            new Project(EProject.Argos, "UBC.ico", App.Helios.StaffReader, "Batch Management Tool"),
             new Project(EProject.Hades, "Hades.ico", App.Helios.StaffReader, "N.I.M.S. - Non-Inventory Management System"),
             new Project(EProject.Panacea, "Panacea.ico", App.Helios.StaffReader, "ALLFIX: Multiple tools to remedy many given issues."),
-            new Project(EProject.Hermes, "Hermes.ico", App.Helios.StaffReader, "Messaging service. Use for dev requests."),
+            new Project(EProject.Quest, "quest.ico", App.Helios.StaffReader, "Manage Restock Staff assignment and tracking. (ZLAM & PickRate Tracker)"),
+            new Project(EProject.Deimos, "deimos.ico", App.Helios.StaffReader, "PickRate tracking and error allocation. (Dredd)"),
         };
 
         App.Helios.StaffCreator.EstablishInitialProjects(projects);
 
     }
 
-    public static void GenerateMasterSkuList()
+    public static async Task GenerateMasterSkuList()
     {
-        var masters = App.Helios.InventoryReader.GetMasters();
-
+        var masters = (await App.Helios.InventoryReader.GetMastersAsync()).ToList();
+        
         // Make sure the target destination exists.
         var dirPath = Path.Combine(App.BaseDirectory(), "SKUMasterExports");
 
@@ -160,7 +174,7 @@ public class OlympusVM : INotifyPropertyChanged
         //var sqlTask = Task.Run(() => ExportMasterSkuIntoSqLite(masters, dirPath));
         Task.WaitAll(csvTask, jsonTask, xmlTask);//, sqlTask);
 
-        _ = MessageBox.Show("Files exported.");
+        MessageBox.Show($"Files exported to {dirPath}.");
     }
 
     public static void ExportMasterSkuAsCSV(IEnumerable<SkuMaster> masters, string dirPath)

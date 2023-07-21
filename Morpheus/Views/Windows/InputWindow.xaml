@@ -1,0 +1,63 @@
+﻿<Window x:Class="Morpheus.Views.Windows.InputWindow"
+        x:Name="Window"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:Morpheus.ViewModels.Windows"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type viewModels:InputWindowVM}, IsDesignTimeCreatable=False}"
+        SizeToContent="WidthAndHeight"
+        Title="{Binding Title}"
+        FocusManager.FocusedElement="{Binding ElementName=Input}"
+        WindowStartupLocation="CenterOwner">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Master/MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Background="{StaticResource Brush04}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Prompt -->
+        <Label Grid.Row="0"
+               VerticalAlignment="Center"
+               HorizontalContentAlignment="Left"
+               Content="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}"
+               Margin="5"/>
+
+        <!-- Input -->
+        <TextBox Grid.Row="1"
+                 Text="{Binding Input, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 x:Name="Input"
+                 MinWidth="200"
+                 Margin="5"/>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="3"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="5">
+            <Button IsCancel="True"
+                    Content="Cancel"
+                    Margin="10,0,0,0"
+                    MinWidth="75"/>
+            <Button IsDefault="True"
+                    Content="Okay"
+                    Margin="10,0,0,0"
+                    MinWidth="75"
+                    Command="{Binding ConfirmInputCommand}"
+                    CommandParameter="{Binding ElementName=Window}"/>
+        </StackPanel>
+    </Grid>
+</Window>

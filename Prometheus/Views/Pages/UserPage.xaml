@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:views="clr-namespace:Prometheus.Views"
       xmlns:pages="clr-namespace:Prometheus.ViewModels.Pages"
-      d:DataContext="{d:DesignInstance pages:UserVM, IsDesignTimeCreatable=False}"
+      d:DataContext="{d:DesignInstance pages:UserPageVM, IsDesignTimeCreatable=False}"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="UserPage">

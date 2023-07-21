@@ -1,10 +1,10 @@
-﻿using Pantheon.ViewModels.Interface;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.Interfaces;
 
 namespace Pantheon.ViewModels.Commands.Employees;
 
-internal class SaveImageChangesCommand : ICommand
+public class SaveImageChangesCommand : ICommand
 {
     public IImageSelector VM { get; set; }
 
@@ -17,7 +17,7 @@ internal class SaveImageChangesCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.SaveImageChanges();
+        VM.SaveImageChangesAsync();
     }
 
     public event EventHandler? CanExecuteChanged

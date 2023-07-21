@@ -24,8 +24,8 @@ public class UpdateUoMCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.UpdateUoM();
+        await VM.UpdateUoM();
     }
 }

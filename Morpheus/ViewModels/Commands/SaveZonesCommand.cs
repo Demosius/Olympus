@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Morpheus.ViewModels.Controls;
+using System;
 using System.Windows.Input;
 
 namespace Morpheus.ViewModels.Commands;
@@ -17,9 +18,9 @@ public class SaveZonesCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.SaveZones();
+        await VM.SaveZones();
     }
 
     public event EventHandler? CanExecuteChanged

@@ -16,9 +16,9 @@ public class UpdateTOLinesCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.UpdateTOLines();
+        await VM.UpdateTOLines();
     }
 
     public event EventHandler? CanExecuteChanged

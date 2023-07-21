@@ -3,6 +3,7 @@ using Aion.ViewModels.Commands;
 using Ookii.Dialogs.Wpf;
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Windows;
 
 namespace Aion.ViewModels.Utility;
@@ -29,8 +30,10 @@ public class DBManager : INotifyPropertyChanged
 
     public AppVM ParentVM { get; set; }
 
-    public DBManager()
+    public DBManager(AppVM parentVM)
     {
+        ParentVM = parentVM;
+
         ChangeDatabaseCommand = new ChangeDatabaseCommand(this);
         MoveDatabaseCommand = new MoveDatabaseCommand(this);
         CopyDatabaseCommand = new CopyDatabaseCommand(this);
@@ -38,19 +41,7 @@ public class DBManager : INotifyPropertyChanged
         NewDatabaseCommand = new NewDatabaseCommand(this);
         MergeDatabaseCommand = new MergeDatabaseCommand(this);
 
-        DBString = Settings.Default.SolLocation;
-    }
-
-    public DBManager(AppVM parentVM) : this()
-    {
-        ParentVM = parentVM;
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void OnPropertyChanged([Uranus.Annotations.NotNull] string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        dbString = Settings.Default.SolLocation;
     }
 
     private static string SelectFolder()
@@ -62,7 +53,7 @@ public class DBManager : INotifyPropertyChanged
 
     // Given a chosen path, makes sure that either it ends in Sol,
     // or adds a Sol folder in the location and returns that.
-    private static string SetSol([Uranus.Annotations.NotNull] string path)
+    private static string SetSol(string path)
     {
         // Empty string means cancellation.
         if (path == "") return "";
@@ -72,14 +63,14 @@ public class DBManager : INotifyPropertyChanged
         return path;
     }
 
-    private void SetDatabase([Uranus.Annotations.NotNull] string path)
+    private void SetDatabase(string path)
     {
         // Set App settings. 
         Settings.Default.SolLocation = path;
         // Set DBString.
         DBString = path;
         // This in turn resets the chariots for both helios and charon.
-        ParentVM.ResetDB();
+        AppVM.ResetDB();
     }
 
     internal void UseLocalDB()
@@ -106,9 +97,9 @@ public class DBManager : INotifyPropertyChanged
         if (path == "") return;
 
         // Make sure directory exists.
-        if (path is not null && !Directory.Exists(path))
+        if (!Directory.Exists(path))
             _ = Directory.CreateDirectory(path);
-        SetDatabase(path!);
+        SetDatabase(path);
     }
 
     public void CopyDatabase()
@@ -183,7 +174,7 @@ public class DBManager : INotifyPropertyChanged
     /// </summary>
     /// <param name="dirPath">Directory location for potential Sol.</param>
     /// <returns>True if Sol exists, else false.</returns>
-    private static bool CheckSolExistence([Uranus.Annotations.NotNull] string dirPath)
+    private static bool CheckSolExistence(string dirPath)
     {
         if (!Directory.Exists(dirPath)) return false;
         var equipmentPath = Path.Join(dirPath, "Equipment", "Equipment.sqlite");
@@ -196,7 +187,7 @@ public class DBManager : INotifyPropertyChanged
                Directory.Exists(usersPath);
     }
 
-    private static void DirectoryCopy([Uranus.Annotations.NotNull] string sourceDirName, string destDirName, bool copySubDirs = true)
+    private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs = true)
     {
         // Get the subdirectories for the specified directory.
         DirectoryInfo dir = new(sourceDirName);
@@ -232,7 +223,7 @@ public class DBManager : INotifyPropertyChanged
 
     }
 
-    private static bool IsSubDirectory([Uranus.Annotations.NotNull] string potentialParentDir, string potentialChildDir)
+    private static bool IsSubDirectory(string potentialParentDir, string potentialChildDir)
     {
         DirectoryInfo parent = new(potentialParentDir);
         DirectoryInfo child = new(potentialChildDir);
@@ -247,5 +238,13 @@ public class DBManager : INotifyPropertyChanged
         if (parent is null)
             return false;   // Once there is no parent, that means that it must be false.
         return parent.FullName == potentialParentDir.FullName || IsSubDirectory(potentialParentDir, parent);
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [Uranus.Annotations.NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

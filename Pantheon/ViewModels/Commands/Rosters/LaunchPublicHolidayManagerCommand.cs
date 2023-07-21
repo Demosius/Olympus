@@ -1,6 +1,6 @@
-﻿using Pantheon.ViewModels.Controls.Rosters;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.Controls.Rosters;
 
 namespace Pantheon.ViewModels.Commands.Rosters;
 

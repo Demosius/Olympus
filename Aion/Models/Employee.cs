@@ -3,6 +3,8 @@ using SQLiteNetExtensions.Attributes;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using Uranus.Annotations;
 using Uranus.Staff.Models;
 
 namespace Aion.Models;
@@ -15,7 +17,7 @@ public class BrokeEmployee : INotifyPropertyChanged
     private string firstName;
     private string location;
     private int reportsToCode;
-    private BrokeEmployee reportsTo;
+    private BrokeEmployee? reportsTo;
     private string payPoint;
     private string employmentType;
     // ReSharper disable once IdentifierTypo
@@ -93,7 +95,7 @@ public class BrokeEmployee : INotifyPropertyChanged
     [OneToMany(inverseProperty: "ReportsTo", CascadeOperations = CascadeOperation.All)]
     public List<BrokeEmployee> Reports { get; set; }
     [ManyToOne(inverseProperty: "Reports")]
-    public BrokeEmployee ReportsTo
+    public BrokeEmployee? ReportsTo
     {
         get => reportsTo;
         set
@@ -110,6 +112,19 @@ public class BrokeEmployee : INotifyPropertyChanged
     [Ignore]
     public string FullName => $"{FirstName} {Surname}";
 
+    public BrokeEmployee()
+    {
+        surname = string.Empty;
+        firstName = string.Empty;
+        location = string.Empty;
+        payPoint = string.Empty;
+        employmentType = string.Empty;
+        jobClasification = string.Empty;
+        Reports = new List<BrokeEmployee>();
+        ClockTimes = new List<ClockEvent>();
+        ShiftEntries = new List<ShiftEntry>();
+    }
+
     /// <summary>
     /// Adds a newly created timestamp (clock time event) for the employee for current time/date.
     /// </summary>
@@ -118,7 +133,7 @@ public class BrokeEmployee : INotifyPropertyChanged
     {
         ClockEvent clock = new() { EmployeeID = Code, Status = Uranus.Staff.Models.EClockStatus.Pending };
         clock.StampTime();
-        ClockTimes?.Add(clock);
+        ClockTimes.Add(clock);
         return clock;
     }
 
@@ -127,7 +142,6 @@ public class BrokeEmployee : INotifyPropertyChanged
     /// </summary>
     public void ConvertClockToEntries()
     {
-        if (ClockTimes is null) return;
         var pendingClocks = ClockTimes.Where(c => c.Status == Uranus.Staff.Models.EClockStatus.Pending).GroupBy(c => c.DtDate.ToString("yyyy-MM-dd")).ToDictionary(g => g.Key, g => g.ToList());
         if (pendingClocks.Count == 0) return;
 
@@ -147,13 +161,14 @@ public class BrokeEmployee : INotifyPropertyChanged
         }
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-
+    
     public override string ToString()
     {
         return $"{FirstName} {Surname}";

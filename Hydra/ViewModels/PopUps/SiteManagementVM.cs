@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Uranus;
@@ -25,8 +26,8 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
 {
     public ItemLevelsVM ItemLevelsVM { get; set; }
     public SiteVM Site { get; set; }
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public List<SiteItemLevelVM> AllItems { get; set; }
 
@@ -62,10 +63,8 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public FilterItemsFromClipboardCommand FilterItemsFromClipboardCommand { get; set; }
     public ActivateAllItemsCommand ActivateAllItemsCommand { get; set; }
     public DeActivateAllItemsCommand DeActivateAllItemsCommand { get; set; }
@@ -74,16 +73,16 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
 
     #endregion
 
-    public SiteManagementVM(ItemLevelsVM parentVM, Site site)
+    private SiteManagementVM(ItemLevelsVM parentVM, Site site)
     {
         ItemLevelsVM = parentVM;
+        Helios = ItemLevelsVM.Helios;
+        Charon = ItemLevelsVM.Charon;
         Site = new SiteVM(site);
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         FilterItemsFromClipboardCommand = new FilterItemsFromClipboardCommand(this);
         ActivateAllItemsCommand = new ActivateAllItemsCommand(this);
         DeActivateAllItemsCommand = new DeActivateAllItemsCommand(this);
@@ -93,31 +92,30 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
         AllItems = new List<SiteItemLevelVM>();
         filterString = string.Empty;
         currentItems = new ObservableCollection<SiteItemLevelVM>();
-
-        SetDataSources(ItemLevelsVM.Helios!, ItemLevelsVM.Charon!);
     }
 
-
-    public void RefreshData()
+    private async Task<SiteManagementVM> InitializeAsync()
     {
-        AllItems = ItemLevelsVM.SiteItemLevelVMs.Values
-            .Where(sil => sil.SiteName == Site.Site.Name && (sil.Item?.SiteLevelTarget ?? false))
-            .OrderBy(sil => sil.ItemNumber)
-            .ToList();
-        ApplyFilters();
-
+        await RefreshDataAsync();
+        return this;
     }
 
-    public void RepairData()
+    public static Task<SiteManagementVM> CreateAsync(ItemLevelsVM parentVM, Site site)
     {
-        throw new NotImplementedException();
+        var ret = new SiteManagementVM(parentVM, site);
+        return ret.InitializeAsync();
     }
 
-    public void SetDataSources(Helios helios, Charon charon)
+    public async Task RefreshDataAsync()
     {
-        Helios = helios;
-        Charon = charon;
-        RefreshData();
+        await Task.Run(() =>
+        {
+            AllItems = ItemLevelsVM.SiteItemLevelVMs.Values
+                .Where(sil => sil.SiteName == Site.Site.Name && (sil.Item?.SiteLevelTarget ?? false))
+                .OrderBy(sil => sil.ItemNumber)
+                .ToList();
+            ApplyFilters();
+        });
     }
 
     public void ClearFilters()
@@ -131,11 +129,6 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
         var regex = new Regex(FilterString);
         CurrentItems =
             new ObservableCollection<SiteItemLevelVM>(AllItems.Where(sil => regex.IsMatch(sil.ItemNumber.ToString())));
-    }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
     }
 
     public void FilterItemsFromClipboard()
@@ -203,14 +196,12 @@ public class SiteManagementVM : INotifyPropertyChanged, IItemDataVM
         foreach (var siteItemLevelVM in CurrentItems) siteItemLevelVM.Active = true;
     }
 
-    public void ConfirmSiteChanges()
+    public async Task ConfirmSiteChanges()
     {
-        if (Helios is null) return;
+        var silTask = Helios.InventoryUpdater.SiteItemLevelsAsync(AllItems.Select(vm => vm.SiteItemLevel));
+        var siteTask = Task.Run(() => Helios.InventoryUpdater.Site(Site.Site));
 
-        Mouse.OverrideCursor = Cursors.Wait;
-        Helios.InventoryUpdater.SiteItemLevels(AllItems.Select(vm => vm.SiteItemLevel));
-        Helios.InventoryUpdater.Site(Site.Site);
-        Mouse.OverrideCursor = Cursors.Arrow;
+        await Task.WhenAll(siteTask, silTask);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

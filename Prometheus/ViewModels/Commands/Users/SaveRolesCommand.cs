@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace Prometheus.ViewModels.Commands.Users;
 
-internal class SaveRolesCommand : ICommand
+public class SaveRolesCommand : ICommand
 {
     public RolesVM VM { get; set; }
 
@@ -12,12 +12,12 @@ internal class SaveRolesCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon?.CanEditUserRole() ?? false;
+        return VM.Charon.CanEditUserRole();
     }
 
     public void Execute(object? parameter)
     {
-        VM.SaveRoles();
+        _ = VM.SaveRoles();
     }
 
     public event EventHandler? CanExecuteChanged

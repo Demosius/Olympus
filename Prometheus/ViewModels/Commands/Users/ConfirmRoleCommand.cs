@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace Prometheus.ViewModels.Commands.Users;
 
-internal class ConfirmRoleCommand : ICommand
+public class ConfirmRoleCommand : ICommand
 {
     public SetUserRoleVM VM { get; set; }
 

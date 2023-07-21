@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace Pantheon.ViewModels.Commands;
 
-internal class ShowEmployeePageCommand : ICommand
+public class ShowEmployeePageCommand : ICommand
 {
     public PantheonVM VM { get; set; }
 

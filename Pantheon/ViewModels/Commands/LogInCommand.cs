@@ -1,7 +1,8 @@
-﻿using Pantheon.Views;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using Pantheon.Views;
+using Uranus;
 
 namespace Pantheon.ViewModels.Commands;
 
@@ -24,7 +25,7 @@ public class LogInCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        if (!VM.LogIn()) return;
+        if (!AsyncHelper.RunSync(() => VM.LogIn())) return;
 
         var w = parameter as Window;
         PantheonWindow pw = new(App.Charon, App.Helios);

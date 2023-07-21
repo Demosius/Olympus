@@ -1,16 +1,20 @@
-﻿using Panacea.Models;
+﻿using System;
+using Panacea.Models;
 using Panacea.Properties;
 using Panacea.ViewModels.Commands;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Panacea.Interfaces;
+using Serilog;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Inventory;
+using Uranus.Inventory.Models;
 
 namespace Panacea.ViewModels.Components;
 
@@ -74,7 +78,7 @@ public class PotentialNegativeVM : INotifyPropertyChanged, IChecker
         RunChecksCommand = new RunChecksCommand(this);
     }
 
-    public void RunChecks()
+    public async Task RunChecksAsync()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
@@ -85,7 +89,18 @@ public class PotentialNegativeVM : INotifyPropertyChanged, IChecker
         var locations = checkLocString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones, locations);
+        BasicStockDataSet? dataSet;
+        try
+        {
+            dataSet = await Helios.InventoryReader.BasicStockDataSetAsync(zones, locations);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Missing Data");
+            Log.Error(ex, "Error pulling data for purge.");
+            Mouse.OverrideCursor = Cursors.Arrow;
+            return;
+        }
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");

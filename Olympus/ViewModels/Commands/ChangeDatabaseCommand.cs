@@ -16,9 +16,9 @@ public class ChangeDatabaseCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.ChangeDatabase();
+        await VM.ChangeDatabase();
     }
 
     public event EventHandler? CanExecuteChanged

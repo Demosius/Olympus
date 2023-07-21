@@ -10,20 +10,20 @@ public class SignInCommand : ICommand
 
     public SignInCommand(SignInVM vm) { VM = vm; }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
-        return VM.Code?.Length > 0 && VM.SelectedManager != null;
+        return VM.Code.Length > 0;
     }
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
-        var w = (Window)parameter;
+        var w = parameter as Window;
         if (VM.SignIn())
         {
             if (w == null) return;

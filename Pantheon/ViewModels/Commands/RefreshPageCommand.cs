@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace Pantheon.ViewModels.Commands;
 
-internal class RefreshPageCommand : ICommand
+public class RefreshPageCommand : ICommand
 {
     public PantheonVM VM { get; set; }
 
@@ -14,9 +14,9 @@ internal class RefreshPageCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.RefreshPage();
+        await VM.RefreshPage();
     }
 
     public event EventHandler? CanExecuteChanged

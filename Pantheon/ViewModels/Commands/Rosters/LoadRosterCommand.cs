@@ -1,6 +1,6 @@
-﻿using Pantheon.ViewModels.Pages;
-using System;
+﻿using System;
 using System.Windows.Input;
+using Pantheon.ViewModels.Pages;
 
 namespace Pantheon.ViewModels.Commands.Rosters;
 
@@ -18,10 +18,10 @@ public class LoadRosterCommand : ICommand
         return VM.SelectedDepartment is not null && VM.SelectedRoster is not null && VM.LoadedRoster is null;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
         if (VM.SelectedRoster is not null && VM.LoadedRoster is null)
-            VM.LoadRoster();
+            await VM.LoadRoster();
     }
 
     public event EventHandler? CanExecuteChanged

@@ -1,17 +1,15 @@
 ﻿using Hydra.ViewModels.Commands;
-using Morpheus.Views;
 using Serilog;
 using Styx;
-using Styx.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
+using Morpheus.Views.Windows;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -20,11 +18,11 @@ using Uranus.Inventory.Models;
 
 namespace Hydra.ViewModels.Controls;
 
-public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
+public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction
 {
     public HydraVM HydraVM { get; set; }
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public SiteVM NoSite { get; set; }
 
@@ -50,69 +48,77 @@ public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public AddNewSiteCommand AddNewSiteCommand { get; set; }
     public DeleteSiteCommand DeleteSiteCommand { get; set; }
     public SaveSitesCommand SaveSitesCommand { get; set; }
 
     #endregion
 
-    public SiteManagerVM(HydraVM hydraVM)
+    private SiteManagerVM(HydraVM hydraVM, Helios helios, Charon charon)
     {
         HydraVM = hydraVM;
+        Helios = helios;
+        Charon = charon;
         Sites = new ObservableCollection<SiteVM>();
         AllZones = new List<NAVZone>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         AddNewSiteCommand = new AddNewSiteCommand(this);
         DeleteSiteCommand = new DeleteSiteCommand(this);
         SaveSitesCommand = new SaveSitesCommand(this);
 
         NoSite = new SiteVM(new Site("NoSite"), DeleteSiteCommand);
         noSiteZoneListing = new ZoneListingVM(new List<NAVZone>(), NoSite);
-
-        Task.Run(() => SetDataSources(HydraVM.Helios!, HydraVM.Charon!));
     }
 
-    public void RefreshData()
+    public SiteManagerVM(HydraVM hydraVM, Helios helios, Charon charon, List<NAVZone> zones, List<Site> siteList) : this(hydraVM, helios, charon)
     {
-        if (Helios is null) return;
-
-        Sites.Clear();
-        AllZones.Clear();
-
-        var sites = Helios.InventoryReader.Sites(out var zones);
-
-        foreach (var site in sites)
-        {
+        foreach (var site in siteList)
             Sites.Add(new SiteVM(site, DeleteSiteCommand));
-        }
 
         foreach (var zone in zones) AllZones.Add(zone);
 
         var noZones = zones.Where(z => z.SiteName == "").ToList();
-        var noSite = new Site("NoSite")
-        {
-            Zones = noZones
-        };
+        var noSite = new Site("NoSite") { Zones = noZones };
 
         NoSite = new SiteVM(noSite, DeleteSiteCommand);
 
         NoSiteZoneListing = NoSite.ZoneListingVM;
     }
 
-    public void RepairData()
+    private async Task<SiteManagerVM> InitializeAsync()
     {
-        throw new NotImplementedException();
+        await RefreshDataAsync();
+        return this;
     }
 
-    public void SetDataSources(Helios helios, Charon charon)
+    public static Task<SiteManagerVM> CreateAsync(HydraVM hydraVM, Helios helios, Charon charon)
     {
-        Helios = helios;
-        Charon = charon;
-        RefreshData();
+        var ret = new SiteManagerVM(hydraVM, helios, charon);
+        return ret.InitializeAsync();
     }
+
+    public async Task RefreshDataAsync()
+    {
+        Sites.Clear();
+        AllZones.Clear();
+
+        var (sites, navZones) = await Helios.InventoryReader.SitesAsync();
+        var zones = navZones.ToList();
+
+        foreach (var site in sites)
+            Sites.Add(new SiteVM(site, DeleteSiteCommand));
+
+        foreach (var zone in zones) AllZones.Add(zone);
+
+        var noZones = zones.Where(z => z.SiteName == "").ToList();
+        var noSite = new Site("NoSite") { Zones = noZones };
+
+        NoSite = new SiteVM(noSite, DeleteSiteCommand);
+
+        NoSiteZoneListing = NoSite.ZoneListingVM;
+    }
+    
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -124,8 +130,6 @@ public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
     public void AddNewSite()
     {
-        if (Helios is null) throw new DataException("Helios is null within active site manager.");
-
         var inputBox = new InputWindow("Enter new Site name: ", "Site Name");
 
         if (inputBox.ShowDialog() != true) return;
@@ -140,16 +144,16 @@ public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
             return;
         }
 
-
         var site = new SiteVM(new Site(siteName), DeleteSiteCommand);
-        Helios.InventoryCreator.Site(site.Site);
+
+        _ = Helios.InventoryCreator.SiteAsync(site.Site);
 
         Sites.Add(site);
     }
 
-    public void DeleteSite(SiteVM siteVM)
+    public async Task DeleteSite(SiteVM siteVM)
     {
-        if (Helios is null || !Sites.Contains(siteVM)) return;
+        if (!Sites.Contains(siteVM)) return;
 
         if (MessageBox.Show($"Are you sure you want to delete site: {siteVM.Site.Name}?", "Confirm Site Deletion",
                 MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
@@ -166,14 +170,14 @@ public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
 
         Sites.Remove(siteVM);
 
-        SaveZones();
+        await SaveZones();
     }
 
-    public void SaveZones()
+    public async Task SaveZones()
     {
         try
         {
-            Helios?.InventoryUpdater.Zones(AllZones);
+            await Helios.InventoryUpdater.ZonesAsync(AllZones);
         }
         catch (Exception ex)
         {
@@ -182,11 +186,11 @@ public class SiteManagerVM : INotifyPropertyChanged, IDBInteraction, IDataSource
         }
     }
 
-    public void SaveSites()
+    public async Task SaveSites()
     {
         try
         {
-            Helios?.InventoryUpdater.Sites(Sites.Select(vm => vm.Site), AllZones);
+            await Helios.InventoryUpdater.SitesAsync(Sites.Select(vm => vm.Site), AllZones);
         }
         catch (Exception ex)
         {

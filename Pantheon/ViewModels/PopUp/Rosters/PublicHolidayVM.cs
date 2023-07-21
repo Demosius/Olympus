@@ -1,4 +1,4 @@
-﻿using Pantheon.Annotations;
+﻿using System;
 using Pantheon.ViewModels.Commands.Rosters;
 using Pantheon.ViewModels.Controls.Rosters;
 using System.ComponentModel;
@@ -118,12 +118,12 @@ internal class PublicHolidayVM : INotifyPropertyChanged
 
     public void ConfirmHolidays()
     {
-        ParentVM.SundayRoster?.SetPublicHoliday(Sunday);
-        ParentVM.MondayRoster?.SetPublicHoliday(Monday);
-        ParentVM.TuesdayRoster?.SetPublicHoliday(Tuesday);
-        ParentVM.WednesdayRoster?.SetPublicHoliday(Wednesday);
-        ParentVM.ThursdayRoster?.SetPublicHoliday(Thursday);
-        ParentVM.FridayRoster?.SetPublicHoliday(Friday);
-        ParentVM.SaturdayRoster?.SetPublicHoliday(Saturday);
+        ParentVM.SetPublicHoliday(DayOfWeek.Sunday, Sunday);
+        ParentVM.SetPublicHoliday(DayOfWeek.Monday, Monday);
+        ParentVM.SetPublicHoliday(DayOfWeek.Tuesday, Tuesday);
+        ParentVM.SetPublicHoliday(DayOfWeek.Wednesday, Wednesday);
+        ParentVM.SetPublicHoliday(DayOfWeek.Thursday, Thursday);
+        ParentVM.SetPublicHoliday(DayOfWeek.Friday, Friday);
+        ParentVM.SetPublicHoliday(DayOfWeek.Saturday, Saturday);
     }
 }

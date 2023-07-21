@@ -37,6 +37,6 @@ public class Clan
 
     public override string ToString()
     {
-        return Name;
+        return $"{Name}{(DepartmentName != string.Empty ? $" ({DepartmentName})" : "")}";
     }
 }

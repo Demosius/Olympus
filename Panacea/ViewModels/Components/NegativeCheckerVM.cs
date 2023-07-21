@@ -1,21 +1,24 @@
-﻿using Panacea.Interfaces;
+﻿using System;
+using Panacea.Interfaces;
 using Panacea.Models;
 using Panacea.Properties;
 using Panacea.ViewModels.Commands;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Serilog;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
 using Uranus.Inventory;
+using Uranus.Inventory.Models;
 
 namespace Panacea.ViewModels.Components;
 
@@ -94,7 +97,6 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public BinsToClipboardCommand BinsToClipboardCommand { get; set; }
     public ItemsToClipboardCommand ItemsToClipboardCommand { get; set; }
     public RunChecksCommand RunChecksCommand { get; set; }
@@ -113,7 +115,6 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         BinsToClipboardCommand = new BinsToClipboardCommand(this);
         ItemsToClipboardCommand = new ItemsToClipboardCommand(this);
         RunChecksCommand = new RunChecksCommand(this);
@@ -154,13 +155,8 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
 
         FilteredCheckResults = new ObservableCollection<NegativeCheckResult>(results);
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void RunChecks()
+    
+    public async Task RunChecksAsync()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
@@ -170,7 +166,18 @@ public class NegativeCheckerVM : INotifyPropertyChanged, IFilters, IBinData, IIt
         var locations = checkLocString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones, locations);
+        BasicStockDataSet? dataSet;
+        try
+        {
+            dataSet = await Helios.InventoryReader.BasicStockDataSetAsync(zones, locations);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Missing Data");
+            Log.Error(ex, "Error pulling data for purge.");
+            Mouse.OverrideCursor = Cursors.Arrow;
+            return;
+        }
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");

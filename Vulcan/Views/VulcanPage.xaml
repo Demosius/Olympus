@@ -5,12 +5,9 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:viewModels="clr-namespace:Vulcan.ViewModels"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type viewModels:VulcanVM}, IsDesignTimeCreatable = False}"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="VulcanPage">
-
-    <Page.DataContext>
-        <viewModels:VulcanVM x:Name="VM"/>
-    </Page.DataContext>
 
     <Grid Background="RosyBrown" />
 </Page>

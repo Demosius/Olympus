@@ -21,9 +21,11 @@ public class EmployeeDataSet
     public IEnumerable<string> Locations { get; set; }
     public IEnumerable<string> PayPoints { get; set; }
     public IEnumerable<Employee> Managers { get; set; }
+    public IEnumerable<TagUse> TagUses { get; set; }
     public Dictionary<int, List<ShiftRuleSingle>> SingleRuleDict { get; set; }
     public Dictionary<int, List<ShiftRuleRecurring>> RecurringRuleDict { get; set; }
     public Dictionary<int, List<ShiftRuleRoster>> RosterRuleDict { get; set; }
+    public Dictionary<string, TempTag> TagDict { get; set; }
 
     public EmployeeDataSet()
     {
@@ -42,12 +44,16 @@ public class EmployeeDataSet
         SingleRuleDict = new Dictionary<int, List<ShiftRuleSingle>>();
         RecurringRuleDict = new Dictionary<int, List<ShiftRuleRecurring>>();
         RosterRuleDict = new Dictionary<int, List<ShiftRuleRoster>>();
+        TagDict = new Dictionary<string, TempTag>();
+        TagUses = new List<TagUse>();
     }
 
-    public EmployeeDataSet(IEnumerable<Employee> employees, IEnumerable<Department> departments, IEnumerable<DepartmentRoster> departmentRosters,
-        IEnumerable<Clan> clans, IEnumerable<Role> roles, IEnumerable<EmployeeIcon> icons, IEnumerable<EmployeeAvatar> avatars,
-        IEnumerable<Shift> shifts, IEnumerable<Break> breaks,
-        IEnumerable<ShiftRuleSingle> singleRules, IEnumerable<ShiftRuleRecurring> recurringRules, IEnumerable<ShiftRuleRoster> rosterRules)
+    public EmployeeDataSet(IEnumerable<Employee> employees, IEnumerable<Department> departments,
+        IEnumerable<DepartmentRoster> departmentRosters, IEnumerable<Clan> clans, IEnumerable<Role> roles,
+        IEnumerable<EmployeeIcon> icons, IEnumerable<EmployeeAvatar> avatars, IEnumerable<Shift> shifts,
+        IEnumerable<Break> breaks, IEnumerable<ShiftRuleSingle> singleRules,
+        IEnumerable<ShiftRuleRecurring> recurringRules, IEnumerable<ShiftRuleRoster> rosterRules, 
+        IEnumerable<TempTag> tags, IEnumerable<TagUse> tagUses)
     {
         var empList = employees.ToList();
         Employees = empList.ToDictionary(e => e.ID, e => e);
@@ -68,6 +74,9 @@ public class EmployeeDataSet
             .GroupBy(b => b.ShiftID)
             .ToDictionary(g => g.Key, b => b.ToList());
 
+        TagUses = tagUses;
+        TagDict = tags.ToDictionary(t => t.RF_ID);
+
         SingleRuleDict = singleRules.GroupBy(r => r.EmployeeID)
             .ToDictionary(g => g.Key, g => g.ToList());
         RecurringRuleDict = recurringRules.GroupBy(r => r.EmployeeID)
@@ -81,13 +90,35 @@ public class EmployeeDataSet
     /// <summary>
     /// Using the dictionaries, assign relevant data as references to each other.
     /// </summary>
-    public void SetRelationships()
+    private void SetRelationships()
     {
+        SetFromTags();
         SetFromShifts();
         SetFromEmployees();
         SetFromRoles();
         SetFromClans();
         SetFromDepartments();
+    }
+
+    private void SetFromTags()
+    {
+        foreach (var tempTag in TagDict.Values)
+            if (tempTag.EmployeeID != 0 && Employees.TryGetValue(tempTag.EmployeeID, out var employee))
+                tempTag.SetEmployee(employee);
+        
+        foreach (var tagUse in TagUses)
+        {
+            if (TagDict.TryGetValue(tagUse.TempTagRF_ID, out var tag))
+            {
+                tag.TagUse.Add(tagUse);
+                tagUse.TempTag = tag;
+            }
+
+            if (!Employees.TryGetValue(tagUse.EmployeeID, out var employee)) continue;
+
+            employee.TagUse.Add(tagUse);
+            tagUse.Employee = employee;
+        }
     }
 
     private void SetFromShifts()
@@ -96,16 +127,15 @@ public class EmployeeDataSet
         {
             if (BreakDict.TryGetValue(shift.ID, out var breaks))
             {
-                shift.SetBreaks(breaks);
+                shift.Breaks = breaks;
                 foreach (var @break in breaks)
                     @break.Shift = shift;
             }
 
-            if (Departments.TryGetValue(shift.DepartmentName, out var department))
-            {
-                department.Shifts.Add(shift);
-                shift.Department = department;
-            }
+            if (!Departments.TryGetValue(shift.DepartmentName, out var department)) continue;
+
+            department.Shifts.Add(shift);
+            shift.Department = department;
         }
     }
 
@@ -405,6 +435,18 @@ public class EmployeeDataSet
         {
             employee.ReportsTo = newEmployee;
             newEmployee.Reports.Add(employee);
+        }
+
+        foreach (var tagUse in TagUses.Where(u => u.EmployeeID == newEmployee.ID))
+        {
+            newEmployee.TagUse.Add(tagUse);
+            tagUse.Employee = newEmployee;
+        }
+
+        if (TagDict.TryGetValue(newEmployee.TempTagRF_ID, out var tempTag))
+        {
+            newEmployee.TempTag = tempTag;
+            tempTag.Employee = newEmployee;
         }
 
         Employees.Add(newEmployee.ID, newEmployee);

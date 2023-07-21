@@ -16,9 +16,9 @@ public class SaveLevelsCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.SaveLevels();
+        await VM.SaveLevels();
     }
 
     public event EventHandler? CanExecuteChanged

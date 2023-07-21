@@ -4,19 +4,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:converter="clr-namespace:Pantheon.ViewModels.Converter"
         xmlns:employees="clr-namespace:Pantheon.ViewModels.PopUp.Employees"
+        xmlns:converters="clr-namespace:Pantheon.ViewModels.Converters"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type employees:EmployeeCreationVM}, IsDesignTimeCreatable=False}"
         Title="Create Employee"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         Background="{StaticResource TooltipBackgroundBrush}"
         Foreground="{StaticResource LightForegroundBrush}"
-        FocusManager.FocusedElement="{Binding ElementName=IDBox}">
-
-    <Window.DataContext>
-        <employees:EmployeeCreationVM x:Name="VM"/>
-    </Window.DataContext>
+        FocusManager.FocusedElement="{Binding ElementName=IDBox}"
+        Initialized="EmployeeCreationWindow_OnInitialized">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -48,7 +46,7 @@
                 <Setter Property="MinWidth" Value="75"/>
                 <Setter Property="HorizontalAlignment" Value="Right"/>
             </Style>
-            <converter:BoolToColourConverter x:Key="BoolToColourConverter"/>
+            <converters:BoolToColourConverter x:Key="BoolToColourConverter"/>
         </StackPanel.Resources>
 
         <Label Content="* Enter Employee ID"/>
@@ -59,15 +57,15 @@
 
         <Label Content="Department"/>
         <ComboBox ItemsSource="{Binding Departments, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedValue="{Binding Department, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                  SelectedValue="{Binding SelectedDepartment, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
         <Label Content="* Role"/>
         <ComboBox ItemsSource="{Binding Roles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedValue="{Binding Role, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                  SelectedValue="{Binding SelectedRole, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
         <Label Content="Reports To"/>
         <ComboBox ItemsSource="{Binding Managers, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedValue="{Binding Manager, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                  SelectedValue="{Binding SelectedManager, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
         <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right"

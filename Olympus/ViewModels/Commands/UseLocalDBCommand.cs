@@ -21,8 +21,8 @@ public class UseLocalDBCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        Dbm.UseLocalDB();
+        await Dbm.UseLocalDB();
     }
 }

@@ -17,11 +17,11 @@ public class ConfirmItemSelectionCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
         if (parameter is not Window window) return;
         Mouse.OverrideCursor = Cursors.Wait;
-        VM.ConfirmItemSelection();
+        await VM.ConfirmItemSelection();
         Mouse.OverrideCursor = Cursors.Arrow;
         window.DialogResult = true;
         window.Close();

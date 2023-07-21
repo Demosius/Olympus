@@ -1,4 +1,5 @@
-﻿using Uranus.Staff.Models;
+﻿using System.Threading.Tasks;
+using Uranus.Staff.Models;
 
 namespace Styx;
 
@@ -43,27 +44,27 @@ public partial class Charon
     }
 
     // Using Employee ID as int.
-    public bool CanCreateUser(int employeeID)
+    public async Task<bool> CanCreateUserAsync(int employeeID)
     {
         if (User is null) return false;
-        return User.Role?.CreateUser >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
+        return User.Role?.CreateUser >= await GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
-    public bool CanReadUser(int employeeID)
+    public async Task<bool> CanReadUserAsync(int employeeID)
     {
         if (User is null) return false;
-        return User.Role?.ReadUser >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
+        return User.Role?.ReadUser >= await GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
-    public bool CanUpdateUser(int employeeID)
+    public async Task<bool> CanUpdateUserAsync(int employeeID)
     {
         if (User is null) return false;
-        return User.Role?.UpdateUser >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
+        return User.Role?.UpdateUser >= await GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
-    public bool CanDeleteUser(int employeeID)
+    public async Task<bool> CanDeleteUserAsync(int employeeID)
     {
         if (User is null) return false;
-        return User.Role?.DeleteUser >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
+        return User.Role?.DeleteUser >= await GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 }

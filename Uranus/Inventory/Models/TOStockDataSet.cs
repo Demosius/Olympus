@@ -19,6 +19,21 @@ public class TOStockDataSet
     public List<Stock> Stock { get; set; }
     public List<NAVTransferOrder> TransferOrders { get; set; }
 
+    public TOStockDataSet()
+    {
+        Items = new Dictionary<int, NAVItem>();
+        Zones = new Dictionary<string, NAVZone>();
+        Bins = new Dictionary<string, NAVBin>();
+        Stores = new Dictionary<string, Store>();
+        Platforms = new Dictionary<int, NAVPlatform>();
+        Categories = new Dictionary<int, NAVCategory>();
+        Divisions = new Dictionary<int, NAVDivision>();
+        Genres = new Dictionary<int, NAVGenre>();
+        NAVStock = new List<NAVStock>();
+        UoMs = new List<NAVUoM>();
+        Stock = new List<Stock>();
+        TransferOrders = new List<NAVTransferOrder>();
+    }
 
     public TOStockDataSet(IEnumerable<NAVItem> items, IEnumerable<NAVZone> zones, IEnumerable<NAVBin> bins,
         IEnumerable<NAVStock> stock, IEnumerable<NAVUoM> uomList, IEnumerable<NAVTransferOrder> transferOrders,

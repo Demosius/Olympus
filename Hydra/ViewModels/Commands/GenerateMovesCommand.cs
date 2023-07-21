@@ -16,9 +16,9 @@ public class GenerateMovesCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.GenerateMoves();
+        await VM.GenerateMoves();
     }
 
     public event EventHandler? CanExecuteChanged

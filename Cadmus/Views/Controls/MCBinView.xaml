@@ -1,0 +1,86 @@
+﻿<UserControl x:Class="Cadmus.Views.Controls.MCBinView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Cadmus.ViewModels.Controls"
+             xmlns:controls="clr-namespace:Cadmus.Views.Controls"
+             xmlns:converters="clr-namespace:Cadmus.ViewModels.Converters"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:MCBinVM}, IsDesignTimeCreatable=False}"
+             d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:UnevenLevelForegroundConverter x:Key="BoolToForegroundConverter"/>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <Border DockPanel.Dock="Top"
+                BorderThickness="1"
+                BorderBrush="Black"
+                CornerRadius="15"
+                Background="{StaticResource Brush05}" 
+                Margin="0"
+                Padding="10,0">
+            <Grid Height="25">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="11"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" 
+                        BorderThickness="1"
+                        BorderBrush="Black"
+                        Name="MyBorder"  
+                        Background="{StaticResource Brush04}" 
+                        CornerRadius="45"
+                        Margin="-5,3, 5, 3">
+                    <Grid>
+                        <Image Source="../../Resources/Images/arrow-090-medium.png"
+                               Visibility="{Binding ShowStock, Converter={StaticResource BooleanToVisibilityConverter}}"
+                               MouseUp="ArrowButton_OnMouseUp"
+                               Margin="2"
+                               />
+                        <Image Source="../../Resources/Images/arrow-270-medium.png"
+                               Visibility="{Binding HideStock, Converter={StaticResource BooleanToVisibilityConverter}}"
+                               MouseUp="ArrowButton_OnMouseUp"
+                               Margin="2"/>
+                    </Grid>
+                </Border>
+
+                <Label Grid.Column="1" Content="{Binding Code}"
+                       FontSize="11"
+                       VerticalAlignment="Center"
+                       Foreground="{Binding UnevenLevels, Converter={StaticResource BoolToForegroundConverter}}"/>
+                <Separator Grid.Column="2" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+                           Margin="5"
+                           Foreground="{Binding UnevenLevels, Converter={StaticResource BoolToForegroundConverter}}"/>
+                <Label Grid.Column="3" Content="{Binding ZoneCode}"
+                       FontSize="11"
+                       VerticalAlignment="Center"
+                       Foreground="{Binding UnevenLevels, Converter={StaticResource BoolToForegroundConverter}}"/>
+                <Separator Grid.Column="4" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+                           Margin="5"/>
+                <Label Grid.Column="5" Content="{Binding MCQty}"
+                       FontSize="11"
+                       VerticalAlignment="Center"
+                       Foreground="{Binding UnevenLevels, Converter={StaticResource BoolToForegroundConverter}}"/>
+            </Grid>
+        </Border>
+        <ListView Margin="15,0,0,0"
+                  Visibility="{Binding ShowStock, Converter={StaticResource BooleanToVisibilityConverter}}"
+                  d:ItemsSource="{d:SampleData ItemCount=5}" 
+                  ItemsSource="{Binding Stock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <controls:MCStockView DataContext="{Binding}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </DockPanel>
+</UserControl>

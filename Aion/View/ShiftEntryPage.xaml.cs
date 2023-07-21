@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Aion.ViewModels;
 using Uranus;
 
 namespace Aion.View;
@@ -14,10 +15,21 @@ namespace Aion.View;
 /// </summary>
 public partial class ShiftEntryPage
 {
+    public ShiftEntryPageVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
+
     public ShiftEntryPage(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+    }
+
+    private async void ShiftEntryPage_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await ShiftEntryPageVM.CreateAsync(Helios, Charon);
+        DataContext = VM;
     }
 
     private readonly Style centerStyle = new()
@@ -31,7 +43,7 @@ public partial class ShiftEntryPage
 
     private void Entries_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
     {
-        var headerName = e.Column.Header.ToString();
+        var headerName = e.Column.Header.ToString() ?? string.Empty;
 
         //Cancel the column you don't want to generate
         if (new List<string> { "ID", "ShiftName", "ClockEvents", "Employee" }.Contains(headerName))
@@ -57,7 +69,7 @@ public partial class ShiftEntryPage
                     DataGridComboBoxColumn col = new()
                     {
                         Header = "Location",
-                        ItemsSource = VM.Locations,
+                        ItemsSource = VM?.Locations,
                         SelectedValueBinding = new Binding("Location")
                     };
 
@@ -137,11 +149,6 @@ public partial class ShiftEntryPage
         grid.Columns.First(c => c.Header.ToString() == "Time Worked").DisplayIndex = 11;
         grid.Columns.First(c => c.Header.ToString() == "Comments").DisplayIndex = 12;
         grid.Columns.First(c => c.Header.ToString() == "Department").DisplayIndex = 13;
-
-    }
-
-    private void EntryGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
 
     }
 }

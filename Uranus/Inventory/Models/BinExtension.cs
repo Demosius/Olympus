@@ -11,6 +11,7 @@ public class BinExtension
     public double Height { get; set; }
     public double Width { get; set; }
     public double Length { get; set; }
+    public string CheckDigits { get; set; }
 
     [OneToOne(nameof(BinID), nameof(NAVBin.Extension), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVBin? Bin { get; set; }
@@ -18,10 +19,12 @@ public class BinExtension
     [ManyToOne(nameof(BayID), nameof(Models.Bay.BayBins), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Bay? Bay { get; set; }
 
+
     public BinExtension()
     {
         BinID = string.Empty;
         BayID = string.Empty;
+        CheckDigits = string.Empty;
     }
 
     public BinExtension(NAVBin bin, Bay bay)
@@ -30,6 +33,7 @@ public class BinExtension
         BayID = bay.ID;
         Bin = bin;
         Bay = bay;
+        CheckDigits = string.Empty;
     }
 
     public BinExtension(NAVBin bin)
@@ -37,6 +41,7 @@ public class BinExtension
         Bin = bin;
         BinID = bin.ID;
         BayID = string.Empty;
+        CheckDigits = string.Empty;     
     }
 
     public void SetBay(Bay? bay)

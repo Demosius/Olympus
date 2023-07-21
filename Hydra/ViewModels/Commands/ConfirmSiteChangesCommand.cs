@@ -17,10 +17,10 @@ public class ConfirmSiteChangesCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
         if (parameter is not Window window) throw new DataException("No appropriate parameter passed to site management command.");
-        VM.ConfirmSiteChanges();
+        await VM.ConfirmSiteChanges();
         window.DialogResult = true;
         window.Close();
     }

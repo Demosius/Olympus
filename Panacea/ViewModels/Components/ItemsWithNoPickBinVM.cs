@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Morpheus;
@@ -156,7 +157,6 @@ public class ItemsWithNoPickBinVM : INotifyPropertyChanged, IFilters, IItemData,
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public ItemsToClipboardCommand ItemsToClipboardCommand { get; set; }
     public RunChecksCommand RunChecksCommand { get; set; }
     public UpdateTOLinesCommand UpdateTOLinesCommand { get; set; }
@@ -179,7 +179,6 @@ public class ItemsWithNoPickBinVM : INotifyPropertyChanged, IFilters, IItemData,
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         ItemsToClipboardCommand = new ItemsToClipboardCommand(this);
         RunChecksCommand = new RunChecksCommand(this);
         UpdateTOLinesCommand = new UpdateTOLinesCommand(this);
@@ -237,12 +236,7 @@ public class ItemsWithNoPickBinVM : INotifyPropertyChanged, IFilters, IItemData,
 
         FilteredCheckResults = new ObservableCollection<IWNPBCheckResult>(results);
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void ItemsToClipboard()
     {
         var itemList = FilteredCheckResults.Select(checkResult => checkResult.ItemNumber).ToList();
@@ -250,7 +244,7 @@ public class ItemsWithNoPickBinVM : INotifyPropertyChanged, IFilters, IItemData,
         MessageBox.Show($"{itemList.Count} items added to clipboard.");
     }
 
-    public void RunChecks()
+    public async Task RunChecksAsync()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
@@ -260,7 +254,7 @@ public class ItemsWithNoPickBinVM : INotifyPropertyChanged, IFilters, IItemData,
         var locations = checkLocString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.TOStockDataSet(zones, locations);
+        var dataSet = await Helios.InventoryReader.TOStockDataSetAsync(zones, locations);
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");
@@ -279,7 +273,7 @@ public class ItemsWithNoPickBinVM : INotifyPropertyChanged, IFilters, IItemData,
         Mouse.OverrideCursor = Cursors.Arrow;
     }
 
-    public void UpdateTOLines()
+    public async Task UpdateTOLines()
     {
         int updateLines;
         var raw = General.ClipboardToString();
@@ -293,16 +287,18 @@ public class ItemsWithNoPickBinVM : INotifyPropertyChanged, IFilters, IItemData,
             MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
+
         if (!newTOLines.Any())
         {
             MessageBox.Show("No TO Line data found on Clipboard.", "No Data", MessageBoxButton.OK,
                 MessageBoxImage.Warning);
             return;
         }
+
         var count = Helios.InventoryReader.TOLineCount();
         if (count == 0)
         {
-            updateLines = Helios.InventoryCreator.NAVTransferOrders(newTOLines);
+            updateLines = await Helios.InventoryCreator.NAVTransferOrdersAsync(newTOLines);
         }
         else
         {
@@ -312,10 +308,10 @@ public class ItemsWithNoPickBinVM : INotifyPropertyChanged, IFilters, IItemData,
             switch (result)
             {
                 case MessageBoxResult.Yes:
-                    updateLines = Helios.InventoryCreator.NAVTransferOrders(newTOLines);
+                    updateLines = await Helios.InventoryCreator.NAVTransferOrdersAsync(newTOLines);
                     break;
                 case MessageBoxResult.No:
-                    updateLines = Helios.InventoryUpdater.NAVTransferOrders(newTOLines);
+                    updateLines = await Helios.InventoryUpdater.NAVTransferOrdersAsync(newTOLines);
                     break;
                 case MessageBoxResult.None:
                 case MessageBoxResult.OK:

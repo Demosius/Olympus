@@ -5,12 +5,10 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:viewModels="clr-namespace:Aion.ViewModels"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type viewModels:EmployeePageVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="1080" d:DesignWidth="1920"
-      Title="EmployeePage">
-
-    <Page.DataContext>
-        <viewModels:EmployeePageVM x:Name="VM"/>
-    </Page.DataContext>
+      Title="EmployeePage"
+      Initialized="EmployeePage_OnInitialized">
 
     <Page.InputBindings>
         <KeyBinding Command="{Binding ApplyFiltersCommand}"

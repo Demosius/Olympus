@@ -28,17 +28,8 @@ public class ExportEntry
     public ExportEntry(ShiftEntry entry)
     {
         ShiftEntry = entry;
-        SetData();
-    }
-
-    /// <summary>
-    /// Sets the data based on the entry - overriding existing data and potential changes.
-    /// Will not work if there is no set ShiftEntry.
-    /// </summary>
-    public void SetData()
-    {
         AssociateNumber = ShiftEntry.EmployeeID;
-        Name = ShiftEntry.Employee?.ToString();
+        Name = ShiftEntry.Employee?.ToString() ?? "";
         Location = ShiftEntry.Location;
         Date = ShiftEntry.Date;
         Day = ShiftEntry.Day.ToString();
@@ -51,6 +42,7 @@ public class ExportEntry
         TimeWorked = Math.Round(ShiftEntry.HoursWorked, 2);
         Comments = ShiftEntry.Comments;
     }
+    
 
     /// <summary>
     /// Takes the data here in the Export Entry data and converts potential changes to the original ShiftEntry.

@@ -1,20 +1,23 @@
-﻿using Panacea.Interfaces;
+﻿using System;
+using Panacea.Interfaces;
 using Panacea.Models;
 using Panacea.Properties;
 using Panacea.ViewModels.Commands;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Serilog;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
+using Uranus.Inventory.Models;
 
 namespace Panacea.ViewModels.Components;
 
@@ -94,7 +97,6 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public BinsToClipboardCommand BinsToClipboardCommand { get; set; }
     public RunChecksCommand RunChecksCommand { get; set; }
 
@@ -114,7 +116,6 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         BinsToClipboardCommand = new BinsToClipboardCommand(this);
         RunChecksCommand = new RunChecksCommand(this);
     }
@@ -144,14 +145,8 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
 
         FilteredCheckResults = new ObservableCollection<BWMICheckResult>(results);
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
-
-    public void RunChecks()
+    
+    public async Task RunChecksAsync()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
@@ -161,7 +156,19 @@ public class BinsWithMultipleItemsVM : INotifyPropertyChanged, IFilters, IBinDat
         var locations = checkLocString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones, locations);
+        BasicStockDataSet? dataSet;
+        try
+        {
+            dataSet = await Helios.InventoryReader.BasicStockDataSetAsync(zones, locations);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Missing Data");
+            Log.Error(ex, "Error pulling data for purge.");
+            Mouse.OverrideCursor = Cursors.Arrow;
+            return;
+        }
+
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");

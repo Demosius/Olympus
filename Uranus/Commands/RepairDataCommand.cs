@@ -7,9 +7,9 @@ namespace Uranus.Commands;
 
 public class RepairDataCommand : ICommand
 {
-    public IDBInteraction VM { get; set; }
+    public IDBRepair VM { get; set; }
 
-    public RepairDataCommand(IDBInteraction vm)
+    public RepairDataCommand(IDBRepair vm)
     {
         VM = vm;
     }
@@ -21,7 +21,7 @@ public class RepairDataCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.RepairData();
+        VM.RepairDataAsync();
     }
 
 #pragma warning disable 67

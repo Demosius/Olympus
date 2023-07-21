@@ -9,13 +9,16 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Serilog;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
 using Uranus.Inventory;
+using Uranus.Inventory.Models;
 
 namespace Panacea.ViewModels.Components;
 
@@ -109,7 +112,6 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public ItemsToClipboardCommand ItemsToClipboardCommand { get; set; }
     public RunChecksCommand RunChecksCommand { get; set; }
 
@@ -132,12 +134,11 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
 
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         ItemsToClipboardCommand = new ItemsToClipboardCommand(this);
         RunChecksCommand = new RunChecksCommand(this);
     }
 
-    public void RunChecks()
+    public async Task RunChecksAsync()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
@@ -147,7 +148,18 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
         var locations = checkLocString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.BasicStockDataSet(zones, locations);
+        BasicStockDataSet? dataSet;
+        try
+        {
+            dataSet = await Helios.InventoryReader.BasicStockDataSetAsync(zones, locations);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Missing Data");
+            Log.Error(ex, "Error pulling data for purge.");
+            Mouse.OverrideCursor = Cursors.Arrow;
+            return;
+        }
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");
@@ -194,12 +206,7 @@ public class ItemsWithMultipleBinsVM : INotifyPropertyChanged, IFilters, IItemDa
 
         FilteredCheckResults = new ObservableCollection<IWMBCheckResult>(results);
     }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public void ItemsToClipboard()
     {
         var itemList = FilteredCheckResults.Select(checkResult => checkResult.Item.Number.ToString()).ToList();

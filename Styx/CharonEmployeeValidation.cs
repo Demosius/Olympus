@@ -1,4 +1,5 @@
-﻿using Uranus.Staff.Models;
+﻿using System.Threading.Tasks;
+using Uranus.Staff.Models;
 
 namespace Styx;
 
@@ -45,33 +46,33 @@ public partial class Charon
     }
 
     // Using Employee ID as int.
-    public bool CanReadEmployee(int employeeID)
+    public async Task<bool> CanReadEmployeeAsync(int employeeID)
     {
         return User?.Role is not null &&
-            User.Role.ReadEmployee >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
+            User.Role.ReadEmployee >= await GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
-    public bool CanReadEmployeeSensitive(int employeeID)
+    public async Task<bool> CanReadEmployeeSensitiveAsync(int employeeID)
     {
         return User?.Role is not null &&
-            User.Role.ReadEmployeeSensitive >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
+            User.Role.ReadEmployeeSensitive >= await GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
-    public bool CanReadEmployeeVerySensitive(int employeeID)
+    public async Task<bool> CanReadEmployeeVerySensitiveAsync(int employeeID)
     {
         return User?.Role is not null &&
-            User.Role.ReadEmployeeVerySensitive >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
+            User.Role.ReadEmployeeVerySensitive >= await GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
-    public bool CanUpdateEmployee(int employeeID)
+    public async Task<bool> CanUpdateEmployeeAsync(int employeeID)
     {
         return User?.Role is not null &&
-            User.Role.UpdateEmployee >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
+            User.Role.UpdateEmployee >= await GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 
-    public bool CanDeleteEmployee(int employeeID)
+    public async Task<bool> CanDeleteEmployeeAsync(int employeeID)
     {
         return User?.Role is not null &&
-            User.Role.DeleteEmployee >= GetLevelDifference(employeeID) || Employee?.ID == employeeID;
+            User.Role.DeleteEmployee >= await GetLevelDifference(employeeID) || Employee?.ID == employeeID;
     }
 }

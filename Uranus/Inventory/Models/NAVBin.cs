@@ -36,17 +36,28 @@ public class NAVBin
     public List<Move> ToMoves { get; set; }
     [OneToMany(nameof(NAVMoveLine.BinID), nameof(NAVMoveLine.Bin), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<NAVMoveLine> MoveLines { get; set; }
+    [OneToMany(nameof(PickLine.CartonID), nameof(PickLine.BatchTOLine), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<PickLine> PickLines { get; set; }
 
     [OneToOne(nameof(ID), nameof(BinExtension.BinID), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public BinExtension? Extension { get; set; }
 
     [Ignore] public BinExtension? Dimensions => Extension;
 
+    [Ignore] public List<MixedCarton> MixedCartons { get; set; }
+
     [Ignore]
     public Bay? Bay
     {
         get => Extension?.Bay;
         set => (Extension ??= new BinExtension(this)).SetBay(value);
+    }
+
+    [Ignore]
+    public string CheckDigits
+    {
+        get => Extension?.CheckDigits ?? string.Empty;
+        set => (Extension ??= new BinExtension(this)).CheckDigits = value;
     }
 
     [Ignore] public Dictionary<int, Stock> Stock { get; set; }
@@ -70,6 +81,8 @@ public class NAVBin
         FromMoves = new List<Move>();
         ToMoves = new List<Move>();
         MoveLines = new List<NAVMoveLine>();
+        PickLines = new List<PickLine>();
+        MixedCartons = new List<MixedCarton>();
     }
 
     public NAVBin(string code, NAVZone zone)
@@ -88,33 +101,8 @@ public class NAVBin
         FromMoves = new List<Move>();
         ToMoves = new List<Move>();
         MoveLines = new List<NAVMoveLine>();
-    }
-
-    public NAVBin(string id, string zoneID, string locationCode, string zoneCode, string code, string description,
-        bool empty, bool assigned, int ranking, double usedCube, double maxCube, DateTime lastCcDate,
-        DateTime lastPiDate, NAVZone zone, List<NAVStock> navStock, Dictionary<int, Stock> stock, List<Move> fromMoves,
-        List<Move> toMoves, List<NAVMoveLine> moveLines, BinExtension extension)
-    {
-        ID = id;
-        ZoneID = zoneID;
-        LocationCode = locationCode;
-        ZoneCode = zoneCode;
-        Code = code;
-        Description = description;
-        Empty = empty;
-        Assigned = assigned;
-        Ranking = ranking;
-        UsedCube = usedCube;
-        MaxCube = maxCube;
-        LastCCDate = lastCcDate;
-        LastPIDate = lastPiDate;
-        Zone = zone;
-        NAVStock = navStock;
-        Stock = stock;
-        FromMoves = fromMoves;
-        ToMoves = toMoves;
-        MoveLines = moveLines;
-        Extension = extension;
+        PickLines = new List<PickLine>();
+        MixedCartons = new List<MixedCarton>();
     }
 
     /// <summary>
@@ -146,10 +134,45 @@ public class NAVBin
     // Takes examples of NAVStock and creates Stock versions.
     public void ConvertStock()
     {
-        foreach (var stock in NAVStock.Select(ns => new Stock(ns)))
+        Stock = Models.Stock.FromNAVStock(NAVStock).ToDictionary(s => s.ItemNumber, s => s);
+    }
+
+    /// <summary>
+    /// Converts bin contents stock to Mixed Carton stock, if applicable.
+    /// </summary>
+    /// <param name="mcIDTool">MixedCarton Identification tool, used to match and identify mixed cartons.</param>
+    /// <param name="createNewMixedCartons">If true will create a new Mixed carton template if one is apparent in data.</param>
+    /// <returns></returns>
+    public bool MixedCartonStockConversion(MixedCartonIdentificationTool mcIDTool, bool createNewMixedCartons = false)
+    {
+        // Get potentially relevant stock lines.
+        var createdMC = false;
+        var invalidStock = new List<Stock>();
+        var allStock = Stock.Values.ToList();
+        var validStock = createNewMixedCartons ? allStock : mcIDTool.GetValidStock(allStock, out invalidStock);
+
+        var mixedCarton = mcIDTool.GetMixedCartonFromStock(validStock, createNewMixedCartons);
+
+        while (mixedCarton is not null)
         {
-            Stock.Add(stock.ItemNumber, stock);
+            mixedCarton.Bins.Add(this);
+            MixedCartons.Add(mixedCarton);
+
+            createdMC = true;
+            var mcStock = mixedCarton.GetValidStock(ref validStock);
+
+            invalidStock.Add(new MixedCartonStock(mixedCarton, ref mcStock));
+
+            if (mcStock.Any()) validStock.AddRange(mcStock);
+
+            mixedCarton = mcIDTool.GetMixedCartonFromStock(validStock, createNewMixedCartons);
         }
+
+        invalidStock.AddRange(validStock);
+
+        Stock = invalidStock.ToDictionary(s => s.ItemNumber, s => s);
+
+        return createdMC;
     }
 
     // Returns true if the given move represents the full quantity of the bin's contents.

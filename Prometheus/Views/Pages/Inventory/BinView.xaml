@@ -6,12 +6,10 @@
                   xmlns:views="clr-namespace:Prometheus.Views"
                   xmlns:inventory="clr-namespace:Prometheus.ViewModels.Pages.Inventory"
                   mc:Ignorable="d" 
+                  d:DataContext="{d:DesignInstance {x:Type inventory:BinVM}, IsDesignTimeCreatable=False}"
                   d:DesignHeight="450" d:DesignWidth="800"
-                  Title="BinView">
-
-    <Page.DataContext>
-        <inventory:BinVM x:Name="VM"/>
-    </Page.DataContext>
+                  Title="BinView"
+                  Initialized="BinView_OnInitialized">
 
     <Page.Resources>
         <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Orange/MSControls.Core.Implicit.xaml" />

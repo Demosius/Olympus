@@ -1,15 +1,12 @@
-﻿using System.Windows;
+﻿namespace Cadmus.Views;
 
-namespace Cadmus.Views
+/// <summary>
+/// Interaction logic for CadmusWindow.xaml
+/// </summary>
+public partial class CadmusWindow
 {
-    /// <summary>
-    /// Interaction logic for CadmusWindow.xaml
-    /// </summary>
-    public partial class CadmusWindow : Window
+    public CadmusWindow()
     {
-        public CadmusWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

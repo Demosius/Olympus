@@ -1,5 +1,4 @@
-﻿using Aion.Properties;
-using Aion.View;
+﻿using Aion.View;
 using Aion.ViewModels.Commands;
 using Aion.ViewModels.Interfaces;
 using Aion.ViewModels.Utility;
@@ -16,6 +15,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using Morpheus.Views.Windows;
 using Uranus;
 using Uranus.Commands;
 using Uranus.Interfaces;
@@ -31,7 +31,7 @@ public enum EEntrySortOption
     DayDateEmployee
 }
 
-public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters, IDateRange
+public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IDBRepair, IFilters, IDateRange, ISorting
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
@@ -81,44 +81,17 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         }
     }
 
-    private Employee manager;
-    public Employee Manager
-    {
-        get => manager;
-        set
-        {
-            manager = value;
-            OnPropertyChanged(nameof(Manager));
-        }
-    }
+    public Employee Manager { get; }
 
-    private ObservableCollection<string> locations;
-    public ObservableCollection<string> Locations
-    {
-        get => locations;
-        set
-        {
-            locations = value;
-            OnPropertyChanged(nameof(Locations));
-        }
-    }
+    public ObservableCollection<string> Locations { get; set; }
 
     public List<ShiftEntry> FullEntries { get; set; }
     private List<ShiftEntry> DeletedEntries { get; set; }
 
-    private ObservableCollection<ShiftEntry> entries;
-    public ObservableCollection<ShiftEntry> Entries
-    {
-        get => entries;
-        set
-        {
-            entries = value;
-            OnPropertyChanged(nameof(Entries));
-        }
-    }
+    public ObservableCollection<ShiftEntry> Entries { get; set; }
 
-    private ShiftEntry selectedEntry;
-    public ShiftEntry SelectedEntry
+    private ShiftEntry? selectedEntry;
+    public ShiftEntry? SelectedEntry
     {
         get => selectedEntry;
         set
@@ -164,19 +137,10 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     private List<ClockEvent> DeletedClocks { get; set; }
 
-    private ObservableCollection<ClockEvent> clocks;
-    public ObservableCollection<ClockEvent> Clocks
-    {
-        get => clocks;
-        set
-        {
-            clocks = value;
-            OnPropertyChanged(nameof(Clocks));
-        }
-    }
+    public ObservableCollection<ClockEvent> Clocks { get; set; }
 
-    private ClockEvent selectedClock;
-    public ClockEvent SelectedClock
+    private ClockEvent? selectedClock;
+    public ClockEvent? SelectedClock
     {
         get => selectedClock;
         set
@@ -289,13 +253,30 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public ApplySortingCommand ApplySortingCommand { get; set; }
     public RepairDataCommand RepairDataCommand { get; set; }
 
-    public ShiftEntryPageVM()
+    private ShiftEntryPageVM(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
+
         minDate = DateTime.Now.AddDays(-((int)DateTime.Now.DayOfWeek - 1) - 7 - ((int)DateTime.Now.DayOfWeek <= 1 ? 7 : 0)).Date;
         maxDate = DateTime.Now.AddDays(-1).Date;
         sortOption = EEntrySortOption.EmployeeDate;
 
         Entries = new ObservableCollection<ShiftEntry>();
+        Clocks = new ObservableCollection<ClockEvent>();
+        Employees = new List<Employee>();
+        days = new List<Day>();
+        Locations = new ObservableCollection<string>();
+        FullEntries = new List<ShiftEntry>();
+        DeletedEntries = new List<ShiftEntry>();
+        fullClockDictionary = new Dictionary<(int, string), List<ClockEvent>>();
+        DeletedClocks = new List<ClockEvent>();
+
+        ExportString = string.Empty;
+        employeeSearchString = string.Empty;
+        departmentSearchString = string.Empty;
+        commentSearchString = string.Empty;
+        daySearchString = string.Empty;
 
         // Commands
         RefreshDataCommand = new RefreshDataCommand(this);
@@ -314,49 +295,54 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         CreateMissingShiftsCommand = new CreateMissingShiftsCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
         RepairDataCommand = new RepairDataCommand(this);
+
+        Manager = charon.Employee!;
+
     }
 
-    public bool CheckDateChange()
+    private async Task<ShiftEntryPageVM> InitializeAsync()
+    {
+        var empTask = SetEmployeesAsync();
+        var entryTask = SetEntriesAsync();
+
+        await Task.WhenAll(empTask, entryTask);
+
+        return this;
+    }
+
+    public static Task<ShiftEntryPageVM> CreateAsync(Helios helios, Charon charon)
+    {
+        var ret = new ShiftEntryPageVM(helios, charon);
+        return ret.InitializeAsync();
+    }
+
+    public async Task<bool> CheckDateChange()
     {
         var result = MessageBox.Show("Changing the working date range will reset the data.\n\n" +
                                      "Would you like to save your changes before you continue.",
             "Caution: Data Reset", MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
 
         if (result == MessageBoxResult.Yes)
-            SaveEntryChanges();
+            await SaveEntryChanges();
 
         return result != MessageBoxResult.Cancel;
     }
 
-    public void SetDataSources(Helios helios, Charon charon)
+    private async Task SetEmployeesAsync()
     {
-        Helios = helios;
-        Charon = charon;
-        Manager = charon.Employee;
-        Employees = Helios.StaffReader.GetManagedEmployees(Manager?.ID ?? 0).ToList();
-
-        Task.Run(SetEntries);
+        Employees = (await Helios.StaffReader.GetManagedEmployeesAsync(Manager.ID)).ToList();
     }
 
     /// <summary>
     /// Sets the entries according to the _manager.
     /// </summary>
-    private void SetEntries()
+    private async Task SetEntriesAsync()
     {
         StartDate = minDate;
         EndDate = maxDate;
 
-        var dTask = Task.Run(() =>
-        {
-            FullClockDictionary = Helios.StaffReader.ClockEvents(Employees.Select(e => e.ID), startDate, endDate)
-                .Where(c => c.Status != EClockStatus.Deleted)
-                .GroupBy(c => (c.EmployeeID, c.Date))
-                .ToDictionary(g => g.Key, g => g.ToList());
-        });
-
-        FullEntries = Helios.StaffReader.GetFilteredEntries(StartDate, EndDate, Manager.ID);
-
-        Locations = new ObservableCollection<string>(FullEntries.Select(e => e.Location).Distinct().Where(e => e is not null or ""));
+        var fullClockTask = Helios.StaffReader.ClockEventsAsync(Employees.Select(e => e.ID), startDate, endDate);
+        var entryTask = Helios.StaffReader.GetFilteredEntriesAsync(StartDate, EndDate, Manager.ID);
 
         Days = new List<Day>
         {
@@ -373,9 +359,18 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         DeletedClocks = new List<ClockEvent>();
 
         // Check for duplicate entries.
-        if (CheckForDuplicateEntries()) return;
+        if (await CheckForDuplicateEntries()) return;
 
-        dTask.Wait();
+        FullEntries = await entryTask;
+
+        var locations = new List<string>(FullEntries.Select(e => e.Location).Distinct().Where(e => e is not null or ""));
+        Locations.Clear();
+        foreach (var location in locations)
+            Locations.Add(location);
+
+        FullClockDictionary = (await fullClockTask).Where(c => c.Status != EClockStatus.Deleted)
+            .GroupBy(c => (c.EmployeeID, c.Date))
+            .ToDictionary(g => g.Key, g => g.ToList());
 
         CheckData();
         ApplyFilters();
@@ -386,7 +381,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
     /// Will offer to run a repair if there is.
     /// </summary>
     /// <returns>True if there is still duplicates by the end of the function.</returns>
-    private bool CheckForDuplicateEntries()
+    private async Task<bool> CheckForDuplicateEntries()
     {
         if (!FullEntries.GroupBy(x => new { x.Date, x.EmployeeID }).Any(x => x.Skip(1).Any()))
             return false;
@@ -404,8 +399,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         MessageBox.Show($"The repair process affected {linesAffected} rows of data.", "Complete",
             MessageBoxButton.OK, MessageBoxImage.Information);
 
-        FullEntries = new List<ShiftEntry>(Helios.StaffReader.GetFilteredEntries(StartDate, EndDate, Manager.ID));
-
+        FullEntries = new List<ShiftEntry>(await Helios.StaffReader.GetFilteredEntriesAsync(StartDate, EndDate, Manager.ID));
 
         if (!FullEntries.GroupBy(x => new { x.Date, x.EmployeeID }).Any(x => x.Skip(1).Any()))
             return false;
@@ -433,13 +427,12 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
     /// </summary>
     public void ApplyFilters()
     {
-        if (Manager is null) return;
-
         IEnumerable<ShiftEntry> shiftEntries = FullEntries;
 
         try
         {
             FilterEmployee(ref shiftEntries);
+            // ReSharper disable once PossibleMultipleEnumeration
             FilterDepartment(ref shiftEntries);
             // ReSharper disable once PossibleMultipleEnumeration
             FilterComment(ref shiftEntries);
@@ -461,31 +454,31 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     private void FilterEmployee(ref IEnumerable<ShiftEntry> shiftEntries)
     {
-        if ((employeeSearchString ?? "") == "") return;
+        if (employeeSearchString == "") return;
 
         Regex rex = new(employeeSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        shiftEntries = shiftEntries?.Where(s => rex.IsMatch(s.EmployeeName) || rex.IsMatch(s.EmployeeID.ToString()));
+        shiftEntries = shiftEntries.Where(s => rex.IsMatch(s.EmployeeName) || rex.IsMatch(s.EmployeeID.ToString()));
     }
 
     private void FilterDepartment(ref IEnumerable<ShiftEntry> shiftEntries)
     {
-        if ((departmentSearchString ?? "") == "") return;
+        if (departmentSearchString == "") return;
 
         Regex rex = new(departmentSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        shiftEntries = shiftEntries?.Where(s => rex.IsMatch(s.Department));
+        shiftEntries = shiftEntries.Where(s => rex.IsMatch(s.Department));
     }
 
     private void FilterComment(ref IEnumerable<ShiftEntry> shiftEntries)
     {
-        if ((commentSearchString ?? "") == "") return;
+        if (commentSearchString == "") return;
 
         Regex rex = new(commentSearchString, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        shiftEntries = shiftEntries?.Where(s => rex.IsMatch(s.Comments));
+        shiftEntries = shiftEntries.Where(s => rex.IsMatch(s.Comments));
     }
 
     private void FilterDay(ref IEnumerable<ShiftEntry> shiftEntries)
     {
-        shiftEntries = shiftEntries?.Where(e => Days.Where(d => d.InUse).Select(d => d.DayOfWeek).Contains(e.Day));
+        shiftEntries = shiftEntries.Where(e => Days.Where(d => d.InUse).Select(d => d.DayOfWeek).Contains(e.Day));
     }
 
     private void FilterDate(ref IEnumerable<ShiftEntry> shiftEntries)
@@ -493,7 +486,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         var startString = startDate.ToString("yyyy-MM-dd");
         var endString = endDate.ToString("yyyy-MM-dd");
 
-        shiftEntries = shiftEntries?.Where(e =>
+        shiftEntries = shiftEntries.Where(e =>
             string.CompareOrdinal(e.Date, startString) >= 0 && string.CompareOrdinal(e.Date, endString) <= 0);
     }
 
@@ -595,20 +588,20 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public void SetExportString()
     {
         ExportString = StartDate == EndDate
-            ? $"{(Manager?.ID == -1 ? "All" : Manager?.ToString())}_{StartDate:ddMMMyyyy}"
-            : $"{(Manager?.ID == -1 ? "All" : Manager?.ToString())}_{StartDate:ddMMMyyyy}-{EndDate:ddMMMyyyy}";
+            ? $"{(Manager.ID == -1 ? "All" : Manager.ToString())}_{StartDate:ddMMMyyyy}"
+            : $"{(Manager.ID == -1 ? "All" : Manager.ToString())}_{StartDate:ddMMMyyyy}-{EndDate:ddMMMyyyy}";
     }
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        RefreshData(false);
+        await RefreshDataAsync(false);
     }
 
-    public void RefreshData(bool force)
+    public async Task RefreshDataAsync(bool force)
     {
         if (force || MessageBox.Show("Refreshing will undo any unsaved changes you have made.\n" +
                                      "Would you like to continue?", "Confirm Refresh", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
-            Task.Run(SetEntries);
+            await SetEntriesAsync();
     }
 
     /// <summary>
@@ -616,24 +609,26 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
     /// or missing fields in tables.
     /// </summary>
     /// <returns>The number of rows of data affected by the repairs.</returns>
-    public void RepairData()
+    public async Task RepairDataAsync()
     {
         if (MessageBox.Show(
                 "This action will reset the data, and undo any unsaved changes that have been made.\n\nDo you want to continue?",
                 "Refresh Data?", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes) return;
 
         var linesAffected = Helios.StaffUpdater.RepairAionData();
-        RefreshData(true);
+        await RefreshDataAsync(true);
         MessageBox.Show($"The repair process affected {linesAffected} rows of data.", "Complete",
             MessageBoxButton.OK, MessageBoxImage.Information);
     }
 
-    public void SaveEntryChanges()
+    public async Task SaveEntryChanges()
     {
-        Helios.StaffUpdater.EntriesAndClocks(FullEntries, FullClockDictionary.SelectMany(d => d.Value));
-        Helios.StaffDeleter.EntriesAndClocks(DeletedEntries, DeletedClocks);
+        var updateTask = Helios.StaffUpdater.EntriesAndClocksAsync(FullEntries, FullClockDictionary.SelectMany(d => d.Value));
+        var deleteTask = Helios.StaffDeleter.EntriesAndClocksAsync(DeletedEntries, DeletedClocks);
 
-        RefreshData(true);
+        await Task.WhenAll(new List<Task> { updateTask, deleteTask });
+
+        await RefreshDataAsync(true);
     }
 
     public void DeleteSelectedShifts(List<ShiftEntry> selectedShifts)
@@ -646,14 +641,21 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
     /// </summary>
     private void SetClocks()
     {
-        if (selectedEntry is not null && FullClockDictionary.TryGetValue((selectedEntry.EmployeeID, SelectedEntry.Date), out var newClockList))
-            Clocks = new ObservableCollection<ClockEvent>(newClockList.Where(c => c.Status != EClockStatus.Deleted));
-        else
-            Clocks = new ObservableCollection<ClockEvent>();
+        var clocks =
+            selectedEntry is not null && FullClockDictionary.TryGetValue((selectedEntry.EmployeeID, SelectedEntry?.Date ?? ""), out var newClockList) ?
+                new List<ClockEvent>(newClockList.Where(c => c.Status != EClockStatus.Deleted)) :
+                new List<ClockEvent>();
+
+        Clocks.Clear();
+        foreach (var clockEvent in clocks)
+            Clocks.Add(clockEvent);
+
     }
 
     public void DeleteSelectedClock()
     {
+        if (SelectedClock is null) return;
+
         SelectedClock.Status = EClockStatus.Deleted;
         // We will only delete the clock event from the DB if the timestamp does not match the date - denoting that it was not created by a physical clock event (but through the Aion Manager instead).
         // (In practice, actual clock events should remain recorded, for posterity.)
@@ -679,7 +681,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         {
             VistaFolderBrowserDialog folderBrowserDialog = new()
             {
-                Description = "Select Export Folder",
+                Description = @"Select Export Folder",
                 UseDescriptionForTitle = true
             };
             if (!folderBrowserDialog.ShowDialog() == true) return;
@@ -763,7 +765,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     public void ReSummarizeEntry()
     {
-        SelectedEntry?.ApplyClockTimes(Clocks is null ? new List<ClockEvent>() : Clocks.ToList());
+        SelectedEntry?.ApplyClockTimes(Clocks.ToList());
     }
 
     public void CreateNewClock()
@@ -781,7 +783,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
         Clocks = new ObservableCollection<ClockEvent>(Clocks.OrderBy(c => c.Time));
 
-        FullClockDictionary[(SelectedEntry.EmployeeID, selectedEntry.Date)] = new List<ClockEvent>(Clocks);
+        FullClockDictionary[(SelectedEntry.EmployeeID, selectedEntry?.Date ?? "")] = new List<ClockEvent>(Clocks);
     }
 
     /// <summary>
@@ -810,8 +812,8 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         }
 
         // Set the count based on total clocks with pending status.
-        PendingClockCount = (FullClockDictionary?
-            .SelectMany(d => d.Value) ?? Array.Empty<ClockEvent>())
+        PendingClockCount = FullClockDictionary
+            .SelectMany(d => d.Value)
             .Count(c => c.Status == EClockStatus.Pending);
     }
 
@@ -865,7 +867,7 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
         if (inputWindow.ShowDialog() != true) return;
 
-        var comment = inputWindow.Input.Text;
+        var comment = inputWindow.InputText;
 
         var newEntries = false;
 
@@ -899,20 +901,21 @@ public class ShiftEntryPageVM : INotifyPropertyChanged, IDBInteraction, IFilters
         MissingEntryCount = 0;  // Assume it has worked and there are no more missing shifts.
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void OnPropertyChanged(string propertyName)
+    public async Task LaunchDateRangeWindowAsync()
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    public void LaunchDateRangeWindow()
-    {
-        if (!CheckDateChange()) return;
+        if (!await CheckDateChange()) return;
 
         DateRangeWindow datePicker = new(this);
 
         datePicker.ShowDialog();
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [Uranus.Annotations.NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
 
@@ -958,10 +961,11 @@ public class Day : INotifyPropertyChanged
         inUse = isInUse;
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
 
-    [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [Uranus.Annotations.NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

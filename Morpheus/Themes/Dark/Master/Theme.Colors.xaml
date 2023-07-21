@@ -5,6 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
 
     <!-- ********************************** THEME BRUSHES - For Color Tuner **********************************-->
+    <SolidColorBrush x:Key="Brush00" Color="#FF80D5EF"/>
     <SolidColorBrush x:Key="Brush01" Color="#FF00AADE"/>
     <SolidColorBrush x:Key="Brush02" Color="White"/>
     <SolidColorBrush x:Key="Brush03" Color="#FFC6C6C6"/>
@@ -25,29 +26,19 @@
     <Color x:Key="Color009">#FF181818</Color>
 
     <!--Transparent and Whites with transparency-->
-    <Color x:Key="Color010">#E5FFFFFF</Color>
-    <!--90% White-->
-    <Color x:Key="Color011">#BFFFFFFF</Color>
-    <!--75% White-->
-    <Color x:Key="Color012">#99FFFFFF</Color>
-    <!--60% White-->
-    <Color x:Key="Color013">#72FFFFFF</Color>
-    <!--45% White-->
-    <Color x:Key="Color014">#4CFFFFFF</Color>
-    <!--30% White-->
-    <Color x:Key="Color016">#00FFFFFF</Color>
-    <!--0% White-->
+    <Color x:Key="Color010">#E5FFFFFF</Color> <!--90% White-->
+    <Color x:Key="Color011">#BFFFFFFF</Color> <!--75% White-->
+    <Color x:Key="Color012">#99FFFFFF</Color> <!--60% White-->
+    <Color x:Key="Color013">#72FFFFFF</Color> <!--45% White-->
+    <Color x:Key="Color014">#4CFFFFFF</Color> <!--30% White-->
+    <Color x:Key="Color016">#00FFFFFF</Color> <!--0% White-->
 
     <!--Blacks and grays with transparency-->
-    <Color x:Key="Color018">#72000000</Color>
-    <!--45% Black-->
-    <Color x:Key="Color019">#4C000000</Color>
-    <!--30% Black-->
-    <Color x:Key="Color020">#26000000</Color>
-    <!--15% Black-->
-    <Color x:Key="Color021">#00000000</Color>
-    <!--0% Black-->
-    <Color x:Key="Color022">#66E2E2E2</Color>
+    <Color x:Key="Color018">#72000000</Color> <!--45% Black-->
+    <Color x:Key="Color019">#4C000000</Color> <!--30% Black-->
+    <Color x:Key="Color020">#26000000</Color> <!--15% Black-->
+    <Color x:Key="Color021">#00000000</Color> <!--0% Black-->
+    <Color x:Key="Color022">#66E2E2E2</Color> 
 
     <!--Theme Accent colors -->
     <Color x:Key="Color023">#FF0086AF</Color>

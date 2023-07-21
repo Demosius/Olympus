@@ -34,5 +34,41 @@ namespace Cadmus.Properties {
                 this["SolLocation"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("MC")]
+        public string MCZoneString {
+            get {
+                return ((string)(this["MCZoneString"]));
+            }
+            set {
+                this["MCZoneString"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("9600")]
+        public string MCLocationString {
+            get {
+                return ((string)(this["MCLocationString"]));
+            }
+            set {
+                this["MCLocationString"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\ausefpdfs01ns\\Shares\\Public\\DC_Data\\Olympus")]
+        public string MixedCartonSoHSaveDirectory {
+            get {
+                return ((string)(this["MixedCartonSoHSaveDirectory"]));
+            }
+            set {
+                this["MixedCartonSoHSaveDirectory"] = value;
+            }
+        }
     }
 }

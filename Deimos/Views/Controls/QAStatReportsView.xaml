@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="Deimos.Views.Controls.QAStatReportsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Deimos.ViewModels.Controls"
+             xmlns:controls="clr-namespace:Deimos.Views.Controls"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:QAStatReportsVM}, IsDesignTimeCreatable=False}"
+             Initialized="QAStatReportsView_OnInitialized">
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </UserControl.InputBindings>
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/DullOrange/MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <TabControl Background="{StaticResource ButtonBackgroundBrush}">
+        <TabItem Header="Weekly Reports">
+            <controls:QAWeeklyStatsView DataContext="{Binding WeeklyStats}"/>
+        </TabItem>
+        <TabItem Header="Monthly Reports">
+            <controls:QAMonthlyStatsView DataContext="{Binding MonthlyStats}"/>
+        </TabItem>
+        <TabItem Header="Yearly Reports">
+            <controls:QAYearlyStatsView DataContext="{Binding YearlyStats}"/>
+        </TabItem>
+    </TabControl>
+</UserControl>

@@ -24,8 +24,8 @@ public class CopyDatabaseCommand : ICommand
         return (parameter ?? "null") is string dbLocation && (App.Charon.CanCopyDatabase() || dbLocation.ToLower() == "local");
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.CopyDatabase();
+        await VM.CopyDatabase();
     }
 }

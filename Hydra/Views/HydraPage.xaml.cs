@@ -1,6 +1,7 @@
-﻿using Hydra.ViewModels;
+﻿using System;
+using Hydra.ViewModels;
 using Styx;
-using System;
+using System.Threading.Tasks;
 using System.Windows;
 using Uranus;
 using Uranus.Interfaces;
@@ -13,19 +14,30 @@ namespace Hydra.Views;
 /// </summary>
 public partial class HydraPage : IProject
 {
+    public HydraVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
+
     public HydraPage(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
-        DataContext = new HydraVM(helios, charon);
+    }
+
+    private async void HydraPage_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await HydraVM.CreateAsync(Helios, Charon);
+        DataContext = VM;
     }
 
     public EProject Project => EProject.Hydra;
 
     public static bool RequiresUser => false;
 
-    public void RefreshData()
+    public async Task RefreshDataAsync()
     {
-        throw new NotImplementedException();
+        await Task.Run(() => {});
     }
 
     private void ActionToggle_OnChecked(object sender, RoutedEventArgs e)

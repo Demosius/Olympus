@@ -1,15 +1,12 @@
-﻿using System.Windows;
+﻿namespace Hades.Views;
 
-namespace Hades.Views
+/// <summary>
+/// Interaction logic for HadesWindow.xaml
+/// </summary>
+public partial class HadesWindow
 {
-    /// <summary>
-    /// Interaction logic for HadesWindow.xaml
-    /// </summary>
-    public partial class HadesWindow : Window
+    public HadesWindow()
     {
-        public HadesWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

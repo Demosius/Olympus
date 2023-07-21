@@ -12,6 +12,8 @@ using Sphynx.Views;
 using Styx;
 using System;
 using Hermes.Views;
+using Deimos.Views;
+using Quest.Views;
 using Uranus.Interfaces;
 using Uranus.Staff;
 using Uranus.Staff.Models;
@@ -27,18 +29,20 @@ public static class ProjectFactory
     {
         return project switch
         {
-            EProject.Vulcan => new VulcanPage(),
+            EProject.Vulcan => new VulcanPage(App.Helios),
             EProject.Prometheus => new PrometheusPage(App.Helios, App.Charon),
-            EProject.Pantheon => new PantheonPage(App.Charon, App.Helios),
+            EProject.Pantheon => new PantheonPage(App.Helios, App.Charon),
             EProject.Phoenix => new PhoenixPage(),
             EProject.Khaos => new KhaosPage(),
             EProject.Aion => new AionPage(App.Helios, App.Charon),
             EProject.Hydra => new HydraPage(App.Helios, App.Charon),
-            EProject.Cadmus => new CadmusPage(),
+            EProject.Cadmus => new CadmusPage(App.Helios, App.ProgressBar),
             EProject.Sphynx => new SphynxPage(App.Helios, App.Charon),
             EProject.Argos => new ArgosPage(App.Helios),
             EProject.Hades => new HadesPage(App.Helios),
             EProject.Panacea => new PanaceaPage(App.Helios),
+            EProject.Quest => new QuestPage(App.Helios, App.Charon, App.ProgressBar),
+            EProject.Deimos => new DeimosPage(App.Helios, App.ProgressBar),
             EProject.Hermes => new HermesPage(App.Helios, App.Charon),
             EProject.None => null,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
@@ -70,6 +74,8 @@ public static class ProjectFactory
             EProject.Argos => ArgosPage.RequiresUser,
             EProject.Hades => HadesPage.RequiresUser,
             EProject.Panacea => PanaceaPage.RequiresUser,
+            EProject.Quest => QuestPage.RequiresUser,
+            EProject.Deimos => DeimosPage.RequiresUser,
             EProject.Hermes => HermesPage.RequiresUser,
             EProject.None => false,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)

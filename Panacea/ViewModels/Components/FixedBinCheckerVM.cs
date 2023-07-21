@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Uranus;
@@ -143,7 +144,6 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
 
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
 
     #endregion
 
@@ -159,10 +159,9 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
         RunFixedBinChecksCommand = new RunFixedBinChecksCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
     }
 
-    public void RunChecks()
+    public async Task RunChecksAsync()
     {
         Mouse.OverrideCursor = Cursors.Wait;
 
@@ -172,7 +171,7 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
         var fixedZones = fixedZoneString.ToUpper().Split(',', '|').ToList();
 
         // Pull dataSet.
-        var dataSet = Helios.InventoryReader.FixedBinCheckDataSet(fromZones, fixedZones);
+        var dataSet = await Helios.InventoryReader.FixedBinCheckDataSetAsync(fromZones, fixedZones);
         if (dataSet is null)
         {
             MessageBox.Show("Failed to pull relevant data.");
@@ -231,10 +230,5 @@ public class FixedBinCheckerVM : INotifyPropertyChanged, IFilters
         }
 
         FilteredCheckResults = new ObservableCollection<FixedBinCheckResult>(results);
-    }
-
-    public void ApplySorting()
-    {
-        throw new System.NotImplementedException();
     }
 }

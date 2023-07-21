@@ -9,20 +9,52 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ViewModels\Pages\Employees\**" />
+    <Compile Remove="ViewModels\Pages\Rosters\**" />
+    <Compile Remove="ViewModels\Pages\Shifts\**" />
+    <Compile Remove="Views\Pages\Employees\**" />
+    <Compile Remove="Views\Pages\Rosters\**" />
+    <Compile Remove="Views\Pages\Shifts\**" />
+    <EmbeddedResource Remove="ViewModels\Pages\Employees\**" />
+    <EmbeddedResource Remove="ViewModels\Pages\Rosters\**" />
+    <EmbeddedResource Remove="ViewModels\Pages\Shifts\**" />
+    <EmbeddedResource Remove="Views\Pages\Employees\**" />
+    <EmbeddedResource Remove="Views\Pages\Rosters\**" />
+    <EmbeddedResource Remove="Views\Pages\Shifts\**" />
+    <None Remove="ViewModels\Pages\Employees\**" />
+    <None Remove="ViewModels\Pages\Rosters\**" />
+    <None Remove="ViewModels\Pages\Shifts\**" />
+    <None Remove="Views\Pages\Employees\**" />
+    <None Remove="Views\Pages\Rosters\**" />
+    <None Remove="Views\Pages\Shifts\**" />
+    <Page Remove="ViewModels\Pages\Employees\**" />
+    <Page Remove="ViewModels\Pages\Rosters\**" />
+    <Page Remove="ViewModels\Pages\Shifts\**" />
+    <Page Remove="Views\Pages\Employees\**" />
+    <Page Remove="Views\Pages\Rosters\**" />
+    <Page Remove="Views\Pages\Shifts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\broken-link.png" />
     <None Remove="Resources\calculator--plus.png" />
     <None Remove="Resources\clock--arrow.png" />
+    <None Remove="Resources\cross.png" />
     <None Remove="Resources\csv.png" />
     <None Remove="Resources\database-import.png" />
+    <None Remove="Resources\edit.png" />
     <None Remove="Resources\Fonts\code128.ttf" />
     <None Remove="Resources\Fonts\DIN Black.ttf" />
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
     <None Remove="Resources\Fonts\DIN Medium.ttf" />
     <None Remove="Resources\Fonts\DIN.ttf" />
+    <None Remove="Resources\link.png" />
     <None Remove="Resources\plus-circle-frame.png" />
     <None Remove="Resources\refresh.png" />
     <None Remove="Resources\repair.png" />
     <None Remove="Resources\save.png" />
     <None Remove="Resources\sort.png" />
+    <None Remove="Resources\user.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +62,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\broken-link.png" />
+    <Resource Include="Resources\cross.png" />
+    <Resource Include="Resources\edit.png" />
     <Resource Include="Resources\Fonts\code128.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -58,11 +93,13 @@
     <Resource Include="Resources\clock--arrow.png" />
     <Resource Include="Resources\csv.png" />
     <Resource Include="Resources\database-import.png" />
+    <Resource Include="Resources\link.png" />
     <Resource Include="Resources\plus-circle-frame.png" />
     <Resource Include="Resources\refresh.png" />
     <Resource Include="Resources\repair.png" />
     <Resource Include="Resources\save.png" />
     <Resource Include="Resources\sort.png" />
+    <Resource Include="Resources\user.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -71,10 +108,10 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Update="Views\Controls\ActiveEmployeeRosterView.xaml.cs">
+    <Compile Update="Views\Controls\Rosters\ActiveEmployeeRosterView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\Controls\ActiveRosterView.xaml.cs">
+    <Compile Update="Views\Controls\Rosters\ActiveRosterView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\PantheonPage.xaml.cs">
@@ -83,16 +120,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Views\Controls\ActiveEmployeeRosterView.xaml">
+    <Page Update="Views\Controls\Rosters\ActiveEmployeeRosterView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\Controls\ActiveRosterView.xaml">
+    <Page Update="Views\Controls\Rosters\ActiveRosterView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\InputWindow.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
     <Page Update="Views\PantheonPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
@@ -105,16 +139,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ViewModels\Controls\Employees\" />
-    <Folder Include="ViewModels\Pages\Employees\" />
-    <Folder Include="ViewModels\Pages\Rosters\" />
-    <Folder Include="ViewModels\Pages\Shifts\" />
-    <Folder Include="Views\Pages\Employees\" />
-    <Folder Include="Views\Pages\Rosters\" />
-    <Folder Include="Views\Pages\Shifts\" />
   </ItemGroup>
 
 </Project>
