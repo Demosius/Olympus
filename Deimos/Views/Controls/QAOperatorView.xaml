@@ -4,9 +4,248 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Deimos.ViewModels.Controls"
+             xmlns:converters="clr-namespace:Morpheus.ViewModels.Converters;assembly=Morpheus"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+             d:DataContext="{d:DesignInstance {x:Type vm:QAOperatorVM}, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/DullOrange/MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converters:AsyncImageConverter x:Key="AsyncImageConverter"/>
+            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="5,0"/>
+                <Setter Property="Padding" Value="5,1"></Setter>
+                <Setter Property="FontWeight" Value="Bold"/>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Border BorderThickness="1"
+            BorderBrush="{StaticResource SelectedTabBackgroundBrush}"
+            Padding="5"
+            Background="{StaticResource TabBackgroundBrush}">
+        <Grid Background="{StaticResource TabBackgroundBrush}" Margin="0">
+
+            <Grid.Resources>
+                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockStyle}">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="5,0"/>
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="FontSize" Value="11"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Style>
+            </Grid.Resources>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="104"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Employee -->
+            <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Image Grid.Row="0"
+                   MaxWidth="50"
+                   MaxHeight="50"
+                   Margin="10,10,10,5">
+                    <Image.Source>
+                        <Binding Path="IconUri" Converter="{StaticResource AsyncImageConverter}">
+                            <Binding.TargetNullValue>
+                                <ImageSource>../../Resources/img/user.png</ImageSource>
+                            </Binding.TargetNullValue>
+                        </Binding>
+                    </Image.Source>
+                </Image>
+                <TextBlock Grid.Row="1" Text="{Binding FullName}"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           FontWeight="Bold"
+                           Margin="2,2,2,10"/>
+            </Grid>
+
+            <!-- Time -->
+            <Grid Grid.Row="0" Grid.Column="1" Grid.RowSpan="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+                <Grid.Resources>
+                    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                        <Setter Property="Margin" Value="5,0"/>
+                        <Setter Property="Padding" Value="5, 0"/>
+                        <Setter Property="FontSize" Value="11"/>
+                    </Style>
+                </Grid.Resources>
+                <Label Grid.Row="1" 
+                       Content="Days Active"/>
+                <Label Grid.Row="2"
+                       Content="{Binding DaysActive}"/>
+                <Label Grid.Row="4" 
+                       Content="Total Scan Time"/>
+                <Label Grid.Row="5"
+                       Content="{Binding ScanTimeString}"/>
+            </Grid>
+
+            <!-- Headers -->
+            <Label Grid.Row="0" Grid.Column="3"
+                   Content="Count"/>
+            <Label Grid.Row="0" Grid.Column="4"
+                   Content="Efficiency"/>
+            <Label Grid.Row="0" Grid.Column="5"
+                   Content="Errors"/>
+            <Label Grid.Row="0" Grid.Column="6"
+                   Content="Accuracy"/>
+            <Label Grid.Row="0" Grid.Column="7"
+                   Content="Performance"/>
+
+            <!-- Cartons -->
+            <Label Grid.Row="1" Grid.Column="2" 
+                   Content="Cartons"/>
+            <TextBlock Grid.Row="1" Grid.Column="3"
+                       Text="{Binding CartonCount}"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="4" Text="{Binding CartonsPerHour, StringFormat='#,##0.## /hr'}"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="5"
+                       Text="{Binding CartonErrors}"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="6"
+                       Text="{Binding CartonAccuracy, StringFormat='#0.##%'}"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="7"
+                       Text="{Binding CartonPerformance, StringFormat='#0.##%'}"/>
+
+            <!-- Scans -->
+            <Label Grid.Row="2" Grid.Column="2" 
+                   Content="Scans"/>
+            <TextBlock Grid.Row="2" Grid.Column="3"
+                       Text="{Binding Scans}"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="4" Text="{Binding ScansPerMinute, StringFormat='#,##0.## /min'}"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="5"
+                       Text="{Binding ScanErrors}"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="6"
+                       Text="{Binding ScanAccuracy, StringFormat='#0.##%'}"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="7"
+                       Text="{Binding ScanPerformance, StringFormat='#0.##%'}"/>
+
+            <!-- Units -->
+            <Label Grid.Row="3" Grid.Column="2" 
+                   Content="Units"/>
+            <TextBlock Grid.Row="3" Grid.Column="3"
+                       Text="{Binding Units}"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="4" Text="{Binding UnitsPerMinute, StringFormat='#,##0.## /min'}"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="5"
+                       Text="{Binding UnitErrors}"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="6"
+                       Text="{Binding UnitAccuracy, StringFormat='#0.##%'}"/>
+
+            <TextBlock Grid.Row="3" Grid.Column="7"
+                       Text="{Binding UnitPerformance, StringFormat='#0.##%'}"/>
+
+            <!-- Items -->
+            <Label Grid.Row="4" Grid.Column="2" 
+                   Content="Items"/>
+            <TextBlock Grid.Row="4" Grid.Column="3"
+                       Text="{Binding Items}"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="4" Text="{Binding ItemsPerMinute, StringFormat='#,##0.## /min'}"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="5"
+                       Text="{Binding ItemErrors}"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="6"
+                       Text="{Binding ItemAccuracy, StringFormat='#0.##%'}"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="7"
+                       Text="{Binding ItemPerformance, StringFormat='#0.##%'}"/>
+
+            <!-- Bar Chart -->
+            <Rectangle Grid.Row="1" Grid.Column="8" Grid.RowSpan="4"
+                       Stroke="Gray"/>
+            <Rectangle Grid.Row="1" Grid.Column="8"
+                       Margin="2"
+                       Width="{Binding PctTopCarton}"
+                       Fill="Cyan"
+                       Stroke="Teal"
+                       HorizontalAlignment="Left"/>
+            <Rectangle Grid.Row="2" Grid.Column="8"
+                       Margin="2"
+                       Width="{Binding PctTopScan}"
+                       Fill="Lime"
+                       Stroke="Green"
+                       HorizontalAlignment="Left"/>
+            <Rectangle Grid.Row="3" Grid.Column="8"
+                       Margin="2"
+                       Width="{Binding PctTopUnit}"
+                       Fill="Magenta"
+                       Stroke="DarkMagenta"
+                       HorizontalAlignment="Left"/>
+            <Rectangle Grid.Row="4" Grid.Column="8"
+                       Margin="2"
+                       Width="{Binding PctTopItem}"
+                       Fill="Yellow"
+                       Stroke="Gold"
+                       HorizontalAlignment="Left"/>
+
+            <!-- Overall Performance -->
+            <StackPanel Grid.Row="0" Grid.Column="9" Grid.RowSpan="5"
+                        Orientation="Vertical"
+                        VerticalAlignment="Center">
+                <TextBlock Text="Overall Accuracy"
+                           FontSize="14"/>
+                <Separator Width="120"></Separator>
+                <TextBlock Text="{Binding OverallAccuracy, StringFormat='#0.##%'}"
+                           FontSize="20"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="0" Grid.Column="10" Grid.RowSpan="5"
+                        Orientation="Vertical"
+                        VerticalAlignment="Center">
+                <TextBlock Text="Overall Performance"
+                           FontSize="14"/>
+                <Separator Width="120"></Separator>
+                <TextBlock Text="{Binding OverallPerformance, StringFormat='#0.##%'}"
+                           FontSize="20"/>
+            </StackPanel>
+        </Grid>
+    </Border>
 </UserControl>

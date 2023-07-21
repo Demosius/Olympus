@@ -43,6 +43,7 @@
     <None Remove="Resources\img\screwdriver.png" />
     <None Remove="Resources\img\search.png" />
     <None Remove="Resources\img\sort.png" />
+    <None Remove="Resources\img\user.png" />
     <None Remove="Resources\img\wand--arrow.png" />
     <None Remove="Resources\img\wrench-screwdriver.png" />
     <None Remove="Resources\img\wrench.png" />
@@ -58,6 +59,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Cadmus\Cadmus.csproj" />
     <ProjectReference Include="..\Morpheus\Morpheus.csproj" />
     <ProjectReference Include="..\Uranus\Uranus.csproj" />
   </ItemGroup>
@@ -112,6 +114,7 @@
     <Resource Include="Resources\img\screwdriver.png" />
     <Resource Include="Resources\img\search.png" />
     <Resource Include="Resources\img\sort.png" />
+    <Resource Include="Resources\img\user.png" />
     <Resource Include="Resources\img\wand--arrow.png" />
     <Resource Include="Resources\img\wrench-screwdriver.png" />
     <Resource Include="Resources\img\wrench.png" />

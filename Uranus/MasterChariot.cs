@@ -327,7 +327,7 @@ public abstract class MasterChariot
 
         void Action()
         {
-            lines += Database.UpdateAll(objList);
+            lines += objList.Select(InsertOrReplace).Sum();
         }
 
         Database?.RunInTransaction(Action);

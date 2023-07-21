@@ -11,7 +11,6 @@ using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
-using Uranus.Staff.Models;
 
 namespace Deimos.ViewModels.Controls;
 
@@ -22,11 +21,22 @@ public class QAOperatorStatsVM : INotifyPropertyChanged, IDBInteraction, IFilter
     public Helios Helios { get; set; }
     public ProgressBarVM ProgressBar { get; set; }
 
-    public List<QACarton> AllCartons { get; set; }
+    public List<QAOperatorVM> AllOperators { get; set; }
 
     #region INotifyPropertyChanged Members
 
-    public ObservableCollection<QACarton> Cartons { get; set; }
+    public ObservableCollection<QAOperatorVM> Operators { get; set; }
+
+    private QAOperatorVM selectedOperator;
+    public QAOperatorVM SelectedOperator
+    {
+        get => selectedOperator;
+        set
+        {
+            selectedOperator = value;
+            OnPropertyChanged();
+        }
+    }
 
     private DateTime? startDate;
     public DateTime? StartDate
@@ -74,6 +84,120 @@ public class QAOperatorStatsVM : INotifyPropertyChanged, IDBInteraction, IFilter
         }
     }
 
+    private TimeSpan minTimeFilter;
+    public string MinTimeFilter
+    {
+        get => minTimeFilter.ToString("g");
+        set
+        {
+            _ = TimeSpan.TryParse(value, out minTimeFilter);
+            OnPropertyChanged();
+            ApplyFilters();
+        }
+    }
+
+    private double bestCartonsPerHour;
+    public double BestCartonsPerHour
+    {
+        get => bestCartonsPerHour;
+        set
+        {
+            bestCartonsPerHour = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private double bestItemsPerMinute;
+    public double BestItemsPerMinute
+    {
+        get => bestItemsPerMinute;
+        set
+        {
+            bestItemsPerMinute = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private double bestScansPerMinute;
+    public double BestScansPerMinute
+    {
+        get => bestScansPerMinute;
+        set
+        {
+            bestScansPerMinute = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private double bestUnitsPerMinute;
+    public double BestUnitsPerMinute
+    {
+        get => bestUnitsPerMinute;
+        set
+        {
+            bestUnitsPerMinute = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private double averageCartonsPerHour;
+    public double AverageCartonsPerHour
+    {
+        get => averageCartonsPerHour;
+        set
+        {
+            averageCartonsPerHour = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private double averageItemsPerMinute;
+    public double AverageItemsPerMinute
+    {
+        get => averageItemsPerMinute;
+        set
+        {
+            averageItemsPerMinute = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private double averageScansPerMinute;
+    public double AverageScansPerMinute
+    {
+        get => averageScansPerMinute;
+        set
+        {
+            averageScansPerMinute = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private double averageUnitsPerMinute;
+    public double AverageUnitsPerMinute
+    {
+        get => averageUnitsPerMinute;
+        set
+        {
+            averageUnitsPerMinute = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private bool showGridView;
+    public bool ShowGridView
+    {
+        get => showGridView;
+        set
+        {
+            showGridView = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(ShowListView));
+        }
+    }
+
+    public bool ShowListView => !ShowGridView;
+
     #endregion
 
     #region Commands
@@ -93,8 +217,8 @@ public class QAOperatorStatsVM : INotifyPropertyChanged, IDBInteraction, IFilter
 
         filterString = string.Empty;
 
-        AllCartons = new List<QACarton>();
-        Cartons = new ObservableCollection<QACarton>();
+        AllOperators = new List<QAOperatorVM>();
+        Operators = new ObservableCollection<QAOperatorVM>();
 
         RefreshDataCommand = new RefreshDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
@@ -107,7 +231,11 @@ public class QAOperatorStatsVM : INotifyPropertyChanged, IDBInteraction, IFilter
         var fromDate = (DateTime)StartDate;
         var toDate = (DateTime)EndDate;
 
-        AllCartons = await Helios.StaffReader.QACartonsAsync(fromDate, toDate);
+        ProgressBar.StartTask("Pulling QA Stat Data...");
+        var operators = await Helios.StaffReader.QAOperatorStatisticsAsync(fromDate, toDate);
+        ProgressBar.EndTask();
+
+        AllOperators = operators.Select(e => new QAOperatorVM(e)).ToList();
 
         ApplyFilters();
     }
@@ -120,11 +248,26 @@ public class QAOperatorStatsVM : INotifyPropertyChanged, IDBInteraction, IFilter
 
     public void ApplyFilters()
     {
-        var cartons = AllCartons.Where(c =>
-            Regex.IsMatch(c.EmployeeID, FilterString));
+        var cartons = AllOperators.Where(o =>
+            o.ScanTime >= minTimeFilter && (
+                Regex.IsMatch(o.ID.ToString(), FilterString, RegexOptions.IgnoreCase) ||
+                Regex.IsMatch(o.FullName, FilterString, RegexOptions.IgnoreCase)));
 
-        Cartons.Clear();
-        foreach (var carton in cartons) Cartons.Add(carton);
+        Operators.Clear();
+        foreach (var carton in cartons) Operators.Add(carton);
+
+        BestCartonsPerHour = Operators.Max(o => o.CartonsPerHour);
+        BestItemsPerMinute = Operators.Max(o => o.ItemsPerMinute);
+        BestScansPerMinute = Operators.Max(o => o.ScansPerMinute);
+        BestUnitsPerMinute = Operators.Max(o => o.UnitsPerMinute);
+        AverageCartonsPerHour = Operators.Average(o => o.CartonsPerHour);
+        AverageItemsPerMinute = Operators.Average(o => o.ItemsPerMinute);
+        AverageScansPerMinute = Operators.Average(o => o.ScansPerMinute);
+        AverageUnitsPerMinute = Operators.Average(o => o.UnitsPerMinute);
+
+        foreach (var operatorVM in Operators)
+            operatorVM.SetPerformance(AverageCartonsPerHour, AverageItemsPerMinute, AverageScansPerMinute, AverageUnitsPerMinute,
+                BestCartonsPerHour, BestItemsPerMinute, BestScansPerMinute, BestUnitsPerMinute);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

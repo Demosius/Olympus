@@ -1,9 +1,11 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Uranus.Extensions;
 using Uranus.Staff.Models;
 
 namespace Uranus.Staff;
@@ -69,8 +71,8 @@ public class StaffCreator
         {
             foreach (var project in newProjects)
             {
-                Chariot.InsertOrReplace((object?) project);
-                Chariot.InsertOrReplace((object?) project.Icon);
+                Chariot.InsertOrReplace((object?)project);
+                Chariot.InsertOrReplace((object?)project.Icon);
             }
         });
     }
@@ -337,6 +339,73 @@ public class StaffCreator
 
             lines += Chariot.UpdateTable(qaLines);
             lines += Chariot.UpdateTable(mispicks);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return lines;
+    }
+
+    [SuppressMessage("ReSharper", "AccessToModifiedClosure")]
+    public async Task<int> QAStatsAsync(DateTime fromDate, EDatePeriod datePeriod)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            var existing = Chariot.PullObjectList<QAStats>(s => s.DatePeriod == datePeriod).ToDictionary(s => s.StartDate, s => s);
+            var newStats = new List<QAStats>();
+
+            var startDate = datePeriod switch
+            {
+                EDatePeriod.Day => fromDate,
+                EDatePeriod.Week => fromDate.WeekStartSunday(),
+                EDatePeriod.Month => fromDate.EBFiscalMonthStart(),
+                EDatePeriod.Year => fromDate.EBFiscalYearStart(),
+                _ => new DateTime()
+            };
+
+            while (startDate < DateTime.Today)
+            {
+                var endDate = datePeriod switch
+                {
+                    EDatePeriod.Day => startDate,
+                    EDatePeriod.Week => startDate.AddDays(6),
+                    EDatePeriod.Month => startDate.EBFiscalMonthEnd(),
+                    EDatePeriod.Year => startDate.EBFiscalYearEnd(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(datePeriod), datePeriod, null)
+                };
+
+                var dateDescription = datePeriod switch
+                {
+                    EDatePeriod.Day => startDate.ToString("dddd dd-MMM-yyyy"),
+                    EDatePeriod.Week => startDate.EBFiscalWeekStringFull(),
+                    EDatePeriod.Month => startDate.EBFiscalMonthStringFull(),
+                    EDatePeriod.Year => startDate.EBFiscalYear().ToString(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(datePeriod), datePeriod, null)
+                };
+
+                if (!existing.ContainsKey(startDate))
+                {
+                    var stats = new QAStats(startDate, endDate, dateDescription)
+                    {
+                        RestockQty = Chariot.ExecuteScalar<int>("SELECT SUM(Qty) From PickEvent WHERE Date >= ? AND Date <= ?;", startDate.Ticks, endDate.Ticks),
+                        RestockHits = Chariot.ExecuteScalar<int>("SELECT Count(*) From PickEvent WHERE Date >= ? AND Date <= ?;", startDate.Ticks, endDate.Ticks),
+                        RestockCartons = Chariot.ExecuteScalar<int>("SELECT Count(DISTINCT ContainerID) From PickEvent WHERE Date >= ? AND Date <= ?;", startDate.Ticks, endDate.Ticks)
+                    };
+
+                    var qaLines = Chariot.PullObjectList<QALine>(l => l.Date >= startDate && l.Date <= endDate);
+                    var qaCartons = Chariot.PullObjectList<QACarton>(c => c.Date >= startDate && c.Date <= endDate);
+
+                    stats.SetValues(qaCartons, qaLines);
+
+                    newStats.Add(stats);
+                }
+
+                startDate = endDate.AddDays(1);
+            }
+
+            lines += Chariot.UpdateTable(newStats);
         }
 
         await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);

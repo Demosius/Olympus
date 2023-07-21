@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Deimos.Models;
+using Morpheus.ViewModels.Controls;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -20,6 +21,7 @@ public class StatisticsReportVM : INotifyPropertyChanged, IDBInteraction, IFilte
     public Helios Helios { get; set; }
     public DeimosVM Deimos { get; set; }
     public ErrorAllocationVM ParentVM { get; set; }
+    public ProgressBarVM ProgressBar { get; set; }
 
     public DateTime? StartDate => ParentVM.StartDate;
     public DateTime? EndDate => ParentVM.EndDate;
@@ -79,6 +81,7 @@ public class StatisticsReportVM : INotifyPropertyChanged, IDBInteraction, IFilte
         ParentVM = parentVM;
         Helios = ParentVM.Helios;
         Deimos = ParentVM.ParentVM;
+        ProgressBar = ParentVM.ProgressBar;
         
         ReportList = new List<EmployeeStatisticsReport>();
         Reports = new ObservableCollection<EmployeeStatisticsReport>();
@@ -95,6 +98,8 @@ public class StatisticsReportVM : INotifyPropertyChanged, IDBInteraction, IFilte
 
         var fromDate = (DateTime)StartDate;
         var toDate = (DateTime)EndDate;
+
+        ProgressBar.StartTask("Calculating Report...", $"{StartDate:dd-MMM-yyyy} - {EndDate:dd-MMM-yyyy}");
 
         var (mispicks, sessions, tagTool) = await Helios.StaffReader.StatisticReportsAsync(fromDate, toDate, SelectedErrorMethod == EErrorMethod.ErrorDiscovered);
         await Task.Run(() =>
@@ -137,6 +142,8 @@ public class StatisticsReportVM : INotifyPropertyChanged, IDBInteraction, IFilte
                 ReportList.Add(newRep);
             }
         });
+        ProgressBar.EndTask();
+
         ApplyFilters();
     }
 

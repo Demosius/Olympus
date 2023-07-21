@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Windows.Controls;
 using System.Windows.Input;
 using Deimos.ViewModels.Controls;
 
 namespace Deimos.ViewModels.Commands;
 
-public class SetBlackoutCommand : ICommand
+public class SetBackoutCommand : ICommand
 {
     public QAErrorManagementVM VM { get; set; }
 
-    public SetBlackoutCommand(QAErrorManagementVM vm) { VM = vm; }
+    public SetBackoutCommand(QAErrorManagementVM vm) { VM = vm; }
 
     public bool CanExecute(object? parameter)
     {
@@ -18,7 +17,7 @@ public class SetBlackoutCommand : ICommand
 
     public async void Execute(object? parameter)
     {
-        await VM.SetBlackoutAsync();
+        await VM.SetBackoutAsync();
     }
 
     public event EventHandler? CanExecuteChanged

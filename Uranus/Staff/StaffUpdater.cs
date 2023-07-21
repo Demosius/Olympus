@@ -607,4 +607,6 @@ public class StaffUpdater
     public async Task<int> QALineAsync(QALine qaLine) => await Chariot.InsertOrReplaceAsync(qaLine);
 
     public async Task<int> QALinesAsync(List<QALine> qaLines) => await Chariot.UpdateTableAsync(qaLines);
+
+    public async Task<int> QAStatsAsync(QAStats stats) => await Chariot.InsertOrReplaceAsync(stats);
 }

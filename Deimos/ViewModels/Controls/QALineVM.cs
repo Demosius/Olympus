@@ -47,7 +47,15 @@ public class QALineVM : INotifyPropertyChanged, IDBInteraction
 
     public string CartonID => QALine.CartonID;
 
-    public string BinCode => QALine.BinCode;
+    public string BinCode
+    {
+        get => QALine.BinCode;
+        set
+        {
+            QALine.BinCode = value;
+            OnPropertyChanged();
+        }
+    }
 
     public string ItemDescription => QALine.ItemDescription;
 
@@ -62,6 +70,7 @@ public class QALineVM : INotifyPropertyChanged, IDBInteraction
         {
             QALine.ErrorType = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(ErrorCategory));
             _ = SetFault();
             _ = SaveAsync();
         }
@@ -104,6 +113,7 @@ public class QALineVM : INotifyPropertyChanged, IDBInteraction
         {
             QALine.QAStatus = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(ErrorCategory));
             _ = SaveAsync();
             Count();
         }
@@ -120,20 +130,54 @@ public class QALineVM : INotifyPropertyChanged, IDBInteraction
         }
     }
 
-    public bool AtFault => QALine.AtFault;
-
-    public bool Blackout
+    public bool External
     {
-        get => QALine.Blackout;
+        get => QALine.ErrorAllocation == EErrorAllocation.External;
         set
         {
-            QALine.Blackout = value;
+            QALine.External = value && QALine.ErrorCategory is EErrorCategory.OtherExternal or EErrorCategory.OtherDept;
             OnPropertyChanged();
-            _ = SetFault();
+            OnPropertyChanged(nameof(ErrorCategory));
             _ = SaveAsync();
             Count();
         }
     }
+
+    public bool Seek
+    {
+        get => QALine.Seek;
+        set
+        {
+            QALine.Seek = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(Fixed));
+            _ = SaveAsync();
+        }
+    }
+
+    public bool Fixed 
+    {
+        get => QALine.Seek && QALine.Fixed;
+        set
+        {
+            QALine.Fixed = value;
+            OnPropertyChanged();
+            _ = SaveAsync();
+        }
+    }
+
+    public bool PickerError => QALine.PickerError;
+    public bool ReceiveError => QALine.ReceiveError;
+    public bool ReplenError => QALine.ReplenError;
+    public bool StockingError => QALine.StockingError;
+    public bool HeatMapError => QALine.HeatMapError;
+    public bool QAError => QALine.QAError;
+    public bool SystemError => QALine.SystemError;
+    public bool SupplierError => QALine.SupplierError;
+
+    public EErrorCategory ErrorCategory => QALine.ErrorCategory;
+
+    public EErrorAllocation ErrorAllocation => QALine.ErrorAllocation;
 
     #endregion
 
@@ -164,8 +208,8 @@ public class QALineVM : INotifyPropertyChanged, IDBInteraction
     /// <returns></returns>
     public async Task SetFault()
     {
-        OnPropertyChanged(nameof(AtFault));
-        switch (AtFault)
+        OnPropertyChanged(nameof(ErrorCategory));
+        switch (QALine.PickerError)
         {
             case true when Mispick is null:
                 var mispick = QALine.GenerateMispick();
@@ -191,11 +235,11 @@ public class QALineVM : INotifyPropertyChanged, IDBInteraction
         QALine = line;
     }
 
-    public void SetBlackOut(bool b)
+    public void SetExternal(bool b)
     {
-        QALine.Blackout = b;
-        OnPropertyChanged(nameof(Blackout));
-        OnPropertyChanged(nameof(AtFault));
+        QALine.External = b;
+        OnPropertyChanged(nameof(External));
+        OnPropertyChanged(nameof(ErrorCategory));
     }
 
     public void Count() => ParentVM.Count();

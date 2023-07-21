@@ -22,8 +22,8 @@ public class QACarton
     public string ShipmentNumber { get; set; }
     public string WarehouseCode { get; set; }
     public string CartonType { get; set; }
-    public int EmployeeID { get; set; }
-    public DateTime Date { get; set; }
+    public string EmployeeID { get; set; }  // PC ID
+    [Indexed] public DateTime Date { get; set; }
     public TimeSpan Time { get; set; }
     public bool Pass { get; set; }
     public string QAStatus { get; set; }
@@ -36,7 +36,7 @@ public class QACarton
     public double CurrentWeight { get; set; }
     public double CurrentCube { get; set; }
 
-    [Ignore] public int QABy => EmployeeID;
+    [Ignore] public string QABy => EmployeeID;
     [Ignore] public Employee? QAOperator { get; set; }
 
     [OneToMany(nameof(QALine.CartonID), nameof(QALine.QACarton), CascadeOperations = CascadeOperation.CascadeRead)]
@@ -58,6 +58,10 @@ public class QACarton
 
     [Ignore] public int QAScans => QALines.Sum(l => l.QAQty);
     [Ignore] public int QAUnits => QALines.Sum(l => l.PickQtyBase);
+    [Ignore] public bool QAError => QALines.Any(l => l.QAError);
+    [Ignore] public int QAErrorItems => QALines.Count(l => l.QAError);
+    [Ignore] public int QAErrorScans => QALines.Where(l => l.QAError).Sum(l => Math.Abs(l.VarianceQty));
+    [Ignore] public int QAErrorUnits => QALines.Where(l => l.QAError).Sum(l => Math.Abs(l.UnitVariance));
 
     public QACarton()
     {
@@ -67,6 +71,7 @@ public class QACarton
         ShipmentNumber = string.Empty;
         WarehouseCode = string.Empty;
         CartonType = string.Empty;
+        EmployeeID = string.Empty;
         QAStatus = string.Empty;
         BatchID = string.Empty;
 

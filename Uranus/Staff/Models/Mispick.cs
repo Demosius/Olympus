@@ -16,9 +16,9 @@ public enum EErrorMethod
 public class Mispick : IEquatable<Mispick>
 {
     [PrimaryKey] public string ID { get; set; } // e.g. 8292418:215854 => [CartonID]:[ItemNumber]
-    public DateTime ShipmentDate { get; set; }
-    public DateTime ReceivedDate { get; set; }
-    public DateTime PostedDate { get; set; }
+    [Indexed] public DateTime ShipmentDate { get; set; }
+    [Indexed] public DateTime ReceivedDate { get; set; }
+    [Indexed] public DateTime PostedDate { get; set; }
     public string CartonID { get; set; }
     public int ItemNumber { get; set; }
     public string ItemDescription { get; set; }
@@ -29,7 +29,7 @@ public class Mispick : IEquatable<Mispick>
     public bool QAAllocated { get; set; }
 
     public string Comments { get; set; }
-    public DateTime ErrorDate { get; set; } // This should represent the date of the actual error. 99+% of the time this will match ShipmentDate, and will default to that.
+    [Indexed] public DateTime ErrorDate { get; set; } // This should represent the date of the actual error. 99+% of the time this will match ShipmentDate, and will default to that.
 
     public bool Checked { get; set; }
     public bool NoCarton { get; set; }  // No appropriate carton found when checking pick events.

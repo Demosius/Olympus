@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Deimos.ViewModels.Controls"
+             xmlns:controls="clr-namespace:Deimos.Views.Controls"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:QAOperatorStatsVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -16,6 +17,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Morpheus;component/Themes/Dark/DullOrange/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary>
+                    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -39,8 +43,21 @@
                      MinWidth="100"
                      MaxWidth="250"
                      VerticalContentAlignment="Center"/>
+            <Label Content="Min Time:"
+                   FontWeight="Bold"
+                   VerticalAlignment="Center"/>
+            <TextBox Text="{Binding MinTimeFilter, Mode=TwoWay}"
+                     Margin="5"
+                     MinWidth="100"
+                     MaxWidth="250"
+                     VerticalContentAlignment="Center"/>
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+                       Margin="5"/>
+            <CheckBox IsChecked="{Binding ShowGridView}"
+                      Content="Grid View"/>
         </StackPanel>
-        <DataGrid ItemsSource="{Binding Cartons}"
+        <DataGrid ItemsSource="{Binding Operators}"
+                  SelectedItem="{Binding SelectedOperator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   d:ItemsSource="{d:SampleData ItemCount=5}"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
@@ -48,73 +65,102 @@
                   CanUserResizeRows="False"
                   CanUserResizeColumns="True"
                   CanUserSortColumns="True"
-                  CanUserReorderColumns="True">
+                  CanUserReorderColumns="True"
+                  RowHeaderWidth="10"
+                  Visibility="{Binding ShowGridView, Converter={StaticResource BooleanToVisibilityConverter}}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Carton ID"
-                                    Binding="{Binding ID}"
+                <DataGridTextColumn Header="Operator ID"
+                                    Binding="{Binding PC_ID}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Store Number"
-                                    Binding="{Binding StoreNo}"
+                <DataGridTextColumn Header="Operator Name"
+                                    Binding="{Binding FullName}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Store Name"
-                                    Binding="{Binding StoreName}"
+                <DataGridTextColumn Header="Active Days"
+                                    Binding="{Binding DaysActive}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Carton Status"
-                                    Binding="{Binding CartonStatus}"
+                <DataGridTextColumn Header="Total Scan Time"
+                                    Binding="{Binding ScanTimeString}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Ship.No."
-                                    Binding="{Binding ShipmentNumber}"
+                <DataGridTextColumn Header="Cartons"
+                                    Binding="{Binding CartonCount}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Warehouse Code"
-                                    Binding="{Binding WarehouseCode}"
+                <DataGridTextColumn Header="Items"
+                                    Binding="{Binding Items}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Carton Type"
-                                    Binding="{Binding CartonType}"
+                <DataGridTextColumn Header="Scans"
+                                    Binding="{Binding Scans}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Operator"
-                                    Binding="{Binding EmployeeID}"
+                <DataGridTextColumn Header="Units"
+                                    Binding="{Binding Units}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Date"
-                                    Binding="{Binding Date, StringFormat='dd-MMM-yyyy'}"
+                <DataGridTextColumn Header="Cartons Per Hour"
+                                    Binding="{Binding CartonsPerHour, StringFormat='#,##0.##'}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Time"
-                                    Binding="{Binding Time}"
+                <DataGridTextColumn Header="ItemsPerMinute"
+                                    Binding="{Binding ItemsPerMinute,  StringFormat='#,##0.##'}"
                                     IsReadOnly="True"/>
-                <DataGridCheckBoxColumn Header="Pass"
-                                        Binding="{Binding Pass}"
-                                        IsReadOnly="True"/>
-                <DataGridTextColumn Header="QA Status"
-                                    Binding="{Binding QAStatus}"
+                <DataGridTextColumn Header="ScansPerMinute"
+                                    Binding="{Binding ScansPerMinute,  StringFormat='#,##0.##'}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Batch ID"
-                                    Binding="{Binding BatchID}"
+                <DataGridTextColumn Header="UnitsPerMinute"
+                                    Binding="{Binding UnitsPerMinute,  StringFormat='#,##0.##'}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Depth"
-                                    Binding="{Binding Depth}"
+                <DataGridTextColumn Header="QA Carton Errors"
+                                    Binding="{Binding CartonErrors}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Width"
-                                    Binding="{Binding Width}"
+                <DataGridTextColumn Header="QA Item Errors"
+                                    Binding="{Binding ItemErrors}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Height"
-                                    Binding="{Binding Height}"
+                <DataGridTextColumn Header="QA Item Errors"
+                                    Binding="{Binding ItemErrors}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Max Weight"
-                                    Binding="{Binding MaxWeight}"
+                <DataGridTextColumn Header="QA Scan Errors"
+                                    Binding="{Binding ScanErrors}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Max Cube"
-                                    Binding="{Binding MaxCube}"
+                <!--<DataGridTextColumn Header="Carton Accuracy"
+                                    Binding="{Binding CartonAccuracy, StringFormat='#0.##%'}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Current Weight"
-                                    Binding="{Binding CurrentWeight}"
+                <DataGridTextColumn Header="Item Accuracy"
+                                    Binding="{Binding ItemAccuracy, StringFormat='#0.##%'}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Current Cube"
-                                    Binding="{Binding CurrentCube}"
+                <DataGridTextColumn Header="Item Accuracy"
+                                    Binding="{Binding ItemAccuracy, StringFormat='#0.##%'}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Scan Accuracy"
+                                    Binding="{Binding ScanAccuracy, StringFormat='#0.##%'}"
+                                    IsReadOnly="True"/>-->
+                <DataGridTextColumn Header="Overall Accuracy"
+                                    Binding="{Binding OverallAccuracy, StringFormat='#0.##%'}"
+                                    IsReadOnly="True"/>
+                <!--<DataGridTextColumn Header="Carton Performance"
+                                    Binding="{Binding CartonPerformance, StringFormat='#0.##%'}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Item Performance"
+                                    Binding="{Binding ItemPerformance, StringFormat='#0.##%'}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Scan Performance"
+                                    Binding="{Binding ScanPerformance, StringFormat='#0.##%'}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Unit Performance"
+                                    Binding="{Binding UnitPerformance, StringFormat='#0.##%'}"
+                                    IsReadOnly="True"/>-->
+                <DataGridTextColumn Header="Overall Performance"
+                                    Binding="{Binding OverallPerformance, StringFormat='#0.##%'}"
                                     IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
-        <!--<ListView Background="{StaticResource ButtonBackgroundBrush}">
 
-        </ListView>-->
+        <ListView Background="{StaticResource ButtonBackgroundBrush}"
+                  d:ItemsSource="{d:SampleData ItemCount=5}"
+                  ItemsSource="{Binding Operators}"
+                  SelectedItem="{Binding SelectedOperator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Visibility="{Binding ShowListView, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <controls:QAOperatorView DataContext="{Binding}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </DockPanel>
 
 </UserControl>

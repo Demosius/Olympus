@@ -63,6 +63,9 @@
                 <DataGridTextColumn Header="Posted Date"
                                     Binding="{Binding PostedDate, StringFormat=dd/MM/yyyy}"
                                     IsReadOnly="True"/>
+                <DataGridTextColumn Header="Tech"
+                                    Binding="{Binding TechType}"
+                                    IsReadOnly="True"/>
                 <DataGridTextColumn Header="Carton"
                                     Binding="{Binding CartonID}"
                                     IsReadOnly="True"/>

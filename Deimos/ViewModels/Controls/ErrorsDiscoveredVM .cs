@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Deimos.Models;
+using Morpheus.ViewModels.Controls;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -19,6 +20,7 @@ public class ErrorsDiscoveredVM : INotifyPropertyChanged, IDBInteraction, IFilte
     public DeimosVM Deimos { get; set; }
     public ErrorAllocationVM ParentVM { get; set; }
     public Helios Helios { get; set; }
+    public ProgressBarVM ProgressBar { get; set; }
 
     public List<ErrorGroup> AllErrors { get; set; }
 
@@ -60,6 +62,7 @@ public class ErrorsDiscoveredVM : INotifyPropertyChanged, IDBInteraction, IFilte
         ParentVM = parentVM;
         Deimos = ParentVM.ParentVM;
         Helios = parentVM.Helios;
+        ProgressBar = parentVM.ProgressBar;
 
         filterString = string.Empty;
 
@@ -77,6 +80,7 @@ public class ErrorsDiscoveredVM : INotifyPropertyChanged, IDBInteraction, IFilte
             AllErrors = new List<ErrorGroup>();
         else
         {
+            ProgressBar.StartTask("Calculating Report...", $"{StartDate:dd-MMM-yyyy} - {EndDate:dd-MMM-yyyy}");
             var mispickTask = Helios.StaffReader.RawMispicksAsync((DateTime)StartDate, (DateTime)EndDate);
             var tagAssignToolTask = Helios.StaffReader.TagAssignmentToolAsync();
 
@@ -88,6 +92,7 @@ public class ErrorsDiscoveredVM : INotifyPropertyChanged, IDBInteraction, IFilte
             AllErrors = ErrorGroup.GenerateErrorGroupsPosted(mispicks).OrderBy(e => e.Date).ToList();
             foreach (var errorGroup in AllErrors)
                 errorGroup.Employee = tagAssignTool.Employee(errorGroup.Date, errorGroup.AssignedRF_ID);
+            ProgressBar.EndTask();
         }
 
         ApplyFilters();

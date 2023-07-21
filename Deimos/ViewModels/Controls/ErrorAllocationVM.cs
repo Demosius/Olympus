@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Deimos.Models;
 using Morpheus.ViewModels.Commands;
 using Morpheus.ViewModels.Controls;
 using Morpheus.ViewModels.Interfaces;
@@ -16,6 +15,7 @@ using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
+using Uranus.Staff.Models;
 
 namespace Deimos.ViewModels.Controls;
 
@@ -181,15 +181,9 @@ public class ErrorAllocationVM : INotifyPropertyChanged, IDBInteraction, IRun
 
         Mouse.OverrideCursor = Cursors.Wait;
 
-        var eventTask = Helios.StaffReader.PickEventLineCountByDate((DateTime)StartDate, (DateTime)EndDate);
-        var mispickTask = Helios.StaffReader.MispickLineCountByDate((DateTime)StartDate, (DateTime)EndDate);
-
-        await Task.WhenAll(eventTask, mispickTask);
-
-        var events = await eventTask.ConfigureAwait(false);
-        var mispicks = await mispickTask.ConfigureAwait(false);
-
-        var comps = DataDateComparison.GetDateComparisons(events, mispicks).OrderBy(d => d.Date);
+        ProgressBar.StartTask("Gathering date comparison data...");
+        var comps = await Helios.StaffReader.DateDateComparisonsAsync((DateTime) StartDate, (DateTime) EndDate);
+        ProgressBar.EndTask();
 
         foreach (var comp in comps)
             DataComps.Add(comp);

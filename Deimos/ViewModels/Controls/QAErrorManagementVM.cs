@@ -14,6 +14,7 @@ using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
 using Uranus.Interfaces;
+using Uranus.Staff.Models;
 
 namespace Deimos.ViewModels.Controls;
 
@@ -36,7 +37,7 @@ public class QAErrorManagementVM : INotifyPropertyChanged, IDBInteraction, IFilt
         {
             selectedQALine = value;
             OnPropertyChanged();
-            OnPropertyChanged(nameof(BlackoutPrompt));
+            OnPropertyChanged(nameof(BackoutPrompt));
         }
     }
 
@@ -85,75 +86,140 @@ public class QAErrorManagementVM : INotifyPropertyChanged, IDBInteraction, IFilt
             ApplyFilters();
         }
     }
-
-    private bool? blackoutFilter;
-    public bool? BlackoutFilter
+    
+    private int pickerErrors;
+    public int PickerErrors
     {
-        get => blackoutFilter;
+        get => pickerErrors;
         set
         {
-            blackoutFilter = value;
-            OnPropertyChanged();
-            ApplyFilters();
-        }
-    }
-
-    private int atFault;
-    public int AtFault
-    {
-        get => atFault;
-        set
-        {
-            atFault = value;
+            pickerErrors = value;
             OnPropertyChanged();
         }
     }
 
-    private int notAtFault;
-    public int NotAtFault
+    private int receivingErrors;
+    public int ReceivingErrors
     {
-        get => notAtFault;
+        get => receivingErrors;
         set
         {
-            notAtFault = value;
+            receivingErrors = value;
             OnPropertyChanged();
         }
     }
 
-    private int errorCount;
-    public int ErrorCount
+    private int replenErrors;
+    public int ReplenErrors
     {
-        get => errorCount;
+        get => replenErrors;
         set
         {
-            errorCount = value;
+            replenErrors = value;
             OnPropertyChanged();
         }
     }
 
-    private int blackouts;
-    public int Blackouts
+    private int stockingErrors;
+    public int StockingErrors
     {
-        get => blackouts;
+        get => stockingErrors;
         set
         {
-            blackouts = value;
+            stockingErrors = value;
             OnPropertyChanged();
         }
     }
 
-    private int fullCount;
-    public int FullCount
+    private int heatMapErrors;
+    public int HeatMapErrors
     {
-        get => fullCount;
+        get => heatMapErrors;
         set
         {
-            fullCount = value;
+            heatMapErrors = value;
             OnPropertyChanged();
         }
     }
 
-    public string BlackoutPrompt => $"Set {SelectedQALine?.ErrorType ?? ""} to Blackout = '{!(SelectedQALine?.Blackout ?? false)}'";
+    private int qaErrors;
+    public int QAErrors
+    {
+        get => qaErrors;
+        set
+        {
+            qaErrors = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private int otherDeptErrors;
+    public int OtherDeptErrors
+    {
+        get => otherDeptErrors;
+        set
+        {
+            otherDeptErrors = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private int warehouseErrorCount;
+    public int WarehouseErrorCount
+    {
+        get => warehouseErrorCount;
+        set
+        {
+            warehouseErrorCount = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private int systemErrors;
+    public int SystemErrors
+    {
+        get => systemErrors;
+        set
+        {
+            systemErrors = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private int supplierErrors;
+    public int SupplierErrors
+    {
+        get => supplierErrors;
+        set
+        {
+            supplierErrors = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private int otherExternalErrors;
+    public int OtherExternalErrors
+    {
+        get => otherExternalErrors;
+        set
+        {
+            otherExternalErrors = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private int fullErrorCount;
+    public int FullErrorCount
+    {
+        get => fullErrorCount;
+        set
+        {
+            fullErrorCount = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string BackoutPrompt => $"Set {SelectedQALine?.ErrorType ?? ""} to Backout = '{!(SelectedQALine?.External ?? false)}'";
 
     #endregion
 
@@ -162,7 +228,7 @@ public class QAErrorManagementVM : INotifyPropertyChanged, IDBInteraction, IFilt
     public RefreshDataCommand RefreshDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public SetBlackoutCommand SetBlackoutCommand { get; set; }
+    public SetBackoutCommand SetBackoutCommand { get; set; }
 
     #endregion
 
@@ -179,7 +245,7 @@ public class QAErrorManagementVM : INotifyPropertyChanged, IDBInteraction, IFilt
         RefreshDataCommand = new RefreshDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        SetBlackoutCommand = new SetBlackoutCommand(this);
+        SetBackoutCommand = new SetBackoutCommand(this);
     }
 
     public async Task RefreshDataAsync()
@@ -207,11 +273,19 @@ public class QAErrorManagementVM : INotifyPropertyChanged, IDBInteraction, IFilt
 
     public void Count()
     {
-        AtFault = QAErrorLines.Count(l => l.AtFault);
-        FullCount = QAErrorLines.Count;
-        NotAtFault = FullCount - AtFault;
-        Blackouts = QAErrorLines.Count(l => l.Blackout);
-        ErrorCount = FullCount - Blackouts;
+        PickerErrors = QAErrorLines.Count(l => l.PickerError);
+        ReceivingErrors = QAErrorLines.Count(l => l.ReceiveError);
+        ReplenErrors = QAErrorLines.Count(l => l.ReplenError);
+        StockingErrors = QAErrorLines.Count(l => l.StockingError);
+        HeatMapErrors = QAErrorLines.Count(l => l.HeatMapError);
+        QAErrors = QAErrorLines.Count(l => l.QAError);
+        SystemErrors = QAErrorLines.Count(l => l.SystemError);
+        SupplierErrors = QAErrorLines.Count(l => l.SupplierError);
+
+        OtherDeptErrors = QAErrorLines.Count(l => l.ErrorCategory == EErrorCategory.OtherDept);
+        WarehouseErrorCount = QAErrorLines.Count(l => l.ErrorAllocation == EErrorAllocation.Warehouse);
+        OtherExternalErrors = QAErrorLines.Count(l => l.ErrorCategory == EErrorCategory.OtherExternal);
+        FullErrorCount = QAErrorLines.Count;
     }
 
     public void ClearFilters()
@@ -224,14 +298,13 @@ public class QAErrorManagementVM : INotifyPropertyChanged, IDBInteraction, IFilt
     public void ApplyFilters()
     {
         var lines = AllQAErrorLines.Where(l =>
-            (BlackoutFilter is null || l.Blackout == BlackoutFilter) &&
-            (Regex.IsMatch(l.CartonID, FilterString, RegexOptions.IgnoreCase) ||
-             Regex.IsMatch(l.BinCode, FilterString, RegexOptions.IgnoreCase) ||
-             Regex.IsMatch(l.ItemDescription, FilterString, RegexOptions.IgnoreCase) ||
-             Regex.IsMatch(l.PickerName, FilterString, RegexOptions.IgnoreCase) ||
-             Regex.IsMatch(l.PickerRFID, FilterString, RegexOptions.IgnoreCase) ||
-             Regex.IsMatch(l.ItemNumber, FilterString, RegexOptions.IgnoreCase) ||
-             Regex.IsMatch(l.ErrorType, FilterString, RegexOptions.IgnoreCase)));
+            Regex.IsMatch(l.CartonID, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(l.BinCode, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(l.ItemDescription, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(l.PickerName, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(l.PickerRFID, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(l.ItemNumber, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(l.ErrorType, FilterString, RegexOptions.IgnoreCase));
 
         QAErrorLines.Clear();
 
@@ -241,18 +314,18 @@ public class QAErrorManagementVM : INotifyPropertyChanged, IDBInteraction, IFilt
         Count();
     }
 
-    public async Task SetBlackoutAsync()
+    public async Task SetBackoutAsync()
     {
         if (SelectedQALine is null) return;
         var errorType = SelectedQALine.ErrorType;
-        var blackout = SelectedQALine.Blackout;
+        var blackout = SelectedQALine.External;
         
         var lines = QAErrorLines.Where(l => l.ErrorType == errorType).ToList();
-        foreach (var line in lines) line.SetBlackOut(!blackout);
+        foreach (var line in lines) line.SetExternal(!blackout);
         await Helios.StaffUpdater.QALinesAsync(lines.Select(vm => vm.QALine).ToList());
 
         Count();
-        OnPropertyChanged(nameof(BlackoutPrompt));
+        OnPropertyChanged(nameof(BackoutPrompt));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

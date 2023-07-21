@@ -204,7 +204,7 @@ public class EntryCreationVM : INotifyPropertyChanged, IDateRange
             return;
         }
 
-        ShiftEntry shiftEntry = new(SelectedEmployee, ((DateTime)SelectedDate))
+        ShiftEntry shiftEntry = new(SelectedEmployee, (DateTime)SelectedDate)
         {
             ShiftStartTime = StartShiftTime,
             ShiftEndTime = EndShiftTime,

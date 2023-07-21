@@ -18,7 +18,38 @@ public class QAStatReportsVM : INotifyPropertyChanged, IDBInteraction
 
     #region INotifyPropertyChanged Members
 
+    private QAWeeklyStatsVM weeklyStats;
+    public QAWeeklyStatsVM WeeklyStats
+    {
+        get => weeklyStats;
+        set
+        {
+            weeklyStats = value;
+            OnPropertyChanged();
+        }
+    }
 
+    private QAMonthlyStatsVM monthlyStats;
+    public QAMonthlyStatsVM MonthlyStats
+    {
+        get => monthlyStats;
+        set
+        {
+            monthlyStats = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private QAYearlyStatsVM yearlyStats;
+    public QAYearlyStatsVM YearlyStats
+    {
+        get => yearlyStats;
+        set
+        {
+            yearlyStats = value;
+            OnPropertyChanged();
+        }
+    }
 
     #endregion
 
@@ -28,19 +59,39 @@ public class QAStatReportsVM : INotifyPropertyChanged, IDBInteraction
 
     #endregion
 
-    public QAStatReportsVM(QAToolVM parentVM)
+    private QAStatReportsVM(QAToolVM parentVM)
     {
         ParentVM = parentVM;
         Deimos = ParentVM.ParentVM;
         Helios = ParentVM.Helios;
         ProgressBar = ParentVM.ProgressBar;
 
+        weeklyStats = QAWeeklyStatsVM.CreateEmpty(Helios, ProgressBar);
+        monthlyStats = QAMonthlyStatsVM.CreateEmpty(Helios, ProgressBar);
+        yearlyStats = QAYearlyStatsVM.CreateEmpty(Helios, ProgressBar);
+
         RefreshDataCommand = new RefreshDataCommand(this);
     }
 
-    public Task RefreshDataAsync()
+    private async Task<QAStatReportsVM> InitializeAsync()
     {
-        throw new System.NotImplementedException();
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<QAStatReportsVM> CreateAsync(QAToolVM parentVM)
+    {
+        var ret = new QAStatReportsVM(parentVM);
+        return ret.InitializeAsync();
+    }
+
+    public static QAStatReportsVM CreateEmpty(QAToolVM parentVM) => new(parentVM);
+
+    public async Task RefreshDataAsync()
+    {
+        WeeklyStats = await QAWeeklyStatsVM.CreateAsync(Helios, ProgressBar);
+        MonthlyStats = await QAMonthlyStatsVM.CreateAsync(Helios, ProgressBar);
+        YearlyStats = await QAYearlyStatsVM.CreateAsync(Helios, ProgressBar);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

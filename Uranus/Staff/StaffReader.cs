@@ -420,9 +420,9 @@ public class StaffReader
         return icons;
     }
 
-    public IEnumerable<EmployeeIcon> EmployeeIcons()
+    public IEnumerable<EmployeeIcon> EmployeeIcons(Expression<Func<EmployeeIcon, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly)
     {
-        var icons = Chariot.PullObjectList<EmployeeIcon>();
+        var icons = Chariot.PullObjectList(filter, pullType);
         foreach (var icon in icons)
             icon.SetDirectory(EmployeeIconDirectory);
 
@@ -1163,6 +1163,31 @@ public class StaffReader
         return items.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
     }
 
+    public async Task<List<DataDateComparison>> DateDateComparisonsAsync(DateTime startDate, DateTime endDate)
+    {
+        var comps = new List<DataDateComparison>();
+
+        void Action()
+        {
+
+            var eventCountDict = Chariot
+                .Query<(DateTime, int)>(
+                    "SELECT Date, COUNT(*) as Lines FROM PickEvent WHERE Date >= ? AND Date <= ? GROUP BY Date;",
+                    startDate.Ticks, endDate.Ticks).ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
+            var mispickCountDict = Chariot
+                .Query<(DateTime, int)>(
+                    "SELECT ShipmentDate, COUNT(*) as Lines FROM Mispick WHERE ShipmentDate >= ? AND ShipmentDate <= ? GROUP BY ShipmentDate;",
+                    startDate.Ticks, endDate.Ticks).ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
+
+
+            comps = DataDateComparison.GetDateComparisons(eventCountDict, mispickCountDict).OrderBy(d => d.Date).ToList();
+        }
+
+        await Task.Run(() => RunInTransaction(Action)).ConfigureAwait(false);
+
+        return comps;
+    }
+
     public async Task<(List<PickDailyStats>, List<Mispick>)> ErrorAssignmentDataAsync(DateTime fromDate, DateTime toDate)
     {
         var stats = new List<PickDailyStats>();
@@ -1208,7 +1233,7 @@ public class StaffReader
         {
             qaLines = Chariot.PullObjectList<QALine>(l =>
                 !(l.QAStatus == EQAStatus.OK || l.QAStatus == EQAStatus.ShortPick) && l.Date >= startDate && l.Date <= endDate);
-            var mispickIDs = qaLines.Where(l => l.AtFault).Select(l => l.MispickID).Distinct();
+            var mispickIDs = qaLines.Where(l => l.PickerError).Select(l => l.MispickID).Distinct();
             var cartonIDs = qaLines.Select(l => l.CartonID).Distinct();
             var pickerIDs = qaLines.Select(l => l.PickerRFID)
                 .Where(s => s != string.Empty)
@@ -1269,7 +1294,7 @@ public class StaffReader
             qaLine = Chariot.PullObject<QALine>(id);
             if (qaLine is null) return;
 
-            if (qaLine.AtFault)
+            if (qaLine.PickerError)
             {
                 qaLine.Mispick = Chariot.PullObject<Mispick>(qaLine.MispickID);
                 if (qaLine.Mispick is null)
@@ -1305,12 +1330,24 @@ public class StaffReader
         void Action()
         {
             var cartonDict = Chariot.PullObjectList<QACarton>(c => c.Date >= fromDate && c.Date <= toDate).ToDictionary(c => c.ID, c => c);
-            var lineDict = Chariot.PullObjectList<QALine>(l => cartonDict.ContainsKey(l.CartonID))
+            var cartonIDs = cartonDict.Keys.ToHashSet();
+            var employeeIDs = cartonDict.Values.Select(c => c.EmployeeID).ToHashSet();
+
+            var lineDict = Chariot.PullObjectList<QALine>(l => cartonIDs.Contains(l.CartonID))
                 .GroupBy(l => l.CartonID)
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-            var employeeIDs = cartonDict.Values.Select(c => c.EmployeeID).ToHashSet();
-            var employeeDict = Chariot.PullObjectList<Employee>(e => employeeIDs.Contains(e.ID)).ToDictionary(e => e.ID, e => e);
+            var employeeDict = Chariot.PullObjectList<Employee>(e => employeeIDs.Contains(e.PC_ID))
+                .ToDictionary(e => e.PC_ID, e => e);
+
+            var iconNames = employeeDict.Values.Select(e => e.IconName).ToHashSet();
+            var iconDict = EmployeeIcons(i => iconNames.Contains(i.Name)).ToDictionary(i => i.Name, i => i);
+            foreach (var employee in employeeDict.Values)
+            {
+                if (!iconDict.TryGetValue(employee.IconName, out var icon)) continue;
+                employee.Icon = icon;
+                icon.Employees.Add(employee);
+            }
 
             foreach (var (cartonID, carton) in cartonDict)
             {
@@ -1322,19 +1359,65 @@ public class StaffReader
 
                 if (!employeeDict.TryGetValue(carton.EmployeeID, out var qaOperator))
                 {
-                    qaOperator = new Employee(carton.EmployeeID)
+                    var id = carton.EmployeeID;
+                    if (id.Length == 0) id = "ANoID";
+                    qaOperator = new Employee(0)
                     {
-                        RF_ID = $"RF_E{carton.EmployeeID}",
-                        FirstName = carton.EmployeeID.ToString(),
-                        LastName = $"Mc{carton.EmployeeID}"
+                        PC_ID = id,
+                        RF_ID = $"RF_{id}",
+                        FirstName = id[..1],
+                        LastName = id.Length < 2 ? "LastName" : id[1..]
                     };
+                    employeeDict.Add(id, qaOperator);
                 }
                 qaOperator.AddQACarton(carton);
-                operators.Add(qaOperator);
             }
+
+            operators = employeeDict.Values.Where(e => e.QACartons.Any()).ToList();
         }
 
         await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
         return operators;
     }
+
+    public async Task<DateTime> EarliestDataDateAsync()
+    {
+        var date = await Task.Run(() => Chariot.ExecuteScalar<DateTime>("SELECT min(Date) FROM QACarton;")).ConfigureAwait(false);
+        if (date == DateTime.MinValue) date = DateTime.Today;
+        return date;
+    }
+
+    public async Task<QAStats> QAStatsAsync(DateTime startDate, DateTime endDate, bool forceRefresh = false, string dateDescription = "")
+    {
+        var stats = new QAStats(startDate, endDate, dateDescription);
+
+        void Action()
+        {
+            var s = Chariot.PullObject<QAStats>(QAStats.GetID(startDate, endDate));
+
+            if (s is not null)
+            {
+                stats = s;
+                if (!forceRefresh) return;
+            }
+
+            stats.RestockQty = Chariot.ExecuteScalar<int>("SELECT SUM(Qty) From PickEvent WHERE Date >= ? AND Date <= ?;", startDate.Ticks, endDate.Ticks);
+            stats.RestockHits = Chariot.ExecuteScalar<int>("SELECT Count(*) From PickEvent WHERE Date >= ? AND Date <= ?;", startDate.Ticks, endDate.Ticks);
+            stats.RestockCartons = Chariot.ExecuteScalar<int>("SELECT Count(DISTINCT ContainerID) From PickEvent WHERE Date >= ? AND Date <= ?;", startDate.Ticks, endDate.Ticks);
+
+            var qaLines = Chariot.PullObjectList<QALine>(l => l.Date >= startDate && l.Date <= endDate);
+            var qaCartons = Chariot.PullObjectList<QACarton>(c => c.Date >= startDate && c.Date <= endDate);
+
+            stats.SetValues(qaCartons, qaLines);
+
+            Chariot.InsertOrReplace(stats);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return stats;
+    }
+
+    public async Task<List<QAStats>> QAStatListAsync(EDatePeriod datePeriod) =>
+        (await Chariot.PullObjectListAsync<QAStats>(s => s.DatePeriod == datePeriod).ConfigureAwait(false)).OrderBy(s => s.StartDate).ToList();
 }

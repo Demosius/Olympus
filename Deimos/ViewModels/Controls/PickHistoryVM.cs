@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Morpheus.ViewModels.Controls;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -19,6 +20,7 @@ public class PickHistoryVM : INotifyPropertyChanged, IDBInteraction, IFilters
     public DeimosVM Deimos { get; set; }
     public ErrorAllocationVM ParentVM { get; set; }
     public Helios Helios { get; set; }
+    public ProgressBarVM ProgressBar { get; set; }
 
     public List<PickEvent> AllEvents { get; set; }
 
@@ -72,6 +74,7 @@ public class PickHistoryVM : INotifyPropertyChanged, IDBInteraction, IFilters
         ParentVM = parentVM;
         Deimos = ParentVM.ParentVM;
         Helios = parentVM.Helios;
+        ProgressBar = parentVM.ProgressBar;
 
         AllEvents = new List<PickEvent>();
         PickEvents = new ObservableCollection<PickEvent>();
@@ -86,7 +89,9 @@ public class PickHistoryVM : INotifyPropertyChanged, IDBInteraction, IFilters
     {
         PickEvents.Clear();
 
+        ProgressBar.StartTask("Loading Pick Events...", $"{Date:dd-MMM-yyyy}");
         AllEvents = Date is null ? new List<PickEvent>() : (await Helios.StaffReader.PickEventsAsync((DateTime) Date)).ToList();
+        ProgressBar.EndTask();
 
         ApplyFilters();
     }

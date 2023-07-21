@@ -19,6 +19,12 @@ public class QASession
     public int CartonCount => Cartons.Count;
     public int Scans => Cartons.Sum(c => c.QAScans);
     public int Units => Cartons.Sum(c => c.QAUnits);
+    public int Items => Cartons.Sum(c => c.QALines.Count);
+
+    public int CartonErrors => Cartons.Count(c => c.QAError);
+    public int ItemErrors => Cartons.Sum(c => c.QAErrorItems);
+    public int ScanErrors => Cartons.Sum(c => c.QAErrorScans);
+    public int UnitErrors => Cartons.Sum(c => c.QAErrorUnits);
 
     // Assume all are the correctly set, same operator, and same date.
     // Use DateTime instead of TimeSpan for Start and End in case they are not the same date.
@@ -37,8 +43,8 @@ public class QASession
             times.Add(Cartons[i].QATime);
         }
 
-        AverageCartonTime =  new TimeSpan((long) times.Average(t => t.Ticks));
-        
+        AverageCartonTime = new TimeSpan((long)times.Average(t => t.Ticks));
+
         StartTime = Cartons.First().DateTime;
         EndTime = Cartons.Last().DateTime.AddTicks(AverageCartonTime.Ticks);
     }
@@ -55,20 +61,21 @@ public class QASession
         {
             var ctns = groupCartons.OrderBy(c => c.Time).ToList();
             var sessions = new List<QASession>();
-            var sessionCartons = new List<QACarton> {ctns.First()};
+            var sessionCartons = new List<QACarton> { ctns.First() };
 
-            for (var i = 0; i < ctns.Count; i++)
+            for (var i = 0; i < ctns.Count - 1; i++)
             {
                 var carton = ctns[i];
                 var nextCarton = ctns[i + 1];
                 if (nextCarton.Time.Subtract(carton.Time) >= breakSpan)
                 {
-                    if (sessionCartons.Count > 1) 
+                    if (sessionCartons.Count > 1)
                         sessions.Add(new QASession(employee!, sessionCartons));
                     sessionCartons.Clear();
                 }
-                sessionCartons.Add(ctns[i+1]);
+                sessionCartons.Add(nextCarton);
             }
+            if (sessionCartons.Count > 1) sessions.Add(new QASession(employee!, sessionCartons));
             // Add to dict.
             if (returnDict.ContainsKey(employee!))
                 returnDict[employee!].AddRange(sessions);
