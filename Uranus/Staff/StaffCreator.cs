@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Uranus.Extensions;
 using Uranus.Staff.Models;
+using Uranus.Users.Models;
+using Role = Uranus.Staff.Models.Role;
 
 namespace Uranus.Staff;
 
@@ -27,7 +29,8 @@ public class StaffCreator
         Chariot = chariot;
     }
 
-    public bool Employee(Employee employee, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(employee, pushType);
+    public bool Employee(Employee employee, EPushType pushType = EPushType.ObjectOnly) =>
+        Chariot.Create(employee, pushType);
 
     public bool ClockEvent(ClockEvent clockEvent) => Chariot.Create(clockEvent);
 
@@ -61,7 +64,8 @@ public class StaffCreator
         return lines;
     }
 
-    public bool Department(Department department, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(department, pushType);
+    public bool Department(Department department, EPushType pushType = EPushType.ObjectOnly) =>
+        Chariot.Create(department, pushType);
 
     public bool Role(Role role, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(role, pushType);
 

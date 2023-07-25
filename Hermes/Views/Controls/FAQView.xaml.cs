@@ -4,13 +4,16 @@ using Uranus;
 
 namespace Hermes.Views.Controls;
 
-/// <summary>
-/// Interaction logic for FAQView.xaml
-/// </summary>
-public partial class FAQView
+namespace Hermes.Views.Controls
 {
-    public FAQView()
+    /// <summary>
+    /// Interaction logic for FAQView.xaml
+    /// </summary>
+public partial class FAQView
     {
-        InitializeComponent();
+        public FAQView()
+        {
+            InitializeComponent();
+        }
     }
 }

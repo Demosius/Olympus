@@ -19,11 +19,21 @@ public class HermesVM : INotifyPropertyChanged, IDBInteraction
 
     #region INotifypropertyChanged Members
     
-
+    private bool canMessage;
+    public bool CanMessage
+    {
+        get => canMessage;
+        set
+        {
+            canMessage = value;
+            OnPropertyChanged();
+        }
+    }
+    
     #endregion
 
     #region Commands
-    
+
     public RefreshDataCommand RefreshDataCommand { get; set; }
 
     #endregion

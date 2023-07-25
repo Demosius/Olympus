@@ -1,45 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<TargetFramework>net6.0-windows</TargetFramework>
-		<Nullable>enable</Nullable>
-		<UseWPF>true</UseWPF>
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
 		<UseWindowsForms>true</UseWindowsForms>
-		<ApplicationIcon>Hermes.ico</ApplicationIcon>
-	</PropertyGroup>
+    <ApplicationIcon>Hermes.ico</ApplicationIcon>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<Content Include="Hermes.ico" />
-	</ItemGroup>
+  <ItemGroup>
+    <Content Include="Hermes.ico" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\Morpheus\Morpheus.csproj" />
-		<ProjectReference Include="..\Styx\Styx.csproj" />
-		<ProjectReference Include="..\Uranus\Uranus.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Morpheus\Morpheus.csproj" />
+    <ProjectReference Include="..\Styx\Styx.csproj" />
+    <ProjectReference Include="..\Uranus\Uranus.csproj" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="Models\" />
-	</ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
 
-	<ItemGroup>
+  <ItemGroup>
 		<PackageReference Include="InputSimulator" Version="1.0.4" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Update="Properties\Settings.Designer.cs">
-			<DesignTimeSharedInput>True</DesignTimeSharedInput>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>Settings.settings</DependentUpon>
-		</Compile>
-	</ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
 
-	<ItemGroup>
-		<None Update="Properties\Settings.settings">
-			<Generator>SettingsSingleFileGenerator</Generator>
-			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
-		</None>
-	</ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
 
 </Project>
