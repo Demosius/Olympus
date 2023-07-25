@@ -25,7 +25,9 @@ public class InventoryUpdater
         return count;
     }
 
-    public int NAVItems(IEnumerable<NAVItem> items, DateTime dateTime)
+    public async Task<int> NAVBinAsync(NAVBin bin) => await Chariot.UpdateAsync(bin);
+
+    public async Task<int> NAVItemsAsync(IEnumerable<NAVItem> items, DateTime dateTime)
     {
         var count = 0;
         Chariot.Database?.RunInTransaction(() =>
