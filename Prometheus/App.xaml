@@ -1,8 +1,8 @@
 ﻿<Application x:Class="Prometheus.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="View/PrometheusWindow.xaml">
+             StartupUri="Views/PrometheusWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Orange/MSControls.Core.Implicit.xaml" />
     </Application.Resources>
 </Application>

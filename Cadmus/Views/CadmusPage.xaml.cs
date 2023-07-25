@@ -1,26 +1,29 @@
-﻿using System;
+﻿using System.Threading.Tasks;
+using Cadmus.ViewModels;
+using Morpheus.ViewModels.Controls;
+using Uranus;
 using Uranus.Interfaces;
 using Uranus.Staff;
 
-namespace Cadmus.Views
+namespace Cadmus.Views;
+
+/// <summary>
+/// Interaction logic for CadmusPage.xaml
+/// </summary>
+public partial class CadmusPage : IProject
 {
-    /// <summary>
-    /// Interaction logic for CadmusPage.xaml
-    /// </summary>
-    public partial class CadmusPage : IProject
+    public CadmusPage(Helios helios, ProgressBarVM progressBar)
     {
-        public CadmusPage()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+        DataContext = new CadmusVM(helios, progressBar);
+    }
 
-        public EProject Project => EProject.Cadmus;
+    public EProject Project => EProject.Cadmus;
 
-        public static bool RequiresUser => false;
+    public static bool RequiresUser => false;
 
-        public void RefreshData()
-        {
-            throw new NotImplementedException();
-        }
+    public async Task RefreshDataAsync()
+    {
+        await Task.Run(() => {});
     }
 }

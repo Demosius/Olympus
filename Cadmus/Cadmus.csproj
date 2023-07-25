@@ -5,40 +5,92 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>cadmus.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Fonts\Calibri.ttf" />
+    <None Remove="Resources\Fonts\calibrib.ttf" />
+    <None Remove="Resources\Fonts\calibril.ttf" />
     <None Remove="Resources\Fonts\code128.ttf" />
     <None Remove="Resources\Fonts\DIN Black.ttf" />
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
     <None Remove="Resources\Fonts\DIN Medium.ttf" />
     <None Remove="Resources\Fonts\DIN.ttf" />
+    <None Remove="Resources\Images\arrow-090-medium.png" />
+    <None Remove="Resources\Images\arrow-270-medium.png" />
+    <None Remove="Resources\Images\cross.png" />
+    <None Remove="Resources\Images\csv.png" />
+    <None Remove="Resources\Images\disk--arrow.png" />
+    <None Remove="Resources\Images\document-break.png" />
+    <None Remove="Resources\Images\document-excel-table.png" />
+    <None Remove="Resources\Images\document-pdf.png" />
+    <None Remove="Resources\Images\printer.png" />
+    <None Remove="Resources\Images\search.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
+    <Content Include="cadmus.ico" />
+    <Content Include="Resources\Fonts\Calibri.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\calibrib.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\calibril.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Morpheus\Morpheus.csproj" />
     <ProjectReference Include="..\Uranus\Uranus.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Fonts\code128.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Fonts\DIN Black.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Fonts\DIN Bold.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Fonts\DIN Medium.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\Fonts\DIN.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+    <Content Include="Resources\Fonts\code128.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\DIN Black.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\DIN Bold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\DIN Medium.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Fonts\DIN.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Resources\Images\arrow-090-medium.png" />
+    <Resource Include="Resources\Images\arrow-270-medium.png" />
+    <Resource Include="Resources\Images\cross.png" />
+    <Resource Include="Resources\Images\csv.png" />
+    <Resource Include="Resources\Images\disk--arrow.png" />
+    <Resource Include="Resources\Images\document-break.png" />
+    <Resource Include="Resources\Images\document-excel-table.png" />
+    <Resource Include="Resources\Images\document-pdf.png" />
+    <Resource Include="Resources\Images\printer.png" />
+    <Resource Include="Resources\Images\search.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Labels\ReceivingPutAwayLabelView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -46,30 +98,23 @@
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Themes\DatagridStyling.xaml">
+    <Page Update="Views\Labels\ReceivingPutAwayLabelView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Themes\MSControls.Core.Implicit.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\MSControls.Toolkit.Implicit.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Styles.Shared.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Styles.WPF.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Theme.Colors.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\Sheets\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EPPlus" Version="4.5.3.3" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+    <PackageReference Include="System.Management" Version="7.0.0" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
+    <PackageReference Include="ZXing.Net" Version="0.16.8" />
+    <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.10" />
   </ItemGroup>
 
 </Project>

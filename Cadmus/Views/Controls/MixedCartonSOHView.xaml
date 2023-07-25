@@ -1,0 +1,153 @@
+﻿<UserControl x:Class="Cadmus.Views.Controls.MixedCartonSOHView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Cadmus.ViewModels.Controls"
+             xmlns:controls="clr-namespace:Cadmus.Views.Controls"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:MixedCartonSOH_VM}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </UserControl.InputBindings>
+
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal">
+            <Button Margin="5"
+                    Content="Generate Report"
+                    Command="{Binding RefreshDataCommand}"/>
+            <CheckBox Content="Auto-Detect"
+                      ToolTip="Leave unchecked to use only established mixed cartons."
+                      IsChecked="{Binding AutoDetect}"/>
+
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+                       Margin="5"/>
+
+            <Label Content="Zone(s): " 
+                   VerticalAlignment="Center"/>
+            <TextBox Text="{Binding ZoneString}"
+                     Margin="5"
+                     MinWidth="75"/>
+            <Label Content="Location(s): " 
+                   VerticalAlignment="Center"/>
+            <TextBox Text="{Binding LocationString}"
+                     Margin="5"
+                     MinWidth="75"/>
+
+            <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+                       Margin="5"/>
+
+            <Label Content="{Binding TotalDisplay}"
+                   VerticalAlignment="Center"/>
+        </StackPanel>
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Label Content="FILTERS:"
+                   VerticalAlignment="Center"
+                   FontWeight="Bold"/>
+                <Label Content="Zone: " 
+                   VerticalAlignment="Center"/>
+                <TextBox Text="{Binding ZoneFilter}"
+                     Margin="5"
+                     MinWidth="75"/>
+                <Label Content="Platform: " 
+                   VerticalAlignment="Center"/>
+                <TextBox Text="{Binding PlatformFilter}"
+                     Margin="5"
+                     MinWidth="75"/>
+                <Label Content="Category: " 
+                   VerticalAlignment="Center"/>
+                <TextBox Text="{Binding CategoryFilter}"
+                     Margin="5"
+                     MinWidth="75"/>
+                <Label Content="Division: " 
+                   VerticalAlignment="Center"/>
+                <TextBox Text="{Binding DivisionFilter}"
+                     Margin="5"
+                     MinWidth="75"/>
+                <Button Command="{Binding ApplyFiltersCommand}"
+                    Width="30"
+                    Height="30"
+                    Margin="2"
+                    Padding="5"
+                    ToolTip="Apply Filter">
+                    <Image Source="../../Resources/Images/search.png"/>
+                </Button>
+                <Button Command="{Binding ClearFiltersCommand}"
+                    Width="30"
+                    Height="30"
+                    Margin="2"
+                    Padding="5"
+                    ToolTip="Clear Filter">
+                    <Image Source="../../Resources/Images/cross.png"/>
+                </Button>
+
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+                       Margin="5"/>
+
+                <Label Content="{Binding FilteredDisplay}"
+                   VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        Margin="5,0">
+
+                <!-- Export/Output Options -->
+                <Button Command="{Binding ExportToCSVCommand}"
+                        ToolTip="Export To CSV"
+                        Margin="2"
+                        Padding="8">
+                    <Image Source="../../Resources/Images/csv.png"
+                           MaxHeight="20"
+                           MaxWidth="20"/>
+                </Button>
+                <!--<Button Command="{Binding ExportToPDFCommand}"
+                        ToolTip="Export To PDF"
+                        Margin="2"
+                        Padding="8">
+                    <Image Source="../../Resources/Images/document-pdf.png"
+                           MaxHeight="20"
+                           MaxWidth="20"/>
+                </Button>-->
+                <Button Command="{Binding ExportToExcelCommand}"
+                        ToolTip="Export To Excel"
+                        Margin="2"
+                        Padding="8">
+                    <Image Source="../../Resources/Images/document-excel-table.png"
+                           MaxHeight="20"
+                           MaxWidth="20"/>
+                </Button>
+
+                <!--<Button Command="{Binding ExportToLabelsCommand}"
+                        ToolTip="Export To Labels"
+                        Margin="2"
+                        Padding="8">
+                    <Image Source="../../Resources/Images/document-break.png"
+                           MaxHeight="20"
+                           MaxWidth="20"/>
+                </Button>-->
+
+            </StackPanel>
+        </Grid>
+        <ListView d:ItemsSource="{d:SampleData ItemCount=5}" 
+                  ItemsSource="{Binding MixedCartons, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  IsSelected="False"
+                  Padding="0,5">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <controls:MixedCartonView DataContext="{Binding}"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+    </DockPanel>
+</UserControl>

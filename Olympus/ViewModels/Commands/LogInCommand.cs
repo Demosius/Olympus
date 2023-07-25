@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using Uranus;
 
 namespace Olympus.ViewModels.Commands;
 
@@ -10,22 +11,22 @@ public class LogInCommand : ICommand
 
     public LogInCommand(LogInVM vm) { VM = vm; }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         if (int.TryParse(VM.UserID, out var id))
             return id > 0 && VM.Password.Length > 0;
         return false;
     }
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
-        if (VM.LogIn())
+        if (AsyncHelper.RunSync(() => VM.LogIn()))
         {
             var window = parameter as Window;
             window?.Close();

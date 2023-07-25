@@ -11,6 +11,7 @@
     <Configurations>Debug;Release;ClockDebug</Configurations>
     <SignAssembly>true</SignAssembly>
     <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -37,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Morpheus\Morpheus.csproj" />
     <ProjectReference Include="..\Styx\Styx.csproj" />
     <ProjectReference Include="..\Uranus\Uranus.csproj" />
   </ItemGroup>

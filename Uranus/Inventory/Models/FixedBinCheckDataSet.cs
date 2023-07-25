@@ -14,6 +14,16 @@ public class FixedBinCheckDataSet : IDataSet
     public List<NAVUoM> UoMs { get; set; }
     public List<Stock> Stock { get; set; }
 
+    public FixedBinCheckDataSet()
+    {
+        Items = new Dictionary<int, NAVItem>();
+        Zones = new Dictionary<string, NAVZone>();
+        Bins = new Dictionary<string, NAVBin>();
+        NAVStock = new List<NAVStock>();
+        UoMs = new List<NAVUoM>();
+        Stock = new List<Stock>();
+    }
+
     public FixedBinCheckDataSet(IEnumerable<NAVItem> items, IEnumerable<NAVZone> zones, IEnumerable<NAVBin> bins,
         IEnumerable<NAVStock> stock, IEnumerable<NAVUoM> uomList)
     {

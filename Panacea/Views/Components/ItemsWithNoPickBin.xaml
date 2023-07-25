@@ -1,0 +1,133 @@
+﻿<UserControl x:Class="Panacea.Views.Components.ItemsWithNoPickBin"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Panacea.ViewModels.Components"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:ItemsWithNoPickBinVM}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Vertical">
+            <WrapPanel Orientation="Horizontal">
+                <!--Prep Panel-->
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Location(s): "></Label>
+                    <TextBox Text="{Binding CheckLocString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             MinWidth="100"
+                             Margin="2"/>
+                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+                    <Label Content="Zones: "></Label>
+                    <TextBox Text="{Binding CheckZoneString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             MinWidth="100"
+                             Margin="2"/>
+                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+                    <Label Content="Check TO Lines"/>
+                    <CheckBox IsChecked="{Binding CheckTOLines, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              ToolTip="Only check items that have demand among Transfer Orders."/>
+                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+                </StackPanel>
+
+                <Button Content="Update TO Lines"
+                        Command="{Binding UpdateTOLinesCommand}"
+                        MinWidth="100"
+                        HorizontalAlignment="Left"
+                        Margin="2"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+                <Button Content="Run"
+                        Command="{Binding RunChecksCommand}"
+                        Width="100"
+                        HorizontalAlignment="Left"
+                        Margin="2"/>
+            </WrapPanel>
+
+            <!--Filter Panel-->
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Zones: "/>
+                <TextBox Text="{Binding ZoneFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         MinWidth="80"
+                         Margin="2"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+
+                <Label Content="Items: "/>
+                <TextBox Text="{Binding ItemFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         MinWidth="80"
+                         Margin="2"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+
+                <Label Content="Platform: "/>
+                <TextBox Text="{Binding PlatformFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         MinWidth="80"
+                         Margin="2"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+
+                <Label Content="Category: "/>
+                <TextBox Text="{Binding CategoryFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         MinWidth="80"
+                         Margin="2"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+
+                <Label Content="Genre: "/>
+                <TextBox Text="{Binding GenreFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         MinWidth="80"
+                         Margin="2"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+
+                <Label Content="Division: "/>
+                <TextBox Text="{Binding DivisionFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         MinWidth="80"
+                         Margin="2"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"/>
+
+                <Button Content="Get Items"
+                        Margin="2"
+                        ToolTip="Add listed items as pipe-separated string into the clipboard."
+                        Command="{Binding ItemsToClipboardCommand}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Data View -->
+        <DataGrid ItemsSource="{Binding FilteredCheckResults}"
+                  AutoGenerateColumns="False"
+                  CanUserDeleteRows="True"
+                  CanUserAddRows="False"
+                  CanUserReorderColumns="True"
+                  RowHeaderWidth="30"
+                  SelectionUnit="CellOrRowHeader"
+                  LoadingRow="DataGrid_OnLoadingRow">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Item"
+                                    Binding="{Binding ItemNumber}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Description"
+                                    Binding="{Binding ItemDescription}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Demand Qty"
+                                    Binding="{Binding TODemandBaseQty}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Demand Cube"
+                                    Binding="{Binding TODemandCube}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Zones"
+                                    Binding="{Binding ZoneString}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Bins"
+                                    Binding="{Binding BinString}"
+                                    IsReadOnly="True"
+                                    MaxWidth="400"/>
+                <DataGridTextColumn Header="Platform"
+                                    Binding="{Binding Platform}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Category"
+                                    Binding="{Binding Category}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Genre"
+                                    Binding="{Binding Genre}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Division"
+                                    Binding="{Binding Division}"
+                                    IsReadOnly="True"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</UserControl>

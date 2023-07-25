@@ -1,6 +1,7 @@
-﻿using Pantheon.ViewModels.Commands;
-using System.ComponentModel;
+﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
+using Pantheon.ViewModels.Commands;
 
 namespace Pantheon.ViewModels;
 
@@ -28,11 +29,11 @@ public class LoginVM : INotifyPropertyChanged
         Password = "";
     }
 
-    internal bool LogIn()
+    internal async Task<bool> LogIn()
     {
         if (int.TryParse(UserCode, out var userID))
         {
-            if (App.Charon.LogIn(userID, Password))
+            if (await App.Charon.LogInAsync(userID, Password))
                 return true;
 
             MessageBox.Show("Incorrect User ID and Password combination.", "Invalid Log In", MessageBoxButton.OK,

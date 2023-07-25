@@ -8,7 +8,7 @@ public class CopyDatabaseCommand : ICommand
 {
     public DBManager VM { get; set; }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
@@ -19,13 +19,13 @@ public class CopyDatabaseCommand : ICommand
         VM = vm;
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return (parameter ?? "null") is string dbLocation && (App.Charon.CanCopyDatabase() || dbLocation.ToLower() == "local");
     }
 
-    public void Execute(object parameter)
+    public async void Execute(object? parameter)
     {
-        VM.CopyDatabase();
+        await VM.CopyDatabase();
     }
 }

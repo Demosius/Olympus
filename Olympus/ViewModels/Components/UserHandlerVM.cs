@@ -1,12 +1,16 @@
-﻿using Olympus.ViewModels.Commands;
+﻿using Cadmus.Annotations;
+using Olympus.ViewModels.Commands;
 using Olympus.Views;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Application = System.Windows.Application;
 
 namespace Olympus.ViewModels.Components;
 
 public class UserHandlerVM : INotifyPropertyChanged
 {
     public OlympusVM ParentVM { get; set; }
+
     private string userGreeting;
     public string UserGreeting
     {
@@ -14,7 +18,7 @@ public class UserHandlerVM : INotifyPropertyChanged
         set
         {
             userGreeting = value;
-            OnPropertyChanged(nameof(UserGreeting));
+            OnPropertyChanged();
         }
     }
     private string buttonString;
@@ -24,22 +28,19 @@ public class UserHandlerVM : INotifyPropertyChanged
         set
         {
             buttonString = value;
-            OnPropertyChanged(nameof(ButtonString));
+            OnPropertyChanged();
         }
     }
 
     public UserCommand UserCommand { get; set; }
 
-    public UserHandlerVM()
-    {
-        CheckUser();
-        UserCommand = new UserCommand(this);
-    }
-
-    public UserHandlerVM(OlympusVM olympusVM) : this()
+    public UserHandlerVM(OlympusVM olympusVM)
     {
         ParentVM = olympusVM;
-        LogIn();
+        userGreeting = string.Empty;
+        buttonString = string.Empty;
+        CheckUser();
+        UserCommand = new UserCommand(this);
     }
 
     public void CheckUser()
@@ -68,7 +69,10 @@ public class UserHandlerVM : INotifyPropertyChanged
     public void LogIn()
     {
         var user = App.Charon.User;
-        LoginWindow login = new();
+        LoginWindow login = new()
+        {
+            Owner = Application.Current.MainWindow
+        };
         _ = login.ShowDialog();
         CheckUser();
         if (user != App.Charon.User) ParentVM.ClearRunningProjects();
@@ -82,9 +86,10 @@ public class UserHandlerVM : INotifyPropertyChanged
         if (user != App.Charon.User) ParentVM.ClearRunningProjects();
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

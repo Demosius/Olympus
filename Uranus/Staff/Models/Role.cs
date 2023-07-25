@@ -23,6 +23,8 @@ public class Role : IComparable
     [OneToMany(nameof(ReportsToRoleName), nameof(ReportsToRole), CascadeOperations = CascadeOperation.All)]
     public List<Role> Reports { get; set; }
 
+    [Ignore] public bool IsDeletable => Employees.Count == 0 && Reports.Count == 0;
+
     public Role()
     {
         Name = "UniqueRole";
@@ -99,7 +101,7 @@ public class Role : IComparable
 
     public override string ToString()
     {
-        return Name;
+        return $"{Name} ({DepartmentName})";
     }
 
     public int CompareTo(object? obj)

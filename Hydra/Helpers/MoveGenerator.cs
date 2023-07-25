@@ -7,7 +7,7 @@ namespace Hydra.Helpers;
 
 public static class MoveGenerator
 {
-    public static IEnumerable<Move> GenerateSiteMoves(HydraDataSet? dataSet, IEnumerable<string> fromSites, IEnumerable<string> toSites)
+    public static IEnumerable<Move> GenerateSiteMoves(HydraDataSet dataSet, IEnumerable<string> fromSites, IEnumerable<string> toSites)
     {
         var returnList = new List<Move>();
 
@@ -30,7 +30,7 @@ public static class MoveGenerator
         return returnList;
     }
 
-    private static void GetSILLists(HydraDataSet? dataSet, ICollection<Site> takeSites, ICollection<Site> placeSites,
+    private static void GetSILLists(HydraDataSet dataSet, ICollection<Site> takeSites, ICollection<Site> placeSites,
         out List<SiteItemLevel> takeableSIL, out List<SiteItemLevel> placeableSIL,
         out List<SiteItemLevel> targetTakeSIL, out List<SiteItemLevel> targetPlaceSIL)
     {

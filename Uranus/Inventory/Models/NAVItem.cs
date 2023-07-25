@@ -37,6 +37,10 @@ public class NAVItem : IEquatable<NAVItem>
     public List<NAVMoveLine> MoveLines { get; set; }
     [OneToMany(nameof(SiteItemLevel.ItemNumber), nameof(SiteItemLevel.Item), CascadeOperations = CascadeOperation.CascadeRead)]
     public List<SiteItemLevel> SiteLevels { get; set; }
+    [OneToMany( nameof(MixedCartonItem.ItemNumber),nameof(MixedCartonItem.Item), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<MixedCartonItem> MixedCartons { get; set; }
+    [OneToMany(nameof(PickLine.CartonID), nameof(PickLine.BatchTOLine), CascadeOperations = CascadeOperation.CascadeRead)]
+    public List<PickLine> PickLines { get; set; }
 
     [ManyToOne(nameof(CategoryCode), nameof(NAVCategory.Items), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVCategory? Category { get; set; }
@@ -71,6 +75,20 @@ public class NAVItem : IEquatable<NAVItem>
     [Ignore] public Stock? Stock { get; set; }
     [Ignore] public Dictionary<string, Stock> StockDict { get; set; }
     [Ignore] public Dictionary<string, Stock> SiteStockDict { get; set; }
+    [Ignore] public Stock? AvailableStock { get; set; } // Stock existing in Pick and Overstock zones.
+
+    // Transfer Orders
+    [Ignore] public int TODemandBaseQty => 
+        Case?.TODemandBaseQty ?? 0 +
+        Pack?.TODemandBaseQty ?? 0 +
+        Each?.TODemandBaseQty ?? 0;
+    [Ignore] public double TODemandCube =>
+        Case?.TODemandCube ?? 0 +
+        Pack?.TODemandCube ?? 0 +
+        Each?.TODemandCube ?? 0;
+
+    // Stock
+    [Ignore] public bool HasPickBin { get; set; }
 
     public NAVItem()
     {
@@ -85,6 +103,8 @@ public class NAVItem : IEquatable<NAVItem>
         Moves = new List<Move>();
         MoveLines = new List<NAVMoveLine>();
         SiteLevels = new List<SiteItemLevel>();
+        MixedCartons = new List<MixedCartonItem>();
+        PickLines = new List<PickLine>();
     }
 
     public NAVItem(int num) : this()
@@ -176,6 +196,8 @@ public class NAVItem : IEquatable<NAVItem>
 
     public void AddStock(Stock newStock)
     {
+        if (newStock.Zone?.ZoneType == EZoneType.Pick) HasPickBin = true;
+
         if (Stock is null)
             Stock = newStock.Copy();
         else
@@ -184,16 +206,72 @@ public class NAVItem : IEquatable<NAVItem>
         if (!StockDict.TryGetValue(newStock.BinID, out _))
             StockDict.Add(newStock.BinID, newStock);
 
-        if (newStock.Site is null) return;
+        if (newStock.Site is not null)
+        {
+            if (SiteStockDict.TryGetValue(newStock.Site.Name, out var oldStock))
+                oldStock.Add(newStock);
+            else
+                SiteStockDict.Add(newStock.Site.Name, newStock.Copy());
+        }
 
-        if (SiteStockDict.TryGetValue(newStock.Site.Name, out var oldStock))
-            oldStock.Add(newStock);
-        else
-            SiteStockDict.Add(newStock.Site.Name, newStock.Copy());
+        // ReSharper disable once InvertIf
+        if (newStock.Zone?.ZoneType is EZoneType.Pick or EZoneType.Overstock)
+        {
+            if (AvailableStock is null)
+                AvailableStock = newStock.Copy();
+            else
+                AvailableStock.Add(newStock);
+        }
     }
 
     public void RemoveStock(Stock stock)
     {
+        // TODO: Clarify and expand:
+        // Remove from dict?
+        // Re-appraise if item has pick bin?
+        // Other required/desirable operations?
+        // Compare to Over-arching stock methods.
         Stock?.Sub(stock);
+    }
+
+    public void AddTO(NAVTransferOrder transferOrder)
+    {
+        if (transferOrder.ItemNumber != Number) return;
+        TransferOrders.Add(transferOrder);
+        transferOrder.Item = this;
+        switch (transferOrder.UoM)
+        {
+            case EUoM.CASE:
+                (Case ?? new NAVUoM(this, EUoM.CASE)).AddTO(transferOrder);
+                break;
+            case EUoM.PACK:
+                (Pack ?? new NAVUoM(this, EUoM.PACK)).AddTO(transferOrder);
+                break;
+            case EUoM.EACH:
+                (Each ?? new NAVUoM(this, EUoM.EACH)).AddTO(transferOrder);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(transferOrder));
+        }
+    }
+
+    public void RemoveTO(NAVTransferOrder transferOrder)
+    {
+        if (!TransferOrders.Contains(transferOrder) || transferOrder.ItemNumber != Number) return;
+        TransferOrders.Remove(transferOrder);
+        switch (transferOrder.UoM)
+        {
+            case EUoM.CASE:
+                Case!.RemoveTO(transferOrder);
+                break;
+            case EUoM.EACH:
+                Each!.RemoveTO(transferOrder);
+                break;
+            case EUoM.PACK:
+                Pack!.RemoveTO(transferOrder);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(transferOrder));
+        }
     }
 }

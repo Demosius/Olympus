@@ -4,6 +4,6 @@
              xmlns:local="clr-namespace:Sphynx"
              StartupUri="Views/SphynxWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary Source="/Morpheus;component/Themes/Light/Goldenrod/MSControls.Core.Implicit.xaml"/>
     </Application.Resources>
 </Application>

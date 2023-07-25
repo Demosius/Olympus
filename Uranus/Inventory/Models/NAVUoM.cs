@@ -46,12 +46,19 @@ public class NAVUoM
     [ManyToOne(nameof(ItemNumber), nameof(NAVItem.UoMs), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public NAVItem? Item { get; set; }
 
+    // Transfer Orders
+    [Ignore] public List<NAVTransferOrder> TransferOrders { get; set; }
+    [Ignore] public int TODemandQty { get; set; }
+    [Ignore] public int TODemandBaseQty => TODemandQty * QtyPerUoM;
+    [Ignore] public double TODemandCube => TODemandQty * Cube;
+
     public NAVUoM()
     {
         ID = string.Empty;
         Code = string.Empty;
         ExcludeCartonization = false;
         Stock = new List<NAVStock>();
+        TransferOrders = new List<NAVTransferOrder>();
     }
 
     public NAVUoM(EUoM uom) : this()
@@ -64,5 +71,19 @@ public class NAVUoM
     {
         Item = item;
         ItemNumber = item.Number;
+    }
+
+    public void AddTO(NAVTransferOrder transferOrder)
+    {
+        if (transferOrder.ItemNumber != ItemNumber || transferOrder.UoM != UoM) return;
+        TransferOrders.Add(transferOrder);
+        TODemandQty += transferOrder.Qty;
+    }
+
+    public void RemoveTO(NAVTransferOrder transferOrder)
+    {
+        if (transferOrder.ItemNumber != ItemNumber || transferOrder.UoM != UoM || !TransferOrders.Contains(transferOrder)) return;
+        TransferOrders.Remove(transferOrder);
+        TODemandQty -= transferOrder.Qty;
     }
 }

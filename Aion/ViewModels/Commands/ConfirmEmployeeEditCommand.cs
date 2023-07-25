@@ -4,29 +4,30 @@ using System.Windows.Input;
 
 namespace Aion.ViewModels.Commands;
 
+
 public class ConfirmEmployeeEditCommand : ICommand
 {
-    public EmployeeEditorVM EditorVM { get; set; }
+    public EmployeeEditorVM VM { get; set; }
 
-    public ConfirmEmployeeEditCommand(EmployeeEditorVM editorVM) { EditorVM = editorVM; }
+    public ConfirmEmployeeEditCommand(EmployeeEditorVM vm) { VM = vm; }
 
-    public event EventHandler CanExecuteChanged
+    public bool CanExecute(object? parameter)
     {
-        add => CommandManager.RequerySuggested += value;
-        remove => CommandManager.RequerySuggested -= value;
+        return true;
     }
 
-    public bool CanExecute(object parameter)
+    public void Execute(object? parameter)
     {
-        return EditorVM.ReportsTo != null;
-    }
-
-    public void Execute(object parameter)
-    {
-        var w = (Window)parameter;
-        EditorVM.ConfirmEdit();
+        var w = parameter as Window;
+        VM.ConfirmEdit();
         if (w == null) return;
         w.DialogResult = true;
         w.Close();
+    }
+
+    public event EventHandler? CanExecuteChanged
+    {
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
     }
 }

@@ -8,7 +8,7 @@ public class UpdateItemsCommand : ICommand
 {
     public InventoryUpdaterVM VM { get; set; }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
@@ -19,13 +19,13 @@ public class UpdateItemsCommand : ICommand
         VM = vm;
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return true;
     }
 
-    public void Execute(object parameter)
+    public async void Execute(object? parameter)
     {
-        VM.UpdateItems();
+        await VM.UpdateItems();
     }
 }

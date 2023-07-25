@@ -1,15 +1,28 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using Uranus;
+using Uranus.Commands;
+using Uranus.Interfaces;
 using Vulcan.Properties;
 
 namespace Vulcan.ViewModels;
 
-public class VulcanVM : INotifyPropertyChanged
+public class VulcanVM : INotifyPropertyChanged, IDBInteraction
 {
-    public void RefreshData()
+    public Helios Helios { get; set; }
+    public RefreshDataCommand RefreshDataCommand { get; set; }
+
+    public VulcanVM(Helios helios)
     {
-        throw new NotImplementedException();
+        Helios = helios;
+
+        RefreshDataCommand = new RefreshDataCommand(this);
+    }
+
+    public async Task RefreshDataAsync()
+    {
+        await Task.Run(() => { });
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

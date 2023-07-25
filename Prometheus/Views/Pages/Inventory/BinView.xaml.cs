@@ -1,6 +1,11 @@
-﻿using Prometheus.ViewModels.Helpers;
+﻿using System;
+using Prometheus.ViewModels.Helpers;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
+using Prometheus.ViewModels.Pages.Inventory;
+using Styx;
+using Uranus;
 
 namespace Prometheus.Views.Pages.Inventory;
 
@@ -9,11 +14,23 @@ namespace Prometheus.Views.Pages.Inventory;
 /// </summary>
 public partial class BinView
 {
-    public BinView()
+    public BinVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
+
+    public BinView(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
     }
 
+
+    private async void BinView_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await BinVM.CreateAsync(Helios, Charon);
+        DataContext = VM;
+    }
     public override EDataType DataType => EDataType.NAVBin;
 
     private void DataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)

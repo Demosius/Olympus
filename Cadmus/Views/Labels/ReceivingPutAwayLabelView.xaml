@@ -1,0 +1,217 @@
+﻿<UserControl x:Class="Cadmus.Views.Labels.ReceivingPutAwayLabelView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:Cadmus.ViewModels"
+             xmlns:labels="clr-namespace:Cadmus.ViewModels.Labels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type labels:ReceivingPutAwayLabelVM}, IsDesignTimeCreatable=False}"
+             Height="{Binding Height}" Width="{Binding Width}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Morpheus;component/Resources/Fonts.xaml"/>
+                <ResourceDictionary>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="Black"></Setter>
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="White">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding Col1}"/>
+            <ColumnDefinition Width="{Binding Col2}"/>
+            <ColumnDefinition Width="{Binding Col3}"/>
+            <ColumnDefinition Width="{Binding Col4}"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+        </Grid.RowDefinitions>
+
+        <!-- Take Zone -->
+        <Border Grid.Column="0"
+                Grid.Row="0"
+                Grid.ColumnSpan="4"
+                BorderThickness="1"
+                BorderBrush="Black">
+            <TextBlock Text="{Binding TakeZone}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       FontWeight="Bold"/>
+        </Border>
+
+        <!--Pick-->
+        <Border Grid.Column="0" 
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                BorderThickness="1"
+                BorderBrush="Black">
+            <TextBlock Text="PICK"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       FontWeight="Bold"/>
+        </Border>
+
+        <!--Take Bin-->
+        <Border Grid.Column="0"
+                Grid.Row="2"
+                Grid.RowSpan="2"
+                Grid.ColumnSpan="2"
+                BorderThickness="1"
+                BorderBrush="Black">
+            <TextBlock Text="{Binding TakeBin}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="36"
+                       FontWeight="Bold"/>
+        </Border>
+
+        <!-- Take Display -->
+        <Border Grid.Column="0"
+                Grid.Row="4"
+                Grid.RowSpan="3"
+                Grid.ColumnSpan="2"
+                BorderThickness="1"
+                BorderBrush="Black">
+            <TextBlock Text="{Binding TakeDisplayString}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       FontWeight="Normal"
+                       FontFamily="Courier New"/>
+        </Border>
+
+        <!-- Description Area -->
+        <Border Grid.Column="0"
+                Grid.Row="7"
+                Grid.ColumnSpan="2"
+                Grid.RowSpan="4"
+                BorderThickness="1"
+                BorderBrush="Black"/>
+
+        <!-- Description -->
+        <Border Grid.Column="0"
+                Grid.Row="7"
+                BorderThickness="1,1,2,2"
+                BorderBrush="Black">
+            <TextBlock Text="DESCRIPTION"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="11"
+                       FontWeight="Bold"/>
+        </Border>
+
+        <!-- Description Text -->
+        <Border Grid.Column="0"
+                Grid.Row="8"
+                Grid.RowSpan="3"
+                Grid.ColumnSpan="2"
+                BorderThickness="1,0,1,1"
+                BorderBrush="Black">
+            <TextBlock Text="{Binding Description}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="16"
+                       TextWrapping="Wrap"
+                       FontWeight="Normal"/>
+        </Border>
+
+        <!--Pallet Qty-->
+        <Border Grid.Column="2"
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                BorderThickness="1"
+                BorderBrush="Black">
+            <TextBlock Text="Pallet Qty"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       FontWeight="Bold"/>
+        </Border>
+
+        <!--Empty-->
+        <Border Grid.Column="2"
+                Grid.Row="2"
+                Grid.RowSpan="5"
+                Grid.ColumnSpan="2"
+                BorderThickness="1"
+                BorderBrush="Black">
+            <TextBlock Text=""
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="11"
+                       FontWeight="Normal"/>
+        </Border>
+
+        <!--Barcode-->
+        <Border Grid.Column="2"
+                Grid.Row="7"
+                Grid.RowSpan="2"
+                Grid.ColumnSpan="2"
+                BorderThickness="1"
+                BorderBrush="Black">
+            <TextBlock Text="{Binding Barcode}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="40"
+                       FontWeight="Normal"
+                       FontFamily="{StaticResource Code128}"/>
+        </Border>
+
+        <!--Item Number-->
+        <Border Grid.Column="2"
+                Grid.Row="9"
+                Grid.ColumnSpan="2"
+                BorderThickness="1"
+                BorderBrush="Black">
+            <TextBlock Text="{Binding ItemNumber}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="12"
+                       FontWeight="Bold"/>
+        </Border>
+
+        <!--Label No-->
+        <Border Grid.Column="2"
+                Grid.Row="10"
+                BorderThickness="1"
+                BorderBrush="Black">
+            <TextBlock Text="LABEL NO:"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="10"
+                       FontWeight="Bold"/>
+        </Border>
+
+        <!--Label Display-->
+        <Border Grid.Column="3"
+                Grid.Row="10"
+                BorderThickness="1"
+                BorderBrush="Black">
+            <TextBlock Text="{Binding LabelCountDisplay}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="11"
+                       FontWeight="Normal"/>
+        </Border>
+
+    </Grid>
+</UserControl>

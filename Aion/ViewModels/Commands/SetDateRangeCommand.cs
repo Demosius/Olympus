@@ -13,19 +13,20 @@ public class SetDateRangeCommand : ICommand
         VM = vm;
     }
 
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
-        return (VM.MinDate.Date != VM.InitialMin.Date || VM.MaxDate.Date != VM.InitialMax.Date);
+        return VM.MinDate.Date != VM.InitialMin.Date || VM.MaxDate.Date != VM.InitialMax.Date;
     }
 
-    public void Execute(object parameter)
+    public async void Execute(object? parameter)
     {
-        var w = (Window)parameter;
-        VM.SetDateRange();
-        w.Close();
+        var w = parameter as Window;
+        var task = VM.SetDateRange();
+        w?.Close();
+        await task;
     }
 
-    public event EventHandler CanExecuteChanged
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;

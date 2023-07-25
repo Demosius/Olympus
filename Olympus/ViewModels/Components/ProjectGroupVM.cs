@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Cadmus.Annotations;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Uranus.Staff.Models;
 
 namespace Olympus.ViewModels.Components;
@@ -17,7 +19,7 @@ public class ProjectGroupVM : INotifyPropertyChanged
         set
         {
             projects = value;
-            OnPropertyChanged(nameof(Projects));
+            OnPropertyChanged();
         }
     }
 
@@ -28,18 +30,15 @@ public class ProjectGroupVM : INotifyPropertyChanged
         set
         {
             groupName = value;
-            OnPropertyChanged(nameof(GroupName));
+            OnPropertyChanged();
         }
     }
 
-    public ProjectGroupVM()
-    {
-        Projects = new ObservableCollection<ProjectButtonVM>();
-    }
-
-    public ProjectGroupVM(ProjectLauncherVM projectLauncher) : this()
+    public ProjectGroupVM(ProjectLauncherVM projectLauncher)
     {
         ProjectLauncher = projectLauncher;
+        projects = new ObservableCollection<ProjectButtonVM>();
+        groupName = string.Empty;
     }
 
     public ProjectGroupVM(ProjectLauncherVM projectLauncher, List<Project> projects, string groupName) : this(projectLauncher)
@@ -62,9 +61,10 @@ public class ProjectGroupVM : INotifyPropertyChanged
         GroupName = department.Name;
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    private void OnPropertyChanged(string propertyName)
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

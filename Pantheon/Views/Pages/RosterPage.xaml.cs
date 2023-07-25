@@ -1,6 +1,9 @@
-﻿using Styx;
+﻿using System;
+using System.Windows;
+using Styx;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Pantheon.ViewModels.Pages;
 using Uranus;
 
 namespace Pantheon.Views.Pages;
@@ -10,10 +13,21 @@ namespace Pantheon.Views.Pages;
 /// </summary>
 public partial class RosterPage
 {
+    public RosterPageVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
+
     public RosterPage(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+    }
+
+    private async void RosterPage_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await RosterPageVM.CreateAsync(Helios, Charon);
+        DataContext = VM;
     }
 
     private void TextBox_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)

@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vm="clr-namespace:Hydra.ViewModels.Controls"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
-             xmlns:model="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:ItemLevelsVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
@@ -18,7 +17,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Green/MSControls.Core.Implicit.xaml"/>
                 <ResourceDictionary>
                     <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonStyle}">
                         <Setter Property="Margin" Value="2"/>

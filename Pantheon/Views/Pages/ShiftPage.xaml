@@ -3,22 +3,19 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:converter="clr-namespace:Pantheon.ViewModels.Converter"
-      xmlns:pages="clr-namespace:Pantheon.ViewModels.Pages"
+      xmlns:vm="clr-namespace:Pantheon.ViewModels.Pages"
+      xmlns:converters="clr-namespace:Pantheon.ViewModels.Converters"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type vm:ShiftPageVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="1080" d:DesignWidth="1200"
+      Initialized="ShiftPage_OnInitialized"
       Title="EmployeePage">
-
-    <Page.DataContext>
-        <pages:ShiftPageVM x:Name="VM"/>
-    </Page.DataContext>
 
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <!-- Dark Theme -->
-                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Core.Implicit.xaml"/>
-                <ResourceDictionary Source="../../Themes/Metro/Dark/MetroDark.MSControls.Toolkit.Implicit.xaml"/>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Master/MSControls.Core.Implicit.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
@@ -33,9 +30,9 @@
                 <Setter Property="Margin" Value="5"/>
             </Style>
 
-            <converter:BreakButtonConverter x:Key="BreakButtonConverter"/>
-            <converter:IntToStringConverter x:Key="IntToStringConverter"/>
-            <converter:CustomBoolToVisConverter x:Key="BoolToVisConverter"/>
+            <converters:BreakButtonConverter x:Key="BreakButtonConverter"/>
+            <converters:IntToStringConverter x:Key="IntToStringConverter"/>
+            <converters:CustomBoolToVisConverter x:Key="BoolToVisConverter"/>
         </DockPanel.Resources>
 
         <ToolBarTray DockPanel.Dock="Top">
@@ -54,8 +51,8 @@
         </ToolBarTray>
 
         <!-- Actual Shift Listings -->
-        <ListView ItemsSource="{Binding Shifts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+        <ListView ItemsSource="{Binding ShiftVMs, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedValue="{Binding SelectedShiftVM, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource ListBoxItemStyle}">
                     <Setter Property="Focusable" Value="False"/>
@@ -106,7 +103,7 @@
                                                    Width="60" Height="22"
                                                    FontSize="10"
                                                    HorizontalContentAlignment="Center"/>
-                                            <TextBox Text="{Binding StartString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            <TextBox Text="{Binding StartString, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                                      VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalContentAlignment="Center"
                                                      MinWidth="0" MinHeight="0"
                                                      Width="70" Height="22"
@@ -114,7 +111,7 @@
                                                      GotKeyboardFocus="TextBox_GotKeyboardFocus"
                                                      LostMouseCapture="TextBox_LostMouseCapture"
                                                      LostKeyboardFocus="TextBox_LostKeyboardFocus"/>
-                                            <TextBox Text="{Binding Length, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                            <TextBox Text="{Binding Length, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                                                      VerticalAlignment="Center" HorizontalContentAlignment="Center"
                                                      MinWidth="0" MinHeight="0"
                                                      Width="35" Height="22"
@@ -126,8 +123,7 @@
                                                        FontSize="8" 
                                                        Height="22"/>
                                             <Button Content="{Binding Name, Converter={StaticResource BreakButtonConverter}}" Margin="4,0,0,0"
-                                                    Command="{Binding ElementName=VM, Path=AddRemoveBreakCommand}"
-                                                    CommandParameter="{Binding}" 
+                                                    Command="{Binding AddRemoveBreakCommand}"
                                                     MinWidth="0" MinHeight="0"
                                                     Height="20" Width="22"
                                                     Padding="-1,-1,0,-1"
@@ -178,14 +174,11 @@
                             </StackPanel>
 
                             <Button Content="Save Changes" Height="30" Width="120"
-                                    CommandParameter="{Binding}"
-                                    Command="{Binding ElementName=VM, Path=SaveShiftCommand}"/>
+                                    Command="{Binding SaveShiftCommand}"/>
                             <Button Content="Employees" Height="30" Width="120"
-                                    CommandParameter="{Binding}"
-                                    Command="{Binding ElementName=VM, Path=LaunchShiftEmployeeWindowCommand}"/>
+                                    Command="{Binding LaunchShiftEmployeeWindowCommand}"/>
                             <Button Content="Delete" Height="30" Width="120"
-                                    CommandParameter="{Binding}"
-                                    Command="{Binding ElementName=VM, Path=DeleteShiftCommand}"
+                                    Command="{Binding DeleteShiftCommand}"
                                     Margin="30,0,0,0"/>
                         </StackPanel>
                     </Border>

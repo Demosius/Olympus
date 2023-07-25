@@ -6,18 +6,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:users="clr-namespace:Prometheus.ViewModels.PopUp.Users"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance {x:Type users:SetUserRoleVM}, IsDesignTimeCreatable=False}"
         Title="SetUserRoleView"
         SizeToContent="Width"
         Height="350"
         WindowStartupLocation="CenterOwner"
         Background="#111">
 
-    <Window.DataContext>
-        <users:SetUserRoleVM x:Name="VM"/>
-    </Window.DataContext>
-
     <Window.Resources>
-        <ResourceDictionary Source="../../../Themes/MSControls.Core.Implicit.xaml"/>
+        <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Orange/MSControls.Core.Implicit.xaml"/>
     </Window.Resources>
 
     <DockPanel>

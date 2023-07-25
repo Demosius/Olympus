@@ -46,7 +46,7 @@ public class ClockConfirmationVM : INotifyPropertyChanged
         ClockEvent clock = new() { EmployeeID = Employee.ID, Employee = Employee, Status = EClockStatus.Pending };
         clock.StampTime();
         App.Helios.StaffCreator.ClockEvent(clock);
-        App.Helios.StaffCreator.SetShiftEntry(clock.DtDate, Employee);
+        _ = App.Helios.StaffCreator.SetShiftEntryAsync(clock.DtDate, Employee);
         return clock;
     }
 

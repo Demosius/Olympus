@@ -29,4 +29,15 @@ public class NAVDivision
         Categories = categories;
         Items = items;
     }
+
+    public void AddItem(NAVItem item)
+    {
+        item.Division = this;
+        Items.Add(item);
+    }
+
+    public override string ToString()
+    {
+        return $"{Code} - {Description}";
+    }
 }

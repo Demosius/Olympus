@@ -1,6 +1,4 @@
-﻿using Pantheon.Annotations;
-using Pantheon.ViewModels.Commands.Shifts;
-using Pantheon.ViewModels.Pages;
+﻿using Pantheon.ViewModels.Commands.Shifts;
 using Styx;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,17 +6,19 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Pantheon.ViewModels.Controls.Shifts;
 using Uranus;
 using Uranus.Staff.Models;
 
 namespace Pantheon.ViewModels.PopUp.Shifts;
 
-internal class ShiftEmployeeVM : INotifyPropertyChanged
+public class ShiftEmployeeVM : INotifyPropertyChanged
 {
-    public ShiftPageVM? ParentVM { get; set; }
-    public Shift? Shift { get; set; }
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Department Department { get; set; }
+    public Shift Shift { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     #region Notifiable Properties
 
@@ -53,8 +53,14 @@ internal class ShiftEmployeeVM : INotifyPropertyChanged
 
     public ConfirmEmployeeAssignmentCommand ConfirmEmployeeAssignmentCommand { get; set; }
 
-    public ShiftEmployeeVM()
+    private ShiftEmployeeVM(ShiftVM shift)
     {
+        Shift = shift.Shift;
+        Department = shift.Department ?? Shift.Department ?? new Department(Shift.ID.Split('|')[0]);
+
+        Helios = shift.Helios;
+        Charon = shift.Charon;
+
         employeeShifts = new ObservableCollection<EmployeeShift>();
         Employees = new Dictionary<int, Employee>();
         employeeSearchString = string.Empty;
@@ -63,18 +69,27 @@ internal class ShiftEmployeeVM : INotifyPropertyChanged
         ConfirmEmployeeAssignmentCommand = new ConfirmEmployeeAssignmentCommand(this);
     }
 
-    public void SetData(ShiftPageVM shiftPageVM, Shift shift)
+    private async Task<ShiftEmployeeVM> InitializeAsync()
     {
-        ParentVM = shiftPageVM;
-        Shift = shift;
-        Helios = ParentVM.Helios;
-        Charon = ParentVM.Charon;
+        await SetData();
+        return this;
+    }
 
-        if (Helios is null || ParentVM.SelectedDepartment is null) return;
+    public static Task<ShiftEmployeeVM> CreateAsync(ShiftVM shift)
+    {
+        var ret = new ShiftEmployeeVM(shift);
+        return ret.InitializeAsync();
+    }
 
-        empShifts = Helios.StaffReader.EmployeeShifts(Shift).ToList();
-        Employees = Helios.StaffReader.Employees(e => e.DepartmentName == ParentVM.SelectedDepartment.Name).ToDictionary(e => e.ID, e => e);
+    public async Task SetData()
+    {
+        var shiftTask = Helios.StaffReader.EmployeeShiftsAsync(Shift); 
+        var empTask = Helios.StaffReader.EmployeesAsync(e => e.DepartmentName == Department.Name);
 
+        await Task.WhenAll(shiftTask, empTask);
+
+        empShifts = (await shiftTask).ToList();
+        Employees = (await empTask).ToDictionary(e => e.ID, e => e);
         // Set current connections as active and original.
         foreach (var employeeShift in empShifts)
         {
@@ -107,8 +122,6 @@ internal class ShiftEmployeeVM : INotifyPropertyChanged
 
     public void ConfirmEmployeeAssignment()
     {
-        if (Helios is null || Shift is null) return;
-
         Helios.StaffUpdater.EmployeeToShiftConnections(EmployeeShifts);
     }
 

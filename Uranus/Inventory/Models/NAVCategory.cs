@@ -39,4 +39,15 @@ public class NAVCategory
         Division = division;
         Items = items;
     }
+
+    public void AddItem(NAVItem item)
+    {
+        item.Category = this;
+        Items.Add(item);
+    }
+
+    public override string ToString()
+    {
+        return $"{Code} - {Description}";
+    }
 }

@@ -29,7 +29,6 @@
     <None Remove="Resources\Fonts\DIN Bold.ttf" />
     <None Remove="Resources\Fonts\DIN Medium.ttf" />
     <None Remove="Resources\Fonts\DIN.ttf" />
-    <None Remove="Resources\Hydra.ico" />
     <None Remove="Resources\plus-circle-frame.png" />
     <None Remove="Resources\plus-small.png" />
     <None Remove="Resources\plus.png" />
@@ -45,12 +44,10 @@
 
   <ItemGroup>
     <Content Include="hydra.ico" />
-    <Content Include="Resources\Hydra.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Cadmus\Cadmus.csproj" />
     <ProjectReference Include="..\Morpheus\Morpheus.csproj" />
     <ProjectReference Include="..\Styx\Styx.csproj" />
     <ProjectReference Include="..\Uranus\Uranus.csproj" />
@@ -117,30 +114,6 @@
 
   <ItemGroup>
     <Page Update="Resources\Fonts.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\DatagridStyling.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\MSControls.Core.Implicit.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\MSControls.Toolkit.Implicit.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Styles.Shared.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Styles.WPF.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Themes\Theme.Colors.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

@@ -5,11 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              d:DataContext="{d:DesignInstance {x:Type components:ProjectLauncherVM}, d:IsDesignTimeCreatable=False}"
              xmlns:components="clr-namespace:Olympus.ViewModels.Components"
-             mc:Ignorable="d">
-
-    <UserControl.DataContext>
-        <components:ProjectLauncherVM x:Name="VM"/>
-    </UserControl.DataContext>
+             mc:Ignorable="d"
+             MaxHeight="300">
 
     <Grid>
         <ItemsControl ItemsSource="{Binding Projects.Projects}" Margin="2">

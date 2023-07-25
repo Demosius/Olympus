@@ -15,8 +15,8 @@ namespace Prometheus.ViewModels;
 
 public class PrometheusVM : INotifyPropertyChanged
 {
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     public ObservableCollection<DataCategory> Categories { get; set; }
     public ObservableCollection<DataType> Types { get; set; }
@@ -57,8 +57,11 @@ public class PrometheusVM : INotifyPropertyChanged
         }
     }
 
-    public PrometheusVM()
+    public PrometheusVM(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
+
         Categories = new ObservableCollection<DataCategory>();
         Types = new ObservableCollection<DataType>();
         Pages = new Dictionary<EDataCategory, CatPage>();
@@ -66,12 +69,6 @@ public class PrometheusVM : INotifyPropertyChanged
         {
             Categories.Add(new DataCategory(category));
         }
-    }
-
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
     }
 
     public void SetTypes()
@@ -99,7 +96,7 @@ public class PrometheusVM : INotifyPropertyChanged
 
         return category switch
         {
-            EDataCategory.Inventory => GeneratePage(new InventoryPage()),
+            EDataCategory.Inventory => GeneratePage(new InventoryPage(Helios)),
             EDataCategory.Equipment => GeneratePage(new EquipmentPage()),
             EDataCategory.Staff => GeneratePage(new StaffPage()),
             EDataCategory.Users => GeneratePage(new UserPage(Helios, Charon)),

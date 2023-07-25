@@ -8,24 +8,21 @@ public class ShowInfoCommand : ICommand
 {
     public InventoryUpdaterVM VM { get; set; }
 
-    public event EventHandler CanExecuteChanged
-    {
-        add => CommandManager.RequerySuggested += value;
-        remove => CommandManager.RequerySuggested -= value;
-    }
+    public ShowInfoCommand(InventoryUpdaterVM vm) { VM = vm; }
 
-    public ShowInfoCommand(InventoryUpdaterVM vm)
-    {
-        VM = vm;
-    }
-
-    public bool CanExecute(object parameter)
+    public bool CanExecute(object? parameter)
     {
         return true;
     }
 
-    public void Execute(object parameter)
+    public void Execute(object? parameter)
     {
-        InventoryUpdaterVM.ShowInfo();
+        VM.ShowInfo();
+    }
+
+    public event EventHandler? CanExecuteChanged
+    {
+        add => CommandManager.RequerySuggested += value;
+        remove => CommandManager.RequerySuggested -= value;
     }
 }

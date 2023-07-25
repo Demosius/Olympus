@@ -2,6 +2,8 @@
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Uranus.Inventory.Models;
 
@@ -34,14 +36,44 @@ public class Stock : IEnumerable
     [Ignore] public Bay? Bay => Bin?.Bay;
     [Ignore] public Site? Site => Zone?.Site;
 
+    [Ignore] public string ZoneCode => Zone?.Code ?? ZoneID.Split(":")[1];
+    [Ignore] public string BinCode => Bin?.Code ?? BinID.Split(":")[2];
+
     [Ignore] public int EachQty => Eaches?.Qty ?? 0;
     [Ignore] public int PackQty => Packs?.Qty ?? 0;
     [Ignore] public int CaseQty => Cases?.Qty ?? 0;
 
-    [Ignore] public int UnitsInPacks => ((Packs?.Qty ?? 0) * (Item?.QtyPerPack ?? 0));
-    [Ignore] public int UnitsInCases => ((Cases?.Qty ?? 0) * (Item?.QtyPerCase ?? 0));
+    [Ignore] public bool EachesOnly => EachQty > 0 && PackQty == 0 && CaseQty == 0;
+
+    [Ignore] public int UnitsInPacks => (Packs?.Qty ?? 0) * (Item?.QtyPerPack ?? 1);
+    [Ignore] public int UnitsInCases => (Cases?.Qty ?? 0) * (Item?.QtyPerCase ?? 1);
+
+    [Ignore] public bool Merged { get; set; } = false;
 
     [Ignore] public int BaseQty => EachQty + UnitsInPacks + UnitsInCases;
+    [Ignore]
+    public bool NonCommitted => (Eaches is null || Eaches.NonCommitted) &&
+                                         (Packs is null || Packs.NonCommitted) &&
+                                         (Cases is null || Cases.NonCommitted);
+    [Ignore]
+    public bool HasNegativeUoM => (Eaches?.IsNegative ?? false) ||
+                                            (Packs?.IsNegative ?? false) ||
+                                             (Cases?.IsNegative ?? false);
+
+    [Ignore]
+    public int BasePickQty => (Eaches?.PickQty ?? 0) +
+                              (Packs?.PickQty ?? 0) * (Item?.QtyPerPack ?? 1) +
+                              (Cases?.PickQty ?? 0) * (Item?.QtyPerCase ?? 1);
+
+    [Ignore]
+    public int BasePutAwayQty => (Eaches?.PutAwayQty ?? 0) +
+                                 (Packs?.PutAwayQty ?? 0) * (Item?.QtyPerPack ?? 1) +
+                                 (Cases?.PutAwayQty ?? 0) * (Item?.QtyPerCase ?? 1);
+
+    [Ignore]
+    public int BaseAvailableQty => (Eaches?.AvailableQty ?? 0) +
+                                   (Packs?.AvailableQty ?? 0) * (Item?.QtyPerPack ?? 1) +
+                                   (Cases?.AvailableQty ?? 0) * (Item?.QtyPerCase ?? 1);
 
     public Stock()
     {
@@ -206,6 +238,7 @@ public class Stock : IEnumerable
 
     /// <summary>
     /// Adds values from new stock to this one without removing them.
+    /// If stock is of the same bin when adding, set sub stock to equal new if it doesn't already exist.
     /// </summary>
     /// <param name="newStock"></param>
     public bool Add(Stock newStock)
@@ -216,21 +249,27 @@ public class Stock : IEnumerable
         // Increase Stock quantities.
         if (newStock.Eaches is not null)
         {
-            Eaches ??= new SubStock(this, EUoM.EACH);
-            Eaches.Qty += newStock.Eaches.Qty;
+            if (Eaches is null)
+                Eaches = newStock.BinID == BinID ? newStock.Eaches.Copy() : Eaches ??= new SubStock(this, EUoM.EACH, newStock.EachQty);
+            else
+                Eaches.Qty += newStock.EachQty;
         }
 
         if (newStock.Packs is not null)
         {
-            Packs ??= new SubStock(this, EUoM.PACK);
-            Packs.Qty += newStock.Packs.Qty;
+            if (Packs is null)
+                Packs ??= newStock.BinID == BinID ? newStock.Packs.Copy() : new SubStock(this, EUoM.PACK, newStock.PackQty);
+            else
+                Packs.Qty += newStock.PackQty;
         }
 
         // ReSharper disable once InvertIf
         if (newStock.Cases is not null)
         {
-            Cases ??= new SubStock(this, EUoM.CASE);
-            Cases.Qty += newStock.Cases.Qty;
+            if (Cases is null)
+                Cases ??= newStock.BinID == BinID ? newStock.Cases.Copy() : new SubStock(this, EUoM.CASE, newStock.CaseQty);
+            else
+                Cases.Qty += newStock.CaseQty;
         }
 
         return true;
@@ -410,7 +449,7 @@ public class Stock : IEnumerable
 
         if (unitsForCases > 0 && Cases is not null)
         {
-            if (unitsForCases > units) unitsForCases = (units / qtyPerCase) * qtyPerCase;
+            if (unitsForCases > units) unitsForCases = units / qtyPerCase * qtyPerCase;
             units -= unitsForCases;
             Cases.Qty += unitsForCases / qtyPerCase;
         }
@@ -418,7 +457,7 @@ public class Stock : IEnumerable
         var unitsForPacks = packs * qtyPerPack;
         if (unitsForPacks > 0 && Packs is not null)
         {
-            if (unitsForPacks > units) unitsForPacks = (units / qtyPerPack) * qtyPerPack;
+            if (unitsForPacks > units) unitsForPacks = units / qtyPerPack * qtyPerPack;
             units -= unitsForPacks;
             Packs.Qty += unitsForPacks / qtyPerPack;
         }
@@ -427,6 +466,43 @@ public class Stock : IEnumerable
         {
             Eaches.Qty += units;
         }
+    }
+
+    /// <summary>
+    /// Gets a string representing the units of measure of the item at this bin location.
+    /// e.g. EACH or EACH,PACK etc.
+    /// </summary>
+    /// <returns></returns>
+    public string GetUoMString()
+    {
+        var list = new List<string>();
+        if (Cases is not null) list.Add("CASE");
+        if (Eaches is not null) list.Add("EACH");
+        if (Packs is not null) list.Add("PACK");
+
+        return $"{Bin?.Code} ({string.Join(",", list)})";
+    }
+
+    public static List<Stock> FromNAVStock(List<NAVStock> navStock)
+    {
+        var stock = new List<Stock>();
+        var stockDict = navStock
+            .Select(ns => new Stock(ns))
+            .GroupBy(s => s.ItemNumber)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        foreach (var (itemNumber, stockList) in stockDict)
+        {
+            var first = stockList.First();
+            if (stockList.Count > 1)
+            {
+                for (var i = 1; i < stockList.Count; i++)
+                    first.Add(stockList[i]);
+            }
+            stock.Add(first);
+        }
+
+        return stock;
     }
 
     public IEnumerator GetEnumerator()

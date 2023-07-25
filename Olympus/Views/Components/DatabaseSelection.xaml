@@ -4,12 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:utility="clr-namespace:Olympus.ViewModels.Utility"
-             d:DataContext="{d:DesignInstance Type=utility:DBManager}"
+             d:DataContext="{d:DesignInstance {x:Type utility:DBManager}, IsDesignTimeCreatable=False}"
              mc:Ignorable="d" >
-
-    <UserControl.DataContext>
-        <utility:DBManager x:Name="VM"/>
-    </UserControl.DataContext>
 
     <UserControl.Resources>
         <Style TargetType="Label">

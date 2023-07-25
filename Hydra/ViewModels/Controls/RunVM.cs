@@ -3,9 +3,9 @@ using Hydra.Helpers;
 using Hydra.Interfaces;
 using Hydra.ViewModels.Commands;
 using Microsoft.Win32;
+using Morpheus;
 using Morpheus.Helpers;
 using Styx;
-using Styx.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,6 +19,11 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Cadmus.Helpers;
+using Cadmus.Interfaces;
+using Cadmus.Models;
+using Cadmus.ViewModels.Commands;
+using Cadmus.ViewModels.Labels;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -27,11 +32,11 @@ using Uranus.Inventory.Models;
 
 namespace Hydra.ViewModels.Controls;
 
-public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemFilters
+public class RunVM : INotifyPropertyChanged, IDBInteraction, IItemFilters, IExport
 {
     public HydraVM HydraVM { get; set; }
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     private HydraDataSet? dataSet;
 
@@ -42,6 +47,8 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
     // Track whether the current data is old data that has been loaded which likely
     // includes different core data (bin contents) than the current database holds.
     public bool OldLoaded { get; set; }
+
+    public bool CanExport => CurrentMoves.Any();
 
     #region InotifyPropertyChanged Members
 
@@ -99,10 +106,8 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
-    public ApplySortingCommand ApplySortingCommand { get; set; }
     public FilterItemsFromClipboardCommand FilterItemsFromClipboardCommand { get; set; }
     public GenerateMovesCommand GenerateMovesCommand { get; set; }
     public ExportToCSVCommand ExportToCSVCommand { get; set; }
@@ -113,9 +118,13 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
 
     #endregion
 
-    public RunVM(HydraVM hydraVM)
+    private RunVM(HydraVM hydraVM, Helios helios, Charon charon)
     {
         HydraVM = hydraVM;
+
+        Helios = helios;
+        Charon = charon;
+
         Sites = new ObservableCollection<SiteVM>();
         AllMoves = new List<MoveVM>();
         currentMoves = new ObservableCollection<MoveVM>();
@@ -125,10 +134,8 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         toSiteFilterString = string.Empty;
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
-        ApplySortingCommand = new ApplySortingCommand(this);
         FilterItemsFromClipboardCommand = new FilterItemsFromClipboardCommand(this);
         GenerateMovesCommand = new GenerateMovesCommand(this);
         ExportToCSVCommand = new ExportToCSVCommand(this);
@@ -136,31 +143,31 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         ExportToExcelCommand = new ExportToExcelCommand(this);
         ExportToLabelsCommand = new ExportToLabelsCommand(this);
         SaveGenerationCommand = new SaveGenerationCommand(this);
-
-        Task.Run(() => SetDataSources(HydraVM.Helios!, HydraVM.Charon!));
     }
 
-    public void SetDataSources(Helios helios, Charon charon)
+    public RunVM(HydraVM hydraVM, Helios helios, Charon charon, IEnumerable<Site> sites) : this(hydraVM, helios, charon)
     {
-        Helios = helios;
-        Charon = charon;
-        RefreshData();
+        Sites = new ObservableCollection<SiteVM>(sites.Select(s => new SiteVM(s)));
     }
 
-    public void RefreshData()
+    private async Task<RunVM> InitializeAsync()
     {
-        if (Helios is null) return;
+        await RefreshDataAsync();
+        return this;
+    }
 
+    public static Task<RunVM> CreateAsync(HydraVM hydraVM, Helios helios, Charon charon)
+    {
+        var ret = new RunVM(hydraVM, helios, charon);
+        return ret.InitializeAsync();
+    }
+
+    public async Task RefreshDataAsync()
+    {
         Sites.Clear();
-        foreach (var site in Helios.InventoryReader.Sites(out _))
-        {
+        var (sites, _) = await Helios.InventoryReader.SitesAsync();
+        foreach (var site in sites)
             Sites.Add(new SiteVM(site));
-        }
-    }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
     }
 
     public void ClearFilters()
@@ -184,11 +191,6 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
             itemRegex.IsMatch(m.ItemNumber.ToString()) &&
             fromRegex.IsMatch(m.TakeSiteName) &&
             toRegex.IsMatch(m.PlaceSiteName)));
-    }
-
-    public void ApplySorting()
-    {
-        throw new NotImplementedException();
     }
 
     public void FilterItemsFromClipboard()
@@ -240,27 +242,12 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         Mouse.OverrideCursor = Cursors.Arrow;
     }
 
-    public void ActivateAllItems()
+    public async Task GenerateMoves()
     {
-        throw new NotImplementedException();
-    }
-
-    public void DeActivateAllItems()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void ExclusiveItemActivation()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void GenerateMoves()
-    {
-        if (Helios is null) return;
-
         Mouse.OverrideCursor = Cursors.Wait;
-        dataSet = Helios.InventoryReader.HydraDataSet();
+        dataSet = await Helios.InventoryReader.HydraDataSetAsync();
+
+        if (dataSet is null) return;
 
         var siteMoves =
             MoveGenerator.GenerateSiteMoves(dataSet, Sites.Where(s => s.TakeFrom).Select(s => s.Name),
@@ -271,10 +258,8 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
         Mouse.OverrideCursor = Cursors.Arrow;
     }
 
-    public void SaveGeneration()
+    public async Task SaveGeneration()
     {
-        if (Helios is null) return;
-
         var dir = Path.Combine(Helios.SolLocation, "Inventory", "Hydra");
         if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
@@ -290,39 +275,61 @@ public class RunVM : INotifyPropertyChanged, IDBInteraction, IDataSource, IItemF
 
         var filePath = dialog.FileName;
 
-        var chariot = new HydraChariot(filePath);
+        var chariot = await Task.Run(() => new HydraChariot(filePath));
 
-        chariot.SendData(dataSet, AllMoves.Select(vm => vm.Move));
+        await chariot.SendDataAsync(dataSet, AllMoves.Select(vm => vm.Move));
     }
 
-    public void ExportToLabels()
+    public async Task ExportToLabels()
     {
-        throw new NotImplementedException();
+        await Task.Run(() =>
+        {
+            // Convert to LabelVM
+            var labels = new List<ReceivingPutAwayLabelVM>();
+
+            foreach (var moveVM in CurrentMoves)
+            {
+                var move = moveVM.Move;
+                var labelCount = new List<int> { move.TakeCases + move.TakePacks + move.TakeEaches, 4 }.AsQueryable().Min();
+
+                for (var i = 0; i < labelCount; i++)
+                {
+                    var label = new ReceivingPutAwayLabel(move) { LabelTotal = labelCount, LabelNumber = i + 1 };
+                    var labelVM = new ReceivingPutAwayLabelVM(label);
+                    labels.Add(labelVM);
+                }
+            }
+
+            PrintUtility.PrintLabels(labels, null);
+        });
     }
 
-    public void ExportToExcel()
+    public async Task ExportToExcel()
     {
-        Output.DataTableToExcel(CurrentMoveDataTable(), DefaultExportString);
+        await Task.Run(() => Output.DataTableToExcel(CurrentMoveDataTable(), DefaultExportString));
     }
 
-    public void ExportToPDF()
+    public async Task ExportToPDF()
     {
-        Output.MovesToPDF(CurrentMoves
-            .Select(vm => vm.Move)
-            .GroupBy(m => m.TakeSite?.Name ?? "")
-            .ToDictionary(g => g.Key, g => g.OrderBy(move => move.TakeBin?.Code ?? "").ToList()), DefaultExportString);
+        await Task.Run(() =>
+        {
+            Output.MovesToPDF(CurrentMoves
+                    .Select(vm => vm.Move)
+                    .GroupBy(m => m.TakeSite?.Name ?? "")
+                    .ToDictionary(g => g.Key, g => g.OrderBy(move => move.TakeBin?.Code ?? "").ToList()),
+                DefaultExportString);
+        });
     }
 
-    public void ExportToCSV()
+    public async Task ExportToCSV()
     {
-        Output.DataTableToCSV(CurrentMoveDataTable(), DefaultExportString);
+        await Task.Run(() => Output.DataTableToCSV(CurrentMoveDataTable(), DefaultExportString));
     }
 
     private static string DefaultExportString => $"hydra_export_{DateTime.Now:yyyyMMddTHHmmss}";
 
     private DataTable CurrentMoveDataTable()
     {
-
         var dt = new DataTable();
 
         dt.Columns.Add(new DataColumn("Item Number"));

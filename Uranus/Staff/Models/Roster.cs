@@ -2,7 +2,6 @@
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Uranus.Staff.Models;
 
@@ -15,6 +14,10 @@ public enum ERosterType
     PublicHoliday
 }
 
+/// <summary>
+/// Instance of a single employee's roster for a single day.
+/// Should reference the Daily Roster object and the Employee Roster object. Will also reference the Department Roster.
+/// </summary>
 public class Roster : IEquatable<Roster>, IComparable<Roster>
 {
     [PrimaryKey] public Guid ID { get; set; }
@@ -40,10 +43,11 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
     public Department? Department { get; set; }
     [ManyToOne(nameof(DailyRosterID), nameof(Models.DailyRoster.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public DailyRoster? DailyRoster { get; set; }
-    [ManyToOne(nameof(EmployeeRosterID), nameof(Models.EmployeeRoster.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public EmployeeRoster? EmployeeRoster { get; set; }
     [ManyToOne(nameof(DepartmentRosterID), nameof(Models.DepartmentRoster.Rosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public DepartmentRoster? DepartmentRoster { get; set; }
+
+    [OneToOne(nameof(EmployeeRosterID), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    public EmployeeRoster? EmployeeRoster { get; set; }
 
     [Ignore] public List<Shift> Shifts => EmployeeRoster?.Shifts ?? new List<Shift>();
     [Ignore] public List<ShiftRule> ShiftRules { get; set; }
@@ -94,6 +98,26 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         Day = Date.DayOfWeek;
         AtWork = true;
         ShiftRules = new List<ShiftRule>();
+    }
+    
+    public Roster(DepartmentRoster departmentRoster, EmployeeRoster employeeRoster, DailyRoster dailyRoster)
+    {
+        ID = Guid.NewGuid();
+        DepartmentRosterID = departmentRoster.ID;
+        DepartmentRoster = departmentRoster;
+        Employee = employeeRoster.Employee;
+        EmployeeID = employeeRoster.EmployeeID;
+        EmployeeRoster = employeeRoster;
+        EmployeeRosterID = employeeRoster.ID;
+        DailyRoster = dailyRoster;
+        DailyRosterID = dailyRoster.ID;
+        Date = dailyRoster.Date;
+        Day = dailyRoster.Day;
+        Department = departmentRoster.Department;
+        DepartmentName = departmentRoster.DepartmentName;
+        ShiftID = string.Empty;
+        AtWork = Day != DayOfWeek.Saturday && Day != DayOfWeek.Sunday;
+        ShiftRules = Employee?.ShiftRules ?? new List<ShiftRule>();
     }
 
     public Roster(Department department, DepartmentRoster departmentRoster, EmployeeRoster employeeRoster, Employee employee, DateTime date)
@@ -146,6 +170,37 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         Day = Date.DayOfWeek;
     }
 
+    public string TimeString()
+    {
+        return $"{StartTime.Hours:00}:{StartTime.Minutes:00} - {EndTime.Hours:00}:{EndTime.Minutes:00}";
+    }
+
+    /// <summary>
+    /// Sets the roster type as public holiday without using the Type Setter - which would result in recursive prompting.
+    /// </summary>
+    public void SetPublicHoliday(bool isPublicHoliday = true)
+    {
+        RosterType = isPublicHoliday ? ERosterType.PublicHoliday : ERosterType.Standard;
+        if (isPublicHoliday)
+            AtWork = false;
+        else
+            AtWork = DailyRoster?.Day is not (DayOfWeek.Saturday or DayOfWeek.Sunday) || Shift is not null;
+    }
+
+    /// <summary>
+    /// Delete self from associated objects.
+    /// </summary>
+    public void Delete()
+    {
+        DailyRoster?.Rosters.Remove(this);
+        DepartmentRoster?.Rosters?.Remove(this);
+    }
+
+    public override string ToString()
+    {
+        return AtWork ? TimeString() : (RosterType == ERosterType.Standard ? ERosterType.RDO : RosterType).ToString();
+    }
+
     public bool Equals(Roster? other)
     {
         if (other is null) return false;
@@ -158,36 +213,69 @@ public class Roster : IEquatable<Roster>, IComparable<Roster>
         return other is null ? 1 : Date.CompareTo(other.Date);
     }
 
-    public string TimeString()
+    public override bool Equals(object? obj)
     {
-        return $"{StartTime.Hours:00}:{StartTime.Minutes:00} - {EndTime.Hours:00}:{EndTime.Minutes:00}";
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        return obj switch
+        {
+            null => false,
+            Roster roster => Equals(roster),
+            _ => false
+        };
     }
 
-    public override string ToString()
+    public override int GetHashCode()
     {
-        return AtWork ? TimeString() : (RosterType == ERosterType.Standard ? ERosterType.RDO : RosterType).ToString();
+        // ReSharper disable NonReadonlyMemberInGetHashCode
+        var hashCode = new HashCode();
+        hashCode.Add(EmployeeID);
+        hashCode.Add(ShiftID);
+        hashCode.Add(DepartmentName);
+        hashCode.Add(DepartmentRosterID);
+        hashCode.Add((int) Day);
+        hashCode.Add(Date);
+        hashCode.Add(StartTime);
+        hashCode.Add(EndTime);
+        hashCode.Add((int) RosterType);
+        hashCode.Add(AtWork);
+        hashCode.Add(Shift);
+        hashCode.Add(ShiftRules);
+        return hashCode.ToHashCode();
+        // ReSharper restore NonReadonlyMemberInGetHashCode
     }
 
-    public void ApplyShiftRules(List<ShiftRule> rules)
+
+    public static bool operator ==(Roster? left, Roster? right)
     {
-        ShiftRules.AddRange(rules.Where(rule => rule.AppliesToDay(Date)));
-        ShiftRules = ShiftRules.Distinct().ToList();
+        return left?.Equals(right) ?? right is null;
     }
 
-    public void SubCount(Shift shift) => DailyRoster?.SubCount(shift);
-
-    public void AddCount(Shift shift) => DailyRoster?.AddCount(shift);
-
-    /// <summary>
-    /// Sets the roster type as public holiday without using the Type Setter - which would result in recursive prompting.
-    /// </summary>
-    public void SetPublicHoliday(bool isPublicHoliday = true)
+    public static bool operator !=(Roster? left, Roster? right)
     {
-        RosterType = isPublicHoliday ? ERosterType.PublicHoliday : ERosterType.Standard;
-        //OnPropertyChanged(nameof(Type));
-        if (isPublicHoliday)
-            AtWork = false;
-        else
-            AtWork = DailyRoster?.Day is not (DayOfWeek.Saturday or DayOfWeek.Sunday) || Shift is not null;
+        return !(left == right);
+    }
+
+    public static bool operator <(Roster? left, Roster? right)
+    {
+        return left is null ? right is not null : left.CompareTo(right) < 0;
+    }
+
+    public static bool operator <=(Roster? left, Roster? right)
+    {
+        return left is null || left.CompareTo(right) <= 0;
+    }
+
+    public static bool operator >(Roster? left, Roster? right)
+    {
+        return left is not null && left.CompareTo(right) > 0;
+    }
+
+    public static bool operator >=(Roster? left, Roster? right)
+    {
+        return left is null ? right is null : left.CompareTo(right) >= 0;
     }
 }

@@ -1,5 +1,4 @@
-﻿using Aion.Properties;
-using Olympus.ViewModels.Commands;
+﻿using Olympus.ViewModels.Commands;
 using Styx;
 using System.ComponentModel;
 using System.Linq;
@@ -10,16 +9,7 @@ namespace Olympus.ViewModels;
 
 internal class ChangePasswordVM : INotifyPropertyChanged
 {
-    private Charon charon;
-    public Charon Charon
-    {
-        get => charon;
-        set
-        {
-            charon = value;
-            OnPropertyChanged(nameof(Charon));
-        }
-    }
+    public Charon Charon { get; set; }
 
     private string currentPassword;
     public string CurrentPassword
@@ -28,7 +18,7 @@ internal class ChangePasswordVM : INotifyPropertyChanged
         set
         {
             currentPassword = value;
-            OnPropertyChanged(nameof(CurrentPassword));
+            OnPropertyChanged();
         }
     }
 
@@ -39,7 +29,7 @@ internal class ChangePasswordVM : INotifyPropertyChanged
         set
         {
             newPassword = value;
-            OnPropertyChanged(nameof(NewPassword));
+            OnPropertyChanged();
         }
     }
 
@@ -50,21 +40,26 @@ internal class ChangePasswordVM : INotifyPropertyChanged
         set
         {
             confirmPassword = value;
-            OnPropertyChanged(nameof(ConfirmPassword));
+            OnPropertyChanged();
         }
     }
 
     public ConfirmPasswordChangeCommand ConfirmPasswordChangeCommand { get; set; }
 
-    public ChangePasswordVM()
+    public ChangePasswordVM(Charon charon)
     {
+        Charon = charon;
+
+        currentPassword = string.Empty;
+        newPassword = string.Empty;
+        confirmPassword = string.Empty;
+
         ConfirmPasswordChangeCommand = new ConfirmPasswordChangeCommand(this);
     }
 
     public bool CheckPassword()
     {
-        return NewPassword is not null && ConfirmPassword is not null &&
-               NewPassword == ConfirmPassword &&
+        return NewPassword == ConfirmPassword &&
                NewPassword.Length >= 6 &&
                !NewPassword.Any(char.IsWhiteSpace);
     }
@@ -84,10 +79,10 @@ internal class ChangePasswordVM : INotifyPropertyChanged
         return success;
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-    [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    [Cadmus.Annotations.NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

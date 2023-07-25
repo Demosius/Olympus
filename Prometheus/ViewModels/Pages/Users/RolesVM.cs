@@ -1,13 +1,12 @@
 ﻿using Prometheus.ViewModels.Commands.Users;
 using Styx;
-using Styx.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using Uranus;
 using Uranus.Annotations;
@@ -24,10 +23,10 @@ public enum ERoleSortMethod
     UserCount
 }
 
-internal class RolesVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IFilters
+public class RolesVM : INotifyPropertyChanged, IDBInteraction, IFilters, ISorting
 {
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     private List<Role> allRoles;
 
@@ -84,7 +83,6 @@ internal class RolesVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IF
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ApplyFiltersCommand ApplyFiltersCommand { get; set; }
     public ClearFiltersCommand ClearFiltersCommand { get; set; }
     public ApplySortingCommand ApplySortingCommand { get; set; }
@@ -93,14 +91,16 @@ internal class RolesVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IF
 
     #endregion
 
-    public RolesVM()
+    private RolesVM(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
+
         allRoles = new List<Role>();
         roles = new ObservableCollection<Role>();
         filterString = string.Empty;
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
         ClearFiltersCommand = new ClearFiltersCommand(this);
         ApplySortingCommand = new ApplySortingCommand(this);
@@ -108,20 +108,27 @@ internal class RolesVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IF
         SaveRolesCommand = new SaveRolesCommand(this);
     }
 
-    public void SetDataSources(Helios helios, Charon charon)
+    private async Task<RolesVM> InitializeAsync()
     {
-        Helios = helios;
-        Charon = charon;
-
-        RefreshData();
+        await RefreshDataAsync();
+        return this;
     }
 
-    public void RefreshData()
+    public static Task<RolesVM> CreateAsync(Helios helios, Charon charon)
     {
-        if (Helios is null || Charon is null) return;
+        var ret = new RolesVM(helios, charon);
+        return ret.InitializeAsync();
+    }
 
-        var roleDict = Helios.UserReader.Roles().ToDictionary(role => role.Name, role => role);
-        var users = Helios.UserReader.Users().ToList();
+    public async Task RefreshDataAsync()
+    {
+        var roleTask = Helios.UserReader.RolesAsync();
+        var userTask = Helios.UserReader.UsersAsync();
+
+        await Task.WhenAll(roleTask, userTask);
+
+        var roleDict = (await roleTask).ToDictionary(role => role.Name, role => role);
+        var users = (await userTask).ToList();
 
         foreach (var user in users)
         {
@@ -134,12 +141,6 @@ internal class RolesVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IF
 
         ApplyFilters();
     }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
-
 
     public void ClearFilters()
     {
@@ -186,26 +187,26 @@ internal class RolesVM : INotifyPropertyChanged, IDataSource, IDBInteraction, IF
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public void SaveRoles()
+    public async Task SaveRoles()
     {
-        if (Charon?.User?.Role is null || Helios is null || !Charon.CanEditUserRole()) return;
+        if (Charon.User?.Role is null || !Charon.CanEditUserRole()) return;
 
         // Check each role to see if the current user has permission to edit them - or that they have no assigned users.
         var savable = Roles.Where(role => role.Users.Count == 0 || Charon.User.Role.IsMasterTo(role)).ToList();
 
-        Helios.UserUpdater.Roles(savable);
+        await Helios.UserUpdater.RolesAsync(savable);
 
-        RefreshData();
+        await RefreshDataAsync();
 
         MessageBox.Show("Save Successful.\n\n(Some data may revert based on your permissions and current users.)", "Data Saved", MessageBoxButton.OK);
     }
 
-    public void DeleteRole()
+    public async Task DeleteRole()
     {
-        if (Helios is null || SelectedRole is null || SelectedRole.Users.Count > 0 || !(Charon?.CanDeleteUserRole() ?? false)) return;
+        if (SelectedRole is null || SelectedRole.Users.Count > 0 || !Charon.CanDeleteUserRole()) return;
 
         // Remove from database.
-        if (!Helios.UserDeleter.Role(SelectedRole))
+        if (!await Helios.UserDeleter.RoleAsync(SelectedRole))
         {
             MessageBox.Show(
                 "Failed to delete user role.\n" +

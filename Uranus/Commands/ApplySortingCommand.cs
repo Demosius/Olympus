@@ -6,12 +6,9 @@ namespace Uranus.Commands;
 
 public class ApplySortingCommand : ICommand
 {
-    public IFilters VM { get; set; }
+    public ISorting VM { get; set; }
 
-    public ApplySortingCommand(IFilters vm)
-    {
-        VM = vm;
-    }
+    public ApplySortingCommand(ISorting vm) { VM = vm; }
 
 #pragma warning disable 67
     public event EventHandler? CanExecuteChanged;

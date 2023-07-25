@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Threading.Tasks;
 using Uranus.Users.Models;
 
 namespace Uranus.Users;
@@ -15,7 +15,7 @@ public class UserDeleter
     // Users
     public bool User(User user)
     {
-        return Chariot.Delete(user) && Chariot.DeleteByKey<Login>(user.ID);
+        return Chariot.Delete(user) > 0 && Chariot.DeleteByKey<Login>(user.ID);
     }
 
     public bool User(int id)
@@ -26,7 +26,7 @@ public class UserDeleter
     // Logins
     public bool Login(Login login)
     {
-        return Chariot.Delete(login) && Chariot.DeleteByKey<User>(login.UserID);
+        return Chariot.Delete(login) > 0 && Chariot.DeleteByKey<User>(login.UserID);
     }
     public bool Login(int userID)
     {
@@ -34,21 +34,21 @@ public class UserDeleter
     }
 
     // Roles
-    public bool Role(Role role)
+    public async Task<bool> RoleAsync(Role role) => await RoleAsync(role.Name).ConfigureAwait(false);
+
+    public async Task<bool> RoleAsync(string roleName)
     {
-        // Can't delete roles that have users attached.
-        var users = Chariot.PullObjectList<User>(pullType: EPullType.ObjectOnly).Where(u => u.RoleName == role.Name).ToList();
-        return users.Count <= 0 && Chariot.Delete(role);
+        var result = false;
+        void Action()
+        {
+            // Can't delete roles that have users attached.
+            var userCount =
+                Chariot.ExecuteScalar<int>("SELECT COUNT(*) FROM Employee WHERE RoleName = ?;", roleName);
+            result = userCount <= 0 && Chariot.DeleteByKey<Role>(roleName);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return result;
     }
-
-    public bool Role(string roleName)
-    {
-        // Can't delete roles that have users attached.
-        var users = Chariot.PullObjectList<User>(pullType: EPullType.ObjectOnly).Where(u => u.RoleName == roleName).ToList();
-        return users.Count <= 0 && Chariot.DeleteByKey<Role>(roleName);
-    }
-
-
-
-
 }

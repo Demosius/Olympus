@@ -1,15 +1,12 @@
-﻿using System.Windows;
+﻿namespace Sphynx.Views;
 
-namespace Sphynx.Views
+/// <summary>
+/// Interaction logic for SphynxWindow.xaml
+/// </summary>
+public partial class SphynxWindow
 {
-    /// <summary>
-    /// Interaction logic for SphynxWindow.xaml
-    /// </summary>
-    public partial class SphynxWindow : Window
+    public SphynxWindow()
     {
-        public SphynxWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

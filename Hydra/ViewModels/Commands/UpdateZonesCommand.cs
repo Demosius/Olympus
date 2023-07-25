@@ -15,9 +15,9 @@ public class UpdateZonesCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.UpdateZones();
+        await VM.UpdateZones();
     }
 
     public event EventHandler? CanExecuteChanged

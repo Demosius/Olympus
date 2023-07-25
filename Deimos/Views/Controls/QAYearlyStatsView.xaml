@@ -1,0 +1,164 @@
+﻿<UserControl x:Class="Deimos.Views.Controls.QAYearlyStatsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Deimos.ViewModels.Controls"
+             xmlns:converters="clr-namespace:Deimos.ViewModels.Converters"
+             xmlns:controls="clr-namespace:Deimos.Views.Controls"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:QAYearlyStatsVM}, IsDesignTimeCreatable=False}">
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </UserControl.InputBindings>
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/DullOrange/MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Margin" Value="5,0"/>
+            </Style>
+            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockStyle}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+            </Style>
+            <converters:DateToFiscalYearConverter x:Key="DateToFiscalYearConverter"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <Border DockPanel.Dock="Top" 
+                BorderThickness="1"
+                BorderBrush="{StaticResource Brush01}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Content="Yearly Reports"
+                       FontSize="16"/>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Margin="3"
+                            Command="{Binding ExportToCSVCommand}"
+                            Padding="5,3"
+                            MinHeight="0">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../../Resources/img/csv.png" 
+                                   Width="12" Height="12"
+                                   Margin="2,0,5,0"/>
+                            <TextBlock Text="Export CSV"
+                                       FontSize="12"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Margin="3"
+                            Command="{Binding ExportToExcelCommand}"
+                            Padding="5,3"
+                            MinHeight="0">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="../../Resources/img/document-excel-table.png" 
+                                   Width="12" Height="12"
+                                   Margin="2,0,5,0"/>
+                            <TextBlock Text="Export to Excel"
+                                   FontSize="12"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0"
+                        BorderBrush="{StaticResource Brush01}"
+                        BorderThickness="1,1,.5,1">
+                    <DockPanel Margin="5">
+                        <ComboBox DockPanel.Dock="Top"
+                          ItemsSource="{Binding Years}"
+                          SelectedItem="{Binding FirstYear}"
+                          HorizontalContentAlignment="Center">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource DateToFiscalYearConverter}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <Button DockPanel.Dock="Bottom"
+                        Margin="5"
+                        Command="{Binding RecalculateCommand}"
+                        CommandParameter="1">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../../Resources/img/refresh.png" 
+                               Margin="5"
+                               Height="15" Width="15"/>
+                                <TextBlock Text="Recalculate"/>
+                            </StackPanel>
+                        </Button>
+
+                        <controls:QAStatsView DataContext="{Binding Year1Stats}"/>
+
+                    </DockPanel>
+                </Border>
+
+                <Border Grid.Column="1"
+                        BorderBrush="{StaticResource Brush01}"
+                        BorderThickness=".5,1">
+                    <DockPanel Margin="5">
+                        <ComboBox DockPanel.Dock="Top"
+                          ItemsSource="{Binding Years}"
+                          SelectedItem="{Binding SecondYear}"
+                          HorizontalContentAlignment="Center">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource DateToFiscalYearConverter}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <Button DockPanel.Dock="Bottom"
+                        Margin="5"
+                        Command="{Binding RecalculateCommand}"
+                        CommandParameter="2">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="../../Resources/img/refresh.png" 
+                               Margin="5"
+                               Height="15" Width="15"/>
+                                <TextBlock Text="Recalculate"/>
+                            </StackPanel>
+                        </Button>
+
+                        <controls:QAStatsView DataContext="{Binding Year2Stats}"/>
+
+                    </DockPanel>
+                </Border>
+
+                <Border Grid.Column="2"
+                        BorderBrush="{StaticResource Brush01}"
+                        BorderThickness=".5,1,1,1">
+                    <DockPanel Margin="5">
+                        <Label DockPanel.Dock="Top"
+                       Content="DIFFERENCE"/>
+                        <controls:QAStatsView DataContext="{Binding StatDiff}"/>
+
+                    </DockPanel>
+                </Border>
+
+            </Grid>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

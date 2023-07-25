@@ -2,15 +2,11 @@
 using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using Uranus.Annotations;
 
 namespace Uranus.Staff.Models;
 
-public class Shift : INotifyPropertyChanged, IEquatable<Shift>, IComparable<Shift>
+public class Shift : IEquatable<Shift>, IComparable<Shift>
 {
     [PrimaryKey] public string ID { get; set; } // {DepartmentName}|{Name}
     public string Name { get; set; }
@@ -18,20 +14,8 @@ public class Shift : INotifyPropertyChanged, IEquatable<Shift>, IComparable<Shif
     public TimeSpan StartTime { get; set; }
     public TimeSpan EndTime { get; set; }
     public int DailyTarget { get; set; }
-
-    private bool def;
-    public bool Default
-    {
-        get => def;
-        set
-        {
-            def = value;
-            OnPropertyChanged(nameof(Default));
-            if (!def || Department?.Shifts is null) return;
-            foreach (var shift in Department.Shifts.Where(shift => shift.Name != Name))
-                shift.Default = false;
-        }
-    }
+    
+    public bool Default { get; set; }
 
     [ManyToOne(nameof(DepartmentName), nameof(Models.Department.Shifts), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public Department? Department { get; set; }
@@ -50,38 +34,6 @@ public class Shift : INotifyPropertyChanged, IEquatable<Shift>, IComparable<Shif
     [OneToMany(nameof(ShiftRuleRoster.ShiftID), nameof(ShiftRuleRoster.Shift), CascadeOperations = CascadeOperation.None)]
     public List<ShiftRuleRoster> RosterRules { get; set; }
 
-    #region Notifiable Properties
-
-    [Ignore] public ObservableCollection<Break> BreaksObservable { get; set; }
-
-    #endregion
-
-    private string? startString;
-    [Ignore]
-    public string StartString
-    {
-        get => startString ??= StartTime.ToString();
-        set
-        {
-            startString = value;
-            if (TimeSpan.TryParse(value, out var newSpan))
-                StartTime = newSpan;
-        }
-    }
-
-    private string? endString;
-    [Ignore]
-    public string EndString
-    {
-        get => endString ??= EndTime.ToString();
-        set
-        {
-            endString = value;
-            if (TimeSpan.TryParse(value, out var newSpan))
-                EndTime = newSpan;
-        }
-    }
-
     public Shift()
     {
         Name = string.Empty;
@@ -90,7 +42,6 @@ public class Shift : INotifyPropertyChanged, IEquatable<Shift>, IComparable<Shif
         Rosters = new List<Roster>();
         EmployeeRosters = new List<EmployeeRoster>();
         Breaks = new List<Break>();
-        BreaksObservable = new ObservableCollection<Break>(Breaks);
         DefaultEmployees = new List<Employee>();
         RosterRules = new List<ShiftRuleRoster>();
         ID = string.Empty;
@@ -115,7 +66,6 @@ public class Shift : INotifyPropertyChanged, IEquatable<Shift>, IComparable<Shif
         {
             new (this)
         };
-        BreaksObservable = new ObservableCollection<Break>(Breaks);
         DefaultEmployees = new List<Employee>();
     }
 
@@ -130,7 +80,6 @@ public class Shift : INotifyPropertyChanged, IEquatable<Shift>, IComparable<Shif
         Rosters = rosters;
         EmployeeRosters = new List<EmployeeRoster>();
         Breaks = breaks;
-        BreaksObservable = new ObservableCollection<Break>(Breaks);
         DefaultEmployees = new List<Employee>();
         RosterRules = new List<ShiftRuleRoster>();
         ID = $"{DepartmentName}|{Name}";
@@ -140,45 +89,6 @@ public class Shift : INotifyPropertyChanged, IEquatable<Shift>, IComparable<Shif
     {
         Breaks = newBreaks.ToList();
         Breaks.Sort();
-        BreaksObservable = new ObservableCollection<Break>(Breaks);
-    }
-
-    public void AddBreaks(IEnumerable<Break> newBreaks)
-    {
-        foreach (var newBreak in newBreaks)
-        {
-            Breaks.Add(newBreak);
-            BreaksObservable.Add(newBreak);
-        }
-    }
-
-    public void AddBreak(Break newBreak)
-    {
-        Breaks.Add(newBreak);
-        Breaks.Sort();
-        BreaksObservable = new ObservableCollection<Break>(Breaks);
-        OnPropertyChanged(nameof(BreaksObservable));
-    }
-
-    public void RemoveBreak(Break deletedBreak)
-    {
-        Breaks.Remove(deletedBreak);
-        BreaksObservable.Remove(deletedBreak);
-    }
-
-    public void SortBreaks()
-    {
-        Breaks.Sort();
-        BreaksObservable = new ObservableCollection<Break>(Breaks);
-        OnPropertyChanged(nameof(BreaksObservable));
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     public bool Equals(Shift? other)

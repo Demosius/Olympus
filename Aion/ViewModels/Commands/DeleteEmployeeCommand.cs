@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Windows;
 using System.Windows.Input;
 
 namespace Aion.ViewModels.Commands;
+
 
 public class DeleteEmployeeCommand : ICommand
 {
@@ -10,19 +10,19 @@ public class DeleteEmployeeCommand : ICommand
 
     public DeleteEmployeeCommand(EmployeePageVM vm) { VM = vm; }
 
-    public event EventHandler CanExecuteChanged
+    public bool CanExecute(object? parameter)
+    {
+        return true;
+    }
+
+    public void Execute(object? parameter)
+    {
+        EmployeePageVM.DeleteEmployee();
+    }
+
+    public event EventHandler? CanExecuteChanged
     {
         add => CommandManager.RequerySuggested += value;
         remove => CommandManager.RequerySuggested -= value;
-    }
-
-    public bool CanExecute(object parameter)
-    {
-        return VM.SelectedEmployee != null;
-    }
-
-    public void Execute(object parameter)
-    {
-        MessageBox.Show("Employee deletion not currently implemented.", "Not Implemented", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 }

@@ -1,6 +1,5 @@
 ﻿using SQLite;
 using SQLiteNetExtensions.Attributes;
-using System;
 using System.Collections.Generic;
 
 namespace Uranus.Inventory.Models;
@@ -16,14 +15,30 @@ public class NAVPlatform
 
     public NAVPlatform()
     {
-        Description = String.Empty;
+        Description = string.Empty;
         Items = new List<NAVItem>();
     }
 
-    public NAVPlatform(int code, string description, List<NAVItem> items)
+    public NAVPlatform(int code, string description)
     {
         Code = code;
         Description = description;
+        Items = new List<NAVItem>();
+    }
+
+    public NAVPlatform(int code, string description, List<NAVItem> items) : this(code, description)
+    {
         Items = items;
+    }
+
+    public void AddItem(NAVItem item)
+    {
+        item.Platform = this;
+        Items.Add(item);
+    }
+
+    public override string ToString()
+    {
+        return $"{Code} - {Description}";
     }
 }

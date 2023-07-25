@@ -15,6 +15,8 @@ public class Options
         var data = File.ReadAllText(jsonFile);
         var o = JsonSerializer.Deserialize<Opt>(data);
 
+        DBLocation = string.Empty;
+
         // Set properties.
         if (o != null) DBLocation = o.DBLocation;
     }
@@ -22,7 +24,7 @@ public class Options
     public static string GetDBLocation()
     {
         var data = File.ReadAllText(jsonFile);
-        return JsonSerializer.Deserialize<Options>(data)?.DBLocation;
+        return JsonSerializer.Deserialize<Options>(data)?.DBLocation ?? string.Empty;
     }
 
     public void LoadOptions()
@@ -48,4 +50,9 @@ public class Options
 public class Opt
 {
     public string DBLocation { get; set; }
+
+    public Opt()
+    {
+        DBLocation = string.Empty;
+    }
 }

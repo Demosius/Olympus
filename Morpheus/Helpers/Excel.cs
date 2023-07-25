@@ -10,8 +10,6 @@ namespace Morpheus.Helpers;
 
 public static class Excel
 {
-
-
     // Given text and a SharedStringTablePart, creates a SharedStringItem with the specified text 
     // and inserts it into the SharedStringTablePart. If the item already exists, returns its index.
     private static int InsertSharedStringItem(string text, SharedStringTablePart shareStringPart)

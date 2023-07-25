@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="Cadmus.Views.Controls.MCStockView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Cadmus.ViewModels.Controls"
+             xmlns:controls="clr-namespace:Cadmus.Views.Controls"
+             xmlns:converters="clr-namespace:Cadmus.ViewModels.Converters"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:MCStockVM}, IsDesignTimeCreatable=False}"
+             d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <converters:UnevenLevelForegroundConverter x:Key="BoolToForegroundConverter"/>
+    </UserControl.Resources>
+
+    <Border DockPanel.Dock="Top"
+            BorderThickness="1"
+            BorderBrush="Black"
+            CornerRadius="15"
+            Background="{StaticResource Brush05}" 
+            Margin="0"
+            Padding="10,0">
+        <Grid Height="25">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="45"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0" Content="{Binding Sku}"
+                   VerticalAlignment="Center"
+                   FontSize="10"
+                   FontWeight="Bold"/>
+            <Label Grid.Column="1" Content="{Binding ItemName}"
+                   FontSize="10"
+                   VerticalAlignment="Center"/>
+            <Label Grid.Column="2" Content="Qty:"
+                   FontSize="10"
+                   VerticalAlignment="Center"/>
+            <Label Grid.Column="3" Content="{Binding LocationQty}"
+                   Foreground="{Binding UnevenLevel, Converter={StaticResource BoolToForegroundConverter}}"
+                   FontSize="10"
+                   VerticalAlignment="Center"/>
+            <Label Grid.Column="5" Content="QtyPerCtn:"
+                   FontSize="10"
+                   VerticalAlignment="Center"/>
+            <Label Grid.Column="6" Content="{Binding QtyPerCarton}"
+                   FontSize="10"
+                   VerticalAlignment="Center"/>
+            <TextBox Grid.Column="7"
+                     MinWidth="120"
+                     Margin="25,2"
+                     VerticalContentAlignment="Center"
+                     VerticalAlignment="Center"
+                     FontSize="11"
+                     Text="{Binding Note, Mode=TwoWay}"/>
+        </Grid>
+    </Border>
+</UserControl>

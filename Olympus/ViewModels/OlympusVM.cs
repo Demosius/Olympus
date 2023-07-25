@@ -1,4 +1,5 @@
-﻿using Olympus.Properties;
+﻿using Cadmus.Annotations;
+using Olympus.Properties;
 using Olympus.ViewModels.Commands;
 using Olympus.ViewModels.Components;
 using Olympus.ViewModels.Utility;
@@ -8,9 +9,12 @@ using SQLite;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Morpheus.ViewModels.Controls;
 using Uranus.Interfaces;
 using Uranus.Inventory.Models;
 using Uranus.Staff;
@@ -22,8 +26,8 @@ public class OlympusVM : INotifyPropertyChanged
 {
     public Dictionary<EProject, IProject> RunningProjects { get; set; }
 
-    private IProject currentProject;
-    public IProject CurrentProject
+    private IProject? currentProject;
+    public IProject? CurrentProject
     {
         get => currentProject;
         set
@@ -36,15 +40,16 @@ public class OlympusVM : INotifyPropertyChanged
     /* Sub ViewModels - Components */
     public DBManager DBManager { get; set; }
     public InventoryUpdaterVM InventoryUpdaterVM { get; set; }
-    public ProjectLauncherVM ProjectLauncherVM { get; set; }
+    public ProjectLauncherVM ProjectLauncherVM { get; set; } = null!;
     public UserHandlerVM UserHandlerVM { get; set; }
+    public ProgressBarVM ProgressBarVM { get; set; }
 
     /* Commands */
     public GenerateMasterSkuListCommand GenerateMasterSkuListCommand { get; set; }
     public ChangePasswordCommand ChangePasswordCommand { get; set; }
 
     /* Constructor(s) */
-    public OlympusVM()
+    private OlympusVM()
     {
         RunningProjects = new Dictionary<EProject, IProject>();
 
@@ -52,29 +57,32 @@ public class OlympusVM : INotifyPropertyChanged
 
         DBManager = new DBManager(this);
         UserHandlerVM = new UserHandlerVM(this);
-        ProjectLauncherVM = new ProjectLauncherVM(this);
         InventoryUpdaterVM = new InventoryUpdaterVM(this);
+        ProgressBarVM = App.ProgressBar;
 
         GenerateMasterSkuListCommand = new GenerateMasterSkuListCommand(this);
         ChangePasswordCommand = new ChangePasswordCommand(this);
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void OnPropertyChanged(string propertyName)
+    private async Task<OlympusVM> InitializeAsync()
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        ProjectLauncherVM = await ProjectLauncherVM.CreateAsync(this);
+        return this;
     }
 
-    internal void RefreshData()
+    public static Task<OlympusVM> CreateAsync()
     {
-        foreach (var project in RunningProjects)
-        {
-            project.Value.RefreshData();
-        }
+        var ret = new OlympusVM();
+        return ret.InitializeAsync();
     }
 
-    internal void ResetDB()
+    internal async Task RefreshData()
+    {
+        var tasks = RunningProjects.Select(project => project.Value.RefreshDataAsync()).ToList();
+        await Task.WhenAll(tasks);
+    }
+
+    internal async Task ResetDB()
     {
         App.Helios.ResetChariots(Settings.Default.SolLocation);
         App.Charon.DatabaseReset(Settings.Default.SolLocation);
@@ -82,7 +90,7 @@ public class OlympusVM : INotifyPropertyChanged
         EstablishInitialProjectIcons();
 
         UserHandlerVM.CheckUser();
-        ProjectLauncherVM = new ProjectLauncherVM(this);
+        ProjectLauncherVM = await ProjectLauncherVM.CreateAsync(this);
         InventoryUpdaterVM = new InventoryUpdaterVM(this);
 
         OnPropertyChanged(nameof(ProjectLauncherVM));
@@ -98,9 +106,10 @@ public class OlympusVM : INotifyPropertyChanged
         if (!RunningProjects.TryGetValue(project, out var loadedProject))
         {
             loadedProject = ProjectFactory.GetProject(project);
-            RunningProjects.Add(project, loadedProject);
+            if (loadedProject is not null)
+                RunningProjects.Add(project, loadedProject);
         }
-        SetPage(loadedProject);
+        if (loadedProject is not null) SetPage(loadedProject);
     }
 
     private void SetPage(IProject project)
@@ -144,17 +153,16 @@ public class OlympusVM : INotifyPropertyChanged
             new Project(EProject.Panacea, "Panacea.ico", App.Helios.StaffReader, "ALLFIX: Multiple tools to remedy many given issues."),
             new Project(EProject.Quest, "quest.ico", App.Helios.StaffReader, "Manage Restock Staff assignment and tracking. (ZLAM & PickRate Tracker)"),
             new Project(EProject.Deimos, "deimos.ico", App.Helios.StaffReader, "PickRate tracking and error allocation. (Dredd)"),
-            new Project(EProject.Hermes, "Hermes.ico", App.Helios.StaffReader, "Auto-Counter (Empty Bins)"),
         };
 
         App.Helios.StaffCreator.EstablishInitialProjects(projects);
 
     }
 
-    public static void GenerateMasterSkuList()
+    public static async Task GenerateMasterSkuList()
     {
-        var masters = App.Helios.InventoryReader.GetMasters();
-
+        var masters = (await App.Helios.InventoryReader.GetMastersAsync()).ToList();
+        
         // Make sure the target destination exists.
         var dirPath = Path.Combine(App.BaseDirectory(), "SKUMasterExports");
 
@@ -166,7 +174,7 @@ public class OlympusVM : INotifyPropertyChanged
         //var sqlTask = Task.Run(() => ExportMasterSkuIntoSqLite(masters, dirPath));
         Task.WaitAll(csvTask, jsonTask, xmlTask);//, sqlTask);
 
-        _ = MessageBox.Show("Files exported.");
+        MessageBox.Show($"Files exported to {dirPath}.");
     }
 
     public static void ExportMasterSkuAsCSV(IEnumerable<SkuMaster> masters, string dirPath)
@@ -197,5 +205,13 @@ public class OlympusVM : INotifyPropertyChanged
         var xml = XmlSerializer.SerializeToString(masters);
         var filePath = Path.Combine(dirPath, "SKUMasterExport.xml");
         File.WriteAllText(filePath, xml);
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

@@ -1,4 +1,7 @@
-﻿using Styx;
+﻿using System;
+using System.Windows;
+using Prometheus.ViewModels.Pages.Users;
+using Styx;
 using Uranus;
 
 namespace Prometheus.Views.Pages.Users;
@@ -8,9 +11,20 @@ namespace Prometheus.Views.Pages.Users;
 /// </summary>
 public partial class UserViewPage
 {
+    public UserViewVM? VM { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
+
     public UserViewPage(Helios helios, Charon charon)
     {
+        Helios = helios;
+        Charon = charon;
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+    }
+
+    private async void UserViewPage_OnInitialized(object? sender, EventArgs e)
+    {
+        VM = await UserViewVM.CreateAsync(Helios, Charon);
+        DataContext = VM;
     }
 }

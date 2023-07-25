@@ -5,15 +5,12 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:viewModels="clr-namespace:Prometheus.ViewModels"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type viewModels:PrometheusVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="PrometheusPage">
 
-    <Page.DataContext>
-        <viewModels:PrometheusVM x:Name="VM"/>
-    </Page.DataContext>
-
     <Page.Resources>
-        <ResourceDictionary Source="../Themes/MSControls.Core.Implicit.xaml"/>
+        <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Orange/MSControls.Core.Implicit.xaml" />
     </Page.Resources>
 
     <DockPanel>
@@ -28,7 +25,7 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Frame Background="{StaticResource Brush03}"
+        <Frame Background="{StaticResource Brush05}"
                Content="{Binding CurrentPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"              
                Height="Auto" 
                HorizontalAlignment="Stretch" 

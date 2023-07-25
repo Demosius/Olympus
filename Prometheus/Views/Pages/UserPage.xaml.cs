@@ -1,4 +1,5 @@
 ﻿using Prometheus.ViewModels.Helpers;
+using Prometheus.ViewModels.Pages;
 using Styx;
 using System.Windows.Navigation;
 using Uranus;
@@ -13,7 +14,7 @@ public partial class UserPage
     public UserPage(Helios helios, Charon charon)
     {
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+        DataContext = new UserPageVM(helios, charon);
     }
 
     public override EDataCategory DataCategory => EDataCategory.Users;

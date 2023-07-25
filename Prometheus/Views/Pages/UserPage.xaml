@@ -5,16 +5,13 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:views="clr-namespace:Prometheus.Views"
       xmlns:pages="clr-namespace:Prometheus.ViewModels.Pages"
+      d:DataContext="{d:DesignInstance pages:UserPageVM, IsDesignTimeCreatable=False}"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="UserPage">
 
-    <Page.DataContext>
-        <pages:UserVM x:Name="VM"/>
-    </Page.DataContext>
-
     <Page.Resources>
-        <ResourceDictionary Source="../../Themes/MSControls.Core.Implicit.xaml"/>
+        <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Orange/MSControls.Core.Implicit.xaml" />
     </Page.Resources>
 
     <DockPanel>
@@ -22,7 +19,7 @@
                   Width="Auto"
                   MinWidth="100"
                   ItemsSource="{Binding Pages}"
-                  SelectedValue="{Binding SelectedPage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                  SelectedValue="{Binding SelectedPage}">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding}" FontSize="14" HorizontalAlignment="Center"/>

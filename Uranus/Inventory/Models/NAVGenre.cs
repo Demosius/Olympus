@@ -25,4 +25,15 @@ public class NAVGenre
         Description = description;
         Items = items;
     }
+
+    public void AddItem(NAVItem item)
+    {
+        item.Genre = this;
+        Items.Add(item);
+    }
+
+    public override string ToString()
+    {
+        return $"{Code} - {Description}";
+    }
 }

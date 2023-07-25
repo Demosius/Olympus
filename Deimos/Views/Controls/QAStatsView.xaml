@@ -1,0 +1,880 @@
+﻿<UserControl x:Class="Deimos.Views.Controls.QAStatsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:interfaces="clr-namespace:Deimos.Interfaces"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type interfaces:IQAStatsVM}, IsDesignTimeCreatable=False}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/DullOrange/MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Margin" Value="5,0"/>
+            </Style>
+            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource TextBlockStyle}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="2,0"/>
+                <Setter Property="FontSize" Value="12"></Setter>
+            </Style>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <DockPanel Background="{StaticResource ButtonBackgroundBrush}">
+        <Grid DockPanel.Dock="Top" Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0"
+                   Content="{Binding Description}"/>
+            <StackPanel Grid.Column="1"
+                        Orientation="Vertical">
+                <Label Content="Avg. QA Staff/Day"
+                       FontSize="10"/>
+                <TextBlock Text="{Binding AverageStaff, StringFormat='#0.##'}"
+                           Margin="5"
+                           VerticalAlignment="Center"
+                           FontSize="18"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2"
+                        Orientation="Vertical">
+                <Label Content="Target Accuracy"
+                       FontSize="10"/>
+                <TextBox Text="{Binding TargetAccuracyString}"
+                         Margin="5"
+                         HorizontalContentAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+        <StackPanel DockPanel.Dock="Bottom" 
+                    Orientation="Vertical"
+                    Visibility="{Binding Actual, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Label Content="Development Opportunities:"
+                   HorizontalAlignment="Left"
+                   FontWeight="Normal"/>
+            <TextBox Margin="5"   
+                     Text="{Binding DevelopmentOpportunity}"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     AcceptsTab="True"
+                     MaxWidth="500"/>
+            <Label Content="Notes:"
+                   HorizontalAlignment="Left"
+                   FontWeight="Normal"/>
+            <TextBox Margin="5"
+                     Text="{Binding Notes}"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     AcceptsTab="True"
+                     MaxWidth="500"/>
+
+        </StackPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition MinWidth="40" Width="Auto"/>
+                <ColumnDefinition MinWidth="40" Width="Auto"/>
+                <ColumnDefinition MinWidth="40" Width="Auto"/>
+                <ColumnDefinition MinWidth="40" Width="Auto"/>
+                <ColumnDefinition MinWidth="40" Width="Auto"/>
+                <ColumnDefinition MinWidth="40" Width="Auto"/>
+                <ColumnDefinition MinWidth="40" Width="Auto"/>
+                <ColumnDefinition MinWidth="40" Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Headers -->
+            <Label Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2"
+               Content="Units"/>
+            <Label Grid.Column="3" Grid.Row="0" Grid.ColumnSpan="2"
+               Content="Qty"/>
+            <Label Grid.Column="5" Grid.Row="0" Grid.ColumnSpan="2"
+               Content="Lines/Hits"/>
+            <Label Grid.Column="7" Grid.Row="0" Grid.ColumnSpan="2"
+               Content="Cartons"/>
+
+            <!-- Restock -->
+            <Label Grid.Column="0" Grid.Row="1" 
+               Content="Restock"/>
+            <Border Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+
+            </Border>
+            <Border Grid.Column="3" Grid.Row="1" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding RestockQty}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="1" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding RestockHits}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="1" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding RestockCartons}"/>
+            </Border>
+
+            <!-- QA -->
+            <Label Grid.Column="0" Grid.Row="2" 
+               Content="QA"/>
+            <Border Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding QAUnits}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="2" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding QAQty}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="2" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding QALines}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="2" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding QACartons}"/>
+            </Border>
+
+            <!-- QA % -->
+            <Label Grid.Column="0" Grid.Row="3" 
+               Content="QA %"/>
+            <Border Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+
+            </Border>
+            <Border Grid.Column="3" Grid.Row="3" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PctQtyQA, StringFormat='#0.00%'}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="3" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PctLinesQA, StringFormat='#0.00%'}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="3" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PctCartonsQA, StringFormat='#0.00%'}"/>
+            </Border>
+
+            <!-- Errors -->
+            <Label Grid.Column="0" Grid.Row="4" 
+               Content="Errors"/>
+            <Border Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="4" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ErrorQty}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="4" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ErrorLines}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="4" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ErrorCartons}"/>
+            </Border>
+
+            <!-- Overall Accuracy % -->
+            <Label Grid.Column="0" Grid.Row="5" 
+               Content="Overall Accuracy %"/>
+            <Border Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding OverallUnitAccuracy, StringFormat='#0.##%'}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="5" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding OverallQtyAccuracy, StringFormat='#0.##%'}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="5" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding OverallLineAccuracy, StringFormat='#0.##%'}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="5" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding OverallCartonAccuracy, StringFormat='#0.##%'}"/>
+            </Border>
+
+            <!-- External Errors -->
+            <Label Grid.Column="0" Grid.Row="6" 
+               Content="External Errors"/>
+            <Border Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ExternalErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="6" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ExternalErrorQty}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="6" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ExternalErrorLines}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="6" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ExternalErrorCartons}"/>
+            </Border>
+
+            <!-- Warehouse Errors -->
+            <Label Grid.Column="0" Grid.Row="7" 
+               Content="Warehouse Errors"/>
+            <Border Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding WHErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="7" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding WHErrorQty}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="7" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding WHErrorLines}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="7" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding WHErrorCartons}"/>
+            </Border>
+
+            <!-- Warehouse Accuracy % -->
+            <Label Grid.Column="0" Grid.Row="8" 
+               Content="Warehouse Accuracy %"/>
+            <Border Grid.Column="1" Grid.Row="8" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding WHUnitAccuracy, StringFormat='#0.##%'}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="8" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding WHQtyAccuracy, StringFormat='#0.##%'}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="8" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding WHLineAccuracy, StringFormat='#0.##%'}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="8" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding WHCartonAccuracy, StringFormat='#0.##%'}"/>
+            </Border>
+
+            <!-- Picker Errors -->
+            <Label Grid.Column="0" Grid.Row="9" 
+               Content="Picker Errors"/>
+            <Border Grid.Column="1" Grid.Row="9" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PickerErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="9" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PickerErrorQty}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="9" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PickerErrorLines}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="9" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PickerErrorCartons}"/>
+            </Border>
+
+            <!-- Picker Accuracy % -->
+            <Label Grid.Column="0" Grid.Row="10" 
+               Content="Picker Accuracy %"/>
+            <Border Grid.Column="1" Grid.Row="10" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PickerUnitAccuracy, StringFormat='#0.##%'}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="10" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PickerQtyAccuracy, StringFormat='#0.##%'}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="10" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PickerLineAccuracy, StringFormat='#0.##%'}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="10" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PickerCartonAccuracy, StringFormat='#0.##%'}"/>
+            </Border>
+
+            <!-- Seek -->
+            <Label Grid.Column="0" Grid.Row="11" 
+               Content="Seek Used"/>
+            <Border Grid.Column="1" Grid.Row="11" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SeekUnits}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="11" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SeekQty}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="11" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SeekLines}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="11" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SeekCartons}"/>
+            </Border>
+
+            <!-- Fixed -->
+            <Label Grid.Column="0" Grid.Row="12" 
+               Content="Seek Fixed"/>
+            <Border Grid.Column="1" Grid.Row="12" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SeekUnitsFixed}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="12" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SeekQtyFixed}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="12" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SeekLinesFixed}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="12" Grid.ColumnSpan="2"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SeekCartonsFixed}"/>
+            </Border>
+
+            <!-- External -->
+            <Border Grid.Column="0" Grid.Row="13" Grid.ColumnSpan="9"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush04}">
+                <Label Content="EXTERNAL"/>
+            </Border>
+
+            <!-- Supplier Errors -->
+            <Label Grid.Column="0" Grid.Row="14" 
+               Content="Supplier Errors"/>
+            <Border Grid.Column="1" Grid.Row="14"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SupplierErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="14"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding SupplierUnitPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="14"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SupplierErrorQty}"/>
+            </Border>
+            <Border Grid.Column="4" Grid.Row="14"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding SupplierQtyPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="14"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SupplierErrorLines}"/>
+            </Border>
+            <Border Grid.Column="6" Grid.Row="14"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding SupplierLinePct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="14"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SupplierErrorCartons}"/>
+            </Border>
+            <Border Grid.Column="8" Grid.Row="14"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding SupplierCartonPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+
+            <!-- System Errors -->
+            <Label Grid.Column="0" Grid.Row="15" 
+               Content="System Errors"/>
+            <Border Grid.Column="1" Grid.Row="15"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SystemErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="15"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding SystemUnitPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="15"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SystemErrorQty}"/>
+            </Border>
+            <Border Grid.Column="4" Grid.Row="15"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding SystemQtyPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="15"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SystemErrorLines}"/>
+            </Border>
+            <Border Grid.Column="6" Grid.Row="15"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding SystemLinePct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="15"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding SystemErrorCartons}"/>
+            </Border>
+            <Border Grid.Column="8" Grid.Row="15"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding SystemCartonPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+
+
+            <!-- OtherExternal Errors -->
+            <Label Grid.Column="0" Grid.Row="16" 
+               Content="Other External Errors"/>
+            <Border Grid.Column="1" Grid.Row="16"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding OtherExternalErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="16"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding OtherExternalUnitPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="16"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding OtherExternalErrorQty}"/>
+            </Border>
+            <Border Grid.Column="4" Grid.Row="16"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding OtherExternalQtyPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="16"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding OtherExternalErrorLines}"/>
+            </Border>
+            <Border Grid.Column="6" Grid.Row="16"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding OtherExternalLinePct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="16"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding OtherExternalErrorCartons}"/>
+            </Border>
+            <Border Grid.Column="8" Grid.Row="16"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding OtherExternalCartonPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+
+            <!-- Warehouse -->
+            <Border Grid.Column="0" Grid.Row="17" Grid.ColumnSpan="9"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush04}">
+                <Label Content="WAREHOUSE"/>
+            </Border>
+
+            <!-- PTL Errors -->
+            <Label Grid.Column="0" Grid.Row="18" 
+               Content="PTL Errors"/>
+            <Border Grid.Column="1" Grid.Row="18"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PTLErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="18"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding PTLUnitPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="18"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PTLErrorQty}"/>
+            </Border>
+            <Border Grid.Column="4" Grid.Row="18"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding PTLQtyPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="18"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PTLErrorLines}"/>
+            </Border>
+            <Border Grid.Column="6" Grid.Row="18"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding PTLLinePct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="18"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PTLErrorCartons}"/>
+            </Border>
+            <Border Grid.Column="8" Grid.Row="18"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding PTLCartonPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+
+            <!-- PTV Errors -->
+            <Label Grid.Column="0" Grid.Row="19" 
+               Content="PTV Errors"/>
+            <Border Grid.Column="1" Grid.Row="19"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PTVErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="19"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding PTVUnitPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="19"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PTVErrorQty}"/>
+            </Border>
+            <Border Grid.Column="4" Grid.Row="19"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding PTVQtyPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="19"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PTVErrorLines}"/>
+            </Border>
+            <Border Grid.Column="6" Grid.Row="19"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding PTVLinePct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="19"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding PTVErrorCartons}"/>
+            </Border>
+            <Border Grid.Column="8" Grid.Row="19"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding PTVCartonPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+
+            <!-- Stocking Errors -->
+            <Label Grid.Column="0" Grid.Row="20" 
+               Content="Stocking Errors"/>
+            <Border Grid.Column="1" Grid.Row="20"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding StockingErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="20"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding StockingUnitPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="20"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding StockingErrorQty}"/>
+            </Border>
+            <Border Grid.Column="4" Grid.Row="20"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding StockingQtyPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="20"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding StockingErrorLines}"/>
+            </Border>
+            <Border Grid.Column="6" Grid.Row="20"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding StockingLinePct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="20"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding StockingErrorCartons}"/>
+            </Border>
+            <Border Grid.Column="8" Grid.Row="20"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding StockingCartonPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+
+            <!-- Replen Errors -->
+            <Label Grid.Column="0" Grid.Row="21" 
+               Content="Replen Errors"/>
+            <Border Grid.Column="1" Grid.Row="21"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ReplenErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="21"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding ReplenUnitPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="21"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ReplenErrorQty}"/>
+            </Border>
+            <Border Grid.Column="4" Grid.Row="21"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding ReplenQtyPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="21"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ReplenErrorLines}"/>
+            </Border>
+            <Border Grid.Column="6" Grid.Row="21"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding ReplenLinePct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="21"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ReplenErrorCartons}"/>
+            </Border>
+            <Border Grid.Column="8" Grid.Row="21"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding ReplenCartonPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+
+            <!-- Receiving Errors -->
+            <Label Grid.Column="0" Grid.Row="22" 
+               Content="Receiving Errors"/>
+            <Border Grid.Column="1" Grid.Row="22"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ReceivingErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="22"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding ReceivingUnitPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="22"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ReceivingErrorQty}"/>
+            </Border>
+            <Border Grid.Column="4" Grid.Row="22"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding ReceivingQtyPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="22"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ReceivingErrorLines}"/>
+            </Border>
+            <Border Grid.Column="6" Grid.Row="22"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding ReceivingLinePct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="22"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding ReceivingErrorCartons}"/>
+            </Border>
+            <Border Grid.Column="8" Grid.Row="22"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding ReceivingCartonPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+
+            <!-- HeatMap Errors -->
+            <Label Grid.Column="0" Grid.Row="23" 
+               Content="HeatMap Errors"/>
+            <Border Grid.Column="1" Grid.Row="23"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding HeatMapErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="23"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding HeatMapUnitPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="23"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding HeatMapErrorQty}"/>
+            </Border>
+            <Border Grid.Column="4" Grid.Row="23"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding HeatMapQtyPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="23"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding HeatMapErrorLines}"/>
+            </Border>
+            <Border Grid.Column="6" Grid.Row="23"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding HeatMapLinePct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="23"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding HeatMapErrorCartons}"/>
+            </Border>
+            <Border Grid.Column="8" Grid.Row="23"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding HeatMapCartonPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+
+            <!-- QA Errors -->
+            <Label Grid.Column="0" Grid.Row="24" 
+               Content="QA Errors"/>
+            <Border Grid.Column="1" Grid.Row="24"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding QAErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="24"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding QAUnitPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="24"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding QAErrorQty}"/>
+            </Border>
+            <Border Grid.Column="4" Grid.Row="24"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding QAQtyPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="24"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding QAErrorLines}"/>
+            </Border>
+            <Border Grid.Column="6" Grid.Row="24"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding QALinePct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="24"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding QAErrorCartons}"/>
+            </Border>
+            <Border Grid.Column="8" Grid.Row="24"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding QACartonPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+
+            <!-- Other Dept Errors -->
+            <Label Grid.Column="0" Grid.Row="25" 
+               Content="Other Dept. Errors"/>
+            <Border Grid.Column="1" Grid.Row="25"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding OtherDeptErrorUnits}"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="25"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding OtherDeptUnitPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="3" Grid.Row="25"
+                BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding OtherDeptErrorQty}"/>
+            </Border>
+            <Border Grid.Column="4" Grid.Row="25"
+                    BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                    Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding OtherDeptQtyPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="5" Grid.Row="25"
+                    BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding OtherDeptErrorLines}"/>
+            </Border>
+            <Border Grid.Column="6" Grid.Row="25"
+                    BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                    Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding OtherDeptLinePct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+            <Border Grid.Column="7" Grid.Row="25"
+                    BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}">
+                <TextBlock Text="{Binding OtherDeptErrorCartons}"/>
+            </Border>
+            <Border Grid.Column="8" Grid.Row="25"
+                    BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                    Background="{StaticResource Brush03}">
+                <TextBlock Text="{Binding OtherDeptCartonPct, StringFormat='#0.##%'}"
+                       Foreground="{StaticResource ButtonBackgroundBrush}"/>
+            </Border>
+
+            <!-- Warehouse -->
+            <Border Grid.Column="0" Grid.Row="26" Grid.ColumnSpan="9"
+                    BorderThickness=".5" BorderBrush="{StaticResource ForegroundBrush}"
+                    Background="{StaticResource Brush04}">
+                <Label Content=""/>
+            </Border>
+        </Grid>
+    </DockPanel>
+</UserControl>

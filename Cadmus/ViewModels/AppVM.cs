@@ -20,7 +20,7 @@ internal class AppVM : INotifyPropertyChanged
 
     public AppVM()
     {
-        CadmusPage = new CadmusPage();
+        CadmusPage = new CadmusPage(App.Helios, App.ProgressBar);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

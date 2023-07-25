@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using Uranus.Extensions;
 
 namespace Uranus.Staff.Models;
 
@@ -26,38 +25,35 @@ public class DepartmentRoster
     [ForeignKey(typeof(DailyRoster))] public Guid SaturdayRosterID { get; set; }
     [ForeignKey(typeof(DailyRoster))] public Guid SundayRosterID { get; set; }
 
-    [ManyToOne(nameof(DepartmentName), nameof(Models.Department.DepartmentRosters), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(nameof(DepartmentName), nameof(Models.Department.DepartmentRosters), CascadeOperations = CascadeOperation.CascadeRead)]
     public Department? Department { get; set; }
 
     [OneToMany(nameof(Roster.DepartmentRosterID), nameof(Roster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<Roster> Rosters { get; set; }
-    [OneToMany(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
-    public List<DailyRoster> DailyRosters { get; set; }
     [OneToMany(nameof(EmployeeRoster.DepartmentRosterID), nameof(EmployeeRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<EmployeeRoster> EmployeeRosters { get; set; }
-    [OneToMany(nameof(WeeklyShiftCounter.RosterID), nameof(WeeklyShiftCounter.Roster), CascadeOperations = CascadeOperation.None)]
+    [OneToMany(nameof(WeeklyShiftCounter.RosterID), nameof(WeeklyShiftCounter.Roster), CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
     public List<WeeklyShiftCounter> ShiftCounters { get; set; }
 
-    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    [OneToOne(nameof(MondayRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
     public DailyRoster? MondayRoster { get; set; }
-    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    [OneToOne(nameof(TuesdayRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
     public DailyRoster? TuesdayRoster { get; set; }
-    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    [OneToOne(nameof(WednesdayRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
     public DailyRoster? WednesdayRoster { get; set; }
-    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    [OneToOne(nameof(ThursdayRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
     public DailyRoster? ThursdayRoster { get; set; }
-    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    [OneToOne(nameof(FridayRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
     public DailyRoster? FridayRoster { get; set; }
-    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    [OneToOne(nameof(SaturdayRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
     public DailyRoster? SaturdayRoster { get; set; }
-    [OneToOne(nameof(DailyRoster.DepartmentRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
+    [OneToOne(nameof(SundayRosterID), nameof(DailyRoster.DepartmentRoster), CascadeOperations = CascadeOperation.CascadeRead)]
     public DailyRoster? SundayRoster { get; set; }
 
-    [Ignore] public Dictionary<int, Employee> EmployeeDict { get; set; }
+    [Ignore] public Dictionary<int, Employee> EmployeeDict { get; set; }    // All Employees for the department.
     [Ignore] public Dictionary<string, Shift> ShiftDict { get; set; }
     [Ignore] public Dictionary<string, List<Break>> BreakDict { get; set; }
     [Ignore] public Dictionary<(int, DateTime), Roster> RosterDict { get; set; }
-    [Ignore] public Dictionary<Guid, DailyRoster> DailyRosterDict { get; set; }
     [Ignore] public Dictionary<Guid, EmployeeRoster> EmployeeRosterDict { get; set; }
     [Ignore] public IEnumerable<EmployeeShift> EmpShiftConnections { get; set; }
     [Ignore] public Dictionary<int, List<ShiftRuleSingle>> SingleRuleDict { get; set; }
@@ -66,38 +62,49 @@ public class DepartmentRoster
     [Ignore] public Dictionary<string, WeeklyShiftCounter> ShiftCounterDict { get; set; }
     [Ignore] public Dictionary<Guid, Dictionary<string, DailyShiftCounter>> DailyCounterDict { get; set; }
 
-    [Ignore] public Shift? DefaultShift { get; set; }
+    [Ignore] public List<Employee> ActiveEmployees { get; }        // Employees that are both active and not salary - and therefore should have a roster associated.
+    [Ignore] public List<Employee> EmployeesWithoutRoster { get; } // Active employees that should, but do not, have a roster.
 
-    [Ignore] public Dictionary<Shift, int> ShiftCounter { get; set; }
-    [Ignore] public Dictionary<Shift, int> TargetShiftCounts { get; set; }
+    [Ignore] public Shift? DefaultShift { get; set; }
 
     [Ignore] public bool IsLoaded { get; set; }
 
+    [Ignore] public List<Shift> Shifts => Department?.Shifts ?? new List<Shift>();
+
+    /// <summary>
+    /// Create basic DepartmentRoster object. Empty.
+    /// </summary>
     public DepartmentRoster()
     {
         Name = string.Empty;
         DepartmentName = string.Empty;
         Rosters = new List<Roster>();
-        DailyRosters = new List<DailyRoster>();
         EmployeeRosters = new List<EmployeeRoster>();
         ShiftCounters = new List<WeeklyShiftCounter>();
 
         EmployeeDict = new Dictionary<int, Employee>();
+        ActiveEmployees = new List<Employee>();
+        EmployeesWithoutRoster = new List<Employee>();
         ShiftDict = new Dictionary<string, Shift>();
         BreakDict = new Dictionary<string, List<Break>>();
         RosterDict = new Dictionary<(int, DateTime), Roster>();
-        DailyRosterDict = new Dictionary<Guid, DailyRoster>();
         EmployeeRosterDict = new Dictionary<Guid, EmployeeRoster>();
         EmpShiftConnections = new List<EmployeeShift>();
         SingleRuleDict = new Dictionary<int, List<ShiftRuleSingle>>();
         RecurringRuleDict = new Dictionary<int, List<ShiftRuleRecurring>>();
         RosterRuleDict = new Dictionary<int, List<ShiftRuleRoster>>();
-        ShiftCounter = new Dictionary<Shift, int>();
-        TargetShiftCounts = new Dictionary<Shift, int>();
         ShiftCounterDict = new Dictionary<string, WeeklyShiftCounter>();
         DailyCounterDict = new Dictionary<Guid, Dictionary<string, DailyShiftCounter>>();
     }
 
+    /// <summary>
+    /// Create a Department Roster from scratch. Fill anything and everything that can be filled from given data.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="startDate"></param>
+    /// <param name="useSaturdays"></param>
+    /// <param name="useSundays"></param>
+    /// <param name="department">How full this is determines how complete the roster will be.</param>
     public DepartmentRoster(string name, DateTime startDate, bool useSaturdays, bool useSundays, Department department)
     {
         ID = Guid.NewGuid();
@@ -108,25 +115,45 @@ public class DepartmentRoster
         Department = department;
         DepartmentName = department.Name;
 
-        Rosters = new List<Roster>();
-        DailyRosters = new List<DailyRoster>();
-        EmployeeRosters = new List<EmployeeRoster>();
-        ShiftCounters = new List<WeeklyShiftCounter>();
+        ActiveEmployees = department.Employees.Where(e => e.IsActive && e.EmploymentType != EEmploymentType.SA).ToList();
+        EmployeeRosters = ActiveEmployees.Select(e => new EmployeeRoster(department, this, e, startDate)).ToList();
+        EmployeesWithoutRoster = new List<Employee>();
 
-        EmployeeDict = new Dictionary<int, Employee>();
-        ShiftDict = new Dictionary<string, Shift>();
-        BreakDict = new Dictionary<string, List<Break>>();
-        RosterDict = new Dictionary<(int, DateTime), Roster>();
-        DailyRosterDict = new Dictionary<Guid, DailyRoster>();
-        EmployeeRosterDict = new Dictionary<Guid, EmployeeRoster>();
+        ShiftCounters = department.Shifts.Select(s => new WeeklyShiftCounter(this, s, s.DailyTarget)).ToList();
+
+        EmployeeDict = department.Employees.ToDictionary(e => e.ID, e => e);
+        ShiftDict = department.Shifts.ToDictionary(s => s.Name, s => s);
+        BreakDict = department.Shifts.ToDictionary(s => s.Name, s => s.Breaks);
+        EmployeeRosterDict = EmployeeRosters.ToDictionary(er => er.ID, er => er);
         EmpShiftConnections = new List<EmployeeShift>();
-        SingleRuleDict = new Dictionary<int, List<ShiftRuleSingle>>();
-        RecurringRuleDict = new Dictionary<int, List<ShiftRuleRecurring>>();
-        RosterRuleDict = new Dictionary<int, List<ShiftRuleRoster>>();
-        ShiftCounter = new Dictionary<Shift, int>();
-        TargetShiftCounts = new Dictionary<Shift, int>();
-        ShiftCounterDict = new Dictionary<string, WeeklyShiftCounter>();
+        SingleRuleDict = department.Employees.ToDictionary(e => e.ID, e => e.SingleRules);
+        RecurringRuleDict = department.Employees.ToDictionary(e => e.ID, e => e.RecurringRules);
+        RosterRuleDict = department.Employees.ToDictionary(e => e.ID, e => e.RosterRules);
+        ShiftCounterDict = ShiftCounters.ToDictionary(c => c.ShiftID, c => c);
+
         DailyCounterDict = new Dictionary<Guid, Dictionary<string, DailyShiftCounter>>();
+
+        FillMissingDailyRosters();
+        CreateDailyCounterDict();
+
+        Rosters = new List<Roster>();
+
+        foreach (var employeeRoster in EmployeeRosters)
+        {
+            foreach (DayOfWeek value in Enum.GetValues(typeof(DayOfWeek)))
+            {
+                var daily = GetDaily(value);
+
+                var roster = new Roster(this, employeeRoster, daily);
+
+                employeeRoster.SetDaily(roster);
+                Rosters.Add(roster);
+            }
+        }
+
+        RosterDict = Rosters.ToDictionary(r => (r.EmployeeID, r.Date), r => r);
+
+        IsLoaded = true;
     }
 
     public void SetData(IEnumerable<Employee> employees, IEnumerable<Roster> rosters, IEnumerable<DailyRoster> dailyRosters, IEnumerable<EmployeeRoster> employeeRosters,
@@ -134,7 +161,15 @@ public class DepartmentRoster
         IEnumerable<ShiftRuleSingle> singleRules, IEnumerable<ShiftRuleRecurring> recurringRules, IEnumerable<ShiftRuleRoster> rosterRules,
         IEnumerable<WeeklyShiftCounter> weeklyShiftCounters, IEnumerable<DailyShiftCounter> dailyShiftCounters)
     {
-        EmployeeDict = employees.ToDictionary(e => e.ID, e => e);
+        var employeeList = employees.ToList();
+
+        EmployeeRosters = employeeRosters.ToList();
+
+        ActiveEmployees.Clear();
+        ActiveEmployees.AddRange(employeeList.Where(e => e.IsActive && e.EmploymentType != EEmploymentType.SA));
+        CheckEmployeeRosters();
+        EmployeeDict = employeeList.ToDictionary(e => e.ID, e => e);
+
         ShiftDict = shifts.ToDictionary(s => s.ID, s => s);
         BreakDict = breaks.GroupBy(b => b.ShiftID).ToDictionary(g => g.Key, g => g.ToList());
         EmpShiftConnections = empShiftCons;
@@ -145,8 +180,11 @@ public class DepartmentRoster
         RosterRuleDict = rosterRules.GroupBy(rule => rule.EmployeeID)
             .ToDictionary(group => group.Key, group => group.ToList());
         RosterDict = rosters.ToDictionary(r => (r.EmployeeID, r.Date), r => r);
-        EmployeeRosterDict = employeeRosters.ToDictionary(er => er.ID, er => er);
-        DailyRosterDict = dailyRosters.ToDictionary(dr => dr.ID, dr => dr);
+        EmployeeRosterDict = EmployeeRosters.ToDictionary(er => er.ID, er => er);
+
+        // Daily Rosters
+        dailyRosters = dailyRosters.Where(dr => dr.DepartmentRosterID == ID);
+        foreach (var dailyRoster in dailyRosters) SetDaily(dailyRoster);
 
         DailyCounterDict = dailyShiftCounters.GroupBy(counter => counter.RosterID).ToDictionary(group => group.Key,
             group => group.ToDictionary(counter => counter.ShiftID, counter => counter));
@@ -155,21 +193,24 @@ public class DepartmentRoster
         ShiftCounters = ShiftCounterDict.Values.ToList();
 
         SetRelationships();
-        GenerateMissingRosters();
         EmployeeRosters.Sort();
 
         IsLoaded = true;
     }
 
-    public void AddCount(Shift shift)
+    private void CreateDailyCounterDict()
     {
-        ShiftCounterDict[shift.ID].Count++;
+        DailyCounterDict = DailyCounterList().GroupBy(counter => counter.RosterID).ToDictionary(group => group.Key,
+            group => group.ToDictionary(counter => counter.ShiftID, counter => counter));
     }
 
-    public void SubCount(Shift shift)
+    private IEnumerable<DailyShiftCounter> DailyCounterList() => DailyRosterList().SelectMany(dr => dr.ShiftCounters).ToList();
+
+    private IEnumerable<DailyRoster> DailyRosterList() => new List<DailyRoster?>
     {
-        ShiftCounterDict[shift.ID].Count--;
-    }
+        MondayRoster, TuesdayRoster, WednesdayRoster, ThursdayRoster,
+        FridayRoster, SaturdayRoster, SundayRoster
+    }.Where(dailyRoster => dailyRoster is not null).ToList()!;
 
     /// <summary>
     /// Using the dictionaries, assign relevant data as references to each other.
@@ -187,32 +228,22 @@ public class DepartmentRoster
     /// <summary>
     /// Generates an empty roster for each that should exist based on employees and date range.
     /// </summary>
-    private void GenerateMissingRosters()
+    /// <returns>The newly created Employee Rosters.</returns>
+    public IEnumerable<EmployeeRoster> CreateMissingRosters(IEnumerable<Employee>? employees = null)
     {
         if (Department is null) throw new DataException("Department Roster initialized without Department.");
 
-        // Make sure we have a daily roster for each day from start date.
-        var dailyRosterDict = DailyRosters.ToDictionary(dr => dr.Date, dr => dr);
-        for (var i = 0; i < 7; i++)
-        {
-            var date = StartDate.AddDays(i);
-            if (dailyRosterDict.TryGetValue(date, out _)) continue;
+        var returnList = new List<EmployeeRoster>();
 
-            var newDailyRoster = new DailyRoster(Department, this, date);
-            DailyRosters.Add(newDailyRoster);
-            DailyRosterDict.Add(newDailyRoster.ID, newDailyRoster);
-            dailyRosterDict.Add(date, newDailyRoster);
-        }
-        DailyRosters.Sort();
-        if (DailyRosters.Count != 7)
-            throw new DataException(
-                "Department Roster has somehow generated a number of daily rosters not equal to 7.");
+        FillMissingDailyRosters();
+
+        var createList = employees ?? EmployeesWithoutRoster;
 
         // Convert EmpRoster list to dictionary to compare to our employee list (which should be all required for the department).
         var empRosterDict = EmployeeRosters.ToDictionary(er => er.EmployeeID, er => er);
 
         // Create employeeRoster for each employee - only for those that do not already exist.
-        foreach (var (_, employee) in EmployeeDict)
+        foreach (var employee in createList)
         {
             if (empRosterDict.TryGetValue(employee.ID, out _)) continue;
 
@@ -222,19 +253,101 @@ public class DepartmentRoster
             for (var i = 0; i < 7; i++)
             {
                 var date = StartDate.AddDays(i);
-                var dailyRoster = dailyRosterDict[date];
-                var roster = new Roster(Department, this, newEmployeeRoster, employee, date);
-                newEmployeeRoster.Rosters.Add(roster);
+                // Make sure that we are not re-creating a dangling (existing but unattached) roster.
+                if (!RosterDict.TryGetValue((employee.ID, date), out var roster))
+                {
+                    roster = new Roster(Department, this, newEmployeeRoster, employee, date);
+                    RosterDict.Add((roster.EmployeeID, date), roster);
+                    Rosters.Add(roster);
+                }
+                // Attach DailyRoster as appropriate.
+                var dailyRoster = GetDaily(date.DayOfWeek);
+                
+                newEmployeeRoster.SetDaily(roster);
                 dailyRoster.AddRoster(roster);
-                Rosters.Add(roster);
-                RosterDict.Add((roster.EmployeeID, date), roster);
+                roster.DailyRoster = dailyRoster;
             }
 
-            newEmployeeRoster.Rosters.Sort();
-            EmployeeRosters.Add(newEmployeeRoster);
+            returnList.Add(newEmployeeRoster);
             EmployeeRosterDict.Add(newEmployeeRoster.ID, newEmployeeRoster);
+            EmployeeRosters.Add(newEmployeeRoster);
         }
 
+        CheckEmployeeRosters();
+
+        return returnList;
+    }
+
+    /// <summary>
+    /// Check employees against employee rosters to determine which employees do not have rosters.
+    /// </summary>
+    private void CheckEmployeeRosters()
+    {
+        EmployeesWithoutRoster.Clear();
+        EmployeesWithoutRoster.AddRange(ActiveEmployees.Where(e => !EmployeeRosters.Select(er => er.EmployeeID).Contains(e.ID)));
+    }
+
+    public DailyRoster GetDaily(DayOfWeek weekDay)
+    {
+        var daily = weekDay switch
+        {
+            DayOfWeek.Sunday => SundayRoster,
+            DayOfWeek.Monday => MondayRoster,
+            DayOfWeek.Tuesday => TuesdayRoster,
+            DayOfWeek.Wednesday => WednesdayRoster,
+            DayOfWeek.Thursday => ThursdayRoster,
+            DayOfWeek.Friday => FridayRoster,
+            DayOfWeek.Saturday => SaturdayRoster,
+            _ => throw new ArgumentOutOfRangeException(nameof(weekDay), weekDay, null)
+        };
+
+        if (daily is not null) return daily;
+
+        daily = new DailyRoster(Department!, this, StartDate.AddDays((weekDay - DayOfWeek.Monday) % 7));
+        SetDaily(daily);
+
+        return daily;
+    }
+
+    public bool SetDaily(DailyRoster dailyRoster)
+    {
+        var date = dailyRoster.Date;
+        if (date < StartDate || date > StartDate.AddDays(6)) return false;
+
+        switch (date.DayOfWeek)
+        {
+            case DayOfWeek.Sunday:
+                SundayRoster = dailyRoster;
+                SundayRosterID = dailyRoster.ID;
+                break;
+            case DayOfWeek.Monday:
+                MondayRoster = dailyRoster;
+                MondayRosterID = dailyRoster.ID;
+                break;
+            case DayOfWeek.Tuesday:
+                TuesdayRoster = dailyRoster;
+                TuesdayRosterID = dailyRoster.ID;
+                break;
+            case DayOfWeek.Wednesday:
+                WednesdayRoster = dailyRoster;
+                WednesdayRosterID = dailyRoster.ID;
+                break;
+            case DayOfWeek.Thursday:
+                ThursdayRoster = dailyRoster;
+                ThursdayRosterID = dailyRoster.ID;
+                break;
+            case DayOfWeek.Friday:
+                FridayRoster = dailyRoster;
+                FridayRosterID = dailyRoster.ID;
+                break;
+            case DayOfWeek.Saturday:
+                SaturdayRoster = dailyRoster;
+                SaturdayRosterID = dailyRoster.ID;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(dailyRoster), dailyRoster, null);
+        }
+        return true;
     }
 
     private void SetFromShifts()
@@ -263,8 +376,6 @@ public class DepartmentRoster
             if (Department is not null && !Department.Shifts.Select(s => s.Name).Contains(shift.Name))
                 Department?.Shifts.Add(shift);
 
-            ShiftCounter[shift] = 0;
-            TargetShiftCounts[shift] = shift.DailyTarget;
             shift.Department = Department;
             if (shift.Default) DefaultShift = shift;
         }
@@ -348,25 +459,19 @@ public class DepartmentRoster
                 shift.Rosters.Add(roster);
             }
 
-            if (DailyRosterDict.TryGetValue(roster.DailyRosterID, out var daily))
-            {
-                roster.DailyRoster = daily;
-                daily.AddRoster(roster);
-            }
-
             if (EmployeeRosterDict.TryGetValue(roster.EmployeeRosterID, out var employeeRoster))
             {
                 roster.EmployeeRoster = employeeRoster;
-                employeeRoster.Rosters.Add(roster);
+                employeeRoster.SetDaily(roster);
             }
 
             if (roster.DepartmentRosterID == ID)
             {
                 Rosters.Add(roster);
                 roster.DepartmentRoster = this;
-                if (roster.Shift is not null && ShiftCounter.TryGetValue(roster.Shift, out _))
-                    ShiftCounter[roster.Shift]++;
             }
+
+            GetDaily(roster.Day).AddRoster(roster);
         }
 
         foreach (var rosterKey in nullIDs)
@@ -377,20 +482,8 @@ public class DepartmentRoster
 
     private void SetFromDailyRosters()
     {
-        foreach (var (_, dailyRoster) in DailyRosterDict)
+        foreach (var dailyRoster in DailyRosters())
         {
-            if (dailyRoster.DepartmentRosterID == ID)
-            {
-                // Check date range to be applicable.
-                if (dailyRoster.Date < StartDate ||
-                    dailyRoster.Date > StartDate.AddDays(7)) continue;
-
-                dailyRoster.DepartmentRoster = this;
-                DailyRosters.Add(dailyRoster);
-
-                AddDaily(dailyRoster);
-            }
-
             if (dailyRoster.DepartmentName == DepartmentName)
             {
                 dailyRoster.Department = Department;
@@ -400,6 +493,7 @@ public class DepartmentRoster
             DailyCounterDict.TryGetValue(dailyRoster.ID, out var counters);
             counters ??= new Dictionary<string, DailyShiftCounter>();
 
+            // Make sure that there is a shift counter for each shift for each day.
             foreach (var (id, shift) in ShiftDict)
             {
                 counters.TryGetValue(id, out var counter);
@@ -417,59 +511,30 @@ public class DepartmentRoster
 
     private void FillMissingDailyRosters()
     {
-        if (MondayRoster is null) FillMissingRosterDay(DayOfWeek.Monday);
-        if (TuesdayRoster is null) FillMissingRosterDay(DayOfWeek.Tuesday);
-        if (WednesdayRoster is null) FillMissingRosterDay(DayOfWeek.Wednesday);
-        if (ThursdayRoster is null) FillMissingRosterDay(DayOfWeek.Thursday);
-        if (FridayRoster is null) FillMissingRosterDay(DayOfWeek.Friday);
-        if (SaturdayRoster is null) FillMissingRosterDay(DayOfWeek.Saturday);
-        if (SundayRoster is null) FillMissingRosterDay(DayOfWeek.Sunday);
-    }
+        if (Department is null) throw new DataException("Department Roster initialized without Department.");
 
-    private void FillMissingRosterDay(DayOfWeek day)
-    {
-        var dayDiff = (day - DayOfWeek.Monday) % 7;
+        // Ensure all daily rosters exist.
+        MondayRoster ??= new DailyRoster(Department, this, StartDate);
+        TuesdayRoster ??= new DailyRoster(Department, this, StartDate.AddDays(1));
+        WednesdayRoster ??= new DailyRoster(Department, this, StartDate.AddDays(2));
+        ThursdayRoster ??= new DailyRoster(Department, this, StartDate.AddDays(3));
+        FridayRoster ??= new DailyRoster(Department, this, StartDate.AddDays(4));
+        if (UseSaturdays) SaturdayRoster ??= new DailyRoster(Department, this, StartDate.AddDays(5));
+        if (UseSundays) SundayRoster ??= new DailyRoster(Department, this, StartDate.AddDays(6));
 
-        var daily = new DailyRoster(Department!, this, StartDate.AddDays(dayDiff));
-
-        AddDaily(daily);
-    }
-
-    private void AddDaily(DailyRoster daily)
-    {
-        var day = daily.Day;
-        switch (day)
-        {
-            case DayOfWeek.Monday:
-                MondayRoster = daily;
-                break;
-            case DayOfWeek.Tuesday:
-                TuesdayRoster = daily;
-                break;
-            case DayOfWeek.Wednesday:
-                WednesdayRoster = daily;
-                break;
-            case DayOfWeek.Thursday:
-                ThursdayRoster = daily;
-                break;
-            case DayOfWeek.Friday:
-                FridayRoster = daily;
-                break;
-            case DayOfWeek.Saturday:
-                SaturdayRoster = daily;
-                break;
-            case DayOfWeek.Sunday:
-                SundayRoster = daily;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(day), day, null);
-        }
+        MondayRosterID = MondayRoster.ID;
+        TuesdayRosterID = TuesdayRoster.ID;
+        WednesdayRosterID = WednesdayRoster.ID;
+        ThursdayRosterID = ThursdayRoster.ID;
+        FridayRosterID = FridayRoster.ID;
+        SaturdayRosterID = SaturdayRoster?.ID ?? Guid.Empty;
+        SundayRosterID = SundayRoster?.ID ?? Guid.Empty;
     }
 
     private void SetFromEmployeeRosters()
     {
         var nullIDs = new List<Guid>();
-        foreach (var (_, employeeRoster) in EmployeeRosterDict)
+        foreach (var employeeRoster in EmployeeRosters)
         {
             if (EmployeeDict.TryGetValue(employeeRoster.EmployeeID, out var employee))
             {
@@ -488,18 +553,13 @@ public class DepartmentRoster
                 Department?.EmployeeRosters.Add(employeeRoster);
             }
 
-            if (employeeRoster.DepartmentRosterID == ID)
-            {
-                employeeRoster.DepartmentRoster = this;
-                EmployeeRosters.Add(employeeRoster);
-            }
-
             if (ShiftDict.TryGetValue(employeeRoster.ShiftID, out var shift))
             {
                 shift.EmployeeRosters.Add(employeeRoster);
                 employeeRoster.Shift = shift;
             }
 
+            if (employeeRoster.DepartmentRosterID == ID) employeeRoster.DepartmentRoster = this;
 
         }
 
@@ -507,6 +567,14 @@ public class DepartmentRoster
         {
             EmployeeRosterDict.Remove(id);
         }
+    }
+
+    /// <summary>
+    /// Change roster list to include entirely and solely those contained within the Employee Roster objects.
+    /// </summary>
+    public void RegenerateRosters()
+    {
+        Rosters = EmployeeRosters.SelectMany(er => er.Rosters()).ToList();
     }
 
     /// <summary>
@@ -519,16 +587,14 @@ public class DepartmentRoster
 
         // Establish columns.
         table.Columns.Add("NAME");
-        foreach (var dailyRoster in DailyRosters)
-            table.Columns.Add(dailyRoster.Date.ToString("dd-MMM"));
+        for (var i = 0; i < 7; i++)
+            table.Columns.Add(StartDate.AddDays(i).ToString("dd-MMM"));
 
         // Day of week row.
         var row = table.NewRow();
-        var i = 0;
-        foreach (var dailyRoster in DailyRosters)
+        for (var i = 0; i < 7; i++)
         {
-            i++;
-            row[i] = dailyRoster.Date.ToString("dddd").ToUpper();
+            row[i] = StartDate.AddDays(i).ToString("dddd").ToUpper();
         }
 
         table.Rows.Add(row);
@@ -537,12 +603,13 @@ public class DepartmentRoster
         foreach (var employeeRoster in EmployeeRosters)
         {
             row = table.NewRow();
-            i = 0;
-            row[i] = employeeRoster.Employee?.FullName ?? "";
-            foreach (var roster in employeeRoster.Rosters)
+            var c = 0;
+            row[c] = employeeRoster.Employee?.FullName ?? "";
+
+            for (var d = 0; d < 7; d++)
             {
-                i++;
-                row[i] = roster.ToString();
+                c++;
+                row[c] = employeeRoster.GetDaily(StartDate.AddDays(d).DayOfWeek).ToString();
             }
 
             table.Rows.Add(row);
@@ -553,91 +620,40 @@ public class DepartmentRoster
 
     public override string ToString() => Name;
 
-    public void GenerateRosterAssignments()
+    public WeeklyShiftCounter ShiftCounter(Shift shift)
     {
-        ApplyShiftRules();
-        AssignDefaults();
-        CountToTargets();
-        ApplyDepartmentDefault();
-        CheckPublicHolidays();
-    }
+        if (ShiftCounterDict.TryGetValue(shift.ID, out var counter)) return counter;
 
-    private void CheckPublicHolidays()
-    {
-        //throw new NotImplementedException();
+        counter = new WeeklyShiftCounter(this, shift, 0);
+        ShiftCounters.Add(counter);
+        ShiftCounterDict.Add(shift.ID, counter);
+
+        return counter;
     }
 
     /// <summary>
-    /// Applies shift rules to employees and their weekly/daily shifts as appropriate.
+    /// Get all Daily rosters within a single data structure.
     /// </summary>
-    private void ApplyShiftRules()
+    /// <returns>IEnumerable of Daily Roster. Should always be 7 (representing Mon-Sun)</returns>
+    public IEnumerable<DailyRoster> DailyRosters()
     {
-        foreach (var employeeRoster in EmployeeRosters)
+        if (Department is null) throw new DataException("Department Roster initialized without Department.");
+
+        return new List<DailyRoster>
         {
-            // TODO: 
-            employeeRoster.ApplyShiftRules();
-        }
+            MondayRoster ?? new DailyRoster(Department, this, StartDate),
+            TuesdayRoster ?? new DailyRoster(Department, this, StartDate.AddDays(1)),
+            WednesdayRoster ?? new DailyRoster(Department, this, StartDate.AddDays(2)),
+            ThursdayRoster ?? new DailyRoster(Department, this, StartDate.AddDays(3)),
+            FridayRoster ?? new DailyRoster(Department, this, StartDate.AddDays(4)),
+            SaturdayRoster ?? new DailyRoster(Department, this, StartDate.AddDays(5)),
+            SundayRoster ?? new DailyRoster(Department, this, StartDate.AddDays(6))
+        };
     }
 
-    /// <summary>
-    /// Assigns shifts to employees based on their defined defaults - only if they do not already have assigned shifts..
-    /// </summary>
-    public void AssignDefaults()
-    {
-        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.Shift is null))
-            employeeRoster.SetDefault();
-    }
+    public IEnumerable<DailyShiftCounter> DailyShiftCounters() => DailyRosters().SelectMany(dr => dr.ShiftCounters);
 
-    /// <summary>
-    /// Attempt to reach the targeted number for each shift.
-    /// </summary>
-    public void CountToTargets()
-    {
-        if (Department is null) throw new DataException("Department Roster has null value for department.");
+    public IEnumerable<DailyShiftCounter> DailyShiftCounters(string shiftID) =>
+        DailyShiftCounters().Where(dc => dc.ShiftID == shiftID);
 
-        // Get every non-default shift with a target above 0.
-        var targetShifts = Department.Shifts.Where(s => !s.Default && s.DailyTarget > 0)
-            .ToDictionary(s => s, _ => new List<EmployeeRoster>());
-
-        foreach (var (shift, _) in targetShifts)
-            targetShifts[shift] = EmployeeRosters
-                .Where(er => er.Employee is not null && er.Employee.Shifts.Contains(shift)).ToList();
-
-        // Order by most needed (discrepancy between those available and number required to reach target.
-        targetShifts = targetShifts.OrderBy(s => s.Value.Count - ShiftCounterDict[s.Key.ID].Discrepancy)
-            .ToDictionary(e => e.Key, e => e.Value);
-
-        foreach (var (shift, empRosters) in targetShifts)
-        {
-            if (ShiftCounterDict[shift.ID].Discrepancy <= 0) continue;
-            // Randomize employees #TODO: Check against history to rotate through staff (instead of randomizing).
-            empRosters.Shuffle();
-
-            foreach (var employeeRoster in empRosters.Where(employeeRoster => employeeRoster.Shift is null).TakeWhile(_ => ShiftCounterDict[shift.ID].Lacking))
-                employeeRoster.Shift = shift;
-        }
-    }
-
-    /// <summary>
-    /// Checks all employees to see if they are assigned. If they aren't, use department defaults if they exist,
-    /// otherwise assign a shift that they are eligible for that is closest to its target count.
-    /// </summary>
-    public void ApplyDepartmentDefault()
-    {
-        foreach (var employeeRoster in EmployeeRosters.Where(employeeRoster => employeeRoster.Shift is null))
-        {
-            if (DefaultShift is not null)
-            {
-                employeeRoster.Shift = DefaultShift;
-                continue;
-            }
-
-            if (employeeRoster.Employee is null)
-                throw new DataException("Employee roster does not have employee initialized.");
-
-            var bestShift = ShiftCounters.First(c => c.Discrepancy == ShiftCounters.Min(counter => counter.Discrepancy)).Shift;
-
-            employeeRoster.Shift = bestShift;
-        }
-    }
 }

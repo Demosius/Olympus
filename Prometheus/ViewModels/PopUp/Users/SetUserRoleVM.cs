@@ -2,13 +2,13 @@
 using Serilog;
 using Serilog.Events;
 using Styx;
-using Styx.Interfaces;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
+using Prometheus.ViewModels.Controls;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -17,15 +17,15 @@ using Uranus.Users.Models;
 
 namespace Prometheus.ViewModels.PopUp.Users;
 
-internal class SetUserRoleVM : INotifyPropertyChanged, IDataSource, IDBInteraction
+public class SetUserRoleVM : INotifyPropertyChanged, IDBInteraction
 {
-    public Helios? Helios { get; set; }
-    public Charon? Charon { get; set; }
+    public Helios Helios { get; set; }
+    public Charon Charon { get; set; }
 
     #region INotifyPropertyChanged Members
 
-    private User? user;
-    public User? User
+    private UserVM user;
+    public UserVM User
     {
         get => user;
         set
@@ -34,17 +34,8 @@ internal class SetUserRoleVM : INotifyPropertyChanged, IDataSource, IDBInteracti
             OnPropertyChanged();
         }
     }
-
-    private ObservableCollection<Role> roles;
-    public ObservableCollection<Role> Roles
-    {
-        get => roles;
-        set
-        {
-            roles = value;
-            OnPropertyChanged();
-        }
-    }
+    
+    public ObservableCollection<Role> Roles { get; set; }
 
     private Role? selectedRole;
     public Role? SelectedRole
@@ -62,44 +53,29 @@ internal class SetUserRoleVM : INotifyPropertyChanged, IDataSource, IDBInteracti
     #region Commands
 
     public RefreshDataCommand RefreshDataCommand { get; set; }
-    public RepairDataCommand RepairDataCommand { get; set; }
     public ConfirmRoleCommand ConfirmRoleCommand { get; set; }
 
     #endregion
 
-    public SetUserRoleVM()
+    public SetUserRoleVM(Helios helios, Charon charon, UserVM newUser)
     {
-        roles = new ObservableCollection<Role>();
+        Helios = helios;
+        Charon = charon;
+        user = newUser;
+
+        Roles = new ObservableCollection<Role>();
+        SelectedRole = Roles.FirstOrDefault(r => r.Name == User.RoleName);
+        User.Role ??= SelectedRole;
 
         RefreshDataCommand = new RefreshDataCommand(this);
-        RepairDataCommand = new RepairDataCommand(this);
         ConfirmRoleCommand = new ConfirmRoleCommand(this);
     }
-
-    public void SetDataSources(Helios helios, Charon charon)
+    
+    public async Task RefreshDataAsync()
     {
-        Helios = helios;
-        Charon = charon;
-        User = new User();
-
-        RefreshData();
-    }
-
-    public void SetDataSources(Helios helios, Charon charon, User newUser)
-    {
-        Helios = helios;
-        Charon = charon;
-        User = newUser;
-
-        RefreshData();
-    }
-
-    public void RefreshData()
-    {
-        if (Helios is null || Charon is null || User is null) return;
-
-        // Get role list.
-        Roles = new ObservableCollection<Role>(Helios.UserReader.Roles().OrderBy(r => r.Name));
+        Roles.Clear();
+        foreach (var role in (await Helios.UserReader.RolesAsync()).OrderBy(r => r.Name))
+            Roles.Add(role);
 
         // Set selected role to be equal to the user's current role.
         SelectedRole = Roles.FirstOrDefault(r => r.Name == User.RoleName);
@@ -108,9 +84,9 @@ internal class SetUserRoleVM : INotifyPropertyChanged, IDataSource, IDBInteracti
 
     public bool ConfirmRole()
     {
-        if (Charon is null || User is null || SelectedRole is null) return false;
+        if (SelectedRole is null) return false;
 
-        var success = Charon.SetRole(User, SelectedRole);
+        var success = Charon.SetRole(User.User, SelectedRole);
 
         if (success)
         {
@@ -128,12 +104,7 @@ internal class SetUserRoleVM : INotifyPropertyChanged, IDataSource, IDBInteracti
 
         return false;
     }
-
-    public void RepairData()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public event PropertyChangedEventHandler? PropertyChanged;
 
     [NotifyPropertyChangedInvocator]
