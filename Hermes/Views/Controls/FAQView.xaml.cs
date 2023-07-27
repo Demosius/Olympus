@@ -1,19 +1,12 @@
-﻿using Hermes.ViewModels.Controls;
-using Styx;
-using Uranus;
+﻿namespace Hermes.Views.Controls;
 
-namespace Hermes.Views.Controls;
-
-namespace Hermes.Views.Controls
-{
-    /// <summary>
-    /// Interaction logic for FAQView.xaml
-    /// </summary>
+/// <summary>
+/// Interaction logic for FAQView.xaml
+/// </summary>
 public partial class FAQView
+{
+    public FAQView()
     {
-        public FAQView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

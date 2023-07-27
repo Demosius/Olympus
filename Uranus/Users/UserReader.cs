@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Uranus.Users.Models;
@@ -34,7 +33,6 @@ public class UserReader
     public async Task<IEnumerable<Role>> RolesAsync(Expression<Func<Role, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
-
     /* Messages */
     public Message? Message(Guid id, EPullType pullType = EPullType.ObjectOnly) =>
         Chariot.PullObject<Message>(id, pullType);
@@ -42,7 +40,9 @@ public class UserReader
     public IEnumerable<Message> Messages(Expression<Func<Message, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
 
-    public async Task<IEnumerable<Role>> RolesAsync(Expression<Func<Role, bool>>? filter = null,
-        EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
-
+    // TODO: Implement (or copy existing implementation from Hermes).
+    public HermesDataSet HermesDataSet(User user)
+    {
+        return new HermesDataSet(Chariot.PullObject<User>(user.ID) ?? user);
+    }
 }

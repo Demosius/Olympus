@@ -61,7 +61,7 @@ public class OlympusVM : INotifyPropertyChanged
         ProgressBarVM = App.ProgressBar;
 
         GenerateMasterSkuListCommand = new GenerateMasterSkuListCommand(this);
-        ChangePasswordCommand = new ChangePasswordCommand(this);
+        ChangePasswordCommand = new ChangePasswordCommand();
     }
 
     private async Task<OlympusVM> InitializeAsync()
@@ -128,7 +128,7 @@ public class OlympusVM : INotifyPropertyChanged
         RunningProjects = new Dictionary<EProject, IProject>();
     }
 
-    public void LaunchPasswordChanger()
+    public static void LaunchPasswordChanger()
     {
         var changePasswordWindow = new ChangePasswordWindow(App.Charon);
         changePasswordWindow.ShowDialog();
@@ -139,20 +139,21 @@ public class OlympusVM : INotifyPropertyChanged
         App.Helios.StaffCreator.CopyProjectIconsFromSource(Path.Combine(App.BaseDirectory(), "Resources", "Images", "Icons"));
         List<Project> projects = new()
         {
-            new Project(EProject.Khaos, "chaos.ico", App.Helios.StaffReader, "Handles make-bulk designation and separation. (Genesis)"),
             new Project(EProject.Pantheon, "pantheon.ico", App.Helios.StaffReader, "Roster management."),
             new Project(EProject.Prometheus, "prometheus.ico", App.Helios.StaffReader, "Data management."),
-            new Project(EProject.Phoenix, "phoenix.ico", App.Helios.StaffReader, "Pre-work automated stock maintenance. (AutoBurn)"),
-            new Project(EProject.Vulcan, "vulcan.ico", App.Helios.StaffReader, "Replenishment DDR management and work assignment. (RefOrge)"),
             new Project(EProject.Aion, "Aion.ico", App.Helios.StaffReader, "Employee clock in and shift time management."),
             new Project(EProject.Hydra, "Hydra.ico", App.Helios.StaffReader, "Manage stock levels between different facilities."),
             new Project(EProject.Cadmus, "cadmus.ico", App.Helios.StaffReader, "Manages document creation and printing."),
             new Project(EProject.Sphynx, "Sphynx.ico", App.Helios.StaffReader, "Product Investigation: Countables and Product Search Sheet"),
             new Project(EProject.Argos, "UBC.ico", App.Helios.StaffReader, "Batch Management Tool"),
-            new Project(EProject.Hades, "Hades.ico", App.Helios.StaffReader, "N.I.M.S. - Non-Inventory Management System"),
             new Project(EProject.Panacea, "Panacea.ico", App.Helios.StaffReader, "ALLFIX: Multiple tools to remedy many given issues."),
             new Project(EProject.Quest, "quest.ico", App.Helios.StaffReader, "Manage Restock Staff assignment and tracking. (ZLAM & PickRate Tracker)"),
             new Project(EProject.Deimos, "deimos.ico", App.Helios.StaffReader, "PickRate tracking and error allocation. (Dredd)"),
+            /*new Project(EProject.Khaos, "chaos.ico", App.Helios.StaffReader, "Handles make-bulk designation and separation. (Genesis)"),*/
+            /*new Project(EProject.Phoenix, "phoenix.ico", App.Helios.StaffReader, "Pre-work automated stock maintenance. (AutoBurn)"),*/
+            /*new Project(EProject.Vulcan, "vulcan.ico", App.Helios.StaffReader, "Replenishment DDR management and work assignment. (RefOrge)"),*/
+            /*new Project(EProject.Hades, "Hades.ico", App.Helios.StaffReader, "N.I.M.S. - Non-Inventory Management System"),*/
+            /*new Project(EProject.Hermes, "Hermes.ico", App.Helios.StaffReader, "Messaging and B ug Reporting system."),*/
         };
 
         App.Helios.StaffCreator.EstablishInitialProjects(projects);

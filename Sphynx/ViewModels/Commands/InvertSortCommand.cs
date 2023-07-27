@@ -1,19 +1,23 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Windows.Input;
+using Sphynx.ViewModels.Controls;
 
-namespace Olympus.ViewModels.Commands;
+namespace Sphynx.ViewModels.Commands;
 
-public class ChangePasswordCommand : ICommand
+public class InvertSortCommand : ICommand
 {
+    public AutoCounterVM VM { get; set; }
+
+    public InvertSortCommand(AutoCounterVM vm) { VM = vm; }
+
     public bool CanExecute(object? parameter)
     {
-        return App.Charon.User is not null;
+        return true;
     }
 
     public void Execute(object? parameter)
     {
-        OlympusVM.LaunchPasswordChanger();
+        VM.InvertSort();
     }
 
     public event EventHandler? CanExecuteChanged

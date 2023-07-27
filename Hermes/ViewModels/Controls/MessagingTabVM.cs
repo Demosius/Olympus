@@ -1,11 +1,6 @@
 ﻿using Styx;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Users.Models;
@@ -17,7 +12,7 @@ public class MessagingTabVM : INotifyPropertyChanged
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
 
-    private HermesDataSet DataSet;
+    public HermesDataSet DataSet;
 
     public MessagingTabVM(Helios helios, Charon charon)
     {

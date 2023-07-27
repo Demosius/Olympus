@@ -1,6 +1,7 @@
 ﻿using Sphynx.ViewModels;
 using Styx;
 using System.Threading.Tasks;
+using Morpheus.ViewModels.Controls;
 using Uranus;
 using Uranus.Interfaces;
 using Uranus.Staff;
@@ -12,10 +13,13 @@ namespace Sphynx.Views;
 /// </summary>
 public partial class SphynxPage : IProject
 {
-    public SphynxPage(Helios helios, Charon charon)
+    public SphynxVM VM { get; set; }
+
+    public SphynxPage(Helios helios, Charon charon, ProgressBarVM progressBar)
     {
+        VM =  new SphynxVM(helios, charon, progressBar);
         InitializeComponent();
-        DataContext = new SphynxVM(helios, charon);
+        DataContext = VM;
     }
 
     public EProject Project => EProject.Sphynx;
@@ -24,6 +28,6 @@ public partial class SphynxPage : IProject
 
     public async Task RefreshDataAsync()
     {
-        await Task.Run(() => {});
+        await VM.RefreshDataAsync();
     }
 }
