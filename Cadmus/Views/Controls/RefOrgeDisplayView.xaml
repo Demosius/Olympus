@@ -59,6 +59,8 @@
                              FontSize="14"
                              HorizontalContentAlignment="Center"/>
                 </StackPanel>
+                <CheckBox Content="Check Full Pallets"
+                          IsChecked="{Binding CheckFullPallets}"/>
             </WrapPanel>
 
             <!-- Data View -->

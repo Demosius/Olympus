@@ -75,11 +75,23 @@ public class RefOrgeDisplayVM : INotifyPropertyChanged, IPrintable, IDataLines
         }
     }
 
+    private bool checkCullPallets;
+    public bool CheckFullPallets
+    {
+        get => checkCullPallets;
+        set
+        {
+            checkCullPallets = value;
+            OnPropertyChanged();
+        }
+    }
+
     public ObservableCollection<RefOrgeMasterLabelVM> SelectedMasterLabels { get; set; }
 
     public ObservableCollection<RefOrgeLabelVM> SelectedLabels { get; set; }
 
     #endregion
+
     #region Commands
 
     public PrintCommand PrintCommand { get; set; }
