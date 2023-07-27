@@ -3,9 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Morpheus;
+using Uranus.Inventory;
 using Uranus.Inventory.Models;
 
 namespace Cadmus.Models;
+
+public enum EMoveType
+{
+    Ground, 
+    Racking,
+    FullPallet
+}
 
 public class RefOrgeMasterLabel
 {
@@ -30,6 +38,7 @@ public class RefOrgeMasterLabel
     public string ItemDescription { get; set; }
     public string TrueOrderTakeBin { get; set; }
     public string TakeZone { get; set; }
+    public EMoveType MoveType { get; set; }
 
     public Move? Move { get; }
 
@@ -73,6 +82,11 @@ public class RefOrgeMasterLabel
         QtyPerPack = move.Item?.QtyPerPack ?? 1;
         ItemDescription = move.Item?.Description ?? string.Empty;
         TakeZone = move.TakeZone?.Code ?? move.TakeBinID.Split(':')[1];
+
+        MoveType = move.AccessLevel == EAccessLevel.Ground ? EMoveType.Ground :
+            move.FullPallet ? EMoveType.FullPallet : EMoveType.Racking;
+
+        if (OperatorName == string.Empty) OperatorName = MoveType.ToString();
 
         Web = move.BatchID.Contains("WEB") || move.BatchID == "ECons";
         Date = DateTime.Today;

@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:controlVM="clr-namespace:Cadmus.ViewModels.Controls"
              xmlns:labels="clr-namespace:Cadmus.Views.Labels"
+             xmlns:controls="clr-namespace:Cadmus.Models"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type controlVM:RefOrgeDisplayVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="1200">
@@ -18,6 +20,13 @@
             <labels:RefOrgeMCLabelView/>
         </DataTemplate>
         <labels:RefOrgeLabelTemplateSelector x:Key="RefOrgeLabelTemplateSelector"/>
+        <ObjectDataProvider x:Key="MoveTypes"
+                            MethodName="GetValues" 
+                            ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="controls:EMoveType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </UserControl.Resources>
 
     <Grid>
@@ -59,8 +68,6 @@
                              FontSize="14"
                              HorizontalContentAlignment="Center"/>
                 </StackPanel>
-                <CheckBox Content="Check Full Pallets"
-                          IsChecked="{Binding CheckFullPallets}"/>
             </WrapPanel>
 
             <!-- Data View -->
@@ -83,6 +90,10 @@
                     <DataGridTextColumn Header="Item Description"
                                         Binding="{Binding ItemDescription}"
                                         IsReadOnly="False"/>
+                    <DataGridComboBoxColumn Header="Move Type"
+                                            SelectedValueBinding="{Binding MoveType}"
+                                            ItemsSource="{Binding Source={StaticResource MoveTypes}}"
+                                            IsReadOnly="False"/>
                     <DataGridTextColumn Header="Take Zone"
                                         Binding="{Binding TakeZone}"
                                         IsReadOnly="False"/>

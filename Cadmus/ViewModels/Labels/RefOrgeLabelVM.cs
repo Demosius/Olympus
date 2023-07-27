@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Cadmus.Annotations;
 using Cadmus.Interfaces;
+using Cadmus.Models;
 using Cadmus.Views.Labels;
 using Image = System.Drawing.Image;
 using Point = System.Drawing.Point;
@@ -101,6 +102,8 @@ public class RefOrgeLabelVM : ILabelVM, INotifyPropertyChanged
     public string CheckDigits => Master.CheckDigits ?? string.Empty;
 
     public string TotalGrab => Master.TotalGrab ?? string.Empty;
+
+    public EMoveType MoveType => Master.MoveType;
 
     #endregion
 

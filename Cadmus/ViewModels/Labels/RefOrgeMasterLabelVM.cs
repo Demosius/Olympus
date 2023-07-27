@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Cadmus.Annotations;
 using Cadmus.Models;
 using Cadmus.ViewModels.Controls;
+using iText.Kernel.Colors;
 using Morpheus;
 using Uranus.Inventory.Models;
 
@@ -263,6 +264,21 @@ public class RefOrgeMasterLabelVM : INotifyPropertyChanged
         set
         {
             Label.MixedContentDisplay = value;
+            OnPropertyChanged();
+            UpdateDisplay();
+        }
+    }
+    
+    public EMoveType MoveType
+    {
+        get => Label.MoveType;
+        set
+        {
+            if (OperatorName == MoveType.ToString())
+                Label.OperatorName = string.Empty;
+            Label.MoveType = value;
+            if (OperatorName == string.Empty) 
+                OperatorName = MoveType.ToString();
             OnPropertyChanged();
             UpdateDisplay();
         }
