@@ -13,11 +13,11 @@ using Quest.Views;
 using Uranus.Interfaces;
 using Uranus.Staff;
 using Uranus.Staff.Models;
-/*using Hades.Views;
+using Hades.Views;
 using Khaos.Views;
 using Phoenix.Views;
 using Hermes.Views;
-using Vulcan.Views;*/
+using Vulcan.Views;
 
 namespace Olympus.ViewModels.Utility;
 
@@ -40,11 +40,11 @@ public static class ProjectFactory
             EProject.Quest => new QuestPage(App.Helios, App.Charon, App.ProgressBar),
             EProject.Deimos => new DeimosPage(App.Helios, App.ProgressBar),
             EProject.None => null,
-            /*EProject.Vulcan => new VulcanPage(App.Helios),
+            EProject.Vulcan => new VulcanPage(App.Helios),
             EProject.Phoenix => new PhoenixPage(),
             EProject.Khaos => new KhaosPage(),
             EProject.Hades => new HadesPage(App.Helios),
-            EProject.Hermes => new HermesPage(App.Helios, App.Charon),*/
+            EProject.Hermes => new HermesPage(App.Helios, App.Charon),
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
         };
     }
@@ -73,11 +73,11 @@ public static class ProjectFactory
             EProject.Quest => QuestPage.RequiresUser,
             EProject.Deimos => DeimosPage.RequiresUser,
             EProject.None => false,
-            /*EProject.Vulcan => VulcanPage.RequiresUser,
+            EProject.Vulcan => VulcanPage.RequiresUser,
             EProject.Phoenix => PhoenixPage.RequiresUser,
             EProject.Khaos => KhaosPage.RequiresUser,
             EProject.Hades => HadesPage.RequiresUser,
-            EProject.Hermes => HermesPage.RequiresUser,*/
+            EProject.Hermes => HermesPage.RequiresUser,
             _ => throw new ArgumentOutOfRangeException(nameof(project), project, null)
         };
     }

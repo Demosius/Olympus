@@ -149,11 +149,11 @@ public class OlympusVM : INotifyPropertyChanged
             new Project(EProject.Panacea, "Panacea.ico", App.Helios.StaffReader, "ALLFIX: Multiple tools to remedy many given issues."),
             new Project(EProject.Quest, "quest.ico", App.Helios.StaffReader, "Manage Restock Staff assignment and tracking. (ZLAM & PickRate Tracker)"),
             new Project(EProject.Deimos, "deimos.ico", App.Helios.StaffReader, "PickRate tracking and error allocation. (Dredd)"),
-            /*new Project(EProject.Khaos, "chaos.ico", App.Helios.StaffReader, "Handles make-bulk designation and separation. (Genesis)"),*/
-            /*new Project(EProject.Phoenix, "phoenix.ico", App.Helios.StaffReader, "Pre-work automated stock maintenance. (AutoBurn)"),*/
-            /*new Project(EProject.Vulcan, "vulcan.ico", App.Helios.StaffReader, "Replenishment DDR management and work assignment. (RefOrge)"),*/
-            /*new Project(EProject.Hades, "Hades.ico", App.Helios.StaffReader, "N.I.M.S. - Non-Inventory Management System"),*/
-            /*new Project(EProject.Hermes, "Hermes.ico", App.Helios.StaffReader, "Messaging and B ug Reporting system."),*/
+            new Project(EProject.Khaos, "chaos.ico", App.Helios.StaffReader, "Handles make-bulk designation and separation. (Genesis)"),
+            new Project(EProject.Phoenix, "phoenix.ico", App.Helios.StaffReader, "Pre-work automated stock maintenance. (AutoBurn)"),
+            new Project(EProject.Vulcan, "vulcan.ico", App.Helios.StaffReader, "Replenishment DDR management and work assignment. (RefOrge)"),
+            new Project(EProject.Hades, "Hades.ico", App.Helios.StaffReader, "N.I.M.S. - Non-Inventory Management System"),
+            new Project(EProject.Hermes, "Hermes.ico", App.Helios.StaffReader, "Messaging and B ug Reporting system."),
         };
 
         App.Helios.StaffCreator.EstablishInitialProjects(projects);
