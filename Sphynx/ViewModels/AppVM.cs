@@ -11,7 +11,7 @@ public class AppVM : INotifyPropertyChanged
 
     public AppVM()
     {
-        SphynxPage = new SphynxPage(App.Helios, App.Charon);
+        SphynxPage = new SphynxPage(App.Helios, App.Charon, App.ProgressBar);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

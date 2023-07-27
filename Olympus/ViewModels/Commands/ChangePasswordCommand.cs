@@ -6,13 +6,6 @@ namespace Olympus.ViewModels.Commands;
 
 public class ChangePasswordCommand : ICommand
 {
-    public OlympusVM VM { get; set; }
-
-    public ChangePasswordCommand(OlympusVM vm)
-    {
-        VM = vm;
-    }
-
     public bool CanExecute(object? parameter)
     {
         return App.Charon.User is not null;
@@ -20,7 +13,7 @@ public class ChangePasswordCommand : ICommand
 
     public void Execute(object? parameter)
     {
-        VM.LaunchPasswordChanger();
+        OlympusVM.LaunchPasswordChanger();
     }
 
     public event EventHandler? CanExecuteChanged

@@ -5,13 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Pantheon.ViewModels.Controls.Employees"
              xmlns:converter="clr-namespace:Pantheon.ViewModels.Converters"
+             xmlns:converters="clr-namespace:Morpheus.ViewModels.Converters;assembly=Morpheus"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:EmployeeVM}, IsDesignTimeCreatable=False}">
 
     <UserControl.Resources>
         <converter:EmploymentToStringConverter x:Key="EmploymentTypeConverter"/>
         <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
-        <converter:AsyncImageConverter x:Key="AsyncImageConverter"/>
+        <converters:AsyncImageConverter x:Key="AsyncImageConverter"/>
     </UserControl.Resources>
 
     <StackPanel Orientation="Horizontal">

@@ -1228,7 +1228,7 @@ public static class DataConversion
 
     public static List<Mispick> RawStringToMispicks(string rawData)
     {
-        if (string.IsNullOrEmpty(rawData)) _ = new MispickIndices(new string[] { });
+        if (string.IsNullOrEmpty(rawData)) _ = new MispickIndices(Array.Empty<string>());
         // Start memory stream from which to read.
         var byteArray = Encoding.UTF8.GetBytes(rawData);
         MemoryStream stream = new(byteArray);
@@ -1604,10 +1604,10 @@ public static class DataConversion
 
         return batchTOLine;
     }
-    
+
     public static List<Batch> RawStringToBatches(string rawData)
     {
-        if (string.IsNullOrEmpty(rawData)) _ = new BatchIndices(new string[] { });
+        if (string.IsNullOrEmpty(rawData)) _ = new BatchIndices(Array.Empty<string>());
         // Start memory stream from which to read.
         var byteArray = Encoding.UTF8.GetBytes(rawData);
         MemoryStream stream = new(byteArray);
@@ -1616,7 +1616,7 @@ public static class DataConversion
 
         return batches;
     }
-    
+
     private static List<Batch> StreamToBatches(Stream stream)
     {
         List<Batch> batches = new();
@@ -1665,10 +1665,10 @@ public static class DataConversion
                     Units = units,
                     Priority = Batch.DetectPriority(desc),
                     TagString = string.Join(',', Batch.DetectTags(desc, batchNo).OrderBy(s => s)),
-                    Progress = fullyShipped ? EBatchProgress.Completed : 
-                        ptlCreated ? EBatchProgress.SentToPick : 
+                    Progress = fullyShipped ? EBatchProgress.Completed :
+                        ptlCreated ? EBatchProgress.SentToPick :
                         shipmentCreated ? EBatchProgress.AutoRun :
-                        cartonized ? EBatchProgress.Cartonized : 
+                        cartonized ? EBatchProgress.Cartonized :
                         EBatchProgress.Created,
                 };
                 batches.Add(batch);
@@ -1679,10 +1679,10 @@ public static class DataConversion
 
         return batches;
     }
-    
+
     public static List<PickLine> RawStringToPickLines(string rawData)
     {
-        if (string.IsNullOrEmpty(rawData)) _ = new PickLineIndices(new string[] { });
+        if (string.IsNullOrEmpty(rawData)) _ = new PickLineIndices(Array.Empty<string>());
         // Start memory stream from which to read.
         var byteArray = Encoding.UTF8.GetBytes(rawData);
         MemoryStream stream = new(byteArray);
@@ -1691,7 +1691,7 @@ public static class DataConversion
 
         return pickLines;
     }
-    
+
     private static List<PickLine> StreamToPickLines(Stream stream)
     {
         List<PickLine> pickLines = new();
@@ -1843,10 +1843,10 @@ public static class DataConversion
         };
         return store;
     }
-    
+
     public static List<Store> RawStringToStores(string rawData)
     {
-        if (string.IsNullOrEmpty(rawData)) _ = new StoreIndices(new string[] { });
+        if (string.IsNullOrEmpty(rawData)) _ = new StoreIndices(Array.Empty<string>());
         // Start memory stream from which to read.
         var byteArray = Encoding.UTF8.GetBytes(rawData);
         MemoryStream stream = new(byteArray);
@@ -1977,4 +1977,196 @@ public static class DataConversion
         // Iterate through rows.
         return (from DataRow row in dataTable.Rows select DataRowToStore(row, col, provider)).ToList();
     }
+
+    /*********************************** QA STATS ***************************************/
+    private static QACarton? ArrayToQACarton(IReadOnlyList<string> row, QACartonIndices col, int colMax, IFormatProvider provider)
+    {
+        if (colMax >= row.Count) return null;
+
+        var cartonID = row[col.CartonID];
+        var storeNo = row[col.StoreNo];
+        var storeName = col.StoreName == -1 ? "" : row[col.StoreName];
+        if (!Enum.TryParse(row[col.CartonStatus].Replace(" ", ""), out ECartonStatus cartonStatus)) cartonStatus = ECartonStatus.FullyShipped;
+        var shipmentNumber = col.ShipmentNo == -1 ? "" : row[col.ShipmentNo];
+        var warehouseCode = col.WarehouseCode == -1 ? "" : row[col.WarehouseCode];
+        var cartonType = row[col.CartonType];
+        var employeeID = row[col.QABy];
+        if (!DateTime.TryParse(row[col.QAPerformed], out var date)) date = DateTime.Today;
+        if (!DateTime.TryParse(row[col.QATime], out var time)) time = date.AddHours(8);
+        var passString = row[col.QAPassed];
+        var pass = passString.ToUpper() == "YES";
+        var qaStatus = col.QAStatus == -1 ? "" : row[col.QAStatus];
+        var batchID = row[col.BatchNo];
+        if (!double.TryParse(row[col.DepthVal], NumberStyles.Float | NumberStyles.AllowThousands, provider, out var depth)) depth = 0;
+        if (!double.TryParse(row[col.WidthVal], NumberStyles.Float | NumberStyles.AllowThousands, provider, out var width)) width = 0;
+        if (!double.TryParse(row[col.HeightVal], NumberStyles.Float | NumberStyles.AllowThousands, provider, out var height)) height = 0;
+        if (!double.TryParse(row[col.MaxWeightVal], NumberStyles.Float | NumberStyles.AllowThousands, provider, out var maxWeight)) maxWeight = 0;
+        if (!double.TryParse(row[col.MaxCubageVal], NumberStyles.Float | NumberStyles.AllowThousands, provider, out var maxCube)) maxCube = 0;
+        if (!double.TryParse(row[col.CurrentWeightVal], NumberStyles.Float | NumberStyles.AllowThousands, provider, out var currentWeight)) currentWeight = 0;
+        if (!double.TryParse(row[col.CurrentCubageVal], NumberStyles.Float | NumberStyles.AllowThousands, provider, out var currentCube)) currentCube = 0;
+
+        var qaCarton = new QACarton
+        {
+            ID = cartonID,
+            StoreNo = storeNo,
+            StoreName = storeName,
+            CartonStatus = cartonStatus,
+            ShipmentNumber = shipmentNumber,
+            WarehouseCode = warehouseCode,
+            CartonType = cartonType,
+            EmployeeID = employeeID,
+            Date = date,
+            Time = time.TimeOfDay,
+            Pass = pass,
+            QAStatus = qaStatus,
+            BatchID = batchID,
+            Depth = depth,
+            Width = width,
+            Height = height,
+            MaxWeight = maxWeight,
+            MaxCube = maxCube,
+            CurrentWeight = currentWeight,
+            CurrentCube = currentCube,
+        };
+        return qaCarton;
+    }
+
+    public static List<QACarton> RawStringToQACartons(string rawData)
+    {
+        if (string.IsNullOrEmpty(rawData)) _ = new QACartonIndices(Array.Empty<string>());
+        // Start memory stream from which to read.
+        var byteArray = Encoding.UTF8.GetBytes(rawData);
+        MemoryStream stream = new(byteArray);
+        // Start Reading from stream.
+        var qaCartons = StreamToQACartons(stream);
+
+        return qaCartons;
+    }
+
+    private static List<QACarton> StreamToQACartons(Stream stream)
+    {
+        List<QACarton> qaCartons = new();
+
+        IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+
+        using StreamReader reader = new(stream);
+        // First set the headers.
+        var line = reader.ReadLine();
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
+        var col = new QACartonIndices(headArr, true);
+
+        // Get highest column value to make sure that any given data line isn't cut short.
+        var colMax = col.Max();
+
+        line = reader.ReadLine();
+
+        // Add row data.
+        while (line != null)
+        {
+            var row = line.Split('\t');
+
+            var qaCarton = ArrayToQACarton(row, col, colMax, provider);
+
+            if (qaCarton is not null) qaCartons.Add(qaCarton);
+
+            line = reader.ReadLine();
+        }
+
+        return qaCartons;
+    }
+
+    private static QALine? ArrayToQALine(IReadOnlyList<string> row, QALineIndices col, int colMax, IFormatProvider provider)
+    {
+        if (colMax >= row.Count) return null;
+
+        var cartonID = row[col.CartonID];
+        if (!int.TryParse(row[col.ItemNumber], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var itemNo)) itemNo = 0;
+        var itemDescription = row[col.Description];
+        if (!int.TryParse(row[col.QtyPicked], NumberStyles.Integer | NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint, provider, out var pickQty)) pickQty = 0;
+        if (!Enum.TryParse(row[col.UnitOfMeasure], out EUoM uom)) uom = EUoM.EACH;
+        if (!int.TryParse(row[col.Qty_Base], NumberStyles.Integer | NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint, provider, out var pickQtyBase)) pickQtyBase = 0;
+
+        int qtyPerUoM;
+        if (col.QtyPerUoM == -1)
+            qtyPerUoM = pickQtyBase / (pickQty == 0 ? 1 : pickQty);
+        else if (!int.TryParse(row[col.QtyPerUoM],
+                     NumberStyles.Integer | NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint, provider,
+                     out qtyPerUoM)) qtyPerUoM = 0;
+        
+        if (!int.TryParse(row[col.QAScanQty], NumberStyles.Integer | NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint, provider, out var qaQty)) qaQty = 0;
+        if (!int.TryParse(row[col.QtyOverUnder], NumberStyles.Integer | NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint, provider, out var varianceQty)) varianceQty = 0;
+        if (!Enum.TryParse(row[col.QAStatus].Replace('.', ' ').Replace(" ", ""), out EQAStatus qaStatus)) qaStatus = EQAStatus.OK;
+        var binCode = row[col.Bincode];
+        var pickerID = row[col.PickerID];
+        var errorType = row[col.QAErrorType];
+        DateTime date;
+        if (col.Date == -1)
+            date = DateTime.Today; 
+        else if (!DateTime.TryParse(row[col.Date], out date)) date = DateTime.Today;
+
+        var qaLine = new QALine
+        {
+            CartonID = cartonID,
+            ItemNumber = itemNo,
+            ItemDescription = itemDescription,
+            PickQty = pickQty,
+            UoM = uom,
+            QtyPerUoM = qtyPerUoM,
+            PickQtyBase = pickQtyBase,
+            QAQty = qaQty,
+            VarianceQty = varianceQty,
+            QAStatus = qaStatus,
+            BinCode = binCode,
+            PickerRFID = pickerID,
+            ErrorType = errorType,
+            Date = date
+        };
+        qaLine.SetID();
+        return qaLine;
+    }
+
+    public static List<QALine> RawStringToQALines(string rawData)
+    {
+        if (string.IsNullOrEmpty(rawData)) _ = new QALineIndices(Array.Empty<string>());
+        // Start memory stream from which to read.
+        var byteArray = Encoding.UTF8.GetBytes(rawData);
+        MemoryStream stream = new(byteArray);
+        // Start Reading from stream.
+        var qaLines = StreamToQALines(stream);
+
+        return qaLines;
+    }
+
+    private static List<QALine> StreamToQALines(Stream stream)
+    {
+        List<QALine> qaLines = new();
+
+        IFormatProvider provider = CultureInfo.CreateSpecificCulture("en-AU");
+
+        using StreamReader reader = new(stream);
+        // First set the headers.
+        var line = reader.ReadLine();
+        var headArr = line?.Split('\t') ?? Array.Empty<string>();
+        var col = new QALineIndices(headArr, true);
+
+        // Get highest column value to make sure that any given data line isn't cut short.
+        var colMax = col.Max();
+
+        line = reader.ReadLine();
+
+        // Add row data.
+        while (line != null)
+        {
+            var row = line.Split('\t');
+
+            var qaLine = ArrayToQALine(row, col, colMax, provider);
+
+            if (qaLine is not null) qaLines.Add(qaLine);
+
+            line = reader.ReadLine();
+        }
+
+        return qaLines;
+    }
+
 }

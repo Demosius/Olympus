@@ -3,20 +3,21 @@
 public enum EProject
 {
     None,
-    Vulcan,
     Prometheus,
-    Phoenix,
     Pantheon,
-    Khaos,
     Aion,
     Hydra,
     Cadmus,
     Sphynx,
     Argos,
-    Hades,
     Panacea,
     Quest,
     Deimos,
+    Vulcan,
+    Phoenix,
+    Khaos,
+    Hades,
+    Hermes,
 }
 
 public enum ELicence
@@ -35,20 +36,21 @@ public static class EnumConverter
         project = project.ToUpper();
         return project switch
         {
-            "VULCAN" => EProject.Vulcan,
-            "PHOENIX" => EProject.Phoenix,
             "PANTHEON" => EProject.Pantheon,
-            "KHAOS" => EProject.Khaos,
             "PROMETHEUS" => EProject.Prometheus,
             "AION" => EProject.Aion,
             "HYDRA" => EProject.Hydra,
             "CADMUS" => EProject.Cadmus,
             "SPHYNX" => EProject.Sphynx,
             "ARGOS" => EProject.Argos,
-            "HADES" => EProject.Hades,
             "PANACEA" => EProject.Panacea,
             "QUEST" => EProject.Quest,
             "DEIMOS" => EProject.Deimos,
+            "VULCAN" => EProject.Vulcan,
+            "PHOENIX" => EProject.Phoenix,
+            "KHAOS" => EProject.Khaos,
+            "HADES" => EProject.Hades,
+            "HERMES" => EProject.Hermes,
             _ => EProject.None
         };
     }

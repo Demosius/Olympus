@@ -297,6 +297,10 @@ public abstract class MasterChariot
         }
     }
 
+    public async Task<T?> PullObjectAsync<T>(object primaryKey, EPullType pullType = EPullType.ObjectOnly)
+        where T : new()
+        => await Task.Run(() => PullObject<T>(primaryKey, pullType));
+
     protected List<string> GetTableNames()
     {
         var tableMappings = Database?.TableMappings.ToList();
@@ -323,8 +327,7 @@ public abstract class MasterChariot
 
         void Action()
         {
-            lines += objList.Select(InsertOrUpdate).Sum();
-            lines += Database.UpdateAll(objList);
+            lines += objList.Select(InsertOrReplace).Sum();
         }
 
         Database?.RunInTransaction(Action);
@@ -338,7 +341,7 @@ public abstract class MasterChariot
 
         void Action()
         {
-            lines += objList.Select(InsertOrUpdate).Sum();
+            lines += objList.Select(InsertOrReplace).Sum();
         }
 
         await Task.Run(() => Database?.RunInTransaction(Action)).ConfigureAwait(false);
@@ -353,9 +356,9 @@ public abstract class MasterChariot
     /// <returns>The number of database rows affected.</returns>
     public int Update<T>(T item) => Database?.Update(item) ?? 0;
 
-    public int InsertOrUpdate<T>(T item) => Database?.InsertOrReplace(item) ?? 0;
+    public int InsertOrReplace<T>(T item) => Database?.InsertOrReplace(item) ?? 0;
 
-    public async Task<int> InsertOrUpdateAsync<T>(T item) =>
+    public async Task<int> InsertOrReplaceAsync<T>(T item) =>
         await Task.Run(() => Database?.InsertOrReplace(item) ?? 0).ConfigureAwait(false);
 
     /**************************** DELETE Data ****************************/

@@ -7,6 +7,11 @@
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:MispickDataVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </UserControl.InputBindings>
+
     <DockPanel>
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <Button Command="{Binding RefreshDataCommand}"
@@ -57,6 +62,9 @@
                                     IsReadOnly="True"/>
                 <DataGridTextColumn Header="Posted Date"
                                     Binding="{Binding PostedDate, StringFormat=dd/MM/yyyy}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Tech"
+                                    Binding="{Binding TechType}"
                                     IsReadOnly="True"/>
                 <DataGridTextColumn Header="Carton"
                                     Binding="{Binding CartonID}"

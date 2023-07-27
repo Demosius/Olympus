@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 
-namespace Pantheon.ViewModels.Converters;
+namespace Morpheus.ViewModels.Converters;
 
 public class AsyncImageConverter : IValueConverter
 {

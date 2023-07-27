@@ -22,7 +22,7 @@ public class WeeklyStatisticReport : EmployeeStatisticsReport
         // Make sure that we a properly handling dates.
         // Turn start date into sunday.
         (start, FiscalYear, FiscalQuarter, FiscalMonth, MonthWeek) = start.GetEBFiscalData();
-        FiscalWeek = start.EBFiscalWeek();
+        FiscalWeek = start.EBFiscalWeekString();
         StartDate = start;
         EndDate = StartDate.AddDays(6);
 

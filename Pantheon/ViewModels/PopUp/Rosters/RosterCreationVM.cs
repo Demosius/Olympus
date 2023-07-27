@@ -44,7 +44,7 @@ public class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
             value = value.AddDays(DayOfWeek.Monday - value.DayOfWeek);
             startDate = value;
             OnPropertyChanged(nameof(StartDate));
-            RosterName = $"{value.EBFiscalWeek()} ({value.Year})";
+            RosterName = $"{value.EBFiscalWeekString()} ({value.Year})";
         }
     }
 
@@ -86,7 +86,7 @@ public class RosterCreationVM : INotifyPropertyChanged, IDBInteraction
         Charon = charon;
 
         startDate = DateTime.Today.AddDays(DayOfWeek.Monday - DateTime.Today.DayOfWeek + 7);
-        rosterName = $"{startDate.EBFiscalWeek()} ({startDate.Year})";
+        rosterName = $"{startDate.EBFiscalWeekString()} ({startDate.Year})";
 
         RefreshDataCommand = new RefreshDataCommand(this);
         ConfirmDepartmentRosterCreationCommand = new ConfirmDepartmentRosterCreationCommand(this);

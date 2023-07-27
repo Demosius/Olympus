@@ -52,7 +52,14 @@ public class PickSession
     [Ignore] public int Units => Qty;
     [Ignore] public double HitsPerMinute => Hits / (Duration.Seconds / 60.0);
     [Ignore] public double UnitsPerMinute => Units / (Duration.Seconds / 60.0);
-    
+
+    [Ignore]
+    public EPickLocation PickLocation => 
+        TechType == ETechType.All ? EPickLocation.None :
+        TechType == ETechType.PTL ? EPickLocation.PTL :
+        !PickEvents.Any() ? EPickLocation.SP01 : 
+        PickEvents.First().PickLocation;
+
     public PickSession()
     {
         ID = Guid.NewGuid().ToString(); // This should be immediately overwritten, but automatically should be unique so as not to cause potential issues.
@@ -182,5 +189,20 @@ public class PickSession
             new PickDailyStats(dictItem.Key.Item1, dictItem.Key.Item2, dictItem.Value)).ToList();
 
         return allSessions;
+    }
+
+    public bool WithinTimespan(TimeSpan startSpan, TimeSpan endSpan)
+    {
+        if (endSpan < startSpan || startSpan > EndTime || StartTime > endSpan) return false;
+
+        // Overlap between pick session and given span must cover at least half of either.
+        var minDuration = new List<TimeSpan> {Duration / 2, endSpan.Subtract(startSpan) / 2}.Min();
+
+        var start = new List<TimeSpan> {StartTime, startSpan}.Max();
+        var end = new List<TimeSpan> {EndTime, endSpan}.Min();
+
+        var overlap = end.Subtract(start);
+
+        return overlap > minDuration;
     }
 }

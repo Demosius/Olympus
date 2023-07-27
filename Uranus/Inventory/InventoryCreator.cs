@@ -89,7 +89,7 @@ public class InventoryCreator
 
     public async Task<int> NAVGenre(List<NAVGenre> gens) => await Chariot.ReplaceFullTableAsync(gens).ConfigureAwait(false);
 
-    public async Task<int> SiteAsync(Site site) => await Chariot.InsertOrUpdateAsync(site).ConfigureAwait(false);
+    public async Task<int> SiteAsync(Site site) => await Chariot.InsertOrReplaceAsync(site).ConfigureAwait(false);
 
     public async Task<int> BatchTODataAsync(List<BatchTOGroup> newGroups)
     {

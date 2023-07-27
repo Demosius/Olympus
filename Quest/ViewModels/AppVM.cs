@@ -11,7 +11,7 @@ public class AppVM : INotifyPropertyChanged
 
     public AppVM()
     {
-        QuestPage = new QuestPage(App.Helios, App.Charon);
+        QuestPage = new QuestPage(App.Helios, App.Charon, App.ProgressBar);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

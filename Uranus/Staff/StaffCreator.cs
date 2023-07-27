@@ -1,10 +1,14 @@
 ﻿using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Uranus.Extensions;
 using Uranus.Staff.Models;
+using Uranus.Users.Models;
+using Role = Uranus.Staff.Models.Role;
 
 namespace Uranus.Staff;
 
@@ -25,7 +29,8 @@ public class StaffCreator
         Chariot = chariot;
     }
 
-    public bool Employee(Employee employee, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(employee, pushType);
+    public bool Employee(Employee employee, EPushType pushType = EPushType.ObjectOnly) =>
+        Chariot.Create(employee, pushType);
 
     public bool ClockEvent(ClockEvent clockEvent) => Chariot.Create(clockEvent);
 
@@ -51,7 +56,7 @@ public class StaffCreator
             entry.ApplyClockTimes(clocks);
 
             lines += Chariot.UpdateTable(clocks);
-            lines += Chariot.InsertOrUpdate(entry);
+            lines += Chariot.InsertOrReplace(entry);
         }
 
         await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
@@ -59,7 +64,8 @@ public class StaffCreator
         return lines;
     }
 
-    public bool Department(Department department, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(department, pushType);
+    public bool Department(Department department, EPushType pushType = EPushType.ObjectOnly) =>
+        Chariot.Create(department, pushType);
 
     public bool Role(Role role, EPushType pushType = EPushType.ObjectOnly) => Chariot.Create(role, pushType);
 
@@ -69,8 +75,8 @@ public class StaffCreator
         {
             foreach (var project in newProjects)
             {
-                Chariot.InsertOrReplace(project);
-                Chariot.InsertOrReplace(project.Icon);
+                Chariot.InsertOrReplace((object?)project);
+                Chariot.InsertOrReplace((object?)project.Icon);
             }
         });
     }
@@ -263,4 +269,151 @@ public class StaffCreator
     public int PickSessions(List<PickSession> sessions) => Chariot.Database?.InsertAll(sessions) ?? 0;
 
     public int PickStats(List<PickDailyStats> pickStats) => Chariot.Database?.InsertAll(pickStats) ?? 0;
+
+    /* QA Stats */
+    /// <summary>
+    /// Upload new QA Carton Data.
+    /// Aligns to matching QA Lines and adjusts the dates of those to match with this data.
+    /// </summary>
+    /// <param name="qaCartons"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<int> QACartonsAsync(List<QACarton> qaCartons)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            var cartonIDs = qaCartons.Select(c => c.ID);
+            var qaLineDict = Chariot.PullObjectList<QALine>(l => cartonIDs.Contains(l.CartonID))
+                .GroupBy(l => l.CartonID)
+                .ToDictionary(g => g.Key, g => g.ToList());
+            var qaLines = new List<QALine>();
+
+            // Update QALine dates.
+            foreach (var qaCarton in qaCartons)
+            {
+                if (!qaLineDict.TryGetValue(qaCarton.ID, out var qaLineGroup)) continue;
+                foreach (var qaLine in qaLineGroup)
+                {
+                    qaLine.Date = qaCarton.Date;
+                    qaLines.Add(qaLine);
+                }
+            }
+
+            lines += Chariot.UpdateTable(qaCartons);
+            lines += Chariot.UpdateTable(qaLines);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return lines;
+    }
+
+    /// <summary>
+    /// Upload new QA Line Data.
+    /// Align to matching QA Cartons to set the day.
+    /// Creates mispick data where appropriate.
+    /// </summary>
+    /// <param name="qaLines"></param>
+    /// <returns></returns>
+    public async Task<int> QALinesAsync(List<QALine> qaLines)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            var qaLineDict = qaLines.GroupBy(l => l.CartonID).ToDictionary(g => g.Key, g => g.ToList());
+            var cartonIDs = qaLineDict.Keys.ToList();
+            var qaCartons = Chariot.PullObjectList<QACarton>(c => cartonIDs.Contains(c.ID));
+
+            // Update QALine dates.
+            foreach (var qaCarton in qaCartons)
+            {
+                if (!qaLineDict.TryGetValue(qaCarton.ID, out var qaLineGroup)) continue;
+                foreach (var qaLine in qaLineGroup)
+                {
+                    qaLine.Date = qaCarton.Date;
+                    qaLines.Add(qaLine);
+                }
+            }
+
+            // Get mispick data.
+            var mispicks = qaLines.Select(qaLine => qaLine.GenerateMispick()).Where(mispick => mispick is not null).ToList();
+
+            lines += Chariot.UpdateTable(qaLines);
+            lines += Chariot.UpdateTable(mispicks);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return lines;
+    }
+
+    [SuppressMessage("ReSharper", "AccessToModifiedClosure")]
+    public async Task<int> QAStatsAsync(DateTime fromDate, EDatePeriod datePeriod)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            var existing = Chariot.PullObjectList<QAStats>(s => s.DatePeriod == datePeriod).ToDictionary(s => s.StartDate, s => s);
+            var newStats = new List<QAStats>();
+
+            var startDate = datePeriod switch
+            {
+                EDatePeriod.Day => fromDate,
+                EDatePeriod.Week => fromDate.WeekStartSunday(),
+                EDatePeriod.Month => fromDate.EBFiscalMonthStart(),
+                EDatePeriod.Year => fromDate.EBFiscalYearStart(),
+                _ => new DateTime()
+            };
+
+            while (startDate < DateTime.Today)
+            {
+                var endDate = datePeriod switch
+                {
+                    EDatePeriod.Day => startDate,
+                    EDatePeriod.Week => startDate.AddDays(6),
+                    EDatePeriod.Month => startDate.EBFiscalMonthEnd(),
+                    EDatePeriod.Year => startDate.EBFiscalYearEnd(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(datePeriod), datePeriod, null)
+                };
+
+                var dateDescription = datePeriod switch
+                {
+                    EDatePeriod.Day => startDate.ToString("dddd dd-MMM-yyyy"),
+                    EDatePeriod.Week => startDate.EBFiscalWeekStringFull(),
+                    EDatePeriod.Month => startDate.EBFiscalMonthStringFull(),
+                    EDatePeriod.Year => startDate.EBFiscalYear().ToString(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(datePeriod), datePeriod, null)
+                };
+
+                if (!existing.ContainsKey(startDate))
+                {
+                    var stats = new QAStats(startDate, endDate, dateDescription)
+                    {
+                        RestockQty = Chariot.ExecuteScalar<int>("SELECT SUM(Qty) From PickEvent WHERE Date >= ? AND Date <= ?;", startDate.Ticks, endDate.Ticks),
+                        RestockHits = Chariot.ExecuteScalar<int>("SELECT Count(*) From PickEvent WHERE Date >= ? AND Date <= ?;", startDate.Ticks, endDate.Ticks),
+                        RestockCartons = Chariot.ExecuteScalar<int>("SELECT Count(DISTINCT ContainerID) From PickEvent WHERE Date >= ? AND Date <= ?;", startDate.Ticks, endDate.Ticks)
+                    };
+
+                    var qaLines = Chariot.PullObjectList<QALine>(l => l.Date >= startDate && l.Date <= endDate);
+                    var qaCartons = Chariot.PullObjectList<QACarton>(c => c.Date >= startDate && c.Date <= endDate);
+
+                    stats.SetValues(qaCartons, qaLines);
+
+                    newStats.Add(stats);
+                }
+
+                startDate = endDate.AddDays(1);
+            }
+
+            lines += Chariot.UpdateTable(newStats);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return lines;
+    }
 }

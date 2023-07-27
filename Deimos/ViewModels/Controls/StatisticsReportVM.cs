@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Deimos.Models;
+using Morpheus.ViewModels.Controls;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -18,10 +19,12 @@ namespace Deimos.ViewModels.Controls;
 public class StatisticsReportVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
     public Helios Helios { get; set; }
-    public DeimosVM DeimosVM { get; set; }
+    public DeimosVM Deimos { get; set; }
+    public ErrorAllocationVM ParentVM { get; set; }
+    public ProgressBarVM ProgressBar { get; set; }
 
-    public DateTime? StartDate => DeimosVM.StartDate;
-    public DateTime? EndDate => DeimosVM.EndDate;
+    public DateTime? StartDate => ParentVM.StartDate;
+    public DateTime? EndDate => ParentVM.EndDate;
 
     public List<EmployeeStatisticsReport> ReportList { get; set; }
 
@@ -73,10 +76,12 @@ public class StatisticsReportVM : INotifyPropertyChanged, IDBInteraction, IFilte
 
     #endregion
 
-    public StatisticsReportVM(DeimosVM deimosVM)
+    public StatisticsReportVM(ErrorAllocationVM parentVM)
     {
-        DeimosVM = deimosVM;
-        Helios = DeimosVM.Helios;
+        ParentVM = parentVM;
+        Helios = ParentVM.Helios;
+        Deimos = ParentVM.ParentVM;
+        ProgressBar = ParentVM.ProgressBar;
         
         ReportList = new List<EmployeeStatisticsReport>();
         Reports = new ObservableCollection<EmployeeStatisticsReport>();
@@ -93,6 +98,8 @@ public class StatisticsReportVM : INotifyPropertyChanged, IDBInteraction, IFilte
 
         var fromDate = (DateTime)StartDate;
         var toDate = (DateTime)EndDate;
+
+        ProgressBar.StartTask("Calculating Report...", $"{StartDate:dd-MMM-yyyy} - {EndDate:dd-MMM-yyyy}");
 
         var (mispicks, sessions, tagTool) = await Helios.StaffReader.StatisticReportsAsync(fromDate, toDate, SelectedErrorMethod == EErrorMethod.ErrorDiscovered);
         await Task.Run(() =>
@@ -135,6 +142,8 @@ public class StatisticsReportVM : INotifyPropertyChanged, IDBInteraction, IFilte
                 ReportList.Add(newRep);
             }
         });
+        ProgressBar.EndTask();
+
         ApplyFilters();
     }
 

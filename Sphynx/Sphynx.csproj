@@ -5,11 +5,13 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Sphynx.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Resources\application--arrow.png" />
+    <None Remove="Resources\arrow-return-090.png" />
     <None Remove="Resources\arrow-transition-090.png" />
     <None Remove="Resources\arrow-transition-270.png" />
     <None Remove="Resources\arrow-transition.png" />
@@ -57,7 +59,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="InputSimulator" Version="1.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Resources\application--arrow.png" />
+    <Resource Include="Resources\arrow-return-090.png" />
     <Resource Include="Resources\arrow-transition-090.png" />
     <Resource Include="Resources\arrow-transition-270.png" />
     <Resource Include="Resources\arrow-transition.png" />
@@ -106,6 +113,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Update="Views\Controls\AutoCounterView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -117,6 +127,10 @@
 
   <ItemGroup>
     <Page Update="Resources\Fonts.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Controls\AutoCounterView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

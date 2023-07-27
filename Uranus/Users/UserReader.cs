@@ -25,10 +25,24 @@ public class UserReader
 
     public int UserCount() => Chariot.ExecuteScalar<int>("SELECT count(*) FROM User;"); /*Chariot.PullObjectListAsync<User>(pullType: EPullType.ObjectOnly).Count;*/
 
+    public IEnumerable<User> Users(Expression<Func<User, bool>>? filter = null, EPullType pullType = EPullType.ObjectOnly) =>Chariot.PullObjectList(filter, pullType);
+
     public async Task<IEnumerable<User>> UsersAsync(Expression<Func<User, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
     public async Task<IEnumerable<Role>> RolesAsync(Expression<Func<Role, bool>>? filter = null,
         EPullType pullType = EPullType.ObjectOnly) => await Chariot.PullObjectListAsync(filter, pullType).ConfigureAwait(false);
 
+    /* Messages */
+    public Message? Message(Guid id, EPullType pullType = EPullType.ObjectOnly) =>
+        Chariot.PullObject<Message>(id, pullType);
+
+    public IEnumerable<Message> Messages(Expression<Func<Message, bool>>? filter = null,
+        EPullType pullType = EPullType.ObjectOnly) => Chariot.PullObjectList(filter, pullType);
+
+    // TODO: Implement (or copy existing implementation from Hermes).
+    public HermesDataSet HermesDataSet(User user)
+    {
+        return new HermesDataSet(Chariot.PullObject<User>(user.ID) ?? user);
+    }
 }

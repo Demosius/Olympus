@@ -127,9 +127,9 @@ public class Employee
     [OneToMany(nameof(PickDailyStats.OperatorID), nameof(PickDailyStats.Operator), CascadeOperations = CascadeOperation.CascadeRead)]
     public List<PickDailyStats> PickStatistics { get; set; }
 
+    [Ignore] public List<QACarton> QACartons { get; set; }
     [Ignore] public string FullName => $"{FirstName} {LastName}";
     [Ignore] public string ReportsToName => ReportsTo?.FullName ?? "";
-
 
     [Ignore]
     public List<ShiftRule> ShiftRules =>
@@ -174,6 +174,7 @@ public class Employee
         PickEvents = new List<PickEvent>();
         PickSessions = new List<PickSession>();
         PickStatistics = new List<PickDailyStats>();
+        QACartons = new List<QACarton>();
     }
 
     public Employee(int id) : this()
@@ -262,6 +263,12 @@ public class Employee
         LicenceNumber = Licence?.Number ?? LicenceNumber;
         IconName = Icon?.Name ?? IconName;
         AvatarName = Avatar?.Name ?? AvatarName;
+    }
+
+    public void AddQACarton(QACarton carton)
+    {
+        QACartons.Add(carton);
+        carton.QAOperator = this;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

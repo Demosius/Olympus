@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Morpheus.ViewModels.Controls;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -15,8 +16,11 @@ namespace Deimos.ViewModels.Controls;
 
 public class MispickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
-    public DeimosVM ParentVM { get; set; }
+    public DeimosVM Deimos { get; set; }
+    public ErrorAllocationVM ParentVM { get; set; }
     public Helios Helios { get; set; }
+    public ProgressBarVM ProgressBar { get; set; }
+
     public List<MispickVM> AllMispicks { get; set; }
 
     #region ParentVM Access
@@ -51,10 +55,12 @@ public class MispickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     #endregion
 
-    public MispickDataVM(DeimosVM parentVM)
+    public MispickDataVM(ErrorAllocationVM parentVM)
     {
         ParentVM = parentVM;
+        Deimos = ParentVM.ParentVM;
         Helios = parentVM.Helios;
+        ProgressBar = parentVM.ProgressBar;
 
         filterString = string.Empty;
 
@@ -69,12 +75,14 @@ public class MispickDataVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     public async Task RefreshDataAsync()
     {
+        ProgressBar.StartTask("Gathering Mispick Data...");
         if (StartDate is null || EndDate is null)
             AllMispicks = new List<MispickVM>();
         else
             AllMispicks = (await Helios.StaffReader.RawMispicksAsync((DateTime) StartDate, (DateTime) EndDate)).Select(mp => new MispickVM(mp, Helios)).ToList();
 
         ApplyFilters();
+        ProgressBar.EndTask();
     }
 
     public void ClearFilters()

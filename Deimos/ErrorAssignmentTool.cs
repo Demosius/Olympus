@@ -199,8 +199,12 @@ public class ErrorAssignmentTool
 
         if (!cartonDictionary.TryGetValue(mispick.ItemNumber, out var itemEvents)) return false;
 
-        if (itemEvents.Count == 0) return false;
+        // If QA Allocated, make sure to match only to existing RF ID.
+        if (mispick.QAAllocated && mispick.AssignedRF_ID != string.Empty)
+            itemEvents = itemEvents.Where(e => e.OperatorRF_ID == mispick.AssignedRF_ID).ToList();
 
+        if (itemEvents.Count == 0) return false;
+        
         itemEvents.First().AssignMispick(mispick);
 
         return true;
@@ -261,7 +265,8 @@ public class ErrorAssignmentTool
                 clusterEvents.AddRange(events);
 
         // Check if item was picked in one (or more) of these clusters.
-        clusterEvents = clusterEvents.Where(e => e.ItemNumber == mispick.ItemNumber).ToList();
+        // If QAAllocated with allocated RFID, only include events with matching ID.
+        clusterEvents = clusterEvents.Where(e => e.ItemNumber == mispick.ItemNumber && (!mispick.CanAllocateRF || e.OperatorRF_ID == mispick.AssignedRF_ID)).ToList();
         if (!clusterEvents.Any()) return false;
 
         // If there is only one eligible event:
@@ -272,19 +277,19 @@ public class ErrorAssignmentTool
         }
 
         // Multi/Assign as appropriate.
-        var dematicIDs = clusterEvents.Select(e => e.OperatorDematicID).Distinct().ToList();
+        var rfIDs = clusterEvents.Select(e => e.OperatorRF_ID).Distinct().ToList();
 
-        if (!dematicIDs.Any()) return false;
+        if (!rfIDs.Any()) return false;
 
-        if (dematicIDs.Count > 1)
+        if (rfIDs.Count > 1)
         {
-            mispick.MultiAssign(dematicIDs);
+            mispick.MultiAssign(rfIDs);
             return false;
         }
 
-        var id = dematicIDs.First();
+        var rfID = rfIDs.First();
 
-        return AssignToSession(mispick, id, clusterEvents);
+        return AssignToSession(mispick, rfID, clusterEvents);
     }
 
     /// <summary>
@@ -314,23 +319,29 @@ public class ErrorAssignmentTool
             var endTime = later.Min(e => e.DateTime);
 
             // Find id of picker(s) and associated events in zone in that time-frame.}
-            var zoneEvents = PickEvents.Where(e => e.ZoneID == zone && e.DateTime > startTime && e.DateTime < endTime).GroupBy(e => e.OperatorDematicID);
+            var zoneEvents = PickEvents
+                .Where(e => e.ZoneID == zone && 
+                            e.DateTime > startTime && 
+                            e.DateTime < endTime && 
+                            (mispick.CanAllocateRF || e.OperatorRF_ID == mispick.AssignedRF_ID))
+                .GroupBy(e => e.OperatorRF_ID);
+
             foreach (var zoneEventGroup in zoneEvents)
             {
-                var key = zoneEventGroup.Key;
+                var rf = zoneEventGroup.Key;
                 var list = zoneEventGroup.ToList();
-                if (idEvents.ContainsKey(key))
-                    idEvents[key].AddRange(list);
+                if (idEvents.ContainsKey(rf))
+                    idEvents[rf].AddRange(list);
                 else
-                    idEvents[key] = list;
+                    idEvents[rf] = list;
             }
         }
 
         if (idEvents.Count != 1) return false;
 
-        var (id, potentialEvents) = idEvents.First();
+        var (rfID, potentialEvents) = idEvents.First();
 
-        return AssignToSession(mispick, id, potentialEvents);
+        return AssignToSession(mispick, rfID, potentialEvents);
     }
 
     private void MatchUnassigned(IProgress<ProgressTaskVM>? progress)
@@ -374,7 +385,7 @@ public class ErrorAssignmentTool
         }
     }
 
-    private bool AssignToSession(Mispick mispick, string id, IReadOnlyCollection<PickEvent> potentialEvents)
+    private bool AssignToSession(Mispick mispick, string rfID, IReadOnlyCollection<PickEvent> potentialEvents)
     {
         var tech = potentialEvents
             .Select(e => e.TechType)
@@ -382,18 +393,18 @@ public class ErrorAssignmentTool
             .OrderByDescending(grp => grp.Count())
             .Select(grp => grp.Key).First();
 
-        var session = GetSession(id, potentialEvents.Min(e => e.DateTime), potentialEvents.Max(e => e.DateTime), tech);
+        var session = GetSession(rfID, potentialEvents.Min(e => e.DateTime), potentialEvents.Max(e => e.DateTime), tech);
 
-        if (session is null) return AssignToStats(mispick, id, tech);
+        if (session is null) return AssignToStats(mispick, rfID, tech);
 
         mispick.AssignPickSession(session);
         return true;
 
     }
 
-    private bool AssignToStats(Mispick mispick, string id, ETechType tech)
+    private bool AssignToStats(Mispick mispick, string rfID, ETechType tech)
     {
-        var stats = GetStats(id, mispick.ShipmentDate);
+        var stats = GetStats(rfID, mispick.ShipmentDate);
 
         if (stats is null) return false;
 
@@ -401,12 +412,12 @@ public class ErrorAssignmentTool
         return true;
     }
 
-    private PickSession? GetSession(string dematicID, DateTime startTime, DateTime endTime, ETechType? tech = null)
+    private PickSession? GetSession(string rfID, DateTime startTime, DateTime endTime, ETechType? tech = null)
     {
         var sessions = PickSessions
             .Where(s =>
                 (tech is null || s.TechType == tech) &&
-                s.OperatorDematicID == dematicID &&
+                s.OperatorRF_ID == rfID &&
                 s.EndDateTime >= startTime &&
                 s.StartDateTime <= endTime)
             .ToList();
@@ -414,9 +425,9 @@ public class ErrorAssignmentTool
         return sessions.Count != 1 ? null : sessions.First();
     }
 
-    private PickDailyStats? GetStats(string dematicID, DateTime date)
+    private PickDailyStats? GetStats(string rfID, DateTime date)
     {
-        return Stats.FirstOrDefault(s => s.OperatorDematicID == dematicID && s.Date == date);
+        return Stats.FirstOrDefault(s => s.OperatorRF_ID == rfID && s.Date == date);
     }
 
     private IEnumerable<string>? GetCartonZones(string cartonID)

@@ -3,14 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:converter="clr-namespace:Pantheon.ViewModels.Converters"
              xmlns:employees="clr-namespace:Pantheon.ViewModels.Controls.Employees"
+             xmlns:converters="clr-namespace:Morpheus.ViewModels.Converters;assembly=Morpheus"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type employees:EmployeeVM}, IsDesignTimeCreatable=False}">
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
-        <converter:AsyncImageConverter x:Key="AsyncImageConverter"/>
+        <converters:AsyncImageConverter x:Key="AsyncImageConverter"/>
     </UserControl.Resources>
 
     <StackPanel Orientation="Horizontal">

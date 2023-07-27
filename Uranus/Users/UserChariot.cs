@@ -18,7 +18,8 @@ public sealed class UserChariot : MasterChariot
 
     public override Type[] Tables { get; } =
     {
-        typeof(User), typeof(Role), typeof(Login)
+        typeof(User), typeof(Role), typeof(Login),
+        typeof(Conversation), typeof(UserConversation), typeof(Message),
     };
 
     /*************************** Constructors ****************************/

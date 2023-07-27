@@ -122,6 +122,12 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
         set { Employee.RF_ID = value; OnPropertyChanged(); }
     }
 
+    public string DematicID
+    {
+        get => Employee.DematicID;
+        set { Employee.DematicID = value[..Math.Min(4, value.Length)]; ; OnPropertyChanged(); }
+    }
+
     public string Location
     {
         get => Employee.Location;

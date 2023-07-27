@@ -4,7 +4,7 @@ using System.Linq;
 
 // ReSharper disable StringLiteralTypo
 
-namespace Uranus.Inventory;
+namespace Uranus;
 
 /// <summary>
 ///  Used for holding constants relevant to the Inventory namespace.
@@ -21,11 +21,14 @@ public static class Constants
     public const string BatchDescription = "Batch Description";
     public const string BatchNo = "Batch No.";
     public const string BinAssigned = "Bin Assigned";
+    public const string Bincode = "Bin code";
     public const string BinCode = "Bin Code";
     public const string BinRanking = "Bin Ranking";
     public const string CartonID = "Carton ID";
     public const string Cartonized = "Cartonized";
     public const string Cartons = "No. of Cartons";
+    public const string CartonStatus = "Carton Status";
+    public const string CartonType = "Carton Type";
     public const string CatCode = "CategoryCode";
     public const string CCN = "CCN";
     public const string CCNRegion = "CCN Region";
@@ -41,8 +44,11 @@ public static class Constants
     public const string Cube = "Cubage";
     public const string CubeCM = "CM Cubage";
     public const string CubeM = "Cube m3";
+    public const string CurrentCubage = "Current Cubage";
+    public const string CurrentWeight = "Current Weight";
     public const string Date = "Date";
     public const string DateCreated = "Date Created";
+    public const string Depth = "Depth";
     public const string Description = "Description";
     public const string Design = "Design";
     public const string DeviceID = "Device ID";
@@ -74,8 +80,10 @@ public static class Constants
     public const string LengthCM = "Length (CM)";
     public const string LineNo = "Line No.";
     public const string LocationCode = "Location Code";
+    public const string MaxCubage = "Max. Cubage";
     public const string MaxCube = "Maximum Cubage";
     public const string MaxQty = "Max Qty";
+    public const string MaxWeight = "Max. Weight";
     public const string MBRegion = "MB Region";
     public const string Name = "Name";
     public const string NegQty = "Neg. Adjmt. Qty.";
@@ -93,13 +101,24 @@ public static class Constants
     public const string PrimaryBarcode = "PrimaryBarcode";
     public const string PTLFileCreated = "PTL File Created";
     public const string PutAwayQty = "Put-away Qty.";
+    public const string QABy = "QA By";
+    public const string QAErrorType = "QA Error Type";
+    public const string QAPassed = "QA Passed";
+    public const string QAPerformed = "QA Performed";
+    public const string QAScanQty = "QA Scan Qty.";
+    public const string QAStatus = "QA Status";
+    public const string QATime = "QA Time";
     public const string Qty = "Qty";
+    public const string Qty_Base = "Qty.Base";
     public const string QtyBase = "Qty. (Base)";
     public const string QtyHandled = "Qty. Handled";
     public const string QtyInLocation = "QTY IN THIS LOCATION";
     public const string QtyOutstanding = "Qty. Outstanding";
+    public const string QtyOverUnder = "Qty. Over/Under";
     public const string QtyPerPack = "QTY PER PACK";
-    public const string QtyPerUoM = "Qty. per Unit of Measure";
+    public const string QtyPerUnitOfMeasure = "Qty. per Unit of Measure";
+    public const string QtyPerUoM = "Qty. per UOM";
+    public const string QtyPicked = "Qty. Picked";
     public const string QtyToHandle = "Qty. to Handle";
     public const string Quantity = "Quantity";
     public const string RackLocation = "RACK LOCATION";
@@ -110,6 +129,7 @@ public static class Constants
     public const string RoadRegion = "Road Regions";
     public const string ShipDate = "Actual Shipment Date";
     public const string ShipmentCreated = "Shipment Created";
+    public const string ShipmentNo = "Shipment No.";
     public const string ShippablePack = "SHIPPABLE PACK";
     public const string ShippingDays = "Shipping Days";
     public const string Sku = "SKU";
@@ -122,6 +142,7 @@ public static class Constants
     public const string StartZone = "Starting Pick Zone";
     public const string State = "State";
     public const string Store = "Store";
+    public const string StoreName = "Store Name";
     public const string StoreNo = "Store No.";
     public const string StoreType = "Store Type";
     public const string Tech = "Tech Type";
@@ -129,11 +150,13 @@ public static class Constants
     public const string Timestamp = "Timestamp";
     public const string TOBatchNo = "TO Batch No.";
     public const string TransferCode = "Transfer-to Code";
+    public const string UnitOfMeasure = "Unit Of Measure";
     public const string Units = "Total Qty. (Base)";
     public const string UoM = "Unit of Measure";
     public const string UoMCode = "Unit of Measure Code";
     public const string UsedCube = "Used Cubage";
     public const string VarianceQty = "Variance Qty.";
+    public const string WarehouseCode = "Warehouse Code";
     public const string Wave = "Wave";
     public const string WaveID = "Wave ID";
     public const string WaveNumber = "Wave Number";
@@ -585,7 +608,7 @@ public class NAV_UoMIndices : IColumnIndexer
     {
         Code = Array.IndexOf(headers, Constants.Code);
         ItemNumber = Array.IndexOf(headers, Constants.ItemNumber);
-        QtyPerUoM = Array.IndexOf(headers, Constants.QtyPerUoM);
+        QtyPerUoM = Array.IndexOf(headers, Constants.QtyPerUnitOfMeasure);
         MaxQty = Array.IndexOf(headers, Constants.MaxQty);
         InnerPack = Array.IndexOf(headers, Constants.InnerPack);
         ExcludeCarton = Array.IndexOf(headers, Constants.ExcludeCtn);
@@ -602,7 +625,7 @@ public class NAV_UoMIndices : IColumnIndexer
 
         if (Code == -1) missingHeaders.Add(Constants.Code);
         if (ItemNumber == -1) missingHeaders.Add(Constants.ItemNumber);
-        if (QtyPerUoM == -1) missingHeaders.Add(Constants.QtyPerUoM);
+        if (QtyPerUoM == -1) missingHeaders.Add(Constants.QtyPerUnitOfMeasure);
         if (MaxQty == -1) missingHeaders.Add(Constants.MaxQty);
         if (InnerPack == -1) missingHeaders.Add(Constants.InnerPack);
         if (ExcludeCarton == -1) missingHeaders.Add(Constants.ExcludeCtn);
@@ -1166,7 +1189,7 @@ public class PickLineIndices : IColumnIndexer
         ItemNumber = Array.IndexOf(headers, Constants.ItemNumber);
         Quantity = Array.IndexOf(headers, Constants.Quantity);
         QtyBase = Array.IndexOf(headers, Constants.QtyBase);
-        QtyPerUoM = Array.IndexOf(headers, Constants.QtyPerUoM);
+        QtyPerUoM = Array.IndexOf(headers, Constants.QtyPerUnitOfMeasure);
         UoMCode = Array.IndexOf(headers, Constants.UoMCode);
         DueDate = Array.IndexOf(headers, Constants.DueDate);
         SourceNo = Array.IndexOf(headers, Constants.SourceNo);
@@ -1193,7 +1216,7 @@ public class PickLineIndices : IColumnIndexer
         if (ItemNumber == -1) missingHeaders.Add(Constants.ItemNumber);
         if (Quantity == -1) missingHeaders.Add(Constants.Quantity);
         if (QtyBase == -1) missingHeaders.Add(Constants.QtyBase);
-        if (QtyPerUoM == -1) missingHeaders.Add(Constants.QtyPerUoM);
+        if (QtyPerUoM == -1) missingHeaders.Add(Constants.QtyPerUnitOfMeasure);
         if (UoMCode == -1) missingHeaders.Add(Constants.UoMCode);
         if (DueDate == -1) missingHeaders.Add(Constants.DueDate);
         if (SourceNo == -1) missingHeaders.Add(Constants.SourceNo);
@@ -1229,7 +1252,7 @@ public class PickLineIndices : IColumnIndexer
         if (ItemNumber == -1) missingHeaders.Add(Constants.ItemNumber);
         if (Quantity == -1) missingHeaders.Add(Constants.Quantity);
         if (QtyBase == -1) missingHeaders.Add(Constants.QtyBase);
-        if (QtyPerUoM == -1) missingHeaders.Add(Constants.QtyPerUoM);
+        if (QtyPerUoM == -1) missingHeaders.Add(Constants.QtyPerUnitOfMeasure);
         if (UoMCode == -1) missingHeaders.Add(Constants.UoMCode);
         if (DueDate == -1) missingHeaders.Add(Constants.DueDate);
         if (SourceNo == -1) missingHeaders.Add(Constants.SourceNo);
@@ -1404,7 +1427,7 @@ public class MixedPackIndices : IColumnIndexer
     public void IncrementColumns()
     {
         RackLocation += 1;
-        Sku +=1;
+        Sku += 1;
         Item_Name += 1;
         Design += 1;
         QtyInLocation += 1;
@@ -1427,6 +1450,246 @@ public class MixedPackIndices : IColumnIndexer
     public List<int> ColumnNumbers() => new()
     {
         RackLocation, Sku, Item_Name, Design, QtyInLocation, ShippablePack, QtyPerPack, OtherNotes
+    };
+
+    public int Max() => ColumnNumbers().Max();
+}
+
+public class QACartonIndices : IColumnIndexer
+{
+    public int CartonID { get; set; }
+    public int StoreNo { get; set; }
+    public int StoreName { get; set; }
+    public int CartonStatus { get; set; }
+    public int ShipmentNo { get; set; }
+    public int WarehouseCode { get; set; }
+    public int CartonType { get; set; }
+    public int QABy { get; set; }
+    public int QAPerformed { get; set; }
+    public int QATime { get; set; }
+    public int QAPassed { get; set; }
+    public int QAStatus { get; set; }
+    public int BatchNo { get; set; }
+    public int Depth { get; set; }
+    public int Width { get; set; }
+    public int Height { get; set; }
+    public int MaxWeight { get; set; }
+    public int MaxCubage { get; set; }
+    public int CurrentWeight { get; set; }
+    public int CurrentCubage { get; set; }
+
+    public int DepthVal => Depth == -1 ? CartonType : Depth;
+    public int WidthVal => Width == -1 ? CartonType : Width;
+    public int HeightVal => Height == -1 ? CartonType : Height;
+    public int MaxWeightVal => MaxWeight == -1 ? CartonType : MaxWeight;
+    public int MaxCubageVal => MaxCubage == -1 ? CartonType : MaxCubage;
+    public int CurrentWeightVal => CurrentWeight == -1 ? CartonType : CurrentWeight;
+    public int CurrentCubageVal => CurrentCubage == -1 ? CartonType : CurrentCubage;
+
+    public QACartonIndices(string[] headers, bool softCheck = false)
+    {
+        SetIndices(headers);
+        if (softCheck)
+            CheckMissingHeadersSoft();
+        else
+            CheckMissingHeaders();
+    }
+
+    public void SetIndices(string[] headers)
+    {
+        CartonID = Array.IndexOf(headers, Constants.CartonID);
+        StoreNo = Array.IndexOf(headers, Constants.StoreNo);
+        StoreName = Array.IndexOf(headers, Constants.StoreName);
+        CartonStatus = Array.IndexOf(headers, Constants.CartonStatus);
+        ShipmentNo = Array.IndexOf(headers, Constants.ShipmentNo);
+        WarehouseCode = Array.IndexOf(headers, Constants.WarehouseCode);
+        CartonType = Array.IndexOf(headers, Constants.CartonType);
+        QABy = Array.IndexOf(headers, Constants.QABy);
+        QAPerformed = Array.IndexOf(headers, Constants.QAPerformed);
+        QATime = Array.IndexOf(headers, Constants.QATime);
+        QAPassed = Array.IndexOf(headers, Constants.QAPassed);
+        QAStatus = Array.IndexOf(headers, Constants.QAStatus);
+        BatchNo = Array.IndexOf(headers, Constants.BatchNo);
+        Depth = Array.IndexOf(headers, Constants.Depth);
+        Width = Array.IndexOf(headers, Constants.Width);
+        Height = Array.IndexOf(headers, Constants.Height);
+        MaxWeight = Array.IndexOf(headers, Constants.MaxWeight);
+        MaxCubage = Array.IndexOf(headers, Constants.MaxCubage);
+        CurrentWeight = Array.IndexOf(headers, Constants.CurrentWeight);
+        CurrentCubage = Array.IndexOf(headers, Constants.CurrentCubage);
+    }
+
+    public void CheckMissingHeaders()
+    {
+        var missingHeaders = GetMissingHeadersPrime();
+        missingHeaders.AddRange(GetMissingHeadersSoft());
+
+        if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for QA Carton conversion.", missingHeaders);
+    }
+
+    public void CheckMissingHeadersSoft()
+    {
+        var missingHerders = GetMissingHeadersPrime();
+
+        if (missingHerders.Count <= 0) return;
+
+        missingHerders.AddRange(GetMissingHeadersSoft());
+        throw new InvalidDataException("Missing columns for QA Carton conversion.", missingHerders);
+    }
+
+    public List<string> GetMissingHeadersSoft()
+    {
+        var missingHeaders = new List<string>();
+
+        if (StoreName == -1) missingHeaders.Add(Constants.StoreName);
+        if (ShipmentNo == -1) missingHeaders.Add(Constants.ShipmentNo);
+        if (WarehouseCode == -1) missingHeaders.Add(Constants.WarehouseCode);
+        if (QAStatus == -1) missingHeaders.Add(Constants.QAStatus);
+        if (Depth == -1) missingHeaders.Add(Constants.Depth);
+        if (Width == -1) missingHeaders.Add(Constants.Width);
+        if (Height == -1) missingHeaders.Add(Constants.Height);
+        if (MaxWeight == -1) missingHeaders.Add(Constants.MaxWeight);
+        if (MaxCubage == -1) missingHeaders.Add(Constants.MaxCubage);
+        if (CurrentWeight == -1) missingHeaders.Add(Constants.CurrentWeight);
+        if (CurrentCubage == -1) missingHeaders.Add(Constants.CurrentCubage);
+
+        return missingHeaders;
+    }
+
+    public List<string> GetMissingHeadersPrime()
+    {
+        var missingHeaders = new List<string>();
+
+        if (CartonID == -1) missingHeaders.Add(Constants.CartonID);
+        if (StoreNo == -1) missingHeaders.Add(Constants.StoreNo);
+        if (CartonStatus == -1) missingHeaders.Add(Constants.CartonStatus);
+        if (CartonType == -1) missingHeaders.Add(Constants.CartonType);
+        if (QABy == -1) missingHeaders.Add(Constants.QABy);
+        if (QAPerformed == -1) missingHeaders.Add(Constants.QAPerformed);
+        if (QATime == -1) missingHeaders.Add(Constants.QATime);
+        if (QAPassed == -1) missingHeaders.Add(Constants.QAPassed);
+        if (BatchNo == -1) missingHeaders.Add(Constants.BatchNo);
+
+        return missingHeaders;
+    }
+
+    public List<int> ColumnNumbers() => new()
+    {
+        CartonID, StoreNo, StoreName, CartonStatus, ShipmentNo, WarehouseCode, CartonType, QABy, QAPerformed, QATime,
+        QAPassed, BatchNo, Depth, Width, Height, MaxWeight, MaxCubage, CurrentWeight, CurrentCubage
+    };
+
+    public int Max() => ColumnNumbers().Max();
+}
+
+
+public class QALineIndices : IColumnIndexer
+{
+    public int CartonID { get; set; }
+    public int ItemNumber { get; set; }
+    public int Description { get; set; }
+    public int PickerID { get; set; }
+    public int Bincode { get; set; }
+    public int QAErrorType { get; set; }
+    public int QtyPicked { get; set; }
+    public int QtyPerUoM { get; set; }
+    public int UnitOfMeasure { get; set; }
+    public int Qty_Base { get; set; }
+    public int QAScanQty { get; set; }
+    public int QtyOverUnder { get; set; }
+    public int QAStatus { get; set; }
+    public int Date { get; set; }
+
+    public QALineIndices(string[] headers, bool softCheck = false)
+    {
+        SetIndices(headers);
+        if (softCheck)
+            CheckMissingHeadersSoft();
+        else
+            CheckMissingHeaders();
+    }
+
+    public void SetIndices(string[] headers)
+    {
+        CartonID = Array.IndexOf(headers, Constants.CartonID);
+        ItemNumber = Array.IndexOf(headers, Constants.ItemNumber);
+        if (ItemNumber == -1) ItemNumber = Array.IndexOf(headers, "Item No");
+        Description = Array.IndexOf(headers, Constants.Description);
+        if (Description == -1) Description = ItemNumber;
+        PickerID = Array.IndexOf(headers, Constants.PickerID);
+        if (PickerID == -1) PickerID = Array.IndexOf(headers, "Picker RF");
+        Bincode = Array.IndexOf(headers, Constants.Bincode);
+        if (Bincode == -1) Bincode = Array.IndexOf(headers, "Bin Loc");
+        QAErrorType = Array.IndexOf(headers, Constants.QAErrorType);
+        if (QAErrorType == -1) QAErrorType = Array.IndexOf(headers, "At Fault");
+        QtyPicked = Array.IndexOf(headers, Constants.QtyPicked);
+        if (QtyPicked == -1) QtyPicked = Array.IndexOf(headers, "Qty Pick");
+        QtyPerUoM = Array.IndexOf(headers, Constants.QtyPerUoM);
+        UnitOfMeasure = Array.IndexOf(headers, Constants.UnitOfMeasure);
+        if (UnitOfMeasure == -1) UnitOfMeasure = Array.IndexOf(headers, "Qty UOM");
+        Qty_Base = Array.IndexOf(headers, Constants.Qty_Base);
+        if (Qty_Base == -1) Qty_Base = Array.IndexOf(headers, "Qty Base");
+        QAScanQty = Array.IndexOf(headers, Constants.QAScanQty);
+        if (QAScanQty == -1) QAScanQty = Array.IndexOf(headers, "QA Qty");
+        QtyOverUnder = Array.IndexOf(headers, Constants.QtyOverUnder);
+        if (QtyOverUnder == -1) QtyOverUnder = Array.IndexOf(headers, "Over/Under");
+        QAStatus = Array.IndexOf(headers, Constants.QAStatus);
+        Date = Array.IndexOf(headers, Constants.Date);
+    }
+
+    public void CheckMissingHeaders()
+    {
+        var missingHeaders = GetMissingHeadersPrime();
+        missingHeaders.AddRange(GetMissingHeadersSoft());
+
+        if (missingHeaders.Count > 0) throw new InvalidDataException("Missing columns for QA Carton conversion.", missingHeaders);
+    }
+
+    public void CheckMissingHeadersSoft()
+    {
+        var missingHerders = GetMissingHeadersPrime();
+
+        if (missingHerders.Count <= 0) return;
+
+        missingHerders.AddRange(GetMissingHeadersSoft());
+        throw new InvalidDataException("Missing columns for QA Carton conversion.", missingHerders);
+    }
+
+    public List<string> GetMissingHeadersPrime()
+    {
+
+        var missingHeaders = new List<string>();
+
+        if (CartonID == -1) missingHeaders.Add(Constants.CartonID);
+        if (ItemNumber == -1) missingHeaders.Add(Constants.ItemNumber);
+        if (Description == -1) missingHeaders.Add(Constants.Description);
+        if (PickerID == -1) missingHeaders.Add(Constants.PickerID);
+        if (Bincode == -1) missingHeaders.Add(Constants.Bincode);
+        if (QAErrorType == -1) missingHeaders.Add(Constants.QAErrorType);
+        if (QtyPicked == -1) missingHeaders.Add(Constants.QtyPicked);
+        if (UnitOfMeasure == -1) missingHeaders.Add(Constants.UnitOfMeasure);
+        if (Qty_Base == -1) missingHeaders.Add(Constants.Qty_Base);
+        if (QAScanQty == -1) missingHeaders.Add(Constants.QAScanQty);
+        if (QtyOverUnder == -1) missingHeaders.Add(Constants.QtyOverUnder);
+        if (QAStatus == -1) missingHeaders.Add(Constants.QAStatus);
+
+        return missingHeaders;
+    }
+
+    public List<string> GetMissingHeadersSoft()
+    {
+        var missingHeaders = new List<string>();
+
+        if (QtyPerUoM == -1) missingHeaders.Add(Constants.QtyPerUoM);
+        if (Date == -1) missingHeaders.Add(Constants.Date);
+
+        return missingHeaders;
+    }
+
+    public List<int> ColumnNumbers() => new()
+    {
+        CartonID, ItemNumber, Description, PickerID, Bincode, QAErrorType, QtyPicked, QtyPerUoM, UnitOfMeasure,
+        Qty_Base, QAScanQty, QtyOverUnder, QAStatus, Date
     };
 
     public int Max() => ColumnNumbers().Max();

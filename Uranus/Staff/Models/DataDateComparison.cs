@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Uranus.Staff.Models;
 
-namespace Deimos.Models;
+namespace Uranus.Staff.Models;
 
 /// <summary>
 /// Use to compare PickEvents to Mispicks on a given date.

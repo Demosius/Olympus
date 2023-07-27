@@ -30,6 +30,8 @@ public class InventoryUpdater
         return count;
     }
 
+    public async Task<int> NAVBinAsync(NAVBin bin) => await Chariot.UpdateAsync(bin);
+
     public async Task<int> NAVItemsAsync(IEnumerable<NAVItem> items, DateTime dateTime)
     {
         var count = 0;
@@ -345,6 +347,6 @@ public class InventoryUpdater
         if (stockNote.Comment == string.Empty)
             await Task.Run(() => Chariot.Delete(stockNote));
         else
-            await Chariot.InsertOrUpdateAsync(stockNote);
+            await Chariot.InsertOrReplaceAsync(stockNote);
     }
 }

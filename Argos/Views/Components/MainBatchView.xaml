@@ -172,15 +172,6 @@
                     <DataGridTextColumn Header="Created On"
                                         Binding="{Binding CreatedOn, StringFormat='dd-MMM-yyyy'}"
                                         IsReadOnly="False"/>
-                    <!--<DataGridTextColumn Header="Created By"
-                                        Binding="{Binding CreatedBy}"
-                                        IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Last Cartonized Date"
-                                        Binding="{Binding LastTimeCartonizedDate, StringFormat='dd-MMM-yyyy'}"
-                                        IsReadOnly="False"/>
-                    <DataGridTextColumn Header="Last Cartonized Time"
-                                        Binding="{Binding LastTimeCartonizedTime, StringFormat='HH:mm:ss'}"
-                                        IsReadOnly="False"/>-->
                     <DataGridTextColumn Header="Cartons"
                                         Binding="{Binding Cartons}"
                                         IsReadOnly="False"/>

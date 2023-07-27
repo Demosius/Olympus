@@ -46,6 +46,8 @@ public class MispickVM : INotifyPropertyChanged
     public bool NoItem => Mispick.NoItem;
     public bool NoMatch => Mispick.NoMatch;
 
+    public ETechType? TechType => Mispick.TechType;
+
     #endregion
 
     #region Other INotifyPropertyChanged Members

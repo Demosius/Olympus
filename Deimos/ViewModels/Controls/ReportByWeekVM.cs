@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Deimos.Models;
+using Morpheus.ViewModels.Controls;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -19,10 +20,12 @@ namespace Deimos.ViewModels.Controls;
 public class ReportByWeekVM : INotifyPropertyChanged, IDBInteraction, IFilters
 {
     public Helios Helios { get; set; }
-    public DeimosVM DeimosVM { get; set; }
+    public ErrorAllocationVM ParentVM { get; set; }
+    public DeimosVM Deimos { get; set; }
+    public ProgressBarVM ProgressBar { get; set; }
 
-    public DateTime? StartDate => DeimosVM.StartDate;
-    public DateTime? EndDate => DeimosVM.EndDate;
+    public DateTime? StartDate => ParentVM.StartDate;
+    public DateTime? EndDate => ParentVM.EndDate;
 
     public List<WeeklyStatisticReport> ReportList { get; set; }
 
@@ -63,10 +66,12 @@ public class ReportByWeekVM : INotifyPropertyChanged, IDBInteraction, IFilters
 
     #endregion
 
-    public ReportByWeekVM(DeimosVM deimos)
+    public ReportByWeekVM(ErrorAllocationVM parent)
     {
-        DeimosVM = deimos;
-        Helios = DeimosVM.Helios;
+        ParentVM = parent;
+        Helios = ParentVM.Helios;
+        Deimos = ParentVM.ParentVM;
+        ProgressBar = ParentVM.ProgressBar;
 
         ReportList = new List<WeeklyStatisticReport>();
         Reports = new ObservableCollection<WeeklyStatisticReport>();
@@ -85,6 +90,7 @@ public class ReportByWeekVM : INotifyPropertyChanged, IDBInteraction, IFilters
         var fromDate = ((DateTime)StartDate).WeekStartSunday();
         var toDate = ((DateTime)EndDate).WeekEndSaturday();
 
+        ProgressBar.StartTask("Calculating WeekByWeek Report...", $"{StartDate:dd-MMM-yyyy} - {EndDate:dd-MMM-yyyy}");
         var (mispicks, sessions, tagTool) = await Helios.StaffReader.StatisticReportsAsync(fromDate, toDate, SelectedErrorMethod == EErrorMethod.ErrorDiscovered);
         await Task.Run(() =>
         {
@@ -136,6 +142,8 @@ public class ReportByWeekVM : INotifyPropertyChanged, IDBInteraction, IFilters
                 weekStart = weekStart.AddDays(7);
             }
         });
+        ProgressBar.EndTask();
+
         ApplyFilters();
     }
 

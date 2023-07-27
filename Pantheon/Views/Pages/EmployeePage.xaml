@@ -8,6 +8,7 @@
       xmlns:pages="clr-namespace:Pantheon.ViewModels.Pages"
       xmlns:controls="clr-namespace:Pantheon.Views.Controls.Employees"
       xmlns:converters="clr-namespace:Pantheon.ViewModels.Converters"
+      xmlns:converters1="clr-namespace:Morpheus.ViewModels.Converters;assembly=Morpheus"
       mc:Ignorable="d" 
       d:DataContext="{d:DesignInstance {x:Type pages:EmployeePageVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="1080" d:DesignWidth="1200"
@@ -41,7 +42,7 @@
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
             <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
-            <converters:AsyncImageConverter x:Key="AsyncImageConverter"/>
+            <converters1:AsyncImageConverter x:Key="AsyncImageConverter"/>
         </DockPanel.Resources>
 
         <ToolBarTray DockPanel.Dock="Top">

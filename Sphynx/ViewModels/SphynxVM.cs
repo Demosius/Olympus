@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Morpheus.ViewModels.Controls;
+using Sphynx.ViewModels.Controls;
 using Uranus;
 using Uranus.Annotations;
 using Uranus.Commands;
@@ -13,6 +15,9 @@ public class SphynxVM : INotifyPropertyChanged, IDBInteraction
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
+    public ProgressBarVM ProgressBar { get; set; }
+
+    public AutoCounterVM AutoCounter { get; set; }
 
     #region INotififyPropertyChanged Members
 
@@ -26,17 +31,20 @@ public class SphynxVM : INotifyPropertyChanged, IDBInteraction
 
     #endregion
 
-    public SphynxVM(Helios helios, Charon charon)
+    public SphynxVM(Helios helios, Charon charon, ProgressBarVM progressBar)
     {
         Helios = helios;
         Charon = charon;
+        ProgressBar = progressBar;
+
+        AutoCounter = new AutoCounterVM(helios, progressBar);
 
         RefreshDataCommand = new RefreshDataCommand(this);
     }
 
     public async Task RefreshDataAsync()
     {
-        await Task.Run(() => { });
+        await AutoCounter.RefreshDataAsync();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

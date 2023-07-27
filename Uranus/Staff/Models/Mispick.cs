@@ -16,9 +16,9 @@ public enum EErrorMethod
 public class Mispick : IEquatable<Mispick>
 {
     [PrimaryKey] public string ID { get; set; } // e.g. 8292418:215854 => [CartonID]:[ItemNumber]
-    public DateTime ShipmentDate { get; set; }
-    public DateTime ReceivedDate { get; set; }
-    public DateTime PostedDate { get; set; }
+    [Indexed] public DateTime ShipmentDate { get; set; }
+    [Indexed] public DateTime ReceivedDate { get; set; }
+    [Indexed] public DateTime PostedDate { get; set; }
     public string CartonID { get; set; }
     public int ItemNumber { get; set; }
     public string ItemDescription { get; set; }
@@ -26,9 +26,10 @@ public class Mispick : IEquatable<Mispick>
     public int OriginalQty { get; set; }
     public int ReceivedQty { get; set; }
     public int VarianceQty { get; set; }
+    public bool QAAllocated { get; set; }
 
     public string Comments { get; set; }
-    public DateTime ErrorDate { get; set; } // This should represent the date of the actual error. 99+% of the time this will match ShipmentDate, and will default to that.
+    [Indexed] public DateTime ErrorDate { get; set; } // This should represent the date of the actual error. 99+% of the time this will match ShipmentDate, and will default to that.
 
     public bool Checked { get; set; }
     public bool NoCarton { get; set; }  // No appropriate carton found when checking pick events.
@@ -63,7 +64,7 @@ public class Mispick : IEquatable<Mispick>
     [Ignore]
     public bool IsAssigned => Checked && !NoCarton && !NoItem &&
                               (AssignedDematicID != string.Empty || AssignedRF_ID != string.Empty);
-
+    [Ignore] public bool CanAllocateRF => !QAAllocated || AssignedRF_ID == string.Empty;
     public Mispick()
     {
         // Use temporary unique value for ID before appropriate assignment.
@@ -90,7 +91,7 @@ public class Mispick : IEquatable<Mispick>
         PickStatsID = pickEvent.StatsID;
         PickStats = pickEvent.PickStats;
 
-        AssignedRF_ID = pickEvent.OperatorRF_ID;
+        if (CanAllocateRF) AssignedRF_ID = pickEvent.OperatorRF_ID;
         AssignedDematicID = pickEvent.OperatorDematicID;
         TechType = pickEvent.TechType;
 
@@ -109,7 +110,7 @@ public class Mispick : IEquatable<Mispick>
         PickStatsID = pickSession.StatsID;
         PickStats = pickSession.PickStats;
 
-        AssignedRF_ID = pickSession.OperatorRF_ID;
+        if (CanAllocateRF) AssignedRF_ID = pickSession.OperatorRF_ID;
         AssignedDematicID = pickSession.OperatorDematicID;
         TechType = pickSession.TechType;
 
@@ -124,7 +125,7 @@ public class Mispick : IEquatable<Mispick>
         PickStatsID = pickStats.ID;
         PickStats = pickStats;
 
-        AssignedRF_ID = pickStats.OperatorRF_ID;
+        if (CanAllocateRF) AssignedRF_ID = pickStats.OperatorRF_ID;
         AssignedDematicID = pickStats.OperatorDematicID;
         TechType = tech;
 
@@ -139,7 +140,7 @@ public class Mispick : IEquatable<Mispick>
     /// <param name="assignedMispick">Another mispick that has already been assigned.</param>
     public void AssignMatchingMispick(Mispick assignedMispick)
     {
-        if (assignedMispick.PickEvent is not null) 
+        if (assignedMispick.PickEvent is not null)
             AssignPickEvent(assignedMispick.PickEvent);
         else if (assignedMispick.PickSession is not null)
             AssignPickSession(assignedMispick.PickSession);
@@ -156,6 +157,8 @@ public class Mispick : IEquatable<Mispick>
         PickEvent = null;
         PickSession = null;
         PickStats = null;
+
+        if (QAAllocated) return;
 
         AssignedDematicID = string.Empty;
         AssignedRF_ID = string.Empty;
@@ -178,7 +181,7 @@ public class Mispick : IEquatable<Mispick>
     }
 
     public static string GetMispickID(string cartonID, int itemNo) => $"{cartonID}:{itemNo}";
-    
+
     public static void HandleDuplicateValues(ref List<Mispick> mispicks)
     {
         // Remove duplicates.
@@ -209,7 +212,7 @@ public class Mispick : IEquatable<Mispick>
     {
         if (obj is null) return false;
         if (ReferenceEquals(this, obj)) return true;
-        return obj.GetType() == GetType() && Equals((Mispick) obj);
+        return obj.GetType() == GetType() && Equals((Mispick)obj);
     }
 
     public override int GetHashCode()

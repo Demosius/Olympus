@@ -4,33 +4,63 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:vm="clr-namespace:Quest.ViewModels"
+      xmlns:components="clr-namespace:Quest.Views.Components"
+      xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+      xmlns:converters="clr-namespace:Quest.ViewModels.Converters"
       mc:Ignorable="d" 
       d:DataContext="{d:DesignInstance {x:Type vm:QuestVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="QuestPage">
+      Title="QuestPage"
+      Background="SaddleBrown">
 
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Morpheus;component/Themes/Light/Goldenrod/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary>
+                    <converters:QuestPageConverter x:Key="QuestPageConverter"/>
+                    <ObjectDataProvider x:Key="Printables"
+                                        MethodName="GetValues" 
+                                        ObjectType="{x:Type sys:Enum}">
+                        <ObjectDataProvider.MethodParameters>
+                            <x:Type TypeName="vm:EQuestPage"/>
+                        </ObjectDataProvider.MethodParameters>
+                    </ObjectDataProvider>
+                </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
 
-    <Grid>
-        <StackPanel VerticalAlignment="Center">
-            <Button Name="UploadButton" 
-                    Margin="15"
-                    Click="UploadButton_OnClick"
-                    Content="Upload Pick Events"
-                    Width="200"
-                    Height="50"/>
-            <Button Name="DownloadButton"
-                    Margin="15"
-                    Click="DownloadButton_OnClick"
-                    Content="Download Pick Events"
-                    Width="200"
-                    Height="50"/>
+    <DockPanel Background="{StaticResource TextBoxBackgroundBrush}">
+        <StackPanel DockPanel.Dock="Left"
+                    Background="BurlyWood">
+            <ListView ItemsSource="{Binding Source={StaticResource Printables}}"
+                  SelectedValue="{Binding SelectedPrintable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Background="BurlyWood"
+                  BorderBrush="Black"
+                  BorderThickness="0">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource QuestPageConverter}}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <Separator Margin="5"
+                       Background="{StaticResource Brush01}"/>
+
+            <Button Margin="5"
+                    MinWidth="80"
+                    Command="{Binding UploadPickEventsCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="../Resources/img/arrow-transition-090.png"
+                           Height="20"
+                           Width="20"/>
+                    <Label Content="Upload Pick Events"></Label>
+                </StackPanel>
+            </Button>
         </StackPanel>
-    </Grid>
+        <UserControl Content="{Binding CurrentControl}"
+                     Background="SaddleBrown"/>
+    </DockPanel>
 </Page>

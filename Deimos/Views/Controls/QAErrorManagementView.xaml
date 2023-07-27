@@ -1,0 +1,264 @@
+﻿<UserControl x:Class="Deimos.Views.Controls.QAErrorManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Deimos.ViewModels.Controls"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:models="clr-namespace:Uranus.Staff.Models;assembly=Uranus"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:QAErrorManagementVM}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="1200">
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </UserControl.InputBindings>
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/DullOrange/MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <ObjectDataProvider x:Key="QAStatus"
+                                MethodName="GetValues" 
+                                ObjectType="{x:Type sys:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="models:EQAStatus"/>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <DockPanel>
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal">
+                <DatePicker Margin="5" 
+                            SelectedDate="{Binding StartDate}"/>
+                <Label Content="to"
+                       VerticalAlignment="Center"></Label>
+                <DatePicker Margin="5"
+                        SelectedDate="{Binding EndDate}"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+                           Margin="5"/>
+                <Label Content="Filters:"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"/>
+                <TextBox Text="{Binding FilterString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="5"
+                         MinWidth="100"
+                         MaxWidth="250"
+                         VerticalContentAlignment="Center"/>
+            </StackPanel>
+            <Grid Grid.Column="2"
+                  Margin="0">
+                <Grid.Resources>
+                    <Style TargetType="{x:Type Label}" BasedOn="{StaticResource LabelStyle}">
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                        <Setter Property="Padding" Value="5,0"/>
+                        <Setter Property="FontSize" Value="10"/>
+                    </Style>
+                </Grid.Resources>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0"
+                       Content="Picker"/>
+                <Label Grid.Column="0" Grid.Row="1"
+                       Content="{Binding PickerErrors}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="Yellow"/>
+
+                <Label Grid.Column="1" Grid.Row="0"
+                       Content="Receiving"/>
+                <Label Grid.Column="1" Grid.Row="1"
+                       Content="{Binding ReceivingErrors}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="Cyan"/>
+
+                <Label Grid.Column="2" Grid.Row="0"
+                       Content="Replen"/>
+                <Label Grid.Column="2" Grid.Row="1"
+                       Content="{Binding ReplenErrors}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="Magenta"/>
+
+                <Label Grid.Column="3" Grid.Row="0"
+                       Content="Stocking"/>
+                <Label Grid.Column="3" Grid.Row="1"
+                       Content="{Binding StockingErrors}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="GreenYellow"/>
+
+                <Label Grid.Column="4" Grid.Row="0"
+                       Content="Heat-map"/>
+                <Label Grid.Column="4" Grid.Row="1"
+                       Content="{Binding HeatMapErrors}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="Red"/>
+
+                <Label Grid.Column="5" Grid.Row="0"
+                       Content="QA"/>
+                <Label Grid.Column="5" Grid.Row="1"
+                       Content="{Binding QAErrors}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="Violet"/>
+
+                <Label Grid.Column="6" Grid.Row="0"
+                       Content="Other Dept."/>
+                <Label Grid.Column="6" Grid.Row="1"
+                       Content="{Binding OtherDeptErrors}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="Beige"/>
+
+                <Label Grid.Column="7" Grid.Row="0"
+                       Content="Warehouse Errors"
+                       FontWeight="Bold"/>
+                <Label Grid.Column="7" Grid.Row="1"
+                       Content="{Binding WarehouseErrorCount}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="LightGoldenrodYellow"/>
+
+                <Label Grid.Column="8" Grid.Row="0"
+                       Content="System"/>
+                <Label Grid.Column="8" Grid.Row="1"
+                       Content="{Binding SystemErrors}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="LightBlue"/>
+
+                <Label Grid.Column="9" Grid.Row="0"
+                       Content="Supplier"/>
+                <Label Grid.Column="9" Grid.Row="1"
+                       Content="{Binding SupplierErrors}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="LightCoral"/>
+
+                <Label Grid.Column="10" Grid.Row="0"
+                       Content="Other External"/>
+                <Label Grid.Column="10" Grid.Row="1"
+                       Content="{Binding OtherExternalErrors}"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="LightGreen"/>
+
+                <Label Grid.Column="11" Grid.Row="0"
+                       Content="Total Errors"
+                       FontWeight="Bold"/>
+                <Label Grid.Column="11" Grid.Row="1"
+                       Content="{Binding FullErrorCount}"
+                       FontSize="14"
+                       FontWeight="Bold"/>
+            </Grid>
+        </Grid>
+        <DataGrid ItemsSource="{Binding QAErrorLines}"
+                  SelectedItem="{Binding SelectedQALine}"
+                  d:ItemsSource="{d:SampleData ItemCount=5}"
+                  AutoGenerateColumns="False"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  CanUserResizeRows="False"
+                  CanUserResizeColumns="True"
+                  CanUserSortColumns="True"
+                  CanUserReorderColumns="True">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="{Binding BackoutPrompt}" Command="{Binding SetBackoutCommand}"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Date"
+                                    Binding="{Binding Date, StringFormat='dd-MMM-yyyy'}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Carton ID"
+                                    Binding="{Binding CartonID}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Item Number"
+                                    Binding="{Binding ItemNumber}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Item Description"
+                                    Binding="{Binding ItemDescription}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Pick Qty"
+                                    Binding="{Binding PickQty}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="UoM"
+                                    Binding="{Binding UoM}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Qty Per UoM"
+                                    Binding="{Binding QtyPerUoM}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Pick Qty Base"
+                                    Binding="{Binding PickQtyBase}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="QA Qty"
+                                    Binding="{Binding QAQty}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Variance"
+                                    Binding="{Binding VarianceQty}"
+                                    IsReadOnly="True"/>
+                <DataGridComboBoxColumn Header="QA Status"
+                                        ItemsSource="{Binding Source={StaticResource QAStatus}}"
+                                        SelectedItemBinding="{Binding QAStatus}"
+                                        IsReadOnly="True"/>
+                <DataGridTextColumn Header="Bin Code"
+                                    Binding="{Binding BinCode}"
+                                    IsReadOnly="False"/>
+                <DataGridTextColumn Header="Picker ID"
+                                    Binding="{Binding PickerRFID}"
+                                    IsReadOnly="False"/>
+                <DataGridTextColumn Header="Picker Name"
+                                    Binding="{Binding PickerName}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Error Type"
+                                    Binding="{Binding ErrorType}"
+                                    IsReadOnly="False"/>
+                <DataGridTextColumn Header="Error Category"
+                                    Binding="{Binding ErrorCategory}"
+                                    IsReadOnly="True"/>
+                <DataGridCheckBoxColumn Header="External"
+                                        Binding="{Binding External, UpdateSourceTrigger=PropertyChanged}"
+                                        IsReadOnly="False"/>
+                <DataGridCheckBoxColumn Header="Seek"
+                                        Binding="{Binding Seek, UpdateSourceTrigger=PropertyChanged}"
+                                        IsReadOnly="False"/>
+                <DataGridCheckBoxColumn Header="Fixed"
+                                        Binding="{Binding Fixed, UpdateSourceTrigger=PropertyChanged}"
+                                        IsReadOnly="False"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+
+</UserControl>

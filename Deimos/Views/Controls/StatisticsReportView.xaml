@@ -9,7 +9,11 @@
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:StatisticsReportVM}, IsDesignTimeCreatable=False}"
              d:DesignHeight="450" d:DesignWidth="800">
-    
+
+    <UserControl.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </UserControl.InputBindings>
+
     <UserControl.Resources>
         <ObjectDataProvider x:Key="TechTypes"
                             MethodName="GetValues" 

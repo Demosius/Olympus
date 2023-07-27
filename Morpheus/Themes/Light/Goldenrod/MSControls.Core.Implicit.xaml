@@ -7,6 +7,8 @@
 	<!-- *********************************  RESOURCES  ********************************* -->
 	<ResourceDictionary.MergedDictionaries>
 		<ResourceDictionary Source="Styles.WPF.xaml" />
+		<ResourceDictionary Source="DatagridStyling.xaml"/>
+		<ResourceDictionary Source="TabControlStyling.xaml"/>
 	</ResourceDictionary.MergedDictionaries>
 
 	<!-- *********************************  BRUSHES  ********************************* -->
@@ -933,6 +935,13 @@
     <Style BasedOn="{StaticResource ExpanderStyle}" TargetType="{x:Type Expander}" />
     <Style BasedOn="{StaticResource ToggleButtonStyle}" TargetType="{x:Type ToggleButton}" />
     <Style BasedOn="{StaticResource GroupBoxStyle}" TargetType="{x:Type GroupBox}" />
+    <Style BasedOn="{StaticResource TreeViewStyle}" TargetType="{x:Type TreeView}"/>
+    <Style BasedOn="{StaticResource TreeViewItemStyle}" TargetType="{x:Type TreeViewItem}"/>
+    <Style BasedOn="{StaticResource ListBoxStyle}" TargetType="{x:Type ListView}"/>
+    <Style BasedOn="{StaticResource ToolBarTrayStyle}" TargetType="{x:Type ToolBarTray}"/>
+    <Style BasedOn="{StaticResource ToolBarStyle}" TargetType="{x:Type ToolBar}"/>
+    <Style BasedOn="{StaticResource DataGridStyle}" TargetType="{x:Type DataGrid}"/>
+    <Style BasedOn="{StaticResource TabItemStyle}" TargetType="{x:Type TabItem}"/>
     <Style BasedOn="{StaticResource DatePickerStyle}" TargetType="{x:Type DatePicker}">
         <Setter Property="FontSize" Value="16" />
         <Setter Property="VerticalAlignment" Value="Top" />

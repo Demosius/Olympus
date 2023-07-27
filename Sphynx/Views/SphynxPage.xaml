@@ -3,20 +3,24 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:Sphynx.Views"
+      xmlns:vm="clr-namespace:Sphynx.ViewModels"
+      xmlns:controls="clr-namespace:Sphynx.Views.Controls"
       mc:Ignorable="d" 
+      d:DataContext="{d:DesignInstance {x:Type vm:SphynxVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="SphynxPage">
+
+    <Page.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </Page.InputBindings>
 
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Morpheus;component/Themes/Light/Goldenrod/MSControls.Core.Implicit.xaml"/>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Sphynx/MSControls.Core.Implicit.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
 
-    <Grid Background="Goldenrod">
-        
-    </Grid>
+    <controls:AutoCounterView DataContext="{Binding AutoCounter}"/>
 </Page>

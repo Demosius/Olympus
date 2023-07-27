@@ -16,6 +16,14 @@ public enum ETechType
     All
 }
 
+public enum EPickLocation
+{
+    PTL,
+    ABULK,
+    SP01,
+    None
+}
+
 public class PickEvent : IEquatable<PickEvent>
 {
     [PrimaryKey] public string ID { get; set; } // Example: 6118.2022.11.23.23.09.03 ([OperatorID].[Year].[Month].[Day].[Hour].[Minute].[Second])
@@ -70,6 +78,13 @@ public class PickEvent : IEquatable<PickEvent>
 
     // Cannot be tied to items directly, as they belong to a separate database.
     [Ignore] public NAVItem? Item { get; set; }
+
+    [Ignore]
+    public EPickLocation PickLocation => TechType == ETechType.RFT ? 
+        ZoneID == "ABULK" ? EPickLocation.ABULK :
+        ZoneID == "SP01" ? EPickLocation.SP01 : 
+        EPickLocation.PTL :
+        EPickLocation.PTL;
 
     public PickEvent()
     {
