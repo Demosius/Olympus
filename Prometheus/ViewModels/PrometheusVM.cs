@@ -88,8 +88,6 @@ public class PrometheusVM : INotifyPropertyChanged
 
     public CatPage? GetPage(EDataCategory category)
     {
-        if (Helios is null || Charon is null) return null;
-
         // If it already exists in the given pages, use it.
         if (Pages.ContainsKey(category))
             return Pages[category];
@@ -98,7 +96,7 @@ public class PrometheusVM : INotifyPropertyChanged
         {
             EDataCategory.Inventory => GeneratePage(new InventoryPage(Helios)),
             EDataCategory.Equipment => GeneratePage(new EquipmentPage()),
-            EDataCategory.Staff => GeneratePage(new StaffPage()),
+            EDataCategory.Staff => GeneratePage(new StaffPage(Helios, Charon)),
             EDataCategory.Users => GeneratePage(new UserPage(Helios, Charon)),
             _ => null
         };

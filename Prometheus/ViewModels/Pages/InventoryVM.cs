@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
-using Morpheus.Views.Controls;
+using Morpheus.Views.Controls.Inventory;
 using Uranus;
 using Uranus.Annotations;
 
@@ -28,7 +28,7 @@ internal class InventoryVM : INotifyPropertyChanged
         MixedCartons
     }
 
-    public Helios? Helios { get; set; }
+    public Helios Helios { get; set; }
 
     public Dictionary<EInventoryControl, Control?> ControlDict { get; set; }
 
@@ -70,6 +70,9 @@ internal class InventoryVM : INotifyPropertyChanged
         Controls = new ObservableCollection<EInventoryControl>
         {
             EInventoryControl.Stores,
+            EInventoryControl.Zones,
+            EInventoryControl.MixedCartons,
+            /*
             EInventoryControl.Bays,
             EInventoryControl.Categories,
             EInventoryControl.Divisions,
@@ -78,16 +81,15 @@ internal class InventoryVM : INotifyPropertyChanged
             EInventoryControl.Sites,
             EInventoryControl.TransferOrders,
             EInventoryControl.Bins,
-            EInventoryControl.Zones,
             EInventoryControl.Items,
             EInventoryControl.Stock,
-            EInventoryControl.MixedCartons
+            */
         };
     }
 
     public void SetControl(EInventoryControl? control)
     {
-        if (Helios is null || control is null) return;
+        if (control is null) return;
 
         var valueControl = (EInventoryControl)control;
 

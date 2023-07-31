@@ -57,20 +57,32 @@ public class SetUserRoleVM : INotifyPropertyChanged, IDBInteraction
 
     #endregion
 
-    public SetUserRoleVM(Helios helios, Charon charon, UserVM newUser)
+    private SetUserRoleVM(Helios helios, Charon charon, UserVM newUser)
     {
         Helios = helios;
         Charon = charon;
         user = newUser;
 
         Roles = new ObservableCollection<Role>();
-        SelectedRole = Roles.FirstOrDefault(r => r.Name == User.RoleName);
-        User.Role ??= SelectedRole;
 
         RefreshDataCommand = new RefreshDataCommand(this);
         ConfirmRoleCommand = new ConfirmRoleCommand(this);
     }
-    
+
+    private async Task<SetUserRoleVM> InitializeAsync()
+    {
+        await RefreshDataAsync();
+        return this;
+    }
+
+    public static Task<SetUserRoleVM> CreateAsync(Helios helios, Charon charon, UserVM newUser)
+    {
+        var ret = new SetUserRoleVM(helios, charon, newUser);
+        return ret.InitializeAsync();
+    }
+
+    public static SetUserRoleVM CreateEmpty(Helios helios, Charon charon, UserVM newUser) => new(helios, charon, newUser);
+
     public async Task RefreshDataAsync()
     {
         Roles.Clear();

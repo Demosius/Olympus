@@ -8,7 +8,7 @@ using Uranus.Annotations;
 using Uranus.Inventory;
 using Uranus.Inventory.Models;
 
-namespace Morpheus.ViewModels.Controls;
+namespace Morpheus.ViewModels.Controls.Inventory;
 
 public class StoreVM : INotifyPropertyChanged
 {

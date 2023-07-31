@@ -1,7 +1,7 @@
-﻿using Morpheus.ViewModels.Controls;
+﻿using Morpheus.ViewModels.Controls.Inventory;
 using Uranus;
 
-namespace Morpheus.Views.Controls;
+namespace Morpheus.Views.Controls.Inventory;
 
 /// <summary>
 /// Interaction logic for MixedCartonHandlerView.xaml

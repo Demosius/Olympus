@@ -190,4 +190,11 @@ public class StaffDeleter
     }
 
     public async Task<int> MispickAsync(Mispick mispick) => await Task.Run(() => Chariot.Delete(mispick)).ConfigureAwait(false);
+
+    public async Task<int> RoleAsync(Role role) => await Task.Run(() => Chariot.Delete(role)).ConfigureAwait(false);
+
+    public async Task<int> DepartmentAsync(Department department) => await Task.Run(() => Chariot.Delete(department)).ConfigureAwait(false);
+
+    public async Task<int> ClanAsync(Clan clan) => await Task.Run(() => Chariot.Delete(clan)).ConfigureAwait(false);
+    
 }

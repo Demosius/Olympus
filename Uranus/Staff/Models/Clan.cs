@@ -26,6 +26,13 @@ public class Clan
         Employees = new List<Employee>();
     }
 
+    public Clan(string name)
+    {
+        Name = name;
+        DepartmentName = string.Empty;
+        Employees = new List<Employee>();
+    }
+
     public Clan(string name, int leaderID, string departmentName, Department department, Employee leader)
     {
         Name = name;

@@ -1,4 +1,4 @@
-﻿using Morpheus.ViewModels.Controls;
+﻿using Morpheus.ViewModels.Controls.Inventory;
 using System;
 using System.Windows.Input;
 

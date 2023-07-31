@@ -26,7 +26,7 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
-        <Frame Background="{StaticResource Brush03}"
+        <Frame Background="{StaticResource Brush04}"
                Content="{Binding CurrentPage, Mode=OneWay}"              
                Height="Auto" 
                HorizontalAlignment="Stretch" 

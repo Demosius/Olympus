@@ -32,6 +32,9 @@ public class StaffCreator
     public bool Employee(Employee employee, EPushType pushType = EPushType.ObjectOnly) =>
         Chariot.Create(employee, pushType);
 
+    public async Task<bool> EmployeeAsync(Employee employee, EPushType pushType = EPushType.ObjectOnly) =>
+        await Task.Run(() => Chariot.Create(employee, pushType));
+
     public bool ClockEvent(ClockEvent clockEvent) => Chariot.Create(clockEvent);
 
     public async Task<int> SetShiftEntryAsync(DateTime date, Employee employee)
@@ -416,4 +419,13 @@ public class StaffCreator
 
         return lines;
     }
+
+    public async Task<bool> RoleAsync(Role role, EPushType pushType = EPushType.ObjectOnly) =>
+        await Task.Run(() => Chariot.Create(role, pushType));
+
+    public async Task<bool> DepartmentAsync(Department department, EPushType pushType = EPushType.ObjectOnly) =>
+        await Task.Run(() => Chariot.Create(department, pushType));
+
+    public async Task<bool> ClanAsync(Clan clan, EPushType pushType = EPushType.ObjectOnly) =>
+        await Task.Run(() => Chariot.Create(clan, pushType));
 }

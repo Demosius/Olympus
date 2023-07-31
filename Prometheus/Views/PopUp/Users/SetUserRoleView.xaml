@@ -11,7 +11,8 @@
         SizeToContent="Width"
         Height="350"
         WindowStartupLocation="CenterOwner"
-        Background="#111">
+        Background="#111"
+        Initialized="SetUserRoleView_OnInitialized">
 
     <Window.Resources>
         <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Orange/MSControls.Core.Implicit.xaml"/>

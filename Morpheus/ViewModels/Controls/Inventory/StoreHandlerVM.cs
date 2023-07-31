@@ -21,7 +21,7 @@ using Uranus.Interfaces;
 using Uranus.Inventory.Models;
 using InvalidDataException = Uranus.InvalidDataException;
 
-namespace Morpheus.ViewModels.Controls;
+namespace Morpheus.ViewModels.Controls.Inventory;
 
 public class StoreHandlerVM : INotifyPropertyChanged, IDBInteraction, IFilters, ICreateDelete<StoreVM>, IClipboardUpload, IFileUpload
 {
@@ -212,7 +212,7 @@ public class StoreHandlerVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
             return;
         }
 
-        var newStore = new Store {Number = newStoreNumber};
+        var newStore = new Store { Number = newStoreNumber };
         var newVM = new StoreVM(newStore, Helios);
         AllStores.Add(newVM);
         Stores.Add(newVM);

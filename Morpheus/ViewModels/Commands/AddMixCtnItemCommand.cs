@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Windows.Input;
-using Morpheus.ViewModels.Controls;
+using Morpheus.ViewModels.Controls.Inventory;
 
 namespace Morpheus.ViewModels.Commands;
 

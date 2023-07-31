@@ -1,4 +1,8 @@
-﻿using Prometheus.ViewModels.Helpers;
+﻿using System.Windows.Navigation;
+using Prometheus.ViewModels.Helpers;
+using Prometheus.ViewModels.Pages;
+using Styx;
+using Uranus;
 
 namespace Prometheus.Views.Pages;
 
@@ -7,9 +11,13 @@ namespace Prometheus.Views.Pages;
 /// </summary>
 public partial class StaffPage
 {
-    public StaffPage()
+    public StaffVM VM { get; set; }
+
+    public StaffPage(Helios helios, Charon charon)
     {
+        VM = new StaffVM(helios, charon);
         InitializeComponent();
+        DataContext = VM;
     }
 
     public override EDataCategory DataCategory => EDataCategory.Staff;

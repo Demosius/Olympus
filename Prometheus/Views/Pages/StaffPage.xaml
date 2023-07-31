@@ -4,7 +4,9 @@
                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                xmlns:views="clr-namespace:Prometheus.Views"
+               xmlns:vm="clr-namespace:Prometheus.ViewModels.Pages"
                mc:Ignorable="d" 
+               d:DataContext="{d:DesignInstance vm:StaffVM, IsDesignTimeCreatable=False}"
                d:DesignHeight="450" d:DesignWidth="800"
                Title="StaffPage">
 
@@ -12,5 +14,19 @@
         <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Orange/MSControls.Core.Implicit.xaml" />
     </Page.Resources>
 
-    <Grid Background="AntiqueWhite"/>
+    <DockPanel>
+        <ListView DockPanel.Dock="Left"
+                  Width="Auto"
+                  MinWidth="100"
+                  ItemsSource="{Binding Controls}"
+                  SelectedValue="{Binding SelectedControl, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" FontSize="14" HorizontalAlignment="Center"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <UserControl Content="{Binding CurrentControl}"
+                     Background="{DynamicResource Brush04}"/>
+    </DockPanel>
 </views:CatPage>

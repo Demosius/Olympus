@@ -16,7 +16,7 @@ using Uranus.Commands;
 using Uranus.Interfaces;
 using Uranus.Inventory.Models;
 
-namespace Morpheus.ViewModels.Controls;
+namespace Morpheus.ViewModels.Controls.Inventory;
 
 public class MixedCartonHandlerVM : INotifyPropertyChanged, IDBInteraction
 {

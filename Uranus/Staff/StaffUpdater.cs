@@ -19,6 +19,8 @@ public class StaffUpdater
 
     public int Employee(Employee employee) => Chariot.Update(employee);
 
+    public async Task<int> EmployeeAsync(Employee employee) => await Chariot.UpdateAsync(employee);
+
     public async Task<int> ClockEventsAsync(IEnumerable<ClockEvent> clocks) => await Chariot.UpdateTableAsync(clocks).ConfigureAwait(false);
 
     public int ClockEvents(IEnumerable<ClockEvent> clocks) => Chariot.UpdateTable(clocks);
@@ -609,4 +611,95 @@ public class StaffUpdater
     public async Task<int> QALinesAsync(List<QALine> qaLines) => await Chariot.UpdateTableAsync(qaLines);
 
     public async Task<int> QAStatsAsync(QAStats stats) => await Chariot.InsertOrReplaceAsync(stats);
+
+    public async Task<int> DepartmentAsync(Department department) => await Chariot.InsertOrReplaceAsync(department);
+
+    public async Task<int> ClanAsync(Clan clan) => await Chariot.InsertOrReplaceAsync(clan);
+
+    public async Task<int> RoleAsync(Role role) => await Chariot.InsertOrReplaceAsync(role);
+
+    public async Task<int> RoleNameChangeAsync(Role role, string newName)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            // Check new name does not already exist.
+            if (Chariot.ExecuteScalar<int>("SELECT count(*) FROM Role WHERE Name=?;", newName) > 0) return;
+
+            // Change role reporting.
+            lines += Chariot.Execute("Update Role SET ReportsToRoleName = ? WHERE ReportsToRoleName = ?;", newName, role.Name);
+
+            // Change employee roles.
+            lines += Chariot.Execute("Update Employee SET RoleName = ? WHERE RoleName = ?;", newName, role.Name);
+
+            // Change role name.
+            lines += Chariot.Delete(role);
+            role.Name = newName;
+            lines += Chariot.Insert(role);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return lines;
+    }
+
+    public async Task<int> ClanNameChangeAsync(Clan clan, string newName)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            // Check new name does not already exist.
+            if (Chariot.ExecuteScalar<int>("SELECT count(*) FROM Clan WHERE Name=?;", newName) > 0) return;
+            
+            // Change employee clans.
+            lines += Chariot.Execute("Update Employee SET ClanName = ? WHERE ClanName = ?;", newName, clan.Name);
+
+            // Change clan name.
+            lines += Chariot.Delete(clan);
+            clan.Name = newName;
+            lines += Chariot.Insert(clan);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return lines;
+    }
+
+    public async Task<int> DepartmentNameChangeAsync(Department department, string newName)
+    {
+        var lines = 0;
+        
+        void Action()
+        {
+            // Check new name does not already exist.
+            if (Chariot.ExecuteScalar<int>("SELECT count(*) FROM Department WHERE Name=?;", newName) > 0) return;
+
+            // Change department structure.
+            lines += Chariot.Execute("Update Department SET OverDepartmentName = ? WHERE OverDepartmentName = ?;", newName, department.Name);
+
+            // Change department for Employees, Clans, Roles, Rosters (Employee, Department, Daily, standard).
+            lines += Chariot.Execute("Update Employee SET DepartmentName = ? WHERE DepartmentName = ?;", newName, department.Name);
+            lines += Chariot.Execute("Update Clan SET DepartmentName = ? WHERE DepartmentName = ?;", newName, department.Name);
+            lines += Chariot.Execute("Update Role SET DepartmentName = ? WHERE DepartmentName = ?;", newName, department.Name);
+            lines += Chariot.Execute("Update Roster SET DepartmentName = ? WHERE DepartmentName = ?;", newName, department.Name);
+            lines += Chariot.Execute("Update DailyRoster SET DepartmentName = ? WHERE DepartmentName = ?;", newName, department.Name);
+            lines += Chariot.Execute("Update EmployeeRoster SET DepartmentName = ? WHERE DepartmentName = ?;", newName, department.Name);
+            lines += Chariot.Execute("Update DepartmentRoster SET DepartmentName = ? WHERE DepartmentName = ?;", newName, department.Name);
+
+            // Change Project and loaning department references.
+            lines += Chariot.Execute("Update DepartmentProject SET DepartmentName = ? WHERE DepartmentName = ?;", newName, department.Name);
+            lines += Chariot.Execute("Update EmployeeDepartmentLoaning SET DepartmentName = ? WHERE DepartmentName = ?;", newName, department.Name);
+            
+            // Change department name.
+            lines += Chariot.Delete(department);
+            department.Name = newName;
+            lines += Chariot.Insert(department);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return lines;
+    }
 }
