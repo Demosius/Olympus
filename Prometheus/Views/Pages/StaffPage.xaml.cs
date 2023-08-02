@@ -1,5 +1,4 @@
-﻿using System.Windows.Navigation;
-using Prometheus.ViewModels.Helpers;
+﻿using Prometheus.ViewModels.Helpers;
 using Prometheus.ViewModels.Pages;
 using Styx;
 using Uranus;

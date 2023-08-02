@@ -15,9 +15,9 @@ public class StartCountCommand : ICommand
         return true;
     }
 
-    public void Execute(object? parameter)
+    public async void Execute(object? parameter)
     {
-        VM.StartCount();
+        await VM.StartCount();
     }
 
     public event EventHandler? CanExecuteChanged

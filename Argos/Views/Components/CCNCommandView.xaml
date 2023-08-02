@@ -5,9 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:Argos.ViewModels.Components"
              xmlns:components="clr-namespace:Argos.Views.Components"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+             xmlns:models="clr-namespace:Uranus.Inventory.Models;assembly=Uranus"
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:CCNCommandVM}, IsDesignTimeCreatable=False}"
-             d:DesignHeight="450" d:DesignWidth="1000">
+             d:DesignHeight="450" >
 
     <UserControl.Resources>
         <ResourceDictionary>
@@ -15,6 +17,13 @@
                 <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Yellow/MSControls.Core.Implicit.xaml"/>
                 <ResourceDictionary>
                     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+                    <ObjectDataProvider x:Key="FreightOptions"
+                                        MethodName="GetValues" 
+                                        ObjectType="{x:Type sys:Enum}">
+                        <ObjectDataProvider.MethodParameters>
+                            <x:Type TypeName="models:EFreightOption"/>
+                        </ObjectDataProvider.MethodParameters>
+                    </ObjectDataProvider>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -174,21 +183,57 @@
                                 BorderBrush="{StaticResource Brush01}"
                                 Visibility="{Binding ShowLines, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <DockPanel DataContext="{Binding SelectedGroup}">
-                                <StackPanel DockPanel.Dock="Top"
-                                    Orientation="Horizontal">
-                                    <ToggleButton Margin="5"
+                                <Grid DockPanel.Dock="Top">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                        <ToggleButton Margin="5"
                                           Content="Reverse Sort"
                                           IsChecked="{Binding ReverseSort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                    <CheckBox Visibility="{Binding CanSendToLanTech, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                        <CheckBox Visibility="{Binding CanSendToLanTech, Converter={StaticResource BooleanToVisibilityConverter}}"
                                               IsChecked="{Binding SendToLanTech}"
                                               Content="Create Carton Erector File"/>
-                                    <Label Content="{Binding BatchDescription}"
+                                        <Label Content="{Binding BatchDescription}"
                                            FontSize="16"
                                            FontWeight="Bold"
                                            VerticalContentAlignment="Center"
                                            Margin="15,0"
                                            Foreground="{StaticResource Brush00}"/>
-                                </StackPanel>
+                                    </StackPanel>
+                                    
+                                    <ComboBox Grid.Column="2"
+                                              Margin="5"
+                                              MinWidth="120"
+                                              ItemsSource="{Binding Source={StaticResource FreightOptions}}"
+                                              SelectedValue="{Binding FreightOption}"/>
+
+                                    <StackPanel Grid.Column="4"
+                                                Orientation="Horizontal">
+                                        <Label Content="Stock Descriptor:"
+                                               Margin="0,5"
+                                               VerticalAlignment="Center"/>
+                                        <TextBox Margin="5"
+                                                 MinWidth="80"
+                                                 VerticalAlignment="Center"
+                                                 VerticalContentAlignment="Center"
+                                                 Text="{Binding StockDescriptor}"/>
+                                        <Button Margin="5"
+                                                Command="{Binding PrintCommand}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Image Source="../../Resources/printer.png" 
+                                                       Width="15" Height="15"/>
+                                                <Label Content="Print"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+
+                                </Grid>
                                 <DataGrid d:ItemsSource="{d:SampleData ItemCount=5}"
                                   ItemsSource="{Binding ObservableLines}"
                                   AutoGenerateColumns="False"

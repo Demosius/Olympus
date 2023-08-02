@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using Argos.Interfaces;
+using Argos.Properties;
 using Argos.ViewModels.Commands;
 using Uranus;
 using Uranus.Annotations;
@@ -201,7 +202,7 @@ public class ProcessedBatchDataVM : INotifyPropertyChanged, IFilters, IBatchTOGr
         AllGroups = groups.Select(group => new BatchTOGroupVM(group, Helios, this)).ToList();
         ApplyFilters();
         var batchIDs = AllGroups.Where(g => !g.LabelFileExists).Select(g => g.BatchString).Distinct().ToList();
-        await Helios.InventoryUpdater.BatchProgressCheck(batchIDs);
+        await Helios.InventoryUpdater.BatchProgressCheck(batchIDs, Settings.Default.BatchLoadDirectory);
     }
 
     public void ClearFilters()

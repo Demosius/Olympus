@@ -27,8 +27,8 @@ public class QAOperatorStatsVM : INotifyPropertyChanged, IDBInteraction, IFilter
 
     public ObservableCollection<QAOperatorVM> Operators { get; set; }
 
-    private QAOperatorVM selectedOperator;
-    public QAOperatorVM SelectedOperator
+    private QAOperatorVM? selectedOperator;
+    public QAOperatorVM? SelectedOperator
     {
         get => selectedOperator;
         set

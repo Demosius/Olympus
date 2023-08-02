@@ -1,8 +1,6 @@
-﻿using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows.Controls;
 using Argos.ViewModels.Components;
-using DocumentFormat.OpenXml.Drawing.ChartDrawing;
 
 namespace Argos.Views.Components;
 

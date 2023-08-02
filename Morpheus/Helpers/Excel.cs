@@ -216,7 +216,7 @@ public static class Excel
             AppendChild(new Sheets());
 
         // Append a new worksheet and associate it with the workbook.
-        var sheet = new Sheet()
+        var sheet = new Sheet
         {
             Id = spreadsheetDocument.WorkbookPart.
                 GetIdOfPart(worksheetPart),

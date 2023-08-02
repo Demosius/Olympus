@@ -5,6 +5,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Basilisk.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -80,6 +81,10 @@
     <None Remove="Resources\img\wand--arrow.png" />
     <None Remove="Resources\img\wrench-screwdriver.png" />
     <None Remove="Resources\img\wrench.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Basilisk.ico" />
   </ItemGroup>
 
   <ItemGroup>

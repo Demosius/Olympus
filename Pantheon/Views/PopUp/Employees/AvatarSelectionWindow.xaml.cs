@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using Pantheon.ViewModels.Controls.Employees;
 using Pantheon.ViewModels.PopUp.Employees;
 

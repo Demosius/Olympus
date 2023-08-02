@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using Argos.Interfaces;
 using Argos.Properties;
+using Cadmus.Helpers;
+using Cadmus.Interfaces;
+using Cadmus.ViewModels.Commands;
 using Microsoft.Win32;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -20,7 +23,7 @@ using Uranus.Inventory.Models;
 
 namespace Argos.ViewModels.Components;
 
-public class BatchTOGroupVM : INotifyPropertyChanged
+public class BatchTOGroupVM : INotifyPropertyChanged, IPrintable
 {
     public Helios Helios { get; set; }
     public BatchTOGroup Group { get; set; }
@@ -106,11 +109,34 @@ public class BatchTOGroupVM : INotifyPropertyChanged
         }
     }
 
+    private string stockDescriptor;
+    public string StockDescriptor
+    {
+        get => stockDescriptor;
+        set
+        {
+            stockDescriptor = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private EFreightOption freightOption;
+    public EFreightOption FreightOption
+    {
+        get => freightOption;
+        set
+        {
+            freightOption = value;
+            OnPropertyChanged();
+            _ = SetFreightOption();
+        }
+    }
+
     #endregion
 
     #region Commands
 
-
+    public PrintCommand PrintCommand { get; set; }
 
     #endregion
 
@@ -120,6 +146,10 @@ public class BatchTOGroupVM : INotifyPropertyChanged
         Group = group;
         ParentVM = parentVM;
         LabelFileExists = Group.IsFinalised && File.Exists(Path.Join(LabelFileDirectory, LabelFileName));
+
+        stockDescriptor = string.Empty;
+
+        PrintCommand = new PrintCommand(this);
     }
 
     public static int GetBatchFileNumber(string batchID, string directory)
@@ -182,14 +212,14 @@ public class BatchTOGroupVM : INotifyPropertyChanged
     {
         // Handle group and line data.
         UseRegion = Settings.Default.UseRegionColumn;
-        var stores  = new Dictionary<string, Store>();
+        var stores = new Dictionary<string, Store>();
         if (UseRegion) stores = (await Helios.InventoryReader.StoresAsync()).ToDictionary(s => s.Number, s => s);
         foreach (var line in Lines)
         {
             line.ItemNumber = 111111;
             line.Description = $"{line.CCN} {line.BatchID} F{FileNumber}";
             if (UseRegion && stores.TryGetValue(line.StoreNo, out var store))
-                line.FreightRegion = store.CCNRegion;
+                line.FreightRegion = store.FreightRegion(FreightOption);
         }
 
         // Create workbook and sheet.
@@ -216,7 +246,7 @@ public class BatchTOGroupVM : INotifyPropertyChanged
         sheet.Cells[1, 15].Value = "Item";
         sheet.Cells[1, 16].Value = "Description";
         if (UseRegion)
-            sheet.Cells[1, 17].Value = "Region"; 
+            sheet.Cells[1, 17].Value = "Region";
 
 
         // Format Headers
@@ -384,7 +414,10 @@ public class BatchTOGroupVM : INotifyPropertyChanged
             File.Delete(newFile);
 
         // Move file to og location.
-        File.Move(backUpFilePath, Path.Join(ogDir, ogFileName));
+        if (File.Exists(Path.Join(ogDir, ogFileName)))
+            File.Delete(backUpFilePath);
+        else
+            File.Move(backUpFilePath, Path.Join(ogDir, ogFileName), false);
     }
 
     public async Task SetObservableLinesAsync() => ObservableLines = await GetObservableLinesAsync();
@@ -398,6 +431,32 @@ public class BatchTOGroupVM : INotifyPropertyChanged
     public IEnumerable<BatchTOLine> GetSortedLines => ReverseSort
         ? Lines.OrderBy(l => l.CartonType).ThenByDescending(l => l.StartBin).ThenByDescending(l => l.EndBin)
         : Lines.OrderBy(l => l.CartonType).ThenBy(l => l.StartBin).ThenByDescending(l => l.EndBin);
+
+    private async Task SetFreightOption()
+    {
+        await Task.Run(() =>
+        {
+            foreach (var observableLine in ObservableLines)
+            {
+                observableLine.SetFreightOption(FreightOption);
+            }
+        });
+    }
+
+    public void Print()
+    {
+        if (!ObservableLines.Any()) return;
+
+        if (StockDescriptor == string.Empty)
+        {
+            MessageBox.Show("Please enter stock descriptor before printing.", "Missing Descriptor", MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return;
+        }
+
+        var labels = ObservableLines.Select(l => l.GetLabel(StockDescriptor)).ToList();
+        PrintUtility.PrintLabels(labels, labels);
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

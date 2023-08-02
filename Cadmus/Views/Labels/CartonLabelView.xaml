@@ -1,0 +1,270 @@
+﻿<UserControl x:Class="Cadmus.Views.Labels.CartonLabelView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Cadmus.ViewModels.Labels"
+             xmlns:converters="clr-namespace:Cadmus.ViewModels.Converters"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:CartonLabelVM}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="242" d:DesignWidth="360"
+             Height="{Binding Height}" Width="{Binding Width}">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Morpheus;component/Resources/Fonts.xaml"/>
+                <ResourceDictionary>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="Black" />
+                    </Style>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding Col01}"/>
+            <ColumnDefinition Width="{Binding Col02}"/>
+            <ColumnDefinition Width="{Binding Col03}"/>
+            <ColumnDefinition Width="{Binding Col04}"/>
+            <ColumnDefinition Width="{Binding Col05}"/>
+            <ColumnDefinition Width="{Binding Col06}"/>
+            <ColumnDefinition Width="{Binding Col07}"/>
+            <ColumnDefinition Width="{Binding Col08}"/>
+            <ColumnDefinition Width="{Binding Col09}"/>
+            <ColumnDefinition Width="{Binding Col10}"/>
+            <ColumnDefinition Width="{Binding Col11}"/>
+            <ColumnDefinition Width="{Binding Col12}"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+            <RowDefinition Height="{Binding Row}"/>
+        </Grid.RowDefinitions>
+
+        <!-- Start Zone -->
+        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2"
+                BorderBrush="Black" BorderThickness="1,1,1,.5">
+            <TextBlock Text="{Binding StartZone}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- Start Bin -->
+        <Border Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="4" Grid.RowSpan="2"
+                BorderBrush="Black" BorderThickness="1,1,1,.5">
+            <TextBlock Text="{Binding StartBin}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- Location (9600) -->
+        <Border Grid.Row="0" Grid.Column="8" Grid.ColumnSpan="4" Grid.RowSpan="2"
+                BorderBrush="Black" BorderThickness="1">
+            <TextBlock Text="9600"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- End Zone -->
+        <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2"
+                BorderBrush="Black" BorderThickness="1,.5,1,1">
+            <TextBlock Text="{Binding EndZone}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- End Bin -->
+        <Border Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="4" Grid.RowSpan="2"
+                BorderBrush="Black" BorderThickness="1,.5,1,.5">
+            <TextBlock Text="{Binding EndBin}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- 'Store #' -->
+        <Border Grid.Row="2" Grid.Column="9" Grid.ColumnSpan="3" Grid.RowSpan="2">
+            <TextBlock Text="Store #"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="18"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- Batch -->
+        <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2">
+            <TextBlock Text="{Binding TOBatchNo}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="16"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <Border Grid.Row="4" Grid.Column="3"
+                BorderThickness="0,.5,0,0" BorderBrush="Black"/>
+
+        <!-- Date -->
+        <Border Grid.Row="4" Grid.Column="4" Grid.ColumnSpan="2" Grid.RowSpan="2"
+                BorderBrush="Black" BorderThickness="1,.5,1,1">
+            <TextBlock Text="{Binding Date, StringFormat=dd/MM/yyyy}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="14"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <Border Grid.Row="4" Grid.Column="6" 
+                BorderThickness="0,.5,0,0" BorderBrush="Black"/>
+
+        <!-- Wave -->
+        <Border Grid.Row="5" Grid.Column="6" Grid.ColumnSpan="2" Grid.RowSpan="2">
+            <TextBlock Text="{Binding WaveNo}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="18"
+                       FontWeight="Bold"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- Store -->
+        <Border Grid.Row="4" Grid.Column="8" Grid.ColumnSpan="4" Grid.RowSpan="4">
+            <TextBlock Text="{Binding StoreNo}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="44"
+                       FontWeight="Bold"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- CCN -->
+        <Border Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="6" Grid.RowSpan="2">
+            <TextBlock VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       FontFamily="Calibri">
+                <Run>CCN </Run>
+                <Run Text="{Binding CCN}"/>
+            </TextBlock>
+        </Border>
+
+        <!-- Barcode -->
+        <Border Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="6" Grid.RowSpan="7">
+            <TextBlock Text="{Binding Barcode}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="68"
+                       FontWeight="Normal"
+                       FontFamily="{StaticResource Code128}"/>
+        </Border>
+
+        <!-- Carrier -->
+        <Border Grid.Row="16" Grid.Column="0" Grid.ColumnSpan="6" Grid.RowSpan="1">
+            <TextBlock Text="{Binding Carrier}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left"
+                       Margin="5,0"
+                       FontSize="12"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- Stock Descriptor -->
+        <Border Grid.Row="8" Grid.Column="6" Grid.ColumnSpan="3" Grid.RowSpan="9"
+                BorderBrush="Black" BorderThickness="1,1,.5,1">
+            <TextBlock Text="{Binding StockDescriptor}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="45"
+                       FontWeight="Bold"
+                       FontFamily="Calibri">
+                <TextBlock.LayoutTransform>
+                    <RotateTransform Angle="270"/>
+                </TextBlock.LayoutTransform>
+            </TextBlock>
+        </Border>
+
+        <Border Grid.Row="8" Grid.Column="9" Grid.RowSpan="5"
+                BorderThickness=".5,0,0,0" BorderBrush="Black"/>
+
+        <!-- Carton Type -->
+        <Border Grid.Row="9" Grid.Column="9" Grid.ColumnSpan="2" Grid.RowSpan="3">
+            <TextBlock Text="{Binding CartonType}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="55"
+                       FontWeight="Bold"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- Weight -->
+        <Border Grid.Row="13" Grid.Column="9" Grid.ColumnSpan="2" Grid.RowSpan="2"
+                BorderBrush="Black" BorderThickness="1">
+            <TextBlock VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="16"
+                       FontWeight="Normal"
+                       FontFamily="Calibri">
+                <Run Text="{Binding Weight, StringFormat='#,##0.##'}"/>
+                <Run> KG</Run>
+            </TextBlock>
+        </Border>
+
+        <!-- Units -->
+        <Border Grid.Row="15" Grid.Column="9" Grid.ColumnSpan="1" Grid.RowSpan="2"
+                BorderBrush="Black" BorderThickness="1">
+            <TextBlock Text="{Binding TotalUnits}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="18"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"/>
+        </Border>
+
+        <!-- 'PCS' -->
+        <Border Grid.Row="15" Grid.Column="10" Grid.ColumnSpan="2" Grid.RowSpan="2">
+            <TextBlock Text="PCS"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="18"
+                       FontWeight="Normal"
+                       FontFamily="Calibri"/>
+        </Border>
+
+    </Grid>
+</UserControl>

@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using Argos.Properties;
 using Argos.ViewModels.Commands;
 using Argos.Views.PopUps;
 using Morpheus;
@@ -254,6 +255,9 @@ public class MainBatchVM : INotifyPropertyChanged, IDBInteraction, IFilters
                 .Select(b => new BatchVM(b, Helios))
                 .ToList();
         }
+
+        await Helios.InventoryUpdater.BatchProgressCheck(AllBatches.Select(b => b.Batch).ToList(),
+            Settings.Default.BatchLoadDirectory);
 
         ApplyFilters();
         SelectedBatch = Batches.FirstOrDefault(b => b.ID == currentSelected?.ID);

@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Uranus.Extensions;
 using Uranus.Staff.Models;
-using Uranus.Users.Models;
 using Role = Uranus.Staff.Models.Role;
 
 namespace Uranus.Staff;

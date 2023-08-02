@@ -250,13 +250,15 @@ public class InventoryUpdater
 
     /// <summary>
     /// Check batches of given IDs to determine if their progress should be updated.
-    ///
+    /// 
+    /// Update from AutoRun to File Exported if batch file exists in export folder.
     /// Update from DataUploaded (or below) to label files created if all lines have been processed.
     /// Update from Files Created to Labels Printed if all listed output files do not exist.
     /// </summary>
     /// <param name="batchIDs"></param>
+    /// <param name="batchExportDirectory"></param>
     /// <returns></returns>
-    public async Task<int> BatchProgressCheck(List<string> batchIDs)
+    public async Task<int> BatchProgressCheck(List<string> batchIDs, string batchExportDirectory)
     {
         var lines = 0;
 
@@ -271,17 +273,24 @@ public class InventoryUpdater
 
             foreach (var batch in batches)
             {
-                if (!toLines.TryGetValue(batch.ID, out var batchLines)) continue;
+                _ = toLines.TryGetValue(batch.ID, out var batchLines);
                 switch (batch.Progress)
                 {
                     // Figure out which check we want to run.
+                    case <= EBatchProgress.AutoRun:
+                        var directoryInfo = new DirectoryInfo(batchExportDirectory);
+                        var filesInDir = directoryInfo.GetFiles("*" + batch.ID + "*.*");
+                        if (filesInDir.Length > 0) batch.Progress = EBatchProgress.FileExported;
+                        updateableBatches.Add(batch);
+                        break;
                     case <= EBatchProgress.DataUploaded:
-                        if (!batchLines.All(l => l.IsFinalised)) continue;
+                        if (!batchLines?.All(l => l.IsFinalised) ?? false) continue;
                         batch.Progress = EBatchProgress.LabelFilesCreated;
                         updateableBatches.Add(batch);
                         break;
 
                     case EBatchProgress.LabelFilesCreated:
+                        if (batchLines is null) continue;
                         var files = batchLines.Select(l => Path.Join(l.FinalFileDirectory, l.FinalFileName))
                             .Distinct()
                             .ToList();
@@ -289,6 +298,72 @@ public class InventoryUpdater
                         batch.Progress = EBatchProgress.LabelsPrinted;
                         updateableBatches.Add(batch);
                         break;
+                        
+
+                }
+            }
+
+            lines += Chariot.UpdateTable(updateableBatches);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+        return lines;
+    }
+
+    /// <summary>
+    /// Check batches of given IDs to determine if their progress should be updated.
+    /// 
+    /// Update from AutoRun to File Exported if batch file exists in export folder.
+    /// Update from DataUploaded (or below) to label files created if all lines have been processed.
+    /// Update from Files Created to Labels Printed if all listed output files do not exist.
+    /// </summary>
+    /// <param name="batches"></param>
+    /// <param name="batchExportDirectory"></param>
+    /// <returns></returns>
+    public async Task<int> BatchProgressCheck(List<Batch> batches, string batchExportDirectory)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            var batchIDs = batches.Select(b => b.ID).ToHashSet();
+            var toLines = Chariot.PullObjectList<BatchTOLine>(l => batchIDs.Contains(l.BatchID))
+                .GroupBy(l => l.BatchID)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            var updateableBatches = new List<Batch>();
+
+            foreach (var batch in batches)
+            {
+                _ = toLines.TryGetValue(batch.ID, out var batchLines);
+                switch (batch.Progress)
+                {
+                    // Figure out which check we want to run.
+                    case <= EBatchProgress.AutoRun:
+                        var directoryInfo = new DirectoryInfo(batchExportDirectory);
+                        var filesInDir = directoryInfo.GetFiles("*" + batch.ID + "*.*");
+                        if (filesInDir.Length <= 0) continue;
+                        batch.Progress = EBatchProgress.FileExported;
+                        updateableBatches.Add(batch);
+                        break;
+
+                    case EBatchProgress.FileExported:
+                    case EBatchProgress.DataUploaded:
+                        if (!batchLines?.All(l => l.IsFinalised) ?? false) continue;
+                        batch.Progress = EBatchProgress.LabelFilesCreated;
+                        updateableBatches.Add(batch);
+                        break;
+
+                    case EBatchProgress.LabelFilesCreated:
+                        if (batchLines is null) continue;
+                        var files = batchLines.Select(l => Path.Join(l.FinalFileDirectory, l.FinalFileName))
+                            .Distinct()
+                            .ToList();
+                        if (files.Any(File.Exists)) continue;
+                        batch.Progress = EBatchProgress.LabelsPrinted;
+                        updateableBatches.Add(batch);
+                        break;
+
 
                 }
             }
@@ -348,5 +423,48 @@ public class InventoryUpdater
             await Task.Run(() => Chariot.Delete(stockNote));
         else
             await Chariot.InsertOrReplaceAsync(stockNote);
+    }
+
+    /// <summary>
+    /// Update stores with given list.
+    /// Create new stores where they don't previously exist, otherwise update them.
+    /// </summary>
+    /// <param name="stores">List of stores.</param>
+    /// <param name="overwrite">If true overwrite completely, otherwise rely on store date marge to detect overwriting values.</param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public async Task<int> StoresAsync(List<Store> stores, bool overwrite = false)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            if (overwrite)
+            {
+                lines += Chariot.UpdateTable(stores);
+                return;
+            }
+
+            var existingStores = Chariot.PullObjectList<Store>().ToDictionary(s => s.Number, s => s);
+            var updateableStores = new List<Store>();
+
+            foreach (var store in stores)
+            {
+                if (!existingStores.TryGetValue(store.Number, out var oldStore))
+                {
+                    updateableStores.Add(store);
+                    continue;
+                }
+
+                oldStore.Update(store);
+                updateableStores.Add(oldStore);
+            }
+
+            lines += Chariot.UpdateTable(updateableStores);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return lines;
     }
 }

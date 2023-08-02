@@ -250,7 +250,7 @@ public class UserActivateVM : INotifyPropertyChanged, IFilters, IDBInteraction, 
 
     private void CreateManagerRole()
     {
-        var role = new UserRole()
+        var role = new UserRole
         {
             Name = "Manager",
             CreateUser = 0,

@@ -1,0 +1,138 @@
+﻿<UserControl x:Class="Cadmus.Views.Controls.CCNDisplayView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:Cadmus.ViewModels.Controls"
+             xmlns:labels="clr-namespace:Cadmus.Views.Labels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance {x:Type vm:CCNDisplayVM}, IsDesignTimeCreatable=False}"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <DockPanel Background="{DynamicResource Brush05}"
+                   Grid.Column="0"
+                   Margin="0,0,10,0">
+            <StackPanel DockPanel.Dock="Top"
+                        Orientation="Horizontal">
+                <Button Content="Add Line"
+                        Command="{Binding AddLineCommand}"
+                        Width="100"
+                        Margin="2"/>
+                <Button Content="Clear Data"
+                        Command="{Binding ClearLinesCommand}"
+                        Width="100"
+                        Margin="2"/>
+                <Button Content="Delete Selected"
+                        Command="{Binding DeleteSelectedCommand}"
+                        MinWidth="100"
+                        Margin="2"/>
+            </StackPanel>
+
+            <!-- Data View -->
+            <DataGrid Name="LabelGrid" 
+                      ItemsSource="{Binding LabelVMs}"
+                      d:ItemsSource="{d:SampleData ItemCount=5}"
+                      SelectionChanged="LabelGrid_OnSelectionChanged"
+                      AutoGenerateColumns="False"
+                      CanUserDeleteRows="True"
+                      CanUserAddRows="True"
+                      CanUserReorderColumns="True"
+                      CanUserResizeColumns="True"
+                      CanUserResizeRows="True"
+                      CanUserSortColumns="True"
+                      RowHeaderWidth="15"
+                      SelectionUnit="CellOrRowHeader">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Store"
+                                        Binding="{Binding StoreNo}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Cartons"
+                                        Binding="{Binding Cartons}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Weight"
+                                        Binding="{Binding Weight, StringFormat='#,##0.## KG'}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Cube"
+                                        Binding="{Binding Cube, StringFormat='#,##0.## m³'}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="CCN"
+                                        Binding="{Binding CCN}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Barcode"
+                                        Binding="{Binding Barcode}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Carton Type"
+                                        Binding="{Binding CartonType}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Start Zone"
+                                        Binding="{Binding StartZone}"
+                                        IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Start Bin"
+                                        Binding="{Binding StartBin}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="End Zone"
+                                        Binding="{Binding EndZone}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Batch"
+                                        Binding="{Binding TOBatchNo}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Date"
+                                        Binding="{Binding Date, StringFormat='dd-MMM-yyyy'}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Units"
+                                        Binding="{Binding TotalUnits}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Wave"
+                                        Binding="{Binding WaveNo}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Descriptor"
+                                        Binding="{Binding StockDescriptor}"
+                                        IsReadOnly="False"/>
+                    <DataGridTextColumn Header="Carrier"
+                                        Binding="{Binding Carrier}"
+                                        IsReadOnly="False"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+
+        <GridSplitter Grid.Column="0"/>
+
+        <DockPanel Background="Black"
+                   Grid.Column="1">
+            <StackPanel Orientation="Horizontal"
+                        DockPanel.Dock="Top">
+                <Button Margin="2"
+                        Command="{Binding PrintCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="../../Resources/Images/printer.png" 
+                               Width="15" Height="15"/>
+                        <Label Content="Print"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+            <ListView Name="LabelViewList"
+                      ItemsSource="{Binding LabelVMs}"
+                      d:ItemsSource="{d:SampleData ItemCount=5}"
+                      SelectionChanged="LabelViewList_OnSelectionChanged"
+                      HorizontalContentAlignment="Center"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <labels:CartonLabelView RenderSize="2, 2"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </DockPanel>
+
+    </Grid>
+</UserControl>

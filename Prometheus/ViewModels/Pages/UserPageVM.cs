@@ -58,7 +58,7 @@ internal class UserPageVM : INotifyPropertyChanged
         Helios = helios;
         Charon = charon;
 
-        Pages = new ObservableCollection<EUserPage>()
+        Pages = new ObservableCollection<EUserPage>
         {
             EUserPage.Users,
             EUserPage.Activate,

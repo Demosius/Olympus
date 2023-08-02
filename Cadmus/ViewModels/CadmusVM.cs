@@ -18,6 +18,8 @@ public enum EPrintable
     ReplenLabels,
     [Description("Mixed Carton Stock Report")]
     MCStockReport,
+    [Description("Carton Labels")]
+    CartonLabels,
 }
 
 public class CadmusVM : INotifyPropertyChanged
@@ -77,6 +79,7 @@ public class CadmusVM : INotifyPropertyChanged
                 EPrintable.ReceivingPutAwayLabels => new ReceivingPutAway(),
                 EPrintable.ReplenLabels => new RefOrgeDisplayView(Helios),
                 EPrintable.MCStockReport => new MixedCartonSOHView(Helios, ProgressBar),
+                EPrintable.CartonLabels => new CCNDisplayView(),
                 _ => throw new ArgumentOutOfRangeException()
             };
 

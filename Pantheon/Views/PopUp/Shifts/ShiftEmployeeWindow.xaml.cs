@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using Pantheon.ViewModels.Controls.Shifts;
 using Pantheon.ViewModels.PopUp.Shifts;
 

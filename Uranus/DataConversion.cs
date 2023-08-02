@@ -1627,7 +1627,7 @@ public static class DataConversion
         // First set the headers.
         var line = reader.ReadLine();
         var headArr = line?.Split('\t') ?? Array.Empty<string>();
-        var col = new BatchIndices(headArr);
+        var col = new BatchIndices(headArr, true);
 
         // Get highest column value to make sure that any given data line isn't cut short.
         var highestCol = col.Max();
@@ -1644,8 +1644,8 @@ public static class DataConversion
                 if (!DateTime.TryParse(row[col.CreatedOn], out var createdOn)) createdOn = DateTime.Today;
                 var createdBy = row[col.CreatedBy];
                 var desc = row[col.Description];
-                if (!DateTime.TryParse(row[col.LastTimeCartonizedDate], out var ctnDate)) ctnDate = DateTime.Today;
-                if (!DateTime.TryParse(row[col.LastTimeCartonizedTime], out var ctnTime)) ctnTime = DateTime.Now;
+                if (col.LastTimeCartonizedDate == -1 || !DateTime.TryParse(row[col.LastTimeCartonizedDate], out var ctnDate)) ctnDate = DateTime.Today;
+                if (col.LastTimeCartonizedTime == -1 || !DateTime.TryParse(row[col.LastTimeCartonizedTime], out var ctnTime)) ctnTime = DateTime.Now;
                 if (!int.TryParse(row[col.Cartons], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var cartons)) cartons = 0;
                 if (!int.TryParse(row[col.Units], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var units)) units = 0;
                 var ptlCreated = row[col.PTLFileCreated].ToUpper() == "YES";
@@ -1780,7 +1780,14 @@ public static class DataConversion
         var waveString = row[col.Wave];
         var waveNo = Regex.Match(waveString, "\\d+").Value;
         if (!int.TryParse(waveNo, NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var wave)) wave = 0;
-        var ccnRegion = row[col.CCNRegion];
+        var restock = row[col.Restock];
+        var casePick = row[col.CasePick];
+        var nr = row[col.NR];
+        var overnight = row[col.Overnight];
+        var road1 = row[col.Road1];
+        var road2 = row[col.Road2];
+        var extRoad = row[col.ExtRoad];
+        var special = row[col.Special];
         var roadCCN = row[col.RoadCCN];
         if (!int.TryParse(row[col.ShippingDays], NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var transitDays)) transitDays = 0;
         var mbRegion = row[col.MBRegion];
@@ -1790,13 +1797,32 @@ public static class DataConversion
         var region = row[col.Region];
         var storeTypeString = row[col.StoreType];
         var groups = Regex.Matches(storeTypeString, "(?i)(EBGAMES|ZING)");
-        if (!Enum.TryParse(groups[0].Value, out EStoreType storeType)) storeType = EStoreType.EBGames;
+
+        EStoreType storeType;
+        if (!groups.Any())
+            storeType = EStoreType.Unknown;
+        else
+            storeType = groups[0].Value.ToUpper() switch
+            {
+                "EBGAMES" => EStoreType.EBGames,
+                "ZING" => EStoreType.ZING,
+                _ => EStoreType.Unknown
+            };
 
         var store = new Store
         {
             Number = number,
+            
+            Restock = restock,
+            CasePick = casePick,
+            NR = nr,
+            Overnight = overnight,
+            Road1 = road1,
+            Road2 = road2,
+            ExtRoad = extRoad,
+            Special = special,
+
             WaveNumber = wave,
-            CCNRegion = ccnRegion,
             RoadCCN = roadCCN,
             TransitDays = transitDays,
             MBRegion = mbRegion,
@@ -1815,7 +1841,14 @@ public static class DataConversion
         var waveString = row[col.Wave].ToString()!;
         var waveNo = Regex.Match(waveString, "\\d+").Value;
         if (!int.TryParse(waveNo, NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var wave)) wave = 0;
-        var ccnRegion = row[col.CCNRegion].ToString()!;
+        var restock = row[col.Restock].ToString()!;
+        var casePick = row[col.CasePick].ToString()!;
+        var nr = row[col.NR].ToString()!;
+        var overnight = row[col.Overnight].ToString()!;
+        var road1 = row[col.Road1].ToString()!;
+        var road2 = row[col.Road2].ToString()!;
+        var extRoad = row[col.ExtRoad].ToString()!;
+        var special = row[col.Special].ToString()!;
         var roadCCN = row[col.RoadCCN].ToString()!;
         if (!int.TryParse(row[col.ShippingDays].ToString()!, NumberStyles.Integer | NumberStyles.AllowThousands, provider, out var transitDays)) transitDays = 0;
         var mbRegion = row[col.MBRegion].ToString()!;
@@ -1825,13 +1858,32 @@ public static class DataConversion
         var region = row[col.Region].ToString()!;
         var storeTypeString = row[col.StoreType].ToString()!;
         var groups = Regex.Matches(storeTypeString, "(?i)(EBGAMES|ZING)");
-        if (!Enum.TryParse(groups[0].Value, out EStoreType storeType)) storeType = EStoreType.EBGames;
+
+        EStoreType storeType;
+        if (!groups.Any())
+            storeType = EStoreType.Unknown;
+        else
+            storeType = groups[0].Value.ToUpper() switch
+            {
+                "EBGAMES" => EStoreType.EBGames,
+                "ZING" => EStoreType.ZING,
+                _ => EStoreType.Unknown
+            };
 
         var store = new Store
         {
             Number = number,
+            
+            Restock = restock,
+            CasePick = casePick,
+            NR = nr,
+            Overnight = overnight,
+            Road1 = road1,
+            Road2 = road2,
+            ExtRoad = extRoad,
+            Special = special,
+
             WaveNumber = wave,
-            CCNRegion = ccnRegion,
             RoadCCN = roadCCN,
             TransitDays = transitDays,
             MBRegion = mbRegion,
@@ -2092,7 +2144,7 @@ public static class DataConversion
         else if (!int.TryParse(row[col.QtyPerUoM],
                      NumberStyles.Integer | NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint, provider,
                      out qtyPerUoM)) qtyPerUoM = 0;
-        
+
         if (!int.TryParse(row[col.QAScanQty], NumberStyles.Integer | NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint, provider, out var qaQty)) qaQty = 0;
         if (!int.TryParse(row[col.QtyOverUnder], NumberStyles.Integer | NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint, provider, out var varianceQty)) varianceQty = 0;
         if (!Enum.TryParse(row[col.QAStatus].Replace('.', ' ').Replace(" ", ""), out EQAStatus qaStatus)) qaStatus = EQAStatus.OK;
@@ -2101,7 +2153,7 @@ public static class DataConversion
         var errorType = row[col.QAErrorType];
         DateTime date;
         if (col.Date == -1)
-            date = DateTime.Today; 
+            date = DateTime.Today;
         else if (!DateTime.TryParse(row[col.Date], out date)) date = DateTime.Today;
 
         var qaLine = new QALine

@@ -1,7 +1,6 @@
 ﻿using System;
 using Prometheus.ViewModels.Helpers;
 using System.Collections.Generic;
-using System.Windows;
 using System.Windows.Controls;
 using Prometheus.ViewModels.Pages.Inventory;
 using Styx;

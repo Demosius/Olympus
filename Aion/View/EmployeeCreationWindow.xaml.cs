@@ -1,7 +1,6 @@
 ﻿using System;
 using Aion.ViewModels;
 using Uranus;
-using Uranus.Annotations;
 
 namespace Aion.View;
 

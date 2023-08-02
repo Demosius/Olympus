@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:vm="clr-namespace:Morpheus.ViewModels.Controls"
+             xmlns:vm="clr-namespace:Morpheus.ViewModels.Controls.Inventory"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:model="clr-namespace:Uranus.Inventory.Models;assembly=Uranus"
              xmlns:inventory="clr-namespace:Uranus.Inventory;assembly=Uranus"
@@ -64,7 +64,7 @@
                 <Button Margin="5"
                         Padding="0"
                         Command="{Binding SetDataFileCommand}">
-                    <Image Source="../../Resources/img/folder--arrow.png"
+                    <Image Source="../../../Resources/img/folder--arrow.png"
                            MaxHeight="20"
                            MaxWidth="20"
                            Margin="5"/>
@@ -94,41 +94,62 @@
                   RowHeaderWidth="15">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Store"
-                                        Binding="{Binding Number}"
-                                        IsReadOnly="True"/>
+                                    Binding="{Binding Number}"
+                                    IsReadOnly="True"/>
                 <DataGridTextColumn Header="Wave"
-                                        Binding="{Binding Wave}"
-                                        IsReadOnly="False"/>
-                <DataGridTextColumn Header="CCN Region"
-                                        Binding="{Binding CCNRegion}"
-                                        IsReadOnly="False"/>
+                                    Binding="{Binding Wave}"
+                                    IsReadOnly="False"/>
+                <DataGridTextColumn Header="Restock"
+                                    Binding="{Binding Restock}"
+                                    IsReadOnly="False"/>
+                <DataGridTextColumn Header="CasePick"
+                                    Binding="{Binding CasePick}"
+                                    IsReadOnly="False"/>
+                <DataGridTextColumn Header="NR"
+                                    Binding="{Binding NR}"
+                                    IsReadOnly="False"/>
+                <DataGridTextColumn Header="Overnight"
+                                    Binding="{Binding Overnight}"
+                                    IsReadOnly="False"/>
+                <DataGridTextColumn Header="Road 1"
+                                    Binding="{Binding Road1}"
+                                    IsReadOnly="False"/>
+                <DataGridTextColumn Header="Road 2"
+                                    Binding="{Binding Road2}"
+                                    IsReadOnly="False"/>
+                <DataGridTextColumn Header="Ext Road"
+                                    Binding="{Binding ExtRoad}"
+                                    IsReadOnly="False"/>
+                <DataGridTextColumn Header="Special"
+                                    Binding="{Binding Special}"
+                                    IsReadOnly="False"/>
                 <DataGridTextColumn Header="Road CCN"
-                                        Binding="{Binding RoadCCN}"
-                                        IsReadOnly="False"/>
+                                    Binding="{Binding RoadCCN}"
+                                    IsReadOnly="False"/>
                 <DataGridTextColumn Header="Transit Days"
-                                        Binding="{Binding TransitDays}"
-                                        IsReadOnly="False"/>
+                                    Binding="{Binding TransitDays}"
+                                    IsReadOnly="False"/>
                 <DataGridTextColumn Header="MB Region"
-                                        Binding="{Binding MBRegion}"
-                                        IsReadOnly="False"/>
+                                    Binding="{Binding MBRegion}"
+                                    IsReadOnly="False"/>
                 <DataGridTextColumn Header="Road Region"
-                                        Binding="{Binding RoadRegion}"
-                                        IsReadOnly="False"/>
+                                    Binding="{Binding RoadRegion}"
+                                    IsReadOnly="False"/>
                 <DataGridTextColumn Header="Sorting Lane"
-                                        Binding="{Binding SortingLane}"
-                                        IsReadOnly="False"/>
+                                    Binding="{Binding SortingLane}"
+                                    IsReadOnly="False"/>
                 <DataGridTextColumn Header="State"
-                                        Binding="{Binding State}"
-                                        IsReadOnly="False"/>
+                                    Binding="{Binding State}"
+                                    IsReadOnly="False"/>
                 <DataGridTextColumn Header="Region"
-                                        Binding="{Binding Region}"
-                                        IsReadOnly="False"/>
+                                    Binding="{Binding Region}"
+                                    IsReadOnly="False"/>
                 <DataGridComboBoxColumn Header="Store Type"
-                                            SelectedItemBinding="{Binding Type}"
-                                            ItemsSource="{Binding Source={StaticResource StoreType}}"/>
+                                        SelectedItemBinding="{Binding Type}"
+                                        ItemsSource="{Binding Source={StaticResource StoreType}}"/>
                 <DataGridComboBoxColumn Header="Volume"
-                                            SelectedItemBinding="{Binding Volume}"
-                                            ItemsSource="{Binding Source={StaticResource Volume}}"/>
+                                        SelectedItemBinding="{Binding Volume}"
+                                        ItemsSource="{Binding Source={StaticResource Volume}}"/>
             </DataGrid.Columns>
         </DataGrid>
     </DockPanel>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using Pantheon.ViewModels.PopUp.Rosters;
 using Styx;
 using Uranus;

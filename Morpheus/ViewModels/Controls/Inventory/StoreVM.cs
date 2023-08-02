@@ -41,12 +41,89 @@ public class StoreVM : INotifyPropertyChanged
         }
     }
 
-    public string CCNRegion
+    public string Restock
     {
-        get => Store.CCNRegion;
+        get => Store.Restock;
         set
         {
-            Store.CCNRegion = value;
+            Store.Restock = value;
+            OnPropertyChanged();
+            _ = Save();
+        }
+    }
+
+    public string CasePick
+    {
+        get => Store.CasePick;
+        set
+        {
+            Store.CasePick = value;
+            OnPropertyChanged();
+            _ = Save();
+        }
+    }
+
+    public string NR
+    {
+        get => Store.NR;
+        set
+        {
+            Store.NR = value;
+            OnPropertyChanged();
+            _ = Save();
+        }
+    }
+
+    public string Overnight
+    {
+        get => Store.Overnight;
+        set
+        {
+            Store.Overnight = value;
+            OnPropertyChanged();
+            _ = Save();
+        }
+    }
+
+    public string Road1
+    {
+        get => Store.Road1;
+        set
+        {
+            Store.Road1 = value;
+            OnPropertyChanged();
+            _ = Save();
+        }
+    }
+
+    public string Road2
+    {
+        get => Store.Road2;
+        set
+        {
+            Store.Road2 = value;
+            OnPropertyChanged();
+            _ = Save();
+        }
+    }
+
+    public string ExtRoad
+    {
+        get => Store.ExtRoad;
+        set
+        {
+            Store.ExtRoad = value;
+            OnPropertyChanged();
+            _ = Save();
+        }
+    }
+
+    public string Special
+    {
+        get => Store.Special;
+        set
+        {
+            Store.Special = value;
             OnPropertyChanged();
             _ = Save();
         }

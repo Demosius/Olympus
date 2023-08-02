@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using Prometheus.ViewModels.Pages.Users;
 using Styx;
 using Uranus;

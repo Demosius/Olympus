@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using Cadmus.Annotations;
 using Cadmus.Models;
 using Cadmus.ViewModels.Controls;
-using iText.Kernel.Colors;
 using Morpheus;
 using Uranus.Inventory.Models;
 

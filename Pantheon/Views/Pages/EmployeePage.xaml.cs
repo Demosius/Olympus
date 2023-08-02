@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Windows;
-using System.Windows.Controls.Primitives;
 using Pantheon.ViewModels.Pages;
 using Styx;
 using Uranus;

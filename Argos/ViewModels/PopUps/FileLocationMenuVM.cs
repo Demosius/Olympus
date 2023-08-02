@@ -90,7 +90,7 @@ public class FileLocationMenuVM : INotifyPropertyChanged, IConfirm
 
     public void SetBatchSavePath()
     {
-        var dlg = new VistaFolderBrowserDialog()
+        var dlg = new VistaFolderBrowserDialog
         {
             SelectedPath = BatchSavePath
         };
@@ -100,7 +100,7 @@ public class FileLocationMenuVM : INotifyPropertyChanged, IConfirm
 
     public void SetBatchLoadPath()
     {
-        var dlg = new VistaFolderBrowserDialog()
+        var dlg = new VistaFolderBrowserDialog
         {
             SelectedPath = BatchLoadPath
         };

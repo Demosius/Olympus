@@ -43,6 +43,7 @@
     <None Remove="Resources\plus-circle-frame.png" />
     <None Remove="Resources\plus-small.png" />
     <None Remove="Resources\plus.png" />
+    <None Remove="Resources\printer.png" />
     <None Remove="Resources\refresh.png" />
     <None Remove="Resources\repair.png" />
     <None Remove="Resources\save.png" />
@@ -58,6 +59,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Cadmus\Cadmus.csproj" />
     <ProjectReference Include="..\Morpheus\Morpheus.csproj" />
     <ProjectReference Include="..\Uranus\Uranus.csproj" />
   </ItemGroup>
@@ -116,6 +118,7 @@
     <Resource Include="Resources\plus-circle-frame.png" />
     <Resource Include="Resources\plus-small.png" />
     <Resource Include="Resources\plus.png" />
+    <Resource Include="Resources\printer.png" />
     <Resource Include="Resources\refresh.png" />
     <Resource Include="Resources\repair.png" />
     <Resource Include="Resources\save.png" />

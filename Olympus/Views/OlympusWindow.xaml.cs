@@ -3,8 +3,6 @@ using System.ComponentModel;
 using Olympus.Properties;
 using System.Globalization;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Navigation;
 using Olympus.ViewModels;
 

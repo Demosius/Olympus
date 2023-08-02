@@ -1,6 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Cadmus.Models;
+using Cadmus.ViewModels.Labels;
+using Morpheus;
 using Uranus.Annotations;
 using Uranus.Inventory.Models;
 
@@ -23,6 +26,8 @@ public class BatchTOLineVM : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+
+    public Store Store => Line.Store ?? new Store();
 
     public int Cartons
     {
@@ -237,6 +242,38 @@ public class BatchTOLineVM : INotifyPropertyChanged
     public BatchTOLineVM(BatchTOLine line)
     {
         Line = line;
+    }
+
+    public void SetFreightOption(EFreightOption option)
+    {
+        if (Line.Store is null) return;
+        Region = Store.FreightRegion(option);
+    }
+
+    public CartonLabelVM GetLabel(string stockDescriptor)
+    {
+        var label = new CartonLabel
+        {
+            StoreNo = StoreNo,
+            Cartons = 1,
+            Weight = Weight,
+            Cube = Cube,
+            CCN = CCN,
+            Barcode = BarcodeUtility.Encode128(CCN),
+            CartonType = CartonType,
+            StartZone = StartingPickZone,
+            StartBin = StartingPickBin,
+            EndZone = EndingPickZone,
+            EndBin = EndingPickBin,
+            TOBatchNo = BatchID,
+            Date = Date,
+            TotalUnits = UnitsBase,
+            WaveNo = WaveNo,
+            StockDescriptor = stockDescriptor,
+            Carrier = Region,
+        };
+
+        return new CartonLabelVM(label);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

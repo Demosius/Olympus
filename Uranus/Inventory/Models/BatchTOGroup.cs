@@ -92,14 +92,13 @@ public class BatchTOGroup
         // See if we are looking at a range.
         var matches = Regex.Matches(waveCheck, @"^(W\d\d)..(W\d\d)$");
         var useRange = matches.Count > 0;
-        var (startWave, endWave) = (matches[0].Groups[1].Value, matches[0].Groups[2].Value);
 
-        if (useRange)
-        {
-            return string.Compare(wave, startWave, StringComparison.Ordinal) >= 0 &&
-                   string.Compare(wave, endWave, StringComparison.Ordinal) <= 0;
-        }
-        return wave == waveCheck;
+        if (!useRange) return wave == waveCheck;
+        
+        var (startWave, endWave) = (matches[0].Groups[1].Value, matches[0].Groups[2].Value);
+        return string.Compare(wave, startWave, StringComparison.Ordinal) >= 0 &&
+               string.Compare(wave, endWave, StringComparison.Ordinal) <= 0;
+
     }
 
     public void Finalise(string filePath)

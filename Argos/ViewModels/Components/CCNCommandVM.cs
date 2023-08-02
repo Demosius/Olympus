@@ -12,6 +12,9 @@ using Argos.Interfaces;
 using Argos.Properties;
 using Argos.ViewModels.Commands;
 using Argos.Views.PopUps;
+using Cadmus.Helpers;
+using Cadmus.Interfaces;
+using Cadmus.ViewModels.Commands;
 using Microsoft.Win32;
 using Morpheus.Views.Windows;
 using Serilog;
@@ -290,7 +293,7 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
 
     public void ClearFilters()
     {
-        startDate = DateTime.Today;
+        startDate = AllGroups.Min(g => g.StartDate);
         endDate = DateTime.Today;
         zoneFilter = string.Empty;
         bayFilter = string.Empty;
@@ -357,7 +360,7 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
                 // Move file to backup location.
                 var fileName = Path.GetFileName(filePath);
                 var destinationPath = Path.Join(Helios.BatchFileBackupDirectory, fileName);
-                File.Move(filePath, destinationPath);
+                File.Move(filePath, destinationPath, true);
             }
             catch (IOException e)
             {
@@ -400,7 +403,7 @@ public class CCNCommandVM : INotifyPropertyChanged, IFilters, IBatchTOGroupHandl
 
         await SelectedGroup.ProcessLabelsAsync();
         await RefreshDataAsync();
-        await Helios.InventoryUpdater.BatchProgressCheck(batchIDs);
+        await Helios.InventoryUpdater.BatchProgressCheck(batchIDs, Settings.Default.BatchLoadDirectory);
     }
 
     public async Task ZoneSplit()

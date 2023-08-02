@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using Pantheon.ViewModels.PopUp.Employees;
 using Styx;
 using Uranus;

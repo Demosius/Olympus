@@ -33,6 +33,7 @@ public enum EAccessLevel
 
 public enum EVolume
 {
+    Unknown,
     Low,
     Medium,
     High

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using Aion.ViewModels;
 using Uranus;
 using Uranus.Staff.Models;

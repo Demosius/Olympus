@@ -133,7 +133,7 @@ public class StoreHandlerVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     {
         var stores = AllStores.Where(s =>
             FilterString == string.Empty ||
-            Regex.IsMatch(s.CCNRegion, FilterString, RegexOptions.IgnoreCase) ||
+            Regex.IsMatch(s.Restock, FilterString, RegexOptions.IgnoreCase) ||
             Regex.IsMatch(s.Number, FilterString, RegexOptions.IgnoreCase) ||
             Regex.IsMatch(s.Region, FilterString, RegexOptions.IgnoreCase) ||
             Regex.IsMatch(s.RoadCCN, FilterString, RegexOptions.IgnoreCase) ||
@@ -156,7 +156,7 @@ public class StoreHandlerVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     {
         try
         {
-            await Helios.InventoryCreator.StoresAsync(await DataConversion.FileToStoresAsync(DataFile));
+            await Helios.InventoryUpdater.StoresAsync(await DataConversion.FileToStoresAsync(DataFile));
         }
         catch (InvalidDataException ex)
         {

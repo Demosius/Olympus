@@ -438,7 +438,7 @@ public class DepartmentRosterVM : INotifyPropertyChanged, IFilters
         ThursdayRoster ??= new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Thursday), this);
         FridayRoster ??= new DailyRosterVM(DepartmentRoster.GetDaily(DayOfWeek.Friday), this);
 
-        var dailies = new List<DailyRosterVM>()
+        var dailies = new List<DailyRosterVM>
         {
             MondayRoster,
             TuesdayRoster,

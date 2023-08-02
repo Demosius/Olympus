@@ -110,6 +110,6 @@ public class BatchTOLine
     {
         Store = store;
         StoreNo = store.Number;
-        FreightRegion = Store.CCNRegion;
+        FreightRegion = Store.Restock;
     }
 }

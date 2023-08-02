@@ -23,6 +23,7 @@ public class DevNotification : Message
     public DevNotification()
     {
         ConversationID = Guid.Empty;
+        Tags = new List<Tag>();
     }
 
     public DevNotification(User dev, DateTime dateTime)
@@ -30,5 +31,6 @@ public class DevNotification : Message
         UserID = dev.ID;
         User = dev;
         DateTime = dateTime;
+        Tags = new List<Tag>();
     }
 }
