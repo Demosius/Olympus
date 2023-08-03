@@ -9,10 +9,18 @@
              mc:Ignorable="d" 
              d:DataContext="{d:DesignInstance {x:Type vm:EmployeeVM}, IsDesignTimeCreatable=False}">
 
+
     <UserControl.Resources>
-        <converter:EmploymentToStringConverter x:Key="EmploymentTypeConverter"/>
-        <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
-        <converters:AsyncImageConverter x:Key="AsyncImageConverter"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Dark Theme -->
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Master/MSControls.Core.Implicit.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <converter:EmploymentToStringConverter x:Key="EmploymentTypeConverter"/>
+            <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
+            <converters:AsyncImageConverter x:Key="AsyncImageConverter"/>
+            <converter:ReportingBoolLabelConverter x:Key="LabelConverter"/>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <StackPanel Orientation="Horizontal">
@@ -33,15 +41,15 @@
                 <Label Content="{Binding FullName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                        FontSize="14"
                        FontWeight="Bold"
-                       Foreground="{StaticResource LightForegroundBrush}"/>
+                       Foreground="{Binding IsReporting, Converter={StaticResource LabelConverter}}"/>
                 <Label Content=" - "
                        FontSize="14"
                        FontWeight="Bold"
-                       Foreground="{StaticResource LightForegroundBrush}"/>
+                       Foreground="{Binding IsReporting, Converter={StaticResource LabelConverter}}"/>
                 <Label Content="{Binding ID, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                        FontSize="14"
                        FontStyle="Italic"
-                       Foreground="{StaticResource LightForegroundBrush}"/>
+                       Foreground="{Binding IsReporting, Converter={StaticResource LabelConverter}}"/>
                 <Label Content=" U" 
                        Foreground="DarkOrange"
                        FontSize="14"

@@ -10,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using Morpheus.ViewModels.Controls;
 using Pantheon.ViewModels.Controls.Employees;
 using Uranus;
 using Uranus.Commands;
@@ -38,27 +39,20 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
 {
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
+    public ProgressBarVM ProgressBar { get; set; }
 
     public EmployeeAvatar Avatar => (SelectedEmployeeVM ?? new EmployeeVM(new Employee(), Charon, Helios)).Avatar ?? new EmployeeAvatar();
 
     public EmployeeDataSet? EmployeeDataSet;
 
     public List<EmployeeVM> ReportingEmployees { get; set; }
+    public List<EmployeeVM> NonReportingEmployees { get; set; }
 
     public Employee? SelectedEmployee => SelectedEmployeeVM?.Employee;
 
     #region OnPropertyChanged_Properties
 
-    private ObservableCollection<EmployeeVM> employees;
-    public ObservableCollection<EmployeeVM> Employees
-    {
-        get => employees;
-        set
-        {
-            employees = value;
-            OnPropertyChanged(nameof(Employees));
-        }
-    }
+    public ObservableCollection<EmployeeVM> Employees { get; set; }
 
     private EmployeeVM? selectedEmployeeVM;
     public EmployeeVM? SelectedEmployeeVM
@@ -156,6 +150,18 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         }
     }
 
+    private bool showAll;
+    public bool ShowAll
+    {
+        get => showAll;
+        set
+        {
+            showAll = value;
+            OnPropertyChanged();
+            ApplyFilters();
+        }
+    }
+
     private ObservableCollection<EEmploymentType?> employmentTypes;
     public ObservableCollection<EEmploymentType?> EmploymentTypes
     {
@@ -167,27 +173,9 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         }
     }
 
-    private ObservableCollection<Role?> roles;
-    public ObservableCollection<Role?> Roles
-    {
-        get => roles;
-        set
-        {
-            roles = value;
-            OnPropertyChanged(nameof(Roles));
-        }
-    }
+    public ObservableCollection<Role?> Roles { get; set; }
 
-    private ObservableCollection<Department?> departments;
-    public ObservableCollection<Department?> Departments
-    {
-        get => departments;
-        set
-        {
-            departments = value;
-            OnPropertyChanged(nameof(Departments));
-        }
-    }
+    public ObservableCollection<Department?> Departments { get; set; }
 
     private ObservableCollection<Department> fullDepartments;
     public ObservableCollection<Department> FullDepartments
@@ -276,10 +264,11 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
     public FillFullTimeRostersCommand FillFullTimeRostersCommand { get; set; }
     #endregion
 
-    private EmployeePageVM(Helios helios, Charon charon)
+    private EmployeePageVM(Helios helios, Charon charon, ProgressBarVM progressBar)
     {
         Helios = helios;
         Charon = charon;
+        ProgressBar = progressBar;
 
         RefreshDataCommand = new RefreshDataCommand(this);
         ApplyFiltersCommand = new ApplyFiltersCommand(this);
@@ -291,12 +280,13 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         FillFullTimeRostersCommand = new FillFullTimeRostersCommand(this);
 
         ReportingEmployees = new List<EmployeeVM>();
-        employees = new ObservableCollection<EmployeeVM>();
+        NonReportingEmployees = new List<EmployeeVM>();
+        Employees = new ObservableCollection<EmployeeVM>();
 
         employeeSearchString = string.Empty;
         employmentTypes = new ObservableCollection<EEmploymentType?> { null };
-        roles = new ObservableCollection<Role?>();
-        departments = new ObservableCollection<Department?>();
+        Roles = new ObservableCollection<Role?>();
+        Departments = new ObservableCollection<Department?>();
         locations = new ObservableCollection<string>();
         fullDepartments = new ObservableCollection<Department>();
         allRoles = new ObservableCollection<Role>();
@@ -312,18 +302,21 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
         return this;
     }
 
-    public static Task<EmployeePageVM> CreateAsync(Helios helios, Charon charon)
+    public static Task<EmployeePageVM> CreateAsync(Helios helios, Charon charon, ProgressBarVM progressBar)
     {
-        var ret = new EmployeePageVM(helios, charon);
+        var ret = new EmployeePageVM(helios, charon, progressBar);
         return ret.InitializeAsync();
     }
 
+    public static EmployeePageVM CreateEmpty(Helios helios, Charon charon, ProgressBarVM progressBar) => new(helios, charon, progressBar);
+
     public async Task RefreshDataAsync()
     {
-        await Task.Run(async () =>
-        {
-            EmployeeDataSet = await Helios.StaffReader.EmployeeDataSetAsync();
+        ProgressBar.StartTask("Loading Employee Data...");
+        EmployeeDataSet = await Helios.StaffReader.EmployeeDataSetAsync();
 
+        await Task.Run(() =>
+        {
             // Make sure that the user has an assigned role.
             if (Charon.Employee is not null && Charon.Employee.Role is null)
                 if (EmployeeDataSet.Roles.TryGetValue(Charon.Employee.RoleName, out var role))
@@ -331,18 +324,16 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
 
             // Reporting employees (and other collections for filtering that list) is base purely on the employees that report to the current user.
             ReportingEmployees = EmployeeDataSet.GetReportsByRole(Charon.Employee?.ID ?? 0)
-                .Select(e => new EmployeeVM(e, Charon, Helios)).ToList();
+                .Select(e => new EmployeeVM(e, Charon, Helios, true)).ToList();
 
+            // Add self to reporting.
             if (Charon.Employee is not null && Charon.CanUpdateEmployee(Charon.Employee) && EmployeeDataSet.Employees.TryGetValue(Charon.Employee.ID, out var user))
-                ReportingEmployees.Add(new EmployeeVM(user, Charon, Helios));
+                ReportingEmployees.Add(new EmployeeVM(user, Charon, Helios, true));
 
-            Departments = new ObservableCollection<Department?>(ReportingEmployees
-                .Select(employee => employee.Department).Distinct().OrderBy(department => department?.Name));
-            selectedDepartment = null;
+            var reportingIDs = ReportingEmployees.Select(e => e.ID).ToHashSet();
 
-            Roles = new ObservableCollection<Role?>(ReportingEmployees.Select(employee => employee.Role).Distinct()
-                .OrderBy(role => role?.Name));
-            selectedRole = null;
+            NonReportingEmployees = EmployeeDataSet.Employees.Where(kv => !reportingIDs.Contains(kv.Key))
+                .Select(kv => new EmployeeVM(kv.Value, Charon, Helios)).ToList();
 
             EmploymentTypes =
                 new ObservableCollection<EEmploymentType?>(Enum.GetValues(typeof(EEmploymentType))
@@ -360,47 +351,69 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
             UseAllAsManagers = false;
 
             employeeSearchString = "";
-
-            ApplyFilters();
         });
+        ProgressBar.EndTask();
+
+        ApplyFilters();
     }
-    
+
     public void ClearFilters()
     {
-        SelectedDepartment = null;
-        SelectedEmploymentType = null;
-        SelectedRole = null;
-        EmployeeSearchString = "";
-        ApplySorting();
+        selectedDepartment = null;
+        selectedEmploymentType = null;
+        selectedRole = null;
+        employeeSearchString = "";
+        OnPropertyChanged(nameof(SelectedDepartment));
+        OnPropertyChanged(nameof(SelectedRole));
+        OnPropertyChanged(nameof(SelectedEmploymentType));
+        OnPropertyChanged(nameof(EmployeeSearchString));
+        ApplyFilters();
     }
 
     public void ApplyFilters()
     {
-        IEnumerable<EmployeeVM> employeeList = ReportingEmployees;
+        var employeeList = ShowAll ? ReportingEmployees.Concat(NonReportingEmployees) : ReportingEmployees;
 
-        if (SelectedDepartment is not null)
-            employeeList = employeeList.Where(e => e.Department == SelectedDepartment);
-        if (SelectedEmploymentType is not null)
-            employeeList = employeeList.Where(e => e.EmploymentType == SelectedEmploymentType);
-        if (SelectedRole is not null)
-            employeeList = employeeList.Where(e => e.Role == SelectedRole);
-        if (EmployeeSearchString != "")
-        {
-            var regex = new Regex(EmployeeSearchString, RegexOptions.IgnoreCase);
-            employeeList = employeeList.Where(e => regex.IsMatch(e.FullName));
-        }
+        employeeList = employeeList.Where(e =>
+            (SelectedDepartment is null || e.Department == SelectedDepartment) &&
+            (SelectedEmploymentType is null || e.EmploymentType == SelectedEmploymentType) &&
+            (SelectedRole is null || e.Role == SelectedRole) &&
+            (Regex.IsMatch(e.FullName, EmployeeSearchString, RegexOptions.IgnoreCase) ||
+             Regex.IsMatch(e.ID.ToString(), EmployeeSearchString, RegexOptions.IgnoreCase))).ToList();
 
-        ApplySorting(employeeList);
+        SetDepartments(employeeList);
+
+        SetRoles(employeeList);
+
+        ApplySorting(employeeList.ToList());
+    }
+
+    private void SetRoles(IEnumerable<EmployeeVM> employeeList)
+    {
+        var currentRole = SelectedRole;
+        Roles.Clear();
+        foreach (var role in employeeList.Select(employee => employee.Role).Distinct().OrderBy(role => role?.Name))
+            Roles.Add(role);
+        selectedRole = currentRole;
+    }
+
+    private void SetDepartments(IEnumerable<EmployeeVM> employeeList)
+    {
+        var currentDepartment = SelectedDepartment;
+        Departments.Clear();
+        foreach (var department in employeeList.Select(employee => employee.Department).Distinct().OrderBy(department => department?.Name))
+            Departments.Add(department);
+        selectedDepartment = currentDepartment;
     }
 
     public void ApplySorting()
     {
-        ApplySorting(ReportingEmployees);
+        ApplySorting(Employees.ToList());
     }
 
-    public void ApplySorting(IEnumerable<EmployeeVM> employeeList)
+    public void ApplySorting(List<EmployeeVM> employeeList)
     {
-        employeeList = SelectedESortMethod switch
+        employeeList = (SelectedESortMethod switch
         {
             ESortMethod.Name => employeeList.OrderBy(e => e.FullName),
             ESortMethod.RoleName => employeeList.OrderBy(e => e.Role).ThenBy(e => e.FullName),
@@ -415,8 +428,11 @@ public class EmployeePageVM : INotifyPropertyChanged, IDBInteraction, IFilters, 
                 .ThenBy(e => e.FullName),
             ESortMethod.ID => employeeList.OrderBy(e => e.ID),
             _ => employeeList.OrderBy(e => e.EmploymentType).ThenBy(e => e.FullName)
-        };
-        Employees = new ObservableCollection<EmployeeVM>(employeeList);
+        }).ToList();
+
+        Employees.Clear();
+        foreach (var employeeVM in employeeList)
+            Employees.Add(employeeVM);
     }
 
     public void CreateNewEmployee()

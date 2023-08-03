@@ -12,7 +12,7 @@ public class AddRuleCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Rule is not null && VM.Charon.CanUpdateEmployee(VM.Employee) && VM.Rule.IsValid;
+        return VM.Rule is not null && VM.CanUpdateEmployee && VM.Rule.IsValid;
     }
 
     public void Execute(object? parameter)

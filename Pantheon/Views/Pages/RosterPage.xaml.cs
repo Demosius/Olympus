@@ -12,7 +12,7 @@ namespace Pantheon.Views.Pages;
 /// </summary>
 public partial class RosterPage
 {
-    public RosterPageVM? VM { get; set; }
+    public RosterPageVM VM { get; set; }
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
 
@@ -20,7 +20,9 @@ public partial class RosterPage
     {
         Helios = helios;
         Charon = charon;
+        VM = RosterPageVM.CreateEmpty(helios, charon);
         InitializeComponent();
+        DataContext = VM;
     }
 
     private async void RosterPage_OnInitialized(object? sender, EventArgs e)

@@ -32,6 +32,7 @@ public class TempTagManagementVM : INotifyPropertyChanged, IFilters, ISelector, 
 
     public bool CanCreate { get; }
     public bool CanDelete => CanCreate && SelectedTag is not null && !SelectedTag.IsAssigned && !SelectedTag.TagUses.Any();
+    public bool CanDeleteUse => CanCreate && SelectedUse is not null;
     public bool CanConfirm => SelectedTag is not null && !SelectedTag.IsAssigned;
     public bool CanUnassign => SelectedTag is not null && SelectedTag.IsAssigned;
     public bool CanAssign => false;
@@ -100,6 +101,7 @@ public class TempTagManagementVM : INotifyPropertyChanged, IFilters, ISelector, 
     public SelectTempTagCommand SelectTempTagCommand { get; set; }
     public UnassignTempTagCommand UnassignTempTagCommand { get; set; }
     public AssignTempTagCommand AssignTempTagCommand { get; set; }
+    public DeleteTagUseCommand DeleteTagUseCommand { get; set; }
 
     #endregion
 
@@ -112,7 +114,7 @@ public class TempTagManagementVM : INotifyPropertyChanged, IFilters, ISelector, 
 
         DataSet = dataSet;
 
-        CanCreate = Charon.CanCreateEmployee();
+        CanCreate = Charon.CanCreateTempTag();
 
         allTags = new List<TempTagVM>();
 
@@ -129,6 +131,7 @@ public class TempTagManagementVM : INotifyPropertyChanged, IFilters, ISelector, 
         SelectTempTagCommand = new SelectTempTagCommand(this);
         UnassignTempTagCommand = new UnassignTempTagCommand(this);
         AssignTempTagCommand = new AssignTempTagCommand(this);
+        DeleteTagUseCommand = new DeleteTagUseCommand(this);
 
         RefreshData();
     }
@@ -269,6 +272,16 @@ public class TempTagManagementVM : INotifyPropertyChanged, IFilters, ISelector, 
     /// Updates the given usage in the database.
     /// </summary>
     public async Task<int> UpdateTagUseAsync(TagUseVM tagUse) => await Helios.StaffUpdater.TagUsageAsync(tagUse.TagUse);
+
+    public async Task DeleteTagUse()
+    {
+        if (!CanDeleteUse || SelectedUse is null) return;
+
+        await Helios.StaffDeleter.TagUseAsync(SelectedUse.TagUse);
+        SelectedTag?.Usage.Remove(SelectedUse);
+        TagUse.Remove(SelectedUse);
+        SelectedUse = null;
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

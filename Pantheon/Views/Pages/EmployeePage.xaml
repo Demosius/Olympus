@@ -15,6 +15,10 @@
       Initialized="EmployeePage_OnInitialized"
       Title="EmployeePage">
 
+    <Page.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </Page.InputBindings>
+
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -48,6 +52,12 @@
         <ToolBarTray DockPanel.Dock="Top">
             <!-- Search / Filter -->
             <ToolBar>
+                <CheckBox Content="Show All"
+                          IsChecked="{Binding ShowAll}"
+                          Foreground="{StaticResource ForegroundBrush}"
+                          FontWeight="Bold"
+                          Margin="5"/>
+
                 <TextBox Text="{Binding EmployeeSearchString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          ToolTip="Employee Search Text"
                          MinWidth="100"

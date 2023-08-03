@@ -12,7 +12,7 @@ namespace Pantheon.Views.Pages;
 /// </summary>
 public partial class ShiftPage
 {
-    public ShiftPageVM? VM { get; set; }
+    public ShiftPageVM VM { get; set; }
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
 
@@ -20,7 +20,9 @@ public partial class ShiftPage
     {
         Helios = helios;
         Charon = charon;
+        VM = ShiftPageVM.CreateEmpty(helios, charon);
         InitializeComponent();
+        DataContext = VM;
     }
 
     private async void ShiftPage_OnInitialized(object? sender, EventArgs e)

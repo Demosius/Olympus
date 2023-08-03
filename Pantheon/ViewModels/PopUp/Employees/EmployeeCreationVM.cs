@@ -257,7 +257,8 @@ public class EmployeeCreationVM : INotifyPropertyChanged
                     Department = SelectedDepartment,
                     DepartmentName = SelectedDepartment?.Name ?? string.Empty,
                     ReportsTo = SelectedManager,
-                    ReportsToID = SelectedManager?.ID ?? 0
+                    ReportsToID = SelectedManager?.ID ?? 0,
+                    IsActive = true,
                 };
                 try
                 {

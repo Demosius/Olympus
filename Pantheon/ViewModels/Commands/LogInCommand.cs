@@ -28,7 +28,7 @@ public class LogInCommand : ICommand
         if (!AsyncHelper.RunSync(() => VM.LogIn())) return;
 
         var w = parameter as Window;
-        PantheonWindow pw = new(App.Charon, App.Helios);
+        PantheonWindow pw = new();
         w?.Close();
         pw.Show();
     }

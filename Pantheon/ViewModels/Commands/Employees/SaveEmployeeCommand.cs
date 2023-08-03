@@ -15,7 +15,7 @@ public class SaveEmployeeCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon.CanUpdateEmployee(VM.Employee);
+        return VM.CanUpdate;
     }
 
     public void Execute(object? parameter)

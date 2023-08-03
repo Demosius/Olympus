@@ -10,7 +10,7 @@ namespace Pantheon.Views.Pages;
 /// </summary>
 public partial class TempTagPage
 {
-    public TempTagPageVM? VM { get; set; }
+    public TempTagPageVM VM { get; set; }
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
 
@@ -18,7 +18,9 @@ public partial class TempTagPage
     {
         Helios = helios;
         Charon = charon;
+        VM = TempTagPageVM.CreateEmpty(helios, charon);
         InitializeComponent();
+        DataContext = VM;
     }
 
     private async void TempTagPage_OnInitialized(object? sender, EventArgs e)

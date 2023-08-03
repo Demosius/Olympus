@@ -21,8 +21,14 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
     public Charon Charon { get; set; }
     public Helios Helios { get; set; }
 
+    public bool IsReporting { get; set; }   // True if employee role comes under user (staff)role - recursive.
+    public bool BasicVisibility { get; set; }
     public bool SensitiveVisibility { get; }
     public bool VerySensitiveVisibility { get; }
+
+    public bool CanUpdate { get; set; }
+
+    public bool CanUpdateShift { get; set; }
 
     public bool CanUnassign => Charon.CanCreateEmployee() && TempTag is not null;
     public bool CanAssign => Charon.CanCreateEmployee() && TempTag is null;
@@ -125,7 +131,7 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
     public string DematicID
     {
         get => Employee.DematicID;
-        set { Employee.DematicID = value[..Math.Min(4, value.Length)]; ; OnPropertyChanged(); }
+        set { Employee.DematicID = value[..Math.Min(4, value.Length)]; OnPropertyChanged(); }
     }
 
     public string Location
@@ -284,15 +290,20 @@ public class EmployeeVM : INotifyPropertyChanged, ILocations, IDepartments, IRol
 
     #endregion
 
-    public EmployeeVM(Employee employee, Charon charon, Helios helios)
+    public EmployeeVM(Employee employee, Charon charon, Helios helios, bool reportingEmployee = false)
     {
         Employee = employee;
 
         Charon = charon;
         Helios = helios;
-
+        
+        IsReporting = reportingEmployee;
+        BasicVisibility = Charon.CanReadEmployee(Employee);
         SensitiveVisibility = Charon.CanReadEmployeeSensitive(Employee);
         VerySensitiveVisibility = Charon.CanReadEmployeeVerySensitive(Employee);
+
+        CanUpdate = Charon.CanUpdateEmployee(Employee);
+        CanUpdateShift = Department is not null && Charon.CanUpdateShift(Department);
 
         IconUri = Icon is null ? null : new Uri(Icon.FullPath, UriKind.RelativeOrAbsolute);
 

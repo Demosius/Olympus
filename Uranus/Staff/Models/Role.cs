@@ -53,11 +53,15 @@ public class Role : IComparable
 
     public bool LookDown(ref Role targetRole)
     {
-        if (this == targetRole) return true;
+        if (this == targetRole) 
+            return true;
+
         foreach (var role in Reports.Where(role => role != this))
         {
-            if (role.LookDown(ref targetRole)) return true;
+            if (role.LookDown(ref targetRole))
+                return true;
         }
+
         return false;
     }
 
@@ -65,13 +69,16 @@ public class Role : IComparable
     {
         level = Math.Max(level, Level);
 
-        if (this == targetRole || this == refRole) return true;
+        if (this == targetRole)
+            return true;
 
         foreach (var role in Reports.Where(role => role != refRole && role != this))
         {
-            if (role.LookDown(ref targetRole)) return true;
+            if (role.LookDown(ref targetRole))
+                return true;
         }
-        return ReportsToRole is not null && ReportsToRole.LookUp(ref level, this, ref targetRole);
+        
+        return ReportsToRole is not null && ReportsToRole != this && ReportsToRole.LookUp(ref level, this, ref targetRole);
     }
 
     public void AddReportingRole(Role reportingRole)

@@ -12,6 +12,10 @@
       Title="TempTagPage"
       Initialized="TempTagPage_OnInitialized">
 
+    <Page.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </Page.InputBindings>
+
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

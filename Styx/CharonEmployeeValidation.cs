@@ -33,6 +33,8 @@ public partial class Charon
                User.Role.UpdateEmployee >= GetLevelDifference(role);
     }
 
+    public bool CanCreateTempTag() => User is not null;
+
     public bool CanUpdateEmployee(Employee employee)
     {
         return User?.Role is not null &&

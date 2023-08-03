@@ -1,4 +1,7 @@
-﻿using Styx;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using Morpheus.ViewModels.Controls;
+using Pantheon.ViewModels;
+using Styx;
 using Uranus;
 
 namespace Pantheon.Views;
@@ -8,9 +11,12 @@ namespace Pantheon.Views;
 /// </summary>
 public partial class PantheonWindow
 {
-    public PantheonWindow(Charon charon, Helios helios)
+    public AppVM VM { get; set; }
+
+    public PantheonWindow()
     {
+        VM = new AppVM();
         InitializeComponent();
-        VM.SetDataSources(helios, charon);
+        DataContext = VM;
     }
 }

@@ -8,8 +8,11 @@
       d:DataContext="{d:DesignInstance {x:Type viewModels:PantheonVM}, IsDesignTimeCreatable=False}"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="PantheonPage"
-      Initialized="PantheonPage_OnInitialized"
       Background="#111">
+
+    <Page.InputBindings>
+        <KeyBinding Command="{Binding RefreshPageCommand}" Key="F5"/>
+    </Page.InputBindings>
 
     <Page.Resources>
         <ResourceDictionary>

@@ -185,8 +185,8 @@
                                 Orientation="Horizontal">
             <CheckBox IsChecked="{Binding SetShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <ComboBox ItemsSource="{Binding Path=Shifts}"
-                                  SelectedValue="{Binding Shift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  Visibility="{Binding SetShift, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                      SelectedValue="{Binding Shift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      Visibility="{Binding SetShift, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
         </StackPanel>
 

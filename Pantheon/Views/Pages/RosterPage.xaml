@@ -11,6 +11,10 @@
       Initialized="RosterPage_OnInitialized"
       Title="EmployeePage">
 
+    <Page.InputBindings>
+        <KeyBinding Command="{Binding RefreshDataCommand}" Key="F5"/>
+    </Page.InputBindings>
+
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

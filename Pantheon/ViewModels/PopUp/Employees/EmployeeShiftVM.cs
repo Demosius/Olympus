@@ -22,6 +22,8 @@ public class EmployeeShiftVM : INotifyPropertyChanged
     public Helios Helios { get; set; }
     public Charon Charon { get; set; }
 
+    public bool CanUpdateEmployee => EmployeeVM.CanUpdate;
+
     public IShiftRuleVM? Rule =>
         RosterCheck ? RosterRule :
         SingleCheck ? SingleRule : 
@@ -48,7 +50,6 @@ public class EmployeeShiftVM : INotifyPropertyChanged
     }
 
     private ObservableCollection<Shift> shifts;
-
     public ObservableCollection<Shift> Shifts
     {
         get => shifts;
@@ -131,7 +132,7 @@ public class EmployeeShiftVM : INotifyPropertyChanged
             if (rosterCheck)
             {
                 RosterRule ??= RosterRules.Count == 0
-                    ? new RosterRuleVM(EmployeeVM.Employee)
+                    ? new RosterRuleVM(EmployeeVM.Employee, shifts.ToList())
                     : new RosterRuleVM(EmployeeVM.Employee, RosterRules.First());
 
                 SingleCheck = false;

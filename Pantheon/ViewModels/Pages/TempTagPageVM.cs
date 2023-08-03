@@ -116,6 +116,8 @@ public class TempTagPageVM : INotifyPropertyChanged, IDBInteraction, ITempTags, 
         return ret.InitializeAsync();
     }
 
+    public static TempTagPageVM CreateEmpty(Helios helios, Charon charon) => new(helios, charon);
+
     public async Task RefreshDataAsync()
     {
         DataSet = await Helios.StaffReader.EmployeeDataSetAsync();

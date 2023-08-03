@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using Pantheon.ViewModels.Commands;
+﻿using Pantheon.ViewModels.Commands;
 using Pantheon.Views.Pages;
 using Styx;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Pantheon.ViewModels.Pages;
+using Morpheus.ViewModels.Controls;
 using Uranus;
 
 namespace Pantheon.ViewModels;
@@ -15,16 +14,12 @@ public class PantheonVM : INotifyPropertyChanged
 {
     public Charon Charon { get; set; }
     public Helios Helios { get; set; }
+    public ProgressBarVM ProgressBar { get; set; }
 
     private EmployeePage? EmployeePage { get; set; }
     private ShiftPage? ShiftPage { get; set; }
     private RosterPage? RosterPage { get; set; }
     private TempTagPage? TempTagPage { get; set; }
-
-    private EmployeePageVM EmployeePageVM { get; set; } = null!;
-    private ShiftPageVM ShiftPageVM { get; set; } = null!;
-    private RosterPageVM RosterPageVM { get; set; } = null!;
-    private TempTagPageVM TempTagPageVM { get; set; } = null!;
 
     #region INotifyPropertyChanged Members
 
@@ -51,10 +46,11 @@ public class PantheonVM : INotifyPropertyChanged
 
     #endregion
 
-    private PantheonVM(Helios helios, Charon charon)
+    public PantheonVM(Helios helios, Charon charon, ProgressBarVM progressBar)
     {
         Helios = helios;
         Charon = charon;
+        ProgressBar = progressBar;
 
         currentPage = new Page();
 
@@ -64,26 +60,10 @@ public class PantheonVM : INotifyPropertyChanged
         ShowTempTagPageCommand = new ShowTempTagPageCommand(this);
         RefreshPageCommand = new RefreshPageCommand(this);
     }
-
-    private async Task<PantheonVM> InitializeAsync()
-    {
-        EmployeePageVM = await EmployeePageVM.CreateAsync(Helios, Charon);
-        ShiftPageVM = await ShiftPageVM.CreateAsync(Helios, Charon);
-        RosterPageVM = await RosterPageVM.CreateAsync(Helios, Charon);
-        TempTagPageVM = await TempTagPageVM.CreateAsync(Helios, Charon);
-
-        return this;
-    }
-
-    public static Task<PantheonVM> CreateAsync(Helios helios, Charon charon)
-    {
-        var ret = new PantheonVM(helios, charon);
-        return ret.InitializeAsync();
-    }
     
     public void ShowEmployeePage()
     {
-        CurrentPage = EmployeePage ??= new EmployeePage(Helios, Charon);
+        CurrentPage = EmployeePage ??= new EmployeePage(Helios, Charon, ProgressBar);
     }
 
     public void ShowShiftPage()
@@ -103,12 +83,10 @@ public class PantheonVM : INotifyPropertyChanged
 
     public async Task RefreshPage()
     {
-        var tasks = new List<Task>();
-        if (EmployeePage is not null) tasks.Add(EmployeePage.VM!.RefreshDataAsync());
-        if (ShiftPage is not null) tasks.Add(ShiftPage.VM!.RefreshDataAsync());
-        if (RosterPage is not null) tasks.Add(RosterPage.VM!.RefreshDataAsync());
-        if (TempTagPage is not null) tasks.Add(TempTagPage.VM!.RefreshDataAsync());
-        await Task.WhenAll(tasks);
+        if (EmployeePage is not null) await EmployeePage.VM.RefreshDataAsync();
+        if (ShiftPage is not null) await ShiftPage.VM.RefreshDataAsync();
+        if (RosterPage is not null) await RosterPage.VM.RefreshDataAsync();
+        if (TempTagPage is not null) await TempTagPage.VM.RefreshDataAsync();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -30,7 +30,7 @@ public static class ProjectFactory
         return project switch
         {
             EProject.Prometheus => new PrometheusPage(App.Helios, App.Charon),
-            EProject.Pantheon => new PantheonPage(App.Helios, App.Charon),
+            EProject.Pantheon => new PantheonPage(App.Helios, App.Charon, App.ProgressBar),
             EProject.Aion => new AionPage(App.Helios, App.Charon),
             EProject.Hydra => new HydraPage(App.Helios, App.Charon),
             EProject.Cadmus => new CadmusPage(App.Helios, App.ProgressBar),

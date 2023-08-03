@@ -1,7 +1,7 @@
-﻿using System;
-using Styx;
+﻿using Styx;
 using System.Threading.Tasks;
 using System.Windows.Navigation;
+using Morpheus.ViewModels.Controls;
 using Pantheon.ViewModels;
 using Uranus;
 using Uranus.Interfaces;
@@ -14,30 +14,22 @@ namespace Pantheon.Views;
 /// </summary>
 public partial class PantheonPage : IProject
 {
-    public PantheonVM? VM { get; set; }
-    public Helios Helios { get; set; }
-    public Charon Charon { get; set; }
+    public PantheonVM VM { get; set; }
 
-    public PantheonPage(Helios helios,Charon charon)
+    public PantheonPage(Helios helios,Charon charon, ProgressBarVM progressBar)
     {
-        Helios = helios;
-        Charon = charon;
         InitializeComponent();
-    }
-
-    private async void PantheonPage_OnInitialized(object? sender, EventArgs e)
-    {
-        VM = await PantheonVM.CreateAsync(Helios, Charon);
+        VM = new PantheonVM(helios, charon, progressBar);
         DataContext = VM;
     }
-
+    
     public EProject Project => EProject.Pantheon;
 
     public static bool RequiresUser => true;
 
     public async Task RefreshDataAsync()
     {
-        await new Task(() => {});
+        await VM.RefreshPage();
     }
 
     private void Frame_OnNavigating(object sender, NavigatingCancelEventArgs e)

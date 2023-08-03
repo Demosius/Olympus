@@ -177,13 +177,18 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         return ret.InitializeAsync();
     }
 
+    public static RosterPageVM CreateEmpty(Helios helios, Charon charon) => new(helios, charon);
+
     private void SetRosters()
     {
         Rosters.Clear();
 
         if (SelectedDepartment is null) return;
 
-        Rosters = new ObservableCollection<DepartmentRoster>(SelectedDepartment.DepartmentRosters.OrderBy(r => r.StartDate));
+        var rosters = SelectedDepartment.DepartmentRosters.OrderBy(r => r.StartDate);
+
+        foreach (var roster in rosters)
+            Rosters.Add(roster);
 
         SelectedRoster = Rosters.FirstOrDefault(r =>
             Math.Abs(DateTime.Now.Date.Subtract(r.StartDate).TotalDays -
@@ -226,7 +231,7 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
 
         SelectedDepartment = Departments.FirstOrDefault(d => d.Name == Charon.Employee?.DepartmentName);
         
-        Rosters.Clear();
+        SetRosters();
         
         minDate = DateTime.Today.AddDays(DayOfWeek.Sunday - DateTime.Today.DayOfWeek + 1);   // Default to Monday of the current week. (Sunday will get the next monday)
         maxDate = minDate.AddDays(4);   // Default to the next friday.

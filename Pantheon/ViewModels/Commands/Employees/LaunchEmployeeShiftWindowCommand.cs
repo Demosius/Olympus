@@ -15,8 +15,7 @@ public class LaunchEmployeeShiftWindowCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.Charon.CanUpdateEmployee(VM.Employee) ||
-               VM.Department is not null && VM.Charon.CanUpdateShift(VM.Department);
+        return VM.CanUpdate || VM.CanUpdateShift;
     }
 
     public void Execute(object? parameter)

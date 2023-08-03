@@ -196,5 +196,30 @@ public class StaffDeleter
     public async Task<int> DepartmentAsync(Department department) => await Task.Run(() => Chariot.Delete(department)).ConfigureAwait(false);
 
     public async Task<int> ClanAsync(Clan clan) => await Task.Run(() => Chariot.Delete(clan)).ConfigureAwait(false);
-    
+
+    public async Task<int> TagUseAsync(TagUse tagUse)
+    {
+        var lines = 0;
+
+        void Action()
+        {
+            // if usage is a current assignment.
+            if (tagUse.EndDate is not null)
+            {
+                // Change tag and user both to have no current assignment.
+                lines += Chariot.Execute(
+                    "Update Employee SET TempTagRF_ID = '' WHERE TempTagRF_ID = ? AND ID = ?;",
+                    tagUse.TempTagRF_ID, tagUse.EmployeeID);
+                lines += Chariot.Execute("UPDATE TempTag SET EmployeeID = 0 WHERE EmployeeID = ? AND RF_ID = ?;",
+                    tagUse.EmployeeID, tagUse.TempTagRF_ID);
+            }
+
+            lines += Chariot.Delete(tagUse);
+        }
+
+        await Task.Run(() => Chariot.RunInTransaction(Action)).ConfigureAwait(false);
+
+        return lines;
+    }
+
 }

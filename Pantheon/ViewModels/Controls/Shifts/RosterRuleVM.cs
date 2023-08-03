@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
@@ -231,10 +232,10 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
         Shifts = new ObservableCollection<Shift>();
     }
 
-    public RosterRuleVM(Employee employee)
+    public RosterRuleVM(Employee employee, List<Shift> shifts)
     {
         RosterRule = new ShiftRuleRoster(employee);
-        Shifts = new ObservableCollection<Shift>(employee.Shifts);
+        Shifts = new ObservableCollection<Shift>(shifts);
     }
 
     public RosterRuleVM(Employee employee, ShiftRuleRoster sampleRosterRule)
@@ -249,7 +250,7 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
         InEdit = true;
         Original = rosterRule;
         RosterRule = rosterRule.Copy();
-        Shifts = new ObservableCollection<Shift>(RosterRule.Employee!.Shifts);
+        Shifts = new ObservableCollection<Shift>(RosterRule.Employee!.Shifts); 
     }
 
     public void CheckMinMax()

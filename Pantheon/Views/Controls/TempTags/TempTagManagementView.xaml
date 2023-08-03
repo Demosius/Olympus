@@ -32,25 +32,26 @@
         <Border DockPanel.Dock="Bottom"
                 BorderBrush="{StaticResource ForegroundBrush}"
                 BorderThickness=".5">
-        <Grid >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="Unassign"
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="Unassign"
                     Margin="5" Width="100"
                     Command="{Binding UnassignTempTagCommand}"/>
-            <Button Grid.Column="2" Content="Create New"
+                <Button Grid.Column="2" Content="Create New"
                     Margin="5" Width="100"
                     Command="{Binding CreateCommand}"/>
-            <Button Grid.Column="3" Content="Delete"
+                <Button Grid.Column="3" Content="Delete"
                     Margin="5" Width="100"
                     Command="{Binding DeleteCommand}"/>
-        </Grid>
-</Border>
+            </Grid>
+        </Border>
+
         <!-- Tags -->
         <ListView DockPanel.Dock="Left" Grid.Row="0"
                       ItemsSource="{Binding TempTags}"
@@ -64,18 +65,37 @@
         </ListView>
 
         <!-- History -->
-        <ListView DockPanel.Dock="Right"
-                  ItemsSource="{Binding TagUse}"
-                  SelectedValue="{Binding SelectedUse}"
-                  d:ItemsSource="{d:SampleData ItemCount=5}">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <tempTags:TagUseView DataContext="{Binding}"/>
-                </DataTemplate>
-            </ListView.ItemTemplate>
+        <DockPanel DockPanel.Dock="Right">
+            <Grid DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Button Margin="5" Padding="5,3"
+                            MinHeight="0"
+                            FontSize="12"
+                            Content="Delete Use"
+                            Command="{Binding DeleteTagUseCommand}"/>
+                </StackPanel>
+            </Grid>
+            <ListView ItemsSource="{Binding TagUse}"
+                      SelectedValue="{Binding SelectedUse}"
+                      d:ItemsSource="{d:SampleData ItemCount=5}">
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Delete"
+                                      Command="{Binding DeleteTagUseCommand}"/>
+                    </ContextMenu>
+                </ListView.ContextMenu>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <tempTags:TagUseView DataContext="{Binding}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
 
-        </ListView>
-
+            </ListView>
+        </DockPanel>
 
     </DockPanel>
 </UserControl>

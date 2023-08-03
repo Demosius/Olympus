@@ -101,6 +101,8 @@ public class ShiftPageVM : INotifyPropertyChanged, IDBInteraction, IShiftManager
         return ret.InitializeAsync();
     }
 
+    public static ShiftPageVM CreateEmpty(Helios helios, Charon charon) => new(helios, charon);
+
     public async Task RefreshDataAsync()
     {
         Departments.Clear();

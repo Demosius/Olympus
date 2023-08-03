@@ -12,7 +12,7 @@ public class DeleteShiftRuleCommand : ICommand
 
     public bool CanExecute(object? parameter)
     {
-        return VM.SelectedRule is not null && VM.Charon.CanUpdateEmployee(VM.EmployeeVM.Employee);
+        return VM.SelectedRule is not null && VM.CanUpdateEmployee;
     }
 
     public void Execute(object? parameter)

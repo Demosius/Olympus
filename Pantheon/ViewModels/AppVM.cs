@@ -2,14 +2,16 @@
 using Styx;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Morpheus.ViewModels.Controls;
 using Uranus;
 
 namespace Pantheon.ViewModels;
 
-internal class AppVM : INotifyPropertyChanged
+public class AppVM : INotifyPropertyChanged
 {
-    public Charon? Charon { get; set; }
-    public Helios? Helios { get; set; }
+    public Charon Charon { get; set; }
+    public Helios Helios { get; set; }
+    public ProgressBarVM ProgressBar { get; set; }
 
     private PantheonPage? pantheonPage;
     public PantheonPage? PantheonPage
@@ -24,14 +26,11 @@ internal class AppVM : INotifyPropertyChanged
 
     public AppVM()
     {
-        PantheonPage = null;
-    }
+        Helios = App.Helios;
+        Charon = App.Charon;
+        ProgressBar = App.ProgressBar;
 
-    public void SetDataSources(Helios helios, Charon charon)
-    {
-        Helios = helios;
-        Charon = charon;
-        PantheonPage = new PantheonPage(helios, charon);
+        PantheonPage = new PantheonPage(Helios, Charon, ProgressBar);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

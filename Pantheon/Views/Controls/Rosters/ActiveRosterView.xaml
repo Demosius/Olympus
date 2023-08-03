@@ -111,7 +111,7 @@
                       HorizontalContentAlignment="Center"
                       VerticalContentAlignment="Center"
                       Style="{StaticResource MiniComboBoxStyle}"
-                      ItemsSource="{Binding DepartmentRosterVM.Shifts, Mode=OneTime}"
+                      ItemsSource="{Binding EmployeeRosterVM.Shifts, Mode=OneTime}"
                       SelectedValue="{Binding SelectedShift, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             <!-- Shift Type Selector (Normal/AL/RDO/etc.) SUPPOSED TO BE MINI -->
