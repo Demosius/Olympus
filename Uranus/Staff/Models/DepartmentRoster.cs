@@ -153,7 +153,7 @@ public class DepartmentRoster
 
         RosterDict = Rosters.ToDictionary(r => (r.EmployeeID, r.Date), r => r);
 
-        IsLoaded = true;
+        IsLoaded = false;
     }
 
     public void SetData(IEnumerable<Employee> employees, IEnumerable<Roster> rosters, IEnumerable<DailyRoster> dailyRosters, IEnumerable<EmployeeRoster> employeeRosters,

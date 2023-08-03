@@ -210,7 +210,7 @@ public class RosterPageVM : INotifyPropertyChanged, IDBInteraction
         Rosters.Add(newRoster);
         SelectedRoster = newRoster;
 
-        await LoadRoster();
+        await LoadRoster(); 
     }
 
     public async Task RefreshDataAsync()
