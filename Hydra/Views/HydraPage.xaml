@@ -37,7 +37,7 @@
                           Content="Item Level Targets"
                           Checked="LevelsToggle_OnChecked"/>
         </StackPanel>
-        <Grid Background="DarkGreen">
+        <Grid Background="#003300">
             <controls:ZoneHandlerView DataContext="{Binding ZoneHandlerVM}" 
                                       Visibility="{Binding ElementName=ZoneToggle, Path=IsChecked, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             <controls:SiteManagerView DataContext="{Binding SiteManagerVM}" 

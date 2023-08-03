@@ -9,5 +9,30 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="VulcanPage">
 
-    <Grid Background="RosyBrown" />
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Morpheus;component/Themes/Dark/Orange/MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Grid Background="#330000">
+        <TextBlock VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap">
+            <Run Foreground="{StaticResource Brush02}"
+                 FontSize="14" FontWeight="Bold"
+            >VULCAN Not Completed</Run>    
+            <LineBreak></LineBreak>
+            <Run Foreground="{StaticResource Brush03}">This was to be a replacement for RefOrge.</Run>
+            <LineBreak/>
+            <LineBreak/>
+            <Run Foreground="{StaticResource Brush03}">The intention was to improve and add functionality, improve usability, and add synergies with other projects - particularly Khaos and Phoenix.</Run>
+            <Run Foreground="{StaticResource Brush03}">It would also prove to be a valuable opportunity to improve the code base, making it easier to build upon and improve over time.</Run>
+            <LineBreak/>
+            <Run Foreground="{StaticResource Brush03}">One of the main goals was to achieve a more flexible setting for the Replen team and make it easier to pivot when required. This could be achieved by reading from live data that can be adjusted instead of committing to an order of work in the morning.</Run>
+        </TextBlock>
+    </Grid>
 </Page>

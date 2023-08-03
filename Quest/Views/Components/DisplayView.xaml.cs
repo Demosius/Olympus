@@ -1,21 +1,22 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Morpheus.ViewModels.Interfaces;
 
 namespace Quest.Views.Components
 {
     /// <summary>
-    /// Interaction logic for MappingView.xaml
+    /// Interaction logic for DisplayView.xaml
     /// </summary>
-    public partial class MappingView : IRefreshingControl
+    public partial class DisplayView : IRefreshingControl
     {
-        public MappingView()
+        public DisplayView()
         {
             InitializeComponent();
         }
 
         public Task RefreshDataAsync()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

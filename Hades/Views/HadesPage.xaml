@@ -16,7 +16,16 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <Grid Background="DarkRed">
-        
+    <Grid Background="#330000">
+        <TextBlock VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap">
+            <Run Foreground="{StaticResource Brush01}"
+                 FontSize="14" FontWeight="Bold"
+            >HADES Not Completed</Run>    
+            <LineBreak></LineBreak>
+            <Run Foreground="{StaticResource Brush03}">Hades was to be a NON-inventory management system - used to keep track of cartons and other non-inventory stock around the warehouse.</Run>
+        </TextBlock>
     </Grid>
 </Page>

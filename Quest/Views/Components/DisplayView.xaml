@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Quest.Views.Components.MappingView"
+﻿<UserControl x:Class="Quest.Views.Components.DisplayView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -24,11 +24,8 @@
                  FontSize="14" FontWeight="Bold"
             >Page Not Completed</Run>    
             <LineBreak></LineBreak>
-            <Run Foreground="{StaticResource Brush05}">This page would be for running the equivalent of ZLAM.</Run>
-            <LineBreak/>
-            <LineBreak/>
-            <Run Foreground="{StaticResource Brush05}">The benefit of this would be improved usability and functionality (compared to ZLAM), and more stable code base, and synergy with data already gathered in Olympus from Argos and Deimos.</Run>
-
+            <Run Foreground="{StaticResource Brush05}">This page would be for displaying the data relevent to the day's picking (akin to that from PickRate Tracker and ZLAM).</Run>
+            
         </TextBlock>
     </Grid>
 </UserControl>

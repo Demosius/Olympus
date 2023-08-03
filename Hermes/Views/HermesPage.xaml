@@ -18,25 +18,18 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <DockPanel>
-        <TabControl Background="{StaticResource Brush05}">
-            <TabItem Header="Auto Counter">
-                <controls:AutoCounterView DataContext="{Binding AutoCounter}"/>
-            </TabItem>
-            <!--<TabItem Header="Notifications">
-                <UserControl Content="{Binding NotificationsView}"/>
-            </TabItem>
-            <TabItem Header="FAQ">
-                <UserControl Content="{Binding FAQView}"/>
-            </TabItem>
-            <TabItem Header="Reporting">
-                <UserControl Content="{Binding ReportingView}"/>
-            </TabItem>
-            <TabItem Header="Messaging"
-                     IsEnabled="{Binding CanMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                <UserControl Content="{Binding MessagingView}"/>
-            </TabItem>-->
-        </TabControl>
-
-    </DockPanel>
+    <Grid Background="#003333">
+        <TextBlock VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap">
+            <Run Foreground="{StaticResource Brush01}"
+                 FontSize="14" FontWeight="Bold"
+            >Hermes Not Completed</Run>    
+            <LineBreak></LineBreak>
+            <Run Foreground="{StaticResource Brush03}">This was to be a messaging system handling Dev-requests and bug-alerts and functioning as a tool for communicating details of updates to Olympus.</Run>
+            <LineBreak/>
+            <Run Foreground="{StaticResource Brush03}">There was also an intended secondary functionality of allowing messages between users - useful, for example, to send requests managers regarding employee transfers, etc.</Run>
+        </TextBlock>
+    </Grid>
 </Page>

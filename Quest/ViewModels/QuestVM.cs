@@ -124,8 +124,8 @@ public class QuestVM : INotifyPropertyChanged, IDBInteraction, IPickEvents
             newControl = questPage switch
             {
                 EQuestPage.PickRateTracker => new PickRateTrackerView(Helios, ProgressBar),
-                EQuestPage.Mapping => new PickRateTrackerView(Helios, ProgressBar),
-                EQuestPage.Display => new PickRateTrackerView(Helios, ProgressBar),
+                EQuestPage.Mapping => new MappingView(),
+                EQuestPage.Display => new DisplayView(),
                 _ => throw new ArgumentOutOfRangeException()
             };
 

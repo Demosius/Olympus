@@ -3,19 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             d:DataContext="{d:DesignInstance {x:Type components:ProjectButtonVM}, IsDesignTimeCreatable=False}"
              xmlns:components="clr-namespace:Olympus.ViewModels.Components"
              mc:Ignorable="d" >
-
-    <UserControl.DataContext>
-        <components:ProjectButtonVM/>
-    </UserControl.DataContext>
 
     <Button Style="{DynamicResource ProjectBtnStyle}" 
             ToolTip="{Binding Project.ToolTip}"
             Command="{Binding LaunchProjectCommand}"
             CommandParameter="{Binding Project.Name}">
         <StackPanel>
-            <Image Source="{Binding Project.Icon.FullPath}" />
+            <Image Source="{Binding Project.Icon.FullPath, FallbackValue='../../Resources/Images/olympus.png'}" />
             <Label Content="{Binding Project.Name}" />
         </StackPanel>
     </Button>
