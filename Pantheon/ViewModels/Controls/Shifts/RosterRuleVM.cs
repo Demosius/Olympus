@@ -238,19 +238,19 @@ public class RosterRuleVM : INotifyPropertyChanged, IShiftRuleVM
         Shifts = new ObservableCollection<Shift>(shifts);
     }
 
-    public RosterRuleVM(Employee employee, ShiftRuleRoster sampleRosterRule)
+    public RosterRuleVM(Employee employee, ShiftRuleRoster sampleRosterRule, List<Shift> shifts)
     {
         RosterRule = new ShiftRuleRoster(employee, sampleRosterRule);
         SampleRosterRule = sampleRosterRule;
-        Shifts = new ObservableCollection<Shift>(employee.Shifts);
+        Shifts = new ObservableCollection<Shift>(shifts);
     }
 
-    public RosterRuleVM(ShiftRuleRoster rosterRule)
+    public RosterRuleVM(ShiftRuleRoster rosterRule, List<Shift> shifts)
     {
         InEdit = true;
         Original = rosterRule;
         RosterRule = rosterRule.Copy();
-        Shifts = new ObservableCollection<Shift>(RosterRule.Employee!.Shifts); 
+        Shifts = new ObservableCollection<Shift>(shifts);
     }
 
     public void CheckMinMax()

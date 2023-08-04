@@ -9,6 +9,7 @@ public class EmployeeStatisticsReport
 {
     public Employee? Employee { get; set; }
     public string EmployeeName => Employee?.FullName ?? string.Empty;
+    public string EmployeeDisplayName => Employee?.DisplayName ?? string.Empty;
     public string DisplayName => Employee?.FullName ?? RFID;
     public string RFID { get; set; }
     public ETechType TechType { get; set; }

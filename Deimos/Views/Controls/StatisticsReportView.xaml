@@ -81,8 +81,11 @@
                   CanUserReorderColumns="True">
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Name"
+                <DataGridTextColumn Header="Full Name"
                                     Binding="{Binding EmployeeName}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Name"
+                                    Binding="{Binding EmployeeDisplayName}"
                                     IsReadOnly="True"/>
                 <DataGridTextColumn Header="User ID"
                                     Binding="{Binding RFID}"

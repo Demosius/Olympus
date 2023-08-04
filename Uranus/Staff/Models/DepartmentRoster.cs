@@ -594,7 +594,7 @@ public class DepartmentRoster
         var row = table.NewRow();
         for (var i = 0; i < 7; i++)
         {
-            row[i] = StartDate.AddDays(i).ToString("dddd").ToUpper();
+            row[i+1] = StartDate.AddDays(i).ToString("dddd").ToUpper();
         }
 
         table.Rows.Add(row);
@@ -604,7 +604,7 @@ public class DepartmentRoster
         {
             row = table.NewRow();
             var c = 0;
-            row[c] = employeeRoster.Employee?.FullName ?? "";
+            row[c] = employeeRoster.Employee?.DisplayName ?? "";
 
             for (var d = 0; d < 7; d++)
             {

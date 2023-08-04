@@ -133,7 +133,7 @@ public class EmployeeShiftVM : INotifyPropertyChanged
             {
                 RosterRule ??= RosterRules.Count == 0
                     ? new RosterRuleVM(EmployeeVM.Employee, shifts.ToList())
-                    : new RosterRuleVM(EmployeeVM.Employee, RosterRules.First());
+                    : new RosterRuleVM(EmployeeVM.Employee, RosterRules.First(), shifts.ToList());
 
                 SingleCheck = false;
                 RecurringCheck = false;
@@ -347,7 +347,7 @@ public class EmployeeShiftVM : INotifyPropertyChanged
 
         RosterRules.Add(shiftRule);
         EmployeeVM.RosterRules.Add(shiftRule);
-        RosterRule = new RosterRuleVM(EmployeeVM.Employee, RosterRules.First());
+        RosterRule = new RosterRuleVM(EmployeeVM.Employee, RosterRules.First(), shifts.ToList());
     }
 
     public void AddRule()
@@ -384,7 +384,7 @@ public class EmployeeShiftVM : INotifyPropertyChanged
 
         RosterRules.Add(RosterRule.Original);
         EmployeeVM.RosterRules.Add(RosterRule.Original);
-        RosterRule = new RosterRuleVM(EmployeeVM.Employee, RosterRule.Original);
+        RosterRule = new RosterRuleVM(EmployeeVM.Employee, RosterRule.Original, shifts.ToList());
     }
 
     public void CancelRuleEdit()
@@ -419,7 +419,7 @@ public class EmployeeShiftVM : INotifyPropertyChanged
                 break;
             case ShiftRuleRoster roster:
                 CancelRosterRuleEdit();
-                RosterRule = new RosterRuleVM(roster);
+                RosterRule = new RosterRuleVM(roster, shifts.ToList());
                 RosterRules.Remove(roster);
                 EmployeeVM.RosterRules.Remove(roster);
                 RosterCheck = true;

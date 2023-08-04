@@ -90,8 +90,11 @@
                 <DataGridTextColumn Header="Clan"
                                     Binding="{Binding Clan}"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Header="Name"
+                <DataGridTextColumn Header="Full Name"
                                     Binding="{Binding EmployeeName}"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Header="Name"
+                                    Binding="{Binding EmployeeDisplayName}"
                                     IsReadOnly="True"/>
                 <DataGridTextColumn Header="User ID"
                                     Binding="{Binding RFID}"
